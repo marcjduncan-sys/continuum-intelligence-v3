@@ -1496,6 +1496,189 @@ a:hover { color: var(--accent-sage); }
     .coverage-table thead th { padding: 6px 8px; }
     .coverage-table tbody td { padding: 8px; }
 }
+
+/* ============================================================
+   SNAPSHOT — Design System (adapted for site integration)
+   ============================================================ */
+
+/* --- Snapshot Grid (listing page) --- */
+.snapshot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--space-md); }
+.snapshot-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
+    padding: var(--space-lg); cursor: pointer; transition: border-color 0.2s, transform 0.15s;
+}
+.snapshot-card:hover { border-color: var(--accent-teal); transform: translateY(-2px); }
+.snapshot-card .sc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-sm); }
+.snapshot-card .sc-ticker { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; }
+.snapshot-card .sc-company { font-size: 0.78rem; color: var(--text-secondary); margin-bottom: var(--space-xs); }
+.snapshot-card .sc-sector { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-teal); background: rgba(26,158,143,0.15); padding: 3px 8px; border-radius: 3px; display: inline-block; margin-bottom: var(--space-sm); }
+.snapshot-card .sc-price { font-family: var(--font-data); font-size: 1.2rem; font-weight: 700; }
+.snapshot-card .sc-price-currency { font-size: 0.75rem; color: var(--text-muted); }
+.snapshot-card .sc-meta { display: flex; gap: var(--space-md); margin-top: var(--space-sm); flex-wrap: wrap; }
+.snapshot-card .sc-meta-item { font-size: 0.68rem; color: var(--text-muted); }
+.snapshot-card .sc-meta-value { font-family: var(--font-data); font-weight: 600; color: var(--text-secondary); }
+.snapshot-card .sc-skew { margin-top: var(--space-md); padding-top: var(--space-sm); border-top: 1px solid var(--border); display: flex; align-items: center; gap: var(--space-sm); }
+.snapshot-card .sc-skew-rationale { font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* --- Snapshot Report Page --- */
+.snap-page { max-width: 1240px; margin: 0 auto; padding: var(--space-md); }
+.snap-back { font-size: 0.78rem; color: var(--accent-teal); cursor: pointer; display: inline-block; margin-bottom: var(--space-md); }
+.snap-back:hover { color: var(--text-primary); }
+
+.snap-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+.snap-header-left { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.snap-ticker { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
+.snap-company-name { font-size: 0.85rem; color: var(--text-secondary); }
+.snap-sector-tag { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-teal); background: rgba(26,158,143,0.15); padding: 3px 8px; border-radius: 3px; }
+.snap-header-right { display: flex; align-items: center; gap: 20px; }
+.snap-logo-mark { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+.snap-logo-mark span { color: var(--accent-teal); }
+.snap-report-date { font-family: var(--font-data); font-size: 0.65rem; color: var(--text-muted); }
+
+.snap-price-bar { display: flex; align-items: baseline; gap: 24px; padding: 8px 0 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; flex-wrap: wrap; }
+.snap-price-main { font-family: var(--font-data); font-size: 1.8rem; font-weight: 700; }
+.snap-price-currency { font-size: 0.8rem; color: var(--text-muted); font-weight: 400; }
+.snap-price-meta { display: flex; gap: 20px; flex-wrap: wrap; }
+.snap-pm-item { display: flex; flex-direction: column; gap: 1px; }
+.snap-pm-label { font-size: 0.55rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+.snap-pm-value { font-family: var(--font-data); font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); }
+.snap-pm-value.premium { color: var(--accent-gold); }
+.snap-pm-value.negative { color: var(--signal-red); }
+.snap-pm-value.positive { color: var(--signal-green); }
+
+.snap-risk-skew-bar { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); margin-bottom: 10px; flex-wrap: wrap; }
+.snap-risk-skew-label { font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+.snap-risk-skew-badge { font-family: var(--font-data); font-size: 0.85rem; font-weight: 800; letter-spacing: 0.04em; padding: 4px 14px; border-radius: 3px; }
+.snap-risk-skew-badge.downside { background: rgba(212,85,85,0.12); color: var(--signal-red); border: 1px solid rgba(212,85,85,0.3); }
+.snap-risk-skew-badge.upside { background: rgba(61,170,109,0.12); color: var(--signal-green); border: 1px solid rgba(61,170,109,0.3); }
+.snap-risk-skew-badge.balanced { background: rgba(212,160,60,0.12); color: var(--signal-amber); border: 1px solid rgba(212,160,60,0.3); }
+.snap-risk-skew-rationale { font-size: 0.65rem; color: var(--text-secondary); line-height: 1.4; flex: 1; min-width: 200px; }
+
+.snap-main-grid { display: grid; grid-template-columns: 280px 1fr 280px; gap: 10px; }
+.snap-col { display: flex; flex-direction: column; gap: 8px; }
+.snap-section-label { font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-teal); margin-bottom: 4px; }
+
+/* Narrative box */
+.snap-narrative-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 10px; }
+.snap-narrative-text { font-size: 0.75rem; line-height: 1.55; color: var(--text-secondary); }
+.snap-narrative-text strong { color: var(--text-primary); font-weight: 600; }
+.snap-narrative-verdict { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.7rem; font-weight: 600; color: var(--signal-amber); line-height: 1.5; }
+
+/* Hypothesis cards */
+.snap-hyp-stack { display: flex; flex-direction: column; gap: 4px; }
+.snap-hyp-card { background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--border); border-radius: 4px; padding: 8px 10px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.snap-hyp-card.h1 { border-left-color: var(--signal-amber); }
+.snap-hyp-card.h2 { border-left-color: var(--signal-green); }
+.snap-hyp-card.h3 { border-left-color: var(--signal-red); }
+.snap-hyp-card.h4 { border-left-color: var(--signal-amber); }
+.snap-hyp-info { flex: 1; }
+.snap-hyp-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+.snap-hyp-desc { font-size: 0.6rem; color: var(--text-muted); line-height: 1.35; }
+.snap-hyp-score-container { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 42px; }
+.snap-hyp-score { font-family: var(--font-data); font-size: 1rem; font-weight: 700; }
+.snap-hyp-score.high { color: var(--signal-red); }
+.snap-hyp-score.medium { color: var(--signal-amber); }
+.snap-hyp-score.low { color: var(--text-muted); }
+.snap-hyp-score.priced { color: var(--signal-green); }
+.snap-hyp-direction { font-size: 0.55rem; font-weight: 600; }
+.snap-hyp-direction.up { color: var(--signal-red); }
+.snap-hyp-direction.down { color: var(--signal-green); }
+.snap-hyp-direction.flat { color: var(--text-muted); }
+.snap-hyp-status-tag { font-size: 0.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 1px 5px; border-radius: 2px; }
+.snap-tag-priced { background: rgba(61,170,109,0.15); color: var(--signal-green); }
+.snap-tag-accumulating { background: rgba(212,85,85,0.12); color: var(--signal-red); }
+.snap-tag-tail { background: rgba(212,160,60,0.12); color: var(--signal-amber); }
+.snap-tag-minimal { background: rgba(86,104,130,0.2); color: var(--text-muted); }
+
+/* Survival bar */
+.snap-survival-bar-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; }
+.snap-survival-bar-label { font-size: 0.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px; }
+.snap-survival-bar { display: flex; height: 20px; border-radius: 3px; overflow: hidden; gap: 2px; }
+.snap-sb-segment { display: flex; align-items: center; justify-content: center; font-family: var(--font-data); font-size: 0.55rem; font-weight: 700; color: rgba(255,255,255,0.9); }
+.snap-sb-h1 { background: var(--signal-green); }
+.snap-sb-h2 { background: var(--signal-amber); }
+.snap-sb-h3 { background: var(--signal-red); }
+.snap-sb-h4 { background: var(--signal-amber); }
+.snap-survival-legend { display: flex; justify-content: space-between; margin-top: 4px; flex-wrap: wrap; gap: 2px; }
+.snap-sl-item { display: flex; align-items: center; gap: 4px; font-size: 0.48rem; color: var(--text-muted); }
+.snap-sl-dot { width: 6px; height: 6px; border-radius: 1px; }
+
+/* Evidence matrix */
+.snap-evidence-matrix { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.snap-ev-matrix-header { display: grid; grid-template-columns: 120px repeat(4, 1fr); background: var(--bg-surface); border-bottom: 1px solid var(--border); }
+.snap-ev-matrix-header .snap-ev-cell { font-size: 0.48rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); padding: 5px; text-align: center; }
+.snap-ev-matrix-header .snap-ev-cell:first-child { text-align: left; }
+.snap-ev-matrix-row { display: grid; grid-template-columns: 120px repeat(4, 1fr); border-bottom: 1px solid var(--border); }
+.snap-ev-matrix-row:last-child { border-bottom: none; }
+.snap-ev-cell { padding: 4px 5px; font-size: 0.6rem; display: flex; align-items: center; }
+.snap-ev-domain { font-weight: 600; color: var(--text-secondary); gap: 4px; }
+.snap-ev-epistemic { font-size: 0.42rem; font-weight: 500; color: var(--text-muted); font-style: italic; }
+.snap-ev-signal { justify-content: center; font-size: 0.8rem; }
+.snap-signal-strong-support { color: var(--signal-green); }
+.snap-signal-support { color: rgba(61,170,109,0.55); }
+.snap-signal-contradict { color: var(--signal-red); }
+.snap-signal-neutral { color: var(--text-muted); }
+
+/* Discriminating evidence */
+.snap-discrim-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 10px; flex: 1; }
+.snap-discrim-item { display: flex; gap: 8px; align-items: flex-start; padding: 4px 0; border-bottom: 1px solid var(--border); }
+.snap-discrim-item:last-child { border-bottom: none; }
+.snap-discrim-tag { font-family: var(--font-data); font-size: 0.5rem; font-weight: 700; padding: 2px 5px; border-radius: 2px; white-space: nowrap; margin-top: 1px; }
+.snap-discrim-tag.high { background: rgba(212,85,85,0.12); color: var(--signal-red); }
+.snap-discrim-tag.medium { background: rgba(212,160,60,0.12); color: var(--signal-amber); }
+.snap-discrim-text { font-size: 0.6rem; color: var(--text-secondary); line-height: 1.4; }
+.snap-discrim-text strong { color: var(--text-primary); font-weight: 600; }
+.snap-non-discrim { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
+.snap-non-discrim-label { font-size: 0.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 3px; }
+.snap-non-discrim-items { display: flex; flex-wrap: wrap; gap: 4px; }
+.snap-nd-chip { font-size: 0.5rem; color: var(--text-muted); background: var(--bg-surface); padding: 2px 6px; border-radius: 2px; text-decoration: line-through; text-decoration-color: rgba(86,104,130,0.4); }
+
+/* Tripwires */
+.snap-tripwire-list { display: flex; flex-direction: column; gap: 4px; }
+.snap-tripwire-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; }
+.snap-tw-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.snap-tw-date { font-family: var(--font-data); font-size: 0.6rem; font-weight: 600; color: var(--accent-gold); }
+.snap-tw-test-name { font-size: 0.53rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.snap-tw-conditions { display: flex; flex-direction: column; gap: 3px; }
+.snap-tw-if { font-size: 0.58rem; color: var(--text-secondary); line-height: 1.35; display: flex; gap: 4px; }
+.snap-tw-if-icon { font-family: var(--font-data); font-weight: 700; flex-shrink: 0; width: 10px; }
+.snap-tw-if-icon.up { color: var(--signal-green); }
+.snap-tw-if-icon.down { color: var(--signal-red); }
+
+/* Gaps & Coverage */
+.snap-gaps-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 10px; }
+.snap-gap-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--border); }
+.snap-gap-row:last-child { border-bottom: none; }
+.snap-gap-domain { font-size: 0.58rem; font-weight: 500; color: var(--text-secondary); }
+.snap-gap-status { font-size: 0.5rem; font-weight: 600; padding: 1px 5px; border-radius: 2px; }
+.snap-gap-full { background: rgba(61,170,109,0.12); color: var(--signal-green); }
+.snap-gap-partial { background: rgba(212,160,60,0.12); color: var(--signal-amber); }
+.snap-gap-limited { background: rgba(86,104,130,0.2); color: var(--text-muted); }
+
+/* Unanswered questions */
+.snap-questions-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 10px; }
+.snap-question-item { font-size: 0.58rem; color: var(--text-secondary); line-height: 1.4; padding: 3px 0 3px 10px; position: relative; }
+.snap-question-item::before { content: '?'; position: absolute; left: 0; font-family: var(--font-data); font-weight: 700; color: var(--accent-teal); font-size: 0.58rem; }
+
+/* Snapshot footer */
+.snap-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 6px; border-top: 1px solid var(--border); margin-top: 10px; flex-wrap: wrap; gap: 8px; }
+.snap-footer-left { font-size: 0.48rem; color: var(--text-muted); font-style: italic; max-width: 60%; line-height: 1.4; }
+.snap-footer-right { display: flex; gap: 16px; }
+.snap-footer-meta { font-family: var(--font-data); font-size: 0.48rem; color: var(--text-muted); }
+
+/* Link to full report */
+.snap-view-full { display: inline-block; margin-top: var(--space-sm); font-size: 0.65rem; font-weight: 600; color: var(--accent-teal); cursor: pointer; }
+.snap-view-full:hover { color: var(--text-primary); }
+
+/* Responsive adjustments */
+@media (max-width: 1280px) {
+    .snap-main-grid { grid-template-columns: 260px 1fr 260px; }
+}
+@media (max-width: 960px) {
+    .snap-main-grid { grid-template-columns: 1fr; }
+    .snap-page { padding: var(--space-sm); }
+    .snap-price-bar { gap: 12px; }
+}
     </style>
 </head>
 <body>
@@ -1510,6 +1693,7 @@ a:hover { color: var(--accent-sage); }
         </a>
         <div class="nav-links">
             <a href="#home" class="active" data-nav="home">Research</a>
+            <a href="#snapshots" data-nav="snapshots">Snapshots</a>
             <a href="#portfolio" data-nav="portfolio">Portfolio</a>
             <a href="#about" data-nav="about">About</a>
         </div>
@@ -1582,6 +1766,33 @@ a:hover { color: var(--accent-sage); }
         </div>
     </footer>
 </div>
+
+<!-- ============================================================
+     PAGE: SNAPSHOTS
+     ============================================================ -->
+<div class="page" id="page-snapshots">
+    <div class="page-inner">
+        <div class="hero" style="text-align:left; padding-bottom: var(--space-lg);">
+            <div class="hero-tagline">Investment Snapshots</div>
+            <div class="hero-title" style="font-size:1.6rem">One-page evidence summaries</div>
+            <p class="hero-subtitle" style="text-align:left; margin:0; max-width: none;">Each snapshot condenses a full Continuum research report into a single landscape view: hypotheses, evidence matrix, discriminating data, and tripwires at a glance.</p>
+        </div>
+
+        <div class="snapshot-grid" id="snapshot-grid"></div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-bottom">
+                <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the ACH methodology.</div>
+                <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- Snapshot Report Pages (dynamically rendered) -->
+<div class="page" id="page-snapshot-WOW"></div>
 
 <!-- ============================================================
      PAGE: PORTFOLIO
@@ -2832,6 +3043,343 @@ function renderReportPage(data) {
       renderHypSidebar(data) +
     '</div>' +
     renderReportFooter(data);
+}
+
+
+// ============================================================
+// SNAPSHOT DATA & RENDER FUNCTIONS
+// ============================================================
+
+const SNAPSHOT_DATA = {};
+
+SNAPSHOT_DATA.WOW = {
+  ticker: 'WOW',
+  tickerFull: 'WOW.AX',
+  company: 'Woolworths Group Limited',
+  sector: 'Consumer Staples',
+  sectorSub: 'Supermarkets',
+  price: 31.41,
+  currency: 'A$',
+  date: '10 FEB 2026',
+  version: 'v1.0',
+  reportId: 'WOW-2026-001',
+  priceMetrics: [
+    { label: 'Mkt Cap', value: 'A$38.3B', cls: '' },
+    { label: 'Fwd P/E', value: '23.5x', cls: 'premium' },
+    { label: 'EV/EBITDA', value: '10.5x', cls: '' },
+    { label: 'Div Yield', value: '2.9%', cls: '' },
+    { label: 'NPAT (FY25)', value: '&darr;19%', cls: 'negative' },
+    { label: 'EBIT Margin', value: '4.0% (&darr;70bp)', cls: 'negative' },
+    { label: 'Mkt Share', value: '38% (Duopoly 67%)', cls: '' },
+    { label: 'Next Event', value: 'H1 FY26 &mdash; 25 Feb', cls: '' }
+  ],
+  riskSkew: {
+    direction: 'downside',
+    badge: '&#9660; DOWNSIDE',
+    rationale: 'Evidence accumulating against the embedded narrative. 5 of 8 domains support erosion (H2); price above consensus target. No valuation cushion if H1 FY26 results disappoint on 25 Feb.'
+  },
+  narrative: {
+    text: 'The market is pricing a <strong>turnaround under new CEO Amanda Bardwell</strong>. 23.5x forward P/E assumes $400M cost-out program delivers, e-commerce scales (penetration now 16.2%), and Australian Food returns to <strong>mid-to-high single-digit EBIT growth</strong>. FY25 was "disappointing" &mdash; FY26 is framed as "transitional."',
+    verdict: 'Turnaround narrative is plausible but unproven. $95M industrial action cost was one-off, but structural headwinds &mdash; mandatory FGCC, ACCC court proceedings, margin pressure from price investment, Aldi expansion &mdash; are not cyclical. Market pricing recovery that management itself calls uncertain.'
+  },
+  survivalBar: [
+    { cls: 'snap-sb-h1', width: '33%', label: 'H1: 50%' },
+    { cls: 'snap-sb-h2', width: '23%', label: 'H2: 35%' },
+    { cls: 'snap-sb-h3', width: '20%', label: 'H3: 30%' },
+    { cls: 'snap-sb-h4', width: '17%', label: 'H4: 25%' }
+  ],
+  survivalLegend: [
+    { color: 'var(--signal-green)', label: 'Turnaround' },
+    { color: 'var(--signal-amber)', label: 'Structural Erosion' },
+    { color: 'var(--signal-red)', label: 'Regulatory Squeeze' },
+    { color: 'var(--signal-amber)', label: 'Competitive Disruption' }
+  ],
+  hypotheses: [
+    { cls: 'h1', label: 'H1: Managed Turnaround', statusTag: 'snap-tag-priced', statusText: 'Priced', desc: '$400M cost-out delivers. E-commerce scales. Australian Food EBIT grows mid-high single digits. Dividend recovers.', score: '50%', scoreCls: 'priced', direction: 'flat', dirLabel: '&rarr; Awaiting' },
+    { cls: 'h2', label: 'H2: Structural Margin Erosion', statusTag: 'snap-tag-accumulating', statusText: 'Evidence Building', desc: 'Price investment to defend share permanently compresses margins. Duopoly premium erodes. 4% EBIT margin becomes ceiling, not floor.', score: '35%', scoreCls: 'medium', direction: 'up', dirLabel: '&uarr; Rising' },
+    { cls: 'h3', label: 'H3: Regulatory Squeeze', statusTag: 'snap-tag-tail', statusText: 'Active', desc: 'Mandatory FGCC + ACCC court action + 20 inquiry recommendations compress supplier margins and impose compliance costs.', score: '30%', scoreCls: 'medium', direction: 'up', dirLabel: '&uarr; Rising' },
+    { cls: 'h4', label: 'H4: Competitive Disruption', statusTag: 'snap-tag-minimal', statusText: 'Slow Burn', desc: 'Aldi 10%+ share &amp; expanding. Amazon enters grocery. Online-only disruptors. Duopoly premium structurally threatened.', score: '25%', scoreCls: 'low', direction: 'flat', dirLabel: '&rarr; Steady' }
+  ],
+  evidenceMatrix: {
+    headers: ['Domain', 'H1 Turnaround', 'H2 Erosion', 'H3 Regulatory', 'H4 Disruption'],
+    rows: [
+      { domain: 'Corporate Comms', epistemic: 'Motivated', cells: [
+        { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }
+      ]},
+      { domain: 'Regulatory Filings', epistemic: 'Under oath', cells: [
+        { cls: 'snap-signal-contradict', text: '&#9660;' }, { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-strong-support', text: '&#9650;&#9650;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }
+      ]},
+      { domain: 'Broker Research', epistemic: 'Consensus', cells: [
+        { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-support', text: '&#9650;', style: 'opacity:0.5' }, { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }
+      ]},
+      { domain: 'Competitor Data', epistemic: 'Independent', cells: [
+        { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-strong-support', text: '&#9650;&#9650;' }
+      ]},
+      { domain: 'Economic Data', epistemic: 'Objective', cells: [
+        { cls: 'snap-signal-support', text: '&#9650;', style: 'opacity:0.5' }, { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }
+      ]},
+      { domain: 'Alternative Data', epistemic: 'Behavioural', cells: [
+        { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-support', text: '&#9650;' }
+      ]},
+      { domain: 'Academic Research', epistemic: 'Peer-reviewed', cells: [
+        { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-support', text: '&#9650;' }
+      ]},
+      { domain: 'Media &amp; Social', epistemic: 'Noise', cells: [
+        { cls: 'snap-signal-contradict', text: '&#9660;' }, { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-strong-support', text: '&#9650;&#9650;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }
+      ]}
+    ]
+  },
+  discriminators: [
+    { level: 'HIGH', cls: 'high', text: '<strong>H1 FY26 results (25 Feb):</strong> Australian Food EBIT growth rate is the single test. Consensus ~11.8% vs mgmt "mid-to-high single digits." A miss confirms H2 structural erosion thesis.' },
+    { level: 'HIGH', cls: 'high', text: '<strong>ACCC court proceedings outcome.</strong> Coles settled for $10.25M for similar conduct. Woolworths is fighting the case. Verdict sets precedent for penalties and remedies under mandatory FGCC.' },
+    { level: 'HIGH', cls: 'high', text: '<strong>$400M cost-out delivery rate.</strong> "On track" per management but unverified. H1 results will show first real evidence. If cost savings are consumed by price investment, H2 strengthens.' },
+    { level: 'MED', cls: 'medium', text: '<strong>Aldi store expansion cadence.</strong> 602 stores. No online. Targeting premium segments. If Aldi launches online grocery, H4 accelerates materially.' }
+  ],
+  nonDiscriminating: [
+    'Revenue +1.7% FY25', 'E-com +17% growth', 'NZ recovery +38%', 'Consensus Hold/Buy', 'Target A$30.45'
+  ],
+  tripwires: [
+    { date: '25 FEB 2026', name: 'H1 FY26 Results', conditions: [
+      { icon: '&#9650;', iconCls: 'up', text: 'AU Food EBIT growth &ge;8% &rarr; H1 strengthens' },
+      { icon: '&#9660;', iconCls: 'down', text: 'AU Food EBIT growth &lt;5% &rarr; H2 strengthens' }
+    ]},
+    { date: 'H1 2026', name: 'ACCC v Woolworths', conditions: [
+      { icon: '&#9650;', iconCls: 'up', text: 'Settlement &lt;$50M, no precedent &rarr; H3 weakens' },
+      { icon: '&#9660;', iconCls: 'down', text: 'Penalties + structural orders &rarr; H3 crystallises' }
+    ]},
+    { date: 'APR 2026', name: 'Mandatory FGCC Impact', conditions: [
+      { icon: '&#9650;', iconCls: 'up', text: 'Compliance cost &lt;$30M pa &rarr; manageable' },
+      { icon: '&#9660;', iconCls: 'down', text: 'Supplier renegotiation wave &rarr; margin headwind' }
+    ]},
+    { date: 'ONGOING', name: 'Aldi Online Launch', conditions: [
+      { icon: '&#9660;', iconCls: 'down', text: 'Aldi launches e-grocery &rarr; H4 accelerates' },
+      { icon: '&#9650;', iconCls: 'up', text: 'Aldi stays offline &rarr; WOW e-com moat holds' }
+    ]}
+  ],
+  evidenceCoverage: [
+    { domain: 'Corporate Comms', status: 'FULL', cls: 'snap-gap-full' },
+    { domain: 'Regulatory Filings', status: 'FULL', cls: 'snap-gap-full' },
+    { domain: 'Broker Research', status: 'FULL', cls: 'snap-gap-full' },
+    { domain: 'Competitor Data', status: 'GOOD', cls: 'snap-gap-full' },
+    { domain: 'Economic Data', status: 'GOOD', cls: 'snap-gap-full' },
+    { domain: 'Alternative Data', status: 'PARTIAL', cls: 'snap-gap-partial' },
+    { domain: 'Academic Research', status: 'LIMITED', cls: 'snap-gap-limited' },
+    { domain: 'Media &amp; Social', status: 'FULL', cls: 'snap-gap-full' }
+  ],
+  questions: [
+    'Can $400M cost-out absorb both price investment AND margin recovery, or is it one or the other?',
+    'Is Aldi\'s lack of online a permanent strategic choice or a timing gap?',
+    'Will mandatory FGCC penalties deter aggressive supplier negotiations, structurally changing gross margins?'
+  ],
+  footerDisclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using ACH methodology. All data sourced from ASX filings, ACCC publications, broker consensus, and publicly available data as at report date. Hypothesis scores reflect editorial assessment.',
+  footerMeta: [
+    { label: 'ID: WOW-2026-001' },
+    { label: 'MODE: Narrative Intelligence' },
+    { label: 'NEXT: Mar 2026' }
+  ]
+};
+
+const SNAPSHOT_ORDER = ['WOW'];
+
+function renderSnapshotListCard(data) {
+  return '<div class="snapshot-card" onclick="navigate(\'snapshot-' + data.ticker + '\')">' +
+    '<div class="sc-top">' +
+      '<div>' +
+        '<div class="sc-ticker">' + data.tickerFull + '</div>' +
+        '<div class="sc-company">' + data.company + '</div>' +
+        '<div class="sc-sector">' + data.sector + ' &bull; ' + data.sectorSub + '</div>' +
+      '</div>' +
+      '<div class="sc-price"><span class="sc-price-currency">' + data.currency + '</span>' + data.price + '</div>' +
+    '</div>' +
+    '<div class="sc-meta">' +
+      data.priceMetrics.slice(0, 4).map(function(m) {
+        return '<div class="sc-meta-item">' + m.label + ': <span class="sc-meta-value">' + m.value + '</span></div>';
+      }).join('') +
+    '</div>' +
+    '<div class="sc-skew">' +
+      '<span class="skew-badge ' + data.riskSkew.direction + '">' + data.riskSkew.badge + '</span>' +
+      '<span class="sc-skew-rationale">' + data.riskSkew.rationale.substring(0, 120) + '&hellip;</span>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderSnapshotPage(data) {
+  // Price metrics
+  var priceMetricsHtml = '';
+  for (var i = 0; i < data.priceMetrics.length; i++) {
+    var m = data.priceMetrics[i];
+    priceMetricsHtml += '<div class="snap-pm-item"><span class="snap-pm-label">' + m.label + '</span><span class="snap-pm-value' + (m.cls ? ' ' + m.cls : '') + '">' + m.value + '</span></div>';
+  }
+
+  // Survival bar segments
+  var survivalHtml = '';
+  for (var i = 0; i < data.survivalBar.length; i++) {
+    var s = data.survivalBar[i];
+    survivalHtml += '<div class="snap-sb-segment ' + s.cls + '" style="width:' + s.width + '">' + s.label + '</div>';
+  }
+  var legendHtml = '';
+  for (var i = 0; i < data.survivalLegend.length; i++) {
+    var l = data.survivalLegend[i];
+    legendHtml += '<div class="snap-sl-item"><div class="snap-sl-dot" style="background:' + l.color + '"></div>' + l.label + '</div>';
+  }
+
+  // Hypothesis cards
+  var hypsHtml = '';
+  for (var i = 0; i < data.hypotheses.length; i++) {
+    var h = data.hypotheses[i];
+    hypsHtml += '<div class="snap-hyp-card ' + h.cls + '">' +
+      '<div class="snap-hyp-info">' +
+        '<div class="snap-hyp-label">' + h.label + ' <span class="snap-hyp-status-tag ' + h.statusTag + '">' + h.statusText + '</span></div>' +
+        '<div class="snap-hyp-desc">' + h.desc + '</div>' +
+      '</div>' +
+      '<div class="snap-hyp-score-container">' +
+        '<div class="snap-hyp-score ' + h.scoreCls + '">' + h.score + '</div>' +
+        '<div class="snap-hyp-direction ' + h.direction + '">' + h.dirLabel + '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  // Evidence matrix
+  var evHeaderHtml = '';
+  for (var i = 0; i < data.evidenceMatrix.headers.length; i++) {
+    evHeaderHtml += '<div class="snap-ev-cell">' + data.evidenceMatrix.headers[i] + '</div>';
+  }
+  var evRowsHtml = '';
+  for (var i = 0; i < data.evidenceMatrix.rows.length; i++) {
+    var row = data.evidenceMatrix.rows[i];
+    var cellsHtml = '<div class="snap-ev-cell snap-ev-domain">' + row.domain + ' <span class="snap-ev-epistemic">' + row.epistemic + '</span></div>';
+    for (var j = 0; j < row.cells.length; j++) {
+      var c = row.cells[j];
+      var styleAttr = c.style ? ' style="' + c.style + '"' : '';
+      cellsHtml += '<div class="snap-ev-cell snap-ev-signal ' + c.cls + '"' + styleAttr + '>' + c.text + '</div>';
+    }
+    evRowsHtml += '<div class="snap-ev-matrix-row">' + cellsHtml + '</div>';
+  }
+
+  // Discriminators
+  var discrimHtml = '';
+  for (var i = 0; i < data.discriminators.length; i++) {
+    var d = data.discriminators[i];
+    discrimHtml += '<div class="snap-discrim-item"><div class="snap-discrim-tag ' + d.cls + '">' + d.level + '</div><div class="snap-discrim-text">' + d.text + '</div></div>';
+  }
+  var ndChips = '';
+  for (var i = 0; i < data.nonDiscriminating.length; i++) {
+    ndChips += '<span class="snap-nd-chip">' + data.nonDiscriminating[i] + '</span>';
+  }
+
+  // Tripwires
+  var tripwiresHtml = '';
+  for (var i = 0; i < data.tripwires.length; i++) {
+    var tw = data.tripwires[i];
+    var condHtml = '';
+    for (var j = 0; j < tw.conditions.length; j++) {
+      var c = tw.conditions[j];
+      condHtml += '<div class="snap-tw-if"><span class="snap-tw-if-icon ' + c.iconCls + '">' + c.icon + '</span><span>' + c.text + '</span></div>';
+    }
+    tripwiresHtml += '<div class="snap-tripwire-card"><div class="snap-tw-header"><span class="snap-tw-date">' + tw.date + '</span><span class="snap-tw-test-name">' + tw.name + '</span></div><div class="snap-tw-conditions">' + condHtml + '</div></div>';
+  }
+
+  // Evidence coverage
+  var coverageHtml = '';
+  for (var i = 0; i < data.evidenceCoverage.length; i++) {
+    var g = data.evidenceCoverage[i];
+    coverageHtml += '<div class="snap-gap-row"><span class="snap-gap-domain">' + g.domain + '</span><span class="snap-gap-status ' + g.cls + '">' + g.status + '</span></div>';
+  }
+
+  // Questions
+  var questionsHtml = '';
+  for (var i = 0; i < data.questions.length; i++) {
+    questionsHtml += '<div class="snap-question-item">' + data.questions[i] + '</div>';
+  }
+
+  // Footer meta
+  var footerMetaHtml = '';
+  for (var i = 0; i < data.footerMeta.length; i++) {
+    footerMetaHtml += '<span class="snap-footer-meta">' + data.footerMeta[i].label + '</span>';
+  }
+
+  return '<div class="snap-page">' +
+    '<a class="snap-back" href="#snapshots" onclick="navigate(\'snapshots\')">&larr; Back to Snapshots</a>' +
+    '<a class="snap-view-full" href="#report-' + data.ticker + '" onclick="navigate(\'report-' + data.ticker + '\')" style="float:right;margin-top:4px">View Full Report &rarr;</a>' +
+    '<div class="snap-header">' +
+      '<div class="snap-header-left">' +
+        '<span class="snap-ticker">' + data.tickerFull + '</span>' +
+        '<span class="snap-company-name">' + data.company + '</span>' +
+        '<span class="snap-sector-tag">' + data.sector + ' &bull; ' + data.sectorSub + '</span>' +
+      '</div>' +
+      '<div class="snap-header-right">' +
+        '<div class="snap-logo-mark"><span>CONTINUUM</span> INTELLIGENCE</div>' +
+        '<div class="snap-report-date">' + data.date + ' &bull; ' + data.version + '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="snap-price-bar">' +
+      '<div><span class="snap-price-currency">' + data.currency + '</span><span class="snap-price-main">' + data.price + '</span></div>' +
+      '<div class="snap-price-meta">' + priceMetricsHtml + '</div>' +
+    '</div>' +
+
+    '<div class="snap-risk-skew-bar">' +
+      '<span class="snap-risk-skew-label">Risk Skew</span>' +
+      '<span class="snap-risk-skew-badge ' + data.riskSkew.direction + '">' + data.riskSkew.badge + '</span>' +
+      '<span class="snap-risk-skew-rationale">' + data.riskSkew.rationale + '</span>' +
+    '</div>' +
+
+    '<div class="snap-main-grid">' +
+      // LEFT COLUMN
+      '<div class="snap-col">' +
+        '<div><div class="snap-section-label">Dominant Narrative</div>' +
+          '<div class="snap-narrative-box">' +
+            '<div class="snap-narrative-text">' + data.narrative.text + '</div>' +
+            '<div class="snap-narrative-verdict">' + data.narrative.verdict + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div><div class="snap-section-label">Hypothesis Survival</div>' +
+          '<div class="snap-survival-bar-container">' +
+            '<div class="snap-survival-bar">' + survivalHtml + '</div>' +
+            '<div class="snap-survival-legend">' + legendHtml + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="snap-hyp-stack">' + hypsHtml + '</div>' +
+      '</div>' +
+
+      // CENTER COLUMN
+      '<div class="snap-col">' +
+        '<div><div class="snap-section-label">Cross-Domain Evidence Matrix</div>' +
+          '<div class="snap-evidence-matrix">' +
+            '<div class="snap-ev-matrix-header">' + evHeaderHtml + '</div>' +
+            evRowsHtml +
+          '</div>' +
+        '</div>' +
+        '<div><div class="snap-section-label">What Discriminates</div>' +
+          '<div class="snap-discrim-box">' +
+            discrimHtml +
+            '<div class="snap-non-discrim">' +
+              '<div class="snap-non-discrim-label">Assessed &amp; Discarded (non-discriminating)</div>' +
+              '<div class="snap-non-discrim-items">' + ndChips + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      // RIGHT COLUMN
+      '<div class="snap-col">' +
+        '<div><div class="snap-section-label">What We\'re Watching</div>' +
+          '<div class="snap-tripwire-list">' + tripwiresHtml + '</div>' +
+        '</div>' +
+        '<div><div class="snap-section-label">Evidence Coverage</div>' +
+          '<div class="snap-gaps-box">' + coverageHtml + '</div>' +
+        '</div>' +
+        '<div><div class="snap-section-label">Unanswered Questions</div>' +
+          '<div class="snap-questions-box">' + questionsHtml + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="snap-footer">' +
+      '<div class="snap-footer-left">' + data.footerDisclaimer + '</div>' +
+      '<div class="snap-footer-right">' + footerMetaHtml + '</div>' +
+    '</div>' +
+  '</div>';
 }
 
 
@@ -7082,6 +7630,7 @@ function navigate(page) {
 }
 
 const renderedPages = new Set();
+const renderedSnapshots = new Set();
 
 function route() {
     const hash = window.location.hash.slice(1) || 'home';
@@ -7101,6 +7650,18 @@ function route() {
         }
     }
 
+    // Lazy render snapshot pages on first visit
+    if (hash.startsWith('snapshot-')) {
+        const ticker = hash.replace('snapshot-', '');
+        if (!renderedSnapshots.has(ticker) && SNAPSHOT_DATA[ticker]) {
+            const container = document.getElementById('page-' + hash);
+            if (container) {
+                container.innerHTML = renderSnapshotPage(SNAPSHOT_DATA[ticker]);
+                renderedSnapshots.add(ticker);
+            }
+        }
+    }
+
     const target = document.getElementById('page-' + hash);
     if (target) {
         target.classList.add('active');
@@ -7112,7 +7673,7 @@ function route() {
     // Update nav links
     document.querySelectorAll('.nav-links a').forEach(a => {
         a.classList.remove('active');
-        if (a.dataset.nav === hash || (hash.startsWith('report-') && a.dataset.nav === 'home')) {
+        if (a.dataset.nav === hash || (hash.startsWith('report-') && a.dataset.nav === 'home') || (hash.startsWith('snapshot-') && a.dataset.nav === 'snapshots')) {
             a.classList.add('active');
         }
     });
@@ -7228,6 +7789,16 @@ window.addEventListener('DOMContentLoaded', () => {
             const d = STOCK_DATA[ticker];
             if (d) {
                 footerLinks.innerHTML += '<a href="#report-' + ticker + '" onclick="navigate(\'report-' + ticker + '\')">' + d.company + ' (' + d.tickerFull + ')</a>';
+            }
+        });
+    }
+
+    // Populate snapshot grid
+    const snapshotGrid = document.getElementById('snapshot-grid');
+    if (snapshotGrid) {
+        SNAPSHOT_ORDER.forEach(ticker => {
+            if (SNAPSHOT_DATA[ticker]) {
+                snapshotGrid.innerHTML += renderSnapshotListCard(SNAPSHOT_DATA[ticker]);
             }
         });
     }
