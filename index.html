@@ -1464,6 +1464,167 @@ a:hover { color: var(--accent-sage); }
 }
 
 /* ============================================================
+   TECHNICAL ANALYSIS — Section Styles
+   ============================================================ */
+
+/* Container */
+.ta-section { margin-top: var(--space-lg); }
+
+/* Regime / Clarity / Key Level badges at top */
+.ta-regime-bar {
+    display: flex; gap: var(--space-md); flex-wrap: wrap;
+    padding: var(--space-md) 0; margin-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
+}
+.ta-regime-item {
+    display: flex; flex-direction: column; gap: 2px;
+}
+.ta-regime-label {
+    font-size: 0.55rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-muted);
+}
+.ta-regime-value {
+    font-family: var(--font-data); font-size: 0.88rem; font-weight: 600;
+    color: var(--text-primary);
+}
+.ta-regime-value.ta-down { color: var(--signal-red); }
+.ta-regime-value.ta-up { color: var(--signal-green); }
+.ta-regime-value.ta-neutral { color: var(--signal-amber); }
+
+/* Moving Average table */
+.ta-ma-table {
+    width: 100%; border-collapse: collapse; font-size: 0.75rem;
+    margin-bottom: var(--space-md);
+}
+.ta-ma-table th {
+    text-align: left; font-size: 0.6rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); padding: 8px 12px;
+    border-bottom: 2px solid var(--border);
+}
+.ta-ma-table td {
+    padding: 8px 12px; border-bottom: 1px solid var(--border);
+    font-family: var(--font-data); font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+.ta-ma-table tr:last-child td { border-bottom: none; }
+.ta-ma-table .ta-label-cell { font-family: var(--font-ui); font-weight: 600; color: var(--text-primary); }
+
+/* Inflection points timeline */
+.ta-inflection-table {
+    width: 100%; border-collapse: collapse; font-size: 0.75rem;
+    margin-bottom: var(--space-md);
+}
+.ta-inflection-table th {
+    text-align: left; font-size: 0.6rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); padding: 8px 12px;
+    border-bottom: 2px solid var(--border);
+}
+.ta-inflection-table td {
+    padding: 8px 12px; border-bottom: 1px solid var(--border);
+    font-size: 0.75rem; color: var(--text-secondary);
+}
+.ta-inflection-table tr:last-child td { border-bottom: none; }
+.ta-inflection-table .ta-date-cell { font-family: var(--font-data); font-weight: 500; white-space: nowrap; color: var(--text-primary); }
+.ta-inflection-table .ta-price-cell { font-family: var(--font-data); font-weight: 600; }
+.ta-inflection-table .ta-event-cell { font-family: var(--font-ui); color: var(--text-secondary); }
+
+/* Volume & Volatility metrics grid */
+.ta-metrics-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+.ta-metric-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 4px; padding: var(--space-md);
+}
+.ta-metric-card-title {
+    font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--accent-teal); margin-bottom: var(--space-sm);
+}
+.ta-metric-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 4px 0; border-bottom: 1px solid var(--border);
+}
+.ta-metric-row:last-child { border-bottom: none; }
+.ta-metric-name { font-size: 0.72rem; color: var(--text-secondary); }
+.ta-metric-val {
+    font-family: var(--font-data); font-size: 0.78rem; font-weight: 600;
+    color: var(--text-primary);
+}
+.ta-metric-val.ta-neg { color: var(--signal-red); }
+.ta-metric-val.ta-pos { color: var(--signal-green); }
+
+/* Mean Reversion positioning bar */
+.ta-mr-container {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 4px; padding: var(--space-md); margin-bottom: var(--space-md);
+}
+.ta-mr-title {
+    font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--accent-teal); margin-bottom: var(--space-sm);
+}
+.ta-mr-bar-track {
+    height: 24px; background: var(--bg-surface); border-radius: 3px;
+    position: relative; margin-bottom: var(--space-sm); overflow: visible;
+}
+.ta-mr-marker {
+    position: absolute; top: -2px; width: 4px; height: 28px;
+    background: var(--signal-red); border-radius: 2px;
+    transform: translateX(-50%);
+}
+.ta-mr-ma50-marker, .ta-mr-ma200-marker {
+    position: absolute; top: 0; width: 2px; height: 24px;
+    opacity: 0.6; transform: translateX(-50%);
+}
+.ta-mr-ma50-marker { background: var(--signal-amber); }
+.ta-mr-ma200-marker { background: var(--signal-blue); }
+.ta-mr-bar-labels {
+    display: flex; justify-content: space-between;
+    font-family: var(--font-data); font-size: 0.6rem; color: var(--text-muted);
+}
+.ta-mr-legend {
+    display: flex; gap: var(--space-md); margin-top: var(--space-sm); flex-wrap: wrap;
+}
+.ta-mr-legend-item {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 0.6rem; color: var(--text-muted);
+}
+.ta-mr-legend-dot {
+    width: 8px; height: 3px; border-radius: 1px;
+}
+
+/* Relative performance */
+.ta-rel-table {
+    width: 100%; border-collapse: collapse; font-size: 0.75rem;
+}
+.ta-rel-table th {
+    text-align: left; font-size: 0.6rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); padding: 8px 12px;
+    border-bottom: 2px solid var(--border);
+}
+.ta-rel-table td {
+    padding: 8px 12px; border-bottom: 1px solid var(--border);
+    font-family: var(--font-data); font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+.ta-rel-table tr:last-child td { border-bottom: none; }
+
+/* TA Crossover callout */
+.ta-crossover-callout {
+    background: rgba(212,85,85,0.06); border: 1px solid rgba(212,85,85,0.15);
+    border-radius: 4px; padding: 10px 14px; margin-bottom: var(--space-md);
+    display: flex; gap: var(--space-sm); align-items: baseline;
+}
+.ta-crossover-label {
+    font-family: var(--font-data); font-size: 0.65rem; font-weight: 700;
+    color: var(--signal-red); white-space: nowrap;
+}
+.ta-crossover-text { font-size: 0.72rem; color: var(--text-secondary); }
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 1024px) {
@@ -1473,6 +1634,7 @@ a:hover { color: var(--accent-sage); }
     .verdict-inner { flex-direction: column; }
     .verdict-scores { justify-content: flex-start; }
     .tw-conditions { grid-template-columns: 1fr; }
+    .ta-metrics-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
     :root { --space-lg: 16px; --space-xl: 24px; --space-2xl: 32px; --space-3xl: 48px; }
@@ -2425,6 +2587,83 @@ STOCK_DATA.WOW = {
     analyticalLimitations: 'Hypothesis survival scores (T1: 36%, T2: 25%, T3: 21%, T4: 18%) reflect editorial assessment based on publicly available evidence. These are qualitative judgments, not algorithmic outputs.'
   },
 
+
+  technicalAnalysis: {
+    date: '10 February 2026',
+    period: '1 Year',
+    source: 'Continuum Technical Intelligence',
+    regime: 'Range-bound',
+    clarity: 'Mixed',
+
+    price: { current: 31.41, currency: 'A$' },
+
+    movingAverages: {
+      ma50:  { value: 29.94, date: '10 Feb 2026' },
+      ma200: { value: 29.90, date: '10 Feb 2026' },
+      crossover: {
+        type: 'Golden Cross',
+        date: 'w/c 20 January 2026',
+        description: '50-day MA crossed above 200-day MA'
+      },
+      priceVsMa50:  4.9,
+      priceVsMa200: 5.0
+    },
+
+    trend: {
+      direction: 'Recovering',
+      duration: '4 months',
+      structure: 'Higher lows from October 2025 trough; approaching prior range resistance',
+      peak:   { price: 33.61, date: 'w/c 8 September 2025' },
+      trough: { price: 25.91, date: 'w/c 20 October 2025' },
+      drawdown: -22.9
+    },
+
+    keyLevels: {
+      support:    { price: 29.30, method: 'Prior consolidation zone (Dec 2025 – Jan 2026)' },
+      resistance: { price: 32.00, method: 'Round number and prior range ceiling (Jun–Aug 2025)' },
+      fiftyTwoWeekHigh: { price: 33.61, date: 'w/c 8 September 2025' },
+      fiftyTwoWeekLow:  { price: 25.91, date: 'w/c 20 October 2025' }
+    },
+
+    volume: {
+      latestVs20DayAvg: 1.1,
+      latestDate: '10 February 2026',
+      priorSpikes: [
+        { period: 'w/c 15 September 2025', ratio: 2.8, context: 'Sharp selloff from A$33.42 to A$28.51; likely earnings reaction' },
+        { period: 'w/c 20 October 2025', ratio: 1.9, context: 'Capitulation low at A$25.91' }
+      ]
+    },
+
+    volatility: {
+      latestDailyRange: { high: 31.69, low: 31.41, date: '10 February 2026' },
+      latestRangePercent: 0.9,
+      avgDailyRangePercent30: 0.6,
+      avgDailyRangePercent90: 0.8
+    },
+
+    meanReversion: {
+      vsMa50:  4.9,
+      vsMa200: 5.0,
+      rangePosition: 71,
+      rangeHigh: 33.61,
+      rangeLow:  25.91
+    },
+
+    inflectionPoints: [
+      { date: 'w/c 8 September 2025',  price: 33.61, event: '12-month high' },
+      { date: 'w/c 15 September 2025', price: 28.51, event: 'Sharp selloff; price drops 15% in one week' },
+      { date: 'w/c 20 October 2025',   price: 25.91, event: '12-month low; capitulation' },
+      { date: 'w/c 15 December 2025',  price: 29.32, event: 'Recovery rally clears A$29 resistance' },
+      { date: 'w/c 20 January 2026',   price: 30.08, event: 'Golden cross forms; 50-day MA crosses above 200-day MA' },
+      { date: '10 February 2026',      price: 31.41, event: 'Approaching A$32 resistance; momentum intact' }
+    ],
+
+    relativePerformance: {
+      vsIndex:  { name: 'S&amp;P/ASX 200',  period: '12 months', stockReturn: 5.4, indexReturn: -2.3, relativeReturn: 7.7 },
+      vsSector: { name: 'S&amp;P/ASX Consumer Staples', period: '12 months', stockReturn: 5.4, sectorReturn: 1.2, relativeReturn: 4.2 }
+    }
+  },
+
   // Footer
   footer: {
     disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, ACCC publications, broker consensus data, and publicly available information. This report does not contain buy, sell, or hold recommendations, price targets, or valuation models.',
@@ -2577,8 +2816,14 @@ function renderSectionNav(data) {
     ['evidence', 'Evidence'],
     ['discriminates', 'Discriminates'],
     ['tripwires', 'Tripwires'],
-    ['gaps', 'Gaps']
+    ['gaps', 'Gaps'],
+    ['technical', 'Technical']
   ];
+
+  // Only include Technical if data exists
+  if (!data.technicalAnalysis) {
+    sections.pop();
+  }
 
   var linksHtml = '';
   for (var i = 0; i < sections.length; i++) {
@@ -2923,6 +3168,172 @@ function renderGaps(data) {
   '</div>';
 }
 
+function renderTechnicalAnalysis(data) {
+  if (!data.technicalAnalysis) return '';
+  var t = data.ticker.toLowerCase();
+  var ta = data.technicalAnalysis;
+
+  // Regime bar — categorical labels + key levels
+  var regimeHtml = '<div class="ta-regime-bar">' +
+    '<div class="ta-regime-item"><div class="ta-regime-label">Regime</div><div class="ta-regime-value">' + ta.regime + '</div></div>' +
+    '<div class="ta-regime-item"><div class="ta-regime-label">Clarity</div><div class="ta-regime-value">' + ta.clarity + '</div></div>' +
+    '<div class="ta-regime-item"><div class="ta-regime-label">Trend</div><div class="ta-regime-value ta-down">' + ta.trend.direction + ' (' + ta.trend.duration + ')</div></div>' +
+    '<div class="ta-regime-item"><div class="ta-regime-label">Structure</div><div class="ta-regime-value">' + ta.trend.structure + '</div></div>' +
+    '<div class="ta-regime-item"><div class="ta-regime-label">Support</div><div class="ta-regime-value">' + ta.price.currency + ta.keyLevels.support.price.toFixed(2) + '</div></div>' +
+    '<div class="ta-regime-item"><div class="ta-regime-label">Resistance</div><div class="ta-regime-value">' + ta.price.currency + ta.keyLevels.resistance.price.toFixed(2) + '</div></div>' +
+  '</div>';
+
+  // Moving averages table
+  var maHtml = '<div class="rs-subtitle">Moving Averages</div>' +
+    '<table class="ta-ma-table"><thead><tr>' +
+      '<th>Measure</th><th>Value</th><th>Price vs MA</th><th>Note</th>' +
+    '</tr></thead><tbody>' +
+    '<tr>' +
+      '<td class="ta-label-cell">50-Day MA</td>' +
+      '<td>' + ta.price.currency + ta.movingAverages.ma50.value.toFixed(2) + '</td>' +
+      '<td style="color:var(--signal-red)">' + ta.movingAverages.priceVsMa50.toFixed(1) + '%</td>' +
+      '<td>As at ' + ta.movingAverages.ma50.date + '</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td class="ta-label-cell">200-Day MA</td>' +
+      '<td>' + ta.price.currency + ta.movingAverages.ma200.value.toFixed(2) + '</td>' +
+      '<td style="color:var(--signal-red)">' + ta.movingAverages.priceVsMa200.toFixed(1) + '%</td>' +
+      '<td>As at ' + ta.movingAverages.ma200.date + '</td>' +
+    '</tr>' +
+    '</tbody></table>';
+
+  // Crossover callout
+  var crossoverHtml = '';
+  if (ta.movingAverages.crossover) {
+    var cx = ta.movingAverages.crossover;
+    crossoverHtml = '<div class="ta-crossover-callout">' +
+      '<div class="ta-crossover-label">' + cx.type + '</div>' +
+      '<div class="ta-crossover-text">' + cx.description + ' &mdash; ' + cx.date + '</div>' +
+    '</div>';
+  }
+
+  // Inflection points table
+  var inflHtml = '';
+  if (ta.inflectionPoints && ta.inflectionPoints.length > 0) {
+    var inflRows = '';
+    for (var i = 0; i < ta.inflectionPoints.length; i++) {
+      var ip = ta.inflectionPoints[i];
+      inflRows += '<tr>' +
+        '<td class="ta-date-cell">' + ip.date + '</td>' +
+        '<td class="ta-price-cell">' + ta.price.currency + ip.price.toFixed(2) + '</td>' +
+        '<td class="ta-event-cell">' + ip.event + '</td>' +
+      '</tr>';
+    }
+    inflHtml = '<div class="rs-subtitle">Price Inflection Points</div>' +
+      '<table class="ta-inflection-table"><thead><tr>' +
+        '<th>Date</th><th>Price</th><th>Observation</th>' +
+      '</tr></thead><tbody>' + inflRows + '</tbody></table>';
+  }
+
+  // Volume & Volatility metrics
+  var volHtml = '<div class="ta-metrics-grid">' +
+    '<div class="ta-metric-card">' +
+      '<div class="ta-metric-card-title">Volume</div>' +
+      '<div class="ta-metric-row"><div class="ta-metric-name">Latest vs 20-day avg</div><div class="ta-metric-val">' + ta.volume.latestVs20DayAvg.toFixed(1) + 'x</div></div>' +
+      '<div class="ta-metric-row"><div class="ta-metric-name">Date</div><div class="ta-metric-val">' + ta.volume.latestDate + '</div></div>';
+  if (ta.volume.priorSpikes) {
+    for (var v = 0; v < ta.volume.priorSpikes.length; v++) {
+      var sp = ta.volume.priorSpikes[v];
+      volHtml += '<div class="ta-metric-row"><div class="ta-metric-name">' + sp.period + '</div><div class="ta-metric-val">' + sp.ratio.toFixed(1) + 'x &mdash; ' + sp.context + '</div></div>';
+    }
+  }
+  volHtml += '</div>' +
+    '<div class="ta-metric-card">' +
+      '<div class="ta-metric-card-title">Volatility</div>' +
+      '<div class="ta-metric-row"><div class="ta-metric-name">Latest daily range</div><div class="ta-metric-val">' + ta.volatility.latestRangePercent.toFixed(1) + '%</div></div>' +
+      '<div class="ta-metric-row"><div class="ta-metric-name">30-day avg range</div><div class="ta-metric-val">' + ta.volatility.avgDailyRangePercent30.toFixed(1) + '%</div></div>' +
+      '<div class="ta-metric-row"><div class="ta-metric-name">90-day avg range</div><div class="ta-metric-val">' + ta.volatility.avgDailyRangePercent90.toFixed(1) + '%</div></div>' +
+      '<div class="ta-metric-row"><div class="ta-metric-name">Latest session</div><div class="ta-metric-val">' + ta.price.currency + ta.volatility.latestDailyRange.high.toFixed(2) + ' &ndash; ' + ta.price.currency + ta.volatility.latestDailyRange.low.toFixed(2) + '</div></div>' +
+    '</div>' +
+  '</div>';
+
+  // Mean reversion positioning
+  var mr = ta.meanReversion;
+  var rangeSpan = mr.rangeHigh - mr.rangeLow;
+  var pricePct = rangeSpan > 0 ? ((ta.price.current - mr.rangeLow) / rangeSpan) * 100 : 50;
+  var ma50Pct = rangeSpan > 0 ? ((ta.movingAverages.ma50.value - mr.rangeLow) / rangeSpan) * 100 : 50;
+  var ma200Pct = rangeSpan > 0 ? ((ta.movingAverages.ma200.value - mr.rangeLow) / rangeSpan) * 100 : 50;
+
+  var mrHtml = '<div class="ta-mr-container">' +
+    '<div class="ta-mr-title">Mean Reversion Positioning</div>' +
+    '<div class="ta-mr-bar-track">' +
+      '<div class="ta-mr-ma200-marker" style="left:' + ma200Pct.toFixed(1) + '%"></div>' +
+      '<div class="ta-mr-ma50-marker" style="left:' + ma50Pct.toFixed(1) + '%"></div>' +
+      '<div class="ta-mr-marker" style="left:' + pricePct.toFixed(1) + '%"></div>' +
+    '</div>' +
+    '<div class="ta-mr-bar-labels">' +
+      '<span>' + ta.price.currency + mr.rangeLow.toFixed(2) + '</span>' +
+      '<span>' + ta.price.currency + mr.rangeHigh.toFixed(2) + '</span>' +
+    '</div>' +
+    '<div class="ta-mr-legend">' +
+      '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-red)"></div>Price (' + ta.price.currency + ta.price.current.toFixed(2) + ')</div>' +
+      '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-amber)"></div>50-Day MA (' + ta.price.currency + ta.movingAverages.ma50.value.toFixed(2) + ')</div>' +
+      '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-blue)"></div>200-Day MA (' + ta.price.currency + ta.movingAverages.ma200.value.toFixed(2) + ')</div>' +
+    '</div>' +
+    '<table class="ta-ma-table" style="margin-top:var(--space-sm)"><thead><tr><th>Measure</th><th>Value</th></tr></thead><tbody>' +
+      '<tr><td class="ta-label-cell">vs 50-Day MA</td><td style="color:var(--signal-red)">' + mr.vsMa50.toFixed(1) + '%</td></tr>' +
+      '<tr><td class="ta-label-cell">vs 200-Day MA</td><td style="color:var(--signal-red)">' + mr.vsMa200.toFixed(1) + '%</td></tr>' +
+      '<tr><td class="ta-label-cell">12-Month Range Position</td><td>Lower ' + mr.rangePosition + '%</td></tr>' +
+    '</tbody></table>' +
+  '</div>';
+
+  // Relative performance table
+  var relHtml = '';
+  if (ta.relativePerformance) {
+    var rp = ta.relativePerformance;
+    relHtml = '<div class="rs-subtitle">Relative Performance (' + rp.vsIndex.period + ')</div>' +
+      '<table class="ta-rel-table"><thead><tr>' +
+        '<th>Benchmark</th><th>Stock Return</th><th>Benchmark Return</th><th>Relative</th>' +
+      '</tr></thead><tbody>' +
+      '<tr>' +
+        '<td style="font-family:var(--font-ui);font-weight:600;color:var(--text-primary)">' + rp.vsIndex.name + '</td>' +
+        '<td style="color:var(--signal-red)">' + rp.vsIndex.stockReturn.toFixed(1) + '%</td>' +
+        '<td>' + (rp.vsIndex.indexReturn >= 0 ? '+' : '') + rp.vsIndex.indexReturn.toFixed(1) + '%</td>' +
+        '<td style="color:var(--signal-red)">' + rp.vsIndex.relativeReturn.toFixed(1) + '%</td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td style="font-family:var(--font-ui);font-weight:600;color:var(--text-primary)">' + rp.vsSector.name + '</td>' +
+        '<td style="color:var(--signal-red)">' + rp.vsSector.stockReturn.toFixed(1) + '%</td>' +
+        '<td style="color:var(--signal-red)">' + rp.vsSector.sectorReturn.toFixed(1) + '%</td>' +
+        '<td style="color:var(--signal-red)">' + rp.vsSector.relativeReturn.toFixed(1) + '%</td>' +
+      '</tr>' +
+      '</tbody></table>';
+  }
+
+  // Key levels with methodology
+  var levelsHtml = '<div class="rs-subtitle">Key Levels</div>' +
+    '<table class="ta-ma-table"><thead><tr><th>Level</th><th>Price</th><th>Derivation</th></tr></thead><tbody>' +
+    '<tr><td class="ta-label-cell">Support</td><td>' + ta.price.currency + ta.keyLevels.support.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + ta.keyLevels.support.method + '</td></tr>' +
+    '<tr><td class="ta-label-cell">Resistance</td><td>' + ta.price.currency + ta.keyLevels.resistance.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + ta.keyLevels.resistance.method + '</td></tr>' +
+    '<tr><td class="ta-label-cell">52-Week High</td><td>' + ta.price.currency + ta.keyLevels.fiftyTwoWeekHigh.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + ta.keyLevels.fiftyTwoWeekHigh.date + '</td></tr>' +
+    '<tr><td class="ta-label-cell">52-Week Low</td><td>' + ta.price.currency + ta.keyLevels.fiftyTwoWeekLow.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + ta.keyLevels.fiftyTwoWeekLow.date + '</td></tr>' +
+    '</tbody></table>';
+
+  // Source & period footer
+  var footerHtml = '<div style="font-size:0.6rem;color:var(--text-muted);margin-top:var(--space-md);padding-top:var(--space-sm);border-top:1px solid var(--border)">' +
+    'Analysis period: ' + ta.period + ' &bull; Generated: ' + ta.date + ' &bull; Source: ' + (ta.source || 'Continuum Technical Intelligence') +
+  '</div>';
+
+  return '<div class="report-section ta-section" id="' + t + '-technical">' +
+    '<div class="rs-number">Section 08</div>' +
+    '<div class="rs-title">Technical Structure</div>' +
+    regimeHtml +
+    maHtml +
+    crossoverHtml +
+    levelsHtml +
+    inflHtml +
+    volHtml +
+    mrHtml +
+    relHtml +
+    footerHtml +
+  '</div>';
+}
+
 function renderReportFooter(data) {
   return '<div class="report-footer-section">' +
     '<div class="rf-inner">' +
@@ -3041,7 +3452,8 @@ function renderReportPage(data) {
     renderEvidence(data) +
     renderDiscriminators(data) +
     renderTripwires(data) +
-    renderGaps(data);
+    renderGaps(data) +
+    renderTechnicalAnalysis(data);
 
   return renderReportHero(data) +
     renderSkewBar(data) +
@@ -3423,6 +3835,18 @@ function buildSnapshotFromStock(ticker) {
     tripwires: snapTripwires,
     evidenceCoverage: snapCoverage,
     questions: snapQuestions,
+    technicalAnalysis: stock.technicalAnalysis ? {
+      regime: stock.technicalAnalysis.regime,
+      trend: stock.technicalAnalysis.trend.direction + ' (' + stock.technicalAnalysis.trend.duration + ')',
+      ma50: stock.technicalAnalysis.price.currency + stock.technicalAnalysis.movingAverages.ma50.value.toFixed(2),
+      ma200: stock.technicalAnalysis.price.currency + stock.technicalAnalysis.movingAverages.ma200.value.toFixed(2),
+      vsMa50: stock.technicalAnalysis.movingAverages.priceVsMa50.toFixed(1) + '%',
+      vsMa200: stock.technicalAnalysis.movingAverages.priceVsMa200.toFixed(1) + '%',
+      support: stock.technicalAnalysis.price.currency + stock.technicalAnalysis.keyLevels.support.price.toFixed(2),
+      resistance: stock.technicalAnalysis.price.currency + stock.technicalAnalysis.keyLevels.resistance.price.toFixed(2),
+      rangePosition: 'Lower ' + stock.technicalAnalysis.meanReversion.rangePosition + '%',
+      crossover: stock.technicalAnalysis.movingAverages.crossover ? stock.technicalAnalysis.movingAverages.crossover.type + ' (' + stock.technicalAnalysis.movingAverages.crossover.date + ')' : null
+    } : null,
     footerDisclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using ACH methodology. All data sourced from ASX filings, broker consensus, and publicly available data as at report date. Hypothesis scores reflect editorial assessment.',
     footerMeta: [
       { label: 'ID: ' + stock.reportId },
@@ -3630,6 +4054,18 @@ function renderSnapshotPage(data) {
         '<div><div class="snap-section-label">Evidence Coverage</div>' +
           '<div class="snap-gaps-box">' + coverageHtml + '</div>' +
         '</div>' +
+        (data.technicalAnalysis ? '<div><div class="snap-section-label">Technical Structure</div>' +
+          '<div class="snap-gaps-box">' +
+            '<div class="snap-gap-row"><span class="snap-gap-domain">Regime</span><span class="snap-gap-status snap-gap-full">' + data.technicalAnalysis.regime + '</span></div>' +
+            '<div class="snap-gap-row"><span class="snap-gap-domain">Trend</span><span class="snap-gap-status snap-gap-limited">' + data.technicalAnalysis.trend + '</span></div>' +
+            '<div class="snap-gap-row"><span class="snap-gap-domain">50-Day MA</span><span style="font-family:var(--font-data);font-size:0.58rem;color:var(--text-secondary)">' + data.technicalAnalysis.ma50 + ' (' + data.technicalAnalysis.vsMa50 + ')</span></div>' +
+            '<div class="snap-gap-row"><span class="snap-gap-domain">200-Day MA</span><span style="font-family:var(--font-data);font-size:0.58rem;color:var(--text-secondary)">' + data.technicalAnalysis.ma200 + ' (' + data.technicalAnalysis.vsMa200 + ')</span></div>' +
+            '<div class="snap-gap-row"><span class="snap-gap-domain">Support</span><span style="font-family:var(--font-data);font-size:0.58rem;color:var(--signal-green)">' + data.technicalAnalysis.support + '</span></div>' +
+            '<div class="snap-gap-row"><span class="snap-gap-domain">Resistance</span><span style="font-family:var(--font-data);font-size:0.58rem;color:var(--signal-red)">' + data.technicalAnalysis.resistance + '</span></div>' +
+            '<div class="snap-gap-row"><span class="snap-gap-domain">Range Position</span><span style="font-family:var(--font-data);font-size:0.58rem;color:var(--signal-red)">' + data.technicalAnalysis.rangePosition + '</span></div>' +
+            (data.technicalAnalysis.crossover ? '<div class="snap-gap-row"><span class="snap-gap-domain">Crossover</span><span style="font-family:var(--font-data);font-size:0.5rem;color:var(--signal-red)">' + data.technicalAnalysis.crossover + '</span></div>' : '') +
+          '</div>' +
+        '</div>' : '') +
         '<div><div class="snap-section-label">Unanswered Questions</div>' +
           '<div class="snap-questions-box">' + questionsHtml + '</div>' +
         '</div>' +
@@ -3757,16 +4193,16 @@ STOCK_DATA.XRO = {
   ],
 
   // Skew
-  skew: { direction: 'upside', rationale: 'Stock down 55% from highs on sentiment, not fundamentals. Analyst consensus targets 120%+ above current price. Delivered 20% revenue growth with expanding margins.' },
+  skew: { direction: 'downside', rationale: 'Market is repricing SaaS multiples as AI disruption reshapes expectations. Stock down 55% from highs despite strong fundamentals. Price and fundamentals are in direct conflict &mdash; that is the signal, not noise.' },
 
   // Verdict
   verdict: {
-    text: 'The market is pricing AI disruption risk and Melio acquisition skepticism into a stock that just delivered 20% revenue growth, Rule of 40 at 44.5%, and expanding FCF margins. The gap between price and analyst consensus is the widest in Xero\'s listed history. Either the sell-side is uniformly wrong, or the market has overreacted.',
-    borderColor: 'var(--signal-green)',
+    text: 'The market is repricing Xero as an AI disruption casualty. The stock is down 55% from its highs despite delivering 20% revenue growth, Rule of 40 at 44.5%, and expanding FCF margins. Fundamentals and price are telling opposite stories. Either the market is pricing a structural shift that hasn\'t yet appeared in the financials, or the widest gap between analyst consensus and market price in Xero\'s history represents a generational opportunity. This is the central tension. We present the evidence; the judgment is yours.',
+    borderColor: 'var(--signal-red)',
     scores: [
-      { label: 'T1 Platform', score: '55%', scoreColor: 'var(--signal-green)', dirArrow: '&uarr;', dirText: 'Strong', dirColor: 'var(--signal-green)' },
-      { label: 'T2 Melio', score: '40%', scoreColor: 'var(--signal-amber)', dirArrow: '&rarr;', dirText: 'Awaiting', dirColor: null },
-      { label: 'T3 AI Disrupt', score: '25%', scoreColor: 'var(--signal-red)', dirArrow: '&darr;', dirText: 'Weakening', dirColor: 'var(--signal-green)' },
+      { label: 'T1 Platform', score: '40%', scoreColor: 'var(--signal-green)', dirArrow: '&darr;', dirText: 'Strong but unpriced', dirColor: 'var(--signal-amber)' },
+      { label: 'T2 Melio', score: '30%', scoreColor: 'var(--signal-amber)', dirArrow: '&rarr;', dirText: 'Awaiting', dirColor: null },
+      { label: 'T3 AI Disrupt', score: '50%', scoreColor: 'var(--signal-red)', dirArrow: '&uarr;', dirText: 'Dominant', dirColor: 'var(--signal-red)' },
       { label: 'T4 Compete', score: '20%', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Steady', dirColor: null }
     ]
   },
@@ -3778,8 +4214,8 @@ STOCK_DATA.XRO = {
     { label: 'Rev Growth', value: '+20%', color: 'var(--signal-green)' },
     { label: 'Subscribers', value: '4.6M', color: '' }
   ],
-  featuredPriceColor: 'var(--signal-green)',
-  featuredRationale: 'Stock down 55% on sentiment, not fundamentals. Consensus target 120%+ above current price.',
+  featuredPriceColor: 'var(--signal-red)',
+  featuredRationale: 'Market repricing SaaS multiples as AI disruption thesis strengthens. Down 55% despite strong fundamentals. Price and evidence in direct conflict.',
 
   // Identity section
   identity: {
@@ -3806,10 +4242,10 @@ STOCK_DATA.XRO = {
       title: 'T1: Platform Expansion Delivers',
       statusClass: 'priced',
       statusText: 'Priced Out &mdash; Market Not Paying',
-      score: '55%',
-      scoreWidth: '55%',
-      scoreMeta: '&uarr; Strong and strengthening',
-      description: 'Xero continues to execute on platform expansion: 20%+ revenue growth, ARPU expansion through upselling payroll, payments, and financial services, and subscriber additions across all geographies. Operating leverage delivers expanding margins. Rule of 40 sustained above 40. The market re-rates as sentiment normalises.',
+      score: '40%',
+      scoreWidth: '40%',
+      scoreMeta: '&darr; Fundamentals strong but market disagrees',
+      description: 'Xero continues to execute on platform expansion: 20%+ revenue growth, ARPU expansion through upselling payroll, payments, and financial services, and subscriber additions across all geographies. Operating leverage delivers expanding margins. Rule of 40 sustained above 40. Fundamentals are strong but the market is not paying for them at any multiple that rewards holders.',
       requires: [
         'Revenue growth sustained at 18%+ through FY26-27',
         'ARPU growth &ge;10% from product upsell, not just pricing',
@@ -3837,8 +4273,8 @@ STOCK_DATA.XRO = {
       title: 'T2: Melio Integration Succeeds',
       statusClass: 'accumulating',
       statusText: 'Awaiting Evidence',
-      score: '40%',
-      scoreWidth: '40%',
+      score: '30%',
+      scoreWidth: '30%',
       scoreMeta: '&rarr; Too early to assess',
       description: 'The US$2.5B Melio acquisition proves strategically correct: B2B payments become the wedge product for US SMB market penetration. Melio\'s payment volumes integrate with Xero\'s accounting platform, creating a payments+accounting bundle that QuickBooks cannot match on payments and PayPal cannot match on accounting.',
       requires: [
@@ -3862,22 +4298,24 @@ STOCK_DATA.XRO = {
     {
       tier: 't3',
       direction: 'downside',
-      title: 'T3: AI Disruption Compresses SaaS Margins',
-      statusClass: 'minimal',
-      statusText: 'Fear-Driven &mdash; No Evidence of Churn',
-      score: '25%',
-      scoreWidth: '25%',
-      scoreMeta: '&darr; Weakening with each earnings beat',
-      description: 'AI-powered accounting tools (automated bookkeeping, receipt scanning, reconciliation) reduce the value proposition of traditional cloud accounting platforms. SMBs migrate to cheaper AI-native alternatives or reduce their spend on accounting software as AI handles routine tasks.',
+      title: 'T3: AI Disruption Re-Prices SaaS',
+      statusClass: 'active',
+      statusText: 'Dominant &mdash; Market Re-Pricing SaaS Multiples',
+      score: '50%',
+      scoreWidth: '50%',
+      scoreMeta: '&uarr; Strengthening with every tech de-rating',
+      description: 'The market is re-pricing the entire SaaS multiple structure as AI reshapes expectations for cloud software economics. Automated bookkeeping, receipt scanning, and reconciliation reduce the perceived moat of traditional cloud accounting. Whether churn has appeared yet is secondary &mdash; the market is pricing the trajectory, not the current quarter. A 55% drawdown is not noise; it is the market telling you this thesis is dominant.',
       requires: null,
-      supportingLabel: 'Supporting Evidence (1 Domain)',
+      supportingLabel: 'Supporting Evidence (3 Domains)',
       supporting: [
-        '<strong>Media:</strong> Persistent narrative about AI threatening SaaS business models; significant mindshare'
+        '<strong>Market Price:</strong> Stock down 55% from A$196.52 to A$84.28. This is the single most powerful evidence domain &mdash; it represents the aggregated judgment of every participant. A drawdown of this magnitude, sustained over months, is not sentiment; it is repricing',
+        '<strong>Economic:</strong> Broad SaaS sector de-rating as AI disruption reprices growth expectations. Xero is not falling alone &mdash; the entire cloud software cohort is being re-valued downward',
+        '<strong>Media &amp; Narrative:</strong> AI disruption of SaaS has become the dominant market narrative. Narrative drives capital allocation; capital allocation drives price'
       ],
       contradictingLabel: 'Contradicting Evidence (4 Domains)',
       contradicting: [
-        '<strong>Financial Statements:</strong> Churn at historic lows; no sign of customer departure',
-        '<strong>Broker Research:</strong> No analyst models AI disruption as a base case',
+        '<strong>Financial Statements:</strong> Churn at historic lows; no sign of customer departure yet. This is the strongest counter-evidence',
+        '<strong>Broker Research:</strong> All 15 analysts rate Buy with 120%+ upside targets. Consensus has never been wider from price',
         '<strong>Academic:</strong> Research shows AI augments accounting workflows rather than replacing them',
         '<strong>Alternative Data:</strong> No visible churn signal in app downloads, web traffic, or reviews'
       ]
@@ -3907,18 +4345,18 @@ STOCK_DATA.XRO = {
 
   // Narrative
   narrative: {
-    theNarrative: 'The market is pricing <strong>AI disruption risk and failed US expansion via the Melio acquisition</strong>. The embedded thesis is that AI will compress SaaS margins as automated bookkeeping reduces the value proposition of traditional cloud accounting platforms; that the US$2.5B Melio acquisition was overpriced and dilutive; and that subscriber growth is decelerating toward saturation. The stock is down <span class="key-stat down">55%</span> from its 52-week high of A$196.52, and the current multiple, while optically high, reflects a market that has stopped paying for growth.',
+    theNarrative: 'The market is repricing Xero as <strong>an AI disruption casualty within a broader SaaS de-rating</strong>. The embedded thesis is that AI will compress SaaS margins as automated bookkeeping reduces the value proposition of traditional cloud accounting; that the US$2.5B Melio acquisition was overpriced for a market Xero has historically failed to crack; and that the entire premium-SaaS multiple structure is structurally lower going forward. The stock is down <span class="key-stat down">55%</span> from its 52-week high of A$196.52. This is not a pullback &mdash; it is the market repricing Xero\'s terminal value.',
     priceImplication: {
       label: 'Embedded Assumptions at A$84.28',
       content: '<strong>Revenue growth decelerating:</strong> Market expects growth to slow from 20% toward low-teens within 2 years. <strong>Melio dilutive:</strong> US$2.5B acquisition does not generate meaningful revenue contribution in FY26-27. <strong>AI threatens core product:</strong> Automated bookkeeping erodes Xero\'s value proposition for SMBs. <strong>Multiple compression continues:</strong> Tech sector de-rating persists; premium SaaS valuations do not recover. <strong>Competitive displacement:</strong> QuickBooks and MYOB gain share in key markets.'
     },
-    evidenceCheck: 'The bearish narrative is sentiment-driven rather than evidence-driven. Xero <strong>beat estimates across the board</strong> in 1H FY26: revenue up 20%, ARPU up 15%, EBITDA margins expanding, Rule of 40 at 44.5%, and churn rates below pre-pandemic levels. Every analyst covering the stock has a Buy rating, with consensus targets between A$183-191 (over 120% above current). The gap between market price and fundamental delivery is the widest it has been in Xero\'s listed history.',
-    narrativeStability: '<strong>Unstable, but favourable.</strong> The bearish narrative is driven by macro sentiment (tech rotation, AI fear), not company-specific deterioration. Each subsequent earnings result that beats expectations weakens the bear case. The narrative is most vulnerable to the FY26 full-year results in May 2026. If Xero delivers another beat, the sentiment overhang becomes increasingly difficult to sustain.'
+    evidenceCheck: 'The evidence is genuinely split. <strong>Fundamentals are strong:</strong> Xero beat estimates across the board in 1H FY26 &mdash; revenue up 20%, ARPU up 15%, EBITDA margins expanding, Rule of 40 at 44.5%, churn at historic lows. Every analyst covering the stock rates Buy with consensus 120%+ above current price. <strong>But the price is unambiguous:</strong> a 55% decline sustained over months is not noise &mdash; it is the market repricing what these fundamentals are worth in an AI world. The gap between analyst consensus and market price is the widest in Xero\'s listed history. One of them is wrong.',
+    narrativeStability: '<strong>Unstable and contested.</strong> The AI disruption narrative is strengthening with each sector de-rating and each new AI product announcement. It is weakened by each earnings beat that shows no churn &mdash; but so far the market has ignored three consecutive beats. The narrative is most vulnerable to the FY26 full-year results in May 2026: another strong result with no churn signal would stretch the bear case to its limit. Conversely, any sign of subscriber deceleration or churn uptick would confirm what the market has been pricing for months.'
   },
 
   // Evidence
   evidence: {
-    intro: 'Ten evidence domains assessed. Evidence strongly favours T1 (Platform Expansion), with limited empirical support for the bearish hypotheses dominating market sentiment.',
+    intro: 'Ten evidence domains assessed. Fundamental evidence supports T1 (Platform Expansion) across multiple domains, but market price &mdash; itself a powerful evidence domain &mdash; is unambiguously pricing T3 (AI Disruption). The gap between these signals is the defining analytical challenge for this stock.',
     cards: [
       {
         number: 1,
@@ -4026,12 +4464,12 @@ STOCK_DATA.XRO = {
         title: '8. Media &amp; Social',
         epistemicClass: 'ep-noise',
         epistemicLabel: 'Noise',
-        finding: '<strong>Bearish sentiment dominates.</strong> Financial media framing: "Xero caught in AI crosshairs," "Melio gamble," "tech sector rout." Social sentiment on investment forums overwhelmingly negative. However, this is <strong>macro-driven, not company-specific</strong>: the same narrative applies to all SaaS companies. Xero-specific negative coverage focuses almost entirely on AI disruption fears and Melio price, not on operational deterioration. No credible reporting of customer churn or competitive displacement.',
+        finding: '<strong>Bearish sentiment dominates.</strong> Financial media framing: "Xero caught in AI crosshairs," "Melio gamble," "tech sector rout." Social sentiment on investment forums overwhelmingly negative. The AI disruption narrative is not unique to Xero &mdash; it applies across the SaaS sector &mdash; but that makes it more powerful, not less. Sector-wide narratives drive capital allocation across entire asset classes. The fact that no credible reporting of actual churn exists creates the key tension: the narrative is ahead of the evidence, but the narrative is driving the price.',
         tension: null,
         table: null,
         tags: [
-          { text: 'Supports T3 (narrative weight)', class: 'supports' },
-          { text: 'Neutral on fundamentals', class: 'neutral' }
+          { text: 'Strongly Supports T3 (dominant narrative)', class: 'strong' },
+          { text: 'Contradicts T1 (sentiment overwhelms fundamentals)', class: 'contradicts' }
         ],
         source: 'Australian Financial Review; major tech press; investment forums; sentiment tracking'
       },
@@ -4165,7 +4603,7 @@ STOCK_DATA.XRO = {
       '<strong>US market unit economics:</strong> Xero does not break out US-specific subscriber economics. The US has historically been Xero\'s weakest market, and Melio\'s effectiveness as a wedge product is unproven.',
       '<strong>AI impact quantification:</strong> While academic research suggests AI augments rather than replaces accounting workflows, the pace of AI capability improvement is uncertain. The absence of current churn does not guarantee absence of future disruption.'
     ],
-    analyticalLimitations: 'Hypothesis survival scores (T1: 39%, T2: 29%, T3: 18%, T4: 14%) reflect editorial assessment. The unusually wide gap between T1 and T3/T4 reflects the evidence asymmetry: the bullish thesis has strong empirical support across multiple independent domains, while the bearish theses rely primarily on sentiment and narrative rather than observable data. This does not mean the bear case is wrong; it means the bear case is currently unfalsifiable.'
+    analyticalLimitations: 'Hypothesis survival scores (T3: 36%, T1: 29%, T2: 21%, T4: 14%) reflect editorial assessment. T3 (AI Disruption) is scored as the dominant hypothesis because the market price &mdash; itself the most powerful evidence signal &mdash; is unambiguously pricing this thesis. A 55% drawdown sustained over months cannot be dismissed as sentiment. However, the fundamental evidence (financial statements, churn data, broker consensus, academic research) uniformly contradicts T3 and supports T1. This is the defining analytical tension: price says one thing, every other evidence domain says another. We present this honestly. The judgment remains yours.'
   },
 
   // Footer
@@ -4173,6 +4611,84 @@ STOCK_DATA.XRO = {
     disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company accounts, broker consensus data, and publicly available information. This report does not contain buy, sell, or hold recommendations, price targets, or valuation models.',
     domainCount: '10 of 10',
     hypothesesCount: '4 Active'
+  },
+
+  // Technical Analysis — observation only, no editorial language
+  technicalAnalysis: {
+    date: '12 February 2026',
+    period: '1 Year',
+    source: 'Continuum Technical Intelligence',
+    regime: 'Trending',
+    clarity: 'Clear',
+
+    price: { current: 77.76, currency: 'A$' },
+
+    movingAverages: {
+      ma50:  { value: 105.28, date: '12 Feb 2026' },
+      ma200: { value: 136.58, date: '12 Feb 2026' },
+      crossover: {
+        type: 'Death Cross',
+        date: 'w/c 6 October 2025',
+        description: '50-day MA crossed below 200-day MA'
+      },
+      priceVsMa50:  -26.1,
+      priceVsMa200: -43.1
+    },
+
+    trend: {
+      direction: 'Down',
+      duration: '8 months',
+      structure: 'Lower highs, lower lows',
+      peak:   { price: 194.21, date: 'w/c 16 June 2025' },
+      trough: { price: 77.76,  date: '12 February 2026' },
+      drawdown: -60.0
+    },
+
+    keyLevels: {
+      support:    { price: 77.00, method: 'Prior intraday low cluster (Feb 2026 sessions)' },
+      resistance: { price: 90.00, method: 'Prior support turned resistance (Jan 2026 breakdown level)' },
+      fiftyTwoWeekHigh: { price: 194.21, date: 'w/c 16 June 2025' },
+      fiftyTwoWeekLow:  { price: 77.71,  date: '12 February 2026' }
+    },
+
+    volume: {
+      latestVs20DayAvg: 3.2,
+      latestDate: '12 February 2026',
+      priorSpikes: [
+        { period: 'w/c 23 June 2025', ratio: 2.8, context: 'Initial break below A$160' },
+        { period: 'w/c 6 October 2025', ratio: 2.1, context: 'Death cross week' },
+        { period: 'w/c 15 December 2025', ratio: 2.4, context: 'Break below A$120' }
+      ]
+    },
+
+    volatility: {
+      latestDailyRange: { high: 81.00, low: 77.71, date: '12 February 2026' },
+      latestRangePercent: 4.2,
+      avgDailyRangePercent30: 2.1,
+      avgDailyRangePercent90: 1.4
+    },
+
+    meanReversion: {
+      vsMa50:  -26.1,
+      vsMa200: -43.1,
+      rangePosition: 5,
+      rangeHigh: 194.21,
+      rangeLow:  77.71
+    },
+
+    inflectionPoints: [
+      { date: 'w/c 16 June 2025',     price: 194.21, event: '12-month high' },
+      { date: 'w/c 23 June 2025',     price: 184.00, event: 'Break below A$190; volume 2.8x 20-day avg' },
+      { date: 'w/c 6 October 2025',   price: 140.00, event: 'Death cross formed; 50-day MA crosses below 200-day MA' },
+      { date: 'w/c 15 December 2025', price: 120.00, event: 'Break below A$120; volume 2.4x 20-day avg' },
+      { date: 'w/c 2 February 2026',  price: 96.10,  event: 'Break below A$100' },
+      { date: '12 February 2026',     price: 77.76,  event: 'New 12-month low; volume 3.2x 20-day avg' }
+    ],
+
+    relativePerformance: {
+      vsIndex:  { name: 'S&amp;P/ASX 200',  period: '12 months', stockReturn: -60.0, indexReturn: -2.3, relativeReturn: -57.7 },
+      vsSector: { name: 'S&amp;P/ASX IT Index', period: '12 months', stockReturn: -60.0, sectorReturn: -18.5, relativeReturn: -41.5 }
+    }
   }
 };
 
@@ -4592,6 +5108,84 @@ STOCK_DATA.WTC = {
       '<strong>Broker target currency:</strong> Most analyst targets predate the February board departures. The consensus A$101.21 may not reflect current governance reality.'
     ],
     analyticalLimitations: 'Hypothesis survival scores (T1: 36%, T2: 25%, T3: 21%, T4: 18%) reflect editorial assessment. T4 (Founder Entrenchment) scores highest because it is driven by observable structural facts: White\'s 36% shareholding, his return as Executive Chairman, and the mass board departure. T2 (Product Carries) scores second because the operational evidence genuinely is strong. These two hypotheses can coexist: a great product can persist inside a poorly governed company, but value accrual to minority shareholders may be impaired.'
+  },
+
+
+  technicalAnalysis: {
+    date: '10 February 2026',
+    period: '1 Year',
+    source: 'Continuum Technical Intelligence',
+    regime: 'Trending',
+    clarity: 'Clear',
+
+    price: { current: 49.30, currency: 'A$' },
+
+    movingAverages: {
+      ma50:  { value: 65.47, date: '10 Feb 2026' },
+      ma200: { value: 89.66, date: '10 Feb 2026' },
+      crossover: {
+        type: 'Death Cross',
+        date: 'w/c 14 July 2025',
+        description: '50-day MA crossed below 200-day MA'
+      },
+      priceVsMa50:  -24.7,
+      priceVsMa200: -45.0
+    },
+
+    trend: {
+      direction: 'Down',
+      duration: '10 months',
+      structure: 'Lower highs, lower lows; accelerating decline since December 2025',
+      peak:   { price: 124.07, date: 'w/c 17 February 2025' },
+      trough: { price: 47.60, date: 'w/c 3 February 2026' },
+      drawdown: -60.3
+    },
+
+    keyLevels: {
+      support:    { price: 47.00, method: 'Recent intraday low cluster (Feb 2026)' },
+      resistance: { price: 68.00, method: 'Prior breakdown level (Jan 2026)' },
+      fiftyTwoWeekHigh: { price: 124.07, date: 'w/c 17 February 2025' },
+      fiftyTwoWeekLow:  { price: 47.60,  date: 'w/c 3 February 2026' }
+    },
+
+    volume: {
+      latestVs20DayAvg: 2.4,
+      latestDate: '10 February 2026',
+      priorSpikes: [
+        { period: 'w/c 24 February 2025', ratio: 3.1, context: 'Governance shock; initial break below A$100' },
+        { period: 'w/c 14 July 2025', ratio: 2.3, context: 'Death cross week; break below A$90' },
+        { period: 'w/c 22 December 2025', ratio: 2.6, context: 'Break below A$70; capitulation selling' }
+      ]
+    },
+
+    volatility: {
+      latestDailyRange: { high: 50.59, low: 47.60, date: '10 February 2026' },
+      latestRangePercent: 6.3,
+      avgDailyRangePercent30: 3.2,
+      avgDailyRangePercent90: 2.4
+    },
+
+    meanReversion: {
+      vsMa50:  -24.7,
+      vsMa200: -45.0,
+      rangePosition: 2,
+      rangeHigh: 124.07,
+      rangeLow:  47.60
+    },
+
+    inflectionPoints: [
+      { date: 'w/c 17 February 2025', price: 124.07, event: '12-month high' },
+      { date: 'w/c 24 February 2025', price: 97.25,  event: 'Governance shock; price drops 21% in one week' },
+      { date: 'w/c 14 July 2025',     price: 90.00,  event: 'Death cross forms; 50-day MA crosses below 200-day MA' },
+      { date: 'w/c 22 December 2025', price: 71.52,  event: 'Break below A$70; selling accelerates' },
+      { date: 'w/c 19 January 2026',  price: 62.63,  event: 'Break below A$65; no buying support' },
+      { date: 'w/c 3 February 2026',  price: 47.60,  event: 'New 12-month low; capitulation' }
+    ],
+
+    relativePerformance: {
+      vsIndex:  { name: 'S&amp;P/ASX 200',  period: '12 months', stockReturn: -60.3, indexReturn: -2.3, relativeReturn: -58.0 },
+      vsSector: { name: 'S&amp;P/ASX IT Index', period: '12 months', stockReturn: -60.3, sectorReturn: -18.5, relativeReturn: -41.8 }
+    }
   },
 
   // Footer
@@ -5034,6 +5628,85 @@ STOCK_DATA.DRO = {
     analyticalLimitations: 'Hypothesis survival scores (T1: 36%, T2: 25%, T3: 25%, T4: 14%) reflect genuinely balanced evidence. The narrow range between T1 and T2 is intentional: the data supports both the thesis that DroneShield is scaling into a structural tailwind and the thesis that revenue remains lumpy and contract-dependent. With only 2 covering analysts and limited institutional coverage, the information environment is relatively opaque compared to large-cap coverage. This uncertainty itself is a finding.'
   },
 
+
+  technicalAnalysis: {
+    date: '10 February 2026',
+    period: '1 Year',
+    source: 'Continuum Technical Intelligence',
+    regime: 'Volatile',
+    clarity: 'Unclear',
+
+    price: { current: 2.90, currency: 'A$' },
+
+    movingAverages: {
+      ma50:  { value: 3.18, date: '10 Feb 2026' },
+      ma200: { value: 3.09, date: '10 Feb 2026' },
+      crossover: {
+        type: 'Golden Cross',
+        date: 'w/c 16 June 2025',
+        description: '50-day MA crossed above 200-day MA during initial momentum rally'
+      },
+      priceVsMa50:  -8.9,
+      priceVsMa200: -6.1
+    },
+
+    trend: {
+      direction: 'Volatile / No Clear Trend',
+      duration: '12 months',
+      structure: 'Extreme swings; rallied from A$0.59 to A$6.60, then retraced to A$1.72 before partial recovery',
+      peak:   { price: 6.60, date: 'w/c 18 August 2025' },
+      trough: { price: 1.72, date: 'w/c 8 December 2025' },
+      drawdown: -56.1
+    },
+
+    keyLevels: {
+      support:    { price: 2.50, method: 'Prior consolidation cluster (Nov–Dec 2025)' },
+      resistance: { price: 4.00, method: 'Round number and prior breakdown level (Oct 2025)' },
+      fiftyTwoWeekHigh: { price: 6.60, date: 'w/c 18 August 2025' },
+      fiftyTwoWeekLow:  { price: 0.59, date: 'w/c 17 February 2025' }
+    },
+
+    volume: {
+      latestVs20DayAvg: 1.5,
+      latestDate: '10 February 2026',
+      priorSpikes: [
+        { period: 'w/c 16 June 2025', ratio: 3.5, context: 'Breakout above A$3.00; defence spending momentum' },
+        { period: 'w/c 18 August 2025', ratio: 4.2, context: 'Blow-off top at A$6.60; record volume' },
+        { period: 'w/c 8 December 2025', ratio: 3.0, context: 'Capitulation at A$1.72; panic selling' }
+      ]
+    },
+
+    volatility: {
+      latestDailyRange: { high: 3.38, low: 2.90, date: '10 February 2026' },
+      latestRangePercent: 16.6,
+      avgDailyRangePercent30: 5.8,
+      avgDailyRangePercent90: 6.2
+    },
+
+    meanReversion: {
+      vsMa50:  -8.9,
+      vsMa200: -6.1,
+      rangePosition: 38,
+      rangeHigh: 6.60,
+      rangeLow:  0.59
+    },
+
+    inflectionPoints: [
+      { date: 'w/c 17 February 2025', price: 0.59,  event: '12-month low; pre-catalyst base' },
+      { date: 'w/c 16 June 2025',     price: 3.24,  event: 'Breakout above A$3.00; defence spending catalyst' },
+      { date: 'w/c 18 August 2025',   price: 6.60,  event: '12-month high; blow-off top' },
+      { date: 'w/c 29 September 2025', price: 3.83, event: 'Retracement to A$3.80; 42% drawdown from peak' },
+      { date: 'w/c 8 December 2025',  price: 1.72,  event: 'Capitulation low; 74% off peak' },
+      { date: 'w/c 26 January 2026',  price: 3.27,  event: 'Recovery rally regains A$3.00' },
+      { date: '10 February 2026',     price: 2.90,  event: 'Volatility continues; price oscillating around A$3.00' }
+    ],
+
+    relativePerformance: {
+      vsIndex:  { name: 'S&amp;P/ASX 200',  period: '12 months', stockReturn: 391.5, indexReturn: -2.3, relativeReturn: 393.8 },
+      vsSector: { name: 'S&amp;P/ASX Small Ords', period: '12 months', stockReturn: 391.5, sectorReturn: -5.1, relativeReturn: 396.6 }
+    }
+  },
+
   // Footer
   footer: {
     disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information. This report does not contain buy, sell, or hold recommendations, price targets, or valuation models.',
@@ -5465,6 +6138,84 @@ STOCK_DATA.PME = {
       '<strong>Key person risk:</strong> Co-founder Dr Sam Hupert is 71. Succession planning is not publicly detailed. The company\'s lean model (132 employees for an A$18.6B company) creates concentration risk in key personnel.'
     ],
     analyticalLimitations: 'Hypothesis survival scores (T1: 39%, T2: 25%, T3: 18%, T4: 18%) reflect the strong evidence asymmetry in this case. The high score for T1 (US Expansion) is driven by observable contract wins, market share data, and competitive positioning. The low score for T3 (Competitive Disruption) reflects the absence of any credible competitive threat in the near term. The Upside skew rating despite a 163x P/E is an editorial judgment: conventional valuation frameworks consistently undervalue platform businesses with this quality of economics. Whether the market agrees is a separate question from whether the evidence supports it.'
+  },
+
+
+  technicalAnalysis: {
+    date: '10 February 2026',
+    period: '1 Year',
+    source: 'Continuum Technical Intelligence',
+    regime: 'Trending',
+    clarity: 'Clear',
+
+    price: { current: 166.35, currency: 'A$' },
+
+    movingAverages: {
+      ma50:  { value: 212.70, date: '10 Feb 2026' },
+      ma200: { value: 269.57, date: '10 Feb 2026' },
+      crossover: {
+        type: 'Death Cross',
+        date: 'w/c 22 September 2025',
+        description: '50-day MA crossed below 200-day MA'
+      },
+      priceVsMa50:  -21.8,
+      priceVsMa200: -38.3
+    },
+
+    trend: {
+      direction: 'Down',
+      duration: '8 months',
+      structure: 'Lower highs, lower lows; occasional rally attempts fail at declining resistance',
+      peak:   { price: 330.48, date: 'w/c 14 July 2025' },
+      trough: { price: 157.62, date: 'w/c 3 February 2026' },
+      drawdown: -49.7
+    },
+
+    keyLevels: {
+      support:    { price: 157.00, method: 'Recent intraday low (Feb 2026)' },
+      resistance: { price: 220.00, method: 'Prior support turned resistance (Dec 2025)' },
+      fiftyTwoWeekHigh: { price: 330.48, date: 'w/c 14 July 2025' },
+      fiftyTwoWeekLow:  { price: 157.62, date: 'w/c 3 February 2026' }
+    },
+
+    volume: {
+      latestVs20DayAvg: 1.8,
+      latestDate: '10 February 2026',
+      priorSpikes: [
+        { period: 'w/c 22 September 2025', ratio: 2.4, context: 'Death cross week; break below A$300' },
+        { period: 'w/c 15 December 2025', ratio: 2.1, context: 'Break below A$250; institutional selling' },
+        { period: 'w/c 3 February 2026', ratio: 2.6, context: 'Break below A$180; new 12-month low' }
+      ]
+    },
+
+    volatility: {
+      latestDailyRange: { high: 167.66, low: 157.62, date: '10 February 2026' },
+      latestRangePercent: 6.4,
+      avgDailyRangePercent30: 3.2,
+      avgDailyRangePercent90: 2.1
+    },
+
+    meanReversion: {
+      vsMa50:  -21.8,
+      vsMa200: -38.3,
+      rangePosition: 5,
+      rangeHigh: 330.48,
+      rangeLow:  157.62
+    },
+
+    inflectionPoints: [
+      { date: 'w/c 14 July 2025',     price: 330.48, event: '12-month high' },
+      { date: 'w/c 22 September 2025', price: 297.15, event: 'Death cross forms; break below A$300' },
+      { date: 'w/c 3 November 2025',  price: 263.34, event: 'Break below A$270; selling accelerates' },
+      { date: 'w/c 15 December 2025', price: 246.67, event: 'Break below A$250' },
+      { date: 'w/c 19 January 2026',  price: 214.86, event: 'Break below A$220; cascading stops' },
+      { date: 'w/c 3 February 2026',  price: 157.62, event: 'New 12-month low; acceleration to downside' }
+    ],
+
+    relativePerformance: {
+      vsIndex:  { name: 'S&amp;P/ASX 200',  period: '12 months', stockReturn: -43.0, indexReturn: -2.3, relativeReturn: -40.7 },
+      vsSector: { name: 'S&amp;P/ASX Healthcare', period: '12 months', stockReturn: -43.0, sectorReturn: -12.4, relativeReturn: -30.6 }
+    }
   },
 
   // Footer
@@ -5904,6 +6655,83 @@ STOCK_DATA.GYG = {
       '<strong>CEO succession:</strong> The identity and strategic orientation of the incoming CEO is unknown. This is the single largest near-term uncertainty: the new CEO\'s stance on US expansion will likely determine whether T2 or T4 prevails.'
     ],
     analyticalLimitations: 'Hypothesis survival scores (T1: 32%, T2: 29%, T3: 21%, T4: 18%) reflect the weight of evidence against the IPO growth narrative. The high score for T3 (Growth Maturation) is driven by observable data: same-store sales at 3.7% vs 7.6% forecast, stock below IPO price, P/E at 166x for a QSR business. The low score for T2 (US Expansion Succeeds) reflects both the unit economics (A$2.6M loss per store) and the academic evidence on international QSR expansion failure rates. We note that 5 stores is a very small sample; it is possible (though not supported by current evidence) that unit economics will improve with scale. The Downside skew rating reflects our assessment that the most probable outcome is valuation correction, not business failure.'
+  },
+
+
+  technicalAnalysis: {
+    date: '10 February 2026',
+    period: '1 Year',
+    source: 'Continuum Technical Intelligence',
+    regime: 'Trending',
+    clarity: 'Clear',
+
+    price: { current: 20.30, currency: 'A$' },
+
+    movingAverages: {
+      ma50:  { value: 21.84, date: '10 Feb 2026' },
+      ma200: { value: 25.90, date: '10 Feb 2026' },
+      crossover: {
+        type: 'Death Cross',
+        date: 'w/c 7 July 2025',
+        description: '50-day MA crossed below 200-day MA'
+      },
+      priceVsMa50:  -7.1,
+      priceVsMa200: -21.6
+    },
+
+    trend: {
+      direction: 'Down',
+      duration: '12 months',
+      structure: 'Persistent lower highs; punctuated by a sharp gap-down in September 2025',
+      peak:   { price: 45.32, date: 'w/c 24 February 2025' },
+      trough: { price: 20.30, date: '10 February 2026' },
+      drawdown: -55.2
+    },
+
+    keyLevels: {
+      support:    { price: 20.00, method: 'Psychological round number and current 12-month low zone' },
+      resistance: { price: 23.00, method: 'Prior consolidation range (Dec 2025 – Jan 2026)' },
+      fiftyTwoWeekHigh: { price: 45.32, date: 'w/c 24 February 2025' },
+      fiftyTwoWeekLow:  { price: 20.30, date: '10 February 2026' }
+    },
+
+    volume: {
+      latestVs20DayAvg: 1.4,
+      latestDate: '10 February 2026',
+      priorSpikes: [
+        { period: 'w/c 8 September 2025', ratio: 3.2, context: 'Gap-down from A$29 to A$23.70; likely earnings shock' },
+        { period: 'w/c 17 November 2025', ratio: 2.0, context: 'Break below A$24; selling pressure' },
+        { period: 'w/c 2 February 2026', ratio: 1.8, context: 'New 12-month low at A$20.30' }
+      ]
+    },
+
+    volatility: {
+      latestDailyRange: { high: 20.87, low: 20.30, date: '10 February 2026' },
+      latestRangePercent: 2.8,
+      avgDailyRangePercent30: 2.4,
+      avgDailyRangePercent90: 2.3
+    },
+
+    meanReversion: {
+      vsMa50:  -7.1,
+      vsMa200: -21.6,
+      rangePosition: 0,
+      rangeHigh: 45.32,
+      rangeLow:  20.30
+    },
+
+    inflectionPoints: [
+      { date: 'w/c 24 February 2025', price: 45.32, event: '12-month high; post-IPO peak' },
+      { date: 'w/c 7 July 2025',      price: 30.25, event: 'Death cross forms; 50-day MA crosses below 200-day MA' },
+      { date: 'w/c 8 September 2025', price: 23.70, event: 'Sharp gap-down; falls 18% in one week' },
+      { date: 'w/c 17 November 2025', price: 23.43, event: 'Breaks prior lows; accelerating decline' },
+      { date: 'w/c 2 February 2026',  price: 20.30, event: 'New 12-month low; at 55% below IPO peak' }
+    ],
+
+    relativePerformance: {
+      vsIndex:  { name: 'S&amp;P/ASX 200',  period: '12 months', stockReturn: -49.2, indexReturn: -2.3, relativeReturn: -46.9 },
+      vsSector: { name: 'S&amp;P/ASX Consumer Disc.', period: '12 months', stockReturn: -49.2, sectorReturn: -8.7, relativeReturn: -40.5 }
+    }
   },
 
   // Footer
@@ -6355,6 +7183,84 @@ STOCK_DATA.CSL = {
     analyticalLimitations: 'Hypothesis survival scores (T1: 33%, T2: 26%, T3: 19%, T4: 22%) reflect editorial assessment. The unusually high score for T2 (Execution Risk) relative to CSL\'s historical stability reflects the specific circumstances of the CEO departure and Seqirus reversal. These are event-driven, not structural, and could resolve quickly with a clean 1H result and prompt CEO appointment.'
   },
 
+
+  technicalAnalysis: {
+    date: '11 February 2026',
+    period: '1 Year',
+    source: 'Continuum Technical Intelligence',
+    regime: 'Transitional',
+    clarity: 'Mixed',
+
+    price: { current: 180.50, currency: 'A$' },
+
+    movingAverages: {
+      ma50:  { value: 177.79, date: '11 Feb 2026' },
+      ma200: { value: 214.00, date: '11 Feb 2026' },
+      crossover: {
+        type: 'Death Cross',
+        date: 'w/c 22 September 2025',
+        description: '50-day MA crossed below 200-day MA following sharp selloff'
+      },
+      priceVsMa50:  1.5,
+      priceVsMa200: -15.7
+    },
+
+    trend: {
+      direction: 'Base-building',
+      duration: '3 months',
+      structure: 'Sharp decline arrested; price consolidating A$168–A$186 since November 2025',
+      peak:   { price: 272.00, date: 'w/c 28 July 2025' },
+      trough: { price: 168.29, date: 'w/c 12 January 2026' },
+      drawdown: -33.6
+    },
+
+    keyLevels: {
+      support:    { price: 168.00, method: '12-month low and recent support (Jan 2026)' },
+      resistance: { price: 186.00, method: 'Upper range of recent consolidation band' },
+      fiftyTwoWeekHigh: { price: 272.00, date: 'w/c 28 July 2025' },
+      fiftyTwoWeekLow:  { price: 168.29, date: 'w/c 12 January 2026' }
+    },
+
+    volume: {
+      latestVs20DayAvg: 1.2,
+      latestDate: '11 February 2026',
+      priorSpikes: [
+        { period: 'w/c 1 September 2025', ratio: 3.4, context: 'Sharp selloff from A$271 to A$225; likely earnings miss or guidance cut' },
+        { period: 'w/c 27 October 2025', ratio: 2.2, context: 'Break below A$200; institutional rebalancing' },
+        { period: 'w/c 10 November 2025', ratio: 2.8, context: 'Crash to A$170; capitulation selling' }
+      ]
+    },
+
+    volatility: {
+      latestDailyRange: { high: 181.70, low: 171.39, date: '11 February 2026' },
+      latestRangePercent: 6.0,
+      avgDailyRangePercent30: 1.5,
+      avgDailyRangePercent90: 1.8
+    },
+
+    meanReversion: {
+      vsMa50:  1.5,
+      vsMa200: -15.7,
+      rangePosition: 12,
+      rangeHigh: 272.00,
+      rangeLow:  168.29
+    },
+
+    inflectionPoints: [
+      { date: 'w/c 28 July 2025',     price: 272.00, event: '12-month high' },
+      { date: 'w/c 1 September 2025', price: 225.50, event: 'Sharp selloff; drops 17% in one week' },
+      { date: 'w/c 22 September 2025', price: 205.81, event: 'Death cross forms; 50-day MA below 200-day MA' },
+      { date: 'w/c 10 November 2025', price: 170.77, event: 'Breaks below A$180; near capitulation' },
+      { date: 'w/c 12 January 2026',  price: 168.29, event: '12-month low; base formation begins' },
+      { date: '11 February 2026',     price: 180.50, event: 'Recovering toward 50-day MA; base-building continues' }
+    ],
+
+    relativePerformance: {
+      vsIndex:  { name: 'S&amp;P/ASX 200',  period: '12 months', stockReturn: -29.7, indexReturn: -2.3, relativeReturn: -27.4 },
+      vsSector: { name: 'S&amp;P/ASX Healthcare', period: '12 months', stockReturn: -29.7, sectorReturn: -12.4, relativeReturn: -17.3 }
+    }
+  },
+
   // Footer
   footer: {
     disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, ACCC publications, broker consensus data, and publicly available information. This report does not contain buy, sell, or hold recommendations, price targets, or valuation models.',
@@ -6490,7 +7396,84 @@ STOCK_DATA.MQG = {
     ],
     analyticalLimitations: 'Hypothesis survival scores (T1: 33%, T2: 22%, T3: 19%, T4: 26%) reflect editorial assessment. The relatively tight spread between T1 and T2 reflects the genuine uncertainty about whether Macquarie\'s infrastructure positioning is a structural advantage (T1) or merely one pillar of a diversified franchise (T2). The answer depends on whether energy transition capital flows accelerate as projected, which is a macroeconomic question rather than a company-specific one.'
   },
-  footer: {
+  
+  technicalAnalysis: {
+    date: '11 February 2026',
+    period: '1 Year',
+    source: 'Continuum Technical Intelligence',
+    regime: 'Range-bound',
+    clarity: 'Mixed',
+
+    price: { current: 207.83, currency: 'A$' },
+
+    movingAverages: {
+      ma50:  { value: 204.71, date: '11 Feb 2026' },
+      ma200: { value: 213.09, date: '11 Feb 2026' },
+      crossover: {
+        type: 'Death Cross',
+        date: 'w/c 13 October 2025',
+        description: '50-day MA crossed below 200-day MA during range compression'
+      },
+      priceVsMa50:  1.5,
+      priceVsMa200: -2.5
+    },
+
+    trend: {
+      direction: 'Recovering',
+      duration: '3 months',
+      structure: 'V-shaped recovery from November 2025 lows; now testing 200-day MA from below',
+      peak:   { price: 237.11, date: 'w/c 24 February 2025' },
+      trough: { price: 170.97, date: 'w/c 5 May 2025' },
+      drawdown: -12.3
+    },
+
+    keyLevels: {
+      support:    { price: 195.00, method: 'Prior consolidation floor (Dec 2025 – Jan 2026)' },
+      resistance: { price: 215.00, method: '200-day MA cluster and prior range ceiling' },
+      fiftyTwoWeekHigh: { price: 237.11, date: 'w/c 24 February 2025' },
+      fiftyTwoWeekLow:  { price: 170.97, date: 'w/c 5 May 2025' }
+    },
+
+    volume: {
+      latestVs20DayAvg: 1.1,
+      latestDate: '11 February 2026',
+      priorSpikes: [
+        { period: 'w/c 5 May 2025', ratio: 2.6, context: 'Selloff to A$170.97; 52-week low' },
+        { period: 'w/c 10 November 2025', ratio: 1.9, context: 'Break below A$195; late-year weakness' }
+      ]
+    },
+
+    volatility: {
+      latestDailyRange: { high: 214.50, low: 207.83, date: '11 February 2026' },
+      latestRangePercent: 3.2,
+      avgDailyRangePercent30: 1.5,
+      avgDailyRangePercent90: 1.4
+    },
+
+    meanReversion: {
+      vsMa50:  1.5,
+      vsMa200: -2.5,
+      rangePosition: 56,
+      rangeHigh: 237.11,
+      rangeLow:  170.97
+    },
+
+    inflectionPoints: [
+      { date: 'w/c 24 February 2025', price: 237.11, event: '12-month high' },
+      { date: 'w/c 5 May 2025',       price: 170.97, event: '12-month low; sharp selloff' },
+      { date: 'w/c 23 June 2025',     price: 215.30, event: 'Recovery rally to A$215; strong bounce' },
+      { date: 'w/c 13 October 2025',  price: 213.10, event: 'Death cross forms' },
+      { date: 'w/c 24 November 2025', price: 189.90, event: 'Retest of lows; A$190 holds' },
+      { date: '11 February 2026',     price: 207.83, event: 'Recovery; approaching 200-day MA resistance at A$213' }
+    ],
+
+    relativePerformance: {
+      vsIndex:  { name: 'S&amp;P/ASX 200',  period: '12 months', stockReturn: -10.2, indexReturn: -2.3, relativeReturn: -7.9 },
+      vsSector: { name: 'S&amp;P/ASX Financials', period: '12 months', stockReturn: -10.2, sectorReturn: -4.1, relativeReturn: -6.1 }
+    }
+  },
+
+footer: {
     disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, ACCC publications, broker consensus data, and publicly available information. This report does not contain buy, sell, or hold recommendations, price targets, or valuation models.',
     domainCount: '10 of 10',
     hypothesesCount: '4 Active'
@@ -6519,7 +7502,85 @@ STOCK_DATA.GMG = {
   discriminators: { intro: 'Three data points carry high diagnosticity. General commentary about "data centre demand" is non-discriminating because it applies to all DC developers equally.', rows: [{ diagnosticity: 'HIGH', diagnosticityClass: 'disc-high', evidence: '<strong>FY26 Half-Year Results.</strong> Operating EPS growth rate and DC pipeline conversion metrics.', discriminatesBetween: 'T1 (DC mega-trend delivering) vs T2 (priced in, growth decelerating)', currentReading: 'On track (guidance +9%)', readingClass: 'td-green' }, { diagnosticity: 'HIGH', diagnosticityClass: 'disc-high', evidence: '<strong>Hyperscaler capex trajectory.</strong> If Microsoft, Google, AWS maintain or increase DC capex budgets through CY2026.', discriminatesBetween: 'T1 (demand accelerating) vs T3 (bubble risk)', currentReading: 'Capex accelerating', readingClass: 'td-green' }, { diagnosticity: 'HIGH', diagnosticityClass: 'disc-high', evidence: '<strong>New institutional DC partnerships.</strong> Follow-on deals similar to CPP A$14B commitment.', discriminatesBetween: 'T4 (platform validated) vs T2 (one-off partnership)', currentReading: 'CPP only so far', readingClass: 'td-amber' }, { diagnosticity: 'MEDIUM', diagnosticityClass: 'disc-med', evidence: '<strong>Power grid approvals and construction timelines.</strong> Any material delays in power delivery.', discriminatesBetween: 'T1 (execution on track) vs T3 (power constraints binding)', currentReading: '300MW constructing', readingClass: 'td-green' }], nonDiscriminating: '<strong>"Data centre demand is growing"</strong> (benefits all DC developers equally) &bull; <strong>"Interest rates pressure REITs"</strong> (macro factor, not GMG-specific) &bull; <strong>"36x P/E looks expensive for a REIT"</strong> (describes the question, not the answer; traditional REIT metrics may not apply) &bull; <strong>"0.5% yield is too low"</strong> (yield is a residual of growth reinvestment, not a standalone signal)' },
   tripwires: { intro: 'Four revision conditions. Data centre pipeline execution is the single most important variable for hypothesis revision.', cards: [{ date: '1H FY26 RESULTS', name: 'Half-Year Operating Performance', conditions: [{ if: 'If operating EPS growth &ge;9% and WIP rises toward A$17.5B guidance', valence: 'positive', then: 'T1 strengthens. Execution on track; DC pipeline expanding as guided. Growth flywheel confirmed.' }, { if: 'If operating EPS growth &lt;7% or WIP growth stalls', valence: 'negative', then: 'T2 strengthens. Growth narrative weakening; market premium at risk.' }], source: 'Source: ASX announcement; GMG half-year results' }, { date: 'CY 2026', name: 'Hyperscaler Capex Announcements', conditions: [{ if: 'If Microsoft, Google, AWS each commit US$50B+ to DC capex for CY2026', valence: 'positive', then: 'T1 and T4 strengthen materially. Multi-year demand runway confirmed.' }, { if: 'If any major hyperscaler materially reduces DC capex guidance', valence: 'negative', then: 'T3 strengthens sharply. First evidence of demand deceleration. DC oversupply narrative gains credibility.' }], source: 'Source: Microsoft, Alphabet, Amazon quarterly earnings; capex disclosures' }, { date: 'CY 2026', name: 'New Institutional DC Partnerships', conditions: [{ if: 'If 1-2 additional sovereign wealth or pension fund partnerships announced', valence: 'positive', then: 'T4 strengthens. Platform model validated. GMG reclassification as infrastructure manager accelerates.' }, { if: 'If no new institutional partnerships beyond CPP', valence: 'negative', then: 'T4 weakens. CPP was opportunistic, not a template. Platform thesis unproven.' }], source: 'Source: ASX announcements; institutional investor disclosures' }, { date: 'ONGOING', name: 'Power Grid and Construction Delivery', conditions: [{ if: 'If 500MW target achieved and power procurement on schedule', valence: 'positive', then: 'T1 execution confirmed. Power moat deepening.' }, { if: 'If material construction delays or power grid bottlenecks disclosed', valence: 'negative', then: 'T3 strengthens. Execution risk is real. Power constraints are binding.' }], source: 'Source: GMG quarterly updates; energy regulator approvals; ASX announcements' }] },
   gaps: { coverageRows: [{ domain: 'Corporate Comms', coverageLevel: 'full', coverageLabel: 'Full', freshness: 'FY25', confidence: 'High (but motivated)', confidenceClass: '' }, { domain: 'Regulatory Filings', coverageLevel: 'full', coverageLabel: 'Full', freshness: 'FY25', confidence: 'High (audited)', confidenceClass: 'td-green' }, { domain: 'Broker Research', coverageLevel: 'full', coverageLabel: 'Full', freshness: 'Recent', confidence: 'High (11 analysts)', confidenceClass: 'td-green' }, { domain: 'Competitor &amp; Industry Data', coverageLevel: 'good', coverageLabel: 'Good', freshness: 'Current', confidence: 'High (independent)', confidenceClass: 'td-green' }, { domain: 'Economic Data', coverageLevel: 'good', coverageLabel: 'Good', freshness: 'Current', confidence: 'High (objective)', confidenceClass: 'td-green' }, { domain: 'Alternative Data', coverageLevel: 'partial', coverageLabel: 'Partial', freshness: 'Mixed', confidence: 'Medium (limited DC-specific)', confidenceClass: 'td-amber' }, { domain: 'Academic Research', coverageLevel: 'good', coverageLabel: 'Good', freshness: 'Structural', confidence: 'High (peer-reviewed)', confidenceClass: 'td-green' }, { domain: 'Media &amp; Social', coverageLevel: 'full', coverageLabel: 'Full', freshness: 'Current', confidence: 'Low (noise)', confidenceClass: '' }, { domain: 'Leadership &amp; Governance', coverageLevel: 'full', coverageLabel: 'Full', freshness: 'Current', confidence: 'High (long track record)', confidenceClass: 'td-green' }, { domain: 'Ownership &amp; Capital Flows', coverageLevel: 'good', coverageLabel: 'Good', freshness: 'Recent', confidence: 'High (ASX 20 disclosures)', confidenceClass: 'td-green' }], couldntAssess: ['<strong>Hyperscaler contract terms:</strong> The specific terms, pricing, and duration of Goodman\'s data centre leases with hyperscalers are commercially confidential. Whether Goodman\'s DC yields are superior or inferior to competitors\' is not publicly available.', '<strong>Power procurement costs:</strong> The cost of securing 5.0 GW of power across 13 cities is not broken out in financial statements. Whether power costs are escalating faster than DC rental yields would be material to margin analysis.', '<strong>CEO succession planning:</strong> Greg Goodman is 27+ years into his tenure. While there is no immediate succession concern, the absence of a disclosed succession plan creates long-term uncertainty for a company whose strategy and culture are deeply founder-led.'], analyticalLimitations: 'Hypothesis survival scores (T1: 38%, T2: 24%, T3: 17%, T4: 21%) reflect the strong evidence asymmetry in this case. T1 (Data Centre Mega-Trend) scores highest because the supporting evidence spans 7 of 10 domains and includes both independently verified facts (audited financials, 94% pre-commitment) and forward-looking indicators (hyperscaler capex trends, power bank expansion). T3 (Bubble Risk) scores lowest because it is driven by narrative rather than observable data: the 94% pre-commitment rate directly contradicts the oversupply thesis for Goodman\'s specific pipeline.' },
-  footer: { disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, ACCC publications, broker consensus data, and publicly available information. This report does not contain buy, sell, or hold recommendations, price targets, or valuation models.', domainCount: '10 of 10', hypothesesCount: '4 Active' }
+  
+  technicalAnalysis: {
+    date: '11 February 2026',
+    period: '1 Year',
+    source: 'Continuum Technical Intelligence',
+    regime: 'Transitional',
+    clarity: 'Mixed',
+
+    price: { current: 30.55, currency: 'A$' },
+
+    movingAverages: {
+      ma50:  { value: 30.28, date: '11 Feb 2026' },
+      ma200: { value: 32.57, date: '11 Feb 2026' },
+      crossover: {
+        type: 'Death Cross',
+        date: 'w/c 20 October 2025',
+        description: '50-day MA crossed below 200-day MA during range breakdown'
+      },
+      priceVsMa50:  0.9,
+      priceVsMa200: -6.2
+    },
+
+    trend: {
+      direction: 'Base-building',
+      duration: '3 months',
+      structure: 'Decline from A$36 peak arrested; building base around A$29–A$31',
+      peak:   { price: 36.26, date: 'w/c 17 February 2025' },
+      trough: { price: 28.64, date: 'w/c 15 December 2025' },
+      drawdown: -15.7
+    },
+
+    keyLevels: {
+      support:    { price: 29.00, method: 'Recent consolidation floor (Nov 2025 – Jan 2026)' },
+      resistance: { price: 32.00, method: '200-day MA and prior range midpoint' },
+      fiftyTwoWeekHigh: { price: 36.26, date: 'w/c 17 February 2025' },
+      fiftyTwoWeekLow:  { price: 26.07, date: 'w/c 5 May 2025' }
+    },
+
+    volume: {
+      latestVs20DayAvg: 1.3,
+      latestDate: '11 February 2026',
+      priorSpikes: [
+        { period: 'w/c 5 May 2025', ratio: 2.8, context: 'Selloff to A$26.07; 12-month low' },
+        { period: 'w/c 20 October 2025', ratio: 1.7, context: 'Death cross week; break below A$33' }
+      ]
+    },
+
+    volatility: {
+      latestDailyRange: { high: 31.36, low: 28.89, date: '11 February 2026' },
+      latestRangePercent: 8.6,
+      avgDailyRangePercent30: 1.8,
+      avgDailyRangePercent90: 1.5
+    },
+
+    meanReversion: {
+      vsMa50:  0.9,
+      vsMa200: -6.2,
+      rangePosition: 44,
+      rangeHigh: 36.26,
+      rangeLow:  26.07
+    },
+
+    inflectionPoints: [
+      { date: 'w/c 17 February 2025', price: 36.26, event: '12-month high' },
+      { date: 'w/c 5 May 2025',       price: 26.07, event: '12-month low; broad market selloff' },
+      { date: 'w/c 30 June 2025',     price: 33.58, event: 'Recovery rally; approaches prior highs' },
+      { date: 'w/c 1 September 2025', price: 36.14, event: 'Retests 12-month high; fails' },
+      { date: 'w/c 20 October 2025',  price: 32.26, event: 'Death cross forms; begins grinding lower' },
+      { date: 'w/c 15 December 2025', price: 28.64, event: 'Tests support at A$29' },
+      { date: '11 February 2026',     price: 30.55, event: 'Building base; reclaiming 50-day MA' }
+    ],
+
+    relativePerformance: {
+      vsIndex:  { name: 'S&amp;P/ASX 200',  period: '12 months', stockReturn: -15.5, indexReturn: -2.3, relativeReturn: -13.2 },
+      vsSector: { name: 'S&amp;P/ASX Real Estate', period: '12 months', stockReturn: -15.5, sectorReturn: -9.8, relativeReturn: -5.7 }
+    }
+  },
+
+footer: { disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, ACCC publications, broker consensus data, and publicly available information. This report does not contain buy, sell, or hold recommendations, price targets, or valuation models.', domainCount: '10 of 10', hypothesesCount: '4 Active' }
 };
 
 STOCK_DATA.WDS = {
@@ -6963,6 +8024,85 @@ STOCK_DATA.WDS = {
       '<strong>Cultural heritage risk:</strong> The Burrup Peninsula cultural heritage risks related to Pluto and Scarborough are subject to ongoing legal and regulatory processes. The potential operational and financial impact is uncertain.'
     ],
     analyticalLimitations: 'Hypothesis survival scores (T1: 29%, T2: 25%, T3: 21%, T4: 25%) reflect a genuinely balanced evidence set. The narrow range between T1, T2, and T4 is intentional: the data supports both the thesis that Woodside is a well-run LNG producer approaching a growth inflection and the thesis that it is a yield stock trapped in a structural valuation discount. T3 (Energy Transition) scores at 21% because, while the stranded asset argument has academic support, it operates on a much longer time horizon than the other hypotheses. The key variable is Scarborough delivery; the other hypotheses are largely resolved or not by that single event.'
+  },
+
+
+  technicalAnalysis: {
+    date: '11 February 2026',
+    period: '1 Year',
+    source: 'Continuum Technical Intelligence',
+    regime: 'Range-bound',
+    clarity: 'Clear',
+
+    price: { current: 25.48, currency: 'A$' },
+
+    movingAverages: {
+      ma50:  { value: 24.29, date: '11 Feb 2026' },
+      ma200: { value: 24.23, date: '11 Feb 2026' },
+      crossover: {
+        type: 'Golden Cross',
+        date: 'w/c 6 January 2026',
+        description: '50-day MA crossed above 200-day MA during recovery'
+      },
+      priceVsMa50:  4.9,
+      priceVsMa200: 5.2
+    },
+
+    trend: {
+      direction: 'Up',
+      duration: '4 months',
+      structure: 'Higher lows since October 2025; grinding upward within historical range',
+      peak:   { price: 27.08, date: 'w/c 1 September 2025' },
+      trough: { price: 19.15, date: 'w/c 5 May 2025' },
+      drawdown: -5.9
+    },
+
+    keyLevels: {
+      support:    { price: 23.50, method: 'Prior consolidation zone (Nov–Dec 2025)' },
+      resistance: { price: 27.00, method: '12-month high and prior distribution zone (Aug–Sep 2025)' },
+      fiftyTwoWeekHigh: { price: 27.08, date: 'w/c 1 September 2025' },
+      fiftyTwoWeekLow:  { price: 19.15, date: 'w/c 5 May 2025' }
+    },
+
+    volume: {
+      latestVs20DayAvg: 1.0,
+      latestDate: '11 February 2026',
+      priorSpikes: [
+        { period: 'w/c 5 May 2025', ratio: 2.4, context: 'Selloff to A$19.15; oil price weakness' },
+        { period: 'w/c 18 August 2025', ratio: 1.8, context: 'Rally to A$26; energy sector rotation' }
+      ]
+    },
+
+    volatility: {
+      latestDailyRange: { high: 25.93, low: 25.48, date: '11 February 2026' },
+      latestRangePercent: 1.8,
+      avgDailyRangePercent30: 1.5,
+      avgDailyRangePercent90: 1.6
+    },
+
+    meanReversion: {
+      vsMa50:  4.9,
+      vsMa200: 5.2,
+      rangePosition: 80,
+      rangeHigh: 27.08,
+      rangeLow:  19.15
+    },
+
+    inflectionPoints: [
+      { date: 'w/c 17 February 2025', price: 24.50, event: 'Starting position; mid-range' },
+      { date: 'w/c 5 May 2025',       price: 19.15, event: '12-month low; oil price selloff' },
+      { date: 'w/c 30 June 2025',     price: 22.12, event: 'Recovery begins; higher lows forming' },
+      { date: 'w/c 18 August 2025',   price: 25.96, event: 'Rally toward 12-month high' },
+      { date: 'w/c 1 September 2025', price: 27.08, event: '12-month high' },
+      { date: 'w/c 27 October 2025',  price: 22.27, event: 'Pullback to A$22; retests support' },
+      { date: 'w/c 6 January 2026',   price: 24.98, event: 'Golden cross forms; recovery confirmed' },
+      { date: '11 February 2026',     price: 25.48, event: 'Approaching 12-month highs; above both MAs' }
+    ],
+
+    relativePerformance: {
+      vsIndex:  { name: 'S&amp;P/ASX 200',  period: '12 months', stockReturn: 4.0, indexReturn: -2.3, relativeReturn: 6.3 },
+      vsSector: { name: 'S&amp;P/ASX Energy', period: '12 months', stockReturn: 4.0, sectorReturn: -6.8, relativeReturn: 10.8 }
+    }
   },
 
   // Footer
@@ -7417,6 +8557,80 @@ STOCK_DATA.SIG = {
     analyticalLimitations: 'Hypothesis survival scores (T1: 26%, T2: 33%, T3: 19%, T4: 22%) reflect editorial assessment. T2 (Escrow Overhang) scores highest because it is driven by a known, dated structural event with clear precedent in academic literature. T1 (Integration) is scored cautiously because insufficient time has elapsed to assess execution. The narrow range between T1 and T4 reflects genuine uncertainty about whether this business is a platform (deserving a premium) or a retailer/distributor (deserving traditional multiples). The answer to this question determines whether the stock is worth A$1 or A$4.'
   },
 
+
+  technicalAnalysis: {
+    date: '11 February 2026',
+    period: '1 Year',
+    source: 'Continuum Technical Intelligence',
+    regime: 'Range-bound',
+    clarity: 'Clear',
+
+    price: { current: 3.14, currency: 'A$' },
+
+    movingAverages: {
+      ma50:  { value: 2.95, date: '11 Feb 2026' },
+      ma200: { value: 2.99, date: '11 Feb 2026' },
+      crossover: null,
+      priceVsMa50:  6.5,
+      priceVsMa200: 5.1
+    },
+
+    trend: {
+      direction: 'Up',
+      duration: '2 months',
+      structure: 'Narrow range stock; recent breakout toward 52-week highs from A$2.83 base',
+      peak:   { price: 3.27, date: 'w/c 24 February 2025' },
+      trough: { price: 2.74, date: 'w/c 14 July 2025' },
+      drawdown: -4.0
+    },
+
+    keyLevels: {
+      support:    { price: 2.90, method: 'Prior consolidation floor and 50-day MA' },
+      resistance: { price: 3.27, method: '12-month high (Feb 2025)' },
+      fiftyTwoWeekHigh: { price: 3.27, date: 'w/c 24 February 2025' },
+      fiftyTwoWeekLow:  { price: 2.74, date: 'w/c 14 July 2025' }
+    },
+
+    volume: {
+      latestVs20DayAvg: 1.3,
+      latestDate: '11 February 2026',
+      priorSpikes: [
+        { period: 'w/c 1 September 2025', ratio: 1.8, context: 'Break above A$3.00; Chemist Warehouse merger speculation' },
+        { period: 'w/c 26 January 2026', ratio: 1.6, context: 'Rally from A$2.83 to A$3.09; momentum building' }
+      ]
+    },
+
+    volatility: {
+      latestDailyRange: { high: 3.16, low: 3.09, date: '11 February 2026' },
+      latestRangePercent: 2.3,
+      avgDailyRangePercent30: 1.2,
+      avgDailyRangePercent90: 1.4
+    },
+
+    meanReversion: {
+      vsMa50:  6.5,
+      vsMa200: 5.1,
+      rangePosition: 75,
+      rangeHigh: 3.27,
+      rangeLow:  2.74
+    },
+
+    inflectionPoints: [
+      { date: 'w/c 24 February 2025', price: 3.27,  event: '12-month high' },
+      { date: 'w/c 14 July 2025',     price: 2.74,  event: '12-month low' },
+      { date: 'w/c 1 September 2025', price: 3.04,  event: 'Breaks back above A$3.00' },
+      { date: 'w/c 6 October 2025',   price: 3.15,  event: 'Approaches 12-month high; fails to break through' },
+      { date: 'w/c 8 December 2025',  price: 2.76,  event: 'Retests lows; A$2.74 support holds' },
+      { date: 'w/c 26 January 2026',  price: 3.09,  event: 'Rally resumes; momentum building' },
+      { date: '11 February 2026',     price: 3.14,  event: 'Approaching 12-month high resistance at A$3.27' }
+    ],
+
+    relativePerformance: {
+      vsIndex:  { name: 'S&amp;P/ASX 200',  period: '12 months', stockReturn: 12.5, indexReturn: -2.3, relativeReturn: 14.8 },
+      vsSector: { name: 'S&amp;P/ASX Healthcare', period: '12 months', stockReturn: 12.5, sectorReturn: -12.4, relativeReturn: 24.9 }
+    }
+  },
+
   // Footer
   footer: {
     disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company accounts, broker consensus data, and publicly available information. This report does not contain buy, sell, or hold recommendations, price targets, or valuation models.',
@@ -7865,6 +9079,84 @@ STOCK_DATA.FMG = {
       '<strong>India demand offset:</strong> Whether India\'s steel demand growth can materially offset China\'s decline is an open question with wide uncertainty bands.'
     ],
     analyticalLimitations: 'Hypothesis survival scores (T1: 30%, T2: 30%, T3: 15%, T4: 26%) reflect editorial assessment. The equal weighting of T1 and T2 is deliberate: both are supported by strong evidence from different domains. T1 (Cost Leader) is supported by operational data; T2 (Structural Decline) is supported by macro data. The question is timeline: T1 may hold for 2-3 years while T2 plays out over 5-10 years. T3 (Green Pivot) is scored lowest because the evidence uniformly contradicts it following project cancellations and hydrogen cost gaps. T4 (Governance) is rising because each green writeoff provides additional evidence of capital misallocation.'
+  },
+
+
+  technicalAnalysis: {
+    date: '11 February 2026',
+    period: '1 Year',
+    source: 'Continuum Technical Intelligence',
+    regime: 'Trending',
+    clarity: 'Clear',
+
+    price: { current: 21.23, currency: 'A$' },
+
+    movingAverages: {
+      ma50:  { value: 22.09, date: '11 Feb 2026' },
+      ma200: { value: 19.10, date: '11 Feb 2026' },
+      crossover: {
+        type: 'Golden Cross',
+        date: 'w/c 15 September 2025',
+        description: '50-day MA crossed above 200-day MA during structural uptrend'
+      },
+      priceVsMa50:  -3.9,
+      priceVsMa200: 11.2
+    },
+
+    trend: {
+      direction: 'Up',
+      duration: '10 months',
+      structure: 'Higher lows from April 2025 trough; structural uptrend with recent pullback',
+      peak:   { price: 22.98, date: 'w/c 22 December 2025' },
+      trough: { price: 14.20, date: 'w/c 5 May 2025' },
+      drawdown: -7.6
+    },
+
+    keyLevels: {
+      support:    { price: 21.00, method: 'Round number and recent pullback low (Feb 2026)' },
+      resistance: { price: 23.00, method: '12-month high cluster (Dec 2025 – Jan 2026)' },
+      fiftyTwoWeekHigh: { price: 22.98, date: 'w/c 22 December 2025' },
+      fiftyTwoWeekLow:  { price: 14.20, date: 'w/c 5 May 2025' }
+    },
+
+    volume: {
+      latestVs20DayAvg: 1.0,
+      latestDate: '11 February 2026',
+      priorSpikes: [
+        { period: 'w/c 5 May 2025', ratio: 2.2, context: 'Selloff to A$14.20; iron ore price weakness' },
+        { period: 'w/c 28 July 2025', ratio: 1.9, context: 'Breakout above A$19; iron ore recovery' },
+        { period: 'w/c 22 December 2025', ratio: 1.6, context: 'New 12-month high at A$22.98' }
+      ]
+    },
+
+    volatility: {
+      latestDailyRange: { high: 21.78, low: 21.00, date: '11 February 2026' },
+      latestRangePercent: 3.7,
+      avgDailyRangePercent30: 1.7,
+      avgDailyRangePercent90: 1.6
+    },
+
+    meanReversion: {
+      vsMa50:  -3.9,
+      vsMa200: 11.2,
+      rangePosition: 80,
+      rangeHigh: 22.98,
+      rangeLow:  14.20
+    },
+
+    inflectionPoints: [
+      { date: 'w/c 17 February 2025', price: 19.12, event: 'Starting position; mid-range' },
+      { date: 'w/c 5 May 2025',       price: 14.20, event: '12-month low; iron ore price weakness' },
+      { date: 'w/c 28 July 2025',     price: 19.42, event: 'Breaks above A$19; recovery confirmed' },
+      { date: 'w/c 15 September 2025', price: 19.72, event: 'Golden cross forms; structural uptrend' },
+      { date: 'w/c 22 December 2025', price: 22.98, event: '12-month high' },
+      { date: '11 February 2026',     price: 21.23, event: 'Pullback from highs; testing 50-day MA support' }
+    ],
+
+    relativePerformance: {
+      vsIndex:  { name: 'S&amp;P/ASX 200',  period: '12 months', stockReturn: 11.0, indexReturn: -2.3, relativeReturn: 13.3 },
+      vsSector: { name: 'S&amp;P/ASX Materials', period: '12 months', stockReturn: 11.0, sectorReturn: -3.5, relativeReturn: 14.5 }
+    }
   },
 
   // Footer
