@@ -3757,16 +3757,16 @@ STOCK_DATA.XRO = {
   ],
 
   // Skew
-  skew: { direction: 'upside', rationale: 'Stock down 55% from highs on sentiment, not fundamentals. Analyst consensus targets 120%+ above current price. Delivered 20% revenue growth with expanding margins.' },
+  skew: { direction: 'downside', rationale: 'Market is repricing SaaS multiples as AI disruption reshapes expectations. Stock down 55% from highs despite strong fundamentals. Price and fundamentals are in direct conflict &mdash; that is the signal, not noise.' },
 
   // Verdict
   verdict: {
-    text: 'The market is pricing AI disruption risk and Melio acquisition skepticism into a stock that just delivered 20% revenue growth, Rule of 40 at 44.5%, and expanding FCF margins. The gap between price and analyst consensus is the widest in Xero\'s listed history. Either the sell-side is uniformly wrong, or the market has overreacted.',
-    borderColor: 'var(--signal-green)',
+    text: 'The market is repricing Xero as an AI disruption casualty. The stock is down 55% from its highs despite delivering 20% revenue growth, Rule of 40 at 44.5%, and expanding FCF margins. Fundamentals and price are telling opposite stories. Either the market is pricing a structural shift that hasn\'t yet appeared in the financials, or the widest gap between analyst consensus and market price in Xero\'s history represents a generational opportunity. This is the central tension. We present the evidence; the judgment is yours.',
+    borderColor: 'var(--signal-red)',
     scores: [
-      { label: 'T1 Platform', score: '55%', scoreColor: 'var(--signal-green)', dirArrow: '&uarr;', dirText: 'Strong', dirColor: 'var(--signal-green)' },
-      { label: 'T2 Melio', score: '40%', scoreColor: 'var(--signal-amber)', dirArrow: '&rarr;', dirText: 'Awaiting', dirColor: null },
-      { label: 'T3 AI Disrupt', score: '25%', scoreColor: 'var(--signal-red)', dirArrow: '&darr;', dirText: 'Weakening', dirColor: 'var(--signal-green)' },
+      { label: 'T1 Platform', score: '40%', scoreColor: 'var(--signal-green)', dirArrow: '&darr;', dirText: 'Strong but unpriced', dirColor: 'var(--signal-amber)' },
+      { label: 'T2 Melio', score: '30%', scoreColor: 'var(--signal-amber)', dirArrow: '&rarr;', dirText: 'Awaiting', dirColor: null },
+      { label: 'T3 AI Disrupt', score: '50%', scoreColor: 'var(--signal-red)', dirArrow: '&uarr;', dirText: 'Dominant', dirColor: 'var(--signal-red)' },
       { label: 'T4 Compete', score: '20%', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Steady', dirColor: null }
     ]
   },
@@ -3778,8 +3778,8 @@ STOCK_DATA.XRO = {
     { label: 'Rev Growth', value: '+20%', color: 'var(--signal-green)' },
     { label: 'Subscribers', value: '4.6M', color: '' }
   ],
-  featuredPriceColor: 'var(--signal-green)',
-  featuredRationale: 'Stock down 55% on sentiment, not fundamentals. Consensus target 120%+ above current price.',
+  featuredPriceColor: 'var(--signal-red)',
+  featuredRationale: 'Market repricing SaaS multiples as AI disruption thesis strengthens. Down 55% despite strong fundamentals. Price and evidence in direct conflict.',
 
   // Identity section
   identity: {
@@ -3806,10 +3806,10 @@ STOCK_DATA.XRO = {
       title: 'T1: Platform Expansion Delivers',
       statusClass: 'priced',
       statusText: 'Priced Out &mdash; Market Not Paying',
-      score: '55%',
-      scoreWidth: '55%',
-      scoreMeta: '&uarr; Strong and strengthening',
-      description: 'Xero continues to execute on platform expansion: 20%+ revenue growth, ARPU expansion through upselling payroll, payments, and financial services, and subscriber additions across all geographies. Operating leverage delivers expanding margins. Rule of 40 sustained above 40. The market re-rates as sentiment normalises.',
+      score: '40%',
+      scoreWidth: '40%',
+      scoreMeta: '&darr; Fundamentals strong but market disagrees',
+      description: 'Xero continues to execute on platform expansion: 20%+ revenue growth, ARPU expansion through upselling payroll, payments, and financial services, and subscriber additions across all geographies. Operating leverage delivers expanding margins. Rule of 40 sustained above 40. Fundamentals are strong but the market is not paying for them at any multiple that rewards holders.',
       requires: [
         'Revenue growth sustained at 18%+ through FY26-27',
         'ARPU growth &ge;10% from product upsell, not just pricing',
@@ -3837,8 +3837,8 @@ STOCK_DATA.XRO = {
       title: 'T2: Melio Integration Succeeds',
       statusClass: 'accumulating',
       statusText: 'Awaiting Evidence',
-      score: '40%',
-      scoreWidth: '40%',
+      score: '30%',
+      scoreWidth: '30%',
       scoreMeta: '&rarr; Too early to assess',
       description: 'The US$2.5B Melio acquisition proves strategically correct: B2B payments become the wedge product for US SMB market penetration. Melio\'s payment volumes integrate with Xero\'s accounting platform, creating a payments+accounting bundle that QuickBooks cannot match on payments and PayPal cannot match on accounting.',
       requires: [
@@ -3862,22 +3862,24 @@ STOCK_DATA.XRO = {
     {
       tier: 't3',
       direction: 'downside',
-      title: 'T3: AI Disruption Compresses SaaS Margins',
-      statusClass: 'minimal',
-      statusText: 'Fear-Driven &mdash; No Evidence of Churn',
-      score: '25%',
-      scoreWidth: '25%',
-      scoreMeta: '&darr; Weakening with each earnings beat',
-      description: 'AI-powered accounting tools (automated bookkeeping, receipt scanning, reconciliation) reduce the value proposition of traditional cloud accounting platforms. SMBs migrate to cheaper AI-native alternatives or reduce their spend on accounting software as AI handles routine tasks.',
+      title: 'T3: AI Disruption Re-Prices SaaS',
+      statusClass: 'active',
+      statusText: 'Dominant &mdash; Market Re-Pricing SaaS Multiples',
+      score: '50%',
+      scoreWidth: '50%',
+      scoreMeta: '&uarr; Strengthening with every tech de-rating',
+      description: 'The market is re-pricing the entire SaaS multiple structure as AI reshapes expectations for cloud software economics. Automated bookkeeping, receipt scanning, and reconciliation reduce the perceived moat of traditional cloud accounting. Whether churn has appeared yet is secondary &mdash; the market is pricing the trajectory, not the current quarter. A 55% drawdown is not noise; it is the market telling you this thesis is dominant.',
       requires: null,
-      supportingLabel: 'Supporting Evidence (1 Domain)',
+      supportingLabel: 'Supporting Evidence (3 Domains)',
       supporting: [
-        '<strong>Media:</strong> Persistent narrative about AI threatening SaaS business models; significant mindshare'
+        '<strong>Market Price:</strong> Stock down 55% from A$196.52 to A$84.28. This is the single most powerful evidence domain &mdash; it represents the aggregated judgment of every participant. A drawdown of this magnitude, sustained over months, is not sentiment; it is repricing',
+        '<strong>Economic:</strong> Broad SaaS sector de-rating as AI disruption reprices growth expectations. Xero is not falling alone &mdash; the entire cloud software cohort is being re-valued downward',
+        '<strong>Media &amp; Narrative:</strong> AI disruption of SaaS has become the dominant market narrative. Narrative drives capital allocation; capital allocation drives price'
       ],
       contradictingLabel: 'Contradicting Evidence (4 Domains)',
       contradicting: [
-        '<strong>Financial Statements:</strong> Churn at historic lows; no sign of customer departure',
-        '<strong>Broker Research:</strong> No analyst models AI disruption as a base case',
+        '<strong>Financial Statements:</strong> Churn at historic lows; no sign of customer departure yet. This is the strongest counter-evidence',
+        '<strong>Broker Research:</strong> All 15 analysts rate Buy with 120%+ upside targets. Consensus has never been wider from price',
         '<strong>Academic:</strong> Research shows AI augments accounting workflows rather than replacing them',
         '<strong>Alternative Data:</strong> No visible churn signal in app downloads, web traffic, or reviews'
       ]
@@ -3907,18 +3909,18 @@ STOCK_DATA.XRO = {
 
   // Narrative
   narrative: {
-    theNarrative: 'The market is pricing <strong>AI disruption risk and failed US expansion via the Melio acquisition</strong>. The embedded thesis is that AI will compress SaaS margins as automated bookkeeping reduces the value proposition of traditional cloud accounting platforms; that the US$2.5B Melio acquisition was overpriced and dilutive; and that subscriber growth is decelerating toward saturation. The stock is down <span class="key-stat down">55%</span> from its 52-week high of A$196.52, and the current multiple, while optically high, reflects a market that has stopped paying for growth.',
+    theNarrative: 'The market is repricing Xero as <strong>an AI disruption casualty within a broader SaaS de-rating</strong>. The embedded thesis is that AI will compress SaaS margins as automated bookkeeping reduces the value proposition of traditional cloud accounting; that the US$2.5B Melio acquisition was overpriced for a market Xero has historically failed to crack; and that the entire premium-SaaS multiple structure is structurally lower going forward. The stock is down <span class="key-stat down">55%</span> from its 52-week high of A$196.52. This is not a pullback &mdash; it is the market repricing Xero\'s terminal value.',
     priceImplication: {
       label: 'Embedded Assumptions at A$84.28',
       content: '<strong>Revenue growth decelerating:</strong> Market expects growth to slow from 20% toward low-teens within 2 years. <strong>Melio dilutive:</strong> US$2.5B acquisition does not generate meaningful revenue contribution in FY26-27. <strong>AI threatens core product:</strong> Automated bookkeeping erodes Xero\'s value proposition for SMBs. <strong>Multiple compression continues:</strong> Tech sector de-rating persists; premium SaaS valuations do not recover. <strong>Competitive displacement:</strong> QuickBooks and MYOB gain share in key markets.'
     },
-    evidenceCheck: 'The bearish narrative is sentiment-driven rather than evidence-driven. Xero <strong>beat estimates across the board</strong> in 1H FY26: revenue up 20%, ARPU up 15%, EBITDA margins expanding, Rule of 40 at 44.5%, and churn rates below pre-pandemic levels. Every analyst covering the stock has a Buy rating, with consensus targets between A$183-191 (over 120% above current). The gap between market price and fundamental delivery is the widest it has been in Xero\'s listed history.',
-    narrativeStability: '<strong>Unstable, but favourable.</strong> The bearish narrative is driven by macro sentiment (tech rotation, AI fear), not company-specific deterioration. Each subsequent earnings result that beats expectations weakens the bear case. The narrative is most vulnerable to the FY26 full-year results in May 2026. If Xero delivers another beat, the sentiment overhang becomes increasingly difficult to sustain.'
+    evidenceCheck: 'The evidence is genuinely split. <strong>Fundamentals are strong:</strong> Xero beat estimates across the board in 1H FY26 &mdash; revenue up 20%, ARPU up 15%, EBITDA margins expanding, Rule of 40 at 44.5%, churn at historic lows. Every analyst covering the stock rates Buy with consensus 120%+ above current price. <strong>But the price is unambiguous:</strong> a 55% decline sustained over months is not noise &mdash; it is the market repricing what these fundamentals are worth in an AI world. The gap between analyst consensus and market price is the widest in Xero\'s listed history. One of them is wrong.',
+    narrativeStability: '<strong>Unstable and contested.</strong> The AI disruption narrative is strengthening with each sector de-rating and each new AI product announcement. It is weakened by each earnings beat that shows no churn &mdash; but so far the market has ignored three consecutive beats. The narrative is most vulnerable to the FY26 full-year results in May 2026: another strong result with no churn signal would stretch the bear case to its limit. Conversely, any sign of subscriber deceleration or churn uptick would confirm what the market has been pricing for months.'
   },
 
   // Evidence
   evidence: {
-    intro: 'Ten evidence domains assessed. Evidence strongly favours T1 (Platform Expansion), with limited empirical support for the bearish hypotheses dominating market sentiment.',
+    intro: 'Ten evidence domains assessed. Fundamental evidence supports T1 (Platform Expansion) across multiple domains, but market price &mdash; itself a powerful evidence domain &mdash; is unambiguously pricing T3 (AI Disruption). The gap between these signals is the defining analytical challenge for this stock.',
     cards: [
       {
         number: 1,
@@ -4026,12 +4028,12 @@ STOCK_DATA.XRO = {
         title: '8. Media &amp; Social',
         epistemicClass: 'ep-noise',
         epistemicLabel: 'Noise',
-        finding: '<strong>Bearish sentiment dominates.</strong> Financial media framing: "Xero caught in AI crosshairs," "Melio gamble," "tech sector rout." Social sentiment on investment forums overwhelmingly negative. However, this is <strong>macro-driven, not company-specific</strong>: the same narrative applies to all SaaS companies. Xero-specific negative coverage focuses almost entirely on AI disruption fears and Melio price, not on operational deterioration. No credible reporting of customer churn or competitive displacement.',
+        finding: '<strong>Bearish sentiment dominates.</strong> Financial media framing: "Xero caught in AI crosshairs," "Melio gamble," "tech sector rout." Social sentiment on investment forums overwhelmingly negative. The AI disruption narrative is not unique to Xero &mdash; it applies across the SaaS sector &mdash; but that makes it more powerful, not less. Sector-wide narratives drive capital allocation across entire asset classes. The fact that no credible reporting of actual churn exists creates the key tension: the narrative is ahead of the evidence, but the narrative is driving the price.',
         tension: null,
         table: null,
         tags: [
-          { text: 'Supports T3 (narrative weight)', class: 'supports' },
-          { text: 'Neutral on fundamentals', class: 'neutral' }
+          { text: 'Strongly Supports T3 (dominant narrative)', class: 'strong' },
+          { text: 'Contradicts T1 (sentiment overwhelms fundamentals)', class: 'contradicts' }
         ],
         source: 'Australian Financial Review; major tech press; investment forums; sentiment tracking'
       },
@@ -4165,7 +4167,7 @@ STOCK_DATA.XRO = {
       '<strong>US market unit economics:</strong> Xero does not break out US-specific subscriber economics. The US has historically been Xero\'s weakest market, and Melio\'s effectiveness as a wedge product is unproven.',
       '<strong>AI impact quantification:</strong> While academic research suggests AI augments rather than replaces accounting workflows, the pace of AI capability improvement is uncertain. The absence of current churn does not guarantee absence of future disruption.'
     ],
-    analyticalLimitations: 'Hypothesis survival scores (T1: 39%, T2: 29%, T3: 18%, T4: 14%) reflect editorial assessment. The unusually wide gap between T1 and T3/T4 reflects the evidence asymmetry: the bullish thesis has strong empirical support across multiple independent domains, while the bearish theses rely primarily on sentiment and narrative rather than observable data. This does not mean the bear case is wrong; it means the bear case is currently unfalsifiable.'
+    analyticalLimitations: 'Hypothesis survival scores (T3: 36%, T1: 29%, T2: 21%, T4: 14%) reflect editorial assessment. T3 (AI Disruption) is scored as the dominant hypothesis because the market price &mdash; itself the most powerful evidence signal &mdash; is unambiguously pricing this thesis. A 55% drawdown sustained over months cannot be dismissed as sentiment. However, the fundamental evidence (financial statements, churn data, broker consensus, academic research) uniformly contradicts T3 and supports T1. This is the defining analytical tension: price says one thing, every other evidence domain says another. We present this honestly. The judgment remains yours.'
   },
 
   // Footer
