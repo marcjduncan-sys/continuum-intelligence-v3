@@ -798,41 +798,8 @@ body {
                 <!-- HYPOTHESIS MAP -->
                 <div class="hypothesis-map">
                     <div class="hypothesis-map-header">How Your Thesis Maps to All Four Hypotheses</div>
-                    
-                    <div class="hypothesis-row">
-                        <div class="hypothesis-indicator t1" id="indicator-t1">T1</div>
-                        <div class="hypothesis-info">
-                            <div class="hypothesis-name">AI-Led Growth Recovery</div>
-                            <div class="hypothesis-prob">Continuum: 28% probability</div>
-                        </div>
-                        <span class="hypothesis-stance supports" id="stance-t1">SUPPORTS</span>
-                    </div>
-
-                    <div class="hypothesis-row">
-                        <div class="hypothesis-indicator t2" id="indicator-t2">T2</div>
-                        <div class="hypothesis-info">
-                            <div class="hypothesis-name">Structural Margin Pressure</div>
-                            <div class="hypothesis-prob">Continuum: 22% probability</div>
-                        </div>
-                        <span class="hypothesis-stance neutral" id="stance-t2">NEUTRAL</span>
-                    </div>
-
-                    <div class="hypothesis-row">
-                        <div class="hypothesis-indicator t3" id="indicator-t3">T3</div>
-                        <div class="hypothesis-info">
-                            <div class="hypothesis-name">Execution Failure</div>
-                            <div class="hypothesis-prob">Continuum: 35% probability</div>
-                        </div>
-                        <span class="hypothesis-stance contradicts" id="stance-t3">CONTRADICTS</span>
-                    </div>
-
-                    <div class="hypothesis-row">
-                        <div class="hypothesis-indicator t4" id="indicator-t4">T4</div>
-                        <div class="hypothesis-info">
-                            <div class="hypothesis-name">Competitive Disruption</div>
-                            <div class="hypothesis-prob">Continuum: 15% probability</div>
-                        </div>
-                        <span class="hypothesis-stance contradicts" id="stance-t4">CONTRADICTS</span>
+                    <div id="hypothesis-rows">
+                        <!-- Dynamically populated by JS -->
                     </div>
                 </div>
 
@@ -889,18 +856,22 @@ body {
     </footer>
 
     <script>
-        // Stock data with hypotheses for each ticker
+        // Stock data with hypotheses for each ticker - MUST MATCH RESEARCH PAGES
         const stockData = {
             'WOW': {
                 name: 'Woolworths Group',
                 primary: 't2',
                 primaryName: 'T2: Structural Margin Erosion',
                 primaryDescription: "You're skeptical of the turnaround. Your view aligns with the hypothesis that price investment and regulatory pressure will permanently compress margins.",
+                t1: { name: 'T1: Managed Turnaround', prob: '36%' },
+                t2: { name: 'T2: Structural Margin Erosion', prob: '25%' },
+                t3: { name: 'T3: Regulatory Squeeze', prob: '21%' },
+                t4: { name: 'T4: Competitive Disruption', prob: '18%' },
                 map: [
-                    { tier: 't1', name: 'T1: Managed Turnaround', prob: '36%', stance: 'contradicts', indicator: 't1' },
-                    { tier: 't2', name: 'T2: Structural Margin Erosion', prob: '25%', stance: 'supports', indicator: 't2' },
-                    { tier: 't3', name: 'T3: Regulatory Squeeze', prob: '21%', stance: 'supports', indicator: 't3' },
-                    { tier: 't4', name: 'T4: Competitive Disruption', prob: '18%', stance: 'neutral', indicator: 't4' }
+                    { tier: 't1', prob: '36%', stance: 'contradicts' },
+                    { tier: 't2', prob: '25%', stance: 'supports' },
+                    { tier: 't3', prob: '21%', stance: 'supports' },
+                    { tier: 't4', prob: '18%', stance: 'neutral' }
                 ],
                 analysis: "Your thesis <strong>supports T2 and T3</strong> — the downside scenarios. You believe margin pressure is structural, not cyclical, and that regulatory headwinds are underappreciated. This puts you <strong>against the prevailing consensus</strong> which is pricing a Bardwell turnaround (T1).<br><br>If T2/T3 materialize, you're positioned correctly. If T1 succeeds, you'll face headwinds as the market reprices.",
                 supporting: ['ACCC margin findings', 'FGCC compliance costs', 'Aldi expansion data'],
@@ -911,11 +882,15 @@ body {
                 primary: 't1',
                 primaryName: 'T1: Plasma Recovery & Growth',
                 primaryDescription: "You're aligned with the recovery narrative. Your thesis supports CSL's return to normalized plasma collections and Behring margin expansion.",
+                t1: { name: 'T1: Plasma Recovery & Margin Expansion', prob: '45%' },
+                t2: { name: 'T2: Collection Shortfall Persists', prob: '25%' },
+                t3: { name: 'T3: Behring Margin Compression', prob: '18%' },
+                t4: { name: 'T4: Competitive Threat Emerges', prob: '12%' },
                 map: [
-                    { tier: 't1', name: 'T1: Plasma Recovery', prob: '45%', stance: 'supports', indicator: 't1' },
-                    { tier: 't2', name: 'T2: Collection Shortfall', prob: '25%', stance: 'contradicts', indicator: 't2' },
-                    { tier: 't3', name: 'T3: Behring Margin Compression', prob: '18%', stance: 'contradicts', indicator: 't3' },
-                    { tier: 't4', name: 'T4: Competitive Threat', prob: '12%', stance: 'neutral', indicator: 't4' }
+                    { tier: 't1', prob: '45%', stance: 'supports' },
+                    { tier: 't2', prob: '25%', stance: 'contradicts' },
+                    { tier: 't3', prob: '18%', stance: 'contradicts' },
+                    { tier: 't4', prob: '12%', stance: 'neutral' }
                 ],
                 analysis: "Your thesis <strong>strongly supports T1</strong> — the base case recovery. You believe plasma collections are normalizing and Behring margins will expand. You're <strong>aligned with consensus</strong> but should monitor collection data closely.<br><br>If T2 (collection shortfall) materializes, your thesis faces significant downside risk.",
                 supporting: ['Plasma collection trends', 'Behring margin guidance', 'Vifor integration synergies'],
@@ -926,11 +901,15 @@ body {
                 primary: 't1',
                 primaryName: 'T1: AI-Led Growth Recovery',
                 primaryDescription: "You're betting on the turnaround narrative. Your view supports the hypothesis that Xero's AI investments will drive subscriber growth and reduce churn.",
+                t1: { name: 'T1: AI-Led Growth Recovery', prob: '28%' },
+                t2: { name: 'T2: Structural Margin Pressure', prob: '22%' },
+                t3: { name: 'T3: Execution Failure', prob: '35%' },
+                t4: { name: 'T4: Competitive Disruption', prob: '15%' },
                 map: [
-                    { tier: 't1', name: 'T1: AI-Led Growth Recovery', prob: '28%', stance: 'supports', indicator: 't1' },
-                    { tier: 't2', name: 'T2: Structural Margin Pressure', prob: '22%', stance: 'neutral', indicator: 't2' },
-                    { tier: 't3', name: 'T3: Execution Failure', prob: '35%', stance: 'contradicts', indicator: 't3' },
-                    { tier: 't4', name: 'T4: Competitive Disruption', prob: '15%', stance: 'contradicts', indicator: 't4' }
+                    { tier: 't1', prob: '28%', stance: 'supports' },
+                    { tier: 't2', prob: '22%', stance: 'neutral' },
+                    { tier: 't3', prob: '35%', stance: 'contradicts' },
+                    { tier: 't4', prob: '15%', stance: 'contradicts' }
                 ],
                 analysis: "Your thesis <strong>strongly supports T1</strong> — the turnaround narrative. You correctly identify the AI partnership as a key catalyst. However, you <strong>dismiss or contradict T3 and T4</strong>, which together represent 50% of Continuum's probability-weighted scenarios.<br><br>If you're right, returns could be significant. If T3 or T4 materialize, your thesis faces serious headwinds.",
                 supporting: ['AI partnership announcement', 'Subscriber growth momentum', 'US market opportunity'],
@@ -941,11 +920,15 @@ body {
                 primary: 'uphill',
                 primaryName: '⚠️ PUSHING UPHILL',
                 primaryDescription: "Your thesis doesn't clearly align with any single hypothesis. You're making a contrarian bet that requires all four scenarios to be wrong in specific ways.",
+                t1: { name: 'T1: Organic Growth & Margins Intact', prob: '30%' },
+                t2: { name: 'T2: Growth Deceleration', prob: '25%' },
+                t3: { name: 'T3: Governance/Execution Risk', prob: '30%' },
+                t4: { name: 'T4: Competitive Disruption', prob: '15%' },
                 map: [
-                    { tier: 't1', name: 'T1: Organic Growth & Margins', prob: '30%', stance: 'neutral', indicator: 't1' },
-                    { tier: 't2', name: 'T2: Growth Deceleration', prob: '25%', stance: 'contradicts', indicator: 't2' },
-                    { tier: 't3', name: 'T3: Governance/Execution Risk', prob: '30%', stance: 'contradicts', indicator: 't3' },
-                    { tier: 't4', name: 'T4: Competitive Disruption', prob: '15%', stance: 'contradicts', indicator: 't4' }
+                    { tier: 't1', prob: '30%', stance: 'neutral' },
+                    { tier: 't2', prob: '25%', stance: 'contradicts' },
+                    { tier: 't3', prob: '30%', stance: 'contradicts' },
+                    { tier: 't4', prob: '15%', stance: 'contradicts' }
                 ],
                 analysis: "Your thesis is <strong>pushing uphill</strong>. You don't clearly align with T1 (organic growth), yet you contradict T2, T3, and T4 which together represent 70% of probability-weighted scenarios.<br><br>This requires a very specific sequence: growth must recover AND governance concerns must prove overblown AND competition must remain muted. High conviction required to justify this position.",
                 supporting: ['CargoWise platform strength', 'Founder vision alignment', 'Global trade recovery'],
@@ -1001,19 +984,22 @@ body {
             document.getElementById('banner-hypothesis').textContent = data.primaryName;
             document.getElementById('banner-description').textContent = data.primaryDescription;
             
-            // Update hypothesis map
-            data.map.forEach(item => {
-                const indicator = document.getElementById('indicator-' + item.tier);
-                const stance = document.getElementById('stance-' + item.tier);
-                
-                indicator.className = 'hypothesis-indicator ' + item.indicator;
-                if (item.stance === 'supports') {
-                    indicator.classList.add('match');
-                }
-                
-                stance.textContent = item.stance.toUpperCase();
-                stance.className = 'hypothesis-stance ' + item.stance;
-            });
+            // Build hypothesis rows dynamically with correct names for this stock
+            const rowsContainer = document.getElementById('hypothesis-rows');
+            rowsContainer.innerHTML = data.map.map(item => {
+                const tierData = data[item.tier];
+                const isMatch = item.stance === 'supports';
+                return `
+                    <div class="hypothesis-row">
+                        <div class="hypothesis-indicator ${item.tier} ${isMatch ? 'match' : ''}">${item.tier.toUpperCase()}</div>
+                        <div class="hypothesis-info">
+                            <div class="hypothesis-name">${tierData.name}</div>
+                            <div class="hypothesis-prob">Continuum: ${item.prob} probability</div>
+                        </div>
+                        <span class="hypothesis-stance ${item.stance}">${item.stance.toUpperCase()}</span>
+                    </div>
+                `;
+            }).join('');
             
             // Update analysis text
             document.getElementById('analysis-text').innerHTML = data.analysis;
