@@ -12609,12 +12609,15 @@ function populateSidebar(ticker) {
     'use strict';
 
     // --- Configuration ---
-    // API base: auto-detect localhost for dev, same origin for production
+    // API base: auto-detect localhost for dev, Railway API for GitHub Pages, same origin for Railway
+    var PRODUCTION_API = 'https://continuum-intelligence-production.up.railway.app';
     var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     var isFile  = window.location.protocol === 'file:';
+    var isGitHubPages = window.location.hostname.indexOf('github.io') !== -1;
     var apiOrigin = window.CHAT_API_URL
         || (isLocal ? 'http://localhost:8000'
             : isFile ? '' // will trigger graceful error below
+            : isGitHubPages ? PRODUCTION_API
             : window.location.origin);
     var CHAT_API_BASE = apiOrigin + '/api/research-chat';
 
