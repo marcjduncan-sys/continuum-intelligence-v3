@@ -12609,8 +12609,11 @@ function populateSidebar(ticker) {
     'use strict';
 
     // --- Configuration ---
-    // API base: same origin in production, configurable for dev
-    var CHAT_API_BASE = (window.CHAT_API_URL || window.location.origin) + '/api/research-chat';
+    // API base: auto-detect localhost for dev, same origin for production
+    var apiOrigin = window.CHAT_API_URL
+        || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? 'http://localhost:8000' : window.location.origin);
+    var CHAT_API_BASE = apiOrigin + '/api/research-chat';
 
     // --- DOM refs ---
     var fab       = document.getElementById('chatFab');
