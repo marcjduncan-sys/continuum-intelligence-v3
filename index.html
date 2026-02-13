@@ -13864,10 +13864,16 @@ function tcAnalyze() {
     'use strict';
 
     // --- Configuration ---
-    // API base: auto-detect localhost for dev, same origin for production
+    // API base: auto-detect localhost for dev, Railway API for GitHub Pages, same origin for Railway
+    var PRODUCTION_API = 'https://continuum-intelligence-production.up.railway.app';
+    var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    var isFile  = window.location.protocol === 'file:';
+    var isGitHubPages = window.location.hostname.indexOf('github.io') !== -1;
     var apiOrigin = window.CHAT_API_URL
-        || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-            ? 'http://localhost:8000' : window.location.origin);
+        || (isLocal ? 'http://localhost:8000'
+            : isFile ? '' // will trigger graceful error below
+            : isGitHubPages ? PRODUCTION_API
+            : window.location.origin);
     var CHAT_API_BASE = apiOrigin + '/api/research-chat';
 
     // --- DOM refs ---
@@ -14072,6 +14078,19 @@ function tcAnalyze() {
             return { role: m.role, content: m.content };
         });
 
+        // Guard: file:// protocol cannot reach the API
+        if (isFile) {
+            hideTyping();
+            var errorEl = document.createElement('div');
+            errorEl.className = 'chat-error';
+            errorEl.textContent = 'Chat requires the hosted version. Open the Railway / Render URL instead of a local file.';
+            messages.appendChild(errorEl);
+            scrollToBottom();
+            isLoading = false;
+            updateSendButton();
+            return;
+        }
+
         // API call
         fetch(CHAT_API_BASE, {
             method: 'POST',
@@ -14084,8 +14103,20 @@ function tcAnalyze() {
         })
         .then(function(res) {
             if (!res.ok) {
-                return res.json().then(function(err) {
-                    throw new Error(err.detail || 'Request failed (' + res.status + ')');
+                return res.text().then(function(body) {
+                    var detail = '';
+                    try {
+                        var parsed = JSON.parse(body);
+                        detail = parsed.detail || '';
+                    } catch(e) { /* non-JSON response */ }
+
+                    if (res.status === 502 && detail.indexOf('authentication_error') !== -1) {
+                        throw new Error('API key error — the server\'s Anthropic key may be invalid. Check the ANTHROPIC_API_KEY environment variable.');
+                    }
+                    if (res.status === 502) {
+                        throw new Error('The AI service returned an error. Please try again in a moment.');
+                    }
+                    throw new Error(detail || 'Request failed (' + res.status + ')');
                 });
             }
             return res.json();
@@ -14101,9 +14132,13 @@ function tcAnalyze() {
         })
         .catch(function(err) {
             hideTyping();
+            var msg = err.message || 'Something went wrong. Please try again.';
+            if (msg === 'Failed to fetch') {
+                msg = 'Cannot reach the API. Check that the server is running and accessible.';
+            }
             var errorEl = document.createElement('div');
             errorEl.className = 'chat-error';
-            errorEl.textContent = err.message || 'Something went wrong. Please try again.';
+            errorEl.textContent = msg;
             messages.appendChild(errorEl);
             scrollToBottom();
         })

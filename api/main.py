@@ -32,6 +32,14 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Ingest research data on startup."""
+    # Validate API key
+    if not config.ANTHROPIC_API_KEY:
+        logger.warning("ANTHROPIC_API_KEY is NOT set — chat will return 500 errors")
+    elif not config.ANTHROPIC_API_KEY.startswith("sk-ant-"):
+        logger.warning("ANTHROPIC_API_KEY does not look like a valid Anthropic key")
+    else:
+        logger.info("ANTHROPIC_API_KEY is configured (starts with sk-ant-...)")
+
     logger.info("Ingesting research data from index.html...")
     t0 = time.time()
     store = ingest()
