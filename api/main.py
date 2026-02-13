@@ -6,12 +6,15 @@ structured equity research data.
 """
 
 import logging
+import os
 import time
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 import anthropic
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field
 
 import config
@@ -275,6 +278,26 @@ async def list_tickers():
         "tickers": get_tickers(),
         "counts": get_passage_count(),
     }
+
+
+# ---------------------------------------------------------------------------
+# Serve frontend
+# ---------------------------------------------------------------------------
+
+@app.get("/data/{filename}")
+async def serve_data(filename: str):
+    """Serve data files (live-prices.json, announcements.json)."""
+    data_dir = Path(config.INDEX_HTML_PATH).parent / "data"
+    file_path = data_dir / filename
+    if file_path.exists() and file_path.suffix == ".json":
+        return FileResponse(file_path, media_type="application/json")
+    raise HTTPException(status_code=404, detail="File not found")
+
+
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    """Serve index.html for all non-API routes (SPA catch-all)."""
+    return FileResponse(config.INDEX_HTML_PATH, media_type="text/html")
 
 
 # ---------------------------------------------------------------------------
