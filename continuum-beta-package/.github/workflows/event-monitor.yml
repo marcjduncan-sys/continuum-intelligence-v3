@@ -1,0 +1,195 @@
+name: Continuum Event Monitor
+
+on:
+  schedule:
+    # Run twice daily: 12:30 PM and 6:30 PM AEDT (UTC+11)
+    # These times catch: (1) midday market update, (2) after-market close
+    - cron: '30 1 * * *'   # 12:30 PM AEDT = 1:30 AM UTC
+    - cron: '30 7 * * *'   # 6:30 PM AEDT = 7:30 AM UTC
+  workflow_dispatch:  # Allow manual trigger
+    inputs:
+      force_update:
+        description: 'Force update all narratives'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  scrape-events:
+    name: Scrape Market Data & Events
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Run event scraper
+        id: scraper
+        run: node scripts/event-scraper.js
+        continue-on-error: true
+        
+      - name: Upload price data artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: price-data
+          path: data/latest-prices.json
+          retention-days: 7
+      
+      - name: Check for new events
+        id: check_events
+        run: |
+          if [ -f data/events-log.json ]; then
+            EVENT_COUNT=$(jq '. | length' data/events-log.json)
+            echo "event_count=$EVENT_COUNT" >> $GITHUB_OUTPUT
+            echo "Found $EVENT_COUNT events in log"
+          else
+            echo "event_count=0" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Commit price updates
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data/latest-prices.json data/events/
+          git diff --staged --quiet || (git commit -m "📊 Auto-update: Prices & events [$(date +%Y-%m-%d)]" && git push)
+
+  generate-narratives:
+    name: Generate Narrative Updates
+    needs: scrape-events
+    runs-on: ubuntu-latest
+    if: ${{ needs.scrape-events.result == 'success' }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Download price data
+        uses: actions/download-artifact@v4
+        with:
+          name: price-data
+          path: data/
+      
+      - name: Run narrative generator
+        id: generator
+        run: node scripts/narrative-generator.js
+        continue-on-error: true
+      
+      - name: Check for pending updates
+        id: check_updates
+        run: |
+          if [ -f data/pending-updates.json ]; then
+            UPDATE_COUNT=$(jq '.updates | keys | length' data/pending-updates.json)
+            echo "update_count=$UPDATE_COUNT" >> $GITHUB_OUTPUT
+            echo "Found $UPDATE_COUNT tickers with pending updates"
+          else
+            echo "update_count=0" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Commit pending updates
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data/pending-updates.json
+          git diff --staged --quiet || (git commit -m "📝 Auto-generate: Narrative updates [$(date +%Y-%m-%d)]" && git push)
+
+  update-html:
+    name: Update Website HTML
+    needs: [scrape-events, generate-narratives]
+    runs-on: ubuntu-latest
+    if: ${{ needs.generate-narratives.outputs.update_count > 0 || github.event.inputs.force_update }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: price-data
+          path: data/
+      
+      - name: Run HTML updater
+        run: node scripts/update-html.js
+      
+      - name: Commit HTML updates
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add index.html
+          git diff --staged --quiet || (git commit -m "🌐 Auto-update: Website refresh [$(date +%Y-%m-%d %H:%M)]" && git push)
+
+  daily-summary:
+    name: Send Daily Summary
+    needs: [scrape-events, generate-narratives]
+    runs-on: ubuntu-latest
+    if: ${{ github.event.schedule == '30 7 * * *' }}  # Only on evening run
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Generate summary
+        run: |
+          echo "## 📊 Continuum Daily Summary - $(date +%Y-%m-%d)" > summary.md
+          echo "" >> summary.md
+          
+          if [ -f data/latest-prices.json ]; then
+            echo "### Price Updates" >> summary.md
+            echo "\`\`\`" >> summary.md
+            cat data/latest-prices.json | jq -r 'to_entries[] | "- \(.key): $\(.value.price | tostring | split(".") | .[0] + "." + (.[1] // "00")[:2]) (\(.value.changePercent | tostring | split(".") | .[0] + "." + (.[1] // "00")[:2])%)"' >> summary.md
+            echo "\`\`\`" >> summary.md
+          fi
+          
+          if [ -f data/pending-updates.json ]; then
+            echo "" >> summary.md
+            echo "### Narrative Updates Required" >> summary.md
+            cat data/pending-updates.json | jq -r '.updates | keys[] | "- \(.)"' >> summary.md
+          fi
+          
+          cat summary.md
+      
+      - name: Create issue for high-impact events
+        if: ${{ needs.scrape-events.outputs.event_count > 0 }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Read events
+            const events = JSON.parse(fs.readFileSync('data/events-log.json', 'utf8'));
+            const today = new Date().toISOString().split('T')[0];
+            const todaysEvents = events.filter(e => e.timestamp.startsWith(today));
+            const highImpact = todaysEvents.filter(e => e.severity === 'HIGH');
+            
+            if (highImpact.length > 0) {
+              const body = highImpact.map(e => 
+                `### ${e.ticker}: ${e.type}\n**${e.title}**\nSeverity: ${e.severity}\n[View announcement](${e.link})`
+              ).join('\n\n');
+              
+              github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🚨 High Impact Events - ${today}`,
+                body: body,
+                labels: ['high-impact', 'auto-generated']
+              });
+            }
