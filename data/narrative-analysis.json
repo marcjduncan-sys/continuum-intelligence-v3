@@ -1,0 +1,564 @@
+{
+  "summary": {
+    "runAt": "2026-02-14T02:40:07.247Z",
+    "tickersAnalyzed": 12,
+    "criticalDislocations": 1,
+    "highDislocations": 2,
+    "normal": 9
+  },
+  "results": {
+    "PME": {
+      "ticker": "PME",
+      "dislocation": {
+        "severity": "CRITICAL",
+        "metrics": {
+          "currentPrice": 118.22,
+          "todayReturn": -27.31,
+          "drawdownFromPeak": -64.8,
+          "zScore": -2.5,
+          "volumeRatio": 2.2
+        },
+        "pattern": "DISTRIBUTION"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 60,
+          "shortTerm": 40,
+          "blended": 52,
+          "confidence": "MEDIUM"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 75,
+          "blended": 51,
+          "confidence": "HIGH"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 65,
+          "blended": 38,
+          "confidence": "HIGH"
+        },
+        "T4": {
+          "longTerm": 50,
+          "shortTerm": 15,
+          "blended": 36,
+          "confidence": "LOW"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T2",
+        "secondaryHypothesis": "T3",
+        "contradictedHypothesis": "T4",
+        "confidence": 0.85
+      }
+    },
+    "XRO": {
+      "ticker": "XRO",
+      "dislocation": {
+        "severity": "NORMAL",
+        "metrics": {
+          "currentPrice": 142.5,
+          "todayReturn": -1.86,
+          "drawdownFromPeak": -5,
+          "zScore": -0.5,
+          "volumeRatio": 1
+        },
+        "pattern": "NORMAL"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 60,
+          "shortTerm": 55,
+          "blended": 58,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 40,
+          "blended": 37,
+          "confidence": "MEDIUM"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 25,
+          "blended": 22,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 50,
+          "shortTerm": 45,
+          "blended": 48,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T1",
+        "secondaryHypothesis": null,
+        "contradictedHypothesis": null,
+        "confidence": 0.6
+      }
+    },
+    "CSL": {
+      "ticker": "CSL",
+      "dislocation": {
+        "severity": "NORMAL",
+        "metrics": {
+          "currentPrice": 272.3,
+          "todayReturn": -1.27,
+          "drawdownFromPeak": -9.2,
+          "zScore": -0.5,
+          "volumeRatio": 1
+        },
+        "pattern": "NORMAL"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 60,
+          "shortTerm": 55,
+          "blended": 58,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 40,
+          "blended": 37,
+          "confidence": "MEDIUM"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 25,
+          "blended": 22,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 50,
+          "shortTerm": 45,
+          "blended": 48,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T1",
+        "secondaryHypothesis": null,
+        "contradictedHypothesis": null,
+        "confidence": 0.6
+      }
+    },
+    "WOW": {
+      "ticker": "WOW",
+      "dislocation": {
+        "severity": "NORMAL",
+        "metrics": {
+          "currentPrice": 30.15,
+          "todayReturn": -1.15,
+          "drawdownFromPeak": -24.6,
+          "zScore": -0.5,
+          "volumeRatio": 1
+        },
+        "pattern": "NORMAL"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 60,
+          "shortTerm": 55,
+          "blended": 58,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 40,
+          "blended": 37,
+          "confidence": "MEDIUM"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 25,
+          "blended": 22,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 50,
+          "shortTerm": 45,
+          "blended": 48,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T1",
+        "secondaryHypothesis": null,
+        "contradictedHypothesis": null,
+        "confidence": 0.6
+      }
+    },
+    "WTC": {
+      "ticker": "WTC",
+      "dislocation": {
+        "severity": "NORMAL",
+        "metrics": {
+          "currentPrice": 72.4,
+          "todayReturn": -0.96,
+          "drawdownFromPeak": -9.5,
+          "zScore": -0.5,
+          "volumeRatio": 1
+        },
+        "pattern": "NORMAL"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 60,
+          "shortTerm": 55,
+          "blended": 58,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 40,
+          "blended": 37,
+          "confidence": "MEDIUM"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 25,
+          "blended": 22,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 50,
+          "shortTerm": 45,
+          "blended": 48,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T1",
+        "secondaryHypothesis": null,
+        "contradictedHypothesis": null,
+        "confidence": 0.6
+      }
+    },
+    "DRO": {
+      "ticker": "DRO",
+      "dislocation": {
+        "severity": "NORMAL",
+        "metrics": {
+          "currentPrice": 3.85,
+          "todayReturn": -1.28,
+          "drawdownFromPeak": -23,
+          "zScore": -0.5,
+          "volumeRatio": 1
+        },
+        "pattern": "NORMAL"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 60,
+          "shortTerm": 55,
+          "blended": 58,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 40,
+          "blended": 37,
+          "confidence": "MEDIUM"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 25,
+          "blended": 22,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 50,
+          "shortTerm": 45,
+          "blended": 48,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T1",
+        "secondaryHypothesis": null,
+        "contradictedHypothesis": null,
+        "confidence": 0.6
+      }
+    },
+    "GYG": {
+      "ticker": "GYG",
+      "dislocation": {
+        "severity": "NORMAL",
+        "metrics": {
+          "currentPrice": 27.6,
+          "todayReturn": -1.78,
+          "drawdownFromPeak": -8,
+          "zScore": -0.5,
+          "volumeRatio": 1
+        },
+        "pattern": "NORMAL"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 60,
+          "shortTerm": 55,
+          "blended": 58,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 40,
+          "blended": 37,
+          "confidence": "MEDIUM"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 25,
+          "blended": 22,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 50,
+          "shortTerm": 45,
+          "blended": 48,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T1",
+        "secondaryHypothesis": null,
+        "contradictedHypothesis": null,
+        "confidence": 0.6
+      }
+    },
+    "MQG": {
+      "ticker": "MQG",
+      "dislocation": {
+        "severity": "NORMAL",
+        "metrics": {
+          "currentPrice": 228.5,
+          "todayReturn": -0.65,
+          "drawdownFromPeak": -8.6,
+          "zScore": -0.5,
+          "volumeRatio": 1
+        },
+        "pattern": "NORMAL"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 60,
+          "shortTerm": 55,
+          "blended": 58,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 40,
+          "blended": 37,
+          "confidence": "MEDIUM"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 25,
+          "blended": 22,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 50,
+          "shortTerm": 45,
+          "blended": 48,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T1",
+        "secondaryHypothesis": null,
+        "contradictedHypothesis": null,
+        "confidence": 0.6
+      }
+    },
+    "GMG": {
+      "ticker": "GMG",
+      "dislocation": {
+        "severity": "NORMAL",
+        "metrics": {
+          "currentPrice": 31.2,
+          "todayReturn": -1.89,
+          "drawdownFromPeak": -10.9,
+          "zScore": -0.5,
+          "volumeRatio": 1
+        },
+        "pattern": "NORMAL"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 60,
+          "shortTerm": 55,
+          "blended": 58,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 40,
+          "blended": 37,
+          "confidence": "MEDIUM"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 25,
+          "blended": 22,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 50,
+          "shortTerm": 45,
+          "blended": 48,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T1",
+        "secondaryHypothesis": null,
+        "contradictedHypothesis": null,
+        "confidence": 0.6
+      }
+    },
+    "WDS": {
+      "ticker": "WDS",
+      "dislocation": {
+        "severity": "HIGH",
+        "metrics": {
+          "currentPrice": 25.4,
+          "todayReturn": -1.93,
+          "drawdownFromPeak": -27.4,
+          "zScore": -1.8,
+          "volumeRatio": 1.8
+        },
+        "pattern": "STEADY_DECLINE"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 60,
+          "shortTerm": 55,
+          "blended": 58,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 40,
+          "blended": 37,
+          "confidence": "MEDIUM"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 25,
+          "blended": 22,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 50,
+          "shortTerm": 45,
+          "blended": 48,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T1",
+        "secondaryHypothesis": null,
+        "contradictedHypothesis": null,
+        "confidence": 0.6
+      }
+    },
+    "SIG": {
+      "ticker": "SIG",
+      "dislocation": {
+        "severity": "HIGH",
+        "metrics": {
+          "currentPrice": 3.1,
+          "todayReturn": -1.59,
+          "drawdownFromPeak": -38,
+          "zScore": -1.8,
+          "volumeRatio": 1.8
+        },
+        "pattern": "STEADY_DECLINE"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 60,
+          "shortTerm": 55,
+          "blended": 58,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 40,
+          "blended": 37,
+          "confidence": "MEDIUM"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 25,
+          "blended": 22,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 50,
+          "shortTerm": 45,
+          "blended": 48,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T1",
+        "secondaryHypothesis": null,
+        "contradictedHypothesis": null,
+        "confidence": 0.6
+      }
+    },
+    "FMG": {
+      "ticker": "FMG",
+      "dislocation": {
+        "severity": "NORMAL",
+        "metrics": {
+          "currentPrice": 18.9,
+          "todayReturn": -1.56,
+          "drawdownFromPeak": -24.4,
+          "zScore": -0.5,
+          "volumeRatio": 1
+        },
+        "pattern": "NORMAL"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 60,
+          "shortTerm": 55,
+          "blended": 58,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 40,
+          "blended": 37,
+          "confidence": "MEDIUM"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 25,
+          "blended": 22,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 50,
+          "shortTerm": 45,
+          "blended": 48,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T1",
+        "secondaryHypothesis": null,
+        "contradictedHypothesis": null,
+        "confidence": 0.6
+      }
+    }
+  },
+  "generatedAt": "2026-02-14T02:40:07.249Z"
+}
