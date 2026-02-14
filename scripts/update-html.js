@@ -6,15 +6,30 @@
 
 const fs = require('fs');
 const path = require('path');
+const { findLatestPrices } = require('./find-latest-prices');
 
 // Load data files
 function loadData() {
   const dataDir = path.join(__dirname, '..', 'data');
-  
+
+  // Prices: use find-latest-prices to pick freshest available source
+  const priceResult = findLatestPrices('newest');
+  if (!priceResult) {
+    throw new Error('No price data found. Run event-scraper or fetch-live-prices first.');
+  }
+  console.log(`Using prices from ${priceResult.source} (${priceResult.file}), updated ${priceResult.updated}`);
+
+  const updatesPath = path.join(dataDir, 'pending-updates.json');
+  const eventsPath = path.join(dataDir, 'events-log.json');
+
   return {
-    prices: JSON.parse(fs.readFileSync(path.join(dataDir, 'latest-prices.json'), 'utf8')),
-    updates: JSON.parse(fs.readFileSync(path.join(dataDir, 'pending-updates.json'), 'utf8')),
-    events: JSON.parse(fs.readFileSync(path.join(dataDir, 'events-log.json'), 'utf8'))
+    prices: priceResult.prices,
+    updates: fs.existsSync(updatesPath)
+      ? JSON.parse(fs.readFileSync(updatesPath, 'utf8'))
+      : { updates: {}, freshnessUpdates: {} },
+    events: fs.existsSync(eventsPath)
+      ? JSON.parse(fs.readFileSync(eventsPath, 'utf8'))
+      : []
   };
 }
 
