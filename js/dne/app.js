@@ -16,7 +16,8 @@
 
 /* global
   recalculateSurvival, updateNarrativeUI, renderNarrativeHistory,
-  startNarrativeRefresh, evaluatePriceSignals, fetchPriceData
+  startNarrativeRefresh, evaluatePriceSignals, fetchPriceData,
+  computeNarrativeWeighting
 */
 
 (function () {
@@ -98,6 +99,13 @@
 
     // Initial recalculation with existing evidence (no price fetch yet)
     recalculateSurvival(stock);
+
+    // Compute narrative weighting with seed price history if available
+    if (stock.price_history && stock.price_history.length > 3 &&
+        typeof computeNarrativeWeighting === 'function') {
+      var prevTop = stock.weighting ? stock.weighting.top_narrative.top_narrative : null;
+      computeNarrativeWeighting(stock, stock.price_history, prevTop);
+    }
 
     // Render UI
     updateNarrativeUI(stock);

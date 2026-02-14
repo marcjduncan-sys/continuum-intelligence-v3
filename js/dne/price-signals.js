@@ -9,7 +9,7 @@
  * Depends on: evidence.js, engine.js
  */
 
-/* global calculateDecayFactor, recalculateSurvival */
+/* global calculateDecayFactor, recalculateSurvival, computeNarrativeWeighting */
 
 // ─── Price Signal Evaluation ─────────────────────────────────────────────────
 
@@ -194,10 +194,24 @@ async function updateStockNarrative(stock, priceEvidenceRules) {
   var priceData = await fetchPriceData(stock.ticker);
   if (!priceData) return;
 
+  // Track price history for correlation analysis (Work Stream 3)
+  if (!stock.price_history) stock.price_history = [];
+  stock.price_history.push(priceData.current);
+  // Keep last 25 trading days of prices (enough for 20-day window + buffer)
+  if (stock.price_history.length > 25) {
+    stock.price_history = stock.price_history.slice(-25);
+  }
+
   evaluatePriceSignals(stock, priceData, priceEvidenceRules);
 
   // evaluatePriceSignals calls recalculateSurvival internally,
   // which calls checkNarrativeFlip. The stock object is now updated.
+
+  // Compute narrative weighting with price correlation (Work Stream 3)
+  if (stock.price_history.length > 3 && typeof computeNarrativeWeighting === 'function') {
+    var prevTop = stock.weighting ? stock.weighting.top_narrative.top_narrative : null;
+    computeNarrativeWeighting(stock, stock.price_history, prevTop);
+  }
 
   // Persist updated stock data
   if (typeof saveStockData === 'function') {

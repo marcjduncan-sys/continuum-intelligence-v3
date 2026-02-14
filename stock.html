@@ -71,15 +71,21 @@
     </div>
   </div>
 
+  <!-- Critical Dislocation Indicator (Work Stream 1: Institutional redesign) -->
+  <div class="dislocation-indicator" id="dislocation-indicator">
+    <span class="dislocation-label">RISK SKEW</span>
+    <span class="dislocation-detail"></span>
+  </div>
+
   <!-- Alert Banner (hidden by default) -->
   <div class="narrative-alert" id="narrative-alert">
-    <span class="alert-icon">⚠️</span>
+    <span class="alert-icon">!</span>
     <span class="alert-text">Narrative under pressure — <span id="alert-detail"></span></span>
   </div>
 
   <!-- Editorial Override Banner (hidden by default) -->
   <div class="editorial-override-banner" id="editorial-override-banner">
-    <span class="override-icon">🔒</span>
+    <span class="override-icon">Lock</span>
     <span>
       <span class="override-label">Editorial override active:</span>
       <span id="override-reason"></span>
@@ -95,6 +101,10 @@
     <div class="dominant-score" id="dominant-score"></div>
   </div>
 
+  <!-- Competing Hypotheses (Work Stream 2: Clarity with explanatory frames) -->
+  <div class="section-title">Competing Hypotheses</div>
+  <div class="hypotheses-panel" id="hypotheses-panel"></div>
+
   <!-- Narrative History -->
   <div class="section-title">Narrative History</div>
   <div id="narrative-history"></div>
@@ -106,6 +116,7 @@
 <script src="js/dne/engine.js"></script>
 <script src="js/dne/price-signals.js"></script>
 <script src="js/dne/override.js"></script>
+<script src="js/dne/weighting.js"></script>
 <script src="js/dne/ui.js"></script>
 
 <!-- Extend updateNarrativeUI to also populate the dominant card and price -->
