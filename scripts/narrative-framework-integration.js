@@ -51,21 +51,21 @@ const NFI_STYLES = `
 }
 
 .nfi-alert-critical {
-  background: linear-gradient(135deg, rgba(212, 85, 85, 0.15), rgba(212, 85, 85, 0.08));
-  border: 1px solid rgba(212, 85, 85, 0.4);
-  color: #E8EDF4;
+  background: linear-gradient(135deg, #7f1d1d, #991b1b);
+  border: 1px solid #dc2626;
+  color: #ffffff !important;
 }
 
 .nfi-alert-high {
-  background: linear-gradient(135deg, rgba(212, 160, 60, 0.15), rgba(212, 160, 60, 0.08));
-  border: 1px solid rgba(212, 160, 60, 0.4);
-  color: #E8EDF4;
+  background: linear-gradient(135deg, #92400e, #b45309);
+  border: 1px solid #f59e0b;
+  color: #ffffff !important;
 }
 
 .nfi-alert-moderate {
-  background: linear-gradient(135deg, rgba(74, 142, 204, 0.15), rgba(74, 142, 204, 0.08));
-  border: 1px solid rgba(74, 142, 204, 0.4);
-  color: #E8EDF4;
+  background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+  border: 1px solid #3b82f6;
+  color: #ffffff !important;
 }
 
 @keyframes nfi-slide-down {
@@ -92,7 +92,7 @@ const NFI_STYLES = `
 
 .nfi-alert-metrics {
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85) !important;
   font-family: var(--font-data);
 }
 
