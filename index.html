@@ -12369,6 +12369,10 @@ function updateLiveUI(ticker) {
             if (container) {
                 container.innerHTML = renderReportPage(STOCK_DATA[ticker]);
                 setupScrollSpy('page-report-' + ticker);
+                // Re-apply narrative analysis after re-render
+                if (typeof window.applyNarrativeAnalysis === 'function') {
+                    window.applyNarrativeAnalysis(ticker);
+                }
             }
             renderedPages.add(ticker);
         }
@@ -12900,6 +12904,10 @@ function route() {
                 renderedPages.add(ticker);
                 setupScrollSpy('page-' + hash);
             }
+        }
+        // Apply narrative analysis (alerts, ST/LT weights, market-responsive narrative)
+        if (typeof window.applyNarrativeAnalysis === 'function') {
+            window.applyNarrativeAnalysis(ticker);
         }
         // Fetch live data asynchronously and update chart + hero price
         if (STOCK_DATA[ticker]) {

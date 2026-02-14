@@ -169,36 +169,77 @@ const NarrativeInferenceEngine = {
   },
 
   /**
-   * Infer which hypothesis is driving price based on stock characteristics
+   * Infer which hypothesis is driving price based on stock characteristics.
+   *
+   * Uses a scoring system instead of cascading overrides so that multiple
+   * stock characteristics contribute additively rather than replacing each
+   * other.  Metrics are in PERCENTAGE form (e.g. drawdownFromPeak = 64.8,
+   * todayReturn = -27.31).
    */
   inferNarrative(ticker, dislocation, stockCharacteristics, newsContext = []) {
     const { pattern, metrics } = dislocation;
     const { highMultiple, growthStock, hasAIExposure } = stockCharacteristics;
 
-    // Base inference from pattern
-    let inference = this.getBaseInference(pattern, metrics.volumeRatio);
+    // Start with base inference from pattern
+    const base = this.getBaseInference(pattern, metrics.volumeRatio);
 
-    // Adjust for stock characteristics
-    if (highMultiple && metrics.drawdownFromPeak > 0.20) {
-      // High multiple stocks experiencing drawdown = valuation narrative
-      inference.secondary = inference.primary;
-      inference.primary = 'T2';
+    // Scoring system: accumulate evidence for each hypothesis
+    const scores = { T1: 0, T2: 0, T3: 0, T4: 0 };
+    let contradicted = null;
+
+    // Base pattern scores
+    scores[base.primary] += 3;
+    if (base.secondary) scores[base.secondary] += 1.5;
+
+    // High-multiple stock with meaningful drawdown → valuation narrative
+    if (highMultiple && metrics.drawdownFromPeak > 20) {
+      scores.T2 += 2.5;
+      // Extreme drawdown makes valuation even more dominant
+      if (metrics.drawdownFromPeak > 40) scores.T2 += 1.5;
     }
 
-    if (hasAIExposure && metrics.todayReturn < -0.05) {
-      // AI stock dropping = either T3 (AI competition) or T4 reversal (AI moat questioned)
-      if (inference.primary === 'T4') {
-        // Market reversing view on AI as moat
-        inference.contradicted = 'T4';
-        inference.primary = 'T3';
+    // AI-exposed stock declining → competitive disruption fears, AI moat questioned
+    // Only contradict T4 if it's a bullish thesis (base weight >= 40 suggests a bull thesis)
+    var t4IsBullish = (stockCharacteristics.t4BaseWeight || 0) >= 40;
+    if (hasAIExposure && metrics.todayReturn < -5) {
+      scores.T3 += 3;  // AI as competitive threat becomes dominant
+      if (t4IsBullish) contradicted = 'T4';  // Only contradict bullish AI-moat thesis
+      // Extreme AI selloff amplifies this
+      if (metrics.todayReturn < -15 || metrics.drawdownFromPeak > 50) {
+        scores.T3 += 2;
       }
+    } else if (hasAIExposure && metrics.drawdownFromPeak > 30) {
+      // Even without a huge single-day drop, sustained drawdown in AI stock
+      scores.T3 += 2;
+      if (t4IsBullish) contradicted = 'T4';
     }
 
+    // Growth stock in sustained decline → growth fears
     if (growthStock && metrics.consecutiveDownDays > 5) {
-      // Sustained decline in growth stock = growth/margin fears
-      inference.primary = 'T1';  // T1 is often growth-oriented
-      inference.tone = 'negative';
+      scores.T1 += 2;
     }
+
+    // Extreme drawdown from peak → valuation narrative is always relevant
+    if (metrics.drawdownFromPeak > 50) {
+      scores.T2 += 1;
+    }
+
+    // Sort by score to find primary and secondary
+    const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+    const primary = sorted[0][0];
+    const secondary = sorted[1][1] > 0 ? sorted[1][0] : null;
+
+    // Calculate confidence based on score separation
+    const scoreSep = sorted[0][1] - (sorted[1][1] || 0);
+    const confidence = Math.min(0.95, base.confidence + (scoreSep > 3 ? 0.10 : scoreSep > 1 ? 0.05 : 0));
+
+    let inference = {
+      primary,
+      secondary,
+      contradicted,
+      confidence,
+      tone: metrics.todayReturn < 0 ? 'negative' : 'positive'
+    };
 
     // Incorporate news context if available
     if (newsContext.length > 0) {
@@ -258,15 +299,18 @@ const NarrativeInferenceEngine = {
    */
   generateReasoning(inference, dislocation, characteristics) {
     const reasons = [];
-    
+
     if (dislocation.pattern === 'GAP_DOWN') {
       reasons.push(`Large gap down (${dislocation.metrics.todayReturn}%) on high volume suggests shock event`);
     }
-    if (dislocation.metrics.drawdownFromPeak > 0.30) {
+    if (Math.abs(dislocation.metrics.drawdownFromPeak) > 30) {
       reasons.push(`Severe drawdown (${dislocation.metrics.drawdownFromPeak}%) from peak indicates narrative regime change`);
     }
     if (characteristics.highMultiple && dislocation.metrics.todayReturn < 0) {
       reasons.push(`High multiple stock declining = valuation compression narrative`);
+    }
+    if (characteristics.hasAIExposure && dislocation.metrics.todayReturn < -5) {
+      reasons.push(`AI-exposed stock in sharp decline = market reversing view on AI as moat, pricing competitive disruption`);
     }
     if (inference.contradicted) {
       reasons.push(`Previous bull thesis (${inference.contradicted}) being contradicted by price action`);
