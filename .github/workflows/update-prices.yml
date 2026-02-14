@@ -39,6 +39,9 @@ jobs:
         run: |
           node scripts/fetch-live-prices.js || true
 
+      - name: Run narrative analysis
+        run: node scripts/run-automated-analysis.js || true
+
       - name: Run freshness monitor
         id: monitor
         run: node scripts/research-monitor.js --json --quiet > freshness-report.json 2>/dev/null || true
