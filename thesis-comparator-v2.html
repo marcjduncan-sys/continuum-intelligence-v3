@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thesis Comparator — Continuum Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+:root {
+    --bg-page: #0B1220;
+    --bg-surface: #111C2E;
+    --bg-elevated: #1A2740;
+    --bg-input: #0E1625;
+    --bg-warning: rgba(212, 160, 60, 0.1);
+    --bg-error: rgba(212, 85, 85, 0.1);
+    --bg-success: rgba(61, 170, 109, 0.1);
+    
+    --text-primary: #E8EDF4;
+    --text-secondary: #8B9AB8;
+    --text-muted: #566882;
+    
+    --accent-teal: #1A9E8F;
+    --accent-gold: #C9A96E;
+    
+    --signal-red: #D45555;
+    --signal-green: #3DAA6D;
+    --signal-amber: #D4A03C;
+    --signal-blue: #4A8ECC;
+    
+    --border: #1E3050;
+    --border-light: #253A58;
+    --border-warning: rgba(212, 160, 60, 0.4);
+    --border-error: rgba(212, 85, 85, 0.4);
+    
+    --font-ui: 'Inter', system-ui, sans-serif;
+    --font-narrative: 'Source Serif 4', Georgia, serif;
+    --font-data: 'JetBrains Mono', monospace;
+    
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--font-ui);
+    background: var(--bg-page);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+}
+
+/* Navigation */
+.site-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(11, 18, 32, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    height: 56px;
+}
+
+.nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.nav-brand-text {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+}
+
+.nav-brand-text span {
+    color: var(--accent-teal);
+}
+
+.nav-links {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.nav-links a {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 150ms ease;
+}
+
+.nav-links a:hover {
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+}
+
+.nav-links a.active {
+    color: var(--accent-teal);
+    background: rgba(26, 158, 143, 0.1);
+}
+
+/* Page Layout */
+.page {
+    padding-top: 56px;
+    min-height: 100vh;
+}
+
+.page-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-lg);
+}
+
+/* Hero */
+.hero {
+    text-align: center;
+    padding: var(--space-2xl) 0;
+}
+
+.hero-tagline {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    margin-bottom: var(--space-md);
+}
+
+.hero-title {
+    font-family: var(--font-narrative);
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin-bottom: var(--space-md);
+}
+
+.hero-subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+/* Validation Alert */
+.validation-alert {
+    display: none;
+    padding: var(--space-md) var(--space-lg);
+    border-radius: 8px;
+    margin-bottom: var(--space-lg);
+    border: 1px solid;
+}
+
+.validation-alert.warning {
+    display: flex;
+    background: var(--bg-warning);
+    border-color: var(--border-warning);
+    color: var(--signal-amber);
+}
+
+.validation-alert.error {
+    display: flex;
+    background: var(--bg-error);
+    border-color: var(--border-error);
+    color: var(--signal-red);
+}
+
+.validation-alert.success {
+    display: flex;
+    background: var(--bg-success);
+    border-color: rgba(61, 170, 109, 0.4);
+    color: var(--signal-green);
+}
+
+.validation-icon {
+    font-size: 1.2rem;
+    margin-right: var(--space-md);
+    flex-shrink: 0;
+}
+
+.validation-content {
+    flex: 1;
+}
+
+.validation-title {
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+}
+
+.validation-message {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+/* Selected Stock Banner */
+.selected-stock-banner {
+    display: none;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: var(--space-lg);
+}
+
+.selected-stock-banner.active {
+    display: flex;
+}
+
+.selected-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.selected-ticker {
+    font-family: var(--font-data);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+}
+
+.selected-name {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.change-selection {
+    margin-left: auto;
+    font-size: 0.8rem;
+    color: var(--accent-teal);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* Upload Section */
+.upload-section {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+}
+
+.section-header-with-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.step-indicator {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Step 1: Stock Selection */
+.stock-selection-step {
+    margin-bottom: var(--space-xl);
+}
+
+.step-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+    display: block;
+}
+
+.stock-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--space-sm);
+}
+
+.stock-card {
+    padding: var(--space-md);
+    background: var(--bg-elevated);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.stock-card:hover {
+    border-color: var(--border-light);
+    background: var(--bg-input);
+}
+
+.stock-card.selected {
+    border-color: var(--accent-teal);
+    background: rgba(26, 158, 143, 0.1);
+}
+
+.stock-card-ticker {
+    font-family: var(--font-data);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.stock-card-name {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Step 2: Thesis Input */
+.thesis-input-step {
+    display: none;
+    border-top: 1px solid var(--border);
+    padding-top: var(--space-xl);
+}
+
+.thesis-input-step.active {
+    display: block;
+}
+
+.input-tabs {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.input-tab {
+    padding: 10px 20px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.input-tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+}
+
+.input-tab.active {
+    color: var(--accent-teal);
+    background: rgba(26, 158, 143, 0.1);
+    border-color: rgba(26, 158, 143, 0.3);
+}
+
+/* Text Input */
+.text-input-area {
+    width: 100%;
+    min-height: 250px;
+    padding: var(--space-md);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: var(--font-narrative);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    resize: vertical;
+    transition: border-color 150ms ease;
+}
+
+.text-input-area:focus {
+    outline: none;
+    border-color: var(--accent-teal);
+}
+
+.text-input-area::placeholder {
+    color: var(--text-muted);
+}
+
+/* Upload Zone */
+.upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: var(--space-2xl);
+    text-align: center;
+    background: var(--bg-input);
+    transition: all 200ms ease;
+    cursor: pointer;
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+    border-color: var(--accent-teal);
+    background: rgba(26, 158, 143, 0.05);
+}
+
+.upload-icon {
+    font-size: 48px;
+    margin-bottom: var(--space-md);
+    opacity: 0.6;
+}
+
+.upload-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.upload-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+}
+
+.upload-formats {
+    display: inline-flex;
+    gap: var(--space-sm);
+    font-family: var(--font-data);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.upload-format {
+    padding: 4px 10px;
+    background: var(--bg-elevated);
+    border-radius: 4px;
+}
+
+/* Ticker Mention Detection */
+.ticker-detection {
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    background: var(--bg-elevated);
+    border-radius: 8px;
+    display: none;
+}
+
+.ticker-detection.active {
+    display: block;
+}
+
+.ticker-detection-title {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.detected-tickers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.detected-ticker {
+    padding: 6px 12px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: var(--font-data);
+    font-size: 0.85rem;
+}
+
+.detected-ticker.match {
+    border-color: var(--signal-green);
+    background: rgba(61, 170, 109, 0.1);
+    color: var(--signal-green);
+}
+
+.detected-ticker.mismatch {
+    border-color: var(--signal-amber);
+    background: rgba(212, 160, 60, 0.1);
+    color: var(--signal-amber);
+}
+
+/* Analyze Button */
+.analyze-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+    padding: 14px 32px;
+    background: var(--accent-teal);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.analyze-btn:hover:not(:disabled) {
+    background: #158a7d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26, 158, 143, 0.3);
+}
+
+.analyze-btn:disabled {
+    background: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Results Section */
+.results-section {
+    display: none;
+}
+
+.results-section.active {
+    display: block;
+}
+
+/* Comparison Context Header */
+.comparison-context {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.comparison-context-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.comparison-ticker {
+    font-family: var(--font-data);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+}
+
+.comparison-vs {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.comparison-thesis-status {
+    margin-left: auto;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.comparison-thesis-status.validated {
+    background: rgba(61, 170, 109, 0.15);
+    color: var(--signal-green);
+    border: 1px solid rgba(61, 170, 109, 0.3);
+}
+
+.comparison-details {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Score Card */
+.score-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+    text-align: center;
+}
+
+.score-value {
+    font-family: var(--font-data);
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+}
+
+.score-value.aligned { color: var(--signal-green); }
+.score-value.misaligned { color: var(--signal-amber); }
+.score-value.contrarian { color: var(--signal-red); }
+
+.score-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.score-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Alignment Grid */
+.alignment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.alignment-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-lg);
+}
+
+.alignment-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
+}
+
+.hypothesis-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.hypothesis-dot.t1 { background: var(--signal-green); }
+.hypothesis-dot.t2 { background: var(--signal-amber); }
+.hypothesis-dot.t3 { background: var(--signal-red); }
+.hypothesis-dot.t4 { background: var(--signal-blue); }
+
+.hypothesis-info { flex: 1; }
+
+.hypothesis-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.hypothesis-prob {
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.alignment-badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.alignment-badge.supports {
+    background: rgba(61, 170, 109, 0.15);
+    color: var(--signal-green);
+    border: 1px solid rgba(61, 170, 109, 0.3);
+}
+
+.alignment-badge.neutral {
+    background: rgba(212, 160, 60, 0.15);
+    color: var(--signal-amber);
+    border: 1px solid rgba(212, 160, 60, 0.3);
+}
+
+.alignment-badge.contradicts {
+    background: rgba(212, 85, 85, 0.15);
+    color: var(--signal-red);
+    border: 1px solid rgba(212, 85, 85, 0.3);
+}
+
+.alignment-reasoning {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Footer */
+.site-footer {
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    padding: var(--space-xl) 0;
+    margin-top: var(--space-2xl);
+}
+
+.footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+
+.footer-disclaimer {
+    font-size: 0.75rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-title { font-size: 1.8rem; }
+    .stock-grid { grid-template-columns: repeat(3, 1fr); }
+    .score-value { font-size: 3rem; }
+    .comparison-context-header { flex-wrap: wrap; }
+    .comparison-thesis-status { margin-left: 0; width: 100%; margin-top: var(--space-sm); }
+}
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="site-nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-brand-text">C<span>∞</span>ntinuum intelligence</div>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Research</a>
+                <a href="index.html#snapshots">Snapshots</a>
+                <a href="index.html#portfolio">Portfolio</a>
+                <a href="thesis-comparator-v2.html" class="active">Thesis Comparator</a>
+                <a href="index.html#about">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="page">
+        <div class="page-inner">
+            <!-- Hero -->
+            <div class="hero">
+                <div class="hero-tagline">Validate Your Conviction</div>
+                <h1 class="hero-title">Investment Thesis Comparator</h1>
+                <p class="hero-subtitle">Upload your investment thesis and compare it against Continuum's evidence-based research. Ensure your analysis aligns with the right company and understand where your views diverge.</p>
+            </div>
+
+            <!-- Validation Alerts -->
+            <div class="validation-alert error" id="mismatch-alert">
+                <span class="validation-icon">⚠️</span>
+                <div class="validation-content">
+                    <div class="validation-title">Ticker Mismatch Detected</div>
+                    <div class="validation-message">Your thesis mentions <strong id="detected-ticker">WOW</strong> but you selected <strong id="selected-ticker">XRO</strong>. Please ensure you're analyzing the correct company, or update your selection.</div>
+                </div>
+            </div>
+
+            <div class="validation-alert success" id="match-alert">
+                <span class="validation-icon">✓</span>
+                <div class="validation-content">
+                    <div class="validation-title">Thesis Validated</div>
+                    <div class="validation-message">Your thesis correctly references <strong id="validated-ticker">XRO</strong>. Proceed with analysis.</div>
+                </div>
+            </div>
+
+            <!-- Selected Stock Banner -->
+            <div class="selected-stock-banner" id="selected-banner">
+                <span class="selected-label">Selected for Analysis</span>
+                <span class="selected-ticker" id="banner-ticker">XRO</span>
+                <span class="selected-name" id="banner-name">Xero Limited</span>
+                <span class="change-selection" onclick="resetSelection()">Change</span>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <!-- Step 1: Stock Selection -->
+                <div class="stock-selection-step" id="step-1">
+                    <div class="section-header-with-action">
+                        <h2 class="section-title">Step 1: Select Company</h2>
+                        <span class="step-indicator">1 of 2</span>
+                    </div>
+                    <label class="step-label">Choose the stock your thesis analyzes:</label>
+                    
+                    <div class="stock-grid">
+                        <div class="stock-card" data-ticker="WOW" data-name="Woolworths Group" onclick="selectStock('WOW', 'Woolworths Group')">
+                            <div class="stock-card-ticker">WOW</div>
+                            <div class="stock-card-name">Woolworths</div>
+                        </div>
+                        <div class="stock-card" data-ticker="CSL" data-name="CSL Limited" onclick="selectStock('CSL', 'CSL Limited')">
+                            <div class="stock-card-ticker">CSL</div>
+                            <div class="stock-card-name">CSL</div>
+                        </div>
+                        <div class="stock-card" data-ticker="XRO" data-name="Xero Limited" onclick="selectStock('XRO', 'Xero Limited')">
+                            <div class="stock-card-ticker">XRO</div>
+                            <div class="stock-card-name">Xero</div>
+                        </div>
+                        <div class="stock-card" data-ticker="WTC" data-name="WiseTech Global" onclick="selectStock('WTC', 'WiseTech Global')">
+                            <div class="stock-card-ticker">WTC</div>
+                            <div class="stock-card-name">WiseTech</div>
+                        </div>
+                        <div class="stock-card" data-ticker="WDS" data-name="Woodside Energy" onclick="selectStock('WDS', 'Woodside Energy')">
+                            <div class="stock-card-ticker">WDS</div>
+                            <div class="stock-card-name">Woodside</div>
+                        </div>
+                        <div class="stock-card" data-ticker="MQG" data-name="Macquarie Group" onclick="selectStock('MQG', 'Macquarie Group')">
+                            <div class="stock-card-ticker">MQG</div>
+                            <div class="stock-card-name">Macquarie</div>
+                        </div>
+                        <div class="stock-card" data-ticker="DRO" data-name="Droneshield" onclick="selectStock('DRO', 'Droneshield')">
+                            <div class="stock-card-ticker">DRO</div>
+                            <div class="stock-card-name">Droneshield</div>
+                        </div>
+                        <div class="stock-card" data-ticker="PME" data-name="Pro Medicus" onclick="selectStock('PME', 'Pro Medicus')">
+                            <div class="stock-card-ticker">PME</div>
+                            <div class="stock-card-name">Pro Medicus</div>
+                        </div>
+                        <div class="stock-card" data-ticker="GYG" data-name="Guzman y Gomez" onclick="selectStock('GYG', 'Guzman y Gomez')">
+                            <div class="stock-card-ticker">GYG</div>
+                            <div class="stock-card-name">Guzman y Gomez</div>
+                        </div>
+                        <div class="stock-card" data-ticker="GMG" data-name="Goodman Group" onclick="selectStock('GMG', 'Goodman Group')">
+                            <div class="stock-card-ticker">GMG</div>
+                            <div class="stock-card-name">Goodman</div>
+                        </div>
+                        <div class="stock-card" data-ticker="SIG" data-name="Sigma Healthcare" onclick="selectStock('SIG', 'Sigma Healthcare')">
+                            <div class="stock-card-ticker">SIG</div>
+                            <div class="stock-card-name">Sigma</div>
+                        </div>
+                        <div class="stock-card" data-ticker="FMG" data-name="Fortescue Metals" onclick="selectStock('FMG', 'Fortescue Metals')">
+                            <div class="stock-card-ticker">FMG</div>
+                            <div class="stock-card-name">Fortescue</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Thesis Input -->
+                <div class="thesis-input-step" id="step-2">
+                    <div class="section-header-with-action">
+                        <h2 class="section-title">Step 2: Input Your Thesis</h2>
+                        <span class="step-indicator">2 of 2</span>
+                    </div>
+
+                    <div class="input-tabs">
+                        <button class="input-tab active" onclick="switchTab('paste')">Paste Text</button>
+                        <button class="input-tab" onclick="switchTab('upload')">Upload File</button>
+                    </div>
+
+                    <!-- Paste Tab -->
+                    <div id="paste-tab" class="tab-content">
+                        <textarea 
+                            class="text-input-area" 
+                            id="thesis-input"
+                            placeholder="Paste your investment thesis here... Include the ticker symbol (e.g., XRO, WOW, CSL) so we can validate your selection.
+
+Example:
+Ticker: XRO
+Investment Horizon: 12-18 months
+Key Thesis: Xero's AI partnership will accelerate subscriber growth and improve churn rates...
+Supporting Evidence: Recent FY26 guidance, competitor analysis...
+Risk Factors: Execution risk, competitive pressure from QuickBooks...
+Expected Outcome: Target price $95-110"
+                            oninput="detectTickers()"
+                        ></textarea>
+                    </div>
+
+                    <!-- Upload Tab -->
+                    <div id="upload-tab" class="tab-content" style="display: none;">
+                        <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+                            <div class="upload-icon">📄</div>
+                            <div class="upload-title">Drag & drop your thesis file</div>
+                            <div class="upload-subtitle">Or click to browse. Accepts PDF, Word, or plain text files.</div>
+                            <div class="upload-formats">
+                                <span class="upload-format">.PDF</span>
+                                <span class="upload-format">.DOCX</span>
+                                <span class="upload-format">.TXT</span>
+                                <span class="upload-format">.MD</span>
+                            </div>
+                            <input type="file" id="file-input" style="display: none;" accept=".pdf,.docx,.txt,.md">
+                        </div>
+                    </div>
+
+                    <!-- Ticker Detection -->
+                    <div class="ticker-detection" id="ticker-detection">
+                        <div class="ticker-detection-title">Detected Tickers in Your Thesis:</div>
+                        <div class="detected-tickers" id="detected-tickers">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <button class="analyze-btn" id="analyze-btn" onclick="analyzeThesis()" disabled>
+                        <span>🔍</span>
+                        <span>Analyze Alignment</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="results">
+                <!-- Comparison Context -->
+                <div class="comparison-context">
+                    <div class="comparison-context-header">
+                        <span class="comparison-ticker" id="result-ticker">XRO</span>
+                        <span class="comparison-vs">vs</span>
+                        <span style="font-size: 0.9rem; color: var(--text-secondary);">Your Investment Thesis</span>
+                        <span class="comparison-thesis-status validated" id="validation-status">✓ Validated</span>
+                    </div>
+                    <div class="comparison-details">
+                        Comparing your thesis against Continuum's four competing hypotheses for <strong id="result-company">Xero Limited</strong>. Analysis based on evidence across 10 domains.
+                    </div>
+                </div>
+
+                <!-- Score Card -->
+                <div class="score-card">
+                    <div class="score-value misaligned" id="alignment-score">38%</div>
+                    <div class="score-label">Thesis Alignment Score</div>
+                    <div class="score-desc" id="score-description">
+                        Your thesis shows partial alignment with Continuum's research. You recognize the AI partnership opportunity but underestimate the execution risk and competitive pressure from QuickBooks.
+                    </div>
+                </div>
+
+                <!-- Hypothesis Alignment -->
+                <div class="alignment-grid">
+                    <div class="alignment-card">
+                        <div class="alignment-card-header">
+                            <div class="hypothesis-dot t1"></div>
+                            <div class="hypothesis-info">
+                                <div class="hypothesis-name">T1: AI-Led Growth Recovery</div>
+                                <div class="hypothesis-prob">Continuum: 28% probability</div>
+                            </div>
+                            <span class="alignment-badge supports">SUPPORTS</span>
+                        </div>
+                        <div class="alignment-reasoning">
+                            Your thesis strongly supports T1. You correctly identify the AI partnership as a catalyst for subscriber growth and churn improvement. However, your timeline (6 months) is more aggressive than Continuum's assessment (12-18 months).
+                        </div>
+                    </div>
+
+                    <div class="alignment-card">
+                        <div class="alignment-card-header">
+                            <div class="hypothesis-dot t2"></div>
+                            <div class="hypothesis-info">
+                                <div class="hypothesis-name">T2: Structural Margin Pressure</div>
+                                <div class="hypothesis-prob">Continuum: 22% probability</div>
+                            </div>
+                            <span class="alignment-badge neutral">NEUTRAL</span>
+                        </div>
+                        <div class="alignment-reasoning">
+                            You acknowledge competitive pressure but believe Xero's brand and ecosystem provide sufficient defense. Continuum assigns higher probability to sustained margin compression from price competition.
+                        </div>
+                    </div>
+
+                    <div class="alignment-card">
+                        <div class="alignment-card-header">
+                            <div class="hypothesis-dot t3"></div>
+                            <div class="hypothesis-info">
+                                <div class="hypothesis-name">T3: Execution Failure</div>
+                                <div class="hypothesis-prob">Continuum: 35% probability</div>
+                            </div>
+                            <span class="alignment-badge contradicts">CONTRADICTS</span>
+                        </div>
+                        <div class="alignment-reasoning">
+                            <strong>Key divergence:</strong> You dismiss execution risk citing "proven management team." Continuum notes Xero's history of missed guidance and product delays. The AI integration timeline may be optimistic.
+                        </div>
+                    </div>
+
+                    <div class="alignment-card">
+                        <div class="alignment-card-header">
+                            <div class="hypothesis-dot t4"></div>
+                            <div class="hypothesis-info">
+                                <div class="hypothesis-name">T4: Competitive Disruption</div>
+                                <div class="hypothesis-prob">Continuum: 15% probability</div>
+                            </div>
+                            <span class="alignment-badge contradicts">CONTRADICTS</span>
+                        </div>
+                        <div class="alignment-reasoning">
+                            Your thesis doesn't address QuickBooks' AI advancements or Microsoft's SMB push. Continuum views competitive threats as underappreciated, particularly in the US market where Xero has weaker positioning.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p class="footer-disclaimer">This comparator provides analysis based on publicly available research. It does not constitute investment advice. Always conduct your own due diligence and consult licensed financial advisors before making investment decisions.</p>
+        </div>
+    </footer>
+
+    <script>
+        let selectedTicker = null;
+        let selectedName = null;
+        const coverageTickers = ['WOW', 'CSL', 'XRO', 'WTC', 'WDS', 'MQG', 'DRO', 'PME', 'GYG', 'GMG', 'SIG', 'FMG'];
+
+        // Stock selection
+        function selectStock(ticker, name) {
+            selectedTicker = ticker;
+            selectedName = name;
+            
+            // Update UI
+            document.querySelectorAll('.stock-card').forEach(card => {
+                card.classList.remove('selected');
+                if (card.dataset.ticker === ticker) {
+                    card.classList.add('selected');
+                }
+            });
+            
+            // Show selected banner
+            document.getElementById('selected-banner').classList.add('active');
+            document.getElementById('banner-ticker').textContent = ticker;
+            document.getElementById('banner-name').textContent = name;
+            
+            // Show thesis input step
+            document.getElementById('step-2').classList.add('active');
+            
+            // Scroll to input
+            document.getElementById('step-2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Re-validate if text exists
+            detectTickers();
+        }
+
+        function resetSelection() {
+            selectedTicker = null;
+            selectedName = null;
+            
+            document.querySelectorAll('.stock-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            document.getElementById('selected-banner').classList.remove('active');
+            document.getElementById('step-2').classList.remove('active');
+            document.getElementById('ticker-detection').classList.remove('active');
+            
+            hideAlerts();
+        }
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.input-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (tab === 'paste') {
+                document.getElementById('paste-tab').style.display = 'block';
+                document.getElementById('upload-tab').style.display = 'none';
+            } else {
+                document.getElementById('paste-tab').style.display = 'none';
+                document.getElementById('upload-tab').style.display = 'block';
+            }
+        }
+
+        // Ticker detection with validation
+        function detectTickers() {
+            const text = document.getElementById('thesis-input').value.toUpperCase();
+            const detected = [];
+            
+            coverageTickers.forEach(ticker => {
+                const regex = new RegExp(`\\b${ticker}\\b`, 'g');
+                if (regex.test(text)) {
+                    detected.push(ticker);
+                }
+            });
+            
+            // Show detection box
+            const detectionBox = document.getElementById('ticker-detection');
+            const detectedContainer = document.getElementById('detected-tickers');
+            
+            if (detected.length > 0) {
+                detectionBox.classList.add('active');
+                detectedContainer.innerHTML = detected.map(ticker => {
+                    let className = 'detected-ticker';
+                    if (selectedTicker) {
+                        if (ticker === selectedTicker) {
+                            className += ' match';
+                        } else {
+                            className += ' mismatch';
+                        }
+                    }
+                    return `<span class="${className}">${ticker}</span>`;
+                }).join('');
+                
+                // Validate
+                validateSelection(detected);
+            } else {
+                detectionBox.classList.remove('active');
+                hideAlerts();
+                document.getElementById('analyze-btn').disabled = true;
+            }
+        }
+
+        // Validation logic
+        function validateSelection(detected) {
+            if (!selectedTicker) {
+                hideAlerts();
+                document.getElementById('analyze-btn').disabled = true;
+                return;
+            }
+            
+            const hasMatch = detected.includes(selectedTicker);
+            const hasMismatch = detected.some(t => t !== selectedTicker);
+            
+            hideAlerts();
+            
+            if (hasMatch) {
+                // Valid - thesis mentions selected ticker
+                document.getElementById('match-alert').classList.add('success');
+                document.getElementById('validated-ticker').textContent = selectedTicker;
+                document.getElementById('analyze-btn').disabled = false;
+            } else if (hasMismatch) {
+                // Invalid - thesis mentions different ticker
+                document.getElementById('mismatch-alert').classList.add('error');
+                document.getElementById('detected-ticker').textContent = detected[0];
+                document.getElementById('selected-ticker').textContent = selectedTicker;
+                document.getElementById('analyze-btn').disabled = true;
+            } else {
+                // No ticker detected
+                document.getElementById('analyze-btn').disabled = true;
+            }
+        }
+
+        function hideAlerts() {
+            document.getElementById('mismatch-alert').classList.remove('error');
+            document.getElementById('match-alert').classList.remove('success');
+        }
+
+        // Analyze thesis
+        function analyzeThesis() {
+            if (!selectedTicker) {
+                alert('Please select a stock first');
+                return;
+            }
+            
+            // Update results with selected ticker
+            document.getElementById('result-ticker').textContent = selectedTicker;
+            document.getElementById('result-company').textContent = selectedName;
+            
+            // Show results
+            document.getElementById('results').classList.add('active');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

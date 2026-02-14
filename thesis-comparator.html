@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thesis Comparator — Continuum Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+/* ============================================
+   THESIS COMPARATOR — CONTINUUM DESIGN SYSTEM
+   ============================================ */
+
+:root {
+    --bg-page: #0B1220;
+    --bg-surface: #111C2E;
+    --bg-elevated: #1A2740;
+    --bg-input: #0E1625;
+    
+    --text-primary: #E8EDF4;
+    --text-secondary: #8B9AB8;
+    --text-muted: #566882;
+    
+    --accent-teal: #1A9E8F;
+    --accent-gold: #C9A96E;
+    
+    --signal-red: #D45555;
+    --signal-green: #3DAA6D;
+    --signal-amber: #D4A03C;
+    --signal-blue: #4A8ECC;
+    
+    --border: #1E3050;
+    --border-light: #253A58;
+    
+    --font-ui: 'Inter', system-ui, sans-serif;
+    --font-narrative: 'Source Serif 4', Georgia, serif;
+    --font-data: 'JetBrains Mono', monospace;
+    
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--font-ui);
+    background: var(--bg-page);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+}
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+
+.site-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(11, 18, 32, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    height: 56px;
+}
+
+.nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.nav-brand-text {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+}
+
+.nav-brand-text span {
+    color: var(--accent-teal);
+}
+
+.nav-links {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.nav-links a {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 150ms ease;
+}
+
+.nav-links a:hover {
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+}
+
+.nav-links a.active {
+    color: var(--accent-teal);
+    background: rgba(26, 158, 143, 0.1);
+}
+
+/* ============================================
+   PAGE LAYOUT
+   ============================================ */
+
+.page {
+    padding-top: 56px;
+    min-height: 100vh;
+}
+
+.page-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-lg);
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+
+.hero {
+    text-align: center;
+    padding: var(--space-2xl) 0;
+}
+
+.hero-tagline {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    margin-bottom: var(--space-md);
+}
+
+.hero-title {
+    font-family: var(--font-narrative);
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin-bottom: var(--space-md);
+}
+
+.hero-subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+/* ============================================
+   UPLOAD SECTION
+   ============================================ */
+
+.upload-section {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+}
+
+.upload-tabs {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--space-md);
+}
+
+.upload-tab {
+    padding: 10px 20px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.upload-tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+}
+
+.upload-tab.active {
+    color: var(--accent-teal);
+    background: rgba(26, 158, 143, 0.1);
+    border-color: rgba(26, 158, 143, 0.3);
+}
+
+/* Drag & Drop Zone */
+.upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: var(--space-2xl);
+    text-align: center;
+    background: var(--bg-input);
+    transition: all 200ms ease;
+    cursor: pointer;
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+    border-color: var(--accent-teal);
+    background: rgba(26, 158, 143, 0.05);
+}
+
+.upload-icon {
+    font-size: 48px;
+    margin-bottom: var(--space-md);
+    opacity: 0.6;
+}
+
+.upload-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.upload-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+}
+
+.upload-formats {
+    display: inline-flex;
+    gap: var(--space-sm);
+    font-family: var(--font-data);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.upload-format {
+    padding: 4px 10px;
+    background: var(--bg-elevated);
+    border-radius: 4px;
+}
+
+/* Text Input */
+.text-input-area {
+    width: 100%;
+    min-height: 300px;
+    padding: var(--space-md);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: var(--font-narrative);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    resize: vertical;
+    transition: border-color 150ms ease;
+}
+
+.text-input-area:focus {
+    outline: none;
+    border-color: var(--accent-teal);
+}
+
+.text-input-area::placeholder {
+    color: var(--text-muted);
+}
+
+/* Stock Selector */
+.stock-selector {
+    margin-top: var(--space-lg);
+}
+
+.selector-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-sm);
+    display: block;
+}
+
+.stock-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.stock-pill {
+    padding: 8px 16px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-family: var(--font-data);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.stock-pill:hover {
+    border-color: var(--accent-teal);
+    color: var(--text-primary);
+}
+
+.stock-pill.active {
+    background: var(--accent-teal);
+    border-color: var(--accent-teal);
+    color: white;
+}
+
+/* Analyze Button */
+.analyze-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+    padding: 14px 32px;
+    background: var(--accent-teal);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.analyze-btn:hover {
+    background: #158a7d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26, 158, 143, 0.3);
+}
+
+/* ============================================
+   COMPARISON RESULTS
+   ============================================ */
+
+.results-section {
+    display: none;
+}
+
+.results-section.active {
+    display: block;
+}
+
+/* Alignment Score Card */
+.score-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+    text-align: center;
+}
+
+.score-value {
+    font-family: var(--font-data);
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+}
+
+.score-value.aligned {
+    color: var(--signal-green);
+}
+
+.score-value.misaligned {
+    color: var(--signal-amber);
+}
+
+.score-value.contrarian {
+    color: var(--signal-red);
+}
+
+.score-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.score-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Alignment Breakdown */
+.alignment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.alignment-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-lg);
+}
+
+.alignment-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
+}
+
+.hypothesis-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.hypothesis-dot.t1 { background: var(--signal-green); }
+.hypothesis-dot.t2 { background: var(--signal-amber); }
+.hypothesis-dot.t3 { background: var(--signal-red); }
+.hypothesis-dot.t4 { background: var(--signal-blue); }
+
+.hypothesis-info {
+    flex: 1;
+}
+
+.hypothesis-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.hypothesis-prob {
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.alignment-badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.alignment-badge.supports {
+    background: rgba(61, 170, 109, 0.15);
+    color: var(--signal-green);
+    border: 1px solid rgba(61, 170, 109, 0.3);
+}
+
+.alignment-badge.neutral {
+    background: rgba(212, 160, 60, 0.15);
+    color: var(--signal-amber);
+    border: 1px solid rgba(212, 160, 60, 0.3);
+}
+
+.alignment-badge.contradicts {
+    background: rgba(212, 85, 85, 0.15);
+    color: var(--signal-red);
+    border: 1px solid rgba(212, 85, 85, 0.3);
+}
+
+.alignment-reasoning {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Evidence Comparison */
+.evidence-section {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-xl);
+}
+
+.evidence-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
+}
+
+.evidence-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.evidence-toggle {
+    font-size: 0.8rem;
+    color: var(--accent-teal);
+    cursor: pointer;
+}
+
+.evidence-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+}
+
+.evidence-column {
+    padding: var(--space-md);
+    background: var(--bg-elevated);
+    border-radius: 8px;
+}
+
+.evidence-column-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: var(--space-md);
+}
+
+.evidence-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.evidence-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    background: var(--bg-surface);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.evidence-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+.evidence-icon.support {
+    background: rgba(61, 170, 109, 0.2);
+    color: var(--signal-green);
+}
+
+.evidence-icon.contradict {
+    background: rgba(212, 85, 85, 0.2);
+    color: var(--signal-red);
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.site-footer {
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    padding: var(--space-xl) 0;
+    margin-top: var(--space-2xl);
+}
+
+.footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+
+.footer-disclaimer {
+    font-size: 0.75rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 1.8rem;
+    }
+    
+    .upload-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .evidence-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .score-value {
+        font-size: 3rem;
+    }
+    
+    .nav-links {
+        display: none;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="site-nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-brand-text">C<span>∞</span>ntinuum intelligence</div>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Research</a>
+                <a href="index.html#snapshots">Snapshots</a>
+                <a href="index.html#portfolio">Portfolio</a>
+                <a href="thesis-comparator.html" class="active">Thesis Comparator</a>
+                <a href="index.html#about">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="page">
+        <div class="page-inner">
+            <!-- Hero -->
+            <div class="hero">
+                <div class="hero-tagline">Validate Your Conviction</div>
+                <h1 class="hero-title">Investment Thesis Comparator</h1>
+                <p class="hero-subtitle">Upload your investment thesis and compare it against Continuum's evidence-based research. Understand whether your views align with or contradict the prevailing hypotheses.</p>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <div class="upload-tabs">
+                    <button class="upload-tab active" onclick="switchTab('paste')">Paste Text</button>
+                    <button class="upload-tab" onclick="switchTab('upload')">Upload File</button>
+                </div>
+
+                <!-- Paste Text Tab -->
+                <div id="paste-tab" class="tab-content">
+                    <textarea class="text-input-area" placeholder="Paste your investment thesis here...
+
+Example structure:
+• Ticker: WOW
+• Investment Horizon: 12-18 months
+• Key Thesis: [Your core investment argument]
+• Supporting Evidence: [What drives your view]
+• Risk Factors: [What could prove you wrong]
+• Expected Outcome: [Price target or scenario]"></textarea>
+                </div>
+
+                <!-- Upload Tab -->
+                <div id="upload-tab" class="tab-content" style="display: none;">
+                    <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-title">Drag & drop your thesis file</div>
+                        <div class="upload-subtitle">Or click to browse. Accepts PDF, Word, or plain text files.</div>
+                        <div class="upload-formats">
+                            <span class="upload-format">.PDF</span>
+                            <span class="upload-format">.DOCX</span>
+                            <span class="upload-format">.TXT</span>
+                            <span class="upload-format">.MD</span>
+                        </div>
+                        <input type="file" id="file-input" style="display: none;" accept=".pdf,.docx,.txt,.md">
+                    </div>
+                </div>
+
+                <!-- Stock Selector -->
+                <div class="stock-selector">
+                    <label class="selector-label">Select stock to compare against:</label>
+                    <div class="stock-pills">
+                        <button class="stock-pill active">WOW</button>
+                        <button class="stock-pill">CSL</button>
+                        <button class="stock-pill">XRO</button>
+                        <button class="stock-pill">WTC</button>
+                        <button class="stock-pill">WDS</button>
+                        <button class="stock-pill">MQG</button>
+                        <button class="stock-pill">DRO</button>
+                        <button class="stock-pill">PME</button>
+                        <button class="stock-pill">GYG</button>
+                        <button class="stock-pill">GMG</button>
+                        <button class="stock-pill">SIG</button>
+                        <button class="stock-pill">FMG</button>
+                    </div>
+                </div>
+
+                <button class="analyze-btn" onclick="showResults()">
+                    <span>🔍</span>
+                    <span>Analyze Alignment</span>
+                </button>
+            </div>
+
+            <!-- Results Section (Hidden by default) -->
+            <div class="results-section" id="results">
+                <!-- Alignment Score -->
+                <div class="score-card">
+                    <div class="score-value misaligned" id="alignment-score">42%</div>
+                    <div class="score-label">Thesis Alignment Score</div>
+                    <div class="score-desc">Your thesis shows partial alignment with Continuum's research. You agree on the turnaround potential but underestimate regulatory risks. Consider reviewing T3 (Regulatory Squeeze) evidence.</div>
+                </div>
+
+                <!-- Hypothesis Alignment Breakdown -->
+                <div class="alignment-grid">
+                    <div class="alignment-card">
+                        <div class="alignment-card-header">
+                            <div class="hypothesis-dot t1"></div>
+                            <div class="hypothesis-info">
+                                <div class="hypothesis-name">T1: Managed Turnaround</div>
+                                <div class="hypothesis-prob">Continuum: 36% probability</div>
+                            </div>
+                            <span class="alignment-badge supports">SUPPORTS</span>
+                        </div>
+                        <div class="alignment-reasoning">
+                            Your thesis aligns with T1. You both believe Bardwell's cost-out program can restore margins. However, your timeline (6 months) is more aggressive than Continuum's assessment (12-18 months).
+                        </div>
+                    </div>
+
+                    <div class="alignment-card">
+                        <div class="alignment-card-header">
+                            <div class="hypothesis-dot t2"></div>
+                            <div class="hypothesis-info">
+                                <div class="hypothesis-name">T2: Structural Erosion</div>
+                                <div class="hypothesis-prob">Continuum: 25% probability</div>
+                            </div>
+                            <span class="alignment-badge neutral">NEUTRAL</span>
+                        </div>
+                        <div class="alignment-reasoning">
+                            You acknowledge competitive pressure from Aldi but believe Woolworths' scale advantage is sufficient. Continuum assigns higher probability to permanent margin compression.
+                        </div>
+                    </div>
+
+                    <div class="alignment-card">
+                        <div class="alignment-card-header">
+                            <div class="hypothesis-dot t3"></div>
+                            <div class="hypothesis-info">
+                                <div class="hypothesis-name">T3: Regulatory Squeeze</div>
+                                <div class="hypothesis-prob">Continuum: 21% probability</div>
+                            </div>
+                            <span class="alignment-badge contradicts">CONTRADICTS</span>
+                        </div>
+                        <div class="alignment-reasoning">
+                            <strong>Key divergence:</strong> You mention regulatory "headwinds" briefly but don't quantify impact. Continuum's analysis suggests mandatory FGCC code could compress gross margins 50-100bps. Your thesis would strengthen by addressing this directly.
+                        </div>
+                    </div>
+
+                    <div class="alignment-card">
+                        <div class="alignment-card-header">
+                            <div class="hypothesis-dot t4"></div>
+                            <div class="hypothesis-info">
+                                <div class="hypothesis-name">T4: Competitive Disruption</div>
+                                <div class="hypothesis-prob">Continuum: 18% probability</div>
+                            </div>
+                            <span class="alignment-badge neutral">NEUTRAL</span>
+                        </div>
+                        <div class="alignment-reasoning">
+                            Both you and Continuum view Aldi expansion as manageable near-term. You note e-commerce moat; Continuum flags binary risk if Aldi launches online grocery.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evidence Comparison -->
+                <div class="evidence-section">
+                    <div class="evidence-section-header">
+                        <div class="evidence-section-title">Evidence Comparison</div>
+                        <span class="evidence-toggle">View All Evidence →</span>
+                    </div>
+                    <div class="evidence-grid">
+                        <div class="evidence-column">
+                            <div class="evidence-column-header">Your Thesis Supports</div>
+                            <div class="evidence-list">
+                                <div class="evidence-item">
+                                    <span class="evidence-icon support">✓</span>
+                                    <span>Q1 FY26 trading update (+2.1% sales)</span>
+                                </div>
+                                <div class="evidence-item">
+                                    <span class="evidence-icon support">✓</span>
+                                    <span>$400M cost-out program on track</span>
+                                </div>
+                                <div class="evidence-item">
+                                    <span class="evidence-icon support">✓</span>
+                                    <span>E-commerce growth (+39% On Demand)</span>
+                                </div>
+                                <div class="evidence-item">
+                                    <span class="evidence-icon support">✓</span>
+                                    <span>NPS improvement (+3 points)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="evidence-column">
+                            <div class="evidence-column-header">Evidence You May Have Missed</div>
+                            <div class="evidence-list">
+                                <div class="evidence-item">
+                                    <span class="evidence-icon contradict">!</span>
+                                    <span>ACCC confirmed margin increases (now reversing)</span>
+                                </div>
+                                <div class="evidence-item">
+                                    <span class="evidence-icon contradict">!</span>
+                                    <span>FGCC fresh produce provisions (April 2026)</span>
+                                </div>
+                                <div class="evidence-item">
+                                    <span class="evidence-icon contradict">!</span>
+                                    <span>Broker consensus price below current ($30.02)</span>
+                                </div>
+                                <div class="evidence-item">
+                                    <span class="evidence-icon contradict">!</span>
+                                    <span>Tobacco decline ($80-100M EBIT headwind)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p class="footer-disclaimer">This comparator provides analysis based on publicly available research. It does not constitute investment advice. Always conduct your own due diligence and consult licensed financial advisors before making investment decisions.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.upload-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (tab === 'paste') {
+                document.getElementById('paste-tab').style.display = 'block';
+                document.getElementById('upload-tab').style.display = 'none';
+            } else {
+                document.getElementById('paste-tab').style.display = 'none';
+                document.getElementById('upload-tab').style.display = 'block';
+            }
+        }
+
+        // Stock pill selection
+        document.querySelectorAll('.stock-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                document.querySelectorAll('.stock-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+            });
+        });
+
+        // Show results (demo)
+        function showResults() {
+            document.getElementById('results').classList.add('active');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Drag and drop
+        const uploadZone = document.querySelector('.upload-zone');
+        
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+        
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            // Handle file drop
+        });
+    </script>
+</body>
+</html>

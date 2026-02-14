@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continuum Intelligence — Independent Cross-Domain Equity Research</title>
+    <meta name="description" content="Cross-domain equity research built by former institutional practitioners. Evidence-driven analysis using the Analysis of Competing Hypotheses framework.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+/* ============================================
+   CONTINUUM INTELLIGENCE — REFINED VISUAL DESIGN
+   ============================================ */
+
+:root {
+    /* Refined Color Palette */
+    --bg-page: #0c1220;
+    --bg-surface: #111a2e;
+    --bg-elevated: #182236;
+    --bg-header: #0e1729;
+    
+    --text-primary: #e8eef5;
+    --text-secondary: #9ab0c7;
+    --text-tertiary: #5d7a99;
+    --text-muted: #3d5a7a;
+    
+    /* Softer Accent Colors */
+    --accent-teal: #2dd4bf;
+    --accent-teal-dim: rgba(45, 212, 191, 0.1);
+    --accent-gold: #fbbf24;
+    --accent-gold-dim: rgba(251, 191, 36, 0.1);
+    
+    /* Signal Colors — Less Harsh */
+    --signal-red: #f87171;
+    --signal-red-bg: rgba(248, 113, 113, 0.08);
+    --signal-green: #4ade80;
+    --signal-green-bg: rgba(74, 222, 128, 0.08);
+    --signal-amber: #fbbf24;
+    --signal-amber-bg: rgba(251, 191, 36, 0.08);
+    
+    /* Sophisticated Borders */
+    --border-subtle: rgba(154, 176, 199, 0.06);
+    --border-default: rgba(154, 176, 199, 0.12);
+    --border-hover: rgba(154, 176, 199, 0.2);
+    
+    /* Typography */
+    --font-serif: 'Crimson Pro', Georgia, serif;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   BASE & RESET
+   ============================================ */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 15px;
+}
+
+body {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-image: 
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(45, 212, 191, 0.03), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(251, 191, 36, 0.02), transparent);
+}
+
+/* ============================================
+   NAVIGATION — Refined Glass
+   ============================================ */
+
+.site-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(12, 18, 32, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--border-subtle);
+    height: 56px;
+}
+
+.nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.nav-brand-text {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+}
+
+.brand-infinity {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+    margin: 0 0.02em;
+}
+
+.brand-infinity svg {
+    height: 0.9em;
+    width: auto;
+    display: block;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.nav-links a {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.nav-links a:hover {
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+}
+
+.nav-links a.active {
+    color: var(--accent-teal);
+    background: var(--accent-teal-dim);
+}
+
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    transition: all var(--transition-fast);
+    margin-left: var(--space-sm);
+}
+
+.theme-toggle:hover {
+    color: var(--text-primary);
+    border-color: var(--border-hover);
+    background: var(--bg-elevated);
+}
+
+/* ============================================
+   HERO — Refined Typography
+   ============================================ */
+
+.hero {
+    padding: calc(var(--space-2xl) + 56px) 0 var(--space-md);
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-tagline {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    margin-bottom: var(--space-lg);
+}
+
+.hero-title {
+    font-family: var(--font-serif);
+    font-size: 2.8rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.15;
+    margin-bottom: var(--space-md);
+    letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+    font-size: 1.05rem;
+    font-weight: 300;
+    color: var(--text-secondary);
+    max-width: 560px;
+    margin: 0 auto var(--space-lg);
+    line-height: 1.7;
+}
+
+.hero-cred {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+    font-style: italic;
+}
+
+/* ============================================
+   SECTIONS — Better Spacing
+   ============================================ */
+
+.page {
+    display: none;
+    min-height: calc(100vh - 56px);
+    padding-top: 56px;
+}
+
+.page.active {
+    display: block;
+}
+
+.page-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.section-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+}
+
+.section-link {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--accent-teal);
+    text-decoration: none;
+}
+
+.section-link:hover {
+    color: var(--text-primary);
+}
+
+/* ============================================
+   FEATURED CARDS — Refined Visuals
+   ============================================ */
+
+.featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-2xl);
+}
+
+.featured-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: var(--space-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.featured-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    transition: all var(--transition-base);
+}
+
+.featured-card.skew-downside::before { 
+    background: linear-gradient(90deg, var(--signal-red), transparent);
+}
+.featured-card.skew-upside::before { 
+    background: linear-gradient(90deg, var(--signal-green), transparent);
+}
+.featured-card.skew-balanced::before { 
+    background: linear-gradient(90deg, var(--signal-amber), transparent);
+}
+
+.featured-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.fc-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-md);
+}
+
+.fc-ticker {
+    font-family: var(--font-mono);
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+}
+
+.fc-company {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+}
+
+.fc-sector {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+}
+
+.fc-price {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: right;
+    color: var(--text-primary);
+}
+
+.fc-metrics {
+    display: flex;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.fc-metric-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: var(--space-xs);
+}
+
+.fc-metric-value {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.fc-skew {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.skew-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+.skew-badge.downside {
+    background: var(--signal-red-bg);
+    color: var(--signal-red);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+.skew-badge.upside {
+    background: var(--signal-green-bg);
+    color: var(--signal-green);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.skew-badge.balanced {
+    background: var(--signal-amber-bg);
+    color: var(--signal-amber);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.fc-skew-rationale {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    line-height: 1.5;
+}
+
+.fc-date {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-top: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* ============================================
+   COVERAGE TABLE — Better Readability
+   ============================================ */
+
+.coverage-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: var(--space-lg);
+    font-size: 0.85rem;
+}
+
+.coverage-table thead th {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    padding: var(--space-sm) var(--space-md);
+    text-align: left;
+    border-bottom: 1px solid var(--border-default);
+    background: var(--bg-header);
+}
+
+.coverage-table tbody tr {
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background var(--transition-fast);
+    cursor: pointer;
+}
+
+.coverage-table tbody tr:hover { 
+    background: var(--bg-elevated);
+}
+
+.coverage-table tbody td {
+    padding: 12px var(--space-md);
+    color: var(--text-secondary);
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.coverage-table .td-ticker {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.coverage-table .td-price {
+    font-family: var(--font-mono);
+    font-weight: 500;
+}
+
+.coverage-table .td-date {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+}
+
+/* ============================================
+   FRESHNESS BADGES — Softer Colors
+   ============================================ */
+
+.freshness-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.freshness-badge.fb-ok {
+    background: var(--signal-green-bg);
+    color: var(--signal-green);
+    border: 1px solid rgba(74, 222, 128, 0.15);
+}
+
+.freshness-badge.fb-moderate {
+    background: var(--signal-amber-bg);
+    color: var(--signal-amber);
+    border: 1px solid rgba(251, 191, 36, 0.15);
+}
+
+.freshness-badge.fb-high,
+.freshness-badge.fb-critical {
+    background: var(--signal-red-bg);
+    color: var(--signal-red);
+    border: 1px solid rgba(248, 113, 113, 0.15);
+}
+
+/* ============================================
+   REPORT PAGE — Refined Typography
+   ============================================ */
+
+.report-hero {
+    background: linear-gradient(180deg, var(--bg-header) 0%, var(--bg-surface) 100%);
+    padding: var(--space-xl) 0;
+    margin-top: -56px;
+    padding-top: calc(56px + var(--space-xl));
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.report-hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+
+.report-back {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    margin-bottom: var(--space-lg);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.report-back:hover { 
+    color: var(--text-primary); 
+}
+
+.rh-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--space-xl);
+    flex-wrap: wrap;
+}
+
+.rh-left { 
+    flex: 1; 
+    min-width: 280px; 
+}
+
+.rh-type {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    margin-bottom: var(--space-xs);
+}
+
+.rh-ticker {
+    font-family: var(--font-mono);
+    font-size: 2.2rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    line-height: 1.1;
+    margin-bottom: 4px;
+}
+
+.rh-company {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-sm);
+}
+
+.rh-sector-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    background: var(--accent-teal-dim);
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+.rh-right { 
+    text-align: right; 
+    flex-shrink: 0; 
+}
+
+.rh-price {
+    font-family: var(--font-mono);
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: var(--space-sm);
+}
+
+/* ============================================
+   EVIDENCE CARDS — Better Hierarchy
+   ============================================ */
+
+.evidence-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    margin-bottom: var(--space-md);
+    overflow: hidden;
+}
+
+.ec-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md) var(--space-lg);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.ec-header:hover { 
+    background: var(--bg-elevated);
+}
+
+.ec-title {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.ec-epistemic {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 4px;
+}
+
+.ep-motivated { 
+    background: var(--signal-amber-bg); 
+    color: var(--signal-amber); 
+}
+.ep-statutory { 
+    background: var(--signal-green-bg); 
+    color: var(--signal-green); 
+}
+.ep-consensus { 
+    background: rgba(96, 165, 250, 0.1); 
+    color: #60a5fa; 
+}
+.ep-independent { 
+    background: rgba(167, 139, 250, 0.1); 
+    color: #a78bfa; 
+}
+.ep-objective { 
+    background: var(--accent-teal-dim); 
+    color: var(--accent-teal); 
+}
+
+.ec-body {
+    padding: 0 var(--space-lg) var(--space-lg);
+}
+
+.ec-finding {
+    font-family: var(--font-serif);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+}
+
+.ec-finding strong { 
+    color: var(--text-primary); 
+    font-weight: 600;
+}
+
+/* ============================================
+   CALLOUTS — Refined Alerts
+   ============================================ */
+
+.callout {
+    background: var(--accent-teal-dim);
+    border-left: 3px solid var(--accent-teal);
+    padding: var(--space-md) var(--space-lg);
+    margin: var(--space-md) 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.callout.warn {
+    background: var(--signal-amber-bg);
+    border-left-color: var(--signal-amber);
+}
+
+.callout.critical {
+    background: var(--signal-red-bg);
+    border-left-color: var(--signal-red);
+}
+
+.callout.positive {
+    background: var(--signal-green-bg);
+    border-left-color: var(--signal-green);
+}
+
+.callout-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-xs);
+    color: var(--accent-teal);
+}
+
+.callout.warn .callout-label { 
+    color: var(--signal-amber); 
+}
+.callout.critical .callout-label { 
+    color: var(--signal-red); 
+}
+.callout.positive .callout-label { 
+    color: var(--signal-green); 
+}
+
+.callout p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* ============================================
+   TABLES — Refined Data Display
+   ============================================ */
+
+.evidence-table, .identity-table, .gaps-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: var(--space-md) 0;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.evidence-table thead th,
+.identity-table thead th,
+.gaps-table thead th {
+    background: var(--bg-elevated);
+    color: var(--text-tertiary);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px var(--space-md);
+    text-align: left;
+    border-bottom: 1px solid var(--border-default);
+}
+
+.evidence-table tbody td,
+.identity-table tbody td,
+.gaps-table tbody td {
+    padding: 10px var(--space-md);
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+}
+
+.evidence-table tbody tr:nth-child(even),
+.identity-table tbody tr:nth-child(even),
+.gaps-table tbody tr:nth-child(even) { 
+    background: rgba(17, 26, 46, 0.5);
+}
+
+/* ============================================
+   FOOTER — Refined
+   ============================================ */
+
+.site-footer {
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-subtle);
+    padding: var(--space-xl) 0;
+    margin-top: var(--space-2xl);
+}
+
+.footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--border-subtle);
+    gap: var(--space-xl);
+    flex-wrap: wrap;
+}
+
+.footer-brand-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: var(--space-xs);
+}
+
+.footer-tagline {
+    font-family: var(--font-serif);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    max-width: 320px;
+    line-height: 1.6;
+}
+
+.footer-disclaimer {
+    font-size: 0.75rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    max-width: 700px;
+    margin-top: var(--space-lg);
+}
+
+.footer-meta {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: var(--space-md);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    :root {
+        --space-lg: 16px;
+        --space-xl: 20px;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .featured-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .rh-main {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .rh-right {
+        text-align: left;
+        width: 100%;
+    }
+    
+    .nav-links a {
+        padding: 8px 12px;
+        font-size: 0.7rem;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="site-nav">
+        <div class="nav-inner">
+            <a class="nav-brand" onclick="navigate('home')">
+                <div class="nav-brand-text">C<span class="brand-infinity"><svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg"><path d="M30,12 C24,2 8,2 4,15 C0,28 24,28 30,18" fill="none" stroke="#9AB0C7" stroke-width="3.5" stroke-linecap="round"/><path d="M30,18 C36,28 52,28 56,15 C60,2 36,2 30,12" fill="none" stroke="#2DD4BF" stroke-width="3.5" stroke-linecap="round"/></svg></span>ntinuum intelligence</div>
+            </a>
+            <div class="nav-links">
+                <a href="#home" class="active" data-nav="home">Research</a>
+                <a href="#snapshots" data-nav="snapshots">Snapshots</a>
+                <a href="#portfolio" data-nav="portfolio">Portfolio</a>
+                <a href="#about" data-nav="about">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-tagline">Independent Cross-Domain Equity Research</div>
+        <div class="hero-title">We map evidence, not opinions.</div>
+        <div class="hero-subtitle">Systematic analysis across ten evidence domains using the Analysis of Competing Hypotheses framework. Every claim sourced. Every hypothesis tested.</div>
+        <div class="hero-cred">Built by former UBS and Goldman Sachs executives.</div>
+    </section>
+
+    <!-- Featured Section -->
+    <section class="section">
+        <div class="page-inner">
+            <div class="section-header">
+                <div class="section-title">Latest Research</div>
+            </div>
+
+            <div class="featured-grid">
+                <!-- WOW Card -->
+                <div class="featured-card skew-downside">
+                    <div class="fc-top">
+                        <div>
+                            <div class="fc-ticker">WOW</div>
+                            <div class="fc-company">Woolworths Group</div>
+                            <div class="fc-sector">Consumer Staples</div>
+                        </div>
+                        <div class="fc-price">$31.41</div>
+                    </div>
+                    <div class="fc-metrics">
+                        <div>
+                            <div class="fc-metric-label">Market Cap</div>
+                            <div class="fc-metric-value">A$38.3B</div>
+                        </div>
+                        <div>
+                            <div class="fc-metric-label">Fwd P/E</div>
+                            <div class="fc-metric-value" style="color: var(--accent-gold)">23.5x</div>
+                        </div>
+                        <div>
+                            <div class="fc-metric-label">NPAT FY25</div>
+                            <div class="fc-metric-value" style="color: var(--signal-red)">↓19%</div>
+                        </div>
+                    </div>
+                    <div class="fc-skew">
+                        <span class="skew-badge downside">Downside</span>
+                        <span class="fc-skew-rationale">Premium multiple pricing turnaround, but FY25 delivered 19% NPAT decline</span>
+                    </div>
+                    <div class="fc-date">
+                        <span class="freshness-badge fb-ok">● Fresh</span>
+                        <span>Updated 10 Feb 2026</span>
+                    </div>
+                </div>
+
+                <!-- CSL Card -->
+                <div class="featured-card skew-upside">
+                    <div class="fc-top">
+                        <div>
+                            <div class="fc-ticker">CSL</div>
+                            <div class="fc-company">CSL Limited</div>
+                            <div class="fc-sector">Health Care</div>
+                        </div>
+                        <div class="fc-price">$165.79</div>
+                    </div>
+                    <div class="fc-metrics">
+                        <div>
+                            <div class="fc-metric-label">Market Cap</div>
+                            <div class="fc-metric-value">A$79.8B</div>
+                        </div>
+                        <div>
+                            <div class="fc-metric-label">Fwd P/E</div>
+                            <div class="fc-metric-value" style="color: var(--accent-gold)">28.4x</div>
+                        </div>
+                        <div>
+                            <div class="fc-metric-label">NPAT Growth</div>
+                            <div class="fc-metric-value" style="color: var(--signal-green)">+8.3%</div>
+                        </div>
+                    </div>
+                    <div class="fc-skew">
+                        <span class="skew-badge upside">Upside</span>
+                        <span class="fc-skew-rationale">Plasma collection recovery on track, Behring margin expansion</span>
+                    </div>
+                    <div class="fc-date">
+                        <span class="freshness-badge fb-ok">● Fresh</span>
+                        <span>Updated 12 Feb 2026</span>
+                    </div>
+                </div>
+
+                <!-- XRO Card -->
+                <div class="featured-card skew-downside">
+                    <div class="fc-top">
+                        <div>
+                            <div class="fc-ticker">XRO</div>
+                            <div class="fc-company">Xero Limited</div>
+                            <div class="fc-sector">Technology</div>
+                        </div>
+                        <div class="fc-price">$81.24</div>
+                    </div>
+                    <div class="fc-metrics">
+                        <div>
+                            <div class="fc-metric-label">Market Cap</div>
+                            <div class="fc-metric-value">A$12.4B</div>
+                        </div>
+                        <div>
+                            <div class="fc-metric-label">P/E</div>
+                            <div class="fc-metric-value" style="color: var(--accent-gold)">142x</div>
+                        </div>
+                        <div>
+                            <div class="fc-metric-label">Drawdown</div>
+                            <div class="fc-metric-value" style="color: var(--signal-red)">-51%</div>
+                        </div>
+                    </div>
+                    <div class="fc-skew">
+                        <span class="skew-badge downside">Downside</span>
+                        <span class="fc-skew-rationale">Down 51% from highs. AI partnership announced but execution risk remains</span>
+                    </div>
+                    <div class="fc-date">
+                        <span class="freshness-badge fb-moderate">● Review Due</span>
+                        <span>Updated 12 Feb 2026</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coverage Table -->
+            <div class="section-header">
+                <div class="section-title">Coverage Universe</div>
+            </div>
+
+            <table class="coverage-table">
+                <thead>
+                    <tr>
+                        <th>ASX</th>
+                        <th>Company</th>
+                        <th>Sector</th>
+                        <th style="text-align:right">Price</th>
+                        <th>Risk Skew</th>
+                        <th>Updated</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="td-ticker">WOW</td>
+                        <td>Woolworths Group</td>
+                        <td>Consumer Staples</td>
+                        <td class="td-price" style="text-align:right;font-family:var(--font-mono)">$31.41</td>
+                        <td><span class="skew-badge downside" style="font-size:0.65rem;padding:2px 8px">Downside</span></td>
+                        <td class="td-date">10 Feb 2026</td>
+                        <td><span class="freshness-badge fb-ok" style="font-size:0.6rem;padding:2px 6px">Fresh</span></td>
+                    </tr>
+                    <tr>
+                        <td class="td-ticker">CSL</td>
+                        <td>CSL Limited</td>
+                        <td>Health Care</td>
+                        <td class="td-price" style="text-align:right;font-family:var(--font-mono)">$165.79</td>
+                        <td><span class="skew-badge upside" style="font-size:0.65rem;padding:2px 8px">Upside</span></td>
+                        <td class="td-date">12 Feb 2026</td>
+                        <td><span class="freshness-badge fb-ok" style="font-size:0.6rem;padding:2px 6px">Fresh</span></td>
+                    </tr>
+                    <tr>
+                        <td class="td-ticker">XRO</td>
+                        <td>Xero Limited</td>
+                        <td>Technology</td>
+                        <td class="td-price" style="text-align:right;font-family:var(--font-mono)">$81.24</td>
+                        <td><span class="skew-badge downside" style="font-size:0.65rem;padding:2px 8px">Downside</span></td>
+                        <td class="td-date">12 Feb 2026</td>
+                        <td><span class="freshness-badge fb-moderate" style="font-size:0.6rem;padding:2px 6px">Review</span></td>
+                    </tr>
+                    <tr>
+                        <td class="td-ticker">WTC</td>
+                        <td>WiseTech Global</td>
+                        <td>Technology</td>
+                        <td class="td-price" style="text-align:right;font-family:var(--font-mono)">$49.10</td>
+                        <td><span class="skew-badge balanced" style="font-size:0.65rem;padding:2px 8px">Balanced</span></td>
+                        <td class="td-date">10 Feb 2026</td>
+                        <td><span class="freshness-badge fb-ok" style="font-size:0.6rem;padding:2px 6px">Fresh</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div>
+                    <div class="footer-brand-name">Continuum Intelligence</div>
+                    <div class="footer-tagline">Independent cross-domain equity research. Evidence-driven analysis for institutional and sophisticated investors.</div>
+                </div>
+            </div>
+            <p class="footer-disclaimer">Continuum Intelligence provides general information and analysis only. Nothing published on this portal constitutes personal financial advice under Australian law or any other jurisdiction. All factual claims are sourced from ASX filings, ACCC publications, ABS statistics, RBA data, company investor presentations, broker consensus data, and publicly available information. Readers should consult their own licensed financial advisors before making any investment decisions.</p>
+            <div class="footer-meta">© 2026 Continuum Intelligence</div>
+        </div>
+    </footer>
+</body>
+</html>
