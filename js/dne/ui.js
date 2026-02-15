@@ -733,7 +733,7 @@ async function generateReport(format) {
         margin: [10, 18, 10, 18],
         filename: 'Continuum_' + stock.ticker.replace('.', '_') + '_Institutional_' + getDateString() + '.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
@@ -743,13 +743,23 @@ async function generateReport(format) {
         margin: [12, 20, 12, 20],
         filename: 'Continuum_' + stock.ticker.replace('.', '_') + '_InvestorBriefing_' + getDateString() + '.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
     }
 
+    // Attach to DOM temporarily so html2canvas can compute dimensions and styles
+    element.style.position = 'fixed';
+    element.style.left = '-9999px';
+    element.style.top = '0';
+    element.style.background = '#ffffff';
+    document.body.appendChild(element);
+
     await html2pdf().set(opt).from(element).save();
+
+    // Clean up
+    document.body.removeChild(element);
   } catch (err) {
     console.error('[DNE] PDF generation error:', err);
     alert('There was an error generating the PDF. Please try again.');

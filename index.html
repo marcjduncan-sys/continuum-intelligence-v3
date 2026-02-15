@@ -14392,10 +14392,11 @@ function generatePDFReport(ticker, type) {
   btn.classList.add('generating');
 
   // Find the report or snapshot page for this ticker
-  var pageId = 'report-' + ticker.toLowerCase();
+  // Page IDs use 'page-report-WOW' / 'page-snapshot-WOW' format
+  var pageId = 'page-report-' + ticker.toUpperCase();
   var page = document.getElementById(pageId);
   if (!page) {
-    pageId = 'snapshot-' + ticker.toLowerCase();
+    pageId = 'page-snapshot-' + ticker.toUpperCase();
     page = document.getElementById(pageId);
   }
 
@@ -14430,10 +14431,11 @@ function generatePDFReport(ticker, type) {
   var now = new Date();
   filename += '-' + now.getFullYear() + ('0' + (now.getMonth()+1)).slice(-2) + ('0' + now.getDate()).slice(-2) + '.pdf';
 
-  // Create a wrapper with print-friendly styles
+  // Attach clone to DOM temporarily so html2canvas can compute dimensions
   var wrapper = document.createElement('div');
-  wrapper.style.cssText = 'background:#0B1220;color:#E8EDF4;font-family:Inter,sans-serif;padding:24px;';
+  wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;background:#0B1220;color:#E8EDF4;font-family:Inter,sans-serif;padding:24px;width:210mm;';
   wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
 
   var opt = {
     margin: [10, 10, 10, 10],
@@ -14445,9 +14447,11 @@ function generatePDFReport(ticker, type) {
   };
 
   html2pdf().set(opt).from(wrapper).save().then(function() {
+    document.body.removeChild(wrapper);
     btn.classList.remove('generating');
   }).catch(function(err) {
     console.error('PDF generation failed:', err);
+    if (wrapper.parentNode) document.body.removeChild(wrapper);
     btn.classList.remove('generating');
     alert('PDF generation failed. Please try again.');
   });
