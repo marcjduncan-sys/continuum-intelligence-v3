@@ -284,7 +284,7 @@ function createMarketNarrativeSection(analysis) {
     var w = weights[t];
     if (!w) continue;
     var name = hNames[t] || t;
-    var gap = Math.abs(w.longTerm - w.shortTerm);
+    var gap = Math.round(Math.abs(w.longTerm - w.shortTerm));
     var gapClass = gap > 40 ? 'nfi-hw-gap-high' : gap > 20 ? 'nfi-hw-gap-medium' : '';
     var isContradicted = analysis.inference.contradictedHypothesis === t;
 
@@ -296,18 +296,18 @@ function createMarketNarrativeSection(analysis) {
         '<div style="flex:1;">' +
           '<div class="nfi-hw-row">' +
             '<span class="nfi-hw-label">Research</span>' +
-            '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-lt" style="width:' + w.longTerm + '%"></div></div>' +
-            '<span class="nfi-hw-value">' + w.longTerm + '%</span>' +
+            '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-lt" style="width:' + Math.round(w.longTerm) + '%"></div></div>' +
+            '<span class="nfi-hw-value">' + Math.round(w.longTerm) + '%</span>' +
           '</div>' +
           '<div class="nfi-hw-row">' +
             '<span class="nfi-hw-label">Market</span>' +
-            '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-st" style="width:' + w.shortTerm + '%"></div></div>' +
-            '<span class="nfi-hw-value">' + w.shortTerm + '%</span>' +
+            '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-st" style="width:' + Math.round(w.shortTerm) + '%"></div></div>' +
+            '<span class="nfi-hw-value">' + Math.round(w.shortTerm) + '%</span>' +
           '</div>' +
           '<div class="nfi-hw-row">' +
             '<span class="nfi-hw-label">Blended</span>' +
-            '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-blend" style="width:' + w.blended + '%"></div></div>' +
-            '<span class="nfi-hw-value">' + w.blended + '%</span>' +
+            '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-blend" style="width:' + Math.round(w.blended) + '%"></div></div>' +
+            '<span class="nfi-hw-value">' + Math.round(w.blended) + '%</span>' +
           '</div>' +
           '<div class="nfi-hw-gap ' + gapClass + '">' + gap + 'pt divergence | Confidence: ' + w.confidence + '</div>' +
         '</div>' +
@@ -363,7 +363,7 @@ function addWeightBreakdownToCards(reportPage, analysis) {
     if (!tier || !weights[tier]) return;
 
     var w = weights[tier];
-    var gap = Math.abs(w.longTerm - w.shortTerm);
+    var gap = Math.round(Math.abs(w.longTerm - w.shortTerm));
     var gapClass = gap > 40 ? 'nfi-hw-gap-high' : gap > 20 ? 'nfi-hw-gap-medium' : '';
     var isContradicted = analysis.inference.contradictedHypothesis === tier;
 
@@ -381,18 +381,18 @@ function addWeightBreakdownToCards(reportPage, analysis) {
     breakdown.innerHTML =
       '<div class="nfi-hw-row">' +
         '<span class="nfi-hw-label">Research</span>' +
-        '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-lt" style="width:' + w.longTerm + '%"></div></div>' +
-        '<span class="nfi-hw-value">' + w.longTerm + '%</span>' +
+        '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-lt" style="width:' + Math.round(w.longTerm) + '%"></div></div>' +
+        '<span class="nfi-hw-value">' + Math.round(w.longTerm) + '%</span>' +
       '</div>' +
       '<div class="nfi-hw-row">' +
         '<span class="nfi-hw-label">Market</span>' +
-        '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-st" style="width:' + w.shortTerm + '%"></div></div>' +
-        '<span class="nfi-hw-value">' + w.shortTerm + '%</span>' +
+        '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-st" style="width:' + Math.round(w.shortTerm) + '%"></div></div>' +
+        '<span class="nfi-hw-value">' + Math.round(w.shortTerm) + '%</span>' +
       '</div>' +
       '<div class="nfi-hw-row">' +
         '<span class="nfi-hw-label">Blended</span>' +
-        '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-blend" style="width:' + w.blended + '%"></div></div>' +
-        '<span class="nfi-hw-value">' + w.blended + '%</span>' +
+        '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-blend" style="width:' + Math.round(w.blended) + '%"></div></div>' +
+        '<span class="nfi-hw-value">' + Math.round(w.blended) + '%</span>' +
       '</div>' +
       '<div class="nfi-hw-gap ' + gapClass + '">' +
         gap + 'pt divergence | Confidence: ' + w.confidence +
@@ -488,7 +488,7 @@ function updateContradictedHypothesis(reportPage, analysis) {
       desc.innerHTML =
         '<span style="color:#ef4444;font-weight:600;display:block;margin-bottom:8px;">' +
           'CONTRADICTED BY PRICE ACTION: Market has reversed view. ' +
-          'Research weight ' + w.longTerm + '% \u2192 Market-implied ' + w.shortTerm + '%. ' +
+          'Research weight ' + Math.round(w.longTerm) + '% \u2192 Market-implied ' + Math.round(w.shortTerm) + '%. ' +
         '</span>' +
         '<span style="opacity:0.7;">' + originalText + '</span>';
       desc.dataset.nfiUpdated = 'true';
