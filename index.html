@@ -6553,15 +6553,7 @@ function buildSnapshotFromStock(ticker) {
   };
 }
 
-// Auto-populate SNAPSHOT_DATA for all stocks in COVERAGE_UNIVERSE
-(function() {
-  for (var i = 0; i < COVERAGE_UNIVERSE.length; i++) {
-    var t = COVERAGE_UNIVERSE[i];
-    if (!SNAPSHOT_DATA[t] && STOCK_DATA[t]) {
-      SNAPSHOT_DATA[t] = buildSnapshotFromStock(t);
-    }
-  }
-})();
+// SNAPSHOT_DATA auto-population moved after all STOCK_DATA definitions (see below FMG block)
 
 function renderSnapshotListCard(data) {
   return '<div class="snapshot-card" onclick="navigate(\'snapshot-' + data.ticker + '\')">' +
@@ -11915,6 +11907,17 @@ STOCK_DATA.FMG = {
   }
 };
 
+// Auto-populate SNAPSHOT_DATA for all stocks in COVERAGE_UNIVERSE
+// (Must run AFTER all STOCK_DATA entries are defined)
+(function() {
+  for (var i = 0; i < COVERAGE_UNIVERSE.length; i++) {
+    var t = COVERAGE_UNIVERSE[i];
+    if (!SNAPSHOT_DATA[t] && STOCK_DATA[t]) {
+      SNAPSHOT_DATA[t] = buildSnapshotFromStock(t);
+    }
+  }
+  console.log('[Snapshots] Auto-populated ' + Object.keys(SNAPSHOT_DATA).length + ' snapshots from COVERAGE_UNIVERSE');
+})();
 
 // ============================================================
 // CONTINUUM DYNAMICS ENGINE
