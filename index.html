@@ -6586,16 +6586,6 @@ function buildSnapshotFromStock(ticker) {
   };
 }
 
-// Auto-populate SNAPSHOT_DATA for all stocks in SNAPSHOT_ORDER
-(function() {
-  for (var i = 0; i < SNAPSHOT_ORDER.length; i++) {
-    var t = SNAPSHOT_ORDER[i];
-    if (!SNAPSHOT_DATA[t] && STOCK_DATA[t]) {
-      SNAPSHOT_DATA[t] = buildSnapshotFromStock(t);
-    }
-  }
-})();
-
 function renderSnapshotListCard(data) {
   return '<div class="snapshot-card" onclick="navigate(\'snapshot-' + data.ticker + '\')">' +
     '<div class="sc-top">' +
@@ -11947,6 +11937,17 @@ STOCK_DATA.FMG = {
     hypothesesCount: '4 Active'
   }
 };
+
+// Auto-populate SNAPSHOT_DATA for all stocks in SNAPSHOT_ORDER
+// NOTE: Must run AFTER all STOCK_DATA definitions above
+(function() {
+  for (var i = 0; i < SNAPSHOT_ORDER.length; i++) {
+    var t = SNAPSHOT_ORDER[i];
+    if (!SNAPSHOT_DATA[t] && STOCK_DATA[t]) {
+      SNAPSHOT_DATA[t] = buildSnapshotFromStock(t);
+    }
+  }
+})();
 
 
 // ============================================================
