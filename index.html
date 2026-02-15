@@ -14408,15 +14408,21 @@ function generatePDFReport(ticker, type) {
   // Clone the page content for PDF generation (don't modify the live DOM)
   var clone = page.cloneNode(true);
 
-  // Force clone visible — pages use display:none when not active
+  // Force clone visible — belt-and-suspenders approach:
+  // 1. Add .active class so .page.active { display:block } fires
+  // 2. Remove .page class to avoid any display:none specificity issues
+  // 3. Set inline display:block as final fallback
+  clone.classList.add('active');
+  clone.classList.remove('page');
   clone.style.display = 'block';
   clone.style.padding = '0';
+  clone.style.paddingTop = '0';
   clone.style.minHeight = 'auto';
 
-  // Remove the download buttons and interactive elements from clone
-  var downloadSections = clone.querySelectorAll('.report-download-section, .narrative-alert-banner');
-  for (var i = 0; i < downloadSections.length; i++) {
-    downloadSections[i].remove();
+  // Remove interactive elements from clone
+  var removables = clone.querySelectorAll('.report-download-section, .narrative-alert-banner, .nfi-alert-banner, .section-nav');
+  for (var i = 0; i < removables.length; i++) {
+    removables[i].remove();
   }
 
   // For retail type, simplify the content
@@ -14427,17 +14433,17 @@ function generatePDFReport(ticker, type) {
     filename += 'investor-briefing';
     // Remove evidence matrix and technical sections for retail
     var techSections = clone.querySelectorAll('[id$="-technical"]');
-    for (var i = 0; i < techSections.length; i++) {
-      techSections[i].remove();
+    for (var j = 0; j < techSections.length; j++) {
+      techSections[j].remove();
     }
   }
 
   var now = new Date();
   filename += '-' + now.getFullYear() + ('0' + (now.getMonth()+1)).slice(-2) + ('0' + now.getDate()).slice(-2) + '.pdf';
 
-  // Attach clone to DOM temporarily so html2canvas can compute dimensions
+  // Attach clone to DOM temporarily — use position:absolute (more reliable for html2canvas than fixed)
   var wrapper = document.createElement('div');
-  wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;background:#0B1220;color:#E8EDF4;font-family:Inter,sans-serif;padding:24px;width:210mm;';
+  wrapper.style.cssText = 'position:absolute;left:-9999px;top:0;background:#0B1220;color:#E8EDF4;font-family:Inter,sans-serif;padding:24px;width:210mm;overflow:visible;';
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);
 
@@ -14445,19 +14451,22 @@ function generatePDFReport(ticker, type) {
     margin: [10, 10, 10, 10],
     filename: filename,
     image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0B1220' },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0B1220', logging: false },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
   };
 
-  html2pdf().set(opt).from(wrapper).save().then(function() {
-    document.body.removeChild(wrapper);
-    btn.classList.remove('generating');
-  }).catch(function(err) {
-    console.error('PDF generation failed:', err);
-    if (wrapper.parentNode) document.body.removeChild(wrapper);
-    btn.classList.remove('generating');
-    alert('PDF generation failed. Please try again.');
+  // Give the browser one frame to compute layout before rendering
+  requestAnimationFrame(function() {
+    html2pdf().set(opt).from(wrapper).save().then(function() {
+      document.body.removeChild(wrapper);
+      btn.classList.remove('generating');
+    }).catch(function(err) {
+      console.error('PDF generation failed:', err);
+      if (wrapper.parentNode) document.body.removeChild(wrapper);
+      btn.classList.remove('generating');
+      alert('PDF generation failed. Please try again.');
+    });
   });
 }
 </script>
