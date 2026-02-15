@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PDF Test — window.print</title>
+</head>
+<body>
+  <h1>PDF Generation Test</h1>
+  <p>Click the button below. A new tab will open with a formatted report. Use the browser print dialog to save as PDF.</p>
+  <button onclick="testPDF()">Generate Test PDF</button>
+
+  <script>
+  function testPDF() {
+    var html = '<!DOCTYPE html><html><head><title>Test PDF</title>' +
+      '<style>body{font-family:Arial,sans-serif;color:#333;max-width:780px;margin:0 auto;padding:40px;line-height:1.5;}' +
+      '@media print{body{margin:0;padding:20px;}@page{margin:15mm 18mm;}}</style></head><body>' +
+      '<div style="font-size:11px;letter-spacing:3px;color:#1B2A4A;font-weight:bold;">CONTINUUM INTELLIGENCE</div>' +
+      '<div style="font-size:9px;color:#888;margin-bottom:20px;">Independent Cross-Domain Equity Research</div>' +
+      '<div style="border-top:3px solid #1B2A4A;margin-bottom:30px;"></div>' +
+      '<h1 style="font-size:28px;color:#1B2A4A;margin:0 0 4px 0;">Woolworths Group</h1>' +
+      '<div style="font-size:14px;color:#666;margin-bottom:24px;">WOW.AX &bull; ASX &bull; Consumer Staples</div>' +
+      '<table style="width:100%;border-collapse:collapse;margin-bottom:24px;">' +
+      '<tr style="background:#F2F2F2;">' +
+      '<td style="padding:8px;font-size:11px;font-weight:bold;">Share Price</td>' +
+      '<td style="padding:8px;font-size:11px;">A$31.94</td>' +
+      '<td style="padding:8px;font-size:11px;font-weight:bold;">Risk Skew</td>' +
+      '<td style="padding:8px;font-size:11px;color:#D50000;">DOWNSIDE</td>' +
+      '</tr></table>' +
+      '<h2 style="font-size:16px;color:#2E5090;border-bottom:2px solid #2E5090;padding-bottom:6px;">Competing Hypotheses</h2>' +
+      '<div style="margin:12px 0;padding:12px;background:#F0F7FF;border-left:4px solid #00C853;">' +
+      '<div style="font-size:13px;font-weight:bold;color:#1B2A4A;">T1: Turnaround <span style="float:right;color:#00C853;font-size:18px;">36%</span></div>' +
+      '<div style="font-size:10px;color:#555;margin-top:4px;">DOMINANT</div></div>' +
+      '<div style="margin:12px 0;padding:12px;background:#FAFAFA;border-left:4px solid #2979FF;">' +
+      '<div style="font-size:13px;font-weight:bold;color:#1B2A4A;">T2: Erosion <span style="float:right;color:#2979FF;font-size:18px;">25%</span></div></div>' +
+      '<div style="margin:12px 0;padding:12px;background:#FAFAFA;border-left:4px solid #FF9100;">' +
+      '<div style="font-size:13px;font-weight:bold;color:#1B2A4A;">T3: Regulatory <span style="float:right;color:#FF9100;font-size:18px;">21%</span></div></div>' +
+      '<div style="margin:12px 0;padding:12px;background:#FAFAFA;border-left:4px solid #D50000;">' +
+      '<div style="font-size:13px;font-weight:bold;color:#1B2A4A;">T4: Disruption <span style="float:right;color:#D50000;font-size:18px;">18%</span></div></div>' +
+      '<div style="margin-top:40px;border-top:1px solid #ddd;padding-top:12px;font-size:8px;color:#999;">' +
+      'This does not constitute personal financial advice. &copy; 2026 Continuum Intelligence</div>' +
+      '</body></html>';
+
+    var win = window.open('', '_blank');
+    if (!win) { alert('Pop-up blocked. Please allow pop-ups.'); return; }
+    win.document.write(html);
+    win.document.close();
+    setTimeout(function() { win.print(); }, 800);
+  }
+  </script>
+</body>
+</html>

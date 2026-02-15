@@ -1,10 +1,16 @@
 {
   "ticker": "CSL.AX",
   "company": "CSL Limited",
+  "sector": "Healthcare",
+  "market_cap": "138.5B",
   "hypotheses": {
     "T1": {
       "label": "Growth/Recovery",
       "description": "Plasma collections normalise; Vifor acquisition delivers synergies; pipeline catalysts",
+      "plain_english": "CSL's plasma collection business is recovering from COVID disruption, and its recent acquisition of Vifor Pharma is starting to deliver cost savings. If both trends continue, earnings growth could accelerate beyond current expectations.",
+      "what_to_watch": "H1 FY26 plasma collection volumes and Vifor integration milestones. If plasma cost per litre returns to pre-COVID levels, this narrative strengthens significantly.",
+      "upside": "Pipeline catalysts (CSL112, garadacimab) could drive re-rating if clinical data exceeds expectations.",
+      "risk_plain": "If plasma collection costs stay elevated or Vifor integration hits unexpected problems, the growth story weakens.",
       "survival_score": 0.58,
       "status": "MODERATE",
       "weighted_inconsistency": 2.5,
@@ -13,6 +19,10 @@
     "T2": {
       "label": "Managed/Base Case",
       "description": "Steady-state compounder: high single-digit earnings growth, premium valuation sustained",
+      "plain_english": "CSL continues doing what it does best — growing earnings at 7-10% per year, driven by its dominant position in the global plasma market. The company deserves its premium valuation because of its deep competitive moat and long runway of growth.",
+      "what_to_watch": "FY26 earnings guidance at H1 result. If guidance stays at 7-10% NPATA growth, the base case holds firm.",
+      "upside": "Consistent execution could attract more long-only institutional capital, supporting valuation multiples.",
+      "risk_plain": "If growth slips below high single digits, the premium valuation may not be sustainable.",
       "survival_score": 0.75,
       "status": "HIGH",
       "weighted_inconsistency": 1.0,
@@ -21,6 +31,10 @@
     "T3": {
       "label": "Risk/Downside",
       "description": "Vifor integration drags; plasma margin recovery slower than guided; FX headwinds",
+      "plain_english": "Several things could go wrong at once: the Vifor acquisition might cost more to integrate than expected, plasma margins might not recover as fast as management promised, and the strong Australian dollar could eat into overseas earnings when converted back.",
+      "what_to_watch": "Vifor integration costs in H1 FY26 and AUD/USD exchange rate trajectory. If integration costs rise or AUD strengthens above 0.70, downside risk increases.",
+      "upside": null,
+      "risk_plain": "Currency headwinds alone could knock 3-5% off reported earnings, and if combined with slower Vifor synergies, the stock could de-rate.",
       "survival_score": 0.33,
       "status": "LOW",
       "weighted_inconsistency": 4.2,
@@ -29,6 +43,10 @@
     "T4": {
       "label": "Disruption",
       "description": "Gene therapy disrupts immunoglobulin demand; biosimilar erosion of key products",
+      "plain_english": "This is the long-term existential risk: if gene therapy advances make immunoglobulin treatments unnecessary, or if biosimilar competitors undercut CSL's key products, the company's core business could face structural decline.",
+      "what_to_watch": "Gene therapy clinical trial results targeting primary immunodeficiency conditions, and any biosimilar approvals for immunoglobulin products in major markets.",
+      "upside": null,
+      "risk_plain": "While this is a long-term risk, any breakthrough gene therapy result could trigger a sharp de-rating of the entire plasma sector.",
       "survival_score": 0.12,
       "status": "VERY_LOW",
       "weighted_inconsistency": 7.1,
@@ -40,6 +58,7 @@
   "alert_state": "NORMAL",
   "alert_started": null,
   "current_price": 285.50,
+  "big_picture": "CSL is a global biotech leader specialising in plasma-derived therapies and vaccines. It is one of only three companies worldwide that can collect and process blood plasma at scale, giving it an extremely strong competitive position.",
   "last_flip": {
     "date": "2025-08-20",
     "from": "T1",
@@ -98,6 +117,46 @@
       "decay": {
         "full_weight_days": 60,
         "half_life_days": 60
+      },
+      "active": true
+    },
+    {
+      "id": "CSL_VIFOR_SYNERGIES",
+      "type": "OPERATIONAL_DATA",
+      "source": "Investor Day",
+      "epistemic_tag": "Motivated (corporate)",
+      "date": "2025-11-10T10:00:00+11:00",
+      "summary": "Vifor synergies tracking to $200M target; iron portfolio growing 12% organically",
+      "diagnosticity": "MEDIUM",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 60,
+        "half_life_days": 90
+      },
+      "active": true
+    },
+    {
+      "id": "CSL_PIPELINE_UPDATE",
+      "type": "CLINICAL_DATA",
+      "source": "ASH Conference",
+      "epistemic_tag": "Peer-reviewed (scientific)",
+      "date": "2025-12-08T08:00:00+11:00",
+      "summary": "Garadacimab Phase III positive for hereditary angioedema prevention; regulatory submission planned",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "NEUTRAL",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 120,
+        "half_life_days": 180
       },
       "active": true
     }
