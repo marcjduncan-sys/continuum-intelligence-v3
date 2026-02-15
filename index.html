@@ -14903,30 +14903,33 @@ function generatePDFReport(ticker, type) {
   var filename = ticker + '-' + (type === 'institutional' ? 'institutional-report' : 'investor-briefing') + '-' + dateStr.replace(/-/g,'') + '.pdf';
 
   var wrapper = document.createElement('div');
-  wrapper.style.cssText = 'position:absolute;left:-9999px;top:0;width:210mm;overflow:visible;';
+  wrapper.style.cssText = 'position:fixed;left:0;top:0;width:210mm;background:#ffffff;z-index:-9999;opacity:0;overflow:visible;';
   wrapper.innerHTML = html;
   document.body.appendChild(wrapper);
+
+  console.log('[PDF] Building ' + type + ' report for ' + ticker + ', HTML length: ' + html.length);
 
   var opt = {
     margin: [10, 15, 10, 15],
     filename: filename,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, scrollY: 0, scrollX: 0, windowWidth: wrapper.scrollWidth, windowHeight: wrapper.scrollHeight },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    pagebreak: { mode: ['css', 'legacy'] }
   };
 
-  requestAnimationFrame(function() {
+  setTimeout(function() {
     html2pdf().set(opt).from(wrapper).save().then(function() {
+      console.log('[PDF] Generated successfully: ' + filename);
       document.body.removeChild(wrapper);
       btn.classList.remove('generating');
     }).catch(function(err) {
-      console.error('PDF generation failed:', err);
+      console.error('[PDF] Generation failed:', err);
       if (wrapper.parentNode) document.body.removeChild(wrapper);
       btn.classList.remove('generating');
-      alert('PDF generation failed. Please try again.');
+      alert('PDF generation failed. Check console for details.');
     });
-  });
+  }, 100);
 }
 
 function pdfEsc(str) {
@@ -14971,8 +14974,8 @@ function buildInstitutionalHTML(stock) {
 
   // Discriminating evidence
   var discItems = '';
-  if (stock.discriminates && stock.discriminates.cards) {
-    var disc = stock.discriminates.cards;
+  if (stock.discriminators && stock.discriminators.rows) {
+    var disc = stock.discriminators.rows;
     for (var d = 0; d < Math.min(disc.length, 5); d++) {
       discItems += '<tr>' +
         '<td style="padding:6px 8px;font-size:11px;font-weight:700;border-bottom:1px solid #eee;white-space:nowrap;">' + pdfEsc(disc[d].diagnosticity) + '</td>' +
@@ -15031,11 +15034,11 @@ function buildInstitutionalHTML(stock) {
     '<div style="font-size:13px;color:#888;margin-bottom:8px;">' + pdfEsc(stock.tickerFull || stock.ticker + '.AX') + ' &bull; ' + pdfEsc(stock.exchange) + ' &bull; ' + pdfEsc(stock.sector) + '</div>' +
     '<div style="font-size:22px;font-weight:700;color:#1B2A4A;margin-bottom:20px;">' + pdfEsc(stock.currency) + ' ' + stock.price + '</div>' +
     // Key Metrics
-    '<div style="display:flex;gap:24px;margin-bottom:24px;flex-wrap:wrap;">' +
+    '<table style="margin-bottom:24px;border-collapse:collapse;"><tr>' +
       (stock.heroMetrics || []).map(function(m) {
-        return '<div style="text-align:center;"><div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;">' + pdfEsc(m.label) + '</div><div style="font-size:14px;font-weight:700;color:#1B2A4A;">' + m.value + '</div></div>';
+        return '<td style="text-align:center;padding:0 16px 0 0;"><div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;">' + pdfEsc(m.label) + '</div><div style="font-size:14px;font-weight:700;color:#1B2A4A;">' + m.value + '</div></td>';
       }).join('') +
-    '</div>' +
+    '</tr></table>' +
     // Verdict
     '<div style="background:#F5F7FA;padding:14px;border-radius:6px;margin-bottom:24px;border-left:3px solid #2E5090;">' +
       '<div style="font-size:13px;color:#555;line-height:1.6;">' + pdfEsc(verdictText) + '</div>' +
@@ -15117,13 +15120,13 @@ function buildRetailHTML(stock) {
     var h = hyps[i];
     var dirIcon = h.direction === 'upside' ? '&#9650;' : h.direction === 'downside' ? '&#9660;' : '&#9670;';
     var dirColor = h.direction === 'upside' ? '#2E7D32' : h.direction === 'downside' ? '#C62828' : '#F9A825';
-    hypSummary += '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #eee;">' +
-      '<div style="font-size:18px;font-weight:700;color:#1B2A4A;width:40px;text-align:center;">' + norm[i] + '%</div>' +
-      '<div style="flex:1;">' +
+    hypSummary += '<table style="width:100%;border-collapse:collapse;border-bottom:1px solid #eee;"><tr>' +
+      '<td style="width:50px;padding:8px 0;font-size:18px;font-weight:700;color:#1B2A4A;text-align:center;vertical-align:top;">' + norm[i] + '%</td>' +
+      '<td style="padding:8px 0;">' +
         '<div style="font-size:12px;font-weight:700;color:#1B2A4A;">' + pdfEsc(stripHtml(h.title)) + ' <span style="color:' + dirColor + ';">' + dirIcon + '</span></div>' +
         '<div style="font-size:11px;color:#666;margin-top:2px;">' + pdfEsc(stripHtml(h.description).substring(0, 120)) + '</div>' +
-      '</div>' +
-    '</div>';
+      '</td>' +
+    '</tr></table>';
   }
 
   return '<div style="font-family:Arial,Helvetica,sans-serif;color:#333;padding:24px;line-height:1.5;">' +
