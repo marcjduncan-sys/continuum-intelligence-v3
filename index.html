@@ -2371,6 +2371,70 @@ a:hover { color: var(--accent-sage); }
     color: var(--text-muted);
 }
 
+/* --- Evidence-Aligned Reweighting --- */
+.port-reweight-section { margin-top: var(--space-xl); }
+.port-reweight-body {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.rw-table { width: 100%; border-collapse: collapse; }
+.rw-table thead th {
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-surface);
+}
+.rw-table tbody td {
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+.rw-table tbody tr:last-child td { border-bottom: none; }
+.rw-table tbody tr:hover { background: var(--bg-elevated); }
+.rw-ticker { font-family: var(--font-data); font-weight: 700; color: var(--accent-teal); }
+.rw-bar-container {
+    display: flex; align-items: center; gap: 8px;
+}
+.rw-bar {
+    flex: 1; height: 8px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px; overflow: hidden;
+    position: relative;
+}
+.rw-bar-current {
+    height: 100%; border-radius: 4px;
+    background: var(--text-muted);
+    position: absolute; left: 0; top: 0;
+}
+.rw-bar-suggested {
+    height: 100%; border-radius: 4px;
+    background: var(--accent-teal);
+    position: absolute; left: 0; top: 0;
+    opacity: 0.6;
+}
+.rw-pct { font-family: var(--font-data); font-size: 0.75rem; width: 42px; text-align: right; }
+.rw-delta { font-family: var(--font-data); font-size: 0.75rem; font-weight: 600; }
+.rw-delta.increase { color: var(--signal-green); }
+.rw-delta.reduce { color: var(--signal-red); }
+.rw-delta.hold { color: var(--text-muted); }
+.rw-action { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.rw-action.increase { color: var(--signal-green); }
+.rw-action.reduce { color: var(--signal-red); }
+.rw-action.hold { color: var(--text-muted); }
+.port-reweight-disclaimer {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    padding: var(--space-md);
+    line-height: 1.5;
+}
+
 /* Light Theme Overrides */
 [data-theme="light"] .port-dna-card,
 [data-theme="light"] .port-insight-card,
@@ -3885,6 +3949,18 @@ a:hover { color: var(--accent-sage); }
                 <div class="change-empty-icon">🔔</div>
                 <div class="change-empty-title">No active alerts</div>
                 <div class="change-empty-text">Recent hypothesis changes will appear here when your portfolio is loaded</div>
+            </div>
+        </div>
+
+        <!-- EVIDENCE-ALIGNED REWEIGHTING -->
+        <div class="port-reweight-section" id="portfolioReweighting" style="display:none">
+            <div class="section-header" style="margin: var(--space-2xl) 0 var(--space-lg);">
+                <div class="section-title">Evidence-Aligned Reweighting</div>
+                <span class="step-indicator">Suggested weights based on Continuum's evidence synthesis</span>
+            </div>
+            <div class="port-reweight-body" id="reweightBody"></div>
+            <div class="port-reweight-disclaimer">
+                These suggestions reflect equal-weight allocation adjusted for Continuum's risk skew assessment. They are not investment recommendations. Consult your financial advisor.
             </div>
         </div>
 
@@ -13566,8 +13642,9 @@ function renderPortfolio(positions, totalValue) {
     summary.style.display = '';
     actions.style.display = '';
 
-    /* Render diagnostics and alerts */
+    /* Render diagnostics, reweighting, and alerts */
     renderPortfolioDiagnostics(positions, totalValue);
+    renderReweighting(positions, totalValue);
     renderChangeAlerts(positions);
 }
 
@@ -13665,6 +13742,115 @@ function renderPortfolioDiagnostics(positions, totalValue) {
     } else {
         alignmentEl.innerHTML = '<span class="alert-highlight">' + formatNum(alignedWeight, 0) + '% aligned</span> with Continuum. Significant divergence. You may see value we do not (or vice versa).';
     }
+}
+
+/* Evidence-Aligned Reweighting */
+function renderReweighting(positions, totalValue) {
+    const sectionEl = document.getElementById('portfolioReweighting');
+    const bodyEl = document.getElementById('reweightBody');
+    if (!sectionEl || !bodyEl) return;
+
+    // Only show for covered positions
+    const covered = positions.filter(p => COVERAGE_DATA[p.ticker]);
+    if (covered.length === 0) {
+        sectionEl.style.display = 'none';
+        return;
+    }
+
+    // Calculate evidence scores
+    const scores = [];
+    const baseWeight = 100 / covered.length;
+
+    covered.forEach(p => {
+        const cd = COVERAGE_DATA[p.ticker];
+        const tc = TC_DATA[p.ticker];
+
+        // Conviction multiplier based on skew direction
+        let multiplier = 1.0;
+        if (cd.skew === 'upside') multiplier = 1.3;
+        else if (cd.skew === 'downside') multiplier = 0.7;
+
+        // Adjust for hypothesis strength from TC_DATA
+        if (tc) {
+            const probs = [tc.t1.prob, tc.t2.prob, tc.t3.prob, tc.t4.prob];
+            const maxProb = Math.max(...probs);
+            // High conviction in dominant thesis = slight boost
+            if (maxProb > 40) multiplier *= 1.05;
+            // Contrarian / uphill = slight reduction
+            if (tc.primary === 'uphill') multiplier *= 0.9;
+        }
+
+        scores.push({
+            ticker: p.ticker,
+            company: p.company,
+            currentWeight: p.weight,
+            skew: cd.skew,
+            rawScore: baseWeight * multiplier
+        });
+    });
+
+    // Normalize suggested weights to 100%
+    const totalScore = scores.reduce((s, x) => s + x.rawScore, 0);
+    scores.forEach(s => {
+        s.suggestedWeight = (s.rawScore / totalScore) * 100;
+    });
+
+    // Sort by largest delta
+    scores.sort((a, b) => Math.abs(b.suggestedWeight - b.currentWeight) - Math.abs(a.suggestedWeight - a.currentWeight));
+
+    // Render table
+    let rows = '';
+    scores.forEach(s => {
+        const delta = s.suggestedWeight - s.currentWeight;
+        const absDelta = Math.abs(delta);
+        let action, actionCls, deltaCls;
+
+        if (delta > 2) {
+            action = 'Increase';
+            actionCls = 'increase';
+            deltaCls = 'increase';
+        } else if (delta < -2) {
+            action = 'Reduce';
+            actionCls = 'reduce';
+            deltaCls = 'reduce';
+        } else {
+            action = 'Hold';
+            actionCls = 'hold';
+            deltaCls = 'hold';
+        }
+
+        const skewArrow = s.skew === 'upside' ? '&#9650; UPSIDE' :
+                          s.skew === 'downside' ? '&#9660; DOWNSIDE' : '&#9670; BALANCED';
+        const skewCls = s.skew;
+
+        const maxBar = Math.max(s.currentWeight, s.suggestedWeight, 1);
+
+        rows += '<tr>' +
+            '<td><span class="rw-ticker">' + s.ticker + '</span></td>' +
+            '<td>' + s.company + '</td>' +
+            '<td><span class="skew-badge ' + skewCls + '">' + skewArrow + '</span></td>' +
+            '<td><span class="rw-pct">' + s.currentWeight.toFixed(1) + '%</span></td>' +
+            '<td><span class="rw-pct">' + s.suggestedWeight.toFixed(1) + '%</span></td>' +
+            '<td><span class="rw-delta ' + deltaCls + '">' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%</span></td>' +
+            '<td><span class="rw-action ' + actionCls + '">' + action + '</span></td>' +
+        '</tr>';
+    });
+
+    bodyEl.innerHTML =
+        '<table class="rw-table">' +
+            '<thead><tr>' +
+                '<th>Ticker</th>' +
+                '<th>Company</th>' +
+                '<th>Evidence</th>' +
+                '<th>Current</th>' +
+                '<th>Suggested</th>' +
+                '<th>Delta</th>' +
+                '<th>Action</th>' +
+            '</tr></thead>' +
+            '<tbody>' + rows + '</tbody>' +
+        '</table>';
+
+    sectionEl.style.display = '';
 }
 
 /* Change Detection Alerts */
@@ -13777,10 +13963,12 @@ function clearPortfolio() {
     document.getElementById('portfolioActions').style.display = 'none';
     document.getElementById('portfolioBody').innerHTML = '';
     
-    /* Hide diagnostics and alerts */
+    /* Hide diagnostics, reweighting, and alerts */
     const diag = document.getElementById('portfolioDiagnostics');
+    const reweight = document.getElementById('portfolioReweighting');
     const alerts = document.getElementById('changeAlertsSection');
     if (diag) diag.style.display = 'none';
+    if (reweight) reweight.style.display = 'none';
     if (alerts) alerts.style.display = 'none';
 }
 
