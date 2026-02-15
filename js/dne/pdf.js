@@ -536,49 +536,39 @@ window.generateReport = function (format) {
     return;
   }
 
-  // 2. Select report format
+  console.log('[PDF] Starting report generation for:', stock.ticker, 'format:', format);
+
+  // 2. Build the HTML
   var reportHTML = format === 'retail'
     ? buildRetailReportHTML(stock)
     : buildInstitutionalReportHTML(stock);
 
-  if (!reportHTML) {
+  if (!reportHTML || reportHTML.length < 100) {
     alert('Failed to generate report HTML.');
+    console.error('[PDF] HTML generation failed, length:', reportHTML ? reportHTML.length : 0);
     return;
   }
 
-  // 3. Create container element
-  // Position off-screen so html2canvas can capture it without user seeing it
+  console.log('[PDF] HTML generated, length:', reportHTML.length);
+
+  // 3. Create a hidden container and inject the HTML
   var container = document.createElement('div');
-  container.style.cssText = 'position:fixed;left:-10000px;top:0;width:210mm;background:white;z-index:-9999;';
+  container.id = 'pdf-container-' + Math.random().toString(36).substr(2, 9);
+  container.style.cssText = 'display:none;';
   container.innerHTML = reportHTML;
   document.body.appendChild(container);
 
-  // 4. Generate PDF
-  var ticker = stock.ticker.replace('.AX', '');
-  var dateStr = new Date().toISOString().split('T')[0];
-  var filename = 'Continuum_' + ticker + '_' + format + '_' + dateStr + '.pdf';
+  console.log('[PDF] Container created and added to DOM');
 
-  var opt = {
-    margin: [10, 18, 10, 18],
-    filename: filename,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, logging: false },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  html2pdf()
-    .set(opt)
-    .from(container)
-    .save()
-    .then(function () {
-      console.log('[PDF] Generated: ' + filename);
+  // 4. Trigger browser print dialog
+  setTimeout(function() {
+    window.print();
+    console.log('[PDF] Print dialog triggered');
+    
+    // Clean up after a delay to allow print dialog to open
+    setTimeout(function() {
       document.body.removeChild(container);
-    })
-    .catch(function (err) {
-      console.error('[PDF] Error:', err);
-      alert('PDF generation failed. Please check your browser console for details.');
-      if (document.body.contains(container)) {
-        document.body.removeChild(container);
-      }
-    });
+      console.log('[PDF] Container removed');
+    }, 1000);
+  }, 100);
 };

@@ -6,6 +6,12 @@
   <title>Stock Analysis — Continuum Intelligence</title>
   <link rel="stylesheet" href="css/narrative.css">
   <style>
+    @media print {
+      body { background: white; margin: 0; padding: 0; }
+      .container { max-width: 100%; margin: 0; padding: 0; display: none; }
+      #pdf-container-* { display: block !important; }
+      * { box-shadow: none !important; border-color: #000 !important; }
+    }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
