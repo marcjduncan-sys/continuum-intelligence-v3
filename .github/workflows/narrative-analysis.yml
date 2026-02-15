@@ -1,167 +1,35 @@
-name: Narrative Framework Analysis
+  name: Narrative Framework Analysis
 
-on:
-  schedule:
-    # Run twice daily: 7:00 AM and 7:00 PM UTC (aligned with market hours)
-    - cron: '0 7 * * *'
-    - cron: '0 19 * * *'
-  workflow_dispatch:
-    inputs:
-      tickers:
-        description: 'Comma-separated list of tickers to analyze (or "all")'
-        required: true
-        default: 'all'
-      severity_threshold:
-        description: 'Minimum severity to trigger updates (NORMAL/MODERATE/HIGH/CRITICAL)'
-        required: true
-        default: 'MODERATE'
+  on:
+    schedule:
+      - cron: '0 7 * * *'
+      - cron: '0 19 * * *'
+    workflow_dispatch:
+      inputs:
+        tickers:
+          description: 'Tickers to analyze (or all)'
+          required: true
+          default: 'all'
+        severity_threshold:
+          description: 'Minimum severity (NORMAL/MODERATE/HIGH/CRITICAL)'
+          required: true
+          default: 'MODERATE'
 
-jobs:
-  analyze:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      issues: write
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      
-      - name: Install dependencies
-        run: npm install node-fetch@2
-      
-      - name: Fetch live prices
-        id: fetch-prices
-        run: |
-          node -e "
-          const fs = require('fs');
-          
-          // Load existing prices or create default
-          let prices = { updated: new Date().toISOString(), prices: {} };
-          try {
-            prices = JSON.parse(fs.readFileSync('data/live-prices.json', 'utf8'));
-          } catch (e) {}
-          
-          // For GitHub Actions, we'd fetch from an API
-          // For now, simulate with slight variations
-          const tickers = ['PME', 'XRO', 'CSL', 'WOW', 'WTC', 'DRO', 'GYG', 'MQG', 'GMG', 'WDS', 'SIG', 'FMG'];
-          tickers.forEach(ticker => {
-            const existing = prices.prices[ticker];
-            if (existing) {
-              // Simulate small price movement for testing
-              const change = (Math.random() - 0.5) * 0.1;
-              existing.pc = existing.p;
-              existing.p = Math.round(existing.p * (1 + change) * 100) / 100;
-              existing.c = Math.round((existing.p - existing.pc) * 100) / 100;
-              existing.cp = Math.round((existing.c / existing.pc) * 10000) / 100;
-            }
-          });
-          
-          prices.updated = new Date().toISOString();
-          fs.writeFileSync('data/live-prices.json', JSON.stringify(prices, null, 2));
-          console.log('Prices updated:', prices.updated);
-          "
-      
-      - name: Run narrative analysis
-        id: narrative-analysis
-        run: |
-          node scripts/run-automated-analysis.js \
-            --tickers="${{ github.event.inputs.tickers || 'all' }}" \
-            --threshold="${{ github.event.inputs.severity_threshold || 'MODERATE' }}" \
-            --output="data/narrative-analysis.json"
-      
-      - name: Check for significant dislocations
-        id: check-dislocations
-        run: |
-          node -e "
-          const fs = require('fs');
-          const analysis = JSON.parse(fs.readFileSync('data/narrative-analysis.json', 'utf8'));
-          
-          const critical = [];
-          const high = [];
-          
-          Object.entries(analysis.results).forEach(([ticker, result]) => {
-            if (result.dislocation.severity === 'CRITICAL') critical.push(ticker);
-            else if (result.dislocation.severity === 'HIGH') high.push(ticker);
-          });
-          
-          console.log('CRITICAL:', critical.join(',') || 'none');
-          console.log('HIGH:', high.join(',') || 'none');
-          
-          // Set outputs for next steps
-          const fs2 = require('fs');
-          fs2.writeFileSync(process.env.GITHUB_OUTPUT, \`critical=\${critical.join(',')}\nhigh=\${high.join(',')}\`);
-          "
-      
-      - name: Update index.html with new commentary
-        if: steps.check-dislocations.outputs.critical != '' || steps.check-dislocations.outputs.high != ''
-        run: |
-          node scripts/apply-narrative-updates.js \
-            --input="data/narrative-analysis.json" \
-            --output="index.html"
-      
-      - name: Commit changes
-        run: |
-          git config user.name "Narrative Framework Bot"
-          git config user.email "narrative-bot@continuum.intelligence"
-          
-          git add data/live-prices.json
-          git add data/narrative-analysis.json
-          
-          if [ -n "${{ steps.check-dislocations.outputs.critical }}" ]; then
-            git add index.html
-          fi
-          
-          git commit -m "Narrative analysis update — ${{ steps.check-dislocations.outputs.critical != '' && 'CRITICAL dislocations detected' || 'routine update' }}" || true
-          git push || true
-      
-      - name: Create issue for critical dislocations
-        if: steps.check-dislocations.outputs.critical != ''
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const tickers = '${{ steps.check-dislocations.outputs.critical }}'.split(',');
-            const analysis = require('./data/narrative-analysis.json');
-            
-            for (const ticker of tickers) {
-              const result = analysis.results[ticker];
-              
-              await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: `🔴 CRITICAL: ${ticker} price dislocation detected`,
-                body: `## Price Dislocation Alert
-            
-**Ticker:** ${ticker}
-**Severity:** ${result.dislocation.severity}
-**Detected:** ${new Date().toISOString()}
+  jobs:
+    analyze:
+      runs-on: ubuntu-latest
+      permissions:
+        contents: write
+        issues: write
 
-### Price Metrics
-- Current: ${result.dislocation.metrics.currentPrice || 'N/A'}
-- Change: ${result.dislocation.metrics.todayReturn}%
-- Z-Score: ${result.dislocation.metrics.zScore}
-- Volume Ratio: ${result.dislocation.metrics.volumeRatio}x
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
 
-### Market-Implied Narrative
-- Primary: ${result.inference.primaryHypothesis}
-- Confidence: ${(result.inference.confidence * 100).toFixed(0)}%
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: '20'
 
-### Hypothesis Divergences
-${Object.entries(result.weights).map(([tier, w]) => {
-  const gap = Math.abs(w.longTerm - w.shortTerm);
-  return gap > 20 ? `- **${tier}:** ${gap}pt gap (Research: ${w.longTerm}%, Market: ${w.shortTerm}%)` : '';
-}).filter(Boolean).join('\n') || 'None significant'}
-
-### Recommended Action
-${result.commentary?.keyAction || 'Review and validate thesis against price action'}
-
----
-*Generated by Narrative Framework v2.0*`,
-                labels: ['price-dislocation', 'critical', 'narrative-framework']
-              });
-            }
+        - name: Run narrative analysis
+          run: node scripts/run-automated-analysis.js
