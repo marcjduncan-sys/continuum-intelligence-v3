@@ -29,10 +29,13 @@ jobs:
       - name: Fetch live prices
         run: node scripts/fetch-live-prices.js
 
+      - name: Run narrative analysis
+        run: node scripts/run-automated-analysis.js || true
+
       - name: Check for changes
         id: changes
         run: |
-          if git diff --quiet data/live-prices.json 2>/dev/null; then
+          if git diff --quiet data/ 2>/dev/null; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No price changes detected."
           else
@@ -46,5 +49,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/live-prices.json
-          git commit -m "Live prices — $(date -u +'%H:%M UTC %d %b %Y')"
+          git add data/narrative-analysis.json 2>/dev/null || true
+          git commit -m "Live prices + analysis — $(date -u +'%H:%M UTC %d %b %Y')"
           git push

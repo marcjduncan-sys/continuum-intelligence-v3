@@ -6,6 +6,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { findLatestPrices } = require('./find-latest-prices');
 
 // Load existing data
 function loadStockData() {
@@ -279,21 +280,23 @@ function generateFreshnessUpdate(ticker, priceData, events) {
 async function main() {
   console.log('=== Continuum Narrative Generator ===\n');
   
-  // Load data
+  // Load data — use find-latest-prices to pick the freshest source
   const dataDir = path.join(__dirname, '..', 'data');
-  const pricesPath = path.join(dataDir, 'latest-prices.json');
   const eventsPath = path.join(dataDir, 'events-log.json');
-  
-  if (!fs.existsSync(pricesPath)) {
-    console.error('No price data found. Run event-scraper first.');
+
+  const priceResult = findLatestPrices('newest');
+  if (!priceResult) {
+    console.error('No price data found. Run event-scraper or fetch-live-prices first.');
     process.exit(1);
   }
-  
-  const prices = JSON.parse(fs.readFileSync(pricesPath, 'utf8'));
-  const events = fs.existsSync(eventsPath) 
-    ? JSON.parse(fs.readFileSync(eventsPath, 'utf8')) 
+
+  console.log(`Using prices from ${priceResult.source} (${priceResult.file}), updated ${priceResult.updated}`);
+  const prices = priceResult.prices;
+
+  const events = fs.existsSync(eventsPath)
+    ? JSON.parse(fs.readFileSync(eventsPath, 'utf8'))
     : [];
-  
+
   console.log(`Loaded ${Object.keys(prices).length} prices, ${events.length} events`);
   
   // Generate updates for each ticker with events
