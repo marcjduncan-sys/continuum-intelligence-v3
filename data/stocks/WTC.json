@@ -1,0 +1,207 @@
+{
+  "ticker": "WTC.AX",
+  "company": "WiseTech Global",
+  "hypotheses": {
+    "T1": {
+      "label": "Growth/Recovery",
+      "description": "Governance concerns priced in; product moat intact; returns to premium growth trajectory",
+      "survival_score": 0.30,
+      "status": "LOW",
+      "weighted_inconsistency": 5.2,
+      "last_updated": "2026-02-14T09:30:00+11:00"
+    },
+    "T2": {
+      "label": "Managed/Base Case",
+      "description": "Solid software compounder but de-rated to sector average on governance discount",
+      "survival_score": 0.55,
+      "status": "MODERATE",
+      "weighted_inconsistency": 2.8,
+      "last_updated": "2026-02-14T09:30:00+11:00"
+    },
+    "T3": {
+      "label": "Risk/Downside",
+      "description": "Governance crisis deepens; customer churn accelerates; key-person risk materialises",
+      "survival_score": 0.72,
+      "status": "HIGH",
+      "weighted_inconsistency": 1.1,
+      "last_updated": "2026-02-14T09:30:00+11:00"
+    },
+    "T4": {
+      "label": "Disruption",
+      "description": "Competitor leapfrogs CargoWise platform; founder departure triggers strategic collapse",
+      "survival_score": 0.22,
+      "status": "LOW",
+      "weighted_inconsistency": 5.8,
+      "last_updated": "2026-02-14T09:30:00+11:00"
+    }
+  },
+  "dominant": "T3",
+  "confidence": "HIGH",
+  "alert_state": "NORMAL",
+  "alert_started": null,
+  "current_price": 68.50,
+  "last_flip": {
+    "date": "2024-10-18",
+    "from": "T1",
+    "to": "T3",
+    "trigger": "Governance crisis: founder conduct allegations; -35% in 3 sessions; board investigation announced",
+    "price_at_flip": 72.30,
+    "from_survival": 0.15,
+    "to_survival": 0.78
+  },
+  "narrative_history": [
+    {
+      "date": "2024-08-20",
+      "from": "T2",
+      "to": "T1",
+      "trigger": "FY24 results beat expectations; ARR growth +28%; CargoWise platform consolidation accelerating",
+      "price_at_flip": 108.50,
+      "from_survival": 0.42,
+      "to_survival": 0.80
+    },
+    {
+      "date": "2024-02-15",
+      "from": "T1",
+      "to": "T2",
+      "trigger": "H1 FY24 solid but organic growth slowing to mid-teens; acquisition integration mixed",
+      "price_at_flip": 88.00,
+      "from_survival": 0.38,
+      "to_survival": 0.73
+    }
+  ],
+  "evidence_items": [
+    {
+      "id": "WTC_GOVERNANCE_CRISIS",
+      "type": "GOVERNANCE_EVENT",
+      "source": "Media / ASX Filing",
+      "epistemic_tag": "Third-party investigation",
+      "date": "2024-10-15T08:00:00+11:00",
+      "summary": "Founder conduct allegations; board investigation; multiple executives departed",
+      "diagnosticity": "CRITICAL",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 180,
+        "half_life_days": 365
+      },
+      "active": true
+    },
+    {
+      "id": "WTC_H1_FY25_RESULT",
+      "type": "EARNINGS_REPORT",
+      "source": "ASX Filing",
+      "epistemic_tag": "Under Oath (statutory)",
+      "date": "2025-02-20T08:00:00+11:00",
+      "summary": "H1 FY25 revenue +20% but below elevated expectations; churn ticking up in mid-market",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "NEUTRAL",
+        "T3": "CONSISTENT",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 120
+      },
+      "active": true
+    },
+    {
+      "id": "WTC_NEW_CEO_APPOINTED",
+      "type": "GOVERNANCE_EVENT",
+      "source": "ASX Filing",
+      "epistemic_tag": "Under Oath (statutory)",
+      "date": "2025-06-01T08:00:00+11:00",
+      "summary": "New CEO appointed; founder transitions to non-executive; governance reset underway",
+      "diagnosticity": "MEDIUM",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 120,
+        "half_life_days": 180
+      },
+      "active": true
+    },
+    {
+      "id": "WTC_FY25_RESULT",
+      "type": "EARNINGS_REPORT",
+      "source": "ASX Filing",
+      "epistemic_tag": "Under Oath (statutory)",
+      "date": "2025-08-21T08:00:00+11:00",
+      "summary": "FY25 revenue $1.1B (+18%); EBITDA margin stable; FY26 guidance cautious",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "NEUTRAL",
+        "T2": "CONSISTENT",
+        "T3": "NEUTRAL",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 120
+      },
+      "active": true
+    }
+  ],
+  "price_signals": [
+    {
+      "id": "INTRADAY_DROP_10_2024-10-15",
+      "rule_id": "INTRADAY_DROP_10",
+      "name": "Critical intraday decline",
+      "date": "2024-10-15T14:30:00+11:00",
+      "diagnosticity": "CRITICAL",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 15,
+        "half_life_days": 30
+      },
+      "active": true,
+      "can_trigger_immediate_flip": true,
+      "price_at_trigger": 78.20,
+      "return_at_trigger": -0.22
+    },
+    {
+      "id": "HIGH_VOLUME_DOWN_2024-10-15",
+      "rule_id": "HIGH_VOLUME_DOWN",
+      "name": "Institutional distribution",
+      "date": "2024-10-15T14:30:00+11:00",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "NEUTRAL",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 10,
+        "half_life_days": 20
+      },
+      "active": true,
+      "can_trigger_immediate_flip": false,
+      "price_at_trigger": 78.20,
+      "return_at_trigger": -0.22
+    }
+  ],
+  "editorial_override": null,
+  "price_history": [
+    100.50, 98.00, 92.00, 85.00, 78.20,
+    74.00, 72.50, 71.80, 70.50, 69.80,
+    69.00, 68.50, 68.80, 69.20, 68.90,
+    68.50, 68.20, 68.00, 67.80, 68.10,
+    68.30, 68.50
+  ],
+  "weighting": null
+}

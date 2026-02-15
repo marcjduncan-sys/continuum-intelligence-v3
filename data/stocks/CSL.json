@@ -1,0 +1,115 @@
+{
+  "ticker": "CSL.AX",
+  "company": "CSL Limited",
+  "hypotheses": {
+    "T1": {
+      "label": "Growth/Recovery",
+      "description": "Plasma collections normalise; Vifor acquisition delivers synergies; pipeline catalysts",
+      "survival_score": 0.58,
+      "status": "MODERATE",
+      "weighted_inconsistency": 2.5,
+      "last_updated": "2026-02-14T09:30:00+11:00"
+    },
+    "T2": {
+      "label": "Managed/Base Case",
+      "description": "Steady-state compounder: high single-digit earnings growth, premium valuation sustained",
+      "survival_score": 0.75,
+      "status": "HIGH",
+      "weighted_inconsistency": 1.0,
+      "last_updated": "2026-02-14T09:30:00+11:00"
+    },
+    "T3": {
+      "label": "Risk/Downside",
+      "description": "Vifor integration drags; plasma margin recovery slower than guided; FX headwinds",
+      "survival_score": 0.33,
+      "status": "LOW",
+      "weighted_inconsistency": 4.2,
+      "last_updated": "2026-02-14T09:30:00+11:00"
+    },
+    "T4": {
+      "label": "Disruption",
+      "description": "Gene therapy disrupts immunoglobulin demand; biosimilar erosion of key products",
+      "survival_score": 0.12,
+      "status": "VERY_LOW",
+      "weighted_inconsistency": 7.1,
+      "last_updated": "2026-02-14T09:30:00+11:00"
+    }
+  },
+  "dominant": "T2",
+  "confidence": "HIGH",
+  "alert_state": "NORMAL",
+  "alert_started": null,
+  "current_price": 285.50,
+  "last_flip": {
+    "date": "2025-08-20",
+    "from": "T1",
+    "to": "T2",
+    "trigger": "FY25 result in-line but guidance conservative; plasma margin recovery on track but gradual",
+    "price_at_flip": 278.00,
+    "from_survival": 0.36,
+    "to_survival": 0.72
+  },
+  "narrative_history": [
+    {
+      "date": "2025-02-15",
+      "from": "T2",
+      "to": "T1",
+      "trigger": "H1 FY25 earnings beat; Vifor synergies ahead of schedule; upgraded FY25 guidance",
+      "price_at_flip": 305.00,
+      "from_survival": 0.40,
+      "to_survival": 0.78
+    }
+  ],
+  "evidence_items": [
+    {
+      "id": "CSL_FY25_RESULT",
+      "type": "EARNINGS_REPORT",
+      "source": "ASX Filing",
+      "epistemic_tag": "Under Oath (statutory)",
+      "date": "2025-08-20T08:00:00+11:00",
+      "summary": "FY25 NPATA $3.2B in-line; FY26 guidance 7-10% growth (conservative)",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "NEUTRAL",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 120
+      },
+      "active": true
+    },
+    {
+      "id": "CSL_PLASMA_COLLECTIONS",
+      "type": "OPERATIONAL_DATA",
+      "source": "Investor Day",
+      "epistemic_tag": "Motivated (corporate)",
+      "date": "2025-11-10T10:00:00+11:00",
+      "summary": "Plasma collections +15% YoY; cost per litre declining but above pre-COVID levels",
+      "diagnosticity": "MEDIUM",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 60,
+        "half_life_days": 60
+      },
+      "active": true
+    }
+  ],
+  "price_signals": [],
+  "editorial_override": null,
+  "price_history": [
+    280.00, 281.50, 282.00, 283.00, 283.50,
+    284.00, 283.80, 284.20, 284.50, 284.80,
+    285.00, 285.20, 284.90, 285.10, 285.30,
+    285.40, 285.50, 285.60, 285.40, 285.50,
+    285.60, 285.50
+  ],
+  "weighting": null
+}

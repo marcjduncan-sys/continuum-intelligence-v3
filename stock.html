@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Analysis — Continuum Intelligence</title>
+  <link rel="stylesheet" href="css/narrative.css">
+  <style>
+    /* Minimal page chrome for the stock template — replace with site-wide styles */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+      background: #f8f9fa;
+      color: #263238;
+      line-height: 1.6;
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+    h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+    .stock-meta { color: #78909C; font-size: 14px; margin-bottom: 24px; }
+    .stock-price { font-size: 36px; font-weight: 700; }
+    .section-title { font-size: 18px; font-weight: 700; margin: 32px 0 12px; color: #37474F; }
+
+    /* Dominant narrative card */
+    .dominant-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      margin: 16px 0;
+    }
+    .dominant-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #90A4AE; }
+    .dominant-hypothesis { font-size: 20px; font-weight: 700; margin: 4px 0; }
+    .dominant-description { font-size: 14px; color: #546E7A; }
+    .dominant-score { font-size: 14px; color: #78909C; margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Stock Header -->
+  <header>
+    <h1 id="stock-company">Loading…</h1>
+    <div class="stock-meta">
+      <span id="stock-ticker"></span> &middot;
+      <span id="stock-exchange">ASX</span>
+    </div>
+    <div class="confidence-halo" id="confidence-halo">
+      <span class="stock-price" id="stock-price">—</span>
+    </div>
+  </header>
+
+  <!-- Narrative Survival Bar -->
+  <div class="section-title">Narrative Survival</div>
+  <div class="narrative-bar" id="narrative-bar">
+    <div class="narrative-segment t1" style="width: 25%" data-hypothesis="T1">
+      <span class="segment-label">T1: Growth</span>
+      <span class="segment-score">—</span>
+    </div>
+    <div class="narrative-segment t2" style="width: 25%" data-hypothesis="T2">
+      <span class="segment-label">T2: Base</span>
+      <span class="segment-score">—</span>
+    </div>
+    <div class="narrative-segment t3" style="width: 25%" data-hypothesis="T3">
+      <span class="segment-label">T3: Risk</span>
+      <span class="segment-score">—</span>
+    </div>
+    <div class="narrative-segment t4" style="width: 25%" data-hypothesis="T4">
+      <span class="segment-label">T4: Disruption</span>
+      <span class="segment-score">—</span>
+    </div>
+  </div>
+
+  <!-- Critical Dislocation Indicator (Work Stream 1: Institutional redesign) -->
+  <div class="dislocation-indicator" id="dislocation-indicator">
+    <span class="dislocation-label">RISK SKEW</span>
+    <span class="dislocation-detail"></span>
+  </div>
+
+  <!-- Alert Banner (hidden by default) -->
+  <div class="narrative-alert" id="narrative-alert">
+    <span class="alert-icon">!</span>
+    <span class="alert-text">Narrative under pressure — <span id="alert-detail"></span></span>
+  </div>
+
+  <!-- Editorial Override Banner (hidden by default) -->
+  <div class="editorial-override-banner" id="editorial-override-banner">
+    <span class="override-icon">Lock</span>
+    <span>
+      <span class="override-label">Editorial override active:</span>
+      <span id="override-reason"></span>
+      <span style="color:#64B5F6"> — expires <span id="override-until"></span></span>
+    </span>
+  </div>
+
+  <!-- Dominant Narrative Card -->
+  <div class="dominant-card" id="dominant-card">
+    <div class="dominant-label">Dominant Narrative</div>
+    <div class="dominant-hypothesis" id="dominant-hypothesis">—</div>
+    <div class="dominant-description" id="dominant-description"></div>
+    <div class="dominant-score" id="dominant-score"></div>
+  </div>
+
+  <!-- Competing Hypotheses (Work Stream 2: Clarity with explanatory frames) -->
+  <div class="section-title">Competing Hypotheses</div>
+  <div class="hypotheses-panel" id="hypotheses-panel"></div>
+
+  <!-- Narrative History -->
+  <div class="section-title">Narrative History</div>
+  <div id="narrative-history"></div>
+
+</div>
+
+<!-- DNE Scripts (load in dependency order) -->
+<script src="js/dne/evidence.js"></script>
+<script src="js/dne/engine.js"></script>
+<script src="js/dne/price-signals.js"></script>
+<script src="js/dne/override.js"></script>
+<script src="js/dne/weighting.js"></script>
+<script src="js/dne/ui.js"></script>
+
+<!-- Extend updateNarrativeUI to also populate the dominant card and price -->
+<script>
+(function () {
+  var _origUpdate = window.updateNarrativeUI;
+
+  window.updateNarrativeUI = function (stock) {
+    // Run core UI update (bar, alert, halo)
+    if (_origUpdate) _origUpdate(stock);
+
+    // Stock header
+    var companyEl = document.getElementById('stock-company');
+    if (companyEl) companyEl.textContent = stock.company;
+
+    var tickerEl = document.getElementById('stock-ticker');
+    if (tickerEl) tickerEl.textContent = stock.ticker;
+
+    var priceEl = document.getElementById('stock-price');
+    if (priceEl && stock.current_price) {
+      priceEl.textContent = '$' + Number(stock.current_price).toFixed(2);
+    }
+
+    // Dominant card
+    var dom = stock.hypotheses[stock.dominant];
+    var hypEl = document.getElementById('dominant-hypothesis');
+    if (hypEl) hypEl.textContent = stock.dominant + ': ' + dom.label;
+
+    var descEl = document.getElementById('dominant-description');
+    if (descEl) descEl.textContent = dom.description;
+
+    var scoreEl = document.getElementById('dominant-score');
+    if (scoreEl) {
+      scoreEl.textContent = 'Survival: ' + Math.round(dom.survival_score * 100) + '% • ' +
+        'Confidence: ' + dom.status;
+    }
+  };
+})();
+</script>
+
+<!-- Set the ticker and boot DNE -->
+<script>
+  // Set this to the stock you want to display.
+  // In production, derive from URL params or route (e.g. ?ticker=WOW.AX)
+  var params = new URLSearchParams(window.location.search);
+  window.DNE_TICKER = params.get('ticker') || 'WOW.AX';
+</script>
+<script src="js/dne/app.js"></script>
+
+</body>
+</html>

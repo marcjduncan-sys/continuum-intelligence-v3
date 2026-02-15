@@ -1,0 +1,490 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DYNAMIC NARRATIVE ENGINE — Styles
+   Narrative survival bar, dislocation indicator, competing hypotheses,
+   confidence halo, flip timeline
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Narrative Survival Bar ──────────────────────────────────────────────── */
+
+.narrative-bar {
+  display: flex;
+  height: 40px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 16px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.narrative-segment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  transition: width 0.8s ease-in-out;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.narrative-segment.t1 { background: #00C853; } /* Growth — green */
+.narrative-segment.t2 { background: #2979FF; } /* Base — blue */
+.narrative-segment.t3 { background: #FF9100; } /* Risk — amber */
+.narrative-segment.t4 { background: #D50000; } /* Disruption — red */
+
+/* Dominant hypothesis gets a glow */
+.narrative-segment.dominant {
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.segment-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.segment-score {
+  flex-shrink: 0;
+  margin-left: 6px;
+}
+
+/* ─── Critical Dislocation Indicator (Work Stream 1) ──────────────────────── */
+/* Institutional-grade: same visual hierarchy as RiskSkew label.               */
+/* No emoji, no pulsing, no aggression. Colour-coded by narrative direction.   */
+
+.dislocation-indicator {
+  display: none; /* shown dynamically when material dislocation exists */
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  margin: 10px 0;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+/* Positive narrative shift: green bg, white/light text */
+.dislocation-indicator.dislocation-positive {
+  background: #E8F5E9;
+  border-color: #A5D6A7;
+  color: #1B5E20;
+}
+
+/* Negative narrative shift: red bg, warm yellow accent text */
+.dislocation-indicator.dislocation-negative {
+  background: #FFEBEE;
+  border-color: #EF9A9A;
+  color: #B71C1C;
+}
+
+.dislocation-negative .dislocation-value {
+  color: #F9A825;
+}
+
+/* Neutral: yellow bg, dark text */
+.dislocation-indicator.dislocation-neutral {
+  background: #FFFDE7;
+  border-color: #FFF176;
+  color: #F57F17;
+}
+
+.dislocation-label {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.dislocation-positive .dislocation-label {
+  background: #1B5E20;
+  color: #E8F5E9;
+}
+
+.dislocation-negative .dislocation-label {
+  background: #B71C1C;
+  color: #FFCDD2;
+}
+
+.dislocation-neutral .dislocation-label {
+  background: #F57F17;
+  color: #FFFDE7;
+}
+
+.dislocation-detail {
+  flex: 1;
+}
+
+.dislocation-value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Narrative Pressure Alert ────────────────────────────────────────────── */
+/* Subtle institutional alert — no pulsing animation                           */
+
+.narrative-alert {
+  display: none;
+  align-items: center;
+  background: #FFF8E1;
+  border: 1px solid #FFE082;
+  border-radius: 4px;
+  padding: 10px 16px;
+  margin: 8px 0;
+  font-size: 13px;
+  color: #E65100;
+}
+
+.alert-icon {
+  margin-right: 10px;
+  font-size: 14px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.alert-text {
+  line-height: 1.4;
+}
+
+/* ─── Editorial Override Banner ───────────────────────────────────────────── */
+
+.editorial-override-banner {
+  display: none;
+  align-items: center;
+  background: #E3F2FD;
+  border: 1px solid #90CAF9;
+  border-radius: 4px;
+  padding: 10px 16px;
+  margin: 8px 0;
+  font-size: 13px;
+  color: #1565C0;
+}
+
+.override-icon {
+  margin-right: 10px;
+  font-size: 14px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.override-label {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+/* ─── Confidence Halo ─────────────────────────────────────────────────────── */
+
+.confidence-halo {
+  display: inline-block;
+  border-radius: 50%;
+  padding: 4px;
+  transition: box-shadow 0.6s ease, border-color 0.6s ease;
+}
+
+.confidence-halo.confidence-high {
+  box-shadow: 0 0 0 3px #00C853;
+}
+
+.confidence-halo.confidence-moderate {
+  box-shadow: 0 0 0 3px #FF9100;
+}
+
+.confidence-halo.confidence-low {
+  box-shadow: 0 0 0 3px #D50000;
+  border: 2px dashed #D50000;
+}
+
+.confidence-halo.confidence-very_low {
+  box-shadow: 0 0 0 3px #B71C1C;
+  border: 2px dashed #B71C1C;
+}
+
+/* ─── Competing Hypotheses Panel (Work Stream 2) ──────────────────────────── */
+
+.hypotheses-panel {
+  margin: 24px 0;
+}
+
+.hypotheses-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 12px 16px;
+  background: #FAFAFA;
+  border: 1px solid #E0E0E0;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #616161;
+  line-height: 1.5;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-dot.dot-signal { background: #263238; }
+.legend-dot.dot-weight { background: #90A4AE; }
+
+.hypothesis-card {
+  background: white;
+  border: 1px solid #E0E0E0;
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 8px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hypothesis-card.hypothesis-dominant {
+  border-color: #B0BEC5;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.hypothesis-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.hypothesis-id {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  color: white;
+}
+
+.hypothesis-id.id-t1 { background: #00C853; }
+.hypothesis-id.id-t2 { background: #2979FF; }
+.hypothesis-id.id-t3 { background: #FF9100; }
+.hypothesis-id.id-t4 { background: #D50000; }
+
+.hypothesis-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #263238;
+  margin-left: 10px;
+  flex: 1;
+}
+
+.hypothesis-status {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #78909C;
+}
+
+/* Explanatory frame: what is being measured, why it matters */
+.hypothesis-frame {
+  font-size: 13px;
+  color: #546E7A;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  padding-left: 2px;
+}
+
+.hypothesis-description {
+  font-size: 13px;
+  color: #78909C;
+  margin-bottom: 10px;
+  font-style: italic;
+}
+
+/* Dual-percentage row */
+.hypothesis-metrics {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.metric-block {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.metric-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #90A4AE;
+  font-weight: 500;
+}
+
+.metric-value {
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #263238;
+}
+
+.metric-value.metric-secondary {
+  font-size: 15px;
+  font-weight: 600;
+  color: #78909C;
+}
+
+.metric-separator {
+  width: 1px;
+  height: 24px;
+  background: #E0E0E0;
+}
+
+.metric-window {
+  font-size: 11px;
+  color: #B0BEC5;
+  font-weight: 500;
+}
+
+/* Inflection tag */
+.inflection-tag {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #E65100;
+  margin-top: 8px;
+}
+
+.inflection-tag.visible {
+  display: flex;
+}
+
+.inflection-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #E65100;
+}
+
+/* ─── Narrative Flip History Timeline ─────────────────────────────────────── */
+
+#narrative-history {
+  margin: 16px 0;
+}
+
+.flip-event {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #ccc;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.flip-event.latest {
+  background: #fffde7;
+  border-left-color: #FF9100;
+}
+
+.flip-date {
+  font-weight: 600;
+  color: #546E7A;
+  min-width: 90px;
+}
+
+.flip-arrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}
+
+.flip-direction {
+  color: #78909C;
+}
+
+.flip-trigger {
+  flex: 1;
+  color: #455A64;
+  min-width: 200px;
+}
+
+.flip-price {
+  color: #78909C;
+  font-size: 12px;
+}
+
+/* Hypothesis colours for timeline pills */
+.hypothesis-t1 { color: #00C853; }
+.hypothesis-t2 { color: #2979FF; }
+.hypothesis-t3 { color: #FF9100; }
+.hypothesis-t4 { color: #D50000; }
+
+.no-flips {
+  color: #90A4AE;
+  font-style: italic;
+  font-size: 13px;
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .narrative-bar {
+    height: 32px;
+  }
+
+  .narrative-segment {
+    font-size: 10px;
+    padding: 0 6px;
+  }
+
+  .flip-event {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .flip-trigger {
+    min-width: 0;
+  }
+
+  .hypotheses-legend {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .hypothesis-metrics {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .hypothesis-card {
+    padding: 12px 14px;
+  }
+
+  .dislocation-indicator {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}

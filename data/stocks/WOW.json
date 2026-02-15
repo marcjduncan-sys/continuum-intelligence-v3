@@ -1,0 +1,115 @@
+{
+  "ticker": "WOW.AX",
+  "company": "Woolworths Group",
+  "hypotheses": {
+    "T1": {
+      "label": "Growth/Recovery",
+      "description": "Market re-rates on margin recovery and digital transformation",
+      "survival_score": 0.72,
+      "status": "HIGH",
+      "weighted_inconsistency": 1.2,
+      "last_updated": "2026-02-14T09:30:00+11:00"
+    },
+    "T2": {
+      "label": "Managed/Base Case",
+      "description": "Defensive compounder delivering GDP+ growth with stable margins",
+      "survival_score": 0.65,
+      "status": "MODERATE",
+      "weighted_inconsistency": 2.1,
+      "last_updated": "2026-02-14T09:30:00+11:00"
+    },
+    "T3": {
+      "label": "Risk/Downside",
+      "description": "Structural margin compression from competition and cost inflation",
+      "survival_score": 0.31,
+      "status": "LOW",
+      "weighted_inconsistency": 4.8,
+      "last_updated": "2026-02-14T09:30:00+11:00"
+    },
+    "T4": {
+      "label": "Disruption",
+      "description": "Business model disruption from ALDI/Costco/Amazon Fresh",
+      "survival_score": 0.18,
+      "status": "VERY_LOW",
+      "weighted_inconsistency": 6.3,
+      "last_updated": "2026-02-14T09:30:00+11:00"
+    }
+  },
+  "dominant": "T1",
+  "confidence": "HIGH",
+  "alert_state": "NORMAL",
+  "alert_started": null,
+  "current_price": 32.45,
+  "last_flip": {
+    "date": "2026-01-15",
+    "from": "T2",
+    "to": "T1",
+    "trigger": "H1 FY26 earnings beat +6% vs consensus; margin guidance upgrade",
+    "price_at_flip": 32.45,
+    "from_survival": 0.38,
+    "to_survival": 0.74
+  },
+  "narrative_history": [
+    {
+      "date": "2025-11-20",
+      "from": "T1",
+      "to": "T2",
+      "trigger": "Q1 sales growth below expectations; competitive intensity rising",
+      "price_at_flip": 29.80,
+      "from_survival": 0.35,
+      "to_survival": 0.71
+    }
+  ],
+  "evidence_items": [
+    {
+      "id": "WOW_H1_FY26_EARNINGS",
+      "type": "EARNINGS_REPORT",
+      "source": "ASX Filing",
+      "epistemic_tag": "Under Oath (statutory)",
+      "date": "2026-01-15T08:00:00+11:00",
+      "summary": "H1 FY26 NPAT beat consensus by 6%; raised FY26 margin guidance",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 90
+      },
+      "active": true
+    },
+    {
+      "id": "WOW_DIGITAL_GROWTH",
+      "type": "OPERATIONAL_DATA",
+      "source": "Company Presentation",
+      "epistemic_tag": "Motivated (corporate)",
+      "date": "2026-01-15T08:00:00+11:00",
+      "summary": "Online sales +22% YoY; Everyday Market GMV doubling",
+      "diagnosticity": "MEDIUM",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "NEUTRAL",
+        "T3": "NEUTRAL",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 60,
+        "half_life_days": 60
+      },
+      "active": true
+    }
+  ],
+  "price_signals": [],
+  "editorial_override": null,
+  "price_history": [
+    29.80, 29.95, 30.10, 30.25, 30.40,
+    30.55, 30.80, 31.00, 31.15, 31.30,
+    31.50, 31.65, 31.80, 32.00, 32.10,
+    32.20, 32.30, 32.35, 32.40, 32.45,
+    32.50, 32.45
+  ],
+  "weighting": null
+}
