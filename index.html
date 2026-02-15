@@ -1885,37 +1885,7 @@ a:hover { color: var(--accent-sage); }
 .btn-pdf-download.generating { opacity: 0.7; pointer-events: none; }
 @keyframes pdf-spin { to { transform: rotate(360deg); } }
 
-/* ============================================================
-   NARRATIVE DISLOCATION ALERT
-   ============================================================ */
-.narrative-alert-banner {
-    background: rgba(212, 85, 85, 0.06);
-    border-bottom: 1px solid rgba(212, 85, 85, 0.2);
-    padding: var(--space-md) 0;
-}
-.narrative-alert-inner {
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 0 var(--space-lg);
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-}
-.narrative-alert-icon {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--signal-red);
-    flex-shrink: 0;
-}
-.narrative-alert-text {
-    font-size: 0.78rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
-}
-.narrative-alert-text strong {
-    color: var(--signal-red);
-    font-weight: 700;
-}
+/* Narrative dislocation alert CSS removed — consolidated into NFI dislocation indicator */
 
 /* ============================================================
    EPISTEMIC BADGES: Leadership & Ownership
@@ -5957,20 +5927,7 @@ function renderPDFDownload(data) {
   '</div>';
 }
 
-function renderNarrativeAlert(data) {
-  if (!data.skew || data.skew.direction === 'balanced') return '';
-  var dir = data.skew.direction;
-  var isDownside = dir === 'downside';
-  var icon = isDownside ? '&#9888;' : '&#9650;';
-  var label = isDownside ? 'Narrative under pressure' : 'Positive skew detected';
-  var detail = data.skew.rationale ? data.skew.rationale.substring(0, 160) : '';
-  return '<div class="narrative-alert-banner">' +
-    '<div class="narrative-alert-inner"' + (isDownside ? '' : ' style="border-color:rgba(61,170,109,0.25);border-left-color:var(--signal-green);background:rgba(61,170,109,0.06)"') + '>' +
-      '<span class="narrative-alert-icon"' + (isDownside ? '' : ' style="color:var(--signal-green)"') + '>' + icon + '</span>' +
-      '<span class="narrative-alert-text"><strong>' + label + '</strong> &mdash; ' + detail + '</span>' +
-    '</div>' +
-  '</div>';
-}
+// renderNarrativeAlert removed — was duplicate of Risk Skew text
 
 function renderHypSidebar(data) {
   var t = data.ticker.toLowerCase();
@@ -6197,7 +6154,6 @@ function renderReportPage(data) {
 
   return renderReportHero(data) +
     renderSkewBar(data) +
-    renderNarrativeAlert(data) +
     renderVerdict(data) +
     renderSectionNav(data) +
     '<div class="report-content">' +
@@ -14686,11 +14642,25 @@ function tcAnalyze() {
   }
 
   function renderMd(text) {
-    return text
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      .replace(/`(.+?)`/g, '<code>$1</code>')
-      .replace(/\n/g, '<br>');
+    var html = escHtml(text);
+    // Bold and italic
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    // Headers → styled divs
+    html = html.replace(/^#{1,4}\s+(.+)$/gm, '<div style="font-weight:700;color:var(--text-primary);margin:12px 0 4px;">$1</div>');
+    // List items
+    html = html.replace(/^[-*]\s+(.+)$/gm, '<li>$1</li>');
+    html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul style="margin:6px 0;padding-left:18px;">$1</ul>');
+    // Paragraphs
+    html = html.split(/\n{2,}/).map(function(block) {
+      block = block.trim();
+      if (!block) return '';
+      if (/^<(ul|ol|div|blockquote)/.test(block)) return block;
+      return '<p style="margin:8px 0;">' + block.replace(/\n/g, '<br>') + '</p>';
+    }).join('');
+    return html;
   }
 
   function getSuggestions(ticker) {
@@ -14760,10 +14730,17 @@ function tcAnalyze() {
       return { role: m.role, content: m.content };
     });
 
+    var systemPrompt = 'You are a senior equity research analyst at Continuum Intelligence. ' +
+      'You speak in the first person plural ("we", "our analysis"). You are direct, precise, and opinionated. ' +
+      'You reference specific evidence items by name. You use natural professional language — the way a fund manager ' +
+      'would speak to another fund manager over coffee. Never use markdown headers (##), bullet point dashes, or ' +
+      'asterisks for formatting. Write in flowing paragraphs. When presenting numbers, weave them into sentences ' +
+      'naturally. Never begin a response with "Based on" or "Here is". Never say "I" — always "we" or speak in the declarative.';
+
     fetch(API_BASE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ticker: ticker, question: question, conversation_history: history })
+      body: JSON.stringify({ ticker: ticker, question: question, conversation_history: history, system_prompt: systemPrompt })
     })
     .then(function(res) {
       if (!res.ok) throw new Error('Request failed (' + res.status + ')');
@@ -14876,78 +14853,37 @@ function tcAnalyze() {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
-// PDF Report Generator
+// PDF Report Generator — builds structured HTML from STOCK_DATA, renders via html2pdf
 function generatePDFReport(ticker, type) {
   var btn = event.currentTarget;
   btn.classList.add('generating');
 
-  // Find the report or snapshot page for this ticker
-  // Page IDs use 'page-report-WOW' / 'page-snapshot-WOW' format
-  var pageId = 'page-report-' + ticker.toUpperCase();
-  var page = document.getElementById(pageId);
-  if (!page) {
-    pageId = 'page-snapshot-' + ticker.toUpperCase();
-    page = document.getElementById(pageId);
-  }
-
-  if (!page) {
-    alert('Report page not found for ' + ticker);
+  var stock = STOCK_DATA[ticker];
+  if (!stock) {
+    alert('Stock data not found for ' + ticker);
     btn.classList.remove('generating');
     return;
   }
 
-  // Clone the page content for PDF generation (don't modify the live DOM)
-  var clone = page.cloneNode(true);
-
-  // Force clone visible — belt-and-suspenders approach:
-  // 1. Add .active class so .page.active { display:block } fires
-  // 2. Remove .page class to avoid any display:none specificity issues
-  // 3. Set inline display:block as final fallback
-  clone.classList.add('active');
-  clone.classList.remove('page');
-  clone.style.display = 'block';
-  clone.style.padding = '0';
-  clone.style.paddingTop = '0';
-  clone.style.minHeight = 'auto';
-
-  // Remove interactive elements from clone
-  var removables = clone.querySelectorAll('.report-download-section, .narrative-alert-banner, .nfi-alert-banner, .section-nav, .chat-inline');
-  for (var i = 0; i < removables.length; i++) {
-    removables[i].remove();
-  }
-
-  // For retail type, simplify the content
-  var filename = ticker + '-';
-  if (type === 'institutional') {
-    filename += 'institutional-report';
-  } else {
-    filename += 'investor-briefing';
-    // Remove evidence matrix and technical sections for retail
-    var techSections = clone.querySelectorAll('[id$="-technical"]');
-    for (var j = 0; j < techSections.length; j++) {
-      techSections[j].remove();
-    }
-  }
-
+  var html = type === 'institutional' ? buildInstitutionalHTML(stock) : buildRetailHTML(stock);
   var now = new Date();
-  filename += '-' + now.getFullYear() + ('0' + (now.getMonth()+1)).slice(-2) + ('0' + now.getDate()).slice(-2) + '.pdf';
+  var dateStr = now.getFullYear() + '-' + ('0' + (now.getMonth()+1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
+  var filename = ticker + '-' + (type === 'institutional' ? 'institutional-report' : 'investor-briefing') + '-' + dateStr.replace(/-/g,'') + '.pdf';
 
-  // Attach clone to DOM temporarily — use position:absolute (more reliable for html2canvas than fixed)
   var wrapper = document.createElement('div');
-  wrapper.style.cssText = 'position:absolute;left:-9999px;top:0;background:#0B1220;color:#E8EDF4;font-family:Inter,sans-serif;padding:24px;width:210mm;overflow:visible;';
-  wrapper.appendChild(clone);
+  wrapper.style.cssText = 'position:absolute;left:-9999px;top:0;width:210mm;overflow:visible;';
+  wrapper.innerHTML = html;
   document.body.appendChild(wrapper);
 
   var opt = {
-    margin: [10, 10, 10, 10],
+    margin: [10, 15, 10, 15],
     filename: filename,
-    image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0B1220', logging: false },
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
   };
 
-  // Give the browser one frame to compute layout before rendering
   requestAnimationFrame(function() {
     html2pdf().set(opt).from(wrapper).save().then(function() {
       document.body.removeChild(wrapper);
@@ -14959,6 +14895,244 @@ function generatePDFReport(ticker, type) {
       alert('PDF generation failed. Please try again.');
     });
   });
+}
+
+function pdfEsc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function stripHtml(str) {
+  if (!str) return '';
+  var tmp = document.createElement('div');
+  tmp.innerHTML = str;
+  return tmp.textContent || tmp.innerText || '';
+}
+
+function normaliseScoresForPDF(scores) {
+  var raw = scores.map(function(s) { return parseFloat(s.score) || 0; });
+  var total = raw.reduce(function(a,b) { return a+b; }, 0);
+  if (total === 0) return raw;
+  return raw.map(function(v) { return Math.round(v / total * 100); });
+}
+
+function buildInstitutionalHTML(stock) {
+  var hyps = stock.hypotheses || [];
+  var norm = normaliseScoresForPDF(stock.verdict.scores);
+  var dateStr = stock.date || new Date().toLocaleDateString();
+
+  // Hypothesis rows
+  var hypRows = '';
+  for (var i = 0; i < hyps.length; i++) {
+    var h = hyps[i];
+    var vs = stock.verdict.scores[i];
+    var titleClean = stripHtml(h.title);
+    var descClean = stripHtml(h.description);
+    var trendClean = stripHtml(vs ? vs.dirText : '');
+    hypRows += '<tr>' +
+      '<td style="padding:8px;font-size:12px;font-weight:700;color:#1B2A4A;border-bottom:1px solid #eee;">' + pdfEsc(titleClean) + '</td>' +
+      '<td style="padding:8px;font-size:12px;text-align:center;font-weight:700;border-bottom:1px solid #eee;">' + norm[i] + '%</td>' +
+      '<td style="padding:8px;font-size:12px;text-align:center;border-bottom:1px solid #eee;">' + pdfEsc(trendClean) + '</td>' +
+      '<td style="padding:8px;font-size:11px;color:#555;border-bottom:1px solid #eee;">' + pdfEsc(descClean) + '</td>' +
+    '</tr>';
+  }
+
+  // Discriminating evidence
+  var discItems = '';
+  if (stock.discriminates && stock.discriminates.cards) {
+    var disc = stock.discriminates.cards;
+    for (var d = 0; d < Math.min(disc.length, 5); d++) {
+      discItems += '<tr>' +
+        '<td style="padding:6px 8px;font-size:11px;font-weight:700;border-bottom:1px solid #eee;white-space:nowrap;">' + pdfEsc(disc[d].diagnosticity) + '</td>' +
+        '<td style="padding:6px 8px;font-size:11px;color:#555;border-bottom:1px solid #eee;">' + pdfEsc(stripHtml(disc[d].evidence)) + '</td>' +
+        '<td style="padding:6px 8px;font-size:11px;color:#888;border-bottom:1px solid #eee;">' + pdfEsc(disc[d].discriminatesBetween) + '</td>' +
+      '</tr>';
+    }
+  }
+
+  // Tripwires
+  var tripItems = '';
+  if (stock.tripwires && stock.tripwires.cards) {
+    var trips = stock.tripwires.cards;
+    for (var tw = 0; tw < trips.length; tw++) {
+      var trip = trips[tw];
+      tripItems += '<div style="margin-bottom:12px;">' +
+        '<div style="font-size:12px;font-weight:700;color:#1B2A4A;">' + pdfEsc(trip.name) + ' <span style="color:#888;font-weight:400;">(' + pdfEsc(trip.date) + ')</span></div>';
+      if (trip.conditions) {
+        for (var c = 0; c < trip.conditions.length; c++) {
+          var cond = trip.conditions[c];
+          var condColor = cond.valence === 'positive' ? '#2E7D32' : '#C62828';
+          tripItems += '<div style="font-size:11px;color:#555;margin:4px 0 4px 12px;">' +
+            '<span style="color:' + condColor + ';font-weight:600;">' + pdfEsc(stripHtml(cond.if)) + ':</span> ' +
+            pdfEsc(stripHtml(cond.then)) + '</div>';
+        }
+      }
+      tripItems += '</div>';
+    }
+  }
+
+  // Evidence summary
+  var evidenceItems = '';
+  if (stock.evidence && stock.evidence.cards) {
+    var evCards = stock.evidence.cards;
+    for (var e = 0; e < evCards.length; e++) {
+      var ev = evCards[e];
+      evidenceItems += '<div style="margin-bottom:14px;page-break-inside:avoid;">' +
+        '<div style="font-size:12px;font-weight:700;color:#1B2A4A;">' + pdfEsc(stripHtml(ev.title)) +
+        ' <span style="font-size:10px;color:#888;font-weight:400;background:#f5f5f5;padding:1px 6px;border-radius:3px;">' + pdfEsc(ev.epistemicLabel) + '</span></div>' +
+        '<div style="font-size:11px;color:#555;margin-top:4px;line-height:1.5;">' + pdfEsc(stripHtml(ev.finding).substring(0, 300)) + '</div>' +
+      '</div>';
+    }
+  }
+
+  // Verdict text
+  var verdictText = stripHtml(stock.verdict.text);
+
+  return '<div style="font-family:Arial,Helvetica,sans-serif;color:#333;padding:24px;line-height:1.5;">' +
+    // Header
+    '<div style="border-bottom:3px solid #1B2A4A;padding-bottom:16px;margin-bottom:24px;">' +
+      '<div style="font-size:12px;color:#888;letter-spacing:2px;font-weight:700;">CONTINUUM INTELLIGENCE</div>' +
+      '<div style="font-size:10px;color:#aaa;margin-top:2px;">Independent Cross-Domain Equity Research</div>' +
+    '</div>' +
+    // Company
+    '<h1 style="font-size:26px;color:#1B2A4A;margin:0 0 4px 0;">' + pdfEsc(stock.company) + '</h1>' +
+    '<div style="font-size:13px;color:#888;margin-bottom:8px;">' + pdfEsc(stock.tickerFull || stock.ticker + '.AX') + ' &bull; ' + pdfEsc(stock.exchange) + ' &bull; ' + pdfEsc(stock.sector) + '</div>' +
+    '<div style="font-size:22px;font-weight:700;color:#1B2A4A;margin-bottom:20px;">' + pdfEsc(stock.currency) + ' ' + stock.price + '</div>' +
+    // Key Metrics
+    '<div style="display:flex;gap:24px;margin-bottom:24px;flex-wrap:wrap;">' +
+      (stock.heroMetrics || []).map(function(m) {
+        return '<div style="text-align:center;"><div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;">' + pdfEsc(m.label) + '</div><div style="font-size:14px;font-weight:700;color:#1B2A4A;">' + m.value + '</div></div>';
+      }).join('') +
+    '</div>' +
+    // Verdict
+    '<div style="background:#F5F7FA;padding:14px;border-radius:6px;margin-bottom:24px;border-left:3px solid #2E5090;">' +
+      '<div style="font-size:13px;color:#555;line-height:1.6;">' + pdfEsc(verdictText) + '</div>' +
+    '</div>' +
+    // Hypothesis Framework
+    '<h2 style="font-size:15px;color:#2E5090;border-bottom:1px solid #ddd;padding-bottom:6px;margin:24px 0 12px;">Hypothesis Framework</h2>' +
+    '<table style="width:100%;border-collapse:collapse;">' +
+      '<tr style="background:#F2F2F2;">' +
+        '<th style="padding:8px;text-align:left;font-size:11px;color:#666;">Hypothesis</th>' +
+        '<th style="padding:8px;text-align:center;font-size:11px;color:#666;">Score</th>' +
+        '<th style="padding:8px;text-align:center;font-size:11px;color:#666;">Trend</th>' +
+        '<th style="padding:8px;text-align:left;font-size:11px;color:#666;">Description</th>' +
+      '</tr>' +
+      hypRows +
+    '</table>' +
+    // Evidence Summary
+    '<h2 style="font-size:15px;color:#2E5090;border-bottom:1px solid #ddd;padding-bottom:6px;margin:24px 0 12px;">Evidence Summary</h2>' +
+    evidenceItems +
+    // Discriminating Evidence
+    (discItems ? '<h2 style="font-size:15px;color:#2E5090;border-bottom:1px solid #ddd;padding-bottom:6px;margin:24px 0 12px;">Discriminating Evidence</h2>' +
+    '<table style="width:100%;border-collapse:collapse;">' +
+      '<tr style="background:#F2F2F2;">' +
+        '<th style="padding:6px 8px;text-align:left;font-size:10px;color:#666;">Diagnosticity</th>' +
+        '<th style="padding:6px 8px;text-align:left;font-size:10px;color:#666;">Evidence</th>' +
+        '<th style="padding:6px 8px;text-align:left;font-size:10px;color:#666;">Discriminates Between</th>' +
+      '</tr>' +
+      discItems +
+    '</table>' : '') +
+    // Tripwires
+    '<h2 style="font-size:15px;color:#2E5090;border-bottom:1px solid #ddd;padding-bottom:6px;margin:24px 0 12px;">Tripwires</h2>' +
+    tripItems +
+    // Disclaimer
+    '<div style="margin-top:36px;padding-top:14px;border-top:1px solid #ddd;font-size:9px;color:#999;line-height:1.5;">' +
+      'This report is produced by Continuum Intelligence for informational purposes only. It does not constitute personal financial advice, ' +
+      'a recommendation to buy or sell any security, or an offer to transact. The Analysis of Competing Hypotheses (ACH) methodology ' +
+      'systematically evaluates evidence against multiple competing explanations. Past performance is not indicative of future results. ' +
+      'Investors should conduct their own research and consult a licensed financial adviser before making investment decisions.' +
+      '<br><br>&copy; 2026 Continuum Intelligence &bull; Report generated: ' + new Date().toLocaleString() +
+    '</div>' +
+  '</div>';
+}
+
+function buildRetailHTML(stock) {
+  var hyps = stock.hypotheses || [];
+  var norm = normaliseScoresForPDF(stock.verdict.scores);
+  var verdictText = stripHtml(stock.verdict.text);
+
+  // Risks (downside hypotheses)
+  var risks = '';
+  for (var i = 0; i < hyps.length; i++) {
+    if (hyps[i].direction === 'downside') {
+      risks += '<li style="margin-bottom:6px;">' + pdfEsc(stripHtml(hyps[i].description).substring(0, 200)) + '</li>';
+    }
+  }
+
+  // Upsides (upside hypotheses)
+  var upsides = '';
+  for (var i = 0; i < hyps.length; i++) {
+    if (hyps[i].direction === 'upside') {
+      upsides += '<li style="margin-bottom:6px;">' + pdfEsc(stripHtml(hyps[i].description).substring(0, 200)) + '</li>';
+    }
+  }
+  if (!upsides) {
+    upsides = '<li>No specific upside catalysts identified in the current evidence base.</li>';
+  }
+
+  // Tripwires simplified
+  var watching = '';
+  if (stock.tripwires && stock.tripwires.cards) {
+    for (var tw = 0; tw < Math.min(stock.tripwires.cards.length, 4); tw++) {
+      var trip = stock.tripwires.cards[tw];
+      watching += '<li style="margin-bottom:6px;"><strong>' + pdfEsc(trip.date) + ':</strong> ' + pdfEsc(stripHtml(trip.name)) + '</li>';
+    }
+  }
+
+  // Hypothesis summary table
+  var hypSummary = '';
+  for (var i = 0; i < hyps.length; i++) {
+    var h = hyps[i];
+    var dirIcon = h.direction === 'upside' ? '&#9650;' : h.direction === 'downside' ? '&#9660;' : '&#9670;';
+    var dirColor = h.direction === 'upside' ? '#2E7D32' : h.direction === 'downside' ? '#C62828' : '#F9A825';
+    hypSummary += '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #eee;">' +
+      '<div style="font-size:18px;font-weight:700;color:#1B2A4A;width:40px;text-align:center;">' + norm[i] + '%</div>' +
+      '<div style="flex:1;">' +
+        '<div style="font-size:12px;font-weight:700;color:#1B2A4A;">' + pdfEsc(stripHtml(h.title)) + ' <span style="color:' + dirColor + ';">' + dirIcon + '</span></div>' +
+        '<div style="font-size:11px;color:#666;margin-top:2px;">' + pdfEsc(stripHtml(h.description).substring(0, 120)) + '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  return '<div style="font-family:Arial,Helvetica,sans-serif;color:#333;padding:24px;line-height:1.5;">' +
+    // Header
+    '<div style="border-bottom:3px solid #2E5090;padding-bottom:16px;margin-bottom:24px;">' +
+      '<div style="font-size:12px;color:#888;letter-spacing:2px;font-weight:700;">CONTINUUM INTELLIGENCE</div>' +
+      '<div style="font-size:11px;color:#2E5090;font-weight:700;margin-top:2px;">Investor Briefing</div>' +
+    '</div>' +
+    // Company
+    '<h1 style="font-size:26px;color:#1B2A4A;margin:0 0 4px 0;">' + pdfEsc(stock.company) + '</h1>' +
+    '<div style="font-size:13px;color:#888;margin-bottom:20px;">' + pdfEsc(stock.tickerFull || stock.ticker + '.AX') + ' &bull; Current price: ' + pdfEsc(stock.currency) + ' ' + stock.price + '</div>' +
+    // What the evidence says
+    '<div style="background:#F5F7FA;padding:16px;border-radius:8px;margin-bottom:24px;">' +
+      '<div style="font-size:13px;font-weight:700;color:#1B2A4A;margin-bottom:8px;">What the evidence says</div>' +
+      '<div style="font-size:13px;color:#555;line-height:1.6;">' + pdfEsc(verdictText) + '</div>' +
+    '</div>' +
+    // Evidence balance
+    '<div style="margin-bottom:24px;">' + hypSummary + '</div>' +
+    // What could go wrong
+    '<h2 style="font-size:15px;color:#1B2A4A;margin:20px 0 8px;">What could go wrong</h2>' +
+    '<ul style="font-size:13px;color:#555;line-height:1.8;padding-left:20px;">' + risks + '</ul>' +
+    // What could go right
+    '<h2 style="font-size:15px;color:#1B2A4A;margin:20px 0 8px;">What could go right</h2>' +
+    '<ul style="font-size:13px;color:#555;line-height:1.8;padding-left:20px;">' + upsides + '</ul>' +
+    // What we are watching
+    '<h2 style="font-size:15px;color:#1B2A4A;margin:20px 0 8px;">What we are watching</h2>' +
+    '<ul style="font-size:13px;color:#555;line-height:1.8;padding-left:20px;">' + watching + '</ul>' +
+    // How to read
+    '<div style="background:#FFF8E1;padding:12px;border-radius:6px;margin-top:24px;">' +
+      '<div style="font-size:11px;color:#666;">' +
+        '<strong>How to read this briefing:</strong> We do not predict share prices or tell you what to buy. ' +
+        'We systematically weigh evidence for and against four competing stories about each company, then tell you ' +
+        'which story the evidence best supports. What you do with that is your decision.' +
+      '</div>' +
+    '</div>' +
+    // Disclaimer
+    '<div style="margin-top:36px;padding-top:14px;border-top:1px solid #ddd;font-size:9px;color:#999;line-height:1.5;">' +
+      'This does not constitute personal financial advice. Readers should consult their own financial advisors before making investment decisions.' +
+      '<br><br>&copy; 2026 Continuum Intelligence &bull; Generated: ' + new Date().toLocaleString() +
+    '</div>' +
+  '</div>';
 }
 </script>
 
