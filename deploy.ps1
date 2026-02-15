@@ -19,7 +19,8 @@ if (Test-Path "$platformDir\scripts") {
 
 Write-Host "`n=== Committing and pushing to continuum-intelligence ===" -ForegroundColor Cyan
 Set-Location $websiteDir
-git add -A
+git add index.html
+if (Test-Path "$websiteDir\scripts") { git add scripts/ }
 $status = git status --porcelain
 if ($status) {
     git commit -m "Deploy from continuum-platform"
