@@ -2728,6 +2728,13 @@ a:hover { color: var(--accent-sage); }
    SNAPSHOT — Design System (adapted for site integration)
    ============================================================ */
 
+/* --- Snapshot Sort Bar --- */
+.snapshot-sort-bar { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-lg); flex-wrap: wrap; }
+.snapshot-sort-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-right: var(--space-xs); }
+.snapshot-sort-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); font-size: 0.72rem; font-family: var(--font-ui); padding: 5px 14px; border-radius: 3px; cursor: pointer; transition: all 0.15s; }
+.snapshot-sort-btn:hover { border-color: var(--accent-teal); color: var(--text-primary); }
+.snapshot-sort-btn.active { background: rgba(26,158,143,0.12); border-color: var(--accent-teal); color: var(--accent-teal); font-weight: 600; }
+
 /* --- Snapshot Grid (listing page) --- */
 .snapshot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--space-md); }
 .snapshot-card {
@@ -3738,6 +3745,13 @@ a:hover { color: var(--accent-sage); }
             <p class="hero-subtitle" style="text-align:left; margin:0; max-width: none;">Each snapshot condenses a full Continuum research report into a single landscape view: hypotheses, evidence matrix, discriminating data, and tripwires at a glance.</p>
         </div>
 
+        <div class="snapshot-sort-bar" id="snapshot-sort-bar">
+            <span class="snapshot-sort-label">Sort by</span>
+            <button class="snapshot-sort-btn active" data-sort="updated">Most recently updated</button>
+            <button class="snapshot-sort-btn" data-sort="alpha">Alphabetical</button>
+            <button class="snapshot-sort-btn" data-sort="skew">Risk skew severity</button>
+            <button class="snapshot-sort-btn" data-sort="narrative">Dominant narrative</button>
+        </div>
         <div class="snapshot-grid" id="snapshot-grid"></div>
     </div>
 
@@ -3751,19 +3765,7 @@ a:hover { color: var(--accent-sage); }
     </footer>
 </div>
 
-<!-- Snapshot Report Pages (dynamically rendered) -->
-<div class="page" id="page-snapshot-WOW"></div>
-<div class="page" id="page-snapshot-XRO"></div>
-<div class="page" id="page-snapshot-WTC"></div>
-<div class="page" id="page-snapshot-DRO"></div>
-<div class="page" id="page-snapshot-PME"></div>
-<div class="page" id="page-snapshot-GYG"></div>
-<div class="page" id="page-snapshot-CSL"></div>
-<div class="page" id="page-snapshot-MQG"></div>
-<div class="page" id="page-snapshot-GMG"></div>
-<div class="page" id="page-snapshot-WDS"></div>
-<div class="page" id="page-snapshot-SIG"></div>
-<div class="page" id="page-snapshot-FMG"></div>
+<!-- Snapshot & Report page containers are created dynamically from COVERAGE_UNIVERSE -->
 
 <!-- ============================================================
      PAGE: PORTFOLIO
@@ -4090,19 +4092,6 @@ a:hover { color: var(--accent-sage); }
     </footer>
 </div>
 
-<!-- Report Pages (dynamically rendered) -->
-<div class="page" id="page-report-WOW"></div>
-<div class="page" id="page-report-XRO"></div>
-<div class="page" id="page-report-WTC"></div>
-<div class="page" id="page-report-DRO"></div>
-<div class="page" id="page-report-PME"></div>
-<div class="page" id="page-report-GYG"></div>
-<div class="page" id="page-report-CSL"></div>
-<div class="page" id="page-report-MQG"></div>
-<div class="page" id="page-report-GMG"></div>
-<div class="page" id="page-report-WDS"></div>
-<div class="page" id="page-report-SIG"></div>
-<div class="page" id="page-report-FMG"></div>
 
 <!-- SheetJS for Excel parsing -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
@@ -6298,7 +6287,7 @@ SNAPSHOT_DATA.WOW = {
   ]
 };
 
-const SNAPSHOT_ORDER = ['WOW', 'XRO', 'WTC', 'DRO', 'PME', 'GYG', 'CSL', 'MQG', 'GMG', 'WDS', 'SIG', 'FMG'];
+const COVERAGE_UNIVERSE = ['WOW', 'XRO', 'WTC', 'DRO', 'PME', 'GYG', 'CSL', 'MQG', 'GMG', 'WDS', 'SIG', 'FMG'];
 
 // Auto-generate snapshot data from STOCK_DATA for any stock without a manual snapshot
 function buildSnapshotFromStock(ticker) {
@@ -6564,10 +6553,10 @@ function buildSnapshotFromStock(ticker) {
   };
 }
 
-// Auto-populate SNAPSHOT_DATA for all stocks in SNAPSHOT_ORDER
+// Auto-populate SNAPSHOT_DATA for all stocks in COVERAGE_UNIVERSE
 (function() {
-  for (var i = 0; i < SNAPSHOT_ORDER.length; i++) {
-    var t = SNAPSHOT_ORDER[i];
+  for (var i = 0; i < COVERAGE_UNIVERSE.length; i++) {
+    var t = COVERAGE_UNIVERSE[i];
     if (!SNAPSHOT_DATA[t] && STOCK_DATA[t]) {
       SNAPSHOT_DATA[t] = buildSnapshotFromStock(t);
     }
@@ -13167,19 +13156,23 @@ function route() {
     const pages = document.querySelectorAll('.page');
     pages.forEach(p => p.classList.remove('active'));
 
-    // Lazy render report pages on first visit
+    // Lazy render report pages on first visit (containers created dynamically)
     if (hash.startsWith('report-')) {
         const ticker = hash.replace('report-', '');
         if (!renderedPages.has(ticker) && STOCK_DATA[ticker]) {
-            const container = document.getElementById('page-' + hash);
-            if (container) {
-                container.innerHTML = renderReportPage(STOCK_DATA[ticker]);
-                renderedPages.add(ticker);
-                setupScrollSpy('page-' + hash);
-                // Initialize inline chat widget
-                if (typeof window.initInlineChat === 'function') {
-                    window.initInlineChat(ticker);
-                }
+            let container = document.getElementById('page-' + hash);
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'page';
+                container.id = 'page-' + hash;
+                document.body.appendChild(container);
+            }
+            container.innerHTML = renderReportPage(STOCK_DATA[ticker]);
+            renderedPages.add(ticker);
+            setupScrollSpy('page-' + hash);
+            // Initialize inline chat widget
+            if (typeof window.initInlineChat === 'function') {
+                window.initInlineChat(ticker);
             }
         }
         // Apply narrative analysis (alerts, ST/LT weights, market-responsive narrative)
@@ -13192,15 +13185,19 @@ function route() {
         }
     }
 
-    // Lazy render snapshot pages on first visit
+    // Lazy render snapshot pages on first visit (containers created dynamically)
     if (hash.startsWith('snapshot-')) {
         const ticker = hash.replace('snapshot-', '');
         if (!renderedSnapshots.has(ticker) && SNAPSHOT_DATA[ticker]) {
-            const container = document.getElementById('page-' + hash);
-            if (container) {
-                container.innerHTML = renderSnapshotPage(SNAPSHOT_DATA[ticker]);
-                renderedSnapshots.add(ticker);
+            let container = document.getElementById('page-' + hash);
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'page';
+                container.id = 'page-' + hash;
+                document.body.appendChild(container);
             }
+            container.innerHTML = renderSnapshotPage(SNAPSHOT_DATA[ticker]);
+            renderedSnapshots.add(ticker);
         }
     }
 
@@ -13334,6 +13331,43 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// Snapshot grid renderer with sort support
+const SKEW_SEVERITY = { 'downside': 3, 'mixed-downside': 2, 'balanced': 1, 'mixed-upside': 0, 'upside': 0 };
+
+function renderSnapshotGrid(sortKey) {
+    const grid = document.getElementById('snapshot-grid');
+    if (!grid) return;
+    // Build sortable array from COVERAGE_UNIVERSE
+    var items = [];
+    for (var i = 0; i < COVERAGE_UNIVERSE.length; i++) {
+        var t = COVERAGE_UNIVERSE[i];
+        if (SNAPSHOT_DATA[t]) items.push({ ticker: t, data: SNAPSHOT_DATA[t], stock: STOCK_DATA[t] });
+    }
+    // Sort
+    if (sortKey === 'alpha') {
+        items.sort(function(a, b) { return a.data.company.localeCompare(b.data.company); });
+    } else if (sortKey === 'skew') {
+        items.sort(function(a, b) {
+            var sa = SKEW_SEVERITY[a.data.riskSkew.direction] || 0;
+            var sb = SKEW_SEVERITY[b.data.riskSkew.direction] || 0;
+            return sb - sa; // most severe first
+        });
+    } else if (sortKey === 'narrative') {
+        // Group by sector, then alphabetical within sector
+        items.sort(function(a, b) {
+            var sa = a.data.sector || '';
+            var sb = b.data.sector || '';
+            if (sa !== sb) return sa.localeCompare(sb);
+            return a.data.company.localeCompare(b.data.company);
+        });
+    }
+    // 'updated' keeps COVERAGE_UNIVERSE order (most recently updated first)
+    grid.innerHTML = '';
+    for (var j = 0; j < items.length; j++) {
+        grid.innerHTML += renderSnapshotListCard(items[j].data);
+    }
+}
+
 // Initialize home page content and portfolio
 window.addEventListener('DOMContentLoaded', () => {
     // Populate featured cards
@@ -13370,13 +13404,18 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Populate snapshot grid
-    const snapshotGrid = document.getElementById('snapshot-grid');
-    if (snapshotGrid) {
-        SNAPSHOT_ORDER.forEach(ticker => {
-            if (SNAPSHOT_DATA[ticker]) {
-                snapshotGrid.innerHTML += renderSnapshotListCard(SNAPSHOT_DATA[ticker]);
-            }
+    // Populate snapshot grid with sort support
+    renderSnapshotGrid('updated');
+
+    // Snapshot sort button handlers
+    const sortBar = document.getElementById('snapshot-sort-bar');
+    if (sortBar) {
+        sortBar.addEventListener('click', function(e) {
+            const btn = e.target.closest('.snapshot-sort-btn');
+            if (!btn) return;
+            sortBar.querySelectorAll('.snapshot-sort-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderSnapshotGrid(btn.dataset.sort);
         });
     }
 
