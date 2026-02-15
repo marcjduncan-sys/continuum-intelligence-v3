@@ -1811,15 +1811,16 @@ a:hover { color: var(--accent-sage); }
    PDF REPORT DOWNLOAD
    ============================================================ */
 .report-download-section {
-    max-width: var(--max-width);
-    margin: var(--space-xl) auto var(--space-lg);
-    padding: 0 var(--space-lg);
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: var(--space-xl) 0;
+    margin-top: var(--space-xl);
 }
 .report-download-inner {
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: var(--space-xl) var(--space-lg);
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
     text-align: center;
 }
 .report-download-title {
@@ -1888,19 +1889,17 @@ a:hover { color: var(--accent-sage); }
    NARRATIVE DISLOCATION ALERT
    ============================================================ */
 .narrative-alert-banner {
-    max-width: var(--max-width);
-    margin: var(--space-md) auto;
-    padding: 0 var(--space-lg);
+    background: rgba(212, 85, 85, 0.06);
+    border-bottom: 1px solid rgba(212, 85, 85, 0.2);
+    padding: var(--space-md) 0;
 }
 .narrative-alert-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
     display: flex;
     align-items: center;
     gap: var(--space-md);
-    padding: 12px var(--space-lg);
-    background: rgba(212, 85, 85, 0.08);
-    border: 1px solid rgba(212, 85, 85, 0.25);
-    border-left: 3px solid var(--signal-red);
-    border-radius: 6px;
 }
 .narrative-alert-icon {
     font-size: 1.1rem;
@@ -14408,6 +14407,11 @@ function generatePDFReport(ticker, type) {
 
   // Clone the page content for PDF generation (don't modify the live DOM)
   var clone = page.cloneNode(true);
+
+  // Force clone visible — pages use display:none when not active
+  clone.style.display = 'block';
+  clone.style.padding = '0';
+  clone.style.minHeight = 'auto';
 
   // Remove the download buttons and interactive elements from clone
   var downloadSections = clone.querySelectorAll('.report-download-section, .narrative-alert-banner');
