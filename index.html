@@ -14872,14 +14872,11 @@ function tcAnalyze() {
 })();
 </script>
 
-<!-- html2pdf.js for client-side PDF generation -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
 <script>
 // ============================================================
-// PDF REPORT GENERATOR — COMPLETE REWRITE
+// PDF REPORT GENERATOR — window.open + window.print
 // Reads directly from STOCK_DATA[ticker]. ALL inline styles.
-// html2pdf with window.print() fallback.
+// NO html2pdf — uses browser print-to-PDF (guaranteed content).
 // ============================================================
 
 function pdfEsc(str) {
@@ -14916,59 +14913,21 @@ function generatePDFReport(ticker, type) {
     return;
   }
 
-  console.log('PDF: Using STOCK_DATA for', ticker, '- company:', stock.company);
+  console.log('[PDF] Using STOCK_DATA for', ticker, '- company:', stock.company);
 
-  var html = type === 'institutional' ? buildInstitutionalHTML(stock) : buildRetailHTML(stock);
-  var now = new Date();
-  var dateStr = now.getFullYear() + '-' + ('0' + (now.getMonth()+1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
-  var filename = ticker + '-' + (type === 'institutional' ? 'institutional-report' : 'investor-briefing') + '-' + dateStr.replace(/-/g,'') + '.pdf';
+  var reportHTML = type === 'institutional' ? buildInstitutionalHTML(stock) : buildRetailHTML(stock);
 
-  var wrapper = document.createElement('div');
-  wrapper.style.cssText = 'position:absolute;left:-9999px;top:0;width:210mm;overflow:visible;background:#ffffff;';
-  wrapper.innerHTML = html;
-  document.body.appendChild(wrapper);
-
-  // Try html2pdf first, fall back to window.print()
-  if (typeof html2pdf !== 'undefined') {
-    var opt = {
-      margin: [15, 18, 15, 18],
-      filename: filename,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(wrapper).save().then(function() {
-      if (wrapper.parentNode) document.body.removeChild(wrapper);
-      if (btn) btn.classList.remove('generating');
-    }).catch(function(err) {
-      console.error('html2pdf failed, using print fallback:', err);
-      if (wrapper.parentNode) document.body.removeChild(wrapper);
-      if (btn) btn.classList.remove('generating');
-      // FALLBACK: open in new window and trigger print dialog
-      pdfPrintFallback(html, stock, type);
-    });
-  } else {
-    // No html2pdf library — go straight to print fallback
-    if (wrapper.parentNode) document.body.removeChild(wrapper);
-    if (btn) btn.classList.remove('generating');
-    pdfPrintFallback(html, stock, type);
-  }
-}
-
-function pdfPrintFallback(html, stock, type) {
+  // Open in new window and trigger print dialog
   var win = window.open('', '_blank');
-  if (win) {
-    win.document.write(
-      '<html><head><title>' + pdfEsc(stock.ticker + ' - ' + type + ' report') + '</title>' +
-      '<style>@media print { body { margin: 0; } }</style></head>' +
-      '<body>' + html + '</body></html>'
-    );
-    win.document.close();
-    setTimeout(function() { win.print(); }, 500);
-  } else {
-    alert('Pop-up blocked. Please allow pop-ups and try again.');
+  if (!win) {
+    alert('Pop-up blocked. Please allow pop-ups for this site.');
+    if (btn) btn.classList.remove('generating');
+    return;
   }
+  win.document.write(reportHTML);
+  win.document.close();
+  if (btn) btn.classList.remove('generating');
+  setTimeout(function() { win.print(); }, 800);
 }
 
 function buildInstitutionalHTML(stock) {
@@ -15071,7 +15030,9 @@ function buildInstitutionalHTML(stock) {
     metricsHtml = '<table style="width:100%;border-collapse:collapse;margin-bottom:24px;"><tr style="background:#F2F2F2;">' + metricsHtml + '</tr></table>';
   }
 
-  return '<div style="font-family:Arial,Helvetica,sans-serif;color:#333;padding:24px;line-height:1.5;">' +
+  return '<!DOCTYPE html><html><head><title>' + pdfEsc(stock.ticker) + ' Institutional Report — Continuum Intelligence</title>' +
+    '<style>body{font-family:Arial,Helvetica,sans-serif;color:#333;line-height:1.5;max-width:780px;margin:0 auto;padding:40px;}' +
+    '@media print{body{margin:0;padding:20px;}@page{margin:15mm 18mm;}}</style></head><body>' +
     // Header
     '<div style="border-bottom:3px solid #1B2A4A;padding-bottom:16px;margin-bottom:24px;">' +
       '<div style="font-size:11px;letter-spacing:3px;color:#1B2A4A;font-weight:bold;">CONTINUUM INTELLIGENCE</div>' +
@@ -15135,7 +15096,7 @@ function buildInstitutionalHTML(stock) {
       'Investors should conduct their own research and consult a licensed financial adviser before making investment decisions.' +
       '<br><br>&copy; 2026 Continuum Intelligence &bull; Report generated: ' + new Date().toLocaleString() +
     '</div>' +
-  '</div>';
+  '</body></html>';
 }
 
 function buildRetailHTML(stock) {
@@ -15189,7 +15150,10 @@ function buildRetailHTML(stock) {
     }
   }
 
-  return '<div style="font-family:Arial,Helvetica,sans-serif;color:#333;padding:24px;line-height:1.5;">' +
+  return '<!DOCTYPE html><html><head><title>' + pdfEsc(stock.ticker) + ' Investor Briefing — Continuum Intelligence</title>' +
+    '<style>body{font-family:Arial,Helvetica,sans-serif;color:#333;line-height:1.7;max-width:750px;margin:0 auto;padding:40px;font-size:13px;}' +
+    'h2{font-size:16px;color:#1B2A4A;margin-top:28px;}' +
+    '@media print{body{margin:0;padding:20px;}@page{margin:15mm 20mm;}}</style></head><body>' +
     // Header
     '<div style="border-bottom:3px solid #2E5090;padding-bottom:16px;margin-bottom:24px;">' +
       '<div style="font-size:11px;letter-spacing:3px;color:#1B2A4A;font-weight:bold;">CONTINUUM INTELLIGENCE</div>' +
@@ -15229,7 +15193,7 @@ function buildRetailHTML(stock) {
       'This does not constitute personal financial advice. Readers should consult their own financial advisors before making investment decisions.' +
       '<br><br>&copy; 2026 Continuum Intelligence &bull; Generated: ' + new Date().toLocaleString() +
     '</div>' +
-  '</div>';
+  '</body></html>';
 }
 </script>
 

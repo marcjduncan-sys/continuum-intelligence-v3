@@ -127,8 +127,75 @@
 
 </div>
 
-<!-- html2pdf.js for client-side PDF generation -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<!-- generateReport for stock.html — window.print approach -->
+<script>
+function generateReport(type) {
+  // stock.html uses DNE engine which stores data differently
+  // Scrape what's visible on the page
+  var ticker = document.getElementById('stock-ticker') ? document.getElementById('stock-ticker').textContent.trim() : 'STOCK';
+  var company = document.getElementById('stock-company') ? document.getElementById('stock-company').textContent.trim() : ticker;
+  var price = document.getElementById('stock-price') ? document.getElementById('stock-price').textContent.trim() : '';
+
+  // Scrape hypothesis data from narrative bar
+  var hypotheses = {};
+  document.querySelectorAll('.narrative-segment').forEach(function(seg) {
+    var label = seg.querySelector('.segment-label');
+    var score = seg.querySelector('.segment-score');
+    if (label && score) {
+      var tid = (seg.dataset.hypothesis || '').trim();
+      if (tid) {
+        hypotheses[tid] = {
+          label: label.textContent.replace(tid + ':', '').replace(tid + ' ', '').trim(),
+          score: score.textContent.trim()
+        };
+      }
+    }
+  });
+
+  // Build report HTML
+  var dateStr = new Date().toLocaleDateString('en-AU', {day:'numeric', month:'long', year:'numeric'});
+  var hypoHTML = '';
+  var colours = { T1: '#00C853', T2: '#2979FF', T3: '#FF9100', T4: '#D50000' };
+  ['T1','T2','T3','T4'].forEach(function(id) {
+    var h = hypotheses[id];
+    if (!h) return;
+    var pct = h.score || '—';
+    hypoHTML += '<div style="margin:12px 0;padding:14px;background:#FAFAFA;border-left:4px solid ' + colours[id] + ';border-radius:0 4px 4px 0;">' +
+      '<div style="font-size:14px;font-weight:bold;color:#1B2A4A;">' + id + ': ' + h.label +
+      '<span style="float:right;font-size:20px;color:' + colours[id] + ';">' + pct + '</span></div></div>';
+  });
+  if (!hypoHTML) hypoHTML = '<p style="color:#999;">Hypothesis data not available.</p>';
+
+  var dominant = document.getElementById('dominant-hypothesis') ? document.getElementById('dominant-hypothesis').textContent.trim() : '';
+  var dominantDesc = document.getElementById('dominant-description') ? document.getElementById('dominant-description').textContent.trim() : '';
+
+  var reportHTML = '<!DOCTYPE html><html><head><title>' + ticker + ' ' + (type === 'institutional' ? 'Institutional Report' : 'Investor Briefing') + '</title>' +
+    '<style>body{font-family:Arial,Helvetica,sans-serif;color:#333;line-height:1.5;max-width:780px;margin:0 auto;padding:40px;}' +
+    '@media print{body{margin:0;padding:20px;}@page{margin:15mm 18mm;}}</style></head><body>' +
+    '<div style="font-size:11px;letter-spacing:3px;color:#1B2A4A;font-weight:bold;">CONTINUUM INTELLIGENCE</div>' +
+    '<div style="font-size:9px;color:#888;margin-bottom:16px;">Independent Cross-Domain Equity Research</div>' +
+    '<div style="border-top:3px solid #1B2A4A;margin-bottom:30px;"></div>' +
+    '<h1 style="font-size:28px;color:#1B2A4A;margin:0 0 4px;">' + company + '</h1>' +
+    '<div style="font-size:14px;color:#666;margin-bottom:6px;">' + ticker + ' &bull; ' + price + '</div>' +
+    '<div style="font-size:12px;color:#999;margin-bottom:24px;">' + dateStr + '</div>' +
+    (dominant ? '<div style="background:#F0F7FF;padding:16px;border-radius:8px;margin-bottom:24px;">' +
+      '<div style="font-size:10px;font-weight:bold;color:#1B2A4A;margin-bottom:6px;">Dominant Narrative</div>' +
+      '<div style="font-size:15px;font-weight:bold;color:#1B2A4A;margin-bottom:4px;">' + dominant + '</div>' +
+      '<div style="font-size:12px;color:#555;">' + dominantDesc + '</div></div>' : '') +
+    '<h2 style="font-size:16px;color:#2E5090;border-bottom:2px solid #2E5090;padding-bottom:6px;">Competing Hypotheses</h2>' +
+    hypoHTML +
+    '<div style="margin-top:60px;border-top:1px solid #ddd;padding-top:12px;font-size:8px;color:#999;line-height:1.6;">' +
+    'This does not constitute personal financial advice. All analysis uses publicly available information and the ACH methodology.' +
+    '<br><br>&copy; 2026 Continuum Intelligence</div>' +
+    '</body></html>';
+
+  var win = window.open('', '_blank');
+  if (!win) { alert('Pop-up blocked. Please allow pop-ups for this site.'); return; }
+  win.document.write(reportHTML);
+  win.document.close();
+  setTimeout(function() { win.print(); }, 800);
+}
+</script>
 
 <!-- DNE Scripts (load in dependency order) -->
 <script src="js/dne/evidence.js"></script>
