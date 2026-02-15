@@ -18,91 +18,77 @@
 // ─── CSS STYLES ──────────────────────────────────────────────────────────────
 
 const NFI_STYLES = `
-/* Narrative Framework v3.0 Styles — Institutional Dislocation Banner */
+/* Narrative Framework v3.0 — Dislocation Indicator (matches Risk Skew bar) */
 .nfi-alert-banner {
-  padding: var(--space-sm, 8px) 0;
+  padding: var(--space-md, 12px) 0;
   font-family: var(--font-ui, system-ui, -apple-system, sans-serif);
-  line-height: 1.5;
-  position: relative;
   border-bottom: 1px solid var(--border, #1E3050);
 }
 .nfi-alert-inner {
   max-width: var(--max-width, 1120px);
   margin: 0 auto;
-  padding: var(--space-xs, 4px) var(--space-lg, 24px);
+  padding: 0 var(--space-lg, 24px);
 }
 .nfi-alert-row {
   display: flex;
   align-items: center;
-  gap: var(--space-sm, 8px);
-  flex-wrap: wrap;
+  gap: var(--space-md, 12px);
 }
 .nfi-alert-label {
   font-size: 0.55rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: var(--text-muted, #6B7A8D);
   white-space: nowrap;
 }
 .nfi-alert-severity {
   font-family: var(--font-data, monospace);
   font-size: 0.7rem;
   font-weight: 700;
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: 3px;
   white-space: nowrap;
-  border: 1px solid;
   letter-spacing: 0.04em;
 }
 .nfi-alert-metrics {
-  font-size: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary, #9CA3AF);
   white-space: nowrap;
-}
-.nfi-alert-detail {
-  font-size: 0.78rem;
-  line-height: 1.4;
-  margin-top: 4px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  flex: 1;
 }
 .nfi-alert-dismiss {
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   cursor: pointer;
   background: none;
   border: none;
-  text-decoration: underline;
-  white-space: nowrap;
-  font-family: var(--font-ui, system-ui, sans-serif);
-  padding: 0;
+  color: var(--text-muted, #6B7A8D);
+  padding: 0 4px;
   margin-left: auto;
+  line-height: 1;
+  opacity: 0.5;
 }
-.nfi-alert-dismiss:hover { opacity: 0.8; }
+.nfi-alert-dismiss:hover { opacity: 1; }
 
-/* Direction-based colour states */
-.nfi-alert-negative { background: #C62828; }
-.nfi-alert-negative .nfi-alert-label { color: #FFD600; }
-.nfi-alert-negative .nfi-alert-severity { color: #FFD600; border-color: rgba(255,214,0,0.3); }
-.nfi-alert-negative .nfi-alert-metrics { color: rgba(255,255,255,0.85); }
-.nfi-alert-negative .nfi-alert-detail { color: rgba(255,255,255,0.9); }
-.nfi-alert-negative .nfi-alert-dismiss { color: rgba(255,255,255,0.5); }
-
-.nfi-alert-positive { background: #2E7D32; }
-.nfi-alert-positive .nfi-alert-label,
-.nfi-alert-positive .nfi-alert-severity { color: #ffffff; }
-.nfi-alert-positive .nfi-alert-severity { border-color: rgba(255,255,255,0.3); }
-.nfi-alert-positive .nfi-alert-metrics { color: rgba(255,255,255,0.85); }
-.nfi-alert-positive .nfi-alert-detail { color: rgba(255,255,255,0.9); }
-.nfi-alert-positive .nfi-alert-dismiss { color: rgba(255,255,255,0.5); }
-
-.nfi-alert-neutral { background: #F9A825; }
-.nfi-alert-neutral .nfi-alert-label,
-.nfi-alert-neutral .nfi-alert-severity { color: #263238; }
-.nfi-alert-neutral .nfi-alert-severity { border-color: rgba(38,50,56,0.2); }
-.nfi-alert-neutral .nfi-alert-metrics { color: rgba(38,50,56,0.75); }
-.nfi-alert-neutral .nfi-alert-detail { color: #263238; }
-.nfi-alert-neutral .nfi-alert-dismiss { color: rgba(38,50,56,0.4); }
+/* Severity badge colours — mirrors .skew-badge styling */
+.nfi-alert-negative { background: var(--bg-surface, #111827); }
+.nfi-alert-negative .nfi-alert-severity {
+  background: rgba(212, 85, 85, 0.12);
+  color: var(--signal-red, #D45555);
+  border: 1px solid rgba(212, 85, 85, 0.25);
+}
+.nfi-alert-positive { background: var(--bg-surface, #111827); }
+.nfi-alert-positive .nfi-alert-severity {
+  background: rgba(61, 170, 109, 0.12);
+  color: var(--signal-green, #3DAA6D);
+  border: 1px solid rgba(61, 170, 109, 0.25);
+}
+.nfi-alert-neutral { background: var(--bg-surface, #111827); }
+.nfi-alert-neutral .nfi-alert-severity {
+  background: rgba(212, 160, 60, 0.12);
+  color: var(--signal-amber, #D4A03C);
+  border: 1px solid rgba(212, 160, 60, 0.25);
+}
 
 /* ─── Market-Responsive Narrative Section ─── */
 .nfi-market-narrative {
@@ -239,9 +225,7 @@ function injectStyles() {
 // ─── ALERT BANNER RENDERING ──────────────────────────────────────────────────
 
 function createAlertBanner(analysis) {
-  var ticker = analysis.ticker;
   var dislocation = analysis.dislocation;
-  var shift = analysis.narrativeShift;
   var severity = dislocation.severity;
   var metrics = dislocation.metrics;
 
@@ -251,17 +235,9 @@ function createAlertBanner(analysis) {
   var direction = metrics.todayReturn < 0 ? 'negative' :
                   metrics.todayReturn > 0 ? 'positive' : 'neutral';
 
-  // Severity label: Critical / Moderate / Minor
+  // Severity label
   var severityLabel = severity === 'CRITICAL' ? 'Critical' :
                       severity === 'HIGH' ? 'Moderate' : 'Minor';
-
-  // Compact analysis text (truncate to 2 lines worth)
-  var detailHtml = '';
-  if (shift && shift.hasShift && shift.shortTermView) {
-    var text = shift.shortTermView;
-    if (text.length > 160) text = text.substring(0, 157) + '\u2026';
-    detailHtml = '<div class="nfi-alert-detail">' + text + '</div>';
-  }
 
   var banner = document.createElement('div');
   banner.className = 'nfi-alert-banner nfi-alert-' + direction;
@@ -273,13 +249,12 @@ function createAlertBanner(analysis) {
         '<span class="nfi-alert-severity">' + severityLabel + '</span>' +
         '<span class="nfi-alert-metrics">' +
           'A$' + metrics.currentPrice.toFixed(2) +
-          ' \u2502 ' + (metrics.todayReturn >= 0 ? '+' : '') + metrics.todayReturn.toFixed(1) + '%' +
-          ' \u2502 Peak: ' + metrics.drawdownFromPeak.toFixed(1) + '%' +
+          ' \u2502 ' + (metrics.todayReturn >= 0 ? '+' : '') + metrics.todayReturn.toFixed(1) + '% today' +
+          ' \u2502 ' + metrics.drawdownFromPeak.toFixed(1) + '% from peak' +
           ' \u2502 Z: ' + metrics.zScore.toFixed(1) +
         '</span>' +
-        '<button class="nfi-alert-dismiss" onclick="this.closest(\'.nfi-alert-banner\').remove()">dismiss</button>' +
+        '<button class="nfi-alert-dismiss" onclick="this.closest(\'.nfi-alert-banner\').remove()">&times;</button>' +
       '</div>' +
-      detailHtml +
     '</div>';
 
   return banner;
@@ -446,18 +421,22 @@ function applyNarrativeAnalysis(ticker) {
   var reportPage = document.getElementById('page-report-' + ticker);
   if (!reportPage || !reportPage.innerHTML) return;
 
-  // 1. Insert alert banner at top of report page
+  // 1. Insert dislocation indicator just before the Risk Skew bar (sibling element)
   var banner = createAlertBanner(analysis);
   if (banner) {
     var existingBanner = reportPage.querySelector('.nfi-alert-banner');
     if (existingBanner) existingBanner.remove();
 
-    // Insert after the hero section (first child) for better visibility
-    var heroSection = reportPage.querySelector('.report-hero') || reportPage.firstChild;
-    if (heroSection && heroSection.nextSibling) {
-      reportPage.insertBefore(banner, heroSection.nextSibling);
+    var skewBar = reportPage.querySelector('.risk-skew-bar');
+    if (skewBar) {
+      skewBar.parentNode.insertBefore(banner, skewBar);
     } else {
-      reportPage.prepend(banner);
+      var heroSection = reportPage.querySelector('.report-hero') || reportPage.firstChild;
+      if (heroSection && heroSection.nextSibling) {
+        reportPage.insertBefore(banner, heroSection.nextSibling);
+      } else {
+        reportPage.prepend(banner);
+      }
     }
   }
 
