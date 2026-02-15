@@ -6,7 +6,6 @@
   <title>Stock Analysis — Continuum Intelligence</title>
   <link rel="stylesheet" href="css/narrative.css">
   <style>
-    /* Minimal page chrome for the stock template — replace with site-wide styles */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
@@ -17,6 +16,7 @@
     .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
     h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
     .stock-meta { color: #78909C; font-size: 14px; margin-bottom: 24px; }
+    .stock-meta-sector { color: #90A4AE; }
     .stock-price { font-size: 36px; font-weight: 700; }
     .section-title { font-size: 18px; font-weight: 700; margin: 32px 0 12px; color: #37474F; }
 
@@ -40,38 +40,39 @@
 
   <!-- Stock Header -->
   <header>
-    <h1 id="stock-company">Loading…</h1>
+    <h1 id="stock-company">Loading&hellip;</h1>
     <div class="stock-meta">
       <span id="stock-ticker"></span> &middot;
       <span id="stock-exchange">ASX</span>
+      <span class="stock-meta-sector" id="stock-sector"></span>
     </div>
     <div class="confidence-halo" id="confidence-halo">
-      <span class="stock-price" id="stock-price">—</span>
+      <span class="stock-price" id="stock-price">&mdash;</span>
     </div>
   </header>
 
-  <!-- Narrative Survival Bar -->
+  <!-- Narrative Survival + RiskSkew Section -->
   <div class="section-title">Narrative Survival</div>
   <div class="narrative-bar" id="narrative-bar">
     <div class="narrative-segment t1" style="width: 25%" data-hypothesis="T1">
       <span class="segment-label">T1: Growth</span>
-      <span class="segment-score">—</span>
+      <span class="segment-score">&mdash;</span>
     </div>
     <div class="narrative-segment t2" style="width: 25%" data-hypothesis="T2">
       <span class="segment-label">T2: Base</span>
-      <span class="segment-score">—</span>
+      <span class="segment-score">&mdash;</span>
     </div>
     <div class="narrative-segment t3" style="width: 25%" data-hypothesis="T3">
       <span class="segment-label">T3: Risk</span>
-      <span class="segment-score">—</span>
+      <span class="segment-score">&mdash;</span>
     </div>
     <div class="narrative-segment t4" style="width: 25%" data-hypothesis="T4">
       <span class="segment-label">T4: Disruption</span>
-      <span class="segment-score">—</span>
+      <span class="segment-score">&mdash;</span>
     </div>
   </div>
 
-  <!-- Critical Dislocation Indicator (Work Stream 1: Institutional redesign) -->
+  <!-- Dislocation Indicator (integrated within RiskSkew section) -->
   <div class="dislocation-indicator" id="dislocation-indicator">
     <span class="dislocation-label">RISK SKEW</span>
     <span class="dislocation-detail"></span>
@@ -80,7 +81,7 @@
   <!-- Alert Banner (hidden by default) -->
   <div class="narrative-alert" id="narrative-alert">
     <span class="alert-icon">!</span>
-    <span class="alert-text">Narrative under pressure — <span id="alert-detail"></span></span>
+    <span class="alert-text">Narrative under pressure &mdash; <span id="alert-detail"></span></span>
   </div>
 
   <!-- Editorial Override Banner (hidden by default) -->
@@ -89,27 +90,45 @@
     <span>
       <span class="override-label">Editorial override active:</span>
       <span id="override-reason"></span>
-      <span style="color:#64B5F6"> — expires <span id="override-until"></span></span>
+      <span style="color:#64B5F6"> &mdash; expires <span id="override-until"></span></span>
     </span>
   </div>
 
   <!-- Dominant Narrative Card -->
   <div class="dominant-card" id="dominant-card">
     <div class="dominant-label">Dominant Narrative</div>
-    <div class="dominant-hypothesis" id="dominant-hypothesis">—</div>
+    <div class="dominant-hypothesis" id="dominant-hypothesis">&mdash;</div>
     <div class="dominant-description" id="dominant-description"></div>
     <div class="dominant-score" id="dominant-score"></div>
   </div>
 
-  <!-- Competing Hypotheses (Work Stream 2: Clarity with explanatory frames) -->
+  <!-- Competing Hypotheses -->
   <div class="section-title">Competing Hypotheses</div>
   <div class="hypotheses-panel" id="hypotheses-panel"></div>
+
+  <!-- PDF Report Download -->
+  <div class="report-download-section">
+    <div class="report-download-title">Download Research Report</div>
+    <div class="report-buttons">
+      <button class="btn-download institutional" onclick="generateReport('institutional')">
+        <span class="btn-download-label">Institutional Report <span class="btn-spinner"></span></span>
+        <span class="btn-download-subtitle">Full ACH analysis with evidence matrix</span>
+      </button>
+      <button class="btn-download retail" onclick="generateReport('retail')">
+        <span class="btn-download-label">Investor Briefing <span class="btn-spinner"></span></span>
+        <span class="btn-download-subtitle">Plain English evidence summary</span>
+      </button>
+    </div>
+  </div>
 
   <!-- Narrative History -->
   <div class="section-title">Narrative History</div>
   <div id="narrative-history"></div>
 
 </div>
+
+<!-- html2pdf.js for client-side PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <!-- DNE Scripts (load in dependency order) -->
 <script src="js/dne/evidence.js"></script>
@@ -125,7 +144,7 @@
   var _origUpdate = window.updateNarrativeUI;
 
   window.updateNarrativeUI = function (stock) {
-    // Run core UI update (bar, alert, halo)
+    // Run core UI update (bar, alert, halo, dislocation, hypotheses)
     if (_origUpdate) _origUpdate(stock);
 
     // Stock header
@@ -140,17 +159,23 @@
       priceEl.textContent = '$' + Number(stock.current_price).toFixed(2);
     }
 
+    // Sector display
+    var sectorEl = document.getElementById('stock-sector');
+    if (sectorEl && stock.sector) {
+      sectorEl.textContent = ' \u00B7 ' + stock.sector;
+    }
+
     // Dominant card
     var dom = stock.hypotheses[stock.dominant];
     var hypEl = document.getElementById('dominant-hypothesis');
     if (hypEl) hypEl.textContent = stock.dominant + ': ' + dom.label;
 
     var descEl = document.getElementById('dominant-description');
-    if (descEl) descEl.textContent = dom.description;
+    if (descEl) descEl.textContent = dom.plain_english || dom.description;
 
     var scoreEl = document.getElementById('dominant-score');
     if (scoreEl) {
-      scoreEl.textContent = 'Survival: ' + Math.round(dom.survival_score * 100) + '% • ' +
+      scoreEl.textContent = 'Evidence Support: ' + Math.round(dom.survival_score * 100) + '% \u2022 ' +
         'Confidence: ' + dom.status;
     }
   };
@@ -159,8 +184,6 @@
 
 <!-- Set the ticker and boot DNE -->
 <script>
-  // Set this to the stock you want to display.
-  // In production, derive from URL params or route (e.g. ?ticker=WOW.AX)
   var params = new URLSearchParams(window.location.search);
   window.DNE_TICKER = params.get('ticker') || 'WOW.AX';
 </script>
