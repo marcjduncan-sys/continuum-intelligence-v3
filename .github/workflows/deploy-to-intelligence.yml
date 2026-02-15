@@ -1,18 +1,21 @@
 name: Deploy to continuum-intelligence
 
+# MANUAL ONLY — no automatic triggers.
+# continuum-intelligence is the primary repo; this workflow is a safety net
+# for syncing shared files when explicitly needed. It will NEVER delete files
+# that exist only in continuum-intelligence.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'index.html'
-      - 'scripts/**'
-      - 'data/**'
-
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type DEPLOY to confirm (additive sync, no deletions)'
+        required: true
+        default: ''
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: github.event.inputs.confirm == 'DEPLOY'
     steps:
       - name: Checkout continuum-platform
         uses: actions/checkout@v4
@@ -26,22 +29,34 @@ jobs:
           token: ${{ secrets.DEPLOY_TOKEN }}
           path: intelligence
 
-      - name: Sync files
+      - name: Sync files (additive only — no deletions)
         run: |
-          # Copy index.html
-          cp platform/index.html intelligence/index.html
+          # Copy index.html only if it exists in platform
+          if [ -f "platform/index.html" ]; then
+            cp platform/index.html intelligence/index.html
+            echo "✓ Synced index.html"
+          fi
 
-          # Sync scripts directory
+          # Sync scripts directory (additive: new/updated files only, no --delete)
           if [ -d "platform/scripts" ]; then
             mkdir -p intelligence/scripts
-            rsync -av --delete platform/scripts/ intelligence/scripts/
+            rsync -av platform/scripts/ intelligence/scripts/
+            echo "✓ Synced scripts/ (additive)"
           fi
 
-          # Sync data directory
+          # Sync data directory (additive: new/updated files only, no --delete)
           if [ -d "platform/data" ]; then
             mkdir -p intelligence/data
-            rsync -av --delete platform/data/ intelligence/data/
+            rsync -av platform/data/ intelligence/data/
+            echo "✓ Synced data/ (additive)"
           fi
+
+      - name: Show diff summary
+        working-directory: intelligence
+        run: |
+          git diff --stat
+          echo ""
+          git status --short
 
       - name: Commit and push
         working-directory: intelligence
@@ -53,7 +68,9 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to deploy"
           else
-            git commit -m "Auto-deploy from continuum-platform $(date -u '+%Y-%m-%d %H:%M UTC')"
+            echo "Changes to deploy:"
+            git diff --cached --stat
+            git commit -m "Manual sync from continuum-platform $(date -u '+%Y-%m-%d %H:%M UTC')"
             git push origin main
-            echo "Deployed successfully"
+            echo "✓ Deployed successfully"
           fi
