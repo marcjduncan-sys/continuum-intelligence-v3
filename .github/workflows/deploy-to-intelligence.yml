@@ -1,0 +1,59 @@
+name: Deploy to continuum-intelligence
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'scripts/**'
+      - 'data/**'
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout continuum-platform
+        uses: actions/checkout@v4
+        with:
+          path: platform
+
+      - name: Checkout continuum-intelligence
+        uses: actions/checkout@v4
+        with:
+          repository: marcjduncan-sys/continuum-intelligence
+          token: ${{ secrets.DEPLOY_TOKEN }}
+          path: intelligence
+
+      - name: Sync files
+        run: |
+          # Copy index.html
+          cp platform/index.html intelligence/index.html
+
+          # Sync scripts directory
+          if [ -d "platform/scripts" ]; then
+            mkdir -p intelligence/scripts
+            rsync -av --delete platform/scripts/ intelligence/scripts/
+          fi
+
+          # Sync data directory
+          if [ -d "platform/data" ]; then
+            mkdir -p intelligence/data
+            rsync -av --delete platform/data/ intelligence/data/
+          fi
+
+      - name: Commit and push
+        working-directory: intelligence
+        run: |
+          git config user.name "Deploy Bot"
+          git config user.email "deploy@continuum-intelligence.dev"
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to deploy"
+          else
+            git commit -m "Auto-deploy from continuum-platform $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git push origin main
+            echo "Deployed successfully"
+          fi
