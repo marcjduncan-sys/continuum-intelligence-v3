@@ -3479,22 +3479,99 @@ a:hover { color: var(--accent-sage); }
     background: #FFFFFF;
 }
 
-/* --- Chat Responsive --- */
-@media (max-width: 480px) {
-    .chat-panel {
-        right: 0;
-        left: 0;
-        width: 100%;
-        max-height: 85vh;
-        border-radius: 12px 12px 0 0;
-    }
-    .chat-fab {
-        bottom: 16px;
-        right: 16px;
-        width: 48px;
-        height: 48px;
-    }
+/* --- Hide FAB and floating panel — chat is now inline --- */
+.chat-fab { display: none !important; }
+.chat-panel { display: none !important; }
+
+/* --- Inline Research Chat (within report sections) --- */
+.chat-inline {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-surface);
+    margin-top: var(--space-md);
 }
+.chat-inline-messages {
+    max-height: 420px;
+    min-height: 120px;
+    overflow-y: auto;
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+.chat-inline-welcome {
+    text-align: center;
+    padding: var(--space-xl) var(--space-md);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+}
+.chat-inline-welcome p { margin-bottom: var(--space-md); }
+.chat-inline-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    justify-content: center;
+}
+.chat-inline-suggestion {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 0.75rem;
+    font-family: var(--font-ui);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+}
+.chat-inline-suggestion:hover {
+    border-color: var(--accent-teal);
+    color: var(--accent-teal);
+}
+.chat-inline-input-area {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border-top: 1px solid var(--border);
+    background: var(--bg-surface-alt);
+}
+.chat-inline-input {
+    flex: 1;
+    font-family: var(--font-ui);
+    font-size: 0.82rem;
+    color: var(--text-primary);
+    background: var(--bg-page);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    resize: none;
+    outline: none;
+    max-height: 100px;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+}
+.chat-inline-input::placeholder { color: var(--text-muted); }
+.chat-inline-input:focus { border-color: var(--accent-teal); }
+.chat-inline-send {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: var(--accent-teal);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.chat-inline-send:disabled { opacity: 0.4; cursor: not-allowed; }
+.chat-inline-send svg { width: 16px; height: 16px; }
+
+[data-theme="light"] .chat-inline { border-color: #E2E8F0; }
+[data-theme="light"] .chat-inline-input { background: #F7F8FA; }
+[data-theme="light"] .chat-inline-suggestion { background: #F7F8FA; }
     </style>
 </head>
 <body>
@@ -5029,12 +5106,13 @@ function renderSectionNav(data) {
     ['discriminates', 'Discriminates'],
     ['tripwires', 'Tripwires'],
     ['gaps', 'Gaps'],
-    ['technical', 'Technical']
+    ['technical', 'Technical'],
+    ['chat', 'Research Chat']
   ];
 
   // Only include Technical if data exists
   if (!data.technicalAnalysis) {
-    sections.pop();
+    sections.splice(sections.length - 2, 1); // remove technical, keep chat
   }
 
   var linksHtml = '';
@@ -6025,7 +6103,21 @@ function renderReportPage(data) {
     renderDiscriminators(data) +
     renderTripwires(data) +
     renderGaps(data) +
-    renderTechnicalAnalysis(data);
+    renderTechnicalAnalysis(data) +
+    '<div class="report-section" id="' + t + '-chat">' +
+      '<div class="rs-number">Research</div>' +
+      '<div class="rs-title">Research Chat</div>' +
+      '<div class="rs-subtitle">Ask questions about ' + data.company + ' grounded in structured research data</div>' +
+      '<div class="chat-inline" data-ticker="' + data.ticker + '">' +
+        '<div class="chat-inline-messages" id="chat-inline-' + data.ticker + '"></div>' +
+        '<div class="chat-inline-input-area">' +
+          '<textarea class="chat-inline-input" placeholder="Ask about ' + data.company + '..." rows="1"></textarea>' +
+          '<button class="chat-inline-send" disabled aria-label="Send">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>' +
+          '</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
 
   return renderReportHero(data) +
     renderSkewBar(data) +
@@ -12517,6 +12609,7 @@ function updateLiveUI(ticker) {
             if (container) {
                 container.innerHTML = renderReportPage(STOCK_DATA[ticker]);
                 setupScrollSpy('page-report-' + ticker);
+                if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
                 // Re-apply narrative analysis after re-render
                 if (typeof window.applyNarrativeAnalysis === 'function') {
                     window.applyNarrativeAnalysis(ticker);
@@ -13051,6 +13144,10 @@ function route() {
                 container.innerHTML = renderReportPage(STOCK_DATA[ticker]);
                 renderedPages.add(ticker);
                 setupScrollSpy('page-' + hash);
+                // Initialize inline chat widget
+                if (typeof window.initInlineChat === 'function') {
+                    window.initInlineChat(ticker);
+                }
             }
         }
         // Apply narrative analysis (alerts, ST/LT weights, market-responsive narrative)
@@ -14381,6 +14478,212 @@ function tcAnalyze() {
 })();
 </script>
 
+<!-- Inline Research Chat (within report pages) -->
+<script>
+(function() {
+  var PRODUCTION_API = 'https://continuum-intelligence-production.up.railway.app';
+  var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  var isGitHubPages = window.location.hostname.indexOf('github.io') !== -1;
+  var apiOrigin = window.CHAT_API_URL
+    || (isLocal ? 'http://localhost:8000'
+        : isGitHubPages ? PRODUCTION_API
+        : window.location.origin);
+  var API_BASE = apiOrigin + '/api/research-chat';
+
+  var inlineConversations = {};
+  var inlineLoading = {};
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function renderMd(text) {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/`(.+?)`/g, '<code>$1</code>')
+      .replace(/\n/g, '<br>');
+  }
+
+  function getSuggestions(ticker) {
+    return [
+      'What is the bull case for ' + ticker + '?',
+      'What are the key risks?',
+      'Summarise the competing hypotheses',
+      'What catalysts should I watch?'
+    ];
+  }
+
+  function renderInlineMessages(ticker) {
+    var el = document.getElementById('chat-inline-' + ticker);
+    if (!el) return;
+    var convo = inlineConversations[ticker] || [];
+    if (convo.length === 0) {
+      var company = STOCK_DATA[ticker] ? STOCK_DATA[ticker].company : ticker;
+      var sugs = getSuggestions(ticker);
+      el.innerHTML =
+        '<div class="chat-inline-welcome">' +
+          '<p>Ask questions about <strong>' + company + '</strong> grounded in structured research data.</p>' +
+          '<div class="chat-inline-suggestions">' +
+            sugs.map(function(s) {
+              return '<button class="chat-inline-suggestion" data-q="' + s.replace(/"/g, '&quot;') + '">' + s + '</button>';
+            }).join('') +
+          '</div>' +
+        '</div>';
+      return;
+    }
+    var html = '';
+    convo.forEach(function(msg) {
+      if (msg.role === 'user') {
+        html += '<div class="chat-msg user">' + escHtml(msg.content) + '</div>';
+      } else {
+        html += '<div class="chat-msg assistant">' + renderMd(msg.content) + '</div>';
+      }
+    });
+    el.innerHTML = html;
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function sendInlineMessage(ticker, question) {
+    if (!question || inlineLoading[ticker]) return;
+    if (!inlineConversations[ticker]) inlineConversations[ticker] = [];
+    var convo = inlineConversations[ticker];
+    convo.push({ role: 'user', content: question });
+    renderInlineMessages(ticker);
+    inlineLoading[ticker] = true;
+
+    // Show typing indicator
+    var el = document.getElementById('chat-inline-' + ticker);
+    if (el) {
+      var typing = document.createElement('div');
+      typing.className = 'chat-typing';
+      typing.id = 'inline-typing-' + ticker;
+      typing.innerHTML = '<div class="chat-typing-dot"></div><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div>';
+      el.appendChild(typing);
+      el.scrollTop = el.scrollHeight;
+    }
+
+    // Disable send button
+    var container = document.querySelector('.chat-inline[data-ticker="' + ticker + '"]');
+    var sendBtn = container ? container.querySelector('.chat-inline-send') : null;
+    if (sendBtn) sendBtn.disabled = true;
+
+    var history = convo.slice(0, -1).map(function(m) {
+      return { role: m.role, content: m.content };
+    });
+
+    fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ticker: ticker, question: question, conversation_history: history })
+    })
+    .then(function(res) {
+      if (!res.ok) throw new Error('Request failed (' + res.status + ')');
+      return res.json();
+    })
+    .then(function(data) {
+      var t = document.getElementById('inline-typing-' + ticker);
+      if (t) t.remove();
+      convo.push({ role: 'assistant', content: data.response });
+      renderInlineMessages(ticker);
+    })
+    .catch(function(err) {
+      var t = document.getElementById('inline-typing-' + ticker);
+      if (t) t.remove();
+      if (el) {
+        var errEl = document.createElement('div');
+        errEl.className = 'chat-error';
+        errEl.textContent = err.message || 'Something went wrong.';
+        el.appendChild(errEl);
+        el.scrollTop = el.scrollHeight;
+      }
+    })
+    .finally(function() {
+      inlineLoading[ticker] = false;
+      if (sendBtn) {
+        var inp = container ? container.querySelector('.chat-inline-input') : null;
+        sendBtn.disabled = !(inp && inp.value.trim());
+      }
+    });
+  }
+
+  // Event delegation for inline chat
+  document.addEventListener('click', function(e) {
+    // Suggestion button click
+    var sugBtn = e.target.closest('.chat-inline-suggestion');
+    if (sugBtn) {
+      var container = sugBtn.closest('.chat-inline');
+      if (container) {
+        var ticker = container.getAttribute('data-ticker');
+        var q = sugBtn.getAttribute('data-q');
+        var inp = container.querySelector('.chat-inline-input');
+        if (inp) inp.value = '';
+        sendInlineMessage(ticker, q);
+      }
+      return;
+    }
+
+    // Send button click
+    var sendBtn = e.target.closest('.chat-inline-send');
+    if (sendBtn) {
+      var container = sendBtn.closest('.chat-inline');
+      if (container) {
+        var ticker = container.getAttribute('data-ticker');
+        var inp = container.querySelector('.chat-inline-input');
+        if (inp && inp.value.trim()) {
+          sendInlineMessage(ticker, inp.value.trim());
+          inp.value = '';
+          inp.style.height = 'auto';
+          sendBtn.disabled = true;
+        }
+      }
+      return;
+    }
+  });
+
+  // Handle input and enter key via delegation
+  document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('chat-inline-input')) {
+      var container = e.target.closest('.chat-inline');
+      if (container) {
+        var sendBtn = container.querySelector('.chat-inline-send');
+        if (sendBtn) sendBtn.disabled = !e.target.value.trim();
+        e.target.style.height = 'auto';
+        e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
+      }
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.target.classList.contains('chat-inline-input') && e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      var container = e.target.closest('.chat-inline');
+      if (container) {
+        var ticker = container.getAttribute('data-ticker');
+        if (e.target.value.trim()) {
+          sendInlineMessage(ticker, e.target.value.trim());
+          e.target.value = '';
+          e.target.style.height = 'auto';
+          var sendBtn = container.querySelector('.chat-inline-send');
+          if (sendBtn) sendBtn.disabled = true;
+        }
+      }
+    }
+  });
+
+  // Initialize welcome state for any already-rendered inline chats
+  document.querySelectorAll('.chat-inline').forEach(function(container) {
+    var ticker = container.getAttribute('data-ticker');
+    if (ticker) renderInlineMessages(ticker);
+  });
+
+  // Expose for dynamic page renders
+  window.initInlineChat = function(ticker) {
+    renderInlineMessages(ticker);
+  };
+})();
+</script>
+
 <!-- html2pdf.js for client-side PDF generation -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -14420,7 +14723,7 @@ function generatePDFReport(ticker, type) {
   clone.style.minHeight = 'auto';
 
   // Remove interactive elements from clone
-  var removables = clone.querySelectorAll('.report-download-section, .narrative-alert-banner, .nfi-alert-banner, .section-nav');
+  var removables = clone.querySelectorAll('.report-download-section, .narrative-alert-banner, .nfi-alert-banner, .section-nav, .chat-inline');
   for (var i = 0; i < removables.length; i++) {
     removables[i].remove();
   }
