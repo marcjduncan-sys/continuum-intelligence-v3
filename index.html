@@ -14408,6 +14408,11 @@ function generatePDFReport(ticker, type) {
   // Clone the page content for PDF generation (don't modify the live DOM)
   var clone = page.cloneNode(true);
 
+  // Force clone visible — pages use display:none when not active
+  clone.style.display = 'block';
+  clone.style.padding = '0';
+  clone.style.minHeight = 'auto';
+
   // Remove the download buttons and interactive elements from clone
   var downloadSections = clone.querySelectorAll('.report-download-section, .narrative-alert-banner');
   for (var i = 0; i < downloadSections.length; i++) {
