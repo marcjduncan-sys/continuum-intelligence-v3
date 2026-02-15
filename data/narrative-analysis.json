@@ -1,9 +1,163 @@
 {
-  "generated": "2026-02-15T22:10:58.282Z",
+  "generated": "2026-02-15T23:01:35.336Z",
   "summary": {
-    "totalStocks": 0,
-    "criticalDislocations": 0,
+    "totalStocks": 3,
+    "criticalDislocations": 3,
     "highDislocations": 0
   },
-  "results": {}
+  "results": {
+    "CSL": {
+      "dislocation": {
+        "severity": "CRITICAL",
+        "metrics": {
+          "currentPrice": 150.01,
+          "todayReturn": -14.538825272033277,
+          "drawdownFromPeak": -45.60716487182277,
+          "zScore": -2.3205721236588595
+        }
+      },
+      "narrativeShift": {
+        "hasShift": false
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 17,
+          "shortTerm": 25,
+          "blended": 20,
+          "confidence": "LOW"
+        },
+        "T2": {
+          "longTerm": 25,
+          "shortTerm": 25,
+          "blended": 25,
+          "confidence": "MODERATE"
+        },
+        "T3": {
+          "longTerm": 26,
+          "shortTerm": 100,
+          "blended": 56,
+          "confidence": "MODERATE"
+        },
+        "T4": {
+          "longTerm": 31,
+          "shortTerm": 100,
+          "blended": 59,
+          "confidence": "HIGH"
+        }
+      },
+      "hypothesisNames": {
+        "T1": "Growth/Recovery",
+        "T2": "Managed/Base Case",
+        "T3": "Risk/Downside",
+        "T4": "Disruption"
+      },
+      "inference": {
+        "contradictedHypothesis": null,
+        "dominantNarrative": "T4",
+        "alertState": "NORMAL"
+      }
+    },
+    "WOW": {
+      "dislocation": {
+        "severity": "CRITICAL",
+        "metrics": {
+          "currentPrice": 31.94,
+          "todayReturn": 5.238879736408566,
+          "drawdownFromPeak": -5.390995260663497,
+          "zScore": 1.430071046554167
+        }
+      },
+      "narrativeShift": {
+        "hasShift": false
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 38,
+          "shortTerm": 25,
+          "blended": 33,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 38,
+          "shortTerm": 25,
+          "blended": 33,
+          "confidence": "HIGH"
+        },
+        "T3": {
+          "longTerm": 5,
+          "shortTerm": 80,
+          "blended": 35,
+          "confidence": "VERY_LOW"
+        },
+        "T4": {
+          "longTerm": 19,
+          "shortTerm": 80,
+          "blended": 43,
+          "confidence": "MODERATE"
+        }
+      },
+      "hypothesisNames": {
+        "T1": "Growth/Recovery",
+        "T2": "Managed/Base Case",
+        "T3": "Risk/Downside",
+        "T4": "Disruption"
+      },
+      "inference": {
+        "contradictedHypothesis": null,
+        "dominantNarrative": "T1",
+        "alertState": "NORMAL"
+      }
+    },
+    "WTC": {
+      "dislocation": {
+        "severity": "CRITICAL",
+        "metrics": {
+          "currentPrice": 42.62,
+          "todayReturn": -36.40704267382871,
+          "drawdownFromPeak": -66.37210036294778,
+          "zScore": -1.8000064645597378
+        }
+      },
+      "narrativeShift": {
+        "hasShift": false
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 7,
+          "shortTerm": 25,
+          "blended": 14,
+          "confidence": "VERY_LOW"
+        },
+        "T2": {
+          "longTerm": 17,
+          "shortTerm": 25,
+          "blended": 20,
+          "confidence": "LOW"
+        },
+        "T3": {
+          "longTerm": 41,
+          "shortTerm": 100,
+          "blended": 65,
+          "confidence": "HIGH"
+        },
+        "T4": {
+          "longTerm": 36,
+          "shortTerm": 100,
+          "blended": 62,
+          "confidence": "HIGH"
+        }
+      },
+      "hypothesisNames": {
+        "T1": "Growth/Recovery",
+        "T2": "Managed/Base Case",
+        "T3": "Risk/Downside",
+        "T4": "Disruption"
+      },
+      "inference": {
+        "contradictedHypothesis": null,
+        "dominantNarrative": "T3",
+        "alertState": "NORMAL"
+      }
+    }
+  }
 }

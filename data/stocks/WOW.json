@@ -11,10 +11,10 @@
       "what_to_watch": "Q3 FY26 margins and online penetration rate. If Australian Food EBIT margin holds above 5.5% and e-commerce grows >20% YoY, this narrative strengthens.",
       "upside": "If digital transformation accelerates and margins expand further, the market could re-rate the stock to a premium multiple, driving 15-20% upside.",
       "risk_plain": "If competition from ALDI and Costco intensifies faster than expected, margin recovery could stall.",
-      "survival_score": 0.72,
+      "survival_score": 1,
       "status": "HIGH",
-      "weighted_inconsistency": 1.2,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "weighted_inconsistency": 0,
+      "last_updated": "2026-02-15T23:01:35.296Z"
     },
     "T2": {
       "label": "Managed/Base Case",
@@ -23,10 +23,10 @@
       "what_to_watch": "Revenue growth vs CPI inflation. If top-line growth consistently falls below inflation, the base case weakens.",
       "upside": "Steady dividend growth and defensive positioning could attract capital in a risk-off market environment.",
       "risk_plain": "If the economy slows significantly, even defensive names like Woolworths could see pressure on volumes.",
-      "survival_score": 0.65,
-      "status": "MODERATE",
-      "weighted_inconsistency": 2.1,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "survival_score": 1,
+      "status": "HIGH",
+      "weighted_inconsistency": 0,
+      "last_updated": "2026-02-15T23:01:35.296Z"
     },
     "T3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "ALDI market share data and quarterly cost inflation trends. If ALDI share exceeds 12% nationally, this narrative gains weight.",
       "upside": null,
       "risk_plain": "If ALDI continues to grow at current rates, Woolworths' margins will come under sustained pressure, potentially leading to earnings downgrades.",
-      "survival_score": 0.31,
-      "status": "LOW",
-      "weighted_inconsistency": 4.8,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "survival_score": 0.13,
+      "status": "VERY_LOW",
+      "weighted_inconsistency": 7,
+      "last_updated": "2026-02-15T23:01:35.296Z"
     },
     "T4": {
       "label": "Disruption",
@@ -47,17 +47,17 @@
       "what_to_watch": "Amazon Fresh AU launch timeline and any announcements of new international grocery entrants to the Australian market.",
       "upside": null,
       "risk_plain": "If Amazon Fresh launches in Australian metro areas, it could trigger a structural re-rating of the entire sector.",
-      "survival_score": 0.18,
-      "status": "VERY_LOW",
-      "weighted_inconsistency": 6.3,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "survival_score": 0.5,
+      "status": "MODERATE",
+      "weighted_inconsistency": 4,
+      "last_updated": "2026-02-15T23:01:35.296Z"
     }
   },
   "dominant": "T1",
   "confidence": "HIGH",
   "alert_state": "NORMAL",
   "alert_started": null,
-  "current_price": 32.45,
+  "current_price": 31.94,
   "big_picture": "Woolworths is Australia's largest supermarket chain, with around 37% market share. The company is currently in a recovery phase after a period of competitive pressure, with improving margins and a growing digital business.",
   "last_flip": {
     "date": "2026-01-15",
@@ -74,7 +74,7 @@
       "from": "T1",
       "to": "T2",
       "trigger": "Q1 sales growth below expectations; competitive intensity rising",
-      "price_at_flip": 29.80,
+      "price_at_flip": 29.8,
       "from_survival": 0.35,
       "to_survival": 0.71
     }
@@ -161,14 +161,133 @@
       "active": true
     }
   ],
-  "price_signals": [],
+  "price_signals": [
+    {
+      "id": "INTRADAY_RALLY_5_2026-02-15",
+      "rule_id": "INTRADAY_RALLY_5",
+      "name": "Significant intraday rally",
+      "date": "2026-02-15T23:01:35.296Z",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "NEUTRAL",
+        "T3": "INCONSISTENT",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 10
+      },
+      "active": true,
+      "can_trigger_immediate_flip": false,
+      "price_at_trigger": 31.94,
+      "return_at_trigger": 0.05238879736408566
+    }
+  ],
   "editorial_override": null,
   "price_history": [
-    29.80, 29.95, 30.10, 30.25, 30.40,
-    30.55, 30.80, 31.00, 31.15, 31.30,
-    31.50, 31.65, 31.80, 32.00, 32.10,
-    32.20, 32.30, 32.35, 32.40, 32.45,
-    32.50, 32.45
+    29.8,
+    29.95,
+    30.1,
+    30.25,
+    30.4,
+    30.55,
+    30.8,
+    31,
+    31.15,
+    31.3,
+    31.5,
+    31.65,
+    31.8,
+    32,
+    32.1,
+    32.2,
+    32.3,
+    32.35,
+    32.4,
+    32.45,
+    32.5,
+    32.45,
+    31.94
   ],
-  "weighting": null
+  "weighting": {
+    "top_narrative": {
+      "top_narrative": "T3",
+      "previous_top": "T3",
+      "inflection": null,
+      "signal_strength": 80,
+      "dominant_window": 5
+    },
+    "dislocation": {
+      "max_dislocation_bps": 4506,
+      "max_dislocation_hypothesis": "T3",
+      "direction": "negative",
+      "per_hypothesis": {
+        "T1": {
+          "evidence_weight_pct": 38,
+          "price_weight_pct": 0,
+          "dislocation_bps": -3802
+        },
+        "T2": {
+          "evidence_weight_pct": 38,
+          "price_weight_pct": 0,
+          "dislocation_bps": -3802
+        },
+        "T3": {
+          "evidence_weight_pct": 5,
+          "price_weight_pct": 50,
+          "dislocation_bps": 4506
+        },
+        "T4": {
+          "evidence_weight_pct": 19,
+          "price_weight_pct": 50,
+          "dislocation_bps": 3099
+        }
+      },
+      "is_material": true
+    },
+    "hypothesis_weights": {
+      "T1": {
+        "signal_strength_pct": 0,
+        "narrative_weight_pct": 38,
+        "dominant_window": 5,
+        "correlations": {
+          "5": -0.984,
+          "10": -0.792,
+          "20": -0.448
+        }
+      },
+      "T2": {
+        "signal_strength_pct": 0,
+        "narrative_weight_pct": 38,
+        "dominant_window": 5,
+        "correlations": {
+          "5": -0.984,
+          "10": -0.792,
+          "20": -0.448
+        }
+      },
+      "T3": {
+        "signal_strength_pct": 80,
+        "narrative_weight_pct": 5,
+        "dominant_window": 5,
+        "correlations": {
+          "5": 0.984,
+          "10": 0.792,
+          "20": 0.448
+        }
+      },
+      "T4": {
+        "signal_strength_pct": 80,
+        "narrative_weight_pct": 19,
+        "dominant_window": 5,
+        "correlations": {
+          "5": 0.984,
+          "10": 0.792,
+          "20": 0.448
+        }
+      }
+    },
+    "computed_at": "2026-02-15T23:01:35.296Z"
+  }
 }

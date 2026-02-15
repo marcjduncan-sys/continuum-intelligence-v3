@@ -11,10 +11,10 @@
       "what_to_watch": "New CEO's first strategy update and H1 FY26 customer churn metrics. If churn returns to pre-crisis levels (<5%) and new contract wins resume, recovery becomes credible.",
       "upside": "If governance concerns fully resolve and growth re-accelerates, the stock could re-rate back toward $100+, representing significant upside.",
       "risk_plain": "The recovery narrative depends heavily on the new CEO successfully rebuilding trust with institutional investors and key customers.",
-      "survival_score": 0.30,
-      "status": "LOW",
-      "weighted_inconsistency": 5.2,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "survival_score": 0.16,
+      "status": "VERY_LOW",
+      "weighted_inconsistency": 9.085865013752246,
+      "last_updated": "2026-02-15T23:01:35.335Z"
     },
     "T2": {
       "label": "Managed/Base Case",
@@ -23,10 +23,10 @@
       "what_to_watch": "FY26 ARR growth rate and valuation multiple vs ASX tech peers. If the governance discount narrows and growth holds at 15%+, this narrative holds.",
       "upside": "Stable execution could gradually close the governance discount over 12-18 months.",
       "risk_plain": "If growth slows further or new governance issues surface, even the base case valuation may be too generous.",
-      "survival_score": 0.55,
-      "status": "MODERATE",
-      "weighted_inconsistency": 2.8,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "survival_score": 0.39,
+      "status": "LOW",
+      "weighted_inconsistency": 6.668042242248278,
+      "last_updated": "2026-02-15T23:01:35.335Z"
     },
     "T3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Board investigation outcomes, any new media reports, and mid-market customer retention data. If churn exceeds 8% or new governance issues emerge, this narrative strengthens.",
       "upside": null,
       "risk_plain": "If the governance situation worsens or major customers defect, the stock could test new lows below $60.",
-      "survival_score": 0.72,
+      "survival_score": 0.95,
       "status": "HIGH",
-      "weighted_inconsistency": 1.1,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "weighted_inconsistency": 0.5830749018550276,
+      "last_updated": "2026-02-15T23:01:35.335Z"
     },
     "T4": {
       "label": "Disruption",
@@ -47,24 +47,24 @@
       "what_to_watch": "Competitive product launches from FourKites, project44, or new AI-native logistics platforms. Also monitor key engineering talent retention.",
       "upside": null,
       "risk_plain": "While the CargoWise moat is deep, the company's reliance on one person for technical vision is a genuine structural vulnerability.",
-      "survival_score": 0.22,
-      "status": "LOW",
-      "weighted_inconsistency": 5.8,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "survival_score": 0.84,
+      "status": "HIGH",
+      "weighted_inconsistency": 1.7785877989169818,
+      "last_updated": "2026-02-15T23:01:35.335Z"
     }
   },
   "dominant": "T3",
   "confidence": "HIGH",
   "alert_state": "NORMAL",
   "alert_started": null,
-  "current_price": 68.50,
+  "current_price": 42.62,
   "big_picture": "WiseTech Global is an Australian software company that makes CargoWise, the world's leading logistics management platform. The company experienced a severe governance crisis in late 2024 when allegations about the founder's conduct emerged, causing the stock to drop 35%.",
   "last_flip": {
     "date": "2024-10-18",
     "from": "T1",
     "to": "T3",
     "trigger": "Governance crisis: founder conduct allegations; -35% in 3 sessions; board investigation announced",
-    "price_at_flip": 72.30,
+    "price_at_flip": 72.3,
     "from_survival": 0.15,
     "to_survival": 0.78
   },
@@ -74,16 +74,16 @@
       "from": "T2",
       "to": "T1",
       "trigger": "FY24 results beat expectations; ARR growth +28%; CargoWise platform consolidation accelerating",
-      "price_at_flip": 108.50,
+      "price_at_flip": 108.5,
       "from_survival": 0.42,
-      "to_survival": 0.80
+      "to_survival": 0.8
     },
     {
       "date": "2024-02-15",
       "from": "T1",
       "to": "T2",
       "trigger": "H1 FY24 solid but organic growth slowing to mid-teens; acquisition integration mixed",
-      "price_at_flip": 88.00,
+      "price_at_flip": 88,
       "from_survival": 0.38,
       "to_survival": 0.73
     }
@@ -187,9 +187,9 @@
         "full_weight_days": 15,
         "half_life_days": 30
       },
-      "active": true,
+      "active": false,
       "can_trigger_immediate_flip": true,
-      "price_at_trigger": 78.20,
+      "price_at_trigger": 78.2,
       "return_at_trigger": -0.22
     },
     {
@@ -208,19 +208,180 @@
         "full_weight_days": 10,
         "half_life_days": 20
       },
+      "active": false,
+      "can_trigger_immediate_flip": false,
+      "price_at_trigger": 78.2,
+      "return_at_trigger": -0.22
+    },
+    {
+      "id": "INTRADAY_DROP_10_2026-02-15",
+      "rule_id": "INTRADAY_DROP_10",
+      "name": "Critical intraday decline",
+      "date": "2026-02-15T23:01:35.335Z",
+      "diagnosticity": "CRITICAL",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 15,
+        "half_life_days": 30
+      },
+      "active": true,
+      "can_trigger_immediate_flip": true,
+      "price_at_trigger": 42.62,
+      "return_at_trigger": -0.3640704267382871
+    },
+    {
+      "id": "CUMULATIVE_5DAY_DROP_8_2026-02-15",
+      "rule_id": "CUMULATIVE_5DAY_DROP_8",
+      "name": "Sustained negative momentum",
+      "date": "2026-02-15T23:01:35.335Z",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 0,
+        "half_life_days": 0,
+        "note": "Full weight while trend persists; removed when 5-day return recovers above -3%"
+      },
       "active": true,
       "can_trigger_immediate_flip": false,
-      "price_at_trigger": 78.20,
-      "return_at_trigger": -0.22
+      "price_at_trigger": 42.62,
+      "return_at_trigger": -0.3640704267382871
+    },
+    {
+      "id": "HIGH_VOLUME_DOWN_2026-02-15",
+      "rule_id": "HIGH_VOLUME_DOWN",
+      "name": "Institutional distribution",
+      "date": "2026-02-15T23:01:35.335Z",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "NEUTRAL",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 10,
+        "half_life_days": 20
+      },
+      "active": true,
+      "can_trigger_immediate_flip": false,
+      "price_at_trigger": 42.62,
+      "return_at_trigger": -0.3640704267382871
     }
   ],
   "editorial_override": null,
   "price_history": [
-    100.50, 98.00, 92.00, 85.00, 78.20,
-    74.00, 72.50, 71.80, 70.50, 69.80,
-    69.00, 68.50, 68.80, 69.20, 68.90,
-    68.50, 68.20, 68.00, 67.80, 68.10,
-    68.30, 68.50
+    100.5,
+    98,
+    92,
+    85,
+    78.2,
+    74,
+    72.5,
+    71.8,
+    70.5,
+    69.8,
+    69,
+    68.5,
+    68.8,
+    69.2,
+    68.9,
+    68.5,
+    68.2,
+    68,
+    67.8,
+    68.1,
+    68.3,
+    68.5,
+    42.62
   ],
-  "weighting": null
+  "weighting": {
+    "top_narrative": {
+      "top_narrative": "T3",
+      "previous_top": "T3",
+      "inflection": null,
+      "signal_strength": 100,
+      "dominant_window": 5
+    },
+    "dislocation": {
+      "max_dislocation_bps": -1667,
+      "max_dislocation_hypothesis": "T2",
+      "direction": "negative",
+      "per_hypothesis": {
+        "T1": {
+          "evidence_weight_pct": 7,
+          "price_weight_pct": 0,
+          "dislocation_bps": -684
+        },
+        "T2": {
+          "evidence_weight_pct": 17,
+          "price_weight_pct": 0,
+          "dislocation_bps": -1667
+        },
+        "T3": {
+          "evidence_weight_pct": 41,
+          "price_weight_pct": 50,
+          "dislocation_bps": 940
+        },
+        "T4": {
+          "evidence_weight_pct": 36,
+          "price_weight_pct": 50,
+          "dislocation_bps": 1410
+        }
+      },
+      "is_material": true
+    },
+    "hypothesis_weights": {
+      "T1": {
+        "signal_strength_pct": 0,
+        "narrative_weight_pct": 7,
+        "dominant_window": 5,
+        "correlations": {
+          "5": -1,
+          "10": -0.999,
+          "20": -0.999
+        }
+      },
+      "T2": {
+        "signal_strength_pct": 0,
+        "narrative_weight_pct": 17,
+        "dominant_window": 5,
+        "correlations": {
+          "5": -1,
+          "10": -0.999,
+          "20": -0.999
+        }
+      },
+      "T3": {
+        "signal_strength_pct": 100,
+        "narrative_weight_pct": 41,
+        "dominant_window": 5,
+        "correlations": {
+          "5": 1,
+          "10": 0.999,
+          "20": 0.999
+        }
+      },
+      "T4": {
+        "signal_strength_pct": 100,
+        "narrative_weight_pct": 36,
+        "dominant_window": 5,
+        "correlations": {
+          "5": 1,
+          "10": 0.999,
+          "20": 0.999
+        }
+      }
+    },
+    "computed_at": "2026-02-15T23:01:35.336Z"
+  }
 }

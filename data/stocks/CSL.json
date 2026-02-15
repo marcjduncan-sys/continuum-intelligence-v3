@@ -11,10 +11,10 @@
       "what_to_watch": "H1 FY26 plasma collection volumes and Vifor integration milestones. If plasma cost per litre returns to pre-COVID levels, this narrative strengthens significantly.",
       "upside": "Pipeline catalysts (CSL112, garadacimab) could drive re-rating if clinical data exceeds expectations.",
       "risk_plain": "If plasma collection costs stay elevated or Vifor integration hits unexpected problems, the growth story weakens.",
-      "survival_score": 0.58,
-      "status": "MODERATE",
-      "weighted_inconsistency": 2.5,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "survival_score": 0.4,
+      "status": "LOW",
+      "weighted_inconsistency": 7,
+      "last_updated": "2026-02-15T23:01:35.230Z"
     },
     "T2": {
       "label": "Managed/Base Case",
@@ -23,10 +23,10 @@
       "what_to_watch": "FY26 earnings guidance at H1 result. If guidance stays at 7-10% NPATA growth, the base case holds firm.",
       "upside": "Consistent execution could attract more long-only institutional capital, supporting valuation multiples.",
       "risk_plain": "If growth slips below high single digits, the premium valuation may not be sustainable.",
-      "survival_score": 0.75,
-      "status": "HIGH",
-      "weighted_inconsistency": 1.0,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "survival_score": 0.57,
+      "status": "MODERATE",
+      "weighted_inconsistency": 5,
+      "last_updated": "2026-02-15T23:01:35.230Z"
     },
     "T3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Vifor integration costs in H1 FY26 and AUD/USD exchange rate trajectory. If integration costs rise or AUD strengthens above 0.70, downside risk increases.",
       "upside": null,
       "risk_plain": "Currency headwinds alone could knock 3-5% off reported earnings, and if combined with slower Vifor synergies, the stock could de-rate.",
-      "survival_score": 0.33,
-      "status": "LOW",
-      "weighted_inconsistency": 4.2,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "survival_score": 0.6,
+      "status": "MODERATE",
+      "weighted_inconsistency": 4.57957210048502,
+      "last_updated": "2026-02-15T23:01:35.230Z"
     },
     "T4": {
       "label": "Disruption",
@@ -47,35 +47,44 @@
       "what_to_watch": "Gene therapy clinical trial results targeting primary immunodeficiency conditions, and any biosimilar approvals for immunoglobulin products in major markets.",
       "upside": null,
       "risk_plain": "While this is a long-term risk, any breakthrough gene therapy result could trigger a sharp de-rating of the entire plasma sector.",
-      "survival_score": 0.12,
-      "status": "VERY_LOW",
-      "weighted_inconsistency": 7.1,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "survival_score": 0.72,
+      "status": "HIGH",
+      "weighted_inconsistency": 3.1886272577980512,
+      "last_updated": "2026-02-15T23:01:35.230Z"
     }
   },
-  "dominant": "T2",
+  "dominant": "T4",
   "confidence": "HIGH",
   "alert_state": "NORMAL",
   "alert_started": null,
-  "current_price": 285.50,
+  "current_price": 150.01,
   "big_picture": "CSL is a global biotech leader specialising in plasma-derived therapies and vaccines. It is one of only three companies worldwide that can collect and process blood plasma at scale, giving it an extremely strong competitive position.",
   "last_flip": {
-    "date": "2025-08-20",
-    "from": "T1",
-    "to": "T2",
-    "trigger": "FY25 result in-line but guidance conservative; plasma margin recovery on track but gradual",
-    "price_at_flip": 278.00,
-    "from_survival": 0.36,
+    "date": "2026-02-15",
+    "from": "T2",
+    "to": "T4",
+    "trigger": "Critical intraday decline",
+    "price_at_flip": 150.01,
+    "from_survival": 0.57,
     "to_survival": 0.72
   },
   "narrative_history": [
+    {
+      "date": "2025-08-20",
+      "from": "T1",
+      "to": "T2",
+      "trigger": "FY25 result in-line but guidance conservative; plasma margin recovery on track but gradual",
+      "price_at_flip": 278,
+      "from_survival": 0.36,
+      "to_survival": 0.72
+    },
     {
       "date": "2025-02-15",
       "from": "T2",
       "to": "T1",
       "trigger": "H1 FY25 earnings beat; Vifor synergies ahead of schedule; upgraded FY25 guidance",
-      "price_at_flip": 305.00,
-      "from_survival": 0.40,
+      "price_at_flip": 305,
+      "from_survival": 0.4,
       "to_survival": 0.78
     }
   ],
@@ -161,14 +170,176 @@
       "active": true
     }
   ],
-  "price_signals": [],
+  "price_signals": [
+    {
+      "id": "INTRADAY_DROP_10_2026-02-15",
+      "rule_id": "INTRADAY_DROP_10",
+      "name": "Critical intraday decline",
+      "date": "2026-02-15T23:01:35.229Z",
+      "diagnosticity": "CRITICAL",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 15,
+        "half_life_days": 30
+      },
+      "active": true,
+      "can_trigger_immediate_flip": true,
+      "price_at_trigger": 150.01,
+      "return_at_trigger": -0.14538825272033276
+    },
+    {
+      "id": "CUMULATIVE_5DAY_DROP_8_2026-02-15",
+      "rule_id": "CUMULATIVE_5DAY_DROP_8",
+      "name": "Sustained negative momentum",
+      "date": "2026-02-15T23:01:35.229Z",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 0,
+        "half_life_days": 0,
+        "note": "Full weight while trend persists; removed when 5-day return recovers above -3%"
+      },
+      "active": true,
+      "can_trigger_immediate_flip": false,
+      "price_at_trigger": 150.01,
+      "return_at_trigger": -0.14538825272033276
+    },
+    {
+      "id": "HIGH_VOLUME_DOWN_2026-02-15",
+      "rule_id": "HIGH_VOLUME_DOWN",
+      "name": "Institutional distribution",
+      "date": "2026-02-15T23:01:35.229Z",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "NEUTRAL",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 10,
+        "half_life_days": 20
+      },
+      "active": true,
+      "can_trigger_immediate_flip": false,
+      "price_at_trigger": 150.01,
+      "return_at_trigger": -0.14538825272033276
+    }
+  ],
   "editorial_override": null,
   "price_history": [
-    280.00, 281.50, 282.00, 283.00, 283.50,
-    284.00, 283.80, 284.20, 284.50, 284.80,
-    285.00, 285.20, 284.90, 285.10, 285.30,
-    285.40, 285.50, 285.60, 285.40, 285.50,
-    285.60, 285.50
+    280,
+    281.5,
+    282,
+    283,
+    283.5,
+    284,
+    283.8,
+    284.2,
+    284.5,
+    284.8,
+    285,
+    285.2,
+    284.9,
+    285.1,
+    285.3,
+    285.4,
+    285.5,
+    285.6,
+    285.4,
+    285.5,
+    285.6,
+    285.5,
+    150.01
   ],
-  "weighting": null
+  "weighting": {
+    "top_narrative": {
+      "top_narrative": "T3",
+      "previous_top": "T3",
+      "inflection": null,
+      "signal_strength": 100,
+      "dominant_window": 5
+    },
+    "dislocation": {
+      "max_dislocation_bps": -2489,
+      "max_dislocation_hypothesis": "T2",
+      "direction": "negative",
+      "per_hypothesis": {
+        "T1": {
+          "evidence_weight_pct": 17,
+          "price_weight_pct": 0,
+          "dislocation_bps": -1747
+        },
+        "T2": {
+          "evidence_weight_pct": 25,
+          "price_weight_pct": 0,
+          "dislocation_bps": -2489
+        },
+        "T3": {
+          "evidence_weight_pct": 26,
+          "price_weight_pct": 50,
+          "dislocation_bps": 2380
+        },
+        "T4": {
+          "evidence_weight_pct": 31,
+          "price_weight_pct": 50,
+          "dislocation_bps": 1856
+        }
+      },
+      "is_material": true
+    },
+    "hypothesis_weights": {
+      "T1": {
+        "signal_strength_pct": 0,
+        "narrative_weight_pct": 17,
+        "dominant_window": 5,
+        "correlations": {
+          "5": -1,
+          "10": -1,
+          "20": -1
+        }
+      },
+      "T2": {
+        "signal_strength_pct": 0,
+        "narrative_weight_pct": 25,
+        "dominant_window": 5,
+        "correlations": {
+          "5": -1,
+          "10": -1,
+          "20": -1
+        }
+      },
+      "T3": {
+        "signal_strength_pct": 100,
+        "narrative_weight_pct": 26,
+        "dominant_window": 5,
+        "correlations": {
+          "5": 1,
+          "10": 1,
+          "20": 1
+        }
+      },
+      "T4": {
+        "signal_strength_pct": 100,
+        "narrative_weight_pct": 31,
+        "dominant_window": 5,
+        "correlations": {
+          "5": 1,
+          "10": 1,
+          "20": 1
+        }
+      }
+    },
+    "computed_at": "2026-02-15T23:01:35.231Z"
+  }
 }
