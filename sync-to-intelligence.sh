@@ -13,6 +13,7 @@ if [ ! -d "$INTELLIGENCE_DIR" ]; then
 fi
 
 echo "Copying updated files..."
+cp "$PLATFORM_DIR/index.html" "$INTELLIGENCE_DIR/index.html"
 cp "$PLATFORM_DIR/stock.html" "$INTELLIGENCE_DIR/stock.html"
 cp "$PLATFORM_DIR/css/narrative.css" "$INTELLIGENCE_DIR/css/narrative.css"
 cp "$PLATFORM_DIR/js/dne/ui.js" "$INTELLIGENCE_DIR/js/dne/ui.js"
@@ -22,10 +23,9 @@ cp "$PLATFORM_DIR/data/stocks/WTC.json" "$INTELLIGENCE_DIR/data/stocks/WTC.json"
 
 cd "$INTELLIGENCE_DIR"
 git add -A
-git commit -m "Sync: dislocation redesign, hypotheses clarity, PDF reports"
+git commit -m "Sync: PDF download + narrative alerts in main SPA + stock.html improvements"
 git push origin main
 
 echo "Done! Changes will be live at:"
-echo "  https://marcjduncan-sys.github.io/continuum-intelligence/stock.html?ticker=WOW.AX"
-echo "  https://marcjduncan-sys.github.io/continuum-intelligence/stock.html?ticker=CSL.AX"
-echo "  https://marcjduncan-sys.github.io/continuum-intelligence/stock.html?ticker=WTC.AX"
+echo "  https://marcjduncan-sys.github.io/continuum-intelligence/"
+echo "  (PDF download buttons on every report + snapshot page)"
