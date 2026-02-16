@@ -10,8 +10,9 @@ const path = require('path');
 
 // Coverage universe - must match your tickers
 const COVERAGE_TICKERS = [
-  'WOW', 'XRO', 'WTC', 'DRO', 'PME', 'GYG', 
-  'CSL', 'MQG', 'GMG', 'WDS', 'SIG', 'FMG'
+  'WOW', 'XRO', 'WTC', 'DRO', 'PME', 'GYG',
+  'CSL', 'MQG', 'GMG', 'WDS', 'SIG', 'FMG',
+  'DXS'
 ];
 
 // Event type patterns for classification

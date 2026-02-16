@@ -192,6 +192,19 @@ const STOCK_CONFIG = {
       T3: 'Green Energy Execution',
       T4: 'FFI Capital Drain'
     }
+  },
+  DXS: {
+    peakPrice: 12.00,
+    low52Week: 6.17,
+    high52Week: 7.89,
+    baseWeights: { T1: 50, T2: 40, T3: 35, T4: 45 },
+    characteristics: { highMultiple: false, growthStock: false, hasAIExposure: false },
+    hypothesisNames: {
+      T1: 'Office Recovery',
+      T2: 'Structural Office Decline',
+      T3: 'Funds Management Growth',
+      T4: 'Interest Rate Risk'
+    }
   }
 };
 

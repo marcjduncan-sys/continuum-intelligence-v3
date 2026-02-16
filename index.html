@@ -4062,6 +4062,7 @@ a:hover { color: var(--accent-sage); }
                     <div class="tc-stock-card" data-ticker="GMG" onclick="tcSelectStock('GMG')"><div class="tc-stock-ticker">GMG</div><div class="tc-stock-name">Goodman</div></div>
                     <div class="tc-stock-card" data-ticker="SIG" onclick="tcSelectStock('SIG')"><div class="tc-stock-ticker">SIG</div><div class="tc-stock-name">Sigma</div></div>
                     <div class="tc-stock-card" data-ticker="FMG" onclick="tcSelectStock('FMG')"><div class="tc-stock-ticker">FMG</div><div class="tc-stock-name">Fortescue</div></div>
+                    <div class="tc-stock-card" data-ticker="DXS" onclick="tcSelectStock('DXS')"><div class="tc-stock-ticker">DXS</div><div class="tc-stock-name">Dexus</div></div>
                 </div>
             </div>
 
@@ -4302,6 +4303,18 @@ const FRESHNESS_DATA = {
     "urgency": 0,
     "status": "OK",
     "badge": "ok"
+  },
+  "DXS": {
+    "reviewDate": "16 February 2026",
+    "daysSinceReview": 0,
+    "priceAtReview": 6.17,
+    "pricePctChange": 0,
+    "nearestCatalyst": "H1 FY26 Results",
+    "nearestCatalystDate": "18 FEBRUARY 2026",
+    "nearestCatalystDays": 2,
+    "urgency": 55,
+    "status": "HIGH",
+    "badge": "high"
   }
 };
 // === END FRESHNESS_DATA ===
@@ -4498,6 +4511,21 @@ const REFERENCE_DATA = {
     c1Cost: 18.17,             // US$/wmt
     shipped: 198.4,            // Mt
     _anchors: { price: 21.21, marketCapStr: '67.9B', pe: 13, divYield: 5.2 }
+  },
+  DXS: {
+    sharesOutstanding: 1080,   // millions
+    analystTarget: 7.60,       // midpoint of analyst range
+    analystBuys: 3, analystHolds: 13, analystSells: 3,
+    analystCount: 19,
+    epsTrailing: 0.15,         // A$6.17 / ~41x
+    epsForward: null,
+    divPerShare: 0.37,
+    reportingCurrency: 'A$',
+    revenue: null,
+    affo: 0.45,                // A$ per security (FY25)
+    aum: 50.1,                 // A$ billions
+    listedPortfolio: 14.5,     // A$ billions
+    _anchors: { price: 6.17, marketCapStr: '6.9B', pe: 41.1, divYield: 5.5 }
   }
 };
 // === END REFERENCE_DATA ===
@@ -6327,7 +6355,7 @@ SNAPSHOT_DATA.WOW = {
   ]
 };
 
-const SNAPSHOT_ORDER = ['WOW', 'XRO', 'WTC', 'DRO', 'PME', 'GYG', 'CSL', 'MQG', 'GMG', 'WDS', 'SIG', 'FMG'];
+const SNAPSHOT_ORDER = ['WOW', 'XRO', 'WTC', 'DRO', 'PME', 'GYG', 'CSL', 'MQG', 'GMG', 'WDS', 'SIG', 'FMG', 'DXS'];
 
 // Auto-generate snapshot data from STOCK_DATA for any stock without a manual snapshot
 function buildSnapshotFromStock(ticker) {
@@ -11941,6 +11969,440 @@ STOCK_DATA.FMG = {
   footer: {
     disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company accounts, broker consensus data, and publicly available information. This report does not contain buy, sell, or hold recommendations, price targets, or valuation models.',
     domainCount: '10 of 10',
+    hypothesesCount: '4 Active'
+  }
+};
+
+// ============================================================
+// DXS — Dexus
+// ============================================================
+
+STOCK_DATA.DXS = {
+  // Meta
+  ticker: 'DXS',
+  tickerFull: 'DXS.AX',
+  exchange: 'ASX',
+  company: 'Dexus',
+  sector: 'Real Estate',
+  sectorSub: 'Office & Industrial REIT',
+  price: 6.17,
+  currency: 'A$',
+  date: '16 February 2026',
+  reportId: 'DXS-2026-001',
+  priceHistory: [7.89, 7.85, 7.80, 7.75, 7.70, 7.65, 7.60, 7.55, 7.50, 7.48, 7.45, 7.42, 7.40, 7.38, 7.35, 7.30, 7.28, 7.25, 7.22, 7.20, 7.18, 7.15, 7.12, 7.10, 7.08, 7.05, 7.00, 6.98, 6.95, 6.92, 6.90, 6.88, 6.85, 6.82, 6.80, 6.78, 6.75, 6.72, 6.70, 6.68, 6.65, 6.62, 6.60, 6.58, 6.55, 6.52, 6.50, 6.48, 6.45, 6.42, 6.40, 6.38, 6.35, 6.32, 6.30, 6.28, 6.25, 6.22, 6.20, 6.18, 6.17],
+
+  // Hero - right side metrics
+  heroDescription: 'Office &amp; Industrial REIT &bull; $50.1B AUM &bull; $14.5B Listed Portfolio',
+  heroCompanyDescription: 'Dexus (ASX: DXS) is Australia\'s largest listed office REIT and a leading integrated real asset manager. The company owns, manages, and develops a portfolio of office, industrial, retail, healthcare, and infrastructure assets, with a $50.1 billion funds management platform and a $14.5 billion listed portfolio. Office assets contribute approximately two-thirds of group earnings, with the portfolio concentrated in Sydney and Melbourne CBDs.',
+  heroMetrics: [
+    { label: 'Mkt Cap', value: 'A$6.9B', colorClass: '' },
+    { label: 'P/E', value: '~41x', colorClass: 'premium' },
+    { label: 'Div Yield', value: '5.5%', colorClass: 'positive' },
+    { label: 'AFFO/sec', value: '45.0c', colorClass: '' },
+    { label: 'AUM', value: '$50.1B', colorClass: 'positive' }
+  ],
+
+  // Skew
+  skew: { direction: 'neutral', rationale: 'Office recovery signals emerging but structural hybrid work headwinds persist. Trading at significant discount to NTA. Funds management platform provides diversification. H1 FY26 results imminent (18 Feb).' },
+
+  // Verdict
+  verdict: {
+    text: 'Dexus sits at the intersection of two powerful forces: an emerging Australian office market recovery (positive net absorption, stabilising cap rates) and structural hybrid work headwinds that have permanently reduced office demand. The stock trades at <span class="key-stat down">A$6.17</span>, well below NTA, reflecting the market\'s uncertainty about the office outlook. The $50.1B funds management platform and industrial development pipeline provide earnings diversification, but office still contributes ~65% of group earnings. <strong>H1 FY26 results on 18 February</strong> will be the key test of the recovery thesis.',
+    borderColor: null,
+    scores: [
+      { label: 'T1 Office Recovery', score: '35%', scoreColor: 'var(--signal-amber)', dirArrow: '&uarr;', dirText: 'Improving', dirColor: 'var(--signal-green)' },
+      { label: 'T2 Base Case', score: '45%', scoreColor: 'var(--signal-green)', dirArrow: '&rarr;', dirText: 'Steady', dirColor: null },
+      { label: 'T3 Office Decline', score: '30%', scoreColor: 'var(--signal-amber)', dirArrow: '&darr;', dirText: 'Fading', dirColor: 'var(--signal-green)' },
+      { label: 'T4 Rate Risk', score: '25%', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Steady', dirColor: null }
+    ]
+  },
+
+  // Featured card metrics (for home page)
+  featuredMetrics: [
+    { label: 'Mkt Cap', value: 'A$6.9B', color: '' },
+    { label: 'Div Yield', value: '5.5%', color: 'var(--signal-green)' },
+    { label: 'AUM', value: '$50.1B', color: '' },
+    { label: 'AFFO', value: '45.0c', color: '' }
+  ],
+  featuredPriceColor: 'var(--signal-amber)',
+  featuredRationale: 'Australia\'s largest office REIT trading at discount to NTA. Office recovery signals emerging but hybrid work headwinds persist. 5.5% yield supported by $50.1B funds management platform.',
+
+  // Identity section
+  identity: {
+    rows: [
+      [['Ticker', 'DXS.AX', 'td-mono'], ['Exchange', 'ASX', 'td-mono']],
+      [['Market Cap', 'A$6.9B', 'td-mono'], ['Sector', 'Real Estate / REIT', 'td-mono']],
+      [['Share Price', 'A$6.17', 'td-mono td-red'], ['52-Week Range', 'A$6.17 &ndash; A$7.89', 'td-mono']],
+      [['P/E Ratio', '~41x', 'td-mono td-amber'], ['AFFO/Security', '45.0 cents (FY25)', 'td-mono']],
+      [['Listed Portfolio', 'A$14.5B', 'td-mono'], ['AUM', 'A$50.1B', 'td-mono']],
+      [['Distribution', 'A$0.37/security (5.5%)', 'td-mono td-green'], ['Payout Ratio', '~82%', 'td-mono']],
+      [['Office Portfolio', '~65% of earnings', 'td-mono'], ['Industrial', '~15% of earnings', 'td-mono']],
+      [['NTA Discount', 'Significant', 'td-mono td-red'], ['Gearing', 'D/E 0.50x', 'td-mono']],
+      [['Key Development', 'Atlassian Central (late 2026)', 'td-mono'], ['Industrial Pipeline', '190,400 sqm', 'td-mono']],
+      [['CEO', 'Ross Du Vernet', ''], ['Employees', '~2,100', 'td-mono']]
+    ],
+    overview: 'Australia\'s largest listed office REIT and a leading integrated real asset manager. The $14.5 billion listed portfolio includes direct and indirect ownership of office, industrial, retail, healthcare, infrastructure, and alternative investments, primarily concentrated in Sydney and Melbourne CBDs. The office portfolio contributes approximately two-thirds of group earnings. Dexus also operates a $50.1 billion funds management platform across diversified strategies. Key developments include Atlassian Central (completing late 2026) and Waterfront Brisbane (late 2028). ESG leader: ranked third among global REIT peers in S&P Global ESG Index.'
+  },
+
+  // Hypotheses
+  hypotheses: [
+    {
+      tier: 't1',
+      direction: 'upside',
+      title: 'T1: Office Market Recovery',
+      statusClass: 'active',
+      statusText: 'Active &mdash; Early Signals',
+      score: '35%',
+      scoreWidth: '35%',
+      scoreMeta: '&uarr; Improving as net absorption turns positive',
+      description: 'The Australian office market is in the early stages of a pronounced recovery. Positive net absorption across all four major CBDs, stabilising capitalisation rates, and a supportive supply pipeline drive Dexus\'s premium office portfolio higher. Cap rate compression and rent growth close the NTA discount.',
+      requires: [
+        'CBD vacancy rates decline below 12% in Sydney and Melbourne',
+        'Positive net absorption sustained for 3+ consecutive quarters',
+        'Cap rates stabilise or compress 25-50bps',
+        'Like-for-like office income growth turns positive',
+        'Return-to-office mandates strengthen across major tenants'
+      ],
+      supportingLabel: 'Supporting Evidence',
+      supporting: [
+        '<strong>Market Data:</strong> Positive net absorption across all four major Australian CBDs in 2025',
+        '<strong>Corporate:</strong> Dexus reporting early signs of office recovery in premium CBD locations',
+        '<strong>Economic:</strong> Limited new office supply pipeline supports rental growth from 2026'
+      ],
+      contradictingLabel: 'Contradicting Evidence',
+      contradicting: [
+        '<strong>Economic:</strong> Hybrid work has permanently reduced average office attendance to 3-4 days per week',
+        '<strong>Market Data:</strong> CBD vacancy rates remain elevated relative to pre-COVID levels',
+        '<strong>Competitor:</strong> Some tenants continue to reduce office footprint on lease expiry'
+      ]
+    },
+    {
+      tier: 't2',
+      direction: 'neutral',
+      title: 'T2: Steady-State REIT',
+      statusClass: 'priced',
+      statusText: 'Priced &mdash; Base Case',
+      score: '45%',
+      scoreWidth: '45%',
+      scoreMeta: '&rarr; Steady',
+      description: 'Dexus continues as a steady-state REIT: distributions maintained at ~37 cents, AFFO stable around 45 cents, and the portfolio gradually repositions toward industrial and alternatives. The NTA discount persists but the yield attracts income investors. The funds management platform grows steadily.',
+      requires: [
+        'AFFO per security maintains 44-46 cent range',
+        'Distribution maintained at ~37 cents (5.5%+ yield)',
+        'Office occupancy holds above 90%',
+        'Funds management AUM grows toward $55B+',
+        'Gearing maintained within target range'
+      ],
+      supportingLabel: 'Supporting Evidence',
+      supporting: [
+        '<strong>Filings:</strong> FY25 delivered on AFFO guidance of 45.0 cents per security',
+        '<strong>Filings:</strong> Distribution of 37.0 cents maintained; 19.3 cent interim for H1 FY26',
+        '<strong>Corporate:</strong> Funds management grown to $50.1B AUM, diversifying earnings',
+        '<strong>Corporate:</strong> Industrial development pipeline delivering strong pre-leased returns'
+      ],
+      contradictingLabel: 'Contradicting Evidence',
+      contradicting: [
+        '<strong>Economic:</strong> Office valuations may face further writedowns if cap rates expand',
+        '<strong>Market Data:</strong> Stock continues to trade at significant NTA discount'
+      ]
+    },
+    {
+      tier: 't3',
+      direction: 'downside',
+      title: 'T3: Structural Office Decline',
+      statusClass: 'active',
+      statusText: 'Active &mdash; Fading',
+      score: '30%',
+      scoreWidth: '30%',
+      scoreMeta: '&darr; Fading as recovery signals emerge',
+      description: 'Hybrid work is permanent and deepening. Companies continue to reduce office footprint, sublease supply floods the market, and CBD vacancy rates stay elevated above 15%. Dexus\'s office-heavy portfolio suffers ongoing valuation writedowns. NTA falls further and distributions may be cut to preserve capital.',
+      requires: [
+        'CBD vacancy rates rise above 15% in Sydney/Melbourne',
+        'Sublease space continues to increase',
+        'Major tenants announce further footprint reductions',
+        'Office cap rates expand 50bps+',
+        'AFFO declines below 40 cents, threatening distribution coverage'
+      ],
+      supportingLabel: 'Supporting Evidence',
+      supporting: [
+        '<strong>Economic:</strong> Hybrid work adoption is permanent; average CBD attendance 3-4 days/week',
+        '<strong>Academic:</strong> Research confirms structural 10-20% reduction in office demand post-COVID',
+        '<strong>Economic:</strong> Higher interest rates have already driven cap rate expansion'
+      ],
+      contradictingLabel: 'Contradicting Evidence',
+      contradicting: [
+        '<strong>Market Data:</strong> Net absorption turned positive across major CBDs in 2025',
+        '<strong>Corporate:</strong> Dexus premium portfolio in core CBD locations is more resilient than B/C-grade',
+        '<strong>Economic:</strong> Limited new supply pipeline supports rental growth from 2026',
+        '<strong>Corporate:</strong> Industrial and funds management diversify earnings away from office'
+      ]
+    },
+    {
+      tier: 't4',
+      direction: 'downside',
+      title: 'T4: Interest Rate &amp; Refinancing Risk',
+      statusClass: 'watching',
+      statusText: 'Watching &mdash; Rate Dependent',
+      score: '25%',
+      scoreWidth: '25%',
+      scoreMeta: '&rarr; Steady',
+      description: 'Higher-for-longer interest rates compress REIT valuations through two channels: higher discount rates reduce asset values, and higher borrowing costs erode distributable earnings. Dexus, with significant debt facilities, faces refinancing risk at elevated rates. Each 50bps increase in borrowing costs reduces AFFO by approximately 2-3 cents per security.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence',
+      supporting: [
+        '<strong>Economic:</strong> RBA cash rate remains elevated; bond yields above pre-COVID levels',
+        '<strong>Economic:</strong> Higher discount rates directly compress property asset values',
+        '<strong>Filings:</strong> Dexus has significant debt facilities requiring periodic refinancing'
+      ],
+      contradictingLabel: 'Contradicting Evidence',
+      contradicting: [
+        '<strong>Economic:</strong> RBA expected to cut rates in 2026, reducing borrowing costs',
+        '<strong>Filings:</strong> Dexus maintains diversified funding sources and hedging program',
+        '<strong>Corporate:</strong> Gearing at D/E 0.50x is within target range and manageable'
+      ]
+    }
+  ],
+
+  // Narrative
+  narrative: {
+    theNarrative: 'The market narrative is a contest between <strong>"office recovery and income yield" versus "structural decline and NTA erosion."</strong> Dexus\'s premium CBD office portfolio is showing early signs of recovery &mdash; positive net absorption, stabilising cap rates, limited new supply &mdash; but the stock trades at <span class="key-stat down">A$6.17</span>, a significant discount to NTA, reflecting the market\'s residual scepticism about office demand. The $50.1B funds management platform and industrial development pipeline provide diversification, but office remains ~65% of earnings. With H1 FY26 results on 18 February, the market is about to get fresh data on whether the recovery is real.',
+    priceImplication: {
+      label: 'Embedded Assumptions at A$6.17',
+      content: '<strong>Office headwinds persist:</strong> The NTA discount implies the market expects further office valuation declines. <strong>Distribution sustainable:</strong> 5.5% yield suggests the market believes distributions are maintained near current levels. <strong>No premium for recovery:</strong> The stock is not pricing in meaningful office recovery or cap rate compression. <strong>Funds management undervalued:</strong> The $50.1B AUM platform receives limited market recognition at current prices. <strong>Rate cuts priced in:</strong> Some benefit from expected RBA rate cuts is embedded, but not aggressively.'
+    },
+    evidenceCheck: 'The evidence is finely balanced. <strong>Positive signals:</strong> net absorption turning positive across CBDs, limited new supply, premium portfolio resilience, growing funds management platform. <strong>Negative signals:</strong> hybrid work is permanent, vacancy rates remain elevated vs pre-COVID, NTA discount persists, interest rate uncertainty. The key question is whether the early recovery signals in CBD office markets will accelerate into a full recovery or plateau at a structurally lower level of demand.',
+    narrativeStability: '<strong>Moderate stability, biased toward improvement.</strong> H1 FY26 results (18 February) are the next major catalyst. If office occupancy improves and AFFO guidance is maintained, T1 and T2 strengthen. If office valuations decline further or distribution guidance is cut, T3 re-emerges. RBA rate decisions through 2026 will determine whether T4 intensifies or fades.'
+  },
+
+  // Evidence
+  evidence: {
+    intro: 'Ten evidence domains assessed. Office market data and interest rate trajectory are the two highest-diagnosticity variables. The funds management platform provides an important but underappreciated earnings diversifier.',
+    cards: [
+      {
+        number: 1,
+        title: '1. Corporate Communications',
+        epistemicClass: 'ep-motivated',
+        epistemicLabel: 'Motivated',
+        finding: 'Management framing the Australian office market as being in "the early stages of a pronounced recovery." Highlighting positive net absorption, stabilising cap rates, and a supportive supply pipeline. Industrial development pipeline emphasised as a growth driver. Funds management platform positioned as a strategic differentiator. Atlassian Central on track for late 2026 completion.',
+        tension: 'Management has clear incentive to frame the office outlook positively. The "early stages of recovery" language has been used by office REITs globally, with mixed results. Need to verify with independent market data.',
+        table: null,
+        tags: [
+          { text: 'Supports T1 (recovery framing)', class: 'supports' },
+          { text: 'Supports T2 (steady operations)', class: 'supports' },
+          { text: 'Contradicts T3 (positive outlook)', class: 'contradicts' }
+        ],
+        source: 'Dexus FY25 Results; Investor presentations; ASX announcements'
+      },
+      {
+        number: 2,
+        title: '2. Regulatory Filings &amp; Financial Statements',
+        epistemicClass: 'ep-statutory',
+        epistemicLabel: 'Under Oath / Statutory',
+        finding: '<strong>FY25:</strong> AFFO 45.0 cents per security (delivered on guidance). Distribution 37.0 cents (~82% payout). H1 FY26 interim distribution 19.3 cents. Listed portfolio $14.5B. Funds management AUM $50.1B. Gearing D/E 0.50x. Industrial development: 190,400 sqm across 10 projects, 6 fully leased.',
+        tension: 'AFFO guidance delivered, but the P/E of ~41x (on statutory EPS) reflects property revaluations that distort headline earnings. AFFO is the more relevant metric for REITs.',
+        table: null,
+        tags: [
+          { text: 'Supports T2 (guidance delivered)', class: 'supports' },
+          { text: 'Neutral on T1', class: 'neutral' },
+          { text: 'Contradicts T3 (earnings stable)', class: 'contradicts' }
+        ],
+        source: 'Dexus FY25 Annual Report; H1 FY26 distribution announcement; ASX filings'
+      },
+      {
+        number: 3,
+        title: '3. Broker Research',
+        epistemicClass: 'ep-consensus',
+        epistemicLabel: 'Consensus',
+        finding: '<strong>Consensus is cautiously constructive.</strong> 19 analysts cover DXS: 3 Buy, 13 Hold, 3 Sell. Average 12-month price target A$7.60, implying <strong>~23% upside</strong> from current price. Macquarie reaffirmed Buy rating (January 2026). Broker views bifurcated: bulls focus on NTA discount and recovery potential; bears focus on structural office headwinds and interest rate risk.',
+        tension: 'The significant upside implied by consensus targets suggests either the market is too pessimistic on office recovery, or brokers are slow to adjust for structural demand decline.',
+        table: null,
+        tags: [
+          { text: 'Supports T1 (upside to targets)', class: 'supports' },
+          { text: 'Supports T2 (Hold consensus)', class: 'supports' },
+          { text: 'Neutral on T3, T4', class: 'neutral' }
+        ],
+        source: 'Macquarie, UBS, Morgan Stanley, Citi consensus data; broker reports'
+      },
+      {
+        number: 4,
+        title: '4. Market &amp; Industry Data',
+        epistemicClass: 'ep-independent',
+        epistemicLabel: 'Independent',
+        finding: '<strong>Office recovery signals are emerging.</strong> Positive net absorption across all four major Australian CBDs in 2025. Sydney CBD vacancy declining from peak. Limited new office supply pipeline through 2027 supports rental growth. Premium A-grade office outperforming B/C-grade significantly. Industrial market remains tight with strong tenant demand.',
+        tension: null,
+        table: null,
+        tags: [
+          { text: 'Strongly Supports T1 (positive absorption)', class: 'strong' },
+          { text: 'Supports T2 (market stabilising)', class: 'supports' },
+          { text: 'Contradicts T3 (vacancy declining)', class: 'contradicts' }
+        ],
+        source: 'PCA Office Market Report; JLL Research; CBRE MarketView; Knight Frank'
+      },
+      {
+        number: 5,
+        title: '5. Economic Data',
+        epistemicClass: 'ep-objective',
+        epistemicLabel: 'Objective',
+        finding: '<strong>Mixed signals.</strong> RBA cash rate remains elevated but rate cuts expected through 2026. Australian employment strong, supporting office demand. However, hybrid work adoption is permanent: average CBD attendance 3-4 days per week. Bond yields above pre-COVID levels continue to pressure REIT valuations. Limited new office supply is a positive for landlords.',
+        tension: null,
+        table: null,
+        tags: [
+          { text: 'Supports T1 (strong employment)', class: 'supports' },
+          { text: 'Supports T3 (hybrid work permanent)', class: 'supports' },
+          { text: 'Supports T4 (elevated rates)', class: 'supports' }
+        ],
+        source: 'RBA; ABS labour force data; CBD attendance surveys; bond market data'
+      }
+    ],
+    alignmentSummary: null
+  },
+
+  // Discriminators
+  discriminators: {
+    intro: 'Three data points carry high diagnosticity. CBD office market data is the single most important variable. Interest rate trajectory determines the valuation framework. Funds management growth provides the diversification narrative.',
+    rows: [
+      { diagnosticity: 'HIGH', diagnosticityClass: 'disc-high', evidence: '<strong>Sydney CBD vacancy rate trajectory.</strong> Decline below 12% confirms T1; rise above 15% confirms T3.', discriminatesBetween: 'T1 (office recovery) vs T3 (structural decline)', currentReading: 'Declining from peak', readingClass: 'td-green' },
+      { diagnosticity: 'HIGH', diagnosticityClass: 'disc-high', evidence: '<strong>RBA cash rate and bond yields.</strong> Rate cuts support T1/T2; higher-for-longer strengthens T4.', discriminatesBetween: 'T2 (base case holds) vs T4 (rate pressure intensifies)', currentReading: 'Cuts expected 2026', readingClass: 'td-amber' },
+      { diagnosticity: 'MEDIUM', diagnosticityClass: 'disc-med', evidence: '<strong>H1 FY26 AFFO and distribution guidance.</strong> Maintained guidance confirms T2; guidance cut activates T3.', discriminatesBetween: 'T2 (steady state) vs T3 (earnings pressure)', currentReading: 'Results 18 Feb 2026', readingClass: 'td-amber' }
+    ],
+    nonDiscriminating: '<strong>"Trading below NTA"</strong> (most A-REITs trade below NTA; the discount alone is not informative) &bull; <strong>"Offices are dead"</strong> (hybrid work reduced demand but offices remain essential for collaboration) &bull; <strong>"High yield means value"</strong> (yield must be assessed against distribution sustainability and capital risk)'
+  },
+
+  // Tripwires
+  tripwires: {
+    intro: 'Three revision conditions. Office market data and interest rates are the dominant variables. H1 FY26 results (18 February) provide the next major data point.',
+    cards: [
+      {
+        date: '18 Feb 2026',
+        name: 'H1 FY26 Results',
+        conditions: [
+          { if: 'If AFFO guidance maintained at 44-46 cents and office occupancy improves', valence: 'positive', then: 'T2 (Base Case) confirmed. Distribution safe. Recovery narrative strengthens.' },
+          { if: 'If AFFO guidance cut or distribution reduced', valence: 'negative', then: 'T3 (Structural Decline) re-activates. NTA discount may widen. Income investors exit.' }
+        ],
+        source: 'Source: Dexus H1 FY26 Results; ASX announcement'
+      },
+      {
+        date: '2026',
+        name: 'RBA Rate Trajectory',
+        conditions: [
+          { if: 'If RBA delivers 2+ rate cuts in 2026', valence: 'positive', then: 'T4 fades. Lower borrowing costs support AFFO. REIT valuations re-rate higher.' },
+          { if: 'If rates held or raised through 2026', valence: 'negative', then: 'T4 strengthens. Refinancing costs rise. Distribution coverage compressed.' }
+        ],
+        source: 'Source: RBA monetary policy decisions; bond market pricing'
+      },
+      {
+        date: '2H 2026',
+        name: 'Office Market Trajectory',
+        conditions: [
+          { if: 'If Sydney CBD vacancy falls below 12% with sustained positive net absorption', valence: 'positive', then: 'T1 (Office Recovery) confirmed. Rental growth drives earnings. NTA discount narrows.' },
+          { if: 'If vacancy rises above 15% or sublease space increases materially', valence: 'negative', then: 'T3 (Structural Decline) strengthens. Further valuation writedowns likely.' }
+        ],
+        source: 'Source: PCA Office Market Report; JLL; CBRE quarterly data'
+      }
+    ]
+  },
+
+  // Gaps
+  gaps: {
+    coverageRows: [
+      { domain: 'Corporate Comms', coverageLevel: 'full', coverageLabel: 'Full', freshness: 'FY25 Results', confidence: 'Low (motivated)', confidenceClass: '' },
+      { domain: 'Financial Statements', coverageLevel: 'full', coverageLabel: 'Full', freshness: 'FY25 (audited)', confidence: 'High (audited)', confidenceClass: 'td-green' },
+      { domain: 'Broker Research', coverageLevel: 'full', coverageLabel: 'Full', freshness: 'Recent', confidence: 'High (19 analysts)', confidenceClass: 'td-green' },
+      { domain: 'Market Data', coverageLevel: 'good', coverageLabel: 'Good', freshness: 'Current', confidence: 'High (independent)', confidenceClass: 'td-green' },
+      { domain: 'Economic Data', coverageLevel: 'full', coverageLabel: 'Full', freshness: 'Current', confidence: 'High (objective)', confidenceClass: 'td-green' },
+      { domain: 'Alternative Data', coverageLevel: 'partial', coverageLabel: 'Partial', freshness: 'Mixed', confidence: 'Medium', confidenceClass: 'td-amber' },
+      { domain: 'Academic Research', coverageLevel: 'partial', coverageLabel: 'Partial', freshness: 'Structural', confidence: 'Medium (limited REIT-specific)', confidenceClass: 'td-amber' },
+      { domain: 'Media & Social', coverageLevel: 'good', coverageLabel: 'Good', freshness: 'Current', confidence: 'Low (narrative-driven)', confidenceClass: '' },
+      { domain: 'Leadership & Governance', coverageLevel: 'good', coverageLabel: 'Good', freshness: 'Current', confidence: 'Medium', confidenceClass: 'td-amber' },
+      { domain: 'Ownership & Capital Flows', coverageLevel: 'partial', coverageLabel: 'Partial', freshness: 'Mixed', confidence: 'Medium', confidenceClass: 'td-amber' }
+    ],
+    couldntAssess: [
+      '<strong>Tenant lease expiry profile detail:</strong> The specific timing and quantum of upcoming lease expiries in the office portfolio is not fully transparent. A cluster of expiries could create a vacancy spike.',
+      '<strong>Funds management fee margins:</strong> The profitability of the $50.1B funds management platform at the fee level is not clearly disclosed. Fee compression in the industry could reduce this earnings stream.',
+      '<strong>Development pipeline risk:</strong> The risk-adjusted returns on major developments (Atlassian Central, Waterfront Brisbane) depend on leasing outcomes that are uncertain in the current market.',
+      '<strong>NTA calculation methodology:</strong> Property valuations used in NTA calculations are inherently backward-looking and may not reflect current market conditions.'
+    ],
+    analyticalLimitations: 'Hypothesis survival scores reflect editorial assessment. The base case (T2: 45%) is weighted highest because Dexus has delivered on guidance and distributions are maintained. T1 (Office Recovery: 35%) is rising as market data improves. T3 (Structural Decline: 30%) is fading but cannot be dismissed given permanent hybrid work changes. T4 (Rate Risk: 25%) is rate-path dependent and could shift rapidly with RBA decisions.'
+  },
+
+  technicalAnalysis: {
+    date: '16 February 2026',
+    period: '1 Year',
+    source: 'Continuum Technical Intelligence',
+    regime: 'Downtrending',
+    clarity: 'Clear',
+
+    price: { current: 6.17, currency: 'A$' },
+
+    movingAverages: {
+      ma50:  { value: 6.45, date: '16 Feb 2026' },
+      ma200: { value: 7.05, date: '16 Feb 2026' },
+      crossover: {
+        type: 'Death Cross',
+        date: 'w/c 15 September 2025',
+        description: '50-day MA crossed below 200-day MA during sustained downtrend'
+      },
+      priceVsMa50:  -4.3,
+      priceVsMa200: -12.5
+    },
+
+    trend: {
+      direction: 'Down',
+      duration: '12 months',
+      structure: 'Lower highs and lower lows from 52-week high; sustained downtrend',
+      peak:   { price: 7.89, date: 'w/c 24 February 2025' },
+      trough: { price: 6.17, date: '16 February 2026' },
+      drawdown: -21.8
+    },
+
+    keyLevels: {
+      support:    { price: 6.00, method: 'Round number and psychological support' },
+      resistance: { price: 6.50, method: '50-day MA resistance and recent consolidation ceiling' },
+      fiftyTwoWeekHigh: { price: 7.89, date: 'w/c 24 February 2025' },
+      fiftyTwoWeekLow:  { price: 6.17, date: '16 February 2026' }
+    },
+
+    volume: {
+      latestVs20DayAvg: 1.0,
+      latestDate: '16 February 2026',
+      priorSpikes: [
+        { period: 'w/c 25 August 2025', ratio: 2.0, context: 'FY25 results release' },
+        { period: 'w/c 10 November 2025', ratio: 1.5, context: 'Investor update; industrial development' }
+      ]
+    },
+
+    volatility: {
+      latestDailyRange: { high: 6.22, low: 6.15, date: '16 February 2026' },
+      latestRangePercent: 1.1,
+      avgDailyRangePercent30: 1.2,
+      avgDailyRangePercent90: 1.3
+    },
+
+    meanReversion: {
+      vsMa50:  -4.3,
+      vsMa200: -12.5,
+      rangePosition: 0,
+      rangeHigh: 7.89,
+      rangeLow:  6.17
+    },
+
+    inflectionPoints: [
+      { date: 'w/c 24 February 2025', price: 7.89, event: '52-week high' },
+      { date: 'w/c 25 August 2025',   price: 6.85, event: 'FY25 results; modest recovery' },
+      { date: 'w/c 15 September 2025', price: 6.70, event: 'Death cross forms; downtrend confirmed' },
+      { date: '16 February 2026',     price: 6.17, event: '52-week low; pre-H1 results' }
+    ],
+
+    relativePerformance: {
+      vsIndex:  { name: 'S&amp;P/ASX 200',  period: '12 months', stockReturn: -21.8, indexReturn: -2.3, relativeReturn: -19.5 },
+      vsSector: { name: 'S&amp;P/ASX A-REIT', period: '12 months', stockReturn: -21.8, sectorReturn: -8.5, relativeReturn: -13.3 }
+    }
+  },
+
+  // Footer
+  footer: {
+    disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information. This report does not contain buy, sell, or hold recommendations, price targets, or valuation models.',
+    domainCount: '5 of 10',
     hypothesesCount: '4 Active'
   }
 };

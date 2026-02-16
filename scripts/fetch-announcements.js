@@ -26,7 +26,8 @@ const OUTPUT_PATH = path.join(DATA_DIR, 'announcements.json');
 // Tickers to monitor (ASX codes, no .AX suffix)
 const TICKERS = [
   'XRO', 'CSL', 'WOW', 'GMG', 'MQG', 'WTC',
-  'PME', 'SIG', 'DRO', 'FMG', 'WDS', 'GYG'
+  'PME', 'SIG', 'DRO', 'FMG', 'WDS', 'GYG',
+  'DXS'
 ];
 
 // Number of announcements to fetch per ticker

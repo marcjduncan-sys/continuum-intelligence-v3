@@ -20,7 +20,8 @@ const INDEX_PATH = path.join(__dirname, '..', 'index.html');
 // All tickers to update (Yahoo Finance symbols)
 const TICKERS = [
   'XRO.AX', 'CSL.AX', 'WOW.AX', 'GMG.AX', 'MQG.AX', 'WTC.AX',
-  'PME.AX', 'SIG.AX', 'DRO.AX', 'FMG.AX', 'WDS.AX', 'GYG.AX'
+  'PME.AX', 'SIG.AX', 'DRO.AX', 'FMG.AX', 'WDS.AX', 'GYG.AX',
+  'DXS.AX'
 ];
 
 // Max priceHistory length (keep last 252 trading days = ~1 year)
