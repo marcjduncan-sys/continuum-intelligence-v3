@@ -27,7 +27,8 @@ const OUTPUT_PATH = path.join(DATA_DIR, 'announcements.json');
 const TICKERS = [
   'XRO', 'CSL', 'WOW', 'GMG', 'MQG', 'WTC',
   'PME', 'SIG', 'DRO', 'FMG', 'WDS', 'GYG',
-  'DXS'
+  'DXS',
+  'NAB'
 ];
 
 // Number of announcements to fetch per ticker

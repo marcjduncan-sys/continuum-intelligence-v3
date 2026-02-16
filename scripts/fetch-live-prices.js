@@ -29,7 +29,8 @@ const OUTPUT_PATH = path.join(DATA_DIR, 'live-prices.json');
 const TICKERS = [
   'XRO.AX', 'CSL.AX', 'WOW.AX', 'GMG.AX', 'MQG.AX', 'WTC.AX',
   'PME.AX', 'SIG.AX', 'DRO.AX', 'FMG.AX', 'WDS.AX', 'GYG.AX',
-  'DXS.AX'
+  'DXS.AX',
+  'NAB.AX'
 ];
 
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';

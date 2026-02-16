@@ -12,7 +12,8 @@ const path = require('path');
 const COVERAGE_TICKERS = [
   'WOW', 'XRO', 'WTC', 'DRO', 'PME', 'GYG',
   'CSL', 'MQG', 'GMG', 'WDS', 'SIG', 'FMG',
-  'DXS'
+  'DXS',
+  'NAB'
 ];
 
 // Event type patterns for classification
