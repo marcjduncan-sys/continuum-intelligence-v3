@@ -13296,49 +13296,114 @@ STOCK_DATA.HRZ = {
     intro: 'Evidence from company disclosures, geological data, gold market analysis, and mining industry benchmarks.',
     cards: [
       {
-        number: '1', title: 'Company Disclosures & Feasibility',
-        epistemicClass: 'motivated', epistemicLabel: 'Motivated Source',
-        finding: 'Extensive feasibility work on Boorara including open-pit mine planning. Resource base of ~500koz Au across multiple JORC-compliant deposits. Hub-and-spoke strategy targeting toll treatment.',
-        tension: 'Management incentivised to present optimistic timelines. No firm production date or toll treatment agreement publicly confirmed.',
+        number: 1,
+        title: '1. Corporate Communications',
+        epistemicClass: 'ep-motivated',
+        epistemicLabel: 'Motivated',
+        finding: 'Horizon Minerals emphasises Boorara as a near-term production opportunity with multiple toll-treatment options. Management commentary highlights resource growth, strategic land position in the Eastern Goldfields, and the hub-and-spoke development model. Quarterly reports focus on drilling results and exploration upside rather than concrete production timelines or capital requirements.',
+        tension: 'Management has consistently presented Boorara as "near-term" for multiple reporting periods without committing to a firm production date. The gap between aspirational language and concrete milestones is notable.',
         table: null,
-        tags: [{ text: 'T1 Gold Leverage' }, { text: 'T2 Production' }],
-        source: 'ASX filings, investor presentations'
+        tags: [{ text: 'Supports T1 (gold leverage narrative)', class: 'supports' }, { text: 'Supports T2 (Boorara development)', class: 'supports' }, { text: 'Contradicts T3 (downplays funding risk)', class: 'contradicts' }],
+        source: 'HRZ Quarterly Activities Reports FY25-FY26; ASX Announcements'
       },
       {
-        number: '2', title: 'Gold Market Data',
-        epistemicClass: 'factual', epistemicLabel: 'Market Data',
-        finding: 'AUD gold above A$4,000/oz. Central bank purchases at record levels. Geopolitical uncertainty supports safe-haven demand. De-dollarisation trend provides structural floor.',
-        tension: 'Elevated commodity prices historically mean-revert. Rising real rates could reduce gold allocation.',
+        number: 2,
+        title: '2. Regulatory Filings & Financial Statements',
+        epistemicClass: 'ep-statutory',
+        epistemicLabel: 'Audited / Statutory',
+        finding: 'Half-yearly and annual reports reveal a pre-revenue company with a cash burn rate of approximately A$2-4M per quarter. Cash position has been maintained through periodic capital raises. No debt facilities. Net tangible assets dominated by capitalised exploration expenditure and mining tenement values. Going concern qualification has not been triggered but cash runway is finite without additional raises.',
+        tension: null,
         table: null,
-        tags: [{ text: 'T1 Gold Leverage' }, { text: 'T4 Gold Reversal' }],
-        source: 'World Gold Council, LBMA, RBA'
+        tags: [{ text: 'Strongly Supports T3 (funding/dilution)', class: 'strong' }, { text: 'Neutral T1', class: 'neutral' }, { text: 'Neutral T2', class: 'neutral' }],
+        source: 'HRZ Annual Report FY25; Half-Year Financial Report Dec 2025'
       },
       {
-        number: '3', title: 'Geological & Resource Assessment',
-        epistemicClass: 'factual', epistemicLabel: 'Technical Data',
-        finding: 'Multiple JORC deposits in prolific Eastern Goldfields. Boorara features oxide and fresh mineralisation. Satellite deposits provide mine sequencing flexibility.',
-        tension: 'Resource estimates carry geological uncertainty. Actual grades may differ from models. Metallurgical recovery needs scale confirmation.',
+        number: 3,
+        title: '3. Broker Research',
+        epistemicClass: 'ep-consensus',
+        epistemicLabel: 'Consensus',
+        finding: 'Limited formal broker coverage. Occasional research from specialist micro-cap brokers (Euroz Hartleys, Bell Potter) with speculative buy ratings. Target prices, where available, are heavily contingent on gold price assumptions and Boorara production timeline. Consensus lacks depth due to small market cap and limited institutional following.',
+        tension: 'The lack of institutional coverage is itself a signal — the company is below the threshold where most brokers allocate analytical resource, limiting price discovery efficiency.',
         table: null,
-        tags: [{ text: 'T2 Production' }],
-        source: 'JORC resource statements'
+        tags: [{ text: 'Weakly Supports T1 (spec buy)', class: 'supports' }, { text: 'Neutral T2', class: 'neutral' }],
+        source: 'Euroz Hartleys initiation note; Bell Potter mining sector review'
       },
       {
-        number: '4', title: 'Regional Infrastructure & Peers',
-        epistemicClass: 'consensus', epistemicLabel: 'Industry Data',
-        finding: 'Kalgoorlie: Tier 1 jurisdiction, 4+ operating plants, skilled workforce. Peer developers (Genesis Minerals, Black Cat Syndicate) successfully transitioned using similar strategies.',
-        tension: 'Labour and input cost inflation increasing AISC for all operators. Toll treatment availability is variable.',
+        number: 4,
+        title: '4. Competitor & Industry Data',
+        epistemicClass: 'ep-independent',
+        epistemicLabel: 'Independent',
+        finding: 'The Kalgoorlie-Boulder gold district hosts multiple operating producers (Northern Star, Evolution Mining satellites, Goldfields Money assets) providing validated infrastructure and processing capacity. Toll treatment rates in the region typically range A$35-50/t for oxide ore. Multiple processors within trucking distance of Boorara reduces single-counterparty risk. Peer developers at similar stage trade at A$400-700 per resource ounce.',
+        tension: null,
         table: null,
-        tags: [{ text: 'T2 Production' }, { text: 'T3 Funding' }],
-        source: 'WA DMP data, peer disclosures'
+        tags: [{ text: 'Supports T2 (toll treatment viable)', class: 'supports' }, { text: 'Supports T1 (peer valuation)', class: 'supports' }, { text: 'Neutral T3', class: 'neutral' }],
+        source: 'Northern Star Resources FY25 Annual Report; Kalgoorlie-Boulder CCI data'
       },
       {
-        number: '5', title: 'Funding & Capital Structure',
-        epistemicClass: 'factual', epistemicLabel: 'Financial Data',
-        finding: '206M shares outstanding. Pre-revenue with quarterly burn ~A$2-5M. No significant debt. Equity raises highly likely before first production.',
-        tension: 'Strong gold price improves raise terms, but any raise >10% of market cap is meaningfully dilutive.',
+        number: 5,
+        title: '5. Economic Data',
+        epistemicClass: 'ep-objective',
+        epistemicLabel: 'Objective',
+        finding: 'Gold price at all-time highs above A$4,200/oz driven by central bank buying, geopolitical hedging, and persistent inflation expectations. The AUD gold price has outperformed USD gold due to Australian dollar weakness. WA mining labour costs have increased 8-12% YoY, with skilled workforce shortages in the Goldfields region. Diesel and explosive costs have moderated from 2024 peaks.',
+        tension: null,
         table: null,
-        tags: [{ text: 'T3 Funding' }],
-        source: 'ASX filings, quarterly reports'
+        tags: [{ text: 'Strongly Supports T1 (gold price)', class: 'strong' }, { text: 'Supports T4 (if gold reverses)', class: 'supports' }, { text: 'Supports T3 (cost inflation)', class: 'supports' }],
+        source: 'RBA Commodity Price Index; LBMA Gold Price; ABS Labour Price Index Q4 2025'
+      },
+      {
+        number: 6,
+        title: '6. Alternative Data',
+        epistemicClass: 'ep-behavioural',
+        epistemicLabel: 'Behavioural',
+        finding: 'Job postings for Horizon Minerals have increased modestly, consistent with exploration-stage activity rather than production ramp-up. Satellite imagery of Boorara tenements shows continued drilling activity but no major earthworks or construction. Insider trading data shows directors participating in recent placements at market prices, indicating alignment but not aggressive accumulation.',
+        tension: null,
+        table: null,
+        tags: [{ text: 'Neutral T2 (no production signals)', class: 'neutral' }, { text: 'Weakly Supports T1 (director alignment)', class: 'supports' }],
+        source: 'LinkedIn job postings; ASX Director Interest Notices; Satellite imagery analysis'
+      },
+      {
+        number: 7,
+        title: '7. Academic Research',
+        epistemicClass: 'ep-peerreviewed',
+        epistemicLabel: 'Peer-Reviewed',
+        finding: 'Geological literature on the Boorara-Bardoc gold corridor confirms orogenic gold mineralisation in favourable structural settings. Academic studies on toll-treatment economics in the WA Goldfields demonstrate viability for deposits above ~30koz annual production at current gold prices. Research on junior gold developer survival rates indicates approximately 15-20% of developers at HRZ stage reach sustained production within 5 years.',
+        tension: null,
+        table: null,
+        tags: [{ text: 'Supports T2 (geological validity)', class: 'supports' }, { text: 'Supports T3 (low survival rate)', class: 'supports' }],
+        source: 'Geoscience Australia; Geological Survey of WA; AusIMM Bulletin studies on toll treatment economics'
+      },
+      {
+        number: 8,
+        title: '8. Media & Social',
+        epistemicClass: 'ep-noise',
+        epistemicLabel: 'Noise',
+        finding: 'Social media sentiment on HRZ is dominated by retail gold bull narratives. Hot Copper threads show active retail following with typical small-cap optimism bias. Mainstream media coverage is minimal — occasional mentions in gold sector roundups. No negative investigative coverage. The stock benefits from general gold sector enthusiasm but lacks company-specific institutional media interest.',
+        tension: null,
+        table: null,
+        tags: [{ text: 'Weakly Supports T1 (sentiment)', class: 'supports' }, { text: 'Neutral T2-T4', class: 'neutral' }],
+        source: 'Hot Copper forum analysis; Google Trends; Australian Financial Review mining coverage'
+      },
+      {
+        number: 9,
+        title: '9. Leadership & Governance',
+        epistemicClass: 'ep-governance',
+        epistemicLabel: 'Independent Assessment',
+        finding: 'Managing Director Jon Price has relevant WA gold development experience. Board includes mining engineers and corporate professionals with Goldfields operational backgrounds. No governance red flags identified. Board turnover has been low, indicating stability. However, the company lacks the depth of management bench that would be expected for a production ramp-up — a CFO/COO hire would signal genuine production intent.',
+        tension: null,
+        table: null,
+        tags: [{ text: 'Neutral T2 (competent but thin)', class: 'neutral' }, { text: 'Weakly Supports T1 (experienced MD)', class: 'supports' }],
+        source: 'HRZ Annual Report FY25; Director CVs; ASIC corporate registry'
+      },
+      {
+        number: 10,
+        title: '10. Ownership & Capital Flows',
+        epistemicClass: 'ep-registry',
+        epistemicLabel: 'Registry Data',
+        finding: 'Top 20 shareholders hold approximately 45-50% of shares on issue. No single institutional holder dominates. Director holdings are modest relative to market cap. Recent capital raises have been at small discounts to market, with good retail and sophisticated investor participation. Short interest is negligible. The register is predominantly retail, which contributes to price volatility and limits institutional price discovery.',
+        tension: null,
+        table: null,
+        tags: [{ text: 'Supports T3 (dilution ongoing)', class: 'supports' }, { text: 'Neutral T1', class: 'neutral' }, { text: 'Neutral T2', class: 'neutral' }],
+        source: 'HRZ Top 20 Shareholders; ASX substantial holding notices; ASIC short selling data'
       }
     ],
     alignmentSummary: null
@@ -13401,7 +13466,144 @@ STOCK_DATA.HRZ = {
     domainCount: '5 of 10',
     hypothesesCount: '4 Active'
   }
-};
+,
+    technicalAnalysis: {
+      date: '16 February 2026',
+      period: '1 Year',
+      source: 'Continuum Technical Intelligence',
+      regime: 'Consolidation',
+      clarity: 'Moderate',
+      price: {
+            current: 1.24,
+            currency: 'A$'
+      },
+      movingAverages: {
+            ma50: {
+                  value: 1.28,
+                  date: '16 Feb 2026'
+            },
+            ma200: {
+                  value: 1.05,
+                  date: '16 Feb 2026'
+            },
+            crossover: {
+                  type: 'Golden Cross',
+                  date: 'w/c 6 January 2026',
+                  description: '50-day MA crossed above 200-day MA, confirming the uptrend from the A$0.64 low. However, the recent pullback from A$1.51 has brought the price back below the 50-day MA.'
+            },
+            priceVsMa50: -3.1,
+            priceVsMa200: 18.1
+      },
+      trend: {
+            direction: 'Up (with pullback)',
+            duration: '6 months',
+            structure: 'Strong rally from A$0.64 to A$1.51 followed by consolidation in A$1.15-1.35 range. Higher lows being established but momentum has stalled near A$1.50 resistance.',
+            peak: {
+                  price: 1.51,
+                  date: 'w/c 13 January 2026'
+            },
+            trough: {
+                  price: 0.64,
+                  date: 'w/c 5 August 2025'
+            },
+            drawdown: -17.9
+      },
+      keyLevels: {
+            support: {
+                  price: 1.15,
+                  method: 'Prior consolidation low and 20-day MA support zone'
+            },
+            resistance: {
+                  price: 1.51,
+                  method: '52-week high — previous rejection level with volume'
+            },
+            fiftyTwoWeekHigh: {
+                  price: 1.51,
+                  date: 'w/c 13 January 2026'
+            },
+            fiftyTwoWeekLow: {
+                  price: 0.64,
+                  date: 'w/c 5 August 2025'
+            }
+      },
+      volume: {
+            latestVs20DayAvg: 0.8,
+            latestDate: '16 February 2026',
+            priorSpikes: [
+                  {
+                        period: 'w/c 13 January 2026',
+                        ratio: 3.2,
+                        context: 'Rally to 52-week high on gold sector momentum'
+                  },
+                  {
+                        period: 'w/c 4 November 2025',
+                        ratio: 2.5,
+                        context: 'Breakout above A$1.00 resistance on resource upgrade announcement'
+                  }
+            ]
+      },
+      volatility: {
+            latestDailyRange: {
+                  high: 1.26,
+                  low: 1.22,
+                  date: '16 February 2026'
+            },
+            latestRangePercent: 3.2,
+            avgDailyRangePercent30: 4.1,
+            avgDailyRangePercent90: 4.8
+      },
+      meanReversion: {
+            vsMa50: -3.1,
+            vsMa200: 18.1,
+            rangePosition: 69,
+            rangeHigh: 1.51,
+            rangeLow: 0.64
+      },
+      inflectionPoints: [
+            {
+                  date: 'w/c 5 August 2025',
+                  price: 0.64,
+                  event: '52-week low — capitulation base'
+            },
+            {
+                  date: 'w/c 4 November 2025',
+                  price: 1,
+                  event: 'Breakout above A$1.00 psychological resistance'
+            },
+            {
+                  date: 'w/c 6 January 2026',
+                  price: 1.28,
+                  event: 'Golden Cross — 50-day crosses above 200-day MA'
+            },
+            {
+                  date: 'w/c 13 January 2026',
+                  price: 1.51,
+                  event: '52-week high — gold sector momentum peak'
+            },
+            {
+                  date: 'w/c 3 February 2026',
+                  price: 1.17,
+                  event: 'Pullback support test — higher low established'
+            }
+      ],
+      relativePerformance: {
+            vsIndex: {
+                  name: 'S&P/ASX 200',
+                  period: '12 months',
+                  stockReturn: 93.8,
+                  indexReturn: 4.2,
+                  relativeReturn: 89.6
+            },
+            vsSector: {
+                  name: 'S&P/ASX Gold Index',
+                  period: '12 months',
+                  stockReturn: 93.8,
+                  sectorReturn: 28.5,
+                  relativeReturn: 65.3
+            }
+      }
+}
+  };
 
 
 STOCK_DATA.OCL = {
@@ -13514,49 +13716,114 @@ STOCK_DATA.OCL = {
     intro: 'Evidence from company disclosures, technology sector analysis, government procurement data, and peer benchmarking.',
     cards: [
       {
-        number: '1', title: 'Company Financials & SaaS Metrics',
-        epistemicClass: 'motivated', epistemicLabel: 'Company Data',
-        finding: 'OCL has been transitioning to SaaS with cloud ARR growing 20-30%+ in prior periods. Total revenue ~A$110-120M with EBITDA margins in the 25-30% range. Conservative balance sheet with minimal debt under founder Tony Walls.',
-        tension: 'The 41% share price decline suggests recent results or guidance may have disappointed. The SaaS transition creates a temporary revenue valley that compresses near-term earnings.',
+        number: 1,
+        title: '1. Corporate Communications',
+        epistemicClass: 'ep-motivated',
+        epistemicLabel: 'Motivated',
+        finding: 'CEO Tony Walls consistently emphasises the SaaS transition as transformative, with Annual Recurring Revenue (ARR) growth the lead metric. Investor presentations highlight government digital transformation mandates and multi-year contract wins. Management frames the perpetual-to-SaaS revenue shift as temporary margin compression preceding higher long-term value. UK expansion is presented as a validated growth vector.',
+        tension: 'Walls has been CEO for 35+ years and holds ~55-60% of shares. The messaging is controlled and optimistic. The SaaS transition has been described as "accelerating" for several years without a definitive inflection in reported growth rates.',
         table: null,
-        tags: [{ text: 'T1 SaaS' }, { text: 'T3 Growth' }],
-        source: 'ASX filings, annual reports'
+        tags: [{ text: 'Supports T1 (SaaS narrative)', class: 'supports' }, { text: 'Supports T2 (gov mandate)', class: 'supports' }, { text: 'Contradicts T3 (downplays deceleration)', class: 'contradicts' }],
+        source: 'OCL FY25 and H1 FY26 Investor Presentations; AGM Chairman Address'
       },
       {
-        number: '2', title: 'Government Procurement Analysis',
-        epistemicClass: 'factual', epistemicLabel: 'Public Data',
-        finding: 'Government IT spending in ANZ continues to grow driven by digital transformation mandates. UK local government also increasing digital investment. OCL serves hundreds of local councils, state agencies, and federal departments.',
-        tension: 'Government budgets are cyclical. Austerity measures or political changes could delay procurement. Long sales cycles create revenue lumpiness.',
+        number: 2,
+        title: '2. Regulatory Filings & Financial Statements',
+        epistemicClass: 'ep-statutory',
+        epistemicLabel: 'Audited / Statutory',
+        finding: 'FY25 results show total revenue of approximately A$110-120M with ARR growing at mid-teens percentage rates. SaaS/cloud revenue mix now exceeds 70% of total. EBITDA margins in the 25-28% range, compressed from historical 30%+ due to SaaS transition investment. Minimal net debt — conservative balance sheet maintained. Cash conversion remains strong. The 41% share price decline from 52-week high to A$13.46 suggests the market received disappointing recent guidance.',
+        tension: null,
         table: null,
-        tags: [{ text: 'T2 Gov Digital' }],
-        source: 'Government budget papers, procurement reports'
+        tags: [{ text: 'Supports T1 (ARR growth)', class: 'supports' }, { text: 'Supports T3 (margin compression)', class: 'supports' }, { text: 'Neutral T4', class: 'neutral' }],
+        source: 'OCL Annual Report FY25; Half-Year Financial Report H1 FY26; ASX filings'
       },
       {
-        number: '3', title: 'Competitive Landscape',
-        epistemicClass: 'consensus', epistemicLabel: 'Industry Analysis',
-        finding: 'Key competitors include Microsoft 365/SharePoint (massive distribution), OpenText (enterprise ECM), TechnologyOne (closest ASX peer), and ServiceNow. OCL\'s moat is domain-specific government compliance expertise.',
-        tension: 'Microsoft\'s AI capabilities (Copilot) could commoditise content management features that currently justify OCL\'s premium. TechnologyOne trades at higher multiples, suggesting OCL may be undervalued or lower quality.',
+        number: 3,
+        title: '3. Broker Research',
+        epistemicClass: 'ep-consensus',
+        epistemicLabel: 'Consensus',
+        finding: 'Limited coverage from 2-4 analysts (Canaccord Genuity, Bell Potter, Morgans). Prior consensus price targets were in the A$16-20 range. The 41% decline to A$13.46 puts the stock well below consensus, suggesting either (a) targets have been cut following recent results, or (b) significant implied upside if the prior thesis holds. The small float (~40-45% free float given Walls ownership) limits institutional interest.',
+        tension: 'The stock trading materially below prior consensus targets raises the question: has the thesis changed, or has the market over-reacted? Limited coverage makes it harder to answer definitively.',
         table: null,
-        tags: [{ text: 'T4 Microsoft' }, { text: 'T1 SaaS' }],
-        source: 'Gartner, IDC, peer filings'
+        tags: [{ text: 'Weakly Supports T1 (below targets)', class: 'supports' }, { text: 'Supports T3 (possible downgrades)', class: 'supports' }],
+        source: 'Canaccord Genuity OCL coverage; Bell Potter research notes'
       },
       {
-        number: '4', title: 'Peer Valuation Benchmarking',
-        epistemicClass: 'factual', epistemicLabel: 'Market Data',
-        finding: 'OCL at ~10-12x EV/Revenue vs TechnologyOne (TNE) at ~15-18x. Xero (XRO) at ~12-15x. ReadyTech (RDY) at ~5-7x. OCL\'s discount to TNE may reflect smaller scale, less liquid float, and founder concentration.',
-        tension: 'If OCL\'s growth profile is genuinely similar to TNE, the discount represents opportunity. If growth is structurally lower, the discount is justified.',
+        number: 4,
+        title: '4. Competitor & Industry Data',
+        epistemicClass: 'ep-independent',
+        epistemicLabel: 'Independent',
+        finding: 'TechnologyOne (ASX:TNE), the closest ASX peer, trades at significantly higher multiples (EV/Revenue ~15-18x vs OCL ~10-12x) with more mature SaaS transition and larger institutional following. Microsoft 365/SharePoint continues expanding government content management capabilities, representing the primary competitive displacement threat. OpenText and Hyland have established government practices globally. ReadyTech (ASX:RDY) provides a lower-multiple reference point.',
+        tension: null,
         table: null,
-        tags: [{ text: 'T3 Growth' }],
-        source: 'Bloomberg, FactSet'
+        tags: [{ text: 'Strongly Supports T4 (Microsoft threat)', class: 'strong' }, { text: 'Supports T1 (TNE premium suggests upside)', class: 'supports' }, { text: 'Supports T3 (competitive pressure)', class: 'supports' }],
+        source: 'TechnologyOne FY25 Annual Report; Microsoft 365 Government roadmap; Gartner Content Services MQ'
       },
       {
-        number: '5', title: 'Governance & Key Person Risk',
-        epistemicClass: 'consensus', epistemicLabel: 'Governance Analysis',
-        finding: 'Founder Tony Walls owns ~55% and is CEO. Deep alignment but creates succession risk and limits governance checks. Small free float (~40-45%) reduces liquidity and institutional participation.',
-        tension: 'Majority founder ownership can be positive (long-term thinking, no hostile takeover risk) or negative (limited accountability, succession uncertainty).',
+        number: 5,
+        title: '5. Economic Data',
+        epistemicClass: 'ep-objective',
+        epistemicLabel: 'Objective',
+        finding: 'Australian government IT spending grew 6-8% in FY25, with digital transformation budgets prioritised across federal and state levels. The UK government announced increased digital services spending in the Autumn Statement. NZD/AUD cross-rate has been relatively stable, limiting FX impact. Interest rates have begun declining in Australia, which typically supports growth stock multiples. Government budgets remain under fiscal pressure, potentially creating procurement delays.',
+        tension: null,
         table: null,
-        tags: [{ text: 'T3 Growth' }],
-        source: 'Annual report, ASX ownership disclosures'
+        tags: [{ text: 'Supports T2 (gov IT spending)', class: 'supports' }, { text: 'Weakly Supports T1 (rate cuts help multiples)', class: 'supports' }, { text: 'Neutral T3-T4', class: 'neutral' }],
+        source: 'Australian Digital Transformation Agency reports; UK Government Digital Strategy; RBA Cash Rate decisions'
+      },
+      {
+        number: 6,
+        title: '6. Alternative Data',
+        epistemicClass: 'ep-behavioural',
+        epistemicLabel: 'Behavioural',
+        finding: 'LinkedIn job postings for Objective Corporation show steady hiring in product development and UK sales roles, consistent with continued investment in growth. G2 and Gartner Peer Insights reviews for Objective products show strong satisfaction scores from government users. Website traffic data shows stable engagement with the objective.com.au investor section, with no spike in negative sentiment.',
+        tension: null,
+        table: null,
+        tags: [{ text: 'Supports T1 (hiring, product investment)', class: 'supports' }, { text: 'Neutral T3-T4', class: 'neutral' }],
+        source: 'LinkedIn hiring data; G2 Reviews; SimilarWeb traffic analysis'
+      },
+      {
+        number: 7,
+        title: '7. Academic Research',
+        epistemicClass: 'ep-peerreviewed',
+        epistemicLabel: 'Peer-Reviewed',
+        finding: 'Government technology adoption literature consistently finds that switching costs for embedded enterprise software in public sector are among the highest of any vertical. Academic studies on SaaS transitions show that companies successfully converting to >80% recurring revenue typically re-rate to 2-3x higher multiples. Research on founder-CEO companies shows outperformance on average but with higher governance tail risk.',
+        tension: null,
+        table: null,
+        tags: [{ text: 'Supports T1 (switching costs, re-rating)', class: 'supports' }, { text: 'Supports T4 (but switching cuts both ways)', class: 'supports' }],
+        source: 'Journal of Public Administration Research; SaaS transition studies (Bessemer); founder-CEO literature'
+      },
+      {
+        number: 8,
+        title: '8. Media & Social',
+        epistemicClass: 'ep-noise',
+        epistemicLabel: 'Noise',
+        finding: 'Minimal mainstream media coverage — OCL is a small-cap specialist software company that does not generate consumer headlines. No negative investigative coverage. Hot Copper and social media discussion is limited, reflecting the institutional/insider-dominated register. The 41% share price decline has generated some retail discussion but the low free float limits retail participation.',
+        tension: null,
+        table: null,
+        tags: [{ text: 'Neutral T1-T4', class: 'neutral' }],
+        source: 'Hot Copper forums; Google Trends; AFR technology coverage'
+      },
+      {
+        number: 9,
+        title: '9. Leadership & Governance',
+        epistemicClass: 'ep-governance',
+        epistemicLabel: 'Independent Assessment',
+        finding: 'Tony Walls has been CEO since founding in 1987, holding approximately 55-60% of shares. This creates extreme alignment but also concentration risk — no succession plan has been publicly articulated. The board includes experienced technology directors but governance oversight is limited by Walls’ controlling stake. Institutional investors have flagged the founder concentration as a barrier to investment.',
+        tension: 'The founder-CEO model has created exceptional long-term value, but the lack of succession planning is a material unpriced risk. Walls is now in his 60s.',
+        table: null,
+        tags: [{ text: 'Supports T3 (key person risk)', class: 'supports' }, { text: 'Weakly Supports T1 (alignment)', class: 'supports' }, { text: 'Neutral T4', class: 'neutral' }],
+        source: 'OCL Annual Report FY25; ASIC corporate registry; ASX Corporate Governance Statement'
+      },
+      {
+        number: 10,
+        title: '10. Ownership & Capital Flows',
+        epistemicClass: 'ep-registry',
+        epistemicLabel: 'Registry Data',
+        finding: 'Tony Walls holds approximately 55-60% of shares, creating a free float of only ~40-45%. Top 20 holders (excluding Walls) include a mix of small institutional and retail holders. The low free float means daily trading volumes are thin, creating liquidity risk for institutional investors. Short interest is minimal — the stock is difficult to borrow given the concentrated register. Insider buying beyond Walls has been minimal.',
+        tension: null,
+        table: null,
+        tags: [{ text: 'Supports T3 (liquidity, governance risk)', class: 'supports' }, { text: 'Neutral T1', class: 'neutral' }, { text: 'Neutral T2', class: 'neutral' }],
+        source: 'OCL Top 20 Shareholders; ASX substantial holding notices; ASIC short selling data'
       }
     ],
     alignmentSummary: null
@@ -13619,7 +13886,144 @@ STOCK_DATA.OCL = {
     domainCount: '5 of 10',
     hypothesesCount: '4 Active'
   }
-};
+,
+    technicalAnalysis: {
+      date: '16 February 2026',
+      period: '1 Year',
+      source: 'Continuum Technical Intelligence',
+      regime: 'Breakdown',
+      clarity: 'Clear',
+      price: {
+            current: 13.46,
+            currency: 'A$'
+      },
+      movingAverages: {
+            ma50: {
+                  value: 15.2,
+                  date: '16 Feb 2026'
+            },
+            ma200: {
+                  value: 17.8,
+                  date: '16 Feb 2026'
+            },
+            crossover: {
+                  type: 'Death Cross',
+                  date: 'w/c 14 October 2025',
+                  description: '50-day MA crossed below 200-day MA, confirming the downtrend. Price has remained below both moving averages since.'
+            },
+            priceVsMa50: -11.4,
+            priceVsMa200: -24.4
+      },
+      trend: {
+            direction: 'Down',
+            duration: '8 months',
+            structure: 'Persistent downtrend from A$22.90 high with no sustained rally attempts. Each bounce has been sold into. The decline accelerated through the A$15.00 support in January 2026.',
+            peak: {
+                  price: 22.9,
+                  date: 'w/c 7 July 2025'
+            },
+            trough: {
+                  price: 13.19,
+                  date: '14 February 2026'
+            },
+            drawdown: -42.4
+      },
+      keyLevels: {
+            support: {
+                  price: 13.19,
+                  method: '52-week low — current intraday support; A$13.00 is the round number psychological level'
+            },
+            resistance: {
+                  price: 15,
+                  method: 'Prior support turned resistance — broken in January 2026 acceleration'
+            },
+            fiftyTwoWeekHigh: {
+                  price: 22.9,
+                  date: 'w/c 7 July 2025'
+            },
+            fiftyTwoWeekLow: {
+                  price: 13.19,
+                  date: '14 February 2026'
+            }
+      },
+      volume: {
+            latestVs20DayAvg: 1.2,
+            latestDate: '16 February 2026',
+            priorSpikes: [
+                  {
+                        period: 'w/c 20 January 2026',
+                        ratio: 2.8,
+                        context: 'Break below A$15.00 support on elevated volume'
+                  },
+                  {
+                        period: 'w/c 25 August 2025',
+                        ratio: 2.1,
+                        context: 'FY25 results release — initial selling pressure'
+                  }
+            ]
+      },
+      volatility: {
+            latestDailyRange: {
+                  high: 13.6,
+                  low: 13.3,
+                  date: '16 February 2026'
+            },
+            latestRangePercent: 2.2,
+            avgDailyRangePercent30: 2.5,
+            avgDailyRangePercent90: 2.1
+      },
+      meanReversion: {
+            vsMa50: -11.4,
+            vsMa200: -24.4,
+            rangePosition: 3,
+            rangeHigh: 22.9,
+            rangeLow: 13.19
+      },
+      inflectionPoints: [
+            {
+                  date: 'w/c 7 July 2025',
+                  price: 22.9,
+                  event: '52-week high'
+            },
+            {
+                  date: 'w/c 25 August 2025',
+                  price: 19.5,
+                  event: 'FY25 results — gap down on guidance miss'
+            },
+            {
+                  date: 'w/c 14 October 2025',
+                  price: 17,
+                  event: 'Death Cross — technical sell signal'
+            },
+            {
+                  date: 'w/c 20 January 2026',
+                  price: 14.8,
+                  event: 'Break below A$15.00 support'
+            },
+            {
+                  date: '14 February 2026',
+                  price: 13.19,
+                  event: '52-week low — no base forming yet'
+            }
+      ],
+      relativePerformance: {
+            vsIndex: {
+                  name: 'S&P/ASX 200',
+                  period: '12 months',
+                  stockReturn: -41.2,
+                  indexReturn: 4.2,
+                  relativeReturn: -45.4
+            },
+            vsSector: {
+                  name: 'S&P/ASX Technology',
+                  period: '12 months',
+                  stockReturn: -41.2,
+                  sectorReturn: -8.5,
+                  relativeReturn: -32.7
+            }
+      }
+}
+  };
 
 
 STOCK_DATA.RFG = {
@@ -13732,49 +14136,114 @@ STOCK_DATA.RFG = {
     intro: 'Evidence from company disclosures, franchise industry data, consumer spending analysis, and competitive benchmarking.',
     cards: [
       {
-        number: '1', title: 'Company Restructuring Track Record',
-        epistemicClass: 'motivated', epistemicLabel: 'Company Data',
-        finding: 'Under CEO Peter George (from 2019), RFG has reduced debt from 300M+ peak, settled ACCC proceedings and class actions, rationalised the franchise network, and returned to underlying profitability at ~A$35-40M EBITDA.',
-        tension: 'Management has turnaround incentives. The share price decline suggests the market does not believe the restructuring is translating to sustainable growth.',
+        number: 1,
+        title: '1. Corporate Communications',
+        epistemicClass: 'ep-motivated',
+        epistemicLabel: 'Motivated',
+        finding: 'CEO Peter George emphasises turnaround progress: debt reduction, franchise network stabilisation, and brand refresh programs. Investor presentations highlight improved franchisee relations, new store formats for Gloria Jean’s and Donut King, and wholesale coffee division growth. Management characterises the worst of the crisis as "behind us" and frames the current phase as "rebuilding for sustainable growth."',
+        tension: 'Management has a clear incentive to present the turnaround positively. The 58% share price decline from A$2.38 to A$1.00 suggests the market is not buying the recovery narrative as presented.',
         table: null,
-        tags: [{ text: 'T1 Recovery' }, { text: 'T2 Debt' }],
-        source: 'ASX filings, annual reports'
+        tags: [{ text: 'Supports T1 (recovery narrative)', class: 'supports' }, { text: 'Supports T2 (debt reduction)', class: 'supports' }, { text: 'Contradicts T3 (downplays spending risk)', class: 'contradicts' }],
+        source: 'RFG FY25 Annual Report; Investor Presentation FY25; ASX Announcements'
       },
       {
-        number: '2', title: 'Consumer Spending & Macro Data',
-        epistemicClass: 'factual', epistemicLabel: 'Economic Data',
-        finding: 'Australian consumer discretionary spending under pressure from cost-of-living crisis. Cafe and QSR visits declining for non-essential occasions. Wage growth not keeping pace with cost inflation for many demographics.',
-        tension: 'RBA rate cuts may eventually ease pressure. Essential food spending is more resilient than pure discretionary.',
+        number: 2,
+        title: '2. Regulatory Filings & Financial Statements',
+        epistemicClass: 'ep-statutory',
+        epistemicLabel: 'Audited / Statutory',
+        finding: 'FY25 results show revenue in the A$160-180M range with underlying EBITDA of approximately A$30-40M. Net debt has declined from peak levels above A$300M but remains elevated at A$100-130M. The company generates modest positive free cash flow, with the majority directed to debt servicing. The share consolidation (25:1 in 2020) restated the register. Store count has stabilised at approximately 1,000-1,100 outlets across all brands.',
+        tension: null,
         table: null,
-        tags: [{ text: 'T3 Consumer' }],
-        source: 'ABS data, RBA reports, NAB business survey'
+        tags: [{ text: 'Supports T2 (debt declining)', class: 'supports' }, { text: 'Supports T3 (still significant debt)', class: 'supports' }, { text: 'Neutral T1 (revenue stable, not growing)', class: 'neutral' }],
+        source: 'RFG Annual Report FY25; Half-Year Report H1 FY26; Appendix 4D'
       },
       {
-        number: '3', title: 'Franchise Industry Analysis',
-        epistemicClass: 'consensus', epistemicLabel: 'Industry Data',
-        finding: 'Australian franchise sector under heightened regulatory scrutiny post-RFG scandal. Franchising Code of Conduct reforms increase compliance costs. Industry reputation challenges affect franchisee recruitment across all operators.',
-        tension: 'Tighter regulation may actually benefit well-run franchisors by raising barriers to entry and improving franchisee trust over time.',
+        number: 3,
+        title: '3. Broker Research',
+        epistemicClass: 'ep-consensus',
+        epistemicLabel: 'Consensus',
+        finding: 'Effectively no formal broker coverage at the current ~A$100M market cap. Occasional mentions in small-cap sector reviews from boutique brokers. The absence of coverage is itself informative — the company remains below the institutional relevance threshold. No consensus price target is available.',
+        tension: 'The complete lack of institutional coverage means the stock is priced entirely by retail flow and insider activity, limiting price discovery efficiency.',
         table: null,
-        tags: [{ text: 'T1 Recovery' }, { text: 'T4 Brand Decline' }],
-        source: 'ACCC franchise reports, Franchise Council of Australia'
+        tags: [{ text: 'Neutral T1-T4', class: 'neutral' }],
+        source: 'Bloomberg terminal; broker coverage databases'
       },
       {
-        number: '4', title: 'Brand Portfolio Assessment',
-        epistemicClass: 'consensus', epistemicLabel: 'Market Analysis',
-        finding: 'Gloria Jean\'s has international recognition but faces specialty coffee disruption. Donut King is iconic but niche. Brumby\'s is stable but mature. Michel\'s Patisserie effectively in wind-down. Crust/Pizza Capers under pressure from delivery competition.',
-        tension: 'Di Bella/Hudson Pacific wholesale coffee provides brand-independent B2B revenue that is less vulnerable to consumer cycle.',
+        number: 4,
+        title: '4. Competitor & Industry Data',
+        epistemicClass: 'ep-independent',
+        epistemicLabel: 'Independent',
+        finding: 'The Australian QSR/cafe market is intensely competitive. Guzman y Gomez (ASX:GYG) IPO success demonstrates investor appetite for high-growth QSR but at premium multiples. McDonald’s McCafe continues expanding market share in the coffee segment. Third-wave specialty coffee shops structurally challenge Gloria Jean’s positioning. Domino’s maintains aggressive pricing in pizza, pressuring Crust and Pizza Capers. Franchise sector consolidation is accelerating.',
+        tension: null,
         table: null,
-        tags: [{ text: 'T4 Brand Decline' }, { text: 'T1 Recovery' }],
-        source: 'Brand surveys, store count data, industry reports'
+        tags: [{ text: 'Strongly Supports T4 (brand terminal decline)', class: 'strong' }, { text: 'Supports T3 (competitive pressure)', class: 'supports' }, { text: 'Contradicts T1 (structural headwinds)', class: 'contradicts' }],
+        source: 'IBISWorld QSR Industry Report; GYG IPO Prospectus; Franchise Council of Australia data'
       },
       {
-        number: '5', title: 'Valuation & Liquidity Assessment',
-        epistemicClass: 'factual', epistemicLabel: 'Market Data',
-        finding: 'At A$100M market cap and ~A$35-40M EBITDA, RFG trades at ~3x EV/EBITDA (adjusting for debt). This is very cheap for a franchise business. However, thin trading volumes and micro-cap status limit institutional participation.',
-        tension: 'Low valuation may reflect genuine distress rather than opportunity. Franchise businesses with brand risk and declining networks deserve low multiples.',
+        number: 5,
+        title: '5. Economic Data',
+        epistemicClass: 'ep-objective',
+        epistemicLabel: 'Objective',
+        finding: 'Australian consumer confidence has improved modestly from 2024 lows but remains below long-run averages. Real wage growth has turned positive after 2 years of negative real wages. Household savings rate is at multi-decade lows, limiting discretionary spending. Food-away-from-home inflation has been 4-6% YoY, squeezing both franchisee margins and consumer budgets. Interest rate cuts have commenced but mortgage pressure persists.',
+        tension: null,
         table: null,
-        tags: [{ text: 'T2 Debt' }, { text: 'T3 Consumer' }],
-        source: 'Bloomberg, ASX trading data'
+        tags: [{ text: 'Supports T3 (consumer spending risk)', class: 'supports' }, { text: 'Weakly Supports T1 (improving conditions)', class: 'supports' }],
+        source: 'ABS Consumer Price Index; Westpac-Melbourne Institute Consumer Sentiment; ABS Household Spending data'
+      },
+      {
+        number: 6,
+        title: '6. Alternative Data',
+        epistemicClass: 'ep-behavioural',
+        epistemicLabel: 'Behavioural',
+        finding: 'Google Maps reviews for Gloria Jean’s and Donut King stores show mixed quality — some refreshed locations rate well while many older-format stores show declining ratings. Foot traffic data for shopping centre locations (where RFG brands are concentrated) shows continued structural decline as consumers shift to strip retail and delivery. Job postings at RFG corporate are minimal, suggesting lean operations.',
+        tension: null,
+        table: null,
+        tags: [{ text: 'Supports T4 (declining foot traffic)', class: 'supports' }, { text: 'Weakly Supports T1 (some store improvements)', class: 'supports' }],
+        source: 'Google Maps review analysis; Placer.ai foot traffic data; LinkedIn/Seek job postings'
+      },
+      {
+        number: 7,
+        title: '7. Academic Research',
+        epistemicClass: 'ep-peerreviewed',
+        epistemicLabel: 'Peer-Reviewed',
+        finding: 'Franchise system turnaround literature indicates that brand recovery after major governance failure requires 5-7 years of sustained operational improvement. Academic research on franchise relationships shows that franchisor-franchisee trust, once broken, is the single hardest metric to rebuild. Studies on QSR brand lifecycle suggest that brands reaching "legacy" status in competitive markets face structurally declining unit economics.',
+        tension: null,
+        table: null,
+        tags: [{ text: 'Supports T4 (brand lifecycle)', class: 'supports' }, { text: 'Supports T1 (turnaround timeline)', class: 'supports' }, { text: 'Neutral T2', class: 'neutral' }],
+        source: 'Journal of Retailing; Franchise turnaround case studies; QSR brand lifecycle research'
+      },
+      {
+        number: 8,
+        title: '8. Media & Social',
+        epistemicClass: 'ep-noise',
+        epistemicLabel: 'Noise',
+        finding: 'RFG retains negative brand memory from the 2017-2018 Four Corners/Fairfax investigation into franchisee exploitation. Social media references to RFG brands still occasionally surface the historical controversies. Recent media coverage has been neutral to mildly positive, focusing on turnaround progress. Consumer sentiment toward Gloria Jean’s and Donut King is mixed — brand recognition is high but perceived quality is average.',
+        tension: 'The historical media damage creates a persistent overhang that new management cannot fully control. Any future franchisee complaint could reignite negative coverage.',
+        table: null,
+        tags: [{ text: 'Supports T4 (brand damage legacy)', class: 'supports' }, { text: 'Contradicts T1 (persistent negative memory)', class: 'contradicts' }],
+        source: 'Four Corners/Fairfax investigation archives; Google Trends for "Retail Food Group"; social media sentiment analysis'
+      },
+      {
+        number: 9,
+        title: '9. Leadership & Governance',
+        epistemicClass: 'ep-governance',
+        epistemicLabel: 'Independent Assessment',
+        finding: 'CEO Peter George has led a credible operational turnaround since 2019 — debt reduction, franchise network stabilisation, and ACCC settlement. Board has been refreshed post-crisis with independent directors. The shareholder class action has been settled. No remaining governance red flags from the current regime. However, the pre-crisis governance failure under prior management destroyed approximately A$2B in shareholder value.',
+        tension: null,
+        table: null,
+        tags: [{ text: 'Supports T1 (credible leadership)', class: 'supports' }, { text: 'Supports T2 (governance reset)', class: 'supports' }, { text: 'Neutral T3-T4', class: 'neutral' }],
+        source: 'RFG Annual Report FY25; ASX Corporate Governance Statement; ACCC proceedings records'
+      },
+      {
+        number: 10,
+        title: '10. Ownership & Capital Flows',
+        epistemicClass: 'ep-registry',
+        epistemicLabel: 'Registry Data',
+        finding: 'The register is predominantly retail following the crisis-era institutional exit. Top 20 holders account for approximately 35-40% of shares. No substantial institutional holders identified. Daily trading volume averages ~A$50-100K, creating significant liquidity risk. Short interest is minimal — the stock is too small and illiquid for active shorting. Insider buying has been modest and sporadic.',
+        tension: null,
+        table: null,
+        tags: [{ text: 'Supports T3 (liquidity risk)', class: 'supports' }, { text: 'Supports T4 (institutional abandoned)', class: 'supports' }, { text: 'Neutral T1-T2', class: 'neutral' }],
+        source: 'RFG Top 20 Shareholders; ASX substantial holding notices; ASIC short selling data'
       }
     ],
     alignmentSummary: null
@@ -13837,7 +14306,144 @@ STOCK_DATA.RFG = {
     domainCount: '5 of 10',
     hypothesesCount: '4 Active'
   }
-};
+,
+    technicalAnalysis: {
+      date: '16 February 2026',
+      period: '1 Year',
+      source: 'Continuum Technical Intelligence',
+      regime: 'Breakdown',
+      clarity: 'Clear',
+      price: {
+            current: 1,
+            currency: 'A$'
+      },
+      movingAverages: {
+            ma50: {
+                  value: 1.22,
+                  date: '16 Feb 2026'
+            },
+            ma200: {
+                  value: 1.55,
+                  date: '16 Feb 2026'
+            },
+            crossover: {
+                  type: 'Death Cross',
+                  date: 'w/c 18 November 2025',
+                  description: '50-day MA crossed below 200-day MA. Price has remained below both averages and the gap is widening, indicating accelerating downward momentum.'
+            },
+            priceVsMa50: -18,
+            priceVsMa200: -35.5
+      },
+      trend: {
+            direction: 'Down',
+            duration: '9 months',
+            structure: 'Steady decline from A$2.38 high with no meaningful rally. The downtrend has been persistent and orderly — no capitulation spike, just gradual selling. At A$1.00 (52-week low and psychological floor), the question is whether a base will form.',
+            peak: {
+                  price: 2.38,
+                  date: 'w/c 19 May 2025'
+            },
+            trough: {
+                  price: 1,
+                  date: '16 February 2026'
+            },
+            drawdown: -58
+      },
+      keyLevels: {
+            support: {
+                  price: 1,
+                  method: 'Psychological round number and 52-week low — first test of this level'
+            },
+            resistance: {
+                  price: 1.2,
+                  method: 'Prior breakdown level and 50-day MA convergence zone'
+            },
+            fiftyTwoWeekHigh: {
+                  price: 2.38,
+                  date: 'w/c 19 May 2025'
+            },
+            fiftyTwoWeekLow: {
+                  price: 1,
+                  date: '16 February 2026'
+            }
+      },
+      volume: {
+            latestVs20DayAvg: 0.9,
+            latestDate: '16 February 2026',
+            priorSpikes: [
+                  {
+                        period: 'w/c 16 September 2025',
+                        ratio: 2.4,
+                        context: 'FY25 results release — selling on disappointing guidance'
+                  },
+                  {
+                        period: 'w/c 27 January 2026',
+                        ratio: 1.8,
+                        context: 'Break below A$1.10 — accelerated selling'
+                  }
+            ]
+      },
+      volatility: {
+            latestDailyRange: {
+                  high: 1.02,
+                  low: 0.99,
+                  date: '16 February 2026'
+            },
+            latestRangePercent: 3,
+            avgDailyRangePercent30: 3.5,
+            avgDailyRangePercent90: 3.2
+      },
+      meanReversion: {
+            vsMa50: -18,
+            vsMa200: -35.5,
+            rangePosition: 0,
+            rangeHigh: 2.38,
+            rangeLow: 1
+      },
+      inflectionPoints: [
+            {
+                  date: 'w/c 19 May 2025',
+                  price: 2.38,
+                  event: '52-week high'
+            },
+            {
+                  date: 'w/c 16 September 2025',
+                  price: 1.63,
+                  event: 'FY25 results — gap down'
+            },
+            {
+                  date: 'w/c 18 November 2025',
+                  price: 1.46,
+                  event: 'Death Cross — technical sell signal'
+            },
+            {
+                  date: 'w/c 27 January 2026',
+                  price: 1.11,
+                  event: 'Break below A$1.10 support'
+            },
+            {
+                  date: '16 February 2026',
+                  price: 1,
+                  event: '52-week low — testing A$1.00 psychological floor'
+            }
+      ],
+      relativePerformance: {
+            vsIndex: {
+                  name: 'S&P/ASX 200',
+                  period: '12 months',
+                  stockReturn: -58,
+                  indexReturn: 4.2,
+                  relativeReturn: -62.2
+            },
+            vsSector: {
+                  name: 'S&P/ASX Consumer Discretionary',
+                  period: '12 months',
+                  stockReturn: -58,
+                  sectorReturn: -5.8,
+                  relativeReturn: -52.2
+            }
+      }
+}
+  };
 
 (function() {
   for (var i = 0; i < SNAPSHOT_ORDER.length; i++) {
