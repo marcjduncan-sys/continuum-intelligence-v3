@@ -1,0 +1,89 @@
+name: Add Stock to Coverage
+
+on:
+  workflow_dispatch:
+    inputs:
+      ticker:
+        description: 'ASX ticker code (e.g. DXS, BHP, CBA — without .AX suffix)'
+        required: true
+      company:
+        description: 'Company name (e.g. "Dexus", "BHP Group")'
+        required: true
+      sector:
+        description: 'Sector (e.g. "Real Estate", "Materials", "Healthcare")'
+        required: true
+        default: 'Unknown'
+      sector_sub:
+        description: 'Sub-sector (optional, e.g. "Office REIT", "Iron Ore")'
+        required: false
+        default: ''
+
+jobs:
+  add-stock:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate ticker not already in coverage
+        run: |
+          TICKER="${{ github.event.inputs.ticker }}"
+          TICKER_UPPER=$(echo "$TICKER" | tr '[:lower:]' '[:upper:]')
+
+          if grep -q "'${TICKER_UPPER}.AX'" scripts/update-prices.js; then
+            echo "::error::${TICKER_UPPER} is already in the coverage universe!"
+            exit 1
+          fi
+          echo "✓ ${TICKER_UPPER} is not yet in coverage — proceeding"
+
+      - name: Add stock to coverage
+        env:
+          STOCK_TICKER: ${{ github.event.inputs.ticker }}
+          STOCK_COMPANY: ${{ github.event.inputs.company }}
+          STOCK_SECTOR: ${{ github.event.inputs.sector }}
+          STOCK_SECTOR_SUB: ${{ github.event.inputs.sector_sub }}
+        run: node scripts/add-stock.js
+
+      - name: Show changes
+        run: |
+          echo "── Files changed ──"
+          git diff --stat
+          echo ""
+          git status --short
+
+      - name: Commit and push
+        run: |
+          git config user.name "Continuum Bot"
+          git config user.email "bot@continuum-intelligence.dev"
+
+          TICKER=$(echo "${{ github.event.inputs.ticker }}" | tr '[:lower:]' '[:upper:]')
+          COMPANY="${{ github.event.inputs.company }}"
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add ${COMPANY} (${TICKER}.AX) to coverage universe
+
+Automated via Add Stock workflow.
+- Ticker arrays updated in all scripts
+- Stock config added to run-automated-analysis.js
+- data/stocks/${TICKER}.json created with placeholder hypotheses
+- index.html updated: FRESHNESS_DATA, REFERENCE_DATA, SNAPSHOT_ORDER, stock card, STOCK_DATA
+
+Note: Narrative hypotheses are placeholders — requires analyst research to populate."
+
+            git push origin main
+            echo ""
+            echo "═══════════════════════════════════════════"
+            echo "✓ ${TICKER}.AX (${COMPANY}) deployed!"
+            echo "═══════════════════════════════════════════"
+          fi
