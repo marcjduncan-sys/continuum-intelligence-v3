@@ -4548,7 +4548,12 @@ const REFERENCE_DATA = {
     epsTrailing: 2.21,
     epsForward: null,
     divPerShare: 1.7,
-    reportingCurrency: 'A
+    reportingCurrency: 'A$',
+    revenue: null,
+    _anchors: { price: 45.52, marketCapStr: '139.1B', pe: 20.6, divYield: 3.7 }
+  }
+};
+// === END REFERENCE_DATA ===
 
 STOCK_DATA.WOW = {
   // Meta
@@ -12441,7 +12446,141 @@ STOCK_DATA.NAB = {
   sector: 'Financials',
   sectorSub: 'Financials',
   price: 45.52,
-  currency: 'A
+  currency: 'A$',
+  date: '16 February 2026',
+  reportId: 'NAB-2026-001',
+  priceHistory: [45.52],
+
+  // Hero - right side metrics
+  heroDescription: 'Financials &bull; ASX-Listed',
+  heroCompanyDescription: 'National Australia Bank (ASX: NAB) is one of Australia\'s four major banks, providing a comprehensive range of banking, wealth management, and financial services to personal, business, and institutional customers across Australia and New Zealand.',
+  heroMetrics: [
+    { label: 'Mkt Cap', value: 'A$139.1B', colorClass: '' },
+    { label: 'P/E', value: '~21x', colorClass: '' },
+    { label: 'Div Yield', value: '3.7%', colorClass: '' }
+  ],
+
+  // Skew
+  skew: { direction: 'neutral', rationale: 'Auto-added stock. Narrative analysis pending. Skew assessment requires analyst research.' },
+
+  // Verdict
+  verdict: {
+    text: 'National Australia Bank has been added to coverage. Trading at <span class="key-stat">A$45.52</span>. Full narrative analysis with competing hypotheses is pending.',
+    borderColor: null,
+    scores: [
+      { label: 'T1 Earnings Growth', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T2 Margin Compression', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T3 Credit Risk', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T4 Regulatory Tightening', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null }
+    ]
+  },
+
+  // Featured card metrics (for home page)
+  featuredMetrics: [
+    { label: 'Mkt Cap', value: 'A$139.1B', color: '' },
+    { label: 'P/E', value: '~21x', color: '' },
+    { label: 'Div Yield', value: '3.7%', color: '' }
+  ],
+  featuredPriceColor: '',
+  featuredRationale: 'Auto-added to coverage. Full narrative analysis pending.',
+
+  // Identity section
+  identity: {
+    rows: [
+      [['Ticker', 'NAB.AX', 'td-mono'], ['Exchange', 'ASX', 'td-mono']],
+      [['Market Cap', 'A$139.1B', 'td-mono'], ['Sector', 'Financials', 'td-mono']],
+      [['Share Price', 'A$45.52', 'td-mono'], ['52-Week Range', 'A$45.52 &ndash; A$45.52', 'td-mono']]
+    ],
+    overview: 'National Australia Bank (ASX: NAB) — auto-added to coverage. Full company overview pending analyst research.'
+  },
+
+  // Hypotheses (placeholder — requires analyst research)
+  hypotheses: [
+    {
+      tier: 't1', direction: 'upside',
+      title: 'T1: Earnings Growth',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't2', direction: 'neutral',
+      title: 'T2: Margin Compression',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't3', direction: 'downside',
+      title: 'T3: Credit Risk',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't4', direction: 'downside',
+      title: 'T4: Regulatory Tightening',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    }
+  ],
+
+  // Narrative (placeholder)
+  narrative: {
+    theNarrative: 'National Australia Bank has been auto-added to the Continuum Intelligence coverage universe. Full narrative analysis with competing hypotheses, evidence assessment, and discriminating data points is pending.',
+    priceImplication: null,
+    evidenceCheck: 'Pending analyst research.',
+    narrativeStability: 'Not yet assessed.'
+  },
+
+  // Evidence (placeholder)
+  evidence: {
+    intro: 'Evidence assessment pending. Stock was auto-added to coverage on 16 February 2026.',
+    cards: [],
+    alignmentSummary: null
+  },
+
+  // Discriminators (placeholder)
+  discriminators: {
+    intro: 'Discriminating evidence pending analyst research.',
+    rows: [],
+    nonDiscriminating: null
+  },
+
+  // Tripwires (placeholder)
+  tripwires: {
+    intro: 'Tripwires pending analyst research.',
+    cards: []
+  },
+
+  // Gaps
+  gaps: {
+    coverageRows: [],
+    couldntAssess: ['Full evidence assessment pending — stock was auto-added to coverage.'],
+    analyticalLimitations: 'This stock was auto-added. All hypothesis scores, evidence assessments, and narrative analysis require manual research and population.'
+  },
+
+  // Footer
+  footer: {
+    disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information. This report does not contain buy, sell, or hold recommendations, price targets, or valuation models.',
+    domainCount: '0 of 10',
+    hypothesesCount: '4 Pending'
+  }
+};
+
 (function() {
   for (var i = 0; i < SNAPSHOT_ORDER.length; i++) {
     var t = SNAPSHOT_ORDER[i];

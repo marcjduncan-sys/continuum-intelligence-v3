@@ -414,9 +414,10 @@ function addToIndexHtml(ticker, company, sector, sectorSub, data, priceHistory) 
     "badge": "ok"
   }`;
 
+  // Use function callbacks to avoid $' and $& special patterns in replacement strings
   html = html.replace(
     /(\n\};?\s*\n\/\/ === END FRESHNESS_DATA ===)/,
-    `,\n${freshnessEntry}\n};\n// === END FRESHNESS_DATA ===`
+    function() { return `,\n${freshnessEntry}\n};\n// === END FRESHNESS_DATA ===`; }
   );
 
   // 2. REFERENCE_DATA — inject before the closing };  // === END REFERENCE_DATA ===
@@ -436,7 +437,7 @@ function addToIndexHtml(ticker, company, sector, sectorSub, data, priceHistory) 
 
   html = html.replace(
     /(\n\};?\s*\n\/\/ === END REFERENCE_DATA ===)/,
-    `,\n${referenceEntry}\n};\n// === END REFERENCE_DATA ===`
+    function() { return `,\n${referenceEntry}\n};\n// === END REFERENCE_DATA ===`; }
   );
 
   // 3. SNAPSHOT_ORDER — append ticker
@@ -621,10 +622,12 @@ STOCK_DATA.${ticker} = {
 
 `;
 
-  html = html.replace(
-    '// Auto-populate SNAPSHOT_DATA for all stocks in SNAPSHOT_ORDER\n// NOTE: Must run AFTER all STOCK_DATA definitions above',
-    stockDataEntry + '// Auto-populate SNAPSHOT_DATA for all stocks in SNAPSHOT_ORDER\n// NOTE: Must run AFTER all STOCK_DATA definitions above'
-  );
+  // Use function callback to avoid $' and $& special patterns in replacement string
+  // (the stockDataEntry contains 'A$' which triggers JS replace $' expansion)
+  const MARKER = '// Auto-populate SNAPSHOT_DATA for all stocks in SNAPSHOT_ORDER\n// NOTE: Must run AFTER all STOCK_DATA definitions above';
+  html = html.replace(MARKER, function() {
+    return stockDataEntry + MARKER;
+  });
 
   // Safety check: ensure file ends with </html> and has no duplicated content after it
   const htmlEndIndex = html.lastIndexOf('</html>');
