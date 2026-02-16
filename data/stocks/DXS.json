@@ -1,0 +1,176 @@
+{
+  "ticker": "DXS.AX",
+  "company": "Dexus",
+  "sector": "Real Estate",
+  "market_cap": "6.9B",
+  "hypotheses": {
+    "T1": {
+      "label": "Growth/Recovery",
+      "description": "Australian office market recovery drives occupancy, rents, and asset revaluations higher",
+      "plain_english": "The worst of the Australian office downturn is over. CBD net absorption is turning positive, vacancy rates are stabilising, and Dexus's premium office portfolio in Sydney and Melbourne is well-positioned to capture the recovery. If cap rates compress and rents grow, NTA per unit will recover and close the gap with the current share price.",
+      "what_to_watch": "H1 FY26 results (18 February 2026): office occupancy, like-for-like income growth, and cap rate movements. Positive net absorption across CBDs would confirm the recovery thesis.",
+      "upside": "If office cap rates compress 25-50bps and rents grow 3-5%, Dexus NTA could recover meaningfully, driving a share price re-rating.",
+      "risk_plain": "If return-to-office trends stall or reverse, and sublease supply increases, the office recovery could take much longer than expected.",
+      "survival_score": 0.50,
+      "status": "MODERATE",
+      "weighted_inconsistency": 3.0,
+      "last_updated": "2026-02-16T09:00:00+11:00"
+    },
+    "T2": {
+      "label": "Managed/Base Case",
+      "description": "Steady-state REIT: stable distributions, gradual portfolio repositioning toward industrial and alternatives",
+      "plain_english": "Dexus continues its strategic pivot from pure office toward a diversified real assets platform. Industrial development delivers strong returns, funds management fees grow steadily, and distributions remain well-covered. The stock trades at a discount to NTA but reflects the market's fair assessment of the office headwinds.",
+      "what_to_watch": "FY26 distribution guidance and AFFO per security. If AFFO holds above 45 cents and distributions are maintained, the base case holds.",
+      "upside": "Funds management platform growth to $50B+ AUM could drive fee income and re-rating as a fund manager, not just a REIT.",
+      "risk_plain": "If office valuations continue to decline, the NTA discount persists and distributions may come under pressure.",
+      "survival_score": 0.65,
+      "status": "HIGH",
+      "weighted_inconsistency": 1.5,
+      "last_updated": "2026-02-16T09:00:00+11:00"
+    },
+    "T3": {
+      "label": "Risk/Downside",
+      "description": "Structural office decline: hybrid work permanently reduces CBD office demand; asset values fall further",
+      "plain_english": "The shift to hybrid work is permanent and accelerating. Companies continue to reduce their office footprint, sublease space floods the market, and CBD vacancy rates stay elevated. Dexus's office-heavy portfolio suffers ongoing valuation writedowns, and the NTA discount to share price persists or widens.",
+      "what_to_watch": "CBD vacancy rates (PCA data), tenant lease expiry profiles, and any major tenant downsizing announcements. Rising sublease availability is the clearest negative signal.",
+      "upside": null,
+      "risk_plain": "If office valuations decline another 10-15%, Dexus may need to cut distributions to preserve capital and manage gearing.",
+      "survival_score": 0.35,
+      "status": "LOW",
+      "weighted_inconsistency": 4.0,
+      "last_updated": "2026-02-16T09:00:00+11:00"
+    },
+    "T4": {
+      "label": "Disruption",
+      "description": "Higher-for-longer interest rates compress REIT valuations; rising cost of debt erodes earnings",
+      "plain_english": "If interest rates stay higher for longer than the market expects, REIT valuations face a double hit: higher discount rates compress asset values, and higher debt costs eat into distributable earnings. Dexus, with significant debt facilities, is exposed to refinancing risk at higher rates.",
+      "what_to_watch": "RBA cash rate trajectory and bond yields. If the 10-year government bond yield rises above 5%, REIT valuations face further pressure.",
+      "upside": null,
+      "risk_plain": "Each 50bps increase in borrowing costs reduces Dexus AFFO by approximately 2-3 cents per security.",
+      "survival_score": 0.25,
+      "status": "LOW",
+      "weighted_inconsistency": 5.0,
+      "last_updated": "2026-02-16T09:00:00+11:00"
+    }
+  },
+  "dominant": "T2",
+  "confidence": "MODERATE",
+  "alert_state": "NORMAL",
+  "alert_started": null,
+  "current_price": 6.17,
+  "big_picture": "Dexus is Australia's largest listed office REIT and a leading integrated real asset manager with $50.1 billion in assets under management. The company owns, manages, and develops premium office, industrial, and alternative assets primarily in Australian CBDs.",
+  "last_flip": {
+    "date": "2025-08-20",
+    "from": "T3",
+    "to": "T2",
+    "trigger": "FY25 results delivered on AFFO guidance; office occupancy stabilising; positive net absorption in Sydney CBD",
+    "price_at_flip": 6.85,
+    "from_survival": 0.30,
+    "to_survival": 0.65
+  },
+  "narrative_history": [
+    {
+      "date": "2025-02-15",
+      "from": "T2",
+      "to": "T3",
+      "trigger": "H1 FY25 office valuations declined; CBD vacancy remained elevated; hybrid work impact deepening",
+      "price_at_flip": 7.20,
+      "from_survival": 0.40,
+      "to_survival": 0.55
+    }
+  ],
+  "evidence_items": [
+    {
+      "id": "DXS_FY25_RESULT",
+      "type": "EARNINGS_REPORT",
+      "source": "ASX Filing",
+      "epistemic_tag": "Under Oath (statutory)",
+      "date": "2025-08-20T08:00:00+11:00",
+      "summary": "FY25 AFFO 45.0 cents per security; delivered on guidance; distribution 37.0 cents",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "NEUTRAL",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 120
+      },
+      "active": true
+    },
+    {
+      "id": "DXS_OFFICE_RECOVERY",
+      "type": "MARKET_DATA",
+      "source": "PCA / JLL",
+      "epistemic_tag": "Independent (third-party)",
+      "date": "2025-12-15T10:00:00+11:00",
+      "summary": "Positive net absorption across all four major Australian CBDs; Sydney CBD vacancy declining from peak",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 60,
+        "half_life_days": 90
+      },
+      "active": true
+    },
+    {
+      "id": "DXS_INDUSTRIAL_DEV",
+      "type": "OPERATIONAL_DATA",
+      "source": "Investor Update",
+      "epistemic_tag": "Motivated (corporate)",
+      "date": "2025-11-01T10:00:00+11:00",
+      "summary": "190,400 sqm industrial construction across 10 projects; 6 fully leased pre-completion",
+      "diagnosticity": "MEDIUM",
+      "hypothesis_impact": {
+        "T1": "NEUTRAL",
+        "T2": "CONSISTENT",
+        "T3": "NEUTRAL",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 60,
+        "half_life_days": 90
+      },
+      "active": true
+    },
+    {
+      "id": "DXS_FUNDS_MGMT",
+      "type": "OPERATIONAL_DATA",
+      "source": "ASX Filing",
+      "epistemic_tag": "Under Oath (statutory)",
+      "date": "2025-08-20T08:00:00+11:00",
+      "summary": "Funds management platform grown to $50.1B AUM; fee income diversifying earnings away from direct property",
+      "diagnosticity": "MEDIUM",
+      "hypothesis_impact": {
+        "T1": "NEUTRAL",
+        "T2": "CONSISTENT",
+        "T3": "NEUTRAL",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 120
+      },
+      "active": true
+    }
+  ],
+  "price_signals": [],
+  "editorial_override": null,
+  "price_history": [
+    7.50, 7.45, 7.42, 7.38, 7.35,
+    7.30, 7.28, 7.25, 7.20, 7.18,
+    7.15, 7.12, 7.10, 7.08, 7.05,
+    7.00, 6.95, 6.90, 6.85, 6.80,
+    6.75, 6.70, 6.65, 6.60, 6.55,
+    6.50, 6.45, 6.40, 6.35, 6.30,
+    6.25, 6.20, 6.17
+  ],
+  "weighting": null
+}
