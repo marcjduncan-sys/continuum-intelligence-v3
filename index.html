@@ -4328,6 +4328,42 @@ const FRESHNESS_DATA = {
     "urgency": 0,
     "status": "OK",
     "badge": "ok"
+  },
+  "HRZ": {
+    "reviewDate": "2026-02-16T21:56:48.993Z",
+    "daysSinceReview": 0,
+    "priceAtReview": 1.24,
+    "pricePctChange": 0,
+    "nearestCatalyst": null,
+    "nearestCatalystDate": null,
+    "nearestCatalystDays": null,
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "OCL": {
+    "reviewDate": "2026-02-16T21:57:01.471Z",
+    "daysSinceReview": 0,
+    "priceAtReview": 13.46,
+    "pricePctChange": 0,
+    "nearestCatalyst": null,
+    "nearestCatalystDate": null,
+    "nearestCatalystDays": null,
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "RFG": {
+    "reviewDate": "2026-02-16T21:57:13.550Z",
+    "daysSinceReview": 0,
+    "priceAtReview": 1,
+    "pricePctChange": 0,
+    "nearestCatalyst": null,
+    "nearestCatalystDate": null,
+    "nearestCatalystDays": null,
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
   }
 };
 // === END FRESHNESS_DATA ===
@@ -4565,6 +4601,48 @@ const REFERENCE_DATA = {
     reportingCurrency: 'A$',
     revenue: null,
     _anchors: { price: 50.36, marketCapStr: '255.7B', pe: null, divYield: null }
+  },
+  HRZ: {
+    sharesOutstanding: 206,
+    analystTarget: null,
+    analystBuys: null,
+    analystHolds: null,
+    analystSells: null,
+    analystCount: null,
+    epsTrailing: null,
+    epsForward: null,
+    divPerShare: null,
+    reportingCurrency: 'A$',
+    revenue: null,
+    _anchors: { price: 1.24, marketCapStr: '0.3B', pe: null, divYield: null }
+  },
+  OCL: {
+    sharesOutstanding: 96,
+    analystTarget: null,
+    analystBuys: null,
+    analystHolds: null,
+    analystSells: null,
+    analystCount: null,
+    epsTrailing: null,
+    epsForward: null,
+    divPerShare: null,
+    reportingCurrency: 'A$',
+    revenue: null,
+    _anchors: { price: 13.46, marketCapStr: '1.3B', pe: null, divYield: null }
+  },
+  RFG: {
+    sharesOutstanding: 63,
+    analystTarget: null,
+    analystBuys: null,
+    analystHolds: null,
+    analystSells: null,
+    analystCount: null,
+    epsTrailing: null,
+    epsForward: null,
+    divPerShare: null,
+    reportingCurrency: 'A$',
+    revenue: null,
+    _anchors: { price: 1, marketCapStr: '0.1B', pe: null, divYield: null }
   }
 };
 // === END REFERENCE_DATA ===
@@ -13097,6 +13175,450 @@ STOCK_DATA.BHP = {
     disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information. This report does not contain buy, sell, or hold recommendations, price targets, or valuation models.',
     domainCount: '5 of 10',
     hypothesesCount: '4 Active'
+  }
+};
+
+
+STOCK_DATA.HRZ = {
+  // Meta
+  ticker: 'HRZ',
+  tickerFull: 'HRZ.AX',
+  exchange: 'ASX',
+  company: 'Horizon Minerals Limited',
+  sector: 'Materials',
+  sectorSub: 'Gold Mining',
+  price: 1.24,
+  currency: 'A$',
+  date: '17 February 2026',
+  reportId: 'HRZ-2026-001',
+  priceHistory: [1, 0.93, 0.96, 1.06, 1.2, 1.09, 1.09, 1.11, 1.08, 1.06, 1.08, 1.02, 1.02, 0.95, 0.99, 0.96, 1, 0.94, 0.93, 1.01, 1.03, 0.99, 1.27, 1.24, 1.19, 1.18, 1.16, 1.22, 1.27, 1.27, 1.24, 1.27, 1.23, 1.23, 1.27, 1.27, 1.3, 1.26, 1.24, 1.3, 1.29, 1.29, 1.23, 1.28, 1.35, 1.49, 1.51, 1.38, 1.26, 1.29, 1.36, 1.25, 1.17, 1.29, 1.32, 1.29, 1.26, 1.22, 1.24, 1.24],
+
+  // Hero - right side metrics
+  heroDescription: 'Gold Mining &bull; ASX-Listed',
+  heroCompanyDescription: 'Horizon Minerals Limited (ASX: HRZ) &mdash; coverage initiated. Full analysis pending.',
+  heroMetrics: [
+    { label: 'Mkt Cap', value: 'A$0.3B', colorClass: '' },
+    { label: '52w High', value: 'A$1.51', colorClass: '' },
+    { label: '52w Low', value: 'A$0.64', colorClass: '' }
+  ],
+
+  // Skew
+  skew: { direction: 'neutral', rationale: 'Auto-added stock. Narrative analysis pending. Skew assessment requires analyst research.' },
+
+  // Verdict
+  verdict: {
+    text: 'Horizon Minerals Limited has been added to coverage. Trading at <span class="key-stat">A$1.24</span>. Full narrative analysis with competing hypotheses is pending.',
+    borderColor: null,
+    scores: [
+      { label: 'T1 Growth/Recovery', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T2 Base Case', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T3 Risk/Downside', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T4 Disruption/Catalyst', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null }
+    ]
+  },
+
+  // Featured card metrics (for home page)
+  featuredMetrics: [
+    { label: 'Mkt Cap', value: 'A$0.3B', color: '' },
+    { label: '52w Range', value: 'A$0.64&ndash;1.51', color: '' },
+    { label: 'Drawdown', value: '-17.9%', color: '' }
+  ],
+  featuredPriceColor: '',
+  featuredRationale: 'Auto-added to coverage. Full narrative analysis pending.',
+
+  // Identity section
+  identity: {
+    rows: [
+      [['Ticker', 'HRZ.AX', 'td-mono'], ['Exchange', 'ASX', 'td-mono']],
+      [['Market Cap', 'A$0.3B', 'td-mono'], ['Sector', 'Materials / Gold Mining', 'td-mono']],
+      [['Share Price', 'A$1.24', 'td-mono'], ['52-Week Range', 'A$0.64 &ndash; A$1.51', 'td-mono']]
+    ],
+    overview: 'Horizon Minerals Limited (ASX: HRZ) &mdash; auto-added to coverage. Full company overview pending analyst research.'
+  },
+
+  // Hypotheses (placeholder — requires analyst research)
+  hypotheses: [
+    {
+      tier: 't1', direction: 'upside',
+      title: 'T1: Growth/Recovery',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't2', direction: 'neutral',
+      title: 'T2: Base Case',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't3', direction: 'downside',
+      title: 'T3: Risk/Downside',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't4', direction: 'downside',
+      title: 'T4: Disruption/Catalyst',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    }
+  ],
+
+  // Narrative (placeholder)
+  narrative: {
+    theNarrative: 'Horizon Minerals Limited has been auto-added to the Continuum Intelligence coverage universe. Full narrative analysis with competing hypotheses, evidence assessment, and discriminating data points is pending.',
+    priceImplication: {
+      label: 'Coverage Initiated &mdash; HRZ',
+      content: 'Full price implication analysis pending. Hypothesis framework requires analyst research before embedded assumptions can be identified.'
+    },
+    evidenceCheck: 'Pending analyst research.',
+    narrativeStability: 'Not yet assessed.'
+  },
+
+  // Evidence (placeholder)
+  evidence: {
+    intro: 'Evidence assessment pending. Stock was auto-added to coverage on 17 February 2026.',
+    cards: [],
+    alignmentSummary: null
+  },
+
+  // Discriminators (placeholder)
+  discriminators: {
+    intro: 'Discriminating evidence pending analyst research.',
+    rows: [],
+    nonDiscriminating: null
+  },
+
+  // Tripwires (placeholder)
+  tripwires: {
+    intro: 'Tripwires pending analyst research.',
+    cards: []
+  },
+
+  // Gaps
+  gaps: {
+    coverageRows: [],
+    couldntAssess: ['Full evidence assessment pending &mdash; stock was auto-added to coverage.'],
+    analyticalLimitations: 'This stock was auto-added. All hypothesis scores, evidence assessments, and narrative analysis require manual research and population.'
+  },
+
+  // Footer
+  footer: {
+    disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information.',
+    domainCount: '0 of 10',
+    hypothesesCount: '4 Pending'
+  }
+};
+
+
+STOCK_DATA.OCL = {
+  // Meta
+  ticker: 'OCL',
+  tickerFull: 'OCL.AX',
+  exchange: 'ASX',
+  company: 'Objective Corporation Limited',
+  sector: 'Technology',
+  sectorSub: 'Enterprise Software',
+  price: 13.46,
+  currency: 'A$',
+  date: '17 February 2026',
+  reportId: 'OCL-2026-001',
+  priceHistory: [17.42, 16.75, 17.6, 17.45, 17.91, 17.79, 17.93, 17.89, 17.46, 18, 18.04, 17.4, 17.33, 17.26, 17.21, 16.77, 16.73, 16.65, 16.99, 17.49, 16.99, 17.63, 17.71, 17.36, 17.13, 17.06, 16.33, 16.51, 16.48, 15.98, 16.13, 16.25, 16.24, 16.66, 16.87, 16.47, 16.82, 16.85, 16.76, 15.79, 15.45, 15.49, 15.81, 16.29, 15.89, 15.57, 15.62, 15.2, 14.88, 15.3, 14.63, 14.89, 14.02, 14.48, 14.47, 14.39, 13.41, 13.19, 13.46, 13.46],
+
+  // Hero - right side metrics
+  heroDescription: 'Enterprise Software &bull; ASX-Listed',
+  heroCompanyDescription: 'Objective Corporation Limited (ASX: OCL) &mdash; coverage initiated. Full analysis pending.',
+  heroMetrics: [
+    { label: 'Mkt Cap', value: 'A$1.3B', colorClass: '' },
+    { label: '52w High', value: 'A$22.9', colorClass: '' },
+    { label: '52w Low', value: 'A$13.19', colorClass: '' }
+  ],
+
+  // Skew
+  skew: { direction: 'neutral', rationale: 'Auto-added stock. Narrative analysis pending. Skew assessment requires analyst research.' },
+
+  // Verdict
+  verdict: {
+    text: 'Objective Corporation Limited has been added to coverage. Trading at <span class="key-stat">A$13.46</span>. Full narrative analysis with competing hypotheses is pending.',
+    borderColor: null,
+    scores: [
+      { label: 'T1 Growth/Recovery', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T2 Base Case', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T3 Risk/Downside', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T4 Disruption/Catalyst', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null }
+    ]
+  },
+
+  // Featured card metrics (for home page)
+  featuredMetrics: [
+    { label: 'Mkt Cap', value: 'A$1.3B', color: '' },
+    { label: '52w Range', value: 'A$13.19&ndash;22.9', color: '' },
+    { label: 'Drawdown', value: '-41.2%', color: '' }
+  ],
+  featuredPriceColor: '',
+  featuredRationale: 'Auto-added to coverage. Full narrative analysis pending.',
+
+  // Identity section
+  identity: {
+    rows: [
+      [['Ticker', 'OCL.AX', 'td-mono'], ['Exchange', 'ASX', 'td-mono']],
+      [['Market Cap', 'A$1.3B', 'td-mono'], ['Sector', 'Technology / Enterprise Software', 'td-mono']],
+      [['Share Price', 'A$13.46', 'td-mono'], ['52-Week Range', 'A$13.19 &ndash; A$22.9', 'td-mono']]
+    ],
+    overview: 'Objective Corporation Limited (ASX: OCL) &mdash; auto-added to coverage. Full company overview pending analyst research.'
+  },
+
+  // Hypotheses (placeholder — requires analyst research)
+  hypotheses: [
+    {
+      tier: 't1', direction: 'upside',
+      title: 'T1: Growth/Recovery',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't2', direction: 'neutral',
+      title: 'T2: Base Case',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't3', direction: 'downside',
+      title: 'T3: Risk/Downside',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't4', direction: 'downside',
+      title: 'T4: Disruption/Catalyst',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    }
+  ],
+
+  // Narrative (placeholder)
+  narrative: {
+    theNarrative: 'Objective Corporation Limited has been auto-added to the Continuum Intelligence coverage universe. Full narrative analysis with competing hypotheses, evidence assessment, and discriminating data points is pending.',
+    priceImplication: {
+      label: 'Coverage Initiated &mdash; OCL',
+      content: 'Full price implication analysis pending. Hypothesis framework requires analyst research before embedded assumptions can be identified.'
+    },
+    evidenceCheck: 'Pending analyst research.',
+    narrativeStability: 'Not yet assessed.'
+  },
+
+  // Evidence (placeholder)
+  evidence: {
+    intro: 'Evidence assessment pending. Stock was auto-added to coverage on 17 February 2026.',
+    cards: [],
+    alignmentSummary: null
+  },
+
+  // Discriminators (placeholder)
+  discriminators: {
+    intro: 'Discriminating evidence pending analyst research.',
+    rows: [],
+    nonDiscriminating: null
+  },
+
+  // Tripwires (placeholder)
+  tripwires: {
+    intro: 'Tripwires pending analyst research.',
+    cards: []
+  },
+
+  // Gaps
+  gaps: {
+    coverageRows: [],
+    couldntAssess: ['Full evidence assessment pending &mdash; stock was auto-added to coverage.'],
+    analyticalLimitations: 'This stock was auto-added. All hypothesis scores, evidence assessments, and narrative analysis require manual research and population.'
+  },
+
+  // Footer
+  footer: {
+    disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information.',
+    domainCount: '0 of 10',
+    hypothesesCount: '4 Pending'
+  }
+};
+
+
+STOCK_DATA.RFG = {
+  // Meta
+  ticker: 'RFG',
+  tickerFull: 'RFG.AX',
+  exchange: 'ASX',
+  company: 'Retail Food Group Limited',
+  sector: 'Consumer Discretionary',
+  sectorSub: 'Quick Service Restaurants',
+  price: 1,
+  currency: 'A$',
+  date: '17 February 2026',
+  reportId: 'RFG-2026-001',
+  priceHistory: [1.63, 1.55, 1.5, 1.65, 1.62, 1.62, 1.59, 1.58, 1.56, 1.54, 1.56, 1.6, 1.6, 1.58, 1.55, 1.52, 1.54, 1.53, 1.53, 1.53, 1.51, 1.48, 1.48, 1.47, 1.48, 1.5, 1.48, 1.48, 1.49, 1.48, 1.49, 1.5, 1.54, 1.52, 1.52, 1.52, 1.52, 1.5, 1.51, 1.5, 1.49, 1.5, 1.51, 1.53, 1.53, 1.49, 1.46, 1.49, 1.46, 1.34, 1.27, 1.25, 1.19, 1.17, 1.17, 1.11, 1.11, 1.06, 1, 1],
+
+  // Hero - right side metrics
+  heroDescription: 'Quick Service Restaurants &bull; ASX-Listed',
+  heroCompanyDescription: 'Retail Food Group Limited (ASX: RFG) &mdash; coverage initiated. Full analysis pending.',
+  heroMetrics: [
+    { label: 'Mkt Cap', value: 'A$0.1B', colorClass: '' },
+    { label: '52w High', value: 'A$2.38', colorClass: '' },
+    { label: '52w Low', value: 'A$1', colorClass: '' }
+  ],
+
+  // Skew
+  skew: { direction: 'neutral', rationale: 'Auto-added stock. Narrative analysis pending. Skew assessment requires analyst research.' },
+
+  // Verdict
+  verdict: {
+    text: 'Retail Food Group Limited has been added to coverage. Trading at <span class="key-stat">A$1</span>. Full narrative analysis with competing hypotheses is pending.',
+    borderColor: null,
+    scores: [
+      { label: 'T1 Growth/Recovery', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T2 Base Case', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T3 Risk/Downside', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T4 Disruption/Catalyst', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null }
+    ]
+  },
+
+  // Featured card metrics (for home page)
+  featuredMetrics: [
+    { label: 'Mkt Cap', value: 'A$0.1B', color: '' },
+    { label: '52w Range', value: 'A$1&ndash;2.38', color: '' },
+    { label: 'Drawdown', value: '-58.0%', color: '' }
+  ],
+  featuredPriceColor: '',
+  featuredRationale: 'Auto-added to coverage. Full narrative analysis pending.',
+
+  // Identity section
+  identity: {
+    rows: [
+      [['Ticker', 'RFG.AX', 'td-mono'], ['Exchange', 'ASX', 'td-mono']],
+      [['Market Cap', 'A$0.1B', 'td-mono'], ['Sector', 'Consumer Discretionary / Quick Service Restaurants', 'td-mono']],
+      [['Share Price', 'A$1', 'td-mono'], ['52-Week Range', 'A$1 &ndash; A$2.38', 'td-mono']]
+    ],
+    overview: 'Retail Food Group Limited (ASX: RFG) &mdash; auto-added to coverage. Full company overview pending analyst research.'
+  },
+
+  // Hypotheses (placeholder — requires analyst research)
+  hypotheses: [
+    {
+      tier: 't1', direction: 'upside',
+      title: 'T1: Growth/Recovery',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't2', direction: 'neutral',
+      title: 'T2: Base Case',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't3', direction: 'downside',
+      title: 'T3: Risk/Downside',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't4', direction: 'downside',
+      title: 'T4: Disruption/Catalyst',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    }
+  ],
+
+  // Narrative (placeholder)
+  narrative: {
+    theNarrative: 'Retail Food Group Limited has been auto-added to the Continuum Intelligence coverage universe. Full narrative analysis with competing hypotheses, evidence assessment, and discriminating data points is pending.',
+    priceImplication: {
+      label: 'Coverage Initiated &mdash; RFG',
+      content: 'Full price implication analysis pending. Hypothesis framework requires analyst research before embedded assumptions can be identified.'
+    },
+    evidenceCheck: 'Pending analyst research.',
+    narrativeStability: 'Not yet assessed.'
+  },
+
+  // Evidence (placeholder)
+  evidence: {
+    intro: 'Evidence assessment pending. Stock was auto-added to coverage on 17 February 2026.',
+    cards: [],
+    alignmentSummary: null
+  },
+
+  // Discriminators (placeholder)
+  discriminators: {
+    intro: 'Discriminating evidence pending analyst research.',
+    rows: [],
+    nonDiscriminating: null
+  },
+
+  // Tripwires (placeholder)
+  tripwires: {
+    intro: 'Tripwires pending analyst research.',
+    cards: []
+  },
+
+  // Gaps
+  gaps: {
+    coverageRows: [],
+    couldntAssess: ['Full evidence assessment pending &mdash; stock was auto-added to coverage.'],
+    analyticalLimitations: 'This stock was auto-added. All hypothesis scores, evidence assessments, and narrative analysis require manual research and population.'
+  },
+
+  // Footer
+  footer: {
+    disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information.',
+    domainCount: '0 of 10',
+    hypothesesCount: '4 Pending'
   }
 };
 
