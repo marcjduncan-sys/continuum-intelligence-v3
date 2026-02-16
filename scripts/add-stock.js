@@ -308,9 +308,12 @@ function injectIntoIndexHTML(ticker, company, sector, sectorSub, marketData) {
   if (freshnessIdx === -1) {
     console.error('  [ERROR] Could not find FRESHNESS_DATA marker');
   } else {
-    // Insert before the closing }; and marker
-    const closingBrace = html.lastIndexOf('};', freshnessIdx);
-    html = html.substring(0, closingBrace) + '},\n' + freshnessEntry + '\n};\n' + freshnessMarker + html.substring(freshnessIdx + freshnessMarker.length);
+    // Find the closing }; of the FRESHNESS_DATA object (just before the marker)
+    const closingSemicolon = html.lastIndexOf('};', freshnessIdx);
+    // Find the last entry's closing } (the } right before the };)
+    // We need to add a comma after it, insert new entry, then re-close with };
+    const lastEntryClose = html.lastIndexOf('}', closingSemicolon - 1);
+    html = html.substring(0, lastEntryClose + 1) + ',\n' + freshnessEntry + '\n};\n' + freshnessMarker + html.substring(freshnessIdx + freshnessMarker.length);
     console.log(`  [OK] FRESHNESS_DATA.${short} injected`);
   }
 
@@ -337,8 +340,11 @@ function injectIntoIndexHTML(ticker, company, sector, sectorSub, marketData) {
   if (refIdx === -1) {
     console.error('  [ERROR] Could not find REFERENCE_DATA marker');
   } else {
-    const refClosingBrace = html.lastIndexOf('};', refIdx);
-    html = html.substring(0, refClosingBrace) + '},\n' + referenceEntry + '\n};\n' + refMarker + html.substring(refIdx + refMarker.length);
+    // Find the closing }; of the REFERENCE_DATA object (just before the marker)
+    const refClosingSemicolon = html.lastIndexOf('};', refIdx);
+    // Find the last entry's closing } (the } right before the };)
+    const refLastEntryClose = html.lastIndexOf('}', refClosingSemicolon - 1);
+    html = html.substring(0, refLastEntryClose + 1) + ',\n' + referenceEntry + '\n};\n' + refMarker + html.substring(refIdx + refMarker.length);
     console.log(`  [OK] REFERENCE_DATA.${short} injected`);
   }
 
