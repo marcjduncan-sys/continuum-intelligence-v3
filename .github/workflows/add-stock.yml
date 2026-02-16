@@ -71,19 +71,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Add ${COMPANY} (${TICKER}.AX) to coverage universe
-
-Automated via Add Stock workflow.
-- Ticker arrays updated in all scripts
-- Stock config added to run-automated-analysis.js
-- data/stocks/${TICKER}.json created with placeholder hypotheses
-- index.html updated: FRESHNESS_DATA, REFERENCE_DATA, SNAPSHOT_ORDER, stock card, STOCK_DATA
-
-Note: Narrative hypotheses are placeholders — requires analyst research to populate."
-
+            git commit -m "Add ${COMPANY} (${TICKER}.AX) to coverage universe [auto]"
             git push origin main
-            echo ""
-            echo "═══════════════════════════════════════════"
-            echo "✓ ${TICKER}.AX (${COMPANY}) deployed!"
-            echo "═══════════════════════════════════════════"
+            echo "Done - ${TICKER}.AX (${COMPANY}) deployed!"
           fi
