@@ -4050,21 +4050,8 @@ a:hover { color: var(--accent-sage); }
                 </div>
                 <label class="tc-step-label">Which stock does your thesis analyze?</label>
                 
-                <div class="tc-stock-grid">
-                    <div class="tc-stock-card" data-ticker="WOW" onclick="tcSelectStock('WOW')"><div class="tc-stock-ticker">WOW</div><div class="tc-stock-name">Woolworths</div></div>
-                    <div class="tc-stock-card" data-ticker="CSL" onclick="tcSelectStock('CSL')"><div class="tc-stock-ticker">CSL</div><div class="tc-stock-name">CSL</div></div>
-                    <div class="tc-stock-card" data-ticker="XRO" onclick="tcSelectStock('XRO')"><div class="tc-stock-ticker">XRO</div><div class="tc-stock-name">Xero</div></div>
-                    <div class="tc-stock-card" data-ticker="WTC" onclick="tcSelectStock('WTC')"><div class="tc-stock-ticker">WTC</div><div class="tc-stock-name">WiseTech</div></div>
-                    <div class="tc-stock-card" data-ticker="WDS" onclick="tcSelectStock('WDS')"><div class="tc-stock-ticker">WDS</div><div class="tc-stock-name">Woodside</div></div>
-                    <div class="tc-stock-card" data-ticker="MQG" onclick="tcSelectStock('MQG')"><div class="tc-stock-ticker">MQG</div><div class="tc-stock-name">Macquarie</div></div>
-                    <div class="tc-stock-card" data-ticker="DRO" onclick="tcSelectStock('DRO')"><div class="tc-stock-ticker">DRO</div><div class="tc-stock-name">Droneshield</div></div>
-                    <div class="tc-stock-card" data-ticker="PME" onclick="tcSelectStock('PME')"><div class="tc-stock-ticker">PME</div><div class="tc-stock-name">Pro Medicus</div></div>
-                    <div class="tc-stock-card" data-ticker="GYG" onclick="tcSelectStock('GYG')"><div class="tc-stock-ticker">GYG</div><div class="tc-stock-name">Guzman y Gomez</div></div>
-                    <div class="tc-stock-card" data-ticker="GMG" onclick="tcSelectStock('GMG')"><div class="tc-stock-ticker">GMG</div><div class="tc-stock-name">Goodman</div></div>
-                    <div class="tc-stock-card" data-ticker="SIG" onclick="tcSelectStock('SIG')"><div class="tc-stock-ticker">SIG</div><div class="tc-stock-name">Sigma</div></div>
-                    <div class="tc-stock-card" data-ticker="FMG" onclick="tcSelectStock('FMG')"><div class="tc-stock-ticker">FMG</div><div class="tc-stock-name">Fortescue</div></div>
-                    <div class="tc-stock-card" data-ticker="DXS" onclick="tcSelectStock('DXS')"><div class="tc-stock-ticker">DXS</div><div class="tc-stock-name">Dexus</div></div>
-                    <div class="tc-stock-card" data-ticker="NAB" onclick="tcSelectStock('NAB')"><div class="tc-stock-ticker">NAB</div><div class="tc-stock-name">National Australia Bank</div></div>
+                <div class="tc-stock-grid" id="tc-stock-grid">
+                    <!-- Stock cards generated dynamically from STOCK_DATA -->
                 </div>
             </div>
 
@@ -4330,6 +4317,19 @@ const FRESHNESS_DATA = {
     "status": "OK",
     "badge": "ok"
   }
+},
+  "BHP": {
+    "reviewDate": "2026-02-16T06:43:02.046Z",
+    "daysSinceReview": 0,
+    "priceAtReview": 50.36,
+    "pricePctChange": 0,
+    "nearestCatalyst": null,
+    "nearestCatalystDate": null,
+    "nearestCatalystDays": null,
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  }
 };
 // === END FRESHNESS_DATA ===
 
@@ -4552,6 +4552,21 @@ const REFERENCE_DATA = {
     reportingCurrency: 'A$',
     revenue: null,
     _anchors: { price: 45.54, marketCapStr: '139B', pe: 20.6, divYield: 3.7 }
+  }
+},
+  BHP: {
+    sharesOutstanding: 5078,
+    analystTarget: null,
+    analystBuys: null,
+    analystHolds: null,
+    analystSells: null,
+    analystCount: null,
+    epsTrailing: null,
+    epsForward: null,
+    divPerShare: null,
+    reportingCurrency: 'A$',
+    revenue: null,
+    _anchors: { price: 50.36, marketCapStr: '255.7B', pe: null, divYield: null }
   }
 };
 // === END REFERENCE_DATA ===
@@ -6381,7 +6396,7 @@ SNAPSHOT_DATA.WOW = {
   ]
 };
 
-const SNAPSHOT_ORDER = ['WOW', 'XRO', 'WTC', 'DRO', 'PME', 'GYG', 'CSL', 'MQG', 'GMG', 'WDS', 'SIG', 'FMG', 'DXS', 'NAB'];
+const SNAPSHOT_ORDER = Object.keys(STOCK_DATA);
 
 // Auto-generate snapshot data from STOCK_DATA for any stock without a manual snapshot
 function buildSnapshotFromStock(ticker) {
@@ -12582,6 +12597,111 @@ STOCK_DATA.NAB = {
   }
 };
 
+STOCK_DATA.BHP = {
+  // Meta
+  ticker: 'BHP',
+  tickerFull: 'BHP.AX',
+  exchange: 'ASX',
+  company: 'BHP Group',
+  sector: 'Materials',
+  sectorSub: 'Iron Ore Mining',
+  price: 50.36,
+  currency: 'A$',
+  date: '16 February 2026',
+  reportId: 'BHP-2026-001',
+
+  // Hero
+  heroDescription: 'Iron Ore Mining &bull; ASX-Listed',
+  heroCompanyDescription: 'BHP Group (ASX: BHP) &mdash; coverage initiated. Full analysis pending.',
+  heroMetrics: [
+    { label: 'Price', value: 'A$50.36', colorClass: '' },
+    { label: '52w High', value: 'A$52.4', colorClass: '' },
+    { label: '52w Low', value: 'A$34.16', colorClass: '' },
+    { label: 'Drawdown', value: '-3.9%', colorClass: '' }
+  ],
+
+  // Skew
+  skew: { direction: 'neutral', rationale: 'Pending full analysis' },
+
+  // Featured
+  featuredMetrics: [
+    { label: 'Price', value: 'A$50.36', colorClass: '' },
+    { label: 'Drawdown', value: '-3.9%', colorClass: '' }
+  ],
+  featuredPriceColor: '',
+  featuredRationale: 'Auto-added to coverage. Full analysis pending.',
+
+  // Verdict
+  verdict: {
+    label: 'PENDING',
+    description: 'Full hypothesis framework under construction.',
+    subLabel: 'Coverage initiated',
+    color: 'var(--accent-yellow)',
+    emoji: '',
+    scores: { t1: 50, t2: 50, t3: 50, t4: 50 },
+    confidence: { level: 'LOW', color: 'var(--accent-yellow)', description: 'Pending analysis' },
+    keyDrivers: ['Coverage recently initiated', 'Full evidence assessment pending']
+  },
+
+  // Identity
+  identity: {
+    oneLiner: 'BHP Group (ASX: BHP)',
+    sector: 'Materials',
+    sectorSub: 'Iron Ore Mining',
+    marketCap: '255.7B',
+    peRatio: 'N/A',
+    divYield: 'N/A'
+  },
+
+  // Hypotheses
+  hypotheses: [
+    { tier: 'T1', direction: 'upside', title: 'T1: Growth/Recovery', score: 50, statusClass: 'status-moderate', confidence: 'LOW', summary: 'Pending analysis', evidence: [], watchItems: [] },
+    { tier: 'T2', direction: 'base', title: 'T2: Base Case', score: 50, statusClass: 'status-moderate', confidence: 'LOW', summary: 'Pending analysis', evidence: [], watchItems: [] },
+    { tier: 'T3', direction: 'downside', title: 'T3: Risk/Downside', score: 50, statusClass: 'status-moderate', confidence: 'LOW', summary: 'Pending analysis', evidence: [], watchItems: [] },
+    { tier: 'T4', direction: 'disruption', title: 'T4: Disruption/Catalyst', score: 50, statusClass: 'status-moderate', confidence: 'LOW', summary: 'Pending analysis', evidence: [], watchItems: [] }
+  ],
+
+  // Narrative
+  narrative: [],
+
+  // Evidence
+  evidenceMatrix: [],
+
+  // Discriminators
+  discriminators: [],
+
+  // Tripwires
+  tripwires: [],
+
+  // Price History
+  priceHistory: [50.36],
+
+  // Questions
+  questions: ['Full analysis pending — what are the key risks and catalysts for BHP?'],
+
+  // Footer
+  footerDisclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using ACH methodology. All data sourced from ASX filings and publicly available data.',
+  footerMeta: [
+    { label: 'ID: BHP-2026-001' },
+    { label: 'MODE: Coverage Initiated' },
+    { label: 'NEXT: Pending' }
+  ],
+
+  // Gaps
+  gaps: {
+    coverageRows: [],
+    couldntAssess: ['Full evidence assessment pending.'],
+    analyticalLimitations: 'This stock was auto-added to coverage. Hypothesis scores, evidence, and narrative require manual research.'
+  },
+
+  // Footer
+  footer: {
+    disclaimer: 'This report does not constitute personal financial advice.',
+    domainCount: '0 of 10',
+    hypothesesCount: '4 Pending'
+  }
+};
+
 (function() {
   for (var i = 0; i < SNAPSHOT_ORDER.length; i++) {
     var t = SNAPSHOT_ORDER[i];
@@ -13811,11 +13931,10 @@ const MarketFeed = (function() {
 })();
 
 // Featured card display order
-const FEATURED_ORDER = ['XRO', 'CSL', 'WOW', 'GMG', 'MQG', 'WTC', 'PME', 'SIG', 'DRO', 'FMG', 'WDS', 'GYG'];
+const FEATURED_ORDER = Object.keys(STOCK_DATA);
 
 // Coming soon stubs
 const COMING_SOON = [
-    { ticker: 'BHP', company: 'BHP Group', sector: 'Materials', price: 39.50, skew: 'downside', currency: 'A$' },
     { ticker: 'CBA', company: 'Commonwealth Bank', sector: 'Financials', price: 158.00, skew: 'balanced', currency: 'A$' }
 ];
 
@@ -13831,6 +13950,14 @@ function route() {
     const hash = window.location.hash.slice(1) || 'home';
     const pages = document.querySelectorAll('.page');
     pages.forEach(p => p.classList.remove('active'));
+
+    // Auto-create page divs for dynamically added stocks
+    if ((hash.startsWith('report-') || hash.startsWith('snapshot-')) && !document.getElementById('page-' + hash)) {
+        const div = document.createElement('div');
+        div.className = 'page';
+        div.id = 'page-' + hash;
+        document.getElementById('page-home').parentNode.appendChild(div);
+    }
 
     // Lazy render report pages on first visit
     if (hash.startsWith('report-')) {
@@ -14042,6 +14169,21 @@ window.addEventListener('DOMContentLoaded', () => {
             if (SNAPSHOT_DATA[ticker]) {
                 snapshotGrid.innerHTML += renderSnapshotListCard(SNAPSHOT_DATA[ticker]);
             }
+        });
+    }
+
+    // Populate thesis comparator stock cards dynamically
+    const tcGrid = document.getElementById('tc-stock-grid');
+    if (tcGrid) {
+        Object.keys(STOCK_DATA).sort().forEach(function(ticker) {
+            var stock = STOCK_DATA[ticker];
+            var card = document.createElement('div');
+            card.className = 'tc-stock-card';
+            card.dataset.ticker = ticker;
+            card.onclick = function() { tcSelectStock(ticker); };
+            card.innerHTML = '<div class="tc-stock-ticker">' + ticker + '</div>' +
+                             '<div class="tc-stock-name">' + (stock.company || ticker) + '</div>';
+            tcGrid.appendChild(card);
         });
     }
 
@@ -14801,8 +14943,13 @@ function tcAnalyze() {
     if (!tcSelectedTicker) { alert('Please select a stock first'); return; }
 
     const data = TC_DATA[tcSelectedTicker];
+    if (!data) {
+        document.getElementById('tc-results').innerHTML = '<div class="tc-banner"><div class="tc-banner-label">Thesis comparison not yet available for ' + tcSelectedTicker + '. Full analysis coming soon.</div></div>';
+        document.getElementById('tc-results').style.display = 'block';
+        return;
+    }
     const thesis = document.getElementById('tc-thesis-input').value.toLowerCase();
-    
+
     let primaryTier = data.primary;
     if (thesis.length > 50) {
         const scores = { t1: 0, t2: 0, t3: 0, t4: 0 };

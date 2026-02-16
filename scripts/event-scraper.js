@@ -8,13 +8,9 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-// Coverage universe - must match your tickers
-const COVERAGE_TICKERS = [
-  'WOW', 'XRO', 'WTC', 'DRO', 'PME', 'GYG',
-  'CSL', 'MQG', 'GMG', 'WDS', 'SIG', 'FMG',
-  'DXS',
-  'NAB'
-];
+// Coverage universe (from central registry)
+const { getActiveTickers } = require('./lib/registry');
+const COVERAGE_TICKERS = getActiveTickers();
 
 // Event type patterns for classification
 const EVENT_PATTERNS = {

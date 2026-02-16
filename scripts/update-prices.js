@@ -17,13 +17,9 @@ const https = require('https');
 
 const INDEX_PATH = path.join(__dirname, '..', 'index.html');
 
-// All tickers to update (Yahoo Finance symbols)
-const TICKERS = [
-  'XRO.AX', 'CSL.AX', 'WOW.AX', 'GMG.AX', 'MQG.AX', 'WTC.AX',
-  'PME.AX', 'SIG.AX', 'DRO.AX', 'FMG.AX', 'WDS.AX', 'GYG.AX',
-  'DXS.AX',
-  'NAB.AX'
-];
+// All tickers to update (from central registry)
+const { getTickersAX } = require('./lib/registry');
+const TICKERS = getTickersAX();
 
 // Max priceHistory length (keep last 252 trading days = ~1 year)
 const MAX_HISTORY = 252;

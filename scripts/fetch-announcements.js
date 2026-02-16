@@ -23,13 +23,9 @@ const https = require('https');
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const OUTPUT_PATH = path.join(DATA_DIR, 'announcements.json');
 
-// Tickers to monitor (ASX codes, no .AX suffix)
-const TICKERS = [
-  'XRO', 'CSL', 'WOW', 'GMG', 'MQG', 'WTC',
-  'PME', 'SIG', 'DRO', 'FMG', 'WDS', 'GYG',
-  'DXS',
-  'NAB'
-];
+// Tickers to monitor (from central registry, ASX codes, no .AX suffix)
+const { getActiveTickers } = require('./lib/registry');
+const TICKERS = getActiveTickers();
 
 // Number of announcements to fetch per ticker
 const ANNOUNCEMENTS_PER_TICKER = 5;
