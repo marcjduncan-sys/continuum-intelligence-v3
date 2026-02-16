@@ -205,6 +205,19 @@ const STOCK_CONFIG = {
       T3: 'Funds Management Growth',
       T4: 'Interest Rate Risk'
     }
+  },
+  NAB: {
+    peakPrice: 47.25,
+    low52Week: 31.13,
+    high52Week: 47.25,
+    baseWeights: { T1: 50, T2: 35, T3: 30, T4: 35 },
+    characteristics: { highMultiple: false, growthStock: false, hasAIExposure: false },
+    hypothesisNames: {
+      T1: 'Earnings Growth',
+      T2: 'Margin Compression',
+      T3: 'Credit Risk',
+      T4: 'Regulatory Tightening'
+    }
   }
 };
 
@@ -417,21 +430,7 @@ function generateNarrativeShift(ticker, config, dislocation, inference, weights)
     divergences: divergences.map(d => ({ tier: d.tier, name: d.name, gap: d.gap, direction: d.direction })),
     maxDivergence: maxDiv.gap,
     regimeChangeRisk: maxDiv.gap > 40 || severity === 'CRITICAL'
-  ,
-  NAB: {
-    peakPrice: 47.25,
-    low52Week: 31.13,
-    high52Week: 47.25,
-    baseWeights: { T1: 50, T2: 35, T3: 30, T4: 35 },
-    characteristics: { highMultiple: false, growthStock: false, hasAIExposure: false },
-    hypothesisNames: {
-      T1: 'Earnings Growth',
-      T2: 'Margin Compression',
-      T3: 'Credit Risk',
-      T4: 'Regulatory Tightening'
-    }
-  }
-};
+  };
 }
 
 // Save results

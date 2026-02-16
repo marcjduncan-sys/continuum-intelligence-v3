@@ -1,0 +1,84 @@
+name: Intraday Price Feed
+
+on:
+  schedule:
+    # Every 15 min, 23:00-23:45 UTC Sun-Thu (covers AEDT morning open)
+    - cron: '0,15,30,45 23 * * 0-4'
+    # Every 15 min, 00:00-06:45 UTC Mon-Fri (covers rest of ASX session)
+    - cron: '0,15,30,45 0-6 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "intraday-update"
+  cancel-in-progress: true
+
+jobs:
+  fetch-prices:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if ASX is open
+        id: market-check
+        run: |
+          HOUR=$(TZ='Australia/Sydney' date +%H)
+          MINUTE=$(TZ='Australia/Sydney' date +%M)
+          DAY=$(TZ='Australia/Sydney' date +%u)
+          TIME_MINS=$((10#$HOUR * 60 + 10#$MINUTE))
+
+          echo "Sydney time: ${HOUR}:${MINUTE} (day $DAY, minutes=$TIME_MINS)"
+
+          # ASX open: 9:55 AM (595 mins) to 4:20 PM (980 mins), weekdays
+          if [ "$DAY" -gt 5 ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Weekend — skipping"
+          elif [ "$TIME_MINS" -lt 595 ] || [ "$TIME_MINS" -gt 980 ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Outside ASX hours — skipping"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "ASX is open — fetching prices"
+          fi
+
+      - name: Checkout
+        if: steps.market-check.outputs.skip != 'true'
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.DEPLOY_TOKEN }}
+
+      - name: Setup Node.js
+        if: steps.market-check.outputs.skip != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch live prices
+        if: steps.market-check.outputs.skip != 'true'
+        id: fetch
+        run: |
+          set +e
+          node scripts/fetch-live-prices.js
+          EXIT_CODE=$?
+          set -e
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "::warning::Live price fetch failed (exit $EXIT_CODE)"
+            exit 1
+          fi
+
+      - name: Commit and push
+        if: steps.market-check.outputs.skip != 'true' && steps.fetch.outputs.exit_code == '0'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add data/live-prices.json
+
+          if git diff --cached --quiet; then
+            echo "No price changes to commit"
+          else
+            TIMESTAMP=$(TZ='Australia/Sydney' date '+%H:%M %Z')
+            git commit -m "Live prices: ${TIMESTAMP} [automated]"
+            git push
+          fi
