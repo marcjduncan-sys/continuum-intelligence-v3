@@ -1,9 +1,1165 @@
 {
-  "generated": "2026-02-15T22:10:58.282Z",
   "summary": {
-    "totalStocks": 0,
-    "criticalDislocations": 0,
-    "highDislocations": 0
+    "runAt": "2026-02-16T06:08:11.082Z",
+    "tickersAnalyzed": 12,
+    "criticalDislocations": 8,
+    "highDislocations": 1,
+    "moderateDislocations": 3,
+    "normal": 0
   },
-  "results": {}
+  "results": {
+    "PME": {
+      "ticker": "PME",
+      "dislocation": {
+        "severity": "CRITICAL",
+        "metrics": {
+          "currentPrice": 117.95,
+          "todayReturn": -0.23,
+          "drawdownFromPeak": -64.9,
+          "zScore": -0.5,
+          "volumeRatio": 1.2
+        },
+        "pattern": "DISTRIBUTION"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 60,
+          "shortTerm": 57.7,
+          "blended": 59,
+          "adjustment": -2,
+          "confidence": "MEDIUM"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 76.4,
+          "blended": 52,
+          "adjustment": 41,
+          "confidence": "LOW"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 43,
+          "blended": 29,
+          "adjustment": 23,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 50,
+          "shortTerm": 5,
+          "blended": 32,
+          "adjustment": -124,
+          "confidence": "LOW"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T2",
+        "secondaryHypothesis": "T3",
+        "contradictedHypothesis": "T4",
+        "confidence": 0.75,
+        "reasoning": "Severe drawdown (64.9%) from peak indicates narrative regime change. High multiple stock declining = valuation compression narrative. Previous bull thesis (T4) being contradicted by price action"
+      },
+      "narrativeShift": {
+        "hasShift": true,
+        "shortTermView": "CRITICAL: 0.2% daily decline with 65% peak drawdown. Market is repricing around Valuation Mean-Reversion (T2). The AI Amplifies the Moat thesis (T4) is being actively contradicted by price action.",
+        "longTermView": "Research-market divergence in AI Amplifies the Moat (45pts), Valuation Mean-Reversion (41.400000000000006pts), Competitive Disruption (23pts). US Expansion Accelerates remains aligned.",
+        "commentary": "The 65% drawdown from peak is not matched by the static research thesis weights. The 45-point spread in AI Amplifies the Moat between research (50%) and market-implied (5%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. AI Amplifies the Moat (research weight: 50%) is being actively contradicted — market-implied weight has fallen to 5%. Action: Deep-dive review within 48 hours.",
+        "divergences": [
+          {
+            "tier": "T4",
+            "name": "AI Amplifies the Moat",
+            "gap": 45,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "T2",
+            "name": "Valuation Mean-Reversion",
+            "gap": 41.400000000000006,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T3",
+            "name": "Competitive Disruption",
+            "gap": 23,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T1",
+            "name": "US Expansion Accelerates",
+            "gap": 2.299999999999997,
+            "direction": "market discounting"
+          }
+        ],
+        "maxDivergence": 45,
+        "regimeChangeRisk": true
+      },
+      "hypothesisNames": {
+        "T1": "US Expansion Accelerates",
+        "T2": "Valuation Mean-Reversion",
+        "T3": "Competitive Disruption",
+        "T4": "AI Amplifies the Moat"
+      },
+      "characteristics": {
+        "highMultiple": true,
+        "growthStock": true,
+        "hasAIExposure": true
+      }
+    },
+    "XRO": {
+      "ticker": "XRO",
+      "dislocation": {
+        "severity": "CRITICAL",
+        "metrics": {
+          "currentPrice": 78.17,
+          "todayReturn": 6.37,
+          "drawdownFromPeak": -47.9,
+          "zScore": 6,
+          "volumeRatio": 2.5
+        },
+        "pattern": "DISTRIBUTION"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 55,
+          "shortTerm": 5,
+          "blended": 35,
+          "adjustment": -64,
+          "confidence": "LOW"
+        },
+        "T2": {
+          "longTerm": 40,
+          "shortTerm": 95,
+          "blended": 62,
+          "adjustment": 764,
+          "confidence": "LOW"
+        },
+        "T3": {
+          "longTerm": 30,
+          "shortTerm": 95,
+          "blended": 56,
+          "adjustment": 637,
+          "confidence": "LOW"
+        },
+        "T4": {
+          "longTerm": 35,
+          "shortTerm": 5,
+          "blended": 23,
+          "adjustment": -64,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T2",
+        "secondaryHypothesis": "T3",
+        "contradictedHypothesis": null,
+        "confidence": 0.7,
+        "reasoning": "Severe drawdown (47.89%) from peak indicates narrative regime change"
+      },
+      "narrativeShift": {
+        "hasShift": true,
+        "shortTermView": "CRITICAL: 6.4% daily decline with 48% peak drawdown. Market is repricing around Valuation Compression (T2). Multiple hypotheses under pressure.",
+        "longTermView": "Research-market divergence in AI Disruption Risk (65pts), Valuation Compression (55pts), Platform Expansion (50pts), Competitive Pressure (30pts). All hypotheses show divergence.",
+        "commentary": "The 48% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in AI Disruption Risk between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
+        "divergences": [
+          {
+            "tier": "T3",
+            "name": "AI Disruption Risk",
+            "gap": 65,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T2",
+            "name": "Valuation Compression",
+            "gap": 55,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T1",
+            "name": "Platform Expansion",
+            "gap": 50,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "T4",
+            "name": "Competitive Pressure",
+            "gap": 30,
+            "direction": "market discounting"
+          }
+        ],
+        "maxDivergence": 65,
+        "regimeChangeRisk": true
+      },
+      "hypothesisNames": {
+        "T1": "Platform Expansion",
+        "T2": "Valuation Compression",
+        "T3": "AI Disruption Risk",
+        "T4": "Competitive Pressure"
+      },
+      "characteristics": {
+        "highMultiple": true,
+        "growthStock": true,
+        "hasAIExposure": true
+      }
+    },
+    "CSL": {
+      "ticker": "CSL",
+      "dislocation": {
+        "severity": "CRITICAL",
+        "metrics": {
+          "currentPrice": 151.44,
+          "todayReturn": 0.95,
+          "drawdownFromPeak": -49.5,
+          "zScore": 0.89,
+          "volumeRatio": 1.2
+        },
+        "pattern": "DISTRIBUTION"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 55,
+          "shortTerm": 45.5,
+          "blended": 51,
+          "adjustment": -9,
+          "confidence": "MEDIUM"
+        },
+        "T2": {
+          "longTerm": 30,
+          "shortTerm": 95,
+          "blended": 56,
+          "adjustment": 114,
+          "confidence": "LOW"
+        },
+        "T3": {
+          "longTerm": 25,
+          "shortTerm": 15.5,
+          "blended": 21,
+          "adjustment": -9,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 40,
+          "shortTerm": 95,
+          "blended": 62,
+          "adjustment": 95,
+          "confidence": "LOW"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T2",
+        "secondaryHypothesis": "T4",
+        "contradictedHypothesis": null,
+        "confidence": 0.7,
+        "reasoning": "Severe drawdown (49.52%) from peak indicates narrative regime change"
+      },
+      "narrativeShift": {
+        "hasShift": true,
+        "shortTermView": "CRITICAL: 0.9% daily decline with 50% peak drawdown. Market is repricing around Multiple Compression (T2). Multiple hypotheses under pressure.",
+        "longTermView": "Research-market divergence in Multiple Compression (65pts), Vifor Integration (55pts). Pipeline Delivery, Competitive Threat remain aligned.",
+        "commentary": "The 50% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Multiple Compression between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
+        "divergences": [
+          {
+            "tier": "T2",
+            "name": "Multiple Compression",
+            "gap": 65,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T4",
+            "name": "Vifor Integration",
+            "gap": 55,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T1",
+            "name": "Pipeline Delivery",
+            "gap": 9.5,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "T3",
+            "name": "Competitive Threat",
+            "gap": 9.5,
+            "direction": "market discounting"
+          }
+        ],
+        "maxDivergence": 65,
+        "regimeChangeRisk": true
+      },
+      "hypothesisNames": {
+        "T1": "Pipeline Delivery",
+        "T2": "Multiple Compression",
+        "T3": "Competitive Threat",
+        "T4": "Vifor Integration"
+      },
+      "characteristics": {
+        "highMultiple": true,
+        "growthStock": true,
+        "hasAIExposure": false
+      }
+    },
+    "WOW": {
+      "ticker": "WOW",
+      "dislocation": {
+        "severity": "MODERATE",
+        "metrics": {
+          "currentPrice": 32.05,
+          "todayReturn": 0.34,
+          "drawdownFromPeak": -19.9,
+          "zScore": 0.67,
+          "volumeRatio": 1.2
+        },
+        "pattern": "STEADY_DECLINE"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 50,
+          "shortTerm": 46.6,
+          "blended": 49,
+          "adjustment": -3,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 55.4,
+          "blended": 43,
+          "adjustment": 20,
+          "confidence": "HIGH"
+        },
+        "T3": {
+          "longTerm": 30,
+          "shortTerm": 47,
+          "blended": 37,
+          "adjustment": 17,
+          "confidence": "HIGH"
+        },
+        "T4": {
+          "longTerm": 25,
+          "shortTerm": 21.6,
+          "blended": 24,
+          "adjustment": -3,
+          "confidence": "HIGH"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T2",
+        "secondaryHypothesis": "T3",
+        "contradictedHypothesis": null,
+        "confidence": 0.65,
+        "reasoning": ""
+      },
+      "narrativeShift": {
+        "hasShift": true,
+        "shortTermView": "MODERATE: Price action suggests growing attention to Structural Margin Erosion. Research thesis not yet invalidated but under pressure.",
+        "longTermView": "Research-market divergence in Structural Margin Erosion (20.4pts), Regulatory Squeeze (17pts). Managed Turnaround, Competitive Disruption remain aligned.",
+        "commentary": "",
+        "divergences": [
+          {
+            "tier": "T2",
+            "name": "Structural Margin Erosion",
+            "gap": 20.4,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T3",
+            "name": "Regulatory Squeeze",
+            "gap": 17,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T1",
+            "name": "Managed Turnaround",
+            "gap": 3.3999999999999986,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "T4",
+            "name": "Competitive Disruption",
+            "gap": 3.3999999999999986,
+            "direction": "market discounting"
+          }
+        ],
+        "maxDivergence": 20.4,
+        "regimeChangeRisk": false
+      },
+      "hypothesisNames": {
+        "T1": "Managed Turnaround",
+        "T2": "Structural Margin Erosion",
+        "T3": "Regulatory Squeeze",
+        "T4": "Competitive Disruption"
+      },
+      "characteristics": {
+        "highMultiple": false,
+        "growthStock": false,
+        "hasAIExposure": false
+      }
+    },
+    "WTC": {
+      "ticker": "WTC",
+      "dislocation": {
+        "severity": "CRITICAL",
+        "metrics": {
+          "currentPrice": 47.81,
+          "todayReturn": 12.18,
+          "drawdownFromPeak": -40.2,
+          "zScore": 10.81,
+          "volumeRatio": 2.5
+        },
+        "pattern": "DISTRIBUTION"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 55,
+          "shortTerm": 5,
+          "blended": 35,
+          "adjustment": -122,
+          "confidence": "LOW"
+        },
+        "T2": {
+          "longTerm": 40,
+          "shortTerm": 95,
+          "blended": 62,
+          "adjustment": 1462,
+          "confidence": "LOW"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 95,
+          "blended": 50,
+          "adjustment": 1218,
+          "confidence": "LOW"
+        },
+        "T4": {
+          "longTerm": 45,
+          "shortTerm": 5,
+          "blended": 29,
+          "adjustment": -4385,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T2",
+        "secondaryHypothesis": "T3",
+        "contradictedHypothesis": "T4",
+        "confidence": 0.7,
+        "reasoning": "Severe drawdown (40.24%) from peak indicates narrative regime change. Previous bull thesis (T4) being contradicted by price action"
+      },
+      "narrativeShift": {
+        "hasShift": true,
+        "shortTermView": "CRITICAL: 12.2% daily decline with 40% peak drawdown. Market is repricing around Valuation Mean-Reversion (T2). The AI/Logistics Moat thesis (T4) is being actively contradicted by price action.",
+        "longTermView": "Research-market divergence in Competitive Disruption (75pts), Valuation Mean-Reversion (55pts), Platform Dominance (50pts), AI/Logistics Moat (40pts). All hypotheses show divergence.",
+        "commentary": "The 40% drawdown from peak is not matched by the static research thesis weights. The 75-point spread in Competitive Disruption between research (20%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. AI/Logistics Moat (research weight: 45%) is being actively contradicted — market-implied weight has fallen to 5%. Action: Deep-dive review within 48 hours.",
+        "divergences": [
+          {
+            "tier": "T3",
+            "name": "Competitive Disruption",
+            "gap": 75,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T2",
+            "name": "Valuation Mean-Reversion",
+            "gap": 55,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T1",
+            "name": "Platform Dominance",
+            "gap": 50,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "T4",
+            "name": "AI/Logistics Moat",
+            "gap": 40,
+            "direction": "market discounting"
+          }
+        ],
+        "maxDivergence": 75,
+        "regimeChangeRisk": true
+      },
+      "hypothesisNames": {
+        "T1": "Platform Dominance",
+        "T2": "Valuation Mean-Reversion",
+        "T3": "Competitive Disruption",
+        "T4": "AI/Logistics Moat"
+      },
+      "characteristics": {
+        "highMultiple": true,
+        "growthStock": true,
+        "hasAIExposure": true
+      }
+    },
+    "DRO": {
+      "ticker": "DRO",
+      "dislocation": {
+        "severity": "CRITICAL",
+        "metrics": {
+          "currentPrice": 3.15,
+          "todayReturn": 3.96,
+          "drawdownFromPeak": -37,
+          "zScore": 3.65,
+          "volumeRatio": 1.2
+        },
+        "pattern": "STEADY_DECLINE"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 60,
+          "shortTerm": 20.4,
+          "blended": 44,
+          "adjustment": -40,
+          "confidence": "MEDIUM"
+        },
+        "T2": {
+          "longTerm": 25,
+          "shortTerm": 95,
+          "blended": 53,
+          "adjustment": 396,
+          "confidence": "LOW"
+        },
+        "T3": {
+          "longTerm": 30,
+          "shortTerm": 95,
+          "blended": 56,
+          "adjustment": 792,
+          "confidence": "LOW"
+        },
+        "T4": {
+          "longTerm": 45,
+          "shortTerm": 5,
+          "blended": 29,
+          "adjustment": -1426,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T3",
+        "secondaryHypothesis": "T2",
+        "contradictedHypothesis": "T4",
+        "confidence": 0.6,
+        "reasoning": "Severe drawdown (37%) from peak indicates narrative regime change. Previous bull thesis (T4) being contradicted by price action"
+      },
+      "narrativeShift": {
+        "hasShift": true,
+        "shortTermView": "CRITICAL: 4.0% daily decline with 37% peak drawdown. Market is repricing around Execution Risk (T3). The Autonomous Systems Moat thesis (T4) is being actively contradicted by price action.",
+        "longTermView": "Research-market divergence in Speculative Premium Unwind (70pts), Execution Risk (65pts), Autonomous Systems Moat (40pts), Defence Contract Pipeline (39.6pts). All hypotheses show divergence.",
+        "commentary": "The 37% drawdown from peak is not matched by the static research thesis weights. The 70-point spread in Speculative Premium Unwind between research (25%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Autonomous Systems Moat (research weight: 45%) is being actively contradicted — market-implied weight has fallen to 5%. Action: Deep-dive review within 48 hours.",
+        "divergences": [
+          {
+            "tier": "T2",
+            "name": "Speculative Premium Unwind",
+            "gap": 70,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T3",
+            "name": "Execution Risk",
+            "gap": 65,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T4",
+            "name": "Autonomous Systems Moat",
+            "gap": 40,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "T1",
+            "name": "Defence Contract Pipeline",
+            "gap": 39.6,
+            "direction": "market discounting"
+          }
+        ],
+        "maxDivergence": 70,
+        "regimeChangeRisk": true
+      },
+      "hypothesisNames": {
+        "T1": "Defence Contract Pipeline",
+        "T2": "Speculative Premium Unwind",
+        "T3": "Execution Risk",
+        "T4": "Autonomous Systems Moat"
+      },
+      "characteristics": {
+        "highMultiple": false,
+        "growthStock": true,
+        "hasAIExposure": true
+      }
+    },
+    "GYG": {
+      "ticker": "GYG",
+      "dislocation": {
+        "severity": "CRITICAL",
+        "metrics": {
+          "currentPrice": 19.16,
+          "todayReturn": -0.78,
+          "drawdownFromPeak": -36.1,
+          "zScore": -0.25,
+          "volumeRatio": 1.2
+        },
+        "pattern": "DISTRIBUTION"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 55,
+          "shortTerm": 47.2,
+          "blended": 52,
+          "adjustment": -8,
+          "confidence": "MEDIUM"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 95,
+          "blended": 59,
+          "adjustment": 78,
+          "confidence": "LOW"
+        },
+        "T3": {
+          "longTerm": 25,
+          "shortTerm": 17.2,
+          "blended": 22,
+          "adjustment": -8,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 30,
+          "shortTerm": 95,
+          "blended": 56,
+          "adjustment": 281,
+          "confidence": "LOW"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T4",
+        "secondaryHypothesis": "T2",
+        "contradictedHypothesis": null,
+        "confidence": 0.7,
+        "reasoning": "Severe drawdown (36.13%) from peak indicates narrative regime change. High multiple stock declining = valuation compression narrative"
+      },
+      "narrativeShift": {
+        "hasShift": true,
+        "shortTermView": "CRITICAL: 0.8% daily decline with 36% peak drawdown. Market is repricing around Unit Economics Erosion (T4). Multiple hypotheses under pressure.",
+        "longTermView": "Research-market divergence in Unit Economics Erosion (65pts), Growth Premium Unwind (60pts). QSR Competition, Store Rollout Acceleration remain aligned.",
+        "commentary": "The 36% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Unit Economics Erosion between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
+        "divergences": [
+          {
+            "tier": "T4",
+            "name": "Unit Economics Erosion",
+            "gap": 65,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T2",
+            "name": "Growth Premium Unwind",
+            "gap": 60,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T3",
+            "name": "QSR Competition",
+            "gap": 7.800000000000001,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "T1",
+            "name": "Store Rollout Acceleration",
+            "gap": 7.799999999999997,
+            "direction": "market discounting"
+          }
+        ],
+        "maxDivergence": 65,
+        "regimeChangeRisk": true
+      },
+      "hypothesisNames": {
+        "T1": "Store Rollout Acceleration",
+        "T2": "Growth Premium Unwind",
+        "T3": "QSR Competition",
+        "T4": "Unit Economics Erosion"
+      },
+      "characteristics": {
+        "highMultiple": true,
+        "growthStock": true,
+        "hasAIExposure": false
+      }
+    },
+    "MQG": {
+      "ticker": "MQG",
+      "dislocation": {
+        "severity": "MODERATE",
+        "metrics": {
+          "currentPrice": 218.26,
+          "todayReturn": 0.97,
+          "drawdownFromPeak": -12.7,
+          "zScore": 1.02,
+          "volumeRatio": 1.2
+        },
+        "pattern": "NORMAL"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 50,
+          "shortTerm": 40.3,
+          "blended": 46,
+          "adjustment": -10,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 30,
+          "shortTerm": 88.19999999999999,
+          "blended": 53,
+          "adjustment": 58,
+          "confidence": "LOW"
+        },
+        "T3": {
+          "longTerm": 25,
+          "shortTerm": 73.5,
+          "blended": 44,
+          "adjustment": 49,
+          "confidence": "LOW"
+        },
+        "T4": {
+          "longTerm": 40,
+          "shortTerm": 30.3,
+          "blended": 36,
+          "adjustment": -10,
+          "confidence": "HIGH"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T2",
+        "secondaryHypothesis": "T3",
+        "contradictedHypothesis": null,
+        "confidence": 0.65,
+        "reasoning": ""
+      },
+      "narrativeShift": {
+        "hasShift": true,
+        "shortTermView": "MODERATE: Price action suggests growing attention to Cycle Normalisation. Research thesis not yet invalidated but under pressure.",
+        "longTermView": "Research-market divergence in Cycle Normalisation (58.19999999999999pts), Regulatory Tightening (48.5pts). MAM & CGM Growth, Green Energy Transition remain aligned.",
+        "commentary": "",
+        "divergences": [
+          {
+            "tier": "T2",
+            "name": "Cycle Normalisation",
+            "gap": 58.19999999999999,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T3",
+            "name": "Regulatory Tightening",
+            "gap": 48.5,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T1",
+            "name": "MAM & CGM Growth",
+            "gap": 9.700000000000003,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "T4",
+            "name": "Green Energy Transition",
+            "gap": 9.7,
+            "direction": "market discounting"
+          }
+        ],
+        "maxDivergence": 58.19999999999999,
+        "regimeChangeRisk": true
+      },
+      "hypothesisNames": {
+        "T1": "MAM & CGM Growth",
+        "T2": "Cycle Normalisation",
+        "T3": "Regulatory Tightening",
+        "T4": "Green Energy Transition"
+      },
+      "characteristics": {
+        "highMultiple": false,
+        "growthStock": false,
+        "hasAIExposure": false
+      }
+    },
+    "GMG": {
+      "ticker": "GMG",
+      "dislocation": {
+        "severity": "MODERATE",
+        "metrics": {
+          "currentPrice": 31.11,
+          "todayReturn": 0.29,
+          "drawdownFromPeak": -11.1,
+          "zScore": 0.05,
+          "volumeRatio": 1.2
+        },
+        "pattern": "NORMAL"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 55,
+          "shortTerm": 52.1,
+          "blended": 54,
+          "adjustment": -3,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 30,
+          "shortTerm": 47.4,
+          "blended": 37,
+          "adjustment": 17,
+          "confidence": "HIGH"
+        },
+        "T3": {
+          "longTerm": 20,
+          "shortTerm": 34.5,
+          "blended": 26,
+          "adjustment": 14,
+          "confidence": "HIGH"
+        },
+        "T4": {
+          "longTerm": 50,
+          "shortTerm": 47.1,
+          "blended": 49,
+          "adjustment": -3,
+          "confidence": "HIGH"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T2",
+        "secondaryHypothesis": "T3",
+        "contradictedHypothesis": null,
+        "confidence": 0.65,
+        "reasoning": ""
+      },
+      "narrativeShift": {
+        "hasShift": true,
+        "shortTermView": "MODERATE: Price action suggests growing attention to Cap Rate Expansion. Research thesis not yet invalidated but under pressure.",
+        "longTermView": "Research-market divergence in Cap Rate Expansion (17.4pts). Supply Overshoot, Data Centre Expansion, AI Infrastructure Moat remain aligned.",
+        "commentary": "",
+        "divergences": [
+          {
+            "tier": "T2",
+            "name": "Cap Rate Expansion",
+            "gap": 17.4,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T3",
+            "name": "Supply Overshoot",
+            "gap": 14.5,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T1",
+            "name": "Data Centre Expansion",
+            "gap": 2.8999999999999986,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "T4",
+            "name": "AI Infrastructure Moat",
+            "gap": 2.8999999999999986,
+            "direction": "market discounting"
+          }
+        ],
+        "maxDivergence": 17.4,
+        "regimeChangeRisk": false
+      },
+      "hypothesisNames": {
+        "T1": "Data Centre Expansion",
+        "T2": "Cap Rate Expansion",
+        "T3": "Supply Overshoot",
+        "T4": "AI Infrastructure Moat"
+      },
+      "characteristics": {
+        "highMultiple": true,
+        "growthStock": true,
+        "hasAIExposure": true
+      }
+    },
+    "WDS": {
+      "ticker": "WDS",
+      "dislocation": {
+        "severity": "HIGH",
+        "metrics": {
+          "currentPrice": 25.89,
+          "todayReturn": 0.43,
+          "drawdownFromPeak": -26,
+          "zScore": 0.19,
+          "volumeRatio": 1.2
+        },
+        "pattern": "DISTRIBUTION"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 40,
+          "shortTerm": 35.7,
+          "blended": 38,
+          "adjustment": -4,
+          "confidence": "HIGH"
+        },
+        "T2": {
+          "longTerm": 35,
+          "shortTerm": 30.7,
+          "blended": 33,
+          "adjustment": -4,
+          "confidence": "HIGH"
+        },
+        "T3": {
+          "longTerm": 40,
+          "shortTerm": 72.25,
+          "blended": 53,
+          "adjustment": 32,
+          "confidence": "MEDIUM"
+        },
+        "T4": {
+          "longTerm": 30,
+          "shortTerm": 95,
+          "blended": 56,
+          "adjustment": 77,
+          "confidence": "LOW"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T4",
+        "secondaryHypothesis": "T3",
+        "contradictedHypothesis": null,
+        "confidence": 0.75,
+        "reasoning": ""
+      },
+      "narrativeShift": {
+        "hasShift": true,
+        "shortTermView": "HIGH: 0.4% move with 26% drawdown signals elevated concern around Scarborough Delivery. Watch for acceleration or reversal.",
+        "longTermView": "Research-market divergence in Scarborough Delivery (65pts), Energy Transition Risk (32.25pts). Commodity Price Risk, LNG Volume Growth remain aligned.",
+        "commentary": "The 26% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Scarborough Delivery between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Accelerate review cycle.",
+        "divergences": [
+          {
+            "tier": "T4",
+            "name": "Scarborough Delivery",
+            "gap": 65,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T3",
+            "name": "Energy Transition Risk",
+            "gap": 32.25,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T2",
+            "name": "Commodity Price Risk",
+            "gap": 4.300000000000001,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "T1",
+            "name": "LNG Volume Growth",
+            "gap": 4.299999999999997,
+            "direction": "market discounting"
+          }
+        ],
+        "maxDivergence": 65,
+        "regimeChangeRisk": true
+      },
+      "hypothesisNames": {
+        "T1": "LNG Volume Growth",
+        "T2": "Commodity Price Risk",
+        "T3": "Energy Transition Risk",
+        "T4": "Scarborough Delivery"
+      },
+      "characteristics": {
+        "highMultiple": false,
+        "growthStock": false,
+        "hasAIExposure": false
+      }
+    },
+    "SIG": {
+      "ticker": "SIG",
+      "dislocation": {
+        "severity": "CRITICAL",
+        "metrics": {
+          "currentPrice": 3.02,
+          "todayReturn": -0.33,
+          "drawdownFromPeak": -39.6,
+          "zScore": -0.47,
+          "volumeRatio": 1.2
+        },
+        "pattern": "DISTRIBUTION"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 55,
+          "shortTerm": 51.7,
+          "blended": 54,
+          "adjustment": -3,
+          "confidence": "MEDIUM"
+        },
+        "T2": {
+          "longTerm": 30,
+          "shortTerm": 26.7,
+          "blended": 29,
+          "adjustment": -3,
+          "confidence": "MEDIUM"
+        },
+        "T3": {
+          "longTerm": 35,
+          "shortTerm": 95,
+          "blended": 59,
+          "adjustment": 99,
+          "confidence": "LOW"
+        },
+        "T4": {
+          "longTerm": 40,
+          "shortTerm": 5,
+          "blended": 26,
+          "adjustment": -145,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T3",
+        "secondaryHypothesis": "T4",
+        "contradictedHypothesis": "T4",
+        "confidence": 0.7,
+        "reasoning": "Severe drawdown (39.6%) from peak indicates narrative regime change. Previous bull thesis (T4) being contradicted by price action"
+      },
+      "narrativeShift": {
+        "hasShift": true,
+        "shortTermView": "CRITICAL: 0.3% daily decline with 40% peak drawdown. Market is repricing around Competition Intensifies (T3). The AI Analytics Moat thesis (T4) is being actively contradicted by price action.",
+        "longTermView": "Research-market divergence in Competition Intensifies (60pts), AI Analytics Moat (35pts). Cash Burn Risk, Network Growth remain aligned.",
+        "commentary": "The 40% drawdown from peak is not matched by the static research thesis weights. The 60-point spread in Competition Intensifies between research (35%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. AI Analytics Moat (research weight: 40%) is being actively contradicted — market-implied weight has fallen to 5%. Action: Deep-dive review within 48 hours.",
+        "divergences": [
+          {
+            "tier": "T3",
+            "name": "Competition Intensifies",
+            "gap": 60,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T4",
+            "name": "AI Analytics Moat",
+            "gap": 35,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "T2",
+            "name": "Cash Burn Risk",
+            "gap": 3.3000000000000007,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "T1",
+            "name": "Network Growth",
+            "gap": 3.299999999999997,
+            "direction": "market discounting"
+          }
+        ],
+        "maxDivergence": 60,
+        "regimeChangeRisk": true
+      },
+      "hypothesisNames": {
+        "T1": "Network Growth",
+        "T2": "Cash Burn Risk",
+        "T3": "Competition Intensifies",
+        "T4": "AI Analytics Moat"
+      },
+      "characteristics": {
+        "highMultiple": false,
+        "growthStock": true,
+        "hasAIExposure": true
+      }
+    },
+    "FMG": {
+      "ticker": "FMG",
+      "dislocation": {
+        "severity": "CRITICAL",
+        "metrics": {
+          "currentPrice": 20.25,
+          "todayReturn": -4.53,
+          "drawdownFromPeak": -19,
+          "zScore": -3.56,
+          "volumeRatio": 1.2
+        },
+        "pattern": "STEADY_DECLINE"
+      },
+      "weights": {
+        "T1": {
+          "longTerm": 45,
+          "shortTerm": 5,
+          "blended": 29,
+          "adjustment": -45,
+          "confidence": "MEDIUM"
+        },
+        "T2": {
+          "longTerm": 40,
+          "shortTerm": 95,
+          "blended": 62,
+          "adjustment": 815,
+          "confidence": "LOW"
+        },
+        "T3": {
+          "longTerm": 30,
+          "shortTerm": 95,
+          "blended": 56,
+          "adjustment": 453,
+          "confidence": "LOW"
+        },
+        "T4": {
+          "longTerm": 35,
+          "shortTerm": 5,
+          "blended": 23,
+          "adjustment": -45,
+          "confidence": "MEDIUM"
+        }
+      },
+      "inference": {
+        "primaryHypothesis": "T2",
+        "secondaryHypothesis": "T3",
+        "contradictedHypothesis": null,
+        "confidence": 0.65,
+        "reasoning": ""
+      },
+      "narrativeShift": {
+        "hasShift": true,
+        "shortTermView": "CRITICAL: 4.5% daily decline with 19% peak drawdown. Market is repricing around Commodity Cycle Risk (T2). Multiple hypotheses under pressure.",
+        "longTermView": "Research-market divergence in Green Energy Execution (65pts), Commodity Cycle Risk (55pts), Iron Ore Volume/Price (40pts), FFI Capital Drain (30pts). All hypotheses show divergence.",
+        "commentary": "The 19% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Green Energy Execution between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
+        "divergences": [
+          {
+            "tier": "T3",
+            "name": "Green Energy Execution",
+            "gap": 65,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T2",
+            "name": "Commodity Cycle Risk",
+            "gap": 55,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T1",
+            "name": "Iron Ore Volume/Price",
+            "gap": 40,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "T4",
+            "name": "FFI Capital Drain",
+            "gap": 30,
+            "direction": "market discounting"
+          }
+        ],
+        "maxDivergence": 65,
+        "regimeChangeRisk": true
+      },
+      "hypothesisNames": {
+        "T1": "Iron Ore Volume/Price",
+        "T2": "Commodity Cycle Risk",
+        "T3": "Green Energy Execution",
+        "T4": "FFI Capital Drain"
+      },
+      "characteristics": {
+        "highMultiple": false,
+        "growthStock": false,
+        "hasAIExposure": false
+      }
+    }
+  },
+  "generatedAt": "2026-02-16T06:08:11.087Z"
 }
