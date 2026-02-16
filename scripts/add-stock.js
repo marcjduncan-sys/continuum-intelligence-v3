@@ -626,6 +626,19 @@ STOCK_DATA.${ticker} = {
     stockDataEntry + '// Auto-populate SNAPSHOT_DATA for all stocks in SNAPSHOT_ORDER\n// NOTE: Must run AFTER all STOCK_DATA definitions above'
   );
 
+  // Safety check: ensure file ends with </html> and has no duplicated content after it
+  const htmlEndIndex = html.lastIndexOf('</html>');
+  if (htmlEndIndex !== -1) {
+    html = html.substring(0, htmlEndIndex + '</html>'.length) + '\n';
+  }
+
+  // Verify no duplicate </html> tags (indicates corrupted file)
+  const htmlTagCount = (html.match(/<\/html>/g) || []).length;
+  if (htmlTagCount > 1) {
+    console.error(`  ✗ SAFETY CHECK FAILED: Found ${htmlTagCount} </html> tags — file is corrupted. Aborting write.`);
+    process.exit(1);
+  }
+
   fs.writeFileSync(INDEX_PATH, html, 'utf8');
   console.log(`  ✓ index.html: added FRESHNESS_DATA, REFERENCE_DATA, SNAPSHOT_ORDER, stock card, STOCK_DATA.${ticker}`);
   return true;
