@@ -42,7 +42,7 @@ jobs:
             echo "::error::${TICKER_UPPER} is already in the coverage universe!"
             exit 1
           fi
-          echo "✓ ${TICKER_UPPER} is not yet in coverage — proceeding"
+          echo "TICKER_UPPER=${TICKER_UPPER}" >> "$GITHUB_ENV"
 
       - name: Add stock to coverage
         env:
@@ -52,14 +52,7 @@ jobs:
           STOCK_SECTOR_SUB: ${{ github.event.inputs.sector_sub }}
         run: node scripts/add-stock.js
 
-      - name: Show changes
-        run: |
-          echo "── Files changed ──"
-          git diff --stat
-          echo ""
-          git status --short
-
-      - name: Commit and push
+      - name: Commit and push to platform
         run: |
           git config user.name "Continuum Bot"
           git config user.email "bot@continuum-intelligence.dev"
@@ -73,5 +66,46 @@ jobs:
           else
             git commit -m "Add ${COMPANY} (${TICKER}.AX) to coverage universe [auto]"
             git push origin main
-            echo "Done - ${TICKER}.AX (${COMPANY}) deployed!"
+          fi
+
+  deploy:
+    needs: add-stock
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout continuum-platform
+        uses: actions/checkout@v4
+        with:
+          path: platform
+
+      - name: Checkout continuum-intelligence
+        uses: actions/checkout@v4
+        with:
+          repository: marcjduncan-sys/continuum-intelligence
+          token: ${{ secrets.DEPLOY_TOKEN }}
+          path: intelligence
+
+      - name: Sync files to continuum-intelligence
+        run: |
+          cp platform/index.html intelligence/index.html
+          rsync -av platform/scripts/ intelligence/scripts/
+          mkdir -p intelligence/data
+          rsync -av platform/data/ intelligence/data/
+
+      - name: Commit and deploy
+        working-directory: intelligence
+        run: |
+          git config user.name "Continuum Bot"
+          git config user.email "bot@continuum-intelligence.dev"
+
+          TICKER=$(echo "${{ github.event.inputs.ticker }}" | tr '[:lower:]' '[:upper:]')
+          COMPANY="${{ github.event.inputs.company }}"
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to deploy"
+          else
+            git commit -m "Add ${COMPANY} (${TICKER}.AX) to live site [auto-deploy]"
+            git push origin main
+            echo "Deployed ${TICKER}.AX to live site!"
           fi
