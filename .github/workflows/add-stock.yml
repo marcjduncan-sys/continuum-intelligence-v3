@@ -73,9 +73,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout continuum-platform
+      - name: Checkout continuum-platform (latest main, including new stock)
         uses: actions/checkout@v4
         with:
+          ref: main
           path: platform
 
       - name: Checkout continuum-intelligence
