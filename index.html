@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/personalisation.css">
     <style>
 /* ============================================================
    CONTINUUM INTELLIGENCE — DESIGN SYSTEM
@@ -3653,6 +3654,7 @@ a:hover { color: var(--accent-sage); }
             <a href="#snapshots" data-nav="snapshots">Snapshots</a>
             <a href="#portfolio" data-nav="portfolio">Portfolio</a>
             <a href="#thesis" data-nav="thesis">Comparator</a>
+            <a href="#personalisation" data-nav="personalisation">Personalisation</a>
             <a href="#about" data-nav="about">About</a>
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
                 <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -4108,6 +4110,11 @@ a:hover { color: var(--accent-sage); }
         </div>
     </footer>
 </div>
+
+<!-- ============================================================
+     PAGE: PERSONALISATION
+     ============================================================ -->
+<div class="page" id="page-personalisation"></div>
 
 <!-- Report Pages (dynamically rendered) -->
 <div class="page" id="page-report-WOW"></div>
@@ -15114,6 +15121,16 @@ function route() {
         }
     }
 
+    // Lazy render personalisation page on first visit
+    if (hash === 'personalisation' && !renderedPages.has('_personalisation')) {
+        var pnContainer = document.getElementById('page-personalisation');
+        if (pnContainer && typeof renderPersonalisationPage === 'function') {
+            pnContainer.innerHTML = renderPersonalisationPage();
+            initPersonalisationDemo();
+            renderedPages.add('_personalisation');
+        }
+    }
+
     // Lazy render snapshot pages on first visit
     if (hash.startsWith('snapshot-')) {
         const ticker = hash.replace('snapshot-', '');
@@ -17216,6 +17233,7 @@ function buildRetailHTML(stock) {
 <script src="scripts/institutional-commentary-engine.js"></script>
 <!-- Narrative Framework v2.0 — Dislocation Alerts & Dynamic Weights -->
 <script src="scripts/narrative-framework-integration.js"></script>
+<script src="js/personalisation.js"></script>
 
 </body>
 </html>
