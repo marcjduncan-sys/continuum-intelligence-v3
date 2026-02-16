@@ -352,107 +352,150 @@ function injectIntoIndexHTML(ticker, company, sector, sectorSub, marketData) {
   const historyStr = marketData.priceHistory.slice(-60).join(', ');
   const drawdown = marketData.yearHigh > 0 ? ((1 - price / marketData.yearHigh) * 100).toFixed(1) : '0.0';
 
+  const esc = (s) => (s || '').replace(/'/g, "\\'");
   const stockDataBlock = `
 STOCK_DATA.${short} = {
   // Meta
   ticker: '${short}',
   tickerFull: '${short}.AX',
   exchange: 'ASX',
-  company: '${company.replace(/'/g, "\\'")}',
+  company: '${esc(company)}',
   sector: '${sector}',
-  sectorSub: '${(sectorSub || sector).replace(/'/g, "\\'")}',
+  sectorSub: '${esc(sectorSub || sector)}',
   price: ${price},
   currency: '${marketData.currency}',
   date: '${today}',
   reportId: '${short}-2026-001',
+  priceHistory: [${historyStr}],
 
-  // Hero
-  heroDescription: '${(sectorSub || sector).replace(/'/g, "\\'")} &bull; ASX-Listed',
-  heroCompanyDescription: '${company.replace(/'/g, "\\'")} (ASX: ${short}) &mdash; coverage initiated. Full analysis pending.',
+  // Hero - right side metrics
+  heroDescription: '${esc(sectorSub || sector)} &bull; ASX-Listed',
+  heroCompanyDescription: '${esc(company)} (ASX: ${short}) &mdash; coverage initiated. Full analysis pending.',
   heroMetrics: [
-    { label: 'Price', value: '${marketData.currency}${price}', colorClass: '' },
+    { label: 'Mkt Cap', value: '${marketCapStr ? marketData.currency + marketCapStr : "N/A"}', colorClass: '' },
     { label: '52w High', value: '${marketData.currency}${marketData.yearHigh}', colorClass: '' },
-    { label: '52w Low', value: '${marketData.currency}${marketData.yearLow}', colorClass: '' },
-    { label: 'Drawdown', value: '-${drawdown}%', colorClass: ${parseFloat(drawdown) > 20 ? "'negative'" : "''"} }
+    { label: '52w Low', value: '${marketData.currency}${marketData.yearLow}', colorClass: '' }
   ],
 
   // Skew
-  skew: { direction: 'neutral', rationale: 'Pending full analysis' },
-
-  // Featured
-  featuredMetrics: [
-    { label: 'Price', value: '${marketData.currency}${price}', colorClass: '' },
-    { label: 'Drawdown', value: '-${drawdown}%', colorClass: ${parseFloat(drawdown) > 20 ? "'negative'" : "''"} }
-  ],
-  featuredPriceColor: '',
-  featuredRationale: 'Auto-added to coverage. Full analysis pending.',
+  skew: { direction: 'neutral', rationale: 'Auto-added stock. Narrative analysis pending. Skew assessment requires analyst research.' },
 
   // Verdict
   verdict: {
-    label: 'PENDING',
-    description: 'Full hypothesis framework under construction.',
-    subLabel: 'Coverage initiated',
-    color: 'var(--accent-yellow)',
-    emoji: '',
-    scores: { t1: 50, t2: 50, t3: 50, t4: 50 },
-    confidence: { level: 'LOW', color: 'var(--accent-yellow)', description: 'Pending analysis' },
-    keyDrivers: ['Coverage recently initiated', 'Full evidence assessment pending']
+    text: '${esc(company)} has been added to coverage. Trading at <span class="key-stat">${marketData.currency}${price}</span>. Full narrative analysis with competing hypotheses is pending.',
+    borderColor: null,
+    scores: [
+      { label: 'T1 Growth/Recovery', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T2 Base Case', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T3 Risk/Downside', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'T4 Disruption/Catalyst', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null }
+    ]
   },
 
-  // Identity
+  // Featured card metrics (for home page)
+  featuredMetrics: [
+    { label: 'Mkt Cap', value: '${marketCapStr ? marketData.currency + marketCapStr : "N/A"}', color: '' },
+    { label: '52w Range', value: '${marketData.currency}${marketData.yearLow}&ndash;${marketData.yearHigh}', color: '' },
+    { label: 'Drawdown', value: '-${drawdown}%', color: '' }
+  ],
+  featuredPriceColor: '',
+  featuredRationale: 'Auto-added to coverage. Full narrative analysis pending.',
+
+  // Identity section
   identity: {
-    oneLiner: '${company.replace(/'/g, "\\'")} (ASX: ${short})',
-    sector: '${sector}',
-    sectorSub: '${(sectorSub || sector).replace(/'/g, "\\'")}',
-    marketCap: '${marketCapStr || "N/A"}',
-    peRatio: 'N/A',
-    divYield: 'N/A'
+    rows: [
+      [['Ticker', '${short}.AX', 'td-mono'], ['Exchange', 'ASX', 'td-mono']],
+      [['Market Cap', '${marketCapStr ? marketData.currency + marketCapStr : "N/A"}', 'td-mono'], ['Sector', '${sector}${sectorSub && sectorSub !== sector ? " / " + esc(sectorSub) : ""}', 'td-mono']],
+      [['Share Price', '${marketData.currency}${price}', 'td-mono'], ['52-Week Range', '${marketData.currency}${marketData.yearLow} &ndash; ${marketData.currency}${marketData.yearHigh}', 'td-mono']]
+    ],
+    overview: '${esc(company)} (ASX: ${short}) &mdash; auto-added to coverage. Full company overview pending analyst research.'
   },
 
-  // Hypotheses
+  // Hypotheses (placeholder — requires analyst research)
   hypotheses: [
-    { tier: 'T1', direction: 'upside', title: 'T1: Growth/Recovery', score: 50, statusClass: 'status-moderate', confidence: 'LOW', summary: 'Pending analysis', evidence: [], watchItems: [] },
-    { tier: 'T2', direction: 'base', title: 'T2: Base Case', score: 50, statusClass: 'status-moderate', confidence: 'LOW', summary: 'Pending analysis', evidence: [], watchItems: [] },
-    { tier: 'T3', direction: 'downside', title: 'T3: Risk/Downside', score: 50, statusClass: 'status-moderate', confidence: 'LOW', summary: 'Pending analysis', evidence: [], watchItems: [] },
-    { tier: 'T4', direction: 'disruption', title: 'T4: Disruption/Catalyst', score: 50, statusClass: 'status-moderate', confidence: 'LOW', summary: 'Pending analysis', evidence: [], watchItems: [] }
+    {
+      tier: 't1', direction: 'upside',
+      title: 'T1: Growth/Recovery',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't2', direction: 'neutral',
+      title: 'T2: Base Case',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't3', direction: 'downside',
+      title: 'T3: Risk/Downside',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    },
+    {
+      tier: 't4', direction: 'downside',
+      title: 'T4: Disruption/Catalyst',
+      statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
+      score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
+      description: 'Placeholder hypothesis. Requires analyst research to populate.',
+      requires: null,
+      supportingLabel: 'Supporting Evidence', supporting: ['Pending analysis'],
+      contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
+    }
   ],
 
-  // Narrative
-  narrative: [],
+  // Narrative (placeholder)
+  narrative: {
+    theNarrative: '${esc(company)} has been auto-added to the Continuum Intelligence coverage universe. Full narrative analysis with competing hypotheses, evidence assessment, and discriminating data points is pending.',
+    priceImplication: {
+      label: 'Coverage Initiated &mdash; ${short}',
+      content: 'Full price implication analysis pending. Hypothesis framework requires analyst research before embedded assumptions can be identified.'
+    },
+    evidenceCheck: 'Pending analyst research.',
+    narrativeStability: 'Not yet assessed.'
+  },
 
-  // Evidence
-  evidenceMatrix: [],
+  // Evidence (placeholder)
+  evidence: {
+    intro: 'Evidence assessment pending. Stock was auto-added to coverage on ${today}.',
+    cards: [],
+    alignmentSummary: null
+  },
 
-  // Discriminators
-  discriminators: [],
+  // Discriminators (placeholder)
+  discriminators: {
+    intro: 'Discriminating evidence pending analyst research.',
+    rows: [],
+    nonDiscriminating: null
+  },
 
-  // Tripwires
-  tripwires: [],
-
-  // Price History
-  priceHistory: [${historyStr}],
-
-  // Questions
-  questions: ['Full analysis pending — what are the key risks and catalysts for ${short}?'],
-
-  // Footer
-  footerDisclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using ACH methodology. All data sourced from ASX filings and publicly available data.',
-  footerMeta: [
-    { label: 'ID: ${short}-2026-001' },
-    { label: 'MODE: Coverage Initiated' },
-    { label: 'NEXT: Pending' }
-  ],
+  // Tripwires (placeholder)
+  tripwires: {
+    intro: 'Tripwires pending analyst research.',
+    cards: []
+  },
 
   // Gaps
   gaps: {
     coverageRows: [],
-    couldntAssess: ['Full evidence assessment pending.'],
-    analyticalLimitations: 'This stock was auto-added to coverage. Hypothesis scores, evidence, and narrative require manual research.'
+    couldntAssess: ['Full evidence assessment pending &mdash; stock was auto-added to coverage.'],
+    analyticalLimitations: 'This stock was auto-added. All hypothesis scores, evidence assessments, and narrative analysis require manual research and population.'
   },
 
   // Footer
   footer: {
-    disclaimer: 'This report does not constitute personal financial advice.',
+    disclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information.',
     domainCount: '0 of 10',
     hypothesesCount: '4 Pending'
   }
