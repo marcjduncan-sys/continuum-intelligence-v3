@@ -1,10 +1,17 @@
 name: Deploy to continuum-intelligence
 
-# MANUAL ONLY — no automatic triggers.
-# continuum-intelligence is the primary repo; this workflow is a safety net
-# for syncing shared files when explicitly needed. It will NEVER delete files
-# that exist only in continuum-intelligence.
+# Triggers:
+# 1. Automatically on push to main (e.g. merged PRs) — syncs shared files
+# 2. Manually via workflow_dispatch with DEPLOY confirmation
+# Additive sync only — will NEVER delete files that exist only in
+# continuum-intelligence.
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'scripts/**'
+      - 'data/**'
   workflow_dispatch:
     inputs:
       confirm:
@@ -15,7 +22,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.event.inputs.confirm == 'DEPLOY'
+    if: github.event_name == 'push' || github.event.inputs.confirm == 'DEPLOY'
     steps:
       - name: Checkout continuum-platform
         uses: actions/checkout@v4
