@@ -415,6 +415,15 @@ function applyNarrativeAnalysis(ticker) {
   if (typeof document === 'undefined') return;
   if (!window._nfiAnalysisData || !window._nfiAnalysisData.results) return;
 
+  // Throttle guard — prevent re-processing the same ticker within 10 seconds
+  // This stops MutationObserver infinite loops where NFI DOM changes re-trigger processing
+  if (!window._nfiProcessedTickers) window._nfiProcessedTickers = {};
+  if (window._nfiProcessedTickers[ticker] &&
+      (Date.now() - window._nfiProcessedTickers[ticker]) < 10000) {
+    return;
+  }
+  window._nfiProcessedTickers[ticker] = Date.now();
+
   var analysis = window._nfiAnalysisData.results[ticker];
   if (!analysis || analysis.dislocation.severity === 'NORMAL') return;
 

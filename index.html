@@ -2844,8 +2844,7 @@ a:hover { color: var(--accent-sage); }
 
 /* --- Snapshot Grid (listing page) --- */
 .snapshot-grid,
-#snapshot-grid,
-.snapshot-container {
+#snapshot-grid {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
     gap: 20px !important;
@@ -2853,18 +2852,22 @@ a:hover { color: var(--accent-sage); }
     padding: 20px 0 !important;
 }
 
+/* Snapshot container is a wrapper — grid is on .snap-grid child */
+#snapshot-container {
+    width: 100%;
+    padding: 20px 0;
+}
+
 @media (max-width: 1024px) {
     .snapshot-grid,
-    #snapshot-grid,
-    .snapshot-container {
+    #snapshot-grid {
         grid-template-columns: repeat(2, 1fr) !important;
     }
 }
 
 @media (max-width: 600px) {
     .snapshot-grid,
-    #snapshot-grid,
-    .snapshot-container {
+    #snapshot-grid {
         grid-template-columns: 1fr !important;
     }
 }
@@ -3882,7 +3885,7 @@ a:hover { color: var(--accent-sage); }
             <p class="hero-subtitle" style="text-align:left; margin:0; max-width: none;">Each snapshot condenses a full Continuum research report into a single landscape view: hypotheses, evidence matrix, discriminating data, and tripwires at a glance.</p>
         </div>
 
-        <div class="snapshot-grid" id="snapshot-grid"></div>
+        <div id="snapshot-container"></div>
     </div>
 
     <footer class="site-footer">
@@ -18346,10 +18349,8 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Populate snapshot grid after NFI has finished processing
-    // 1.5s delay lets narrative-framework-integration.js complete
-    // weight adjustments, dislocation alerts, and narrative updates
-    setTimeout(function() { initSnapshots('snapshot-grid'); }, 1500);
+    // Snapshot grid is now populated by snapshot-generator.js
+    // via window.addEventListener('load', ...) with 1.5s delay
 
     // Populate thesis comparator stock cards dynamically
     const tcGrid = document.getElementById('tc-stock-grid');
@@ -20765,9 +20766,14 @@ function buildRetailHTML(stock) {
 <script src="scripts/institutional-commentary-engine.js"></script>
 <!-- Narrative Framework v2.0 — Dislocation Alerts & Dynamic Weights -->
 <script src="scripts/narrative-framework-integration.js"></script>
-<!-- Snapshot Generator — rebuilds snapshot grid after NFI processing -->
-<script src="scripts/snapshot-generator.js"></script>
 <script src="js/personalisation.js"></script>
+<!-- Snapshot Generator v2 — runs after NFI + personalisation -->
+<script src="scripts/snapshot-generator.js"></script>
+<script>
+window.addEventListener('load', function() {
+  setTimeout(function() { initSnapshots('snapshot-container'); }, 1500);
+});
+</script>
 
 </body>
 </html>
