@@ -1,712 +1,1784 @@
 /* ============================================================
-   PERSONALISATION DEMONSTRATION PAGE
-   Data + Render + State + Interactions
+   PERSONALISATION ONBOARDING WIZARD
+   5-step wizard: Firm > Strategy > Portfolio > Assessment > Chat
+   All scoring happens client-side. Profile saved to localStorage.
    ============================================================ */
+
 (function() {
 'use strict';
 
-// ============================================================
-// DATA: MANAGERS
-// ============================================================
+// =========================================================================
+// CONSTANTS & DATA
+// =========================================================================
 
-var PN_MANAGERS = {
-    pullen: {
-        id: 'pullen', name: 'Alan Pullen', firm: 'Magellan Financial Group',
-        fund: 'Magellan Global Fund',
-        traits: [
-            { label: 'Evidence-first', type: 'cognitive' },
-            { label: 'Analytical under loss', type: 'emotional' },
-            { label: 'Well-calibrated', type: 'bias' },
-            { label: 'Deliberate', type: 'decision' }
-        ]
-    },
-    mcvicar: {
-        id: 'mcvicar', name: 'Ben McVicar', firm: 'Magellan Financial Group',
-        fund: 'Magellan Infrastructure Fund',
-        traits: [
-            { label: 'Quantitative-first', type: 'cognitive' },
-            { label: 'Defensive under loss', type: 'emotional' },
-            { label: 'Narrows focus', type: 'bias' },
-            { label: 'Deliberate', type: 'decision' }
-        ]
-    },
-    lamm: {
-        id: 'lamm', name: 'Raphael Lamm', firm: 'L1 Capital',
-        fund: 'L1 Capital Long Short Fund',
-        traits: [
-            { label: 'Conclusion-first', type: 'cognitive' },
-            { label: 'Offensive under loss', type: 'emotional' },
-            { label: 'Overconfident', type: 'bias' },
-            { label: 'Fast conviction', type: 'decision' }
-        ]
-    },
-    steinthal: {
-        id: 'steinthal', name: 'David Steinthal', firm: 'L1 Capital',
-        fund: 'L1 Capital International Fund',
-        traits: [
-            { label: 'Qualitative-first', type: 'cognitive' },
-            { label: 'Moderate loss processing', type: 'emotional' },
-            { label: 'Underconfident', type: 'bias' },
-            { label: 'Moderate conviction', type: 'decision' }
-        ]
-    },
-    burns: {
-        id: 'burns', name: 'Marcus Burns', firm: 'Spheria Asset Management',
-        fund: 'Spheria Smaller Companies Fund',
-        traits: [
-            { label: 'Evidence-first', type: 'cognitive' },
-            { label: 'Analytical under loss', type: 'emotional' },
-            { label: 'Disposition effect', type: 'bias' },
-            { label: 'Deliberate', type: 'decision' }
-        ]
-    },
-    booker: {
-        id: 'booker', name: 'Matthew Booker', firm: 'Spheria Asset Management',
-        fund: 'Spheria Microcap Fund',
-        traits: [
-            { label: 'Quantitative-first', type: 'cognitive' },
-            { label: 'Defensive under loss', type: 'emotional' },
-            { label: 'Model anchoring', type: 'bias' },
-            { label: 'Deliberate', type: 'decision' }
-        ]
-    }
+var PN_STEP_LABELS = [
+    { num: 1, title: 'Firm', subtitle: 'Institutional context' },
+    { num: 2, title: 'Strategy', subtitle: 'Fund mandate' },
+    { num: 3, title: 'Portfolio', subtitle: 'Current holdings' },
+    { num: 4, title: 'Assessment', subtitle: 'Cognitive profile' },
+    { num: 5, title: 'Chat', subtitle: 'Calibrated AI' }
+];
+
+// ---------------------------------------------------------------------------
+// Step 1: Firm options
+// ---------------------------------------------------------------------------
+
+var PN_FIRM_OPTIONS = {
+    type: [
+        'Superannuation Fund',
+        'Insurance Company',
+        'Family Office',
+        'HNWI Advisor',
+        'Boutique Fund Manager',
+        'Institutional Fund Manager'
+    ],
+    aum: [
+        '< $500M',
+        '$500M - $2B',
+        '$2B - $10B',
+        '$10B - $50B',
+        '$50B+'
+    ],
+    regulations: [
+        'APRA Prudential Standards',
+        'SIS Act Compliance',
+        'AFSL Conditions',
+        'ESG / Responsible Investment',
+        'FIRB Reporting'
+    ],
+    governance: [
+        'Sole Decision-Maker',
+        'Investment Committee',
+        'CIO-Led with IC Oversight',
+        'Board-Delegated Authority'
+    ]
 };
 
-// ============================================================
-// DATA: SCENARIOS
-// ============================================================
+// ---------------------------------------------------------------------------
+// Step 2: Fund options
+// ---------------------------------------------------------------------------
 
-var PN_SCENARIOS = {
-    hls: {
-        id: 'hls', label: 'Thesis Under Pressure', type: 'negative',
-        stock: 'Healius (ASX:HLS) | A$680M | Healthcare',
-        signal: 'Flat pathology volumes, CFO resignation, unchanged debt. Bull thesis survival: 55% \u2192 35%.',
-        rawSignal: 'SIGNAL: Position Update | Earnings Miss + Management Event\nSTOCK: Healius Limited (ASX:HLS) | Market Cap: ~A$680M | Sector: Healthcare, Pathology Services\nDATE: 6 February 2026 | URGENCY: Tier 2 (Position Update, Event-Driven)\n\nSIGNAL SUMMARY\nHealius reported Q3 FY26 pathology volumes flat versus prior corresponding period, missing consensus expectations for 3% organic growth. The Agilex Biolabs clinical trials division has downgraded FY26 revenue guidance by 15%, citing delayed pharmaceutical trial commencements across multiple clients. Net debt remains at A$855M, unchanged from the prior half, despite management\u2019s previous commentary about deleveraging from Lumus Imaging divestiture proceeds. Management has withdrawn its prior guidance that the business would reach \u201cnormalised operations by 2H FY26.\u201d\n\nThe CFO has resigned, citing personal reasons. No replacement has been announced. The resignation is effective in 4 weeks.\n\nKEY DATA POINTS\n\u2022 Pathology volume growth (Q3): 0.0% vs +3.0% consensus (-3.0pp)\n\u2022 Agilex revenue guidance (FY26): Down 15% vs prior guidance\n\u2022 Net debt: A$855M vs A$780M expected (+A$75M)\n\u2022 Altman Z-score: -0.45 (distress territory)\n\u2022 Share price (prior close): A$0.94 (down 67% over 3yr)\n\nTHESIS IMPACT\nBull thesis (turnaround): Weakened. Three pillars were (1) pathology volume recovery, (2) cost restructuring, (3) debt reduction. Pillar 1 stalled. Pillar 3 failed. Pillar 2 now carrying entire thesis.\nBear thesis (value trap): Strengthened. Flat volumes + Altman Z-score -0.45 + CFO departure = pattern consistent with structural impairment.\nACH Survival Score: Bull thesis 55% \u2192 35%.'
-    },
-    min: {
-        id: 'min', label: 'Consensus Challenge', type: 'positive',
-        stock: 'Mineral Resources (ASX:MIN) | A$11.5B | Mining',
-        signal: 'Lithium price recovery, operational turnaround under new leadership. Bear thesis weakening.',
-        rawSignal: 'SIGNAL: New Opportunity | Thesis Reassessment\nSTOCK: Mineral Resources Limited (ASX:MIN) | Market Cap: ~A$11.5B | Sector: Mining Services + Lithium\nDATE: 6 February 2026 | URGENCY: Tier 3 (New Opportunity)\n\nSIGNAL SUMMARY\nMineral Resources has reported a material improvement in operational metrics following Chris Ellison\u2019s departure as Managing Director. The new CEO (interim) has initiated a balance sheet review, suspended the Mt Marion expansion capex (preserving ~A$400M), and signalled a shift from growth-at-all-costs to capital discipline. Spodumene prices have recovered to US$1,250/t from US$900/t trough, driven by Chinese energy storage system (ESS) demand exceeding market expectations.\n\nBroker consensus has shifted from 14 Sell/Hold and 3 Buy to 8 Sell/Hold and 9 Buy over the past 60 days. Short interest has declined from 8.2% to 5.1%.\n\nKEY DATA POINTS\n\u2022 Spodumene price: US$1,250/t (was US$900, +39%)\n\u2022 Broker consensus (Buy): 9/17 (was 3/17, +6 upgrades)\n\u2022 Short interest: 5.1% (was 8.2%, -3.1pp)\n\u2022 Net debt/EBITDA (est): 2.8x (was 3.4x, improving)\n\u2022 Iron ore (mining services): Stable baseline\n\nTHESIS IMPACT\nBull thesis (operational turnaround + lithium recovery): Strengthened. New management discipline + lithium price recovery + broker consensus shift = multiple concurrent positive signals.\nBear thesis (overleveraged, Ellison governance risk): Weakened on governance (Ellison gone), partially addressed on leverage (capex suspension), but net debt/EBITDA still elevated at 2.8x.\nACH Survival Score: Bull thesis 45% \u2192 62%.'
-    }
+var PN_FUND_OPTIONS = {
+    strategy: [
+        'Long Only',
+        'Long-Short',
+        'Market Neutral',
+        'Macro',
+        'Multi-Strategy',
+        'Event-Driven',
+        'Quantitative'
+    ],
+    geography: [
+        'ASX Only',
+        'ASX + Global Developed',
+        'Global All-Cap',
+        'Asia-Pacific',
+        'Emerging Markets'
+    ],
+    benchmark: [
+        'S&P/ASX 200',
+        'S&P/ASX 300',
+        'S&P/ASX Small Ordinaries',
+        'MSCI World',
+        'Absolute Return',
+        'Custom'
+    ],
+    holdingPeriod: [
+        '< 3 months',
+        '3-12 months',
+        '1-3 years',
+        '3-5 years',
+        '5+ years'
+    ]
 };
 
-// ============================================================
-// DATA: DELIVERIES (all 12 manager x scenario combinations)
-// ============================================================
+// ---------------------------------------------------------------------------
+// Step 4a: Mini-IPIP Big Five (20 items)
+// Donnellan et al. (2006). Validated 20-item short form.
+// 4 items per factor. Reverse-coded items marked.
+// ---------------------------------------------------------------------------
 
-var PN_DELIVERIES = {
-    hls: {
-        pullen: {
-            body: "Signal noted \u2014 outside Magellan Global Fund mandate.\n\nHealius (ASX:HLS, A$680M, Healthcare/Pathology) missed Q3 pathology volumes and downgraded Agilex guidance. Domestic Australian small cap \u2014 no action required for global equities mandate. Relevant as a data point on Australian healthcare services demand trends if monitoring global pathology/diagnostics peers.",
-            annotations: [
-                { step: 1, type: 'mandate', badge: 'Mandate Filter', detail: 'OUT OF MANDATE. HLS is domestic small cap (A$680M). Magellan Global invests global large/mega cap.' },
-                { step: 5, type: 'format', badge: 'Format & Timing', detail: 'Brief. One paragraph. Delivered in morning digest.' }
-            ]
-        },
-        mcvicar: {
-            body: "Signal noted \u2014 outside Magellan Infrastructure Fund mandate.\n\nHealius (ASX:HLS, A$680M, Healthcare/Pathology) reported flat pathology volumes and a CFO resignation. Not an infrastructure asset \u2014 no action required. No read-through to current infrastructure holdings identified.",
-            annotations: [
-                { step: 1, type: 'mandate', badge: 'Mandate Filter', detail: 'OUT OF MANDATE. HLS is healthcare services. Magellan Infrastructure invests in global infrastructure.' },
-                { step: 5, type: 'format', badge: 'Format & Timing', detail: 'Brief. One line. Weekly summary.' }
-            ]
-        },
-        lamm: {
-            body: "HLS: Short Opportunity Catalyst \u2014 CFO Out, Volumes Flat, Debt Stuck\n\nHealius has delivered a triple negative: pathology volumes flat (missed +3% consensus), Agilex Biolabs guiding down 15%, and CFO resigning. Net debt at A$855M is unchanged despite the Lumus divestiture \u2014 the deleveraging thesis is dead. Altman Z-score sits at -0.45.\n\nActionable angle: If you\u2019re not already short, this is your catalyst. The market hasn\u2019t fully priced the CFO departure yet \u2014 announcement was after-hours. Borrow should be available given the A$680M market cap.\n\nKey risk to the short: Pathology is Medicare-funded essential infrastructure. Volume recovery could still come \u2014 one flat quarter is not structural proof. If you initiate, define your cover trigger: what volume growth number in Q4 would make you cover?\n\nPosition sizing note: L1 Long Short Fund capacity \u2014 adding a short in HLS at this size would move net exposure by approximately [X]bp.",
-            annotations: [
-                { step: 1, type: 'mandate', badge: 'Mandate Filter', detail: 'IN MANDATE. L1 Long Short invests in Australian equities, all-cap, long and short. HLS is a valid short candidate.' },
-                { step: 2, type: 'structural', badge: 'Structural Calibration', detail: 'Conclusion-first. Lamm is conclusion-first, narrative-driven, low information satiation. Lead with the verdict and action angle. Key data points embedded in narrative, not tables. Brief format.' },
-                { step: 3, type: 'emotional', badge: 'Emotional Calibration', detail: 'Offensive framing. Lamm processes loss/negative signals offensively \u2014 "this is your catalyst" frames the negative signal as opportunity. No hedging, no graduated context. Direct.' },
-                { step: 4, type: 'bias', badge: 'Bias Counter-Intervention', detail: 'Overconfidence counter. "Define your cover trigger" forces pre-commitment to disconfirmation criteria before entry. Lamm\u2019s overconfidence manifests on high-conviction contrarian positions; this is exactly that scenario. Socratic framing (question, not directive) because CRT 3/4 = high enough to rationalise directive warnings.' },
-                { step: 5, type: 'format', badge: 'Format & Timing', detail: 'Real-time delivery. No batching. Narrative format.' }
-            ]
-        },
-        steinthal: {
-            body: "Signal noted \u2014 outside L1 International Fund mandate. Coordination note below.\n\nHealius (ASX:HLS, A$680M, Healthcare/Pathology): domestic small cap, negative signal (flat volumes, CFO departure, debt unchanged). No action for international mandate.\n\nCoordination: Raphael Lamm may act on this signal for the L1 Long Short Fund \u2014 it aligns with his short thesis criteria. If L1 Long Short initiates a HLS short, you should be aware in case of any cross-fund risk considerations.",
-            annotations: [
-                { step: 1, type: 'mandate', badge: 'Mandate Filter', detail: 'OUT OF MANDATE. L1 International invests global, ex-Australia. HLS is domestic. Cross-strategy coordination note added.' },
-                { step: 2, type: 'structural', badge: 'Structural Calibration', detail: 'Cross-strategy coordination note flagged as Layer 1 firm-level delivery.' },
-                { step: 5, type: 'format', badge: 'Format & Timing', detail: 'Morning delivery. Brief. Coordination note appended.' }
-            ]
-        },
-        burns: {
-            body: "HLS: Thesis Review \u2014 Three Pillars, Two Under Pressure\n\nHealius update by thesis pillar:\n\nPillar 1 \u2014 Pathology Volume Recovery: STALLED. Q3 volumes flat vs +3% consensus. Medicare-funded volumes should recover with demographics, but timing is uncertain. One flat quarter is not structural failure, but it is not the inflection the turnaround thesis requires.\n\nPillar 2 \u2014 Cost Restructuring: UNASSESSED. No new data in this update. This pillar is now carrying the entire thesis \u2014 if cost restructuring doesn\u2019t deliver margin improvement in 2H FY26, the turnaround thesis fails regardless of volume trajectory.\n\nPillar 3 \u2014 Debt Reduction: FAILING. Net debt at A$855M, unchanged despite Lumus proceeds. Management has withdrawn \u201cnormalised operations by 2H FY26\u201d guidance. Altman Z-score at -0.45 (distress territory).\n\nAdditional signal: CFO resignation. Personal reasons stated. No replacement announced. Effective in 4 weeks. In context of the debt position, this is concerning.\n\nSpheria holds 6.55% of HLS. This is a substantial holding with disclosure obligations.\n\nDecision framework: If you did not already hold HLS at 6.55%, would you initiate this position today at A$0.94?\n\nInaction carries risk: Spheria\u2019s substantial holding is public. If the thesis is failing, continued holding is a visible signal to the market about your conviction. If your conviction has genuinely declined, inaction is not neutral \u2014 it is a decision to maintain a position you may not initiate from scratch.\n\nCounter-thesis to consider: Pathology is essential infrastructure. Demographics are structural tailwinds. A$0.94 may represent deep value if cost restructuring delivers. But deep value and value trap are distinguished by the balance sheet, and this balance sheet is not improving.",
-            annotations: [
-                { step: 1, type: 'mandate', badge: 'Mandate Filter', detail: 'IN MANDATE. HLS (A$680M) is outside ASX 100, in the Small Ordinaries. Spheria Smaller Companies holds 6.55% (top holding). Substantial holding flag activated.' },
-                { step: 2, type: 'structural', badge: 'Structural Calibration', detail: 'Evidence-first, balanced. Burns is evidence-first, builds thesis from data. Structured by thesis pillar (his framework for evaluating positions). Moderate depth with drill-down available.' },
-                { step: 3, type: 'emotional', badge: 'Emotional Calibration', detail: 'Analytical. Burns processes loss analytically. Direct evidence presented without graduated softening. The substantial holding is acknowledged as a contextual factor, not a pressure point. "Inaction carries risk" is analytical framing, not emotional.' },
-                { step: 4, type: 'bias', badge: 'Bias Counter-Intervention', detail: 'Disposition effect + Value trap. "If you did not already hold HLS at 6.55%, would you initiate this position today at A$0.94?" is the classic disposition-effect counter \u2014 forces clean-sheet evaluation. "Inaction is not neutral" addresses the specific condition where Burns\u2019 disposition effect manifests (on publicly disclosed positions where exit is itself a signal).' },
-                { step: 5, type: 'format', badge: 'Format & Timing', detail: 'Morning digest. Moderate depth. Balanced narrative with data.' }
-            ]
-        },
-        booker: {
-            body: "HLS: Model Update Required \u2014 Assumptions Need Downward Revision\n\nKey metrics vs your base case:\n\n\u2022 Pathology volume growth: 0.0% vs +3.0% consensus = Revenue line needs cut\n\u2022 Agilex revenue (FY26): Down 15% vs prior guidance = Growth engine decelerating\n\u2022 Net debt: A$855M vs A$780M (deleveraging) = No deleveraging occurring\n\u2022 Altman Z-score: -0.45 = Distress indicator\n\nBase case assumptions require downward revision. The pathology volume growth assumption and the debt reduction assumption are both invalidated by this update. If your intrinsic value calculation still assumes volume recovery in 2H FY26 and deleveraging to A$780M, your model output is stale.\n\nCFO resignation: Effective in 4 weeks. No replacement. In context of A$855M net debt and Altman Z-score of -0.45, financial leadership continuity is a material risk.\n\nLiquidity context: HLS average daily volume ~A$2.5M. Exit takes 2-4 trading days. Liquidity is not a binding constraint. If your analytical conclusion is to reduce, the market structure supports execution.\n\nBroader context you may be missing: The CFO departure, combined with withdrawn guidance and flat volumes, may indicate internal awareness of structural issues not yet disclosed. Management\u2019s withdrawal of \u201cnormalised operations by 2H FY26\u201d guidance is a significant downgrade from prior commentary. Evaluate whether the turnaround thesis has any remaining pillar with evidentiary support.\n\nIf HLS has graduated above the microcap range during your holding period, review whether this position still fits within the Microcap Fund mandate or whether it should be allocated to the Smaller Companies Fund.",
-            annotations: [
-                { step: 1, type: 'mandate', badge: 'Mandate Filter', detail: 'MARGINAL. HLS at A$680M is at the upper boundary of microcap. If Spheria Microcap held it when smaller, it may still hold a residual position. Treated as in-mandate with graduation flag.' },
-                { step: 2, type: 'structural', badge: 'Structural Calibration', detail: 'Quantitative-first, evidence-first. Booker is quantitative \u2014 leads with a model comparison table. Data first, narrative wraps the numbers. Full context. Every data point mapped to model implication.' },
-                { step: 3, type: 'emotional', badge: 'Emotional Calibration', detail: 'Defensive, data-led. Booker processes loss defensively. "Broader context you may be missing" gently widens his focus beyond the immediate data without confrontation. Table format reduces emotional load (numbers feel more objective than narrative).' },
-                { step: 4, type: 'bias', badge: 'Bias Counter-Intervention', detail: 'Anchoring (model) + Illiquidity bias. "Base case assumptions require downward revision" directly targets model anchoring \u2014 forces assumption update rather than clinging to stale intrinsic value. "Liquidity is not a binding constraint" directly counters illiquidity bias \u2014 Booker\u2019s pattern is to avoid selling because "I can\u2019t sell without moving the price" becomes "I won\u2019t sell." The explicit liquidity data removes the rationalisation.' },
-                { step: 5, type: 'format', badge: 'Format & Timing', detail: 'Morning digest. Full depth. Quantitative format with tables.' }
-            ]
-        }
+var PN_IPIP_ITEMS = [
+    // Extraversion (E)
+    { id: 'E1', text: 'I am the life of the party.', factor: 'E', reverse: false },
+    { id: 'E2', text: 'I don\'t talk a lot.', factor: 'E', reverse: true },
+    { id: 'E3', text: 'I talk to a lot of different people at parties.', factor: 'E', reverse: false },
+    { id: 'E4', text: 'I keep in the background.', factor: 'E', reverse: true },
+    // Agreeableness (A)
+    { id: 'A1', text: 'I sympathize with others\' feelings.', factor: 'A', reverse: false },
+    { id: 'A2', text: 'I am not interested in other people\'s problems.', factor: 'A', reverse: true },
+    { id: 'A3', text: 'I feel others\' emotions.', factor: 'A', reverse: false },
+    { id: 'A4', text: 'I am not really interested in others.', factor: 'A', reverse: true },
+    // Conscientiousness (C)
+    { id: 'C1', text: 'I get chores done right away.', factor: 'C', reverse: false },
+    { id: 'C2', text: 'I often forget to put things back in their proper place.', factor: 'C', reverse: true },
+    { id: 'C3', text: 'I like order.', factor: 'C', reverse: false },
+    { id: 'C4', text: 'I make a mess of things.', factor: 'C', reverse: true },
+    // Neuroticism (N)
+    { id: 'N1', text: 'I have frequent mood swings.', factor: 'N', reverse: false },
+    { id: 'N2', text: 'I am relaxed most of the time.', factor: 'N', reverse: true },
+    { id: 'N3', text: 'I get upset easily.', factor: 'N', reverse: false },
+    { id: 'N4', text: 'I seldom feel blue.', factor: 'N', reverse: true },
+    // Openness (O)
+    { id: 'O1', text: 'I have a vivid imagination.', factor: 'O', reverse: false },
+    { id: 'O2', text: 'I am not interested in abstract ideas.', factor: 'O', reverse: true },
+    { id: 'O3', text: 'I have difficulty understanding abstract ideas.', factor: 'O', reverse: true },
+    { id: 'O4', text: 'I have a rich vocabulary.', factor: 'O', reverse: false }
+];
+
+// ---------------------------------------------------------------------------
+// Step 4b: Cognitive Reflection Test (6 items)
+// Items 1-3: Frederick (2005). Items 4-6: Thomson & Oppenheimer (2016).
+// ---------------------------------------------------------------------------
+
+var PN_CRT_ITEMS = [
+    {
+        id: 'CRT1',
+        text: 'A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost? (in cents)',
+        correctAnswer: 5,
+        intuitiveAnswer: 10,
+        biasType: 'substitution'
     },
-    min: {
-        pullen: {
-            body: "Signal noted \u2014 outside Magellan Global Fund mandate.\n\nMineral Resources (ASX:MIN, A$11.5B, Mining Services/Lithium) showing operational improvement post-Ellison departure, spodumene recovery to US$1,250/t. Domestic-listed mining conglomerate \u2014 no action required for global equities mandate. Note as a data point on global lithium supply/demand dynamics if monitoring battery materials peers (Albemarle, SQM, Pilbara Minerals).",
-            annotations: [
-                { step: 1, type: 'mandate', badge: 'Mandate Filter', detail: 'OUT OF MANDATE. MIN is ASX-listed domestic mining. Magellan Global invests global large/mega cap.' },
-                { step: 5, type: 'format', badge: 'Format & Timing', detail: 'Brief. One paragraph. Morning digest.' }
-            ]
-        },
-        mcvicar: {
-            body: "Signal noted \u2014 outside Magellan Infrastructure Fund mandate.\n\nMineral Resources (ASX:MIN, A$11.5B, Mining Services/Lithium) reports operational improvements. Not an infrastructure asset. Marginal read-through: if you hold port infrastructure or rail assets with mining services exposure, note the improving volume outlook for bulk commodities transport.",
-            annotations: [
-                { step: 1, type: 'mandate', badge: 'Mandate Filter', detail: 'OUT OF MANDATE. MIN is mining/lithium. Not infrastructure. Marginal sector read-through noted for transport infrastructure holdings.' },
-                { step: 5, type: 'format', badge: 'Format & Timing', detail: 'Brief. One paragraph. Weekly summary.' }
-            ]
-        },
-        lamm: {
-            body: "MIN: Consensus Is Wrong \u2014 The Bears Are Getting Squeezed\n\nThe market is flipping on Mineral Resources. 6 broker upgrades in 60 days. Short interest down from 8.2% to 5.1%. Spodumene at US$1,250 from US$900 trough. New management has suspended A$400M in capex \u2014 this is a different company from the Ellison era.\n\nYour variant perception: The consensus shift is real but incomplete. The market is pricing operational improvement but still discounting the lithium recovery as cyclical. If Chinese ESS demand sustains (and the data says it is), spodumene above US$1,000 is structural, not cyclical. The bears are right about one thing: Ellison\u2019s governance was a genuine risk. But that risk is now removed.\n\nBefore you act: What could be wrong? (1) Lithium price recovery is a dead cat bounce \u2014 Chinese ESS demand could plateau. (2) Net debt/EBITDA at 2.8x is still elevated \u2014 a lithium price reversal here would stress the balance sheet. (3) New management hasn\u2019t been tested through a full cycle.\n\nL1 note: If Lamm is considering a long position in MIN for the domestic book, Steinthal should be aware for international coordination \u2014 MIN has global commodity exposure.",
-            annotations: [
-                { step: 1, type: 'mandate', badge: 'Mandate Filter', detail: 'IN MANDATE. L1 Long Short invests Australian all-cap. MIN is A$11.5B ASX-listed.' },
-                { step: 2, type: 'structural', badge: 'Structural Calibration', detail: 'Conclusion-first. "Consensus is wrong" leads \u2014 this is Lamm\u2019s language. Contrarian framing. Narrative-driven.' },
-                { step: 3, type: 'emotional', badge: 'Emotional Calibration', detail: 'Energising. Lamm is offensive \u2014 positive signals get "the crowd is wrong and you see it" framing. No excessive caution.' },
-                { step: 4, type: 'bias', badge: 'Bias Counter-Intervention', detail: 'Overconfidence + Contrarian overcorrection. "Before you act" section forces pause. "What could be wrong?" is Socratic. "The bears are right about one thing" validates the opposing view to prevent reflexive contrarianism. Cross-strategy coordination note flagged.' },
-                { step: 5, type: 'format', badge: 'Format & Timing', detail: 'Real-time. Narrative.' }
-            ]
-        },
-        steinthal: {
-            body: "MIN: Quality Assessment \u2014 Operational Turnaround, Governance Reset, Lithium Recovery\n\nMineral Resources presents an unusual case for the quality screen: a business with historically poor governance (Ellison-era conflicts, related-party transactions) undergoing a genuine reset. The question is whether the operational improvements are structural or cosmetic.\n\nEvidence supporting quality improvement:\n\u2022 New management has suspended A$400M capex (capital discipline signal)\n\u2022 Spodumene recovery to US$1,250/t (demand-driven, not speculative)\n\u2022 Short interest declining from 8.2% to 5.1% (informed sellers retreating)\n\u2022 Mining services division provides stable cash flow base\n\nEvidence against quality status:\n\u2022 Net debt/EBITDA at 2.8x remains elevated for a cyclical business\n\u2022 New management is untested through a cycle\n\u2022 Lithium pricing is inherently volatile; US$1,250 may not sustain\n\u2022 Historical governance failures may have created structural issues not yet visible\n\nQuality verdict: Improving but not yet confirmed. The governance risk removal is genuine. The operational discipline is early-stage. The commodity price recovery creates a tailwind that may mask underlying issues. Monitor for 2 quarters before assigning quality status.\n\nFor your international portfolio: MIN\u2019s lithium exposure gives it global commodity relevance. If you\u2019re constructing a critical minerals thesis, MIN is a domestic proxy for global lithium supply. Weight accordingly \u2014 this is not a traditional quality-growth holding.",
-            annotations: [
-                { step: 1, type: 'mandate', badge: 'Mandate Filter', detail: 'PARTIAL. MIN is ASX-listed (domestic) but has global commodity exposure. L1 International\u2019s quality-focused mandate can accommodate global thematic positions. In-mandate as thematic context.' },
-                { step: 2, type: 'structural', badge: 'Structural Calibration', detail: 'Evidence-first, qualitative. Steinthal is qualitative-first, evidence-first. Quality assessment leads. Evidence organised as for/against (not conclusion-first). Moderate depth.' },
-                { step: 3, type: 'emotional', badge: 'Emotional Calibration', detail: 'Moderate. Steinthal is more cautious than Lamm but not defensive. Direct assessment with appropriate caveats. "Improving but not yet confirmed" reflects his quality-over-speed orientation.' },
-                { step: 4, type: 'bias', badge: 'Bias Counter-Intervention', detail: 'Confirmation bias counter. Quality screen separates governance improvement (genuine positive) from commodity price recovery (potential false signal). Prevents confirming quality status based on price action alone.' },
-                { step: 5, type: 'format', badge: 'Format & Timing', detail: 'Morning delivery. Moderate depth. Balanced narrative.' }
-            ]
-        },
-        burns: {
-            body: "Signal noted \u2014 outside Spheria Smaller Companies Fund mandate. Sector context below.\n\nMineral Resources (ASX:MIN, A$11.5B) is far too large for the Smaller Companies mandate (inside ASX 100). However, the lithium price recovery to US$1,250/t has read-through for smaller lithium producers in your universe.\n\nSector read-through for existing holdings:\n\u2022 Spodumene at US$1,250 vs ~US$900 trough = 39% recovery\n\u2022 Demand driver is Chinese ESS (energy storage systems), not EV \u2014 potentially more durable\n\u2022 If you hold small-cap lithium producers, update commodity price assumptions\n\nNo direct action on MIN.",
-            annotations: [
-                { step: 1, type: 'mandate', badge: 'Mandate Filter', detail: 'OUT OF MANDATE. MIN at A$11.5B is inside ASX 100. Spheria Smaller Companies invests outside ASX 100. Sector read-through provided for in-mandate lithium holdings.' },
-                { step: 2, type: 'structural', badge: 'Structural Calibration', detail: 'Evidence-first, brief. Structured bullet list for sector read-through. Burns\u2019 analytical process applied even to out-of-mandate context.' },
-                { step: 4, type: 'bias', badge: 'Bias Counter-Intervention', detail: 'Light-touch anchoring counter \u2014 "update commodity price assumptions" nudges model refresh on in-mandate holdings that may be using stale lithium price assumptions.' }
-            ]
-        },
-        booker: {
-            body: "Signal noted \u2014 outside Spheria Microcap Fund mandate. Sector context below.\n\nMineral Resources (ASX:MIN, A$11.5B) is far too large for the Microcap mandate. Sector read-through for microcap lithium and mining services holdings:\n\n\u2022 Spodumene price: US$1,250/t \u2192 Revenue assumptions for lithium producers\n\u2022 Demand driver: Chinese ESS \u2192 Review critical minerals holdings\n\u2022 Mining services outlook: Stable \u2192 Positive for microcap mining services cos\n\nModel note: If you hold any microcap lithium producers, update your commodity price assumptions to reflect US$1,250 spot. Your base case may be stale if it still assumes sub-US$1,000 spodumene.\n\nNo direct action on MIN. Sector context only.",
-            annotations: [
-                { step: 1, type: 'mandate', badge: 'Mandate Filter', detail: 'OUT OF MANDATE. MIN at A$11.5B is far too large. Context delivery only.' },
-                { step: 2, type: 'structural', badge: 'Structural Calibration', detail: 'Quantitative \u2014 structured table even for context signal. Model note speaks to Booker\u2019s quantitative process.' },
-                { step: 4, type: 'bias', badge: 'Bias Counter-Intervention', detail: 'Light-touch anchoring (model) counter \u2014 "your base case may be stale" nudges assumption updates on in-mandate holdings.' }
-            ]
-        }
+    {
+        id: 'CRT2',
+        text: 'If it takes 5 machines 5 minutes to make 5 widgets, how long would it take 100 machines to make 100 widgets? (in minutes)',
+        correctAnswer: 5,
+        intuitiveAnswer: 100,
+        biasType: 'proportionality'
+    },
+    {
+        id: 'CRT3',
+        text: 'In a lake, there is a patch of lily pads. Every day, the patch doubles in size. If it takes 48 days for the patch to cover the entire lake, how long would it take for the patch to cover half of the lake? (in days)',
+        correctAnswer: 47,
+        intuitiveAnswer: 24,
+        biasType: 'exponential'
+    },
+    {
+        id: 'CRT4',
+        text: 'If John can drink one barrel of water in 6 days, and Mary can drink one barrel of water in 12 days, how long would it take them to drink one barrel of water together? (in days)',
+        correctAnswer: 4,
+        intuitiveAnswer: 9,
+        biasType: 'rate'
+    },
+    {
+        id: 'CRT5',
+        text: 'Jerry received both the 15th highest and the 15th lowest mark in the class. How many students are in the class?',
+        correctAnswer: 29,
+        intuitiveAnswer: 30,
+        biasType: 'boundary'
+    },
+    {
+        id: 'CRT6',
+        text: 'A man buys a pig for $60, sells it for $70, buys it back for $80, and sells it again for $90. How much has he made? (in dollars)',
+        correctAnswer: 20,
+        intuitiveAnswer: 10,
+        biasType: 'framing'
     }
+];
+
+// ---------------------------------------------------------------------------
+// Step 4c: Investment Philosophy (8 items, 5-point agree/disagree)
+// ---------------------------------------------------------------------------
+
+var PN_PHILOSOPHY_ITEMS = [
+    { id: 'PH1', text: 'I prefer to take a contrarian position against market consensus.', dimension: 'Contrarianism' },
+    { id: 'PH2', text: 'I would rather hold a concentrated portfolio of 10 high-conviction names than a diversified portfolio of 40.', dimension: 'Conviction' },
+    { id: 'PH3', text: 'Valuation is the most important factor in any investment decision.', dimension: 'Value Orientation' },
+    { id: 'PH4', text: 'I rely more on quantitative models than qualitative judgment.', dimension: 'Quantitative Lean' },
+    { id: 'PH5', text: 'I am comfortable holding a position through significant drawdowns if my thesis is intact.', dimension: 'Drawdown Tolerance' },
+    { id: 'PH6', text: 'I prefer to cut losses quickly rather than wait for thesis confirmation.', dimension: 'Loss Cut Speed' },
+    { id: 'PH7', text: 'I actively seek out disconfirming evidence for my positions.', dimension: 'Disconfirmation Seeking' },
+    { id: 'PH8', text: 'I prefer to make investment decisions quickly once I have enough information.', dimension: 'Decision Speed' }
+];
+
+// ---------------------------------------------------------------------------
+// Step 4d: Bias Scenarios (6 items, forced-choice A/B)
+// ---------------------------------------------------------------------------
+
+var PN_BIAS_ITEMS = [
+    {
+        id: 'B1',
+        bias: 'disposition_effect',
+        biasLabel: 'Disposition Effect',
+        scenario: 'You bought a stock at $50. It is now $35 with no change in fundamentals. What do you do?',
+        optionA: { text: 'Hold and wait for recovery to my purchase price', score: 'biased' },
+        optionB: { text: 'Evaluate the position as if I had no prior cost basis', score: 'debiased' }
+    },
+    {
+        id: 'B2',
+        bias: 'anchoring',
+        biasLabel: 'Anchoring',
+        scenario: 'A broker initiates coverage with a $120 price target. Your own analysis suggests $85. The stock trades at $75. How do you value it?',
+        optionA: { text: 'Somewhere between $85 and $120 \u2014 the broker may see something I missed', score: 'biased' },
+        optionB: { text: 'At $85 \u2014 my own analysis is what matters; the broker target is irrelevant', score: 'debiased' }
+    },
+    {
+        id: 'B3',
+        bias: 'loss_aversion',
+        biasLabel: 'Loss Aversion',
+        scenario: 'You can choose: (A) A certain gain of $500, or (B) A 50% chance of gaining $1,100 and a 50% chance of gaining nothing. Which do you prefer?',
+        optionA: { text: 'The certain $500 gain', score: 'biased' },
+        optionB: { text: 'The 50/50 gamble for $1,100', score: 'debiased' }
+    },
+    {
+        id: 'B4',
+        bias: 'confirmation_bias',
+        biasLabel: 'Confirmation Bias',
+        scenario: 'You are bullish on a mining stock. A negative geological report is published. What is your first instinct?',
+        optionA: { text: 'Look for reasons the report may be flawed or incomplete', score: 'biased' },
+        optionB: { text: 'Treat the report as potentially thesis-destroying and re-evaluate from scratch', score: 'debiased' }
+    },
+    {
+        id: 'B5',
+        bias: 'sunk_cost',
+        biasLabel: 'Sunk Cost',
+        scenario: 'You have spent 6 months and $200K on due diligence for an acquisition target. The final data room reveals a material liability not previously disclosed. What do you do?',
+        optionA: { text: 'Proceed but negotiate the price down \u2014 we\'ve come too far to walk away', score: 'biased' },
+        optionB: { text: 'Walk away \u2014 the prior investment in due diligence is irrelevant to the go/no-go decision', score: 'debiased' }
+    },
+    {
+        id: 'B6',
+        bias: 'overconfidence',
+        biasLabel: 'Overconfidence',
+        scenario: 'Give a 90% confidence interval for the current price of BHP shares (you should be 90% sure the true price falls within your range).',
+        optionA: { text: 'I can give a narrow range (within $5)', score: 'biased' },
+        optionB: { text: 'I need a wide range (at least $15-20) to be 90% confident', score: 'debiased' }
+    }
+];
+
+// ---------------------------------------------------------------------------
+// Step 4e: Delivery Preferences (5 items)
+// ---------------------------------------------------------------------------
+
+var PN_PREFERENCE_ITEMS = [
+    {
+        id: 'PR1',
+        text: 'When do you want to receive investment analysis?',
+        dimension: 'timing',
+        options: [
+            'Real-time as signals arrive',
+            'Morning digest (7am)',
+            'Evening summary (6pm)',
+            'Weekly batch'
+        ]
+    },
+    {
+        id: 'PR2',
+        text: 'What level of detail do you prefer in standard deliveries?',
+        dimension: 'detail',
+        options: [
+            'One-liner with verdict',
+            'One paragraph summary',
+            'Full analysis with data',
+            'Deep-dive with appendices'
+        ]
+    },
+    {
+        id: 'PR3',
+        text: 'Preferred analytical format:',
+        dimension: 'format',
+        options: [
+            'Narrative (flowing text)',
+            'Structured (bullet points and tables)',
+            'Quantitative (model outputs and charts)',
+            'Mixed (narrative with embedded data)'
+        ]
+    },
+    {
+        id: 'PR4',
+        text: 'How often should the system proactively update you on existing positions?',
+        dimension: 'updateFrequency',
+        options: [
+            'Only when material events occur',
+            'Weekly position review',
+            'Daily summary',
+            'Continuous monitoring'
+        ]
+    },
+    {
+        id: 'PR5',
+        text: 'When you are under stress or facing losses, I should:',
+        dimension: 'stressResponse',
+        options: [
+            'Give me more data and evidence to ground the decision',
+            'Give me a clear recommendation with reasoning',
+            'Give me both sides and let me decide',
+            'Slow me down with questions before I act'
+        ]
+    }
+];
+
+// ---------------------------------------------------------------------------
+// Bias counter-intervention strategies
+// ---------------------------------------------------------------------------
+
+var PN_BIAS_INTERVENTIONS = {
+    disposition_effect: 'Use clean-sheet evaluation framing ("If you did not already hold this stock, would you buy today at this price?")',
+    anchoring: 'Challenge external price anchors; force model-based valuation refresh before referencing broker targets',
+    loss_aversion: 'Frame decisions in terms of expected value, not certain outcomes; present asymmetric risk/reward explicitly',
+    confirmation_bias: 'Present disconfirming evidence prominently; ask "What would change your mind?" before presenting the bull case',
+    sunk_cost: 'Separate prior investment from forward-looking decision; frame as "go/no-go from today with fresh eyes"',
+    overconfidence: 'Widen confidence intervals; force pre-commitment to disconfirmation criteria before analysis delivery'
 };
 
-// ============================================================
+
+// =========================================================================
 // STATE
-// ============================================================
+// =========================================================================
 
 var pnState = {
-    selectedManager: null,
-    selectedScenario: 'hls',
-    compareMode: false,
-    compareManager: null
+    currentStep: 1,
+    maxStepReached: 1,
+    firm: {
+        name: '',
+        type: '',
+        aum: '',
+        regulations: [],
+        governance: ''
+    },
+    fund: {
+        name: '',
+        strategy: '',
+        geography: '',
+        benchmark: '',
+        riskBudget: 10,
+        holdingPeriod: ''
+    },
+    portfolio: [],
+    portfolioSkipped: false,
+    assessment: {
+        ipip: {},
+        crt: {},
+        philosophy: {},
+        bias: {},
+        preferences: {}
+    },
+    profile: null,
+    chatHistory: [],
+    chatTicker: '',
+    chatLoading: false,
+    assessmentBlock: 0
 };
 
-// ============================================================
-// RENDER: MAIN PAGE
-// ============================================================
 
-window.renderPersonalisationPage = function() {
-    return '<div class="page-inner">' +
-        renderHero() +
-        renderLayers() +
-        renderDemo() +
-        renderAssessment() +
-        renderLearning() +
-    '</div>' +
-    '<footer class="site-footer">' +
-        '<div class="footer-inner">' +
-            '<div class="footer-bottom">' +
-                '<div class="footer-disclaimer">This page demonstrates the Personalisation Agent concept using illustrative scenarios. No real investment analysis is provided. Manager profiles are hypothetical.</div>' +
-                '<div class="footer-meta">&copy; 2026 Continuum Intelligence</div>' +
-            '</div>' +
-        '</div>' +
-    '</footer>';
-};
+// =========================================================================
+// PERSISTENCE (localStorage)
+// =========================================================================
 
-// ============================================================
-// RENDER: HERO
-// ============================================================
+var PN_STORAGE_KEY = 'continuum_personalisation_profile';
 
-function renderHero() {
-    return '<div class="pn-hero">' +
-        '<div class="pn-hero-inner">' +
-            '<h1 class="pn-hero-title">Same facts. Different delivery.<br>Better decisions.</h1>' +
-            '<p class="pn-hero-subtitle">The Personalisation Agent calibrates how investment analysis reaches each fund manager \u2014 matching delivery to how they actually think, feel, and decide. The substance never changes. The framing does.</p>' +
-            '<div class="pn-split-panel">' +
-                '<div class="pn-profile-card profile-a">' +
-                    '<div class="pn-profile-label">Profile A</div>' +
-                    '<div class="pn-profile-name">Analytical + Low Loss Aversion</div>' +
-                    '<div class="pn-profile-traits">' +
-                        '<span class="pn-trait pn-trait-cognitive">Clinical</span>' +
-                        '<span class="pn-trait pn-trait-cognitive">Data-First</span>' +
-                        '<span class="pn-trait pn-trait-emotional">Evidence-Based</span>' +
-                    '</div>' +
-                    '<div class="pn-profile-text">6/8 evidence domains contradict thesis. Competing hypothesis now has stronger evidentiary support. ACH survival score declined from 55% to 35%. Cost restructuring is the sole remaining pillar.</div>' +
-                '</div>' +
-                '<div class="pn-profile-card profile-b">' +
-                    '<div class="pn-profile-label">Profile B</div>' +
-                    '<div class="pn-profile-name">Intuitive + High Loss Aversion</div>' +
-                    '<div class="pn-profile-traits">' +
-                        '<span class="pn-trait pn-trait-cognitive">Narrative-Led</span>' +
-                        '<span class="pn-trait pn-trait-emotional">Loss-Framed</span>' +
-                        '<span class="pn-trait pn-trait-decision">Urgent</span>' +
-                    '</div>' +
-                    '<div class="pn-profile-text">The story is cracking. Competitors are gaining share faster than expected. What is your exposure if this breaks? Define your exit trigger now.</div>' +
-                '</div>' +
-            '</div>' +
-            '<div class="pn-gold-tagline">Different words. Identical facts. Optimised for decision.</div>' +
-            '<button class="pn-cta-btn" id="pn-cta-scroll">See it in action <span>\u2193</span></button>' +
-        '</div>' +
-    '</div>';
+function pnSaveToLocalStorage() {
+    try {
+        var data = {
+            version: 2,
+            savedAt: new Date().toISOString(),
+            state: {
+                currentStep: pnState.currentStep,
+                maxStepReached: pnState.maxStepReached,
+                firm: pnState.firm,
+                fund: pnState.fund,
+                portfolio: pnState.portfolio,
+                portfolioSkipped: pnState.portfolioSkipped,
+                assessment: pnState.assessment,
+                profile: pnState.profile,
+                assessmentBlock: pnState.assessmentBlock
+            }
+        };
+        localStorage.setItem(PN_STORAGE_KEY, JSON.stringify(data));
+    } catch (e) { /* localStorage unavailable or full */ }
 }
 
-// ============================================================
-// RENDER: THREE LAYERS
-// ============================================================
+function pnLoadFromLocalStorage() {
+    try {
+        var raw = localStorage.getItem(PN_STORAGE_KEY);
+        if (!raw) return false;
+        var data = JSON.parse(raw);
+        if (!data || data.version !== 2) return false;
+        var s = data.state;
+        pnState.currentStep = s.currentStep || 1;
+        pnState.maxStepReached = s.maxStepReached || 1;
+        pnState.firm = s.firm || pnState.firm;
+        pnState.fund = s.fund || pnState.fund;
+        pnState.portfolio = s.portfolio || [];
+        pnState.portfolioSkipped = s.portfolioSkipped || false;
+        pnState.assessment = s.assessment || pnState.assessment;
+        pnState.profile = s.profile || null;
+        pnState.assessmentBlock = s.assessmentBlock || 0;
+        return true;
+    } catch (e) { return false; }
+}
 
-function renderLayers() {
-    var svgBuilding = '<svg class="pn-layer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4M9 9h.01M15 9h.01M9 13h.01M15 13h.01"/></svg>';
-    var svgTarget = '<svg class="pn-layer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>';
-    var svgBrain = '<svg class="pn-layer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C9 2 7 4 7 6.5c0 .5.1 1 .2 1.5C5.3 8.8 4 10.5 4 12.5 4 14.4 5.2 16 7 16.7V20c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2v-3.3c1.8-.7 3-2.3 3-4.2 0-2-1.3-3.7-3.2-4.5.1-.5.2-1 .2-1.5C17 4 15 2 12 2z"/><path d="M12 2v20M8 8h8M8 12h8M8 16h8"/></svg>';
+function pnClearLocalStorage() {
+    try { localStorage.removeItem(PN_STORAGE_KEY); } catch (e) {}
+}
 
-    var pipelines = [
-        { name: 'Mandate Filter', layer: 'Layer 1+2', tip: 'Checks signal against firm constraints and strategy mandate. Out-of-mandate signals get a one-line flag and stop.' },
-        { name: 'Structural Calibration', layer: 'Layer 3, Dim A', tip: 'Restructures output to match cognitive architecture: conclusion-first vs evidence-first, data tables vs narrative, depth level.' },
-        { name: 'Emotional Calibration', layer: 'Layer 3, Dim B', tip: 'Adjusts framing based on emotional architecture: offensive vs defensive, urgent vs measured, direct vs graduated.' },
-        { name: 'Bias Counter-Intervention', layer: 'Layer 3, Dim C', tip: 'Embeds surgical counter-framing where signal context intersects with observed bias patterns. Evidence-based, not categorical.' },
-        { name: 'Format & Timing', layer: 'Layer 3, Dim D', tip: 'Delivers in preferred format (narrative, quantitative, brief) at preferred time (real-time, morning digest, weekly).' }
-    ];
 
-    var pipelineHtml = '';
-    for (var i = 0; i < pipelines.length; i++) {
-        if (i > 0) pipelineHtml += '<span class="pn-pipeline-arrow">\u2192</span>';
-        pipelineHtml += '<div class="pn-pipeline-step">' +
-            '<div class="pn-pipeline-node">' +
-                pipelines[i].name +
-                '<span class="pn-pipeline-layer">' + pipelines[i].layer + '</span>' +
-                '<div class="pn-tooltip">' + pipelines[i].tip + '</div>' +
-            '</div>' +
-        '</div>';
+// =========================================================================
+// SCORING
+// =========================================================================
+
+function pnScoreBigFive() {
+    var scores = { E: 0, A: 0, C: 0, N: 0, O: 0 };
+    for (var i = 0; i < PN_IPIP_ITEMS.length; i++) {
+        var item = PN_IPIP_ITEMS[i];
+        var val = pnState.assessment.ipip[item.id];
+        if (val === undefined) continue;
+        val = parseInt(val, 10);
+        if (item.reverse) val = 6 - val;
+        scores[item.factor] += val;
     }
-
-    return '<div class="pn-section">' +
-        '<div class="pn-section-label">Framework</div>' +
-        '<h2 class="pn-section-title">Three Layers of Calibration</h2>' +
-        '<div class="pn-layers-grid">' +
-            '<div class="pn-layer-card">' +
-                svgBuilding +
-                '<div class="pn-layer-num">Layer 1</div>' +
-                '<div class="pn-layer-title">Institutional Context</div>' +
-                '<div class="pn-layer-desc">Governance structure, compliance requirements, operational infrastructure, balance sheet. An IC-formatted deliverable at Magellan is appropriate; the same format at Spheria would be absurd.</div>' +
-                '<div class="pn-layer-tag">4 domains assessed</div>' +
-            '</div>' +
-            '<div class="pn-layer-card">' +
-                svgTarget +
-                '<div class="pn-layer-num">Layer 2</div>' +
-                '<div class="pn-layer-title">Strategy Mandate</div>' +
-                '<div class="pn-layer-desc">Benchmark, geography, market cap range, long/short capability, position limits. A signal about a $680M Australian healthcare stock is directly relevant to a smaller companies fund but entirely out-of-mandate for a global fund.</div>' +
-                '<div class="pn-layer-tag">Hard gate: in / out / marginal</div>' +
-            '</div>' +
-            '<div class="pn-layer-card">' +
-                svgBrain +
-                '<div class="pn-layer-num">Layer 3</div>' +
-                '<div class="pn-layer-title">Manager Calibration</div>' +
-                '<div class="pn-layer-desc">Cognitive architecture, emotional architecture, bias fingerprint, decision style. Every fund manager profiled across four dimensions that determine how analysis is framed, sequenced, and delivered.</div>' +
-                '<div class="pn-layer-tag">4 dimensions \u2022 20+ data points</div>' +
-            '</div>' +
-        '</div>' +
-        '<div class="pn-pipeline">' + pipelineHtml + '</div>' +
-    '</div>';
+    return scores;
 }
 
-// ============================================================
-// RENDER: INTERACTIVE DEMO
-// ============================================================
-
-function renderDemo() {
-    // Manager cards
-    var managerIds = ['pullen', 'mcvicar', 'lamm', 'steinthal', 'burns', 'booker'];
-    var managerHtml = '';
-    for (var i = 0; i < managerIds.length; i++) {
-        var m = PN_MANAGERS[managerIds[i]];
-        var traitsHtml = '';
-        for (var j = 0; j < m.traits.length; j++) {
-            traitsHtml += '<span class="pn-trait pn-trait-' + m.traits[j].type + '">' + m.traits[j].label + '</span>';
+function pnScoreCRT() {
+    var correct = 0;
+    var intuitiveErrors = 0;
+    var errorTypes = [];
+    for (var i = 0; i < PN_CRT_ITEMS.length; i++) {
+        var item = PN_CRT_ITEMS[i];
+        var answer = parseFloat(pnState.assessment.crt[item.id]);
+        if (isNaN(answer)) continue;
+        if (answer === item.correctAnswer) {
+            correct++;
+        } else if (answer === item.intuitiveAnswer) {
+            intuitiveErrors++;
+            errorTypes.push(item.biasType);
         }
-        managerHtml += '<div class="pn-manager-card" data-manager="' + m.id + '">' +
-            '<div class="pn-manager-name">' + m.name + '</div>' +
-            '<div class="pn-manager-firm">' + m.firm + '</div>' +
-            '<div class="pn-manager-fund">' + m.fund + '</div>' +
-            '<div class="pn-manager-traits">' + traitsHtml + '</div>' +
+    }
+    var label = correct >= 5 ? 'High System 2' :
+                correct >= 3 ? 'Moderate System 2' :
+                'System 1 Dominant';
+    return { score: correct, total: 6, intuitiveErrors: intuitiveErrors, errorTypes: errorTypes, label: label };
+}
+
+function pnScorePhilosophy() {
+    var scores = {};
+    for (var i = 0; i < PN_PHILOSOPHY_ITEMS.length; i++) {
+        var item = PN_PHILOSOPHY_ITEMS[i];
+        var val = pnState.assessment.philosophy[item.id];
+        if (val !== undefined) scores[item.dimension] = parseInt(val, 10);
+    }
+    return scores;
+}
+
+function pnScoreBiases() {
+    var biases = [];
+    for (var i = 0; i < PN_BIAS_ITEMS.length; i++) {
+        var item = PN_BIAS_ITEMS[i];
+        var choice = pnState.assessment.bias[item.id];
+        if (choice === 'a' && item.optionA.score === 'biased') {
+            biases.push({
+                bias: item.biasLabel,
+                key: item.bias,
+                intervention: PN_BIAS_INTERVENTIONS[item.bias] || ''
+            });
+        }
+    }
+    return biases;
+}
+
+function pnScorePreferences() {
+    return {
+        timing: pnState.assessment.preferences.PR1 || 'Not specified',
+        detail: pnState.assessment.preferences.PR2 || 'Not specified',
+        format: pnState.assessment.preferences.PR3 || 'Not specified',
+        updateFrequency: pnState.assessment.preferences.PR4 || 'Not specified',
+        stressResponse: pnState.assessment.preferences.PR5 || 'Not specified'
+    };
+}
+
+function pnBuildProfile() {
+    return {
+        bigFive: pnScoreBigFive(),
+        crt: pnScoreCRT(),
+        philosophy: pnScorePhilosophy(),
+        biases: pnScoreBiases(),
+        preferences: pnScorePreferences()
+    };
+}
+
+function pnPercentileLabel(score, max) {
+    var pct = (score / max) * 100;
+    if (pct >= 80) return 'High';
+    if (pct >= 60) return 'Above Average';
+    if (pct >= 40) return 'Average';
+    if (pct >= 20) return 'Below Average';
+    return 'Low';
+}
+
+
+// =========================================================================
+// VALIDATION
+// =========================================================================
+
+function pnValidateStep(stepNum) {
+    switch (stepNum) {
+        case 1:
+            return pnState.firm.name.trim() !== '' &&
+                   pnState.firm.type !== '' &&
+                   pnState.firm.aum !== '' &&
+                   pnState.firm.governance !== '';
+        case 2:
+            return pnState.fund.name.trim() !== '' &&
+                   pnState.fund.strategy !== '' &&
+                   pnState.fund.geography !== '' &&
+                   pnState.fund.benchmark !== '' &&
+                   pnState.fund.holdingPeriod !== '';
+        case 3:
+            return pnState.portfolioSkipped || pnHasPortfolioEntry();
+        case 4:
+            return pnAssessmentComplete();
+        case 5:
+            return true;
+        default:
+            return false;
+    }
+}
+
+function pnHasPortfolioEntry() {
+    for (var i = 0; i < pnState.portfolio.length; i++) {
+        if (pnState.portfolio[i].ticker && pnState.portfolio[i].ticker.trim() !== '') return true;
+    }
+    return false;
+}
+
+function pnAssessmentComplete() {
+    for (var i = 0; i < PN_IPIP_ITEMS.length; i++) {
+        if (pnState.assessment.ipip[PN_IPIP_ITEMS[i].id] === undefined) return false;
+    }
+    for (var i = 0; i < PN_CRT_ITEMS.length; i++) {
+        if (pnState.assessment.crt[PN_CRT_ITEMS[i].id] === undefined ||
+            pnState.assessment.crt[PN_CRT_ITEMS[i].id] === '') return false;
+    }
+    for (var i = 0; i < PN_PHILOSOPHY_ITEMS.length; i++) {
+        if (pnState.assessment.philosophy[PN_PHILOSOPHY_ITEMS[i].id] === undefined) return false;
+    }
+    for (var i = 0; i < PN_BIAS_ITEMS.length; i++) {
+        if (!pnState.assessment.bias[PN_BIAS_ITEMS[i].id]) return false;
+    }
+    for (var i = 0; i < PN_PREFERENCE_ITEMS.length; i++) {
+        if (!pnState.assessment.preferences[PN_PREFERENCE_ITEMS[i].id]) return false;
+    }
+    return true;
+}
+
+function pnAssessmentProgress() {
+    var total = PN_IPIP_ITEMS.length + PN_CRT_ITEMS.length + PN_PHILOSOPHY_ITEMS.length +
+                PN_BIAS_ITEMS.length + PN_PREFERENCE_ITEMS.length;
+    var answered = 0;
+    var k;
+    for (k in pnState.assessment.ipip) {
+        if (pnState.assessment.ipip.hasOwnProperty(k)) answered++;
+    }
+    for (k in pnState.assessment.crt) {
+        if (pnState.assessment.crt.hasOwnProperty(k) && pnState.assessment.crt[k] !== '') answered++;
+    }
+    for (k in pnState.assessment.philosophy) {
+        if (pnState.assessment.philosophy.hasOwnProperty(k)) answered++;
+    }
+    for (k in pnState.assessment.bias) {
+        if (pnState.assessment.bias.hasOwnProperty(k)) answered++;
+    }
+    for (k in pnState.assessment.preferences) {
+        if (pnState.assessment.preferences.hasOwnProperty(k)) answered++;
+    }
+    return { answered: answered, total: total, percent: Math.round((answered / total) * 100) };
+}
+
+function pnBlockComplete(blockIndex) {
+    var i;
+    switch (blockIndex) {
+        case 0:
+            for (i = 0; i < PN_IPIP_ITEMS.length; i++) {
+                if (pnState.assessment.ipip[PN_IPIP_ITEMS[i].id] === undefined) return false;
+            }
+            return true;
+        case 1:
+            for (i = 0; i < PN_CRT_ITEMS.length; i++) {
+                if (pnState.assessment.crt[PN_CRT_ITEMS[i].id] === undefined ||
+                    pnState.assessment.crt[PN_CRT_ITEMS[i].id] === '') return false;
+            }
+            return true;
+        case 2:
+            for (i = 0; i < PN_PHILOSOPHY_ITEMS.length; i++) {
+                if (pnState.assessment.philosophy[PN_PHILOSOPHY_ITEMS[i].id] === undefined) return false;
+            }
+            return true;
+        case 3:
+            for (i = 0; i < PN_BIAS_ITEMS.length; i++) {
+                if (!pnState.assessment.bias[PN_BIAS_ITEMS[i].id]) return false;
+            }
+            return true;
+        case 4:
+            for (i = 0; i < PN_PREFERENCE_ITEMS.length; i++) {
+                if (!pnState.assessment.preferences[PN_PREFERENCE_ITEMS[i].id]) return false;
+            }
+            return true;
+        default:
+            return false;
+    }
+}
+
+
+// =========================================================================
+// SYSTEM PROMPT BUILDER
+// =========================================================================
+
+function pnBuildSystemPrompt(profile, firm, fund, portfolio) {
+    var p = '';
+
+    p += 'You are a senior equity research analyst at Continuum Intelligence, an independent research platform focused on ASX-listed companies. ';
+    p += 'You are providing personalised investment research analysis calibrated to this specific fund manager\'s cognitive profile, institutional context, and decision-making style.\n\n';
+
+    p += '## INSTITUTIONAL CONTEXT\n';
+    p += 'Firm: ' + firm.name + ' (' + firm.type + ')\n';
+    p += 'AUM: ' + firm.aum + '\n';
+    if (firm.regulations && firm.regulations.length > 0) {
+        p += 'Regulatory framework: ' + firm.regulations.join(', ') + '\n';
+    }
+    p += 'Governance: ' + firm.governance + '\n\n';
+
+    p += '## STRATEGY MANDATE\n';
+    p += 'Fund: ' + fund.name + '\n';
+    p += 'Strategy: ' + fund.strategy + '\n';
+    p += 'Geography: ' + fund.geography + '\n';
+    p += 'Benchmark: ' + fund.benchmark + '\n';
+    p += 'Risk budget: ' + fund.riskBudget + '% tracking error\n';
+    p += 'Typical holding period: ' + fund.holdingPeriod + '\n\n';
+
+    if (portfolio && portfolio.length > 0) {
+        var validHoldings = portfolio.filter(function(h) { return h.ticker && h.ticker.trim(); });
+        if (validHoldings.length > 0) {
+            p += '## CURRENT PORTFOLIO\n';
+            p += 'The manager currently holds these positions. Reference them when relevant:\n';
+            for (var i = 0; i < validHoldings.length; i++) {
+                p += '- ' + validHoldings[i].ticker.toUpperCase();
+                if (validHoldings[i].weight) p += ': ' + validHoldings[i].weight + '%';
+                p += '\n';
+            }
+            p += '\n';
+        }
+    }
+
+    p += '## MANAGER COGNITIVE PROFILE\n\n';
+
+    var factors = [
+        { key: 'E', label: 'Extraversion' },
+        { key: 'A', label: 'Agreeableness' },
+        { key: 'C', label: 'Conscientiousness' },
+        { key: 'N', label: 'Neuroticism' },
+        { key: 'O', label: 'Openness' }
+    ];
+    p += 'Big Five Personality:\n';
+    for (var i = 0; i < factors.length; i++) {
+        var f = factors[i];
+        var score = profile.bigFive[f.key];
+        p += '- ' + f.label + ': ' + score + '/20 (' + pnPercentileLabel(score, 20) + ')\n';
+    }
+    p += '\n';
+
+    if (profile.bigFive.N >= 14) {
+        p += 'HIGH NEUROTICISM: Present risk factors calmly with context. Avoid alarming language. Frame drawdowns as data points, not emergencies.\n';
+    } else if (profile.bigFive.N <= 8) {
+        p += 'LOW NEUROTICISM: Can handle direct, unfiltered risk warnings. Do not soften negative signals.\n';
+    }
+    if (profile.bigFive.O >= 14) {
+        p += 'HIGH OPENNESS: Can use metaphorical and narrative framing. Open to unconventional analysis angles.\n';
+    } else if (profile.bigFive.O <= 8) {
+        p += 'LOW OPENNESS: Stick to concrete, structured analysis. Avoid abstract framing. Use data tables and bullet points.\n';
+    }
+    if (profile.bigFive.C >= 14) {
+        p += 'HIGH CONSCIENTIOUSNESS: Provide thorough, well-structured analysis. Include checklists and process steps.\n';
+    }
+    if (profile.bigFive.E <= 8) {
+        p += 'LOW EXTRAVERSION: This manager prefers depth over breadth. Focus analysis rather than broad overviews.\n';
+    }
+    p += '\n';
+
+    p += 'Cognitive Reflection: ' + profile.crt.score + '/6 (' + profile.crt.label + ')\n';
+    if (profile.crt.score >= 5) {
+        p += 'HIGH CRT: This manager will rationalise away directive warnings. Use Socratic questioning for bias counter-interventions \u2014 ask questions that expose the bias rather than telling them they are biased.\n';
+    } else if (profile.crt.score <= 2) {
+        p += 'LOW CRT: Use direct, clear bias warnings rather than subtle Socratic framing. Be explicit about cognitive traps.\n';
+    } else {
+        p += 'MODERATE CRT: Balance direct warnings with questioning. Use a mix of directive and Socratic approaches.\n';
+    }
+    p += '\n';
+
+    if (profile.philosophy && Object.keys(profile.philosophy).length > 0) {
+        p += 'Investment Philosophy:\n';
+        for (var dim in profile.philosophy) {
+            if (profile.philosophy.hasOwnProperty(dim)) {
+                var val = profile.philosophy[dim];
+                var strength = val >= 4 ? 'Strong' : val <= 2 ? 'Weak' : 'Moderate';
+                p += '- ' + dim + ': ' + val + '/5 (' + strength + ')\n';
+            }
+        }
+        p += '\n';
+    }
+
+    if (profile.biases && profile.biases.length > 0) {
+        p += '## BIAS COUNTER-INTERVENTIONS\n';
+        p += 'The manager has identified bias vulnerabilities below. When delivering analysis that touches these areas, embed subtle counter-framing:\n';
+        for (var b = 0; b < profile.biases.length; b++) {
+            p += '- ' + profile.biases[b].bias + ': ' + profile.biases[b].intervention + '\n';
+        }
+        p += '\n';
+    }
+
+    p += '## DELIVERY CALIBRATION\n';
+    p += 'Timing preference: ' + profile.preferences.timing + '\n';
+    p += 'Detail preference: ' + profile.preferences.detail + '\n';
+    p += 'Format preference: ' + profile.preferences.format + '\n';
+    p += 'Update frequency: ' + profile.preferences.updateFrequency + '\n';
+    p += 'Under stress: ' + profile.preferences.stressResponse + '\n\n';
+
+    p += '## VOICE & STYLE\n';
+    p += 'Speak as "we" (Continuum Intelligence). Never say "I". Be direct and opinionated.\n';
+    p += 'Reference specific evidence from the research passages. Take positions.\n';
+    p += 'Use the vocabulary of an institutional investor: "the print", "the tape", "the multiple", "re-rate", "de-rate", "the street", "consensus".\n';
+    p += 'Never use markdown headers (## or ###). Write in flowing paragraphs.\n';
+    p += 'Never begin a response with "Based on" or "Here is" or "Sure". Get straight to the analysis.\n';
+    p += 'When presenting numbers, weave them into sentences naturally.\n';
+    p += 'Ground every claim in the provided research passages. Cite specific evidence.\n';
+    p += 'Never fabricate data, price targets, or financial metrics not in the provided research.\n';
+
+    return p;
+}
+
+
+// =========================================================================
+// FORM COMPONENT HELPERS
+// =========================================================================
+
+function pnTextInput(id, label, value, placeholder, required) {
+    var req = required !== false;
+    return '<div class="pn-form-group">' +
+        '<label class="pn-label" for="pn-' + id + '">' + label + (req ? ' <span class="pn-required">*</span>' : '') + '</label>' +
+        '<input type="text" class="pn-input" id="pn-' + id + '" data-field="' + id + '" ' +
+            'value="' + escapeAttr(value || '') + '" ' +
+            'placeholder="' + escapeAttr(placeholder || '') + '">' +
+    '</div>';
+}
+
+function pnSelect(id, label, options, selectedValue, required) {
+    var req = required !== false;
+    var html = '<div class="pn-form-group">' +
+        '<label class="pn-label" for="pn-' + id + '">' + label + (req ? ' <span class="pn-required">*</span>' : '') + '</label>' +
+        '<select class="pn-select" id="pn-' + id + '" data-field="' + id + '">' +
+        '<option value="">Select...</option>';
+    for (var i = 0; i < options.length; i++) {
+        var sel = options[i] === selectedValue ? ' selected' : '';
+        html += '<option value="' + escapeAttr(options[i]) + '"' + sel + '>' + escapeHtml(options[i]) + '</option>';
+    }
+    html += '</select></div>';
+    return html;
+}
+
+function pnMultiSelect(id, label, options, selectedValues) {
+    var html = '<div class="pn-form-group full-width">' +
+        '<label class="pn-label">' + label + '</label>' +
+        '<div class="pn-multi-select" id="pn-' + id + '">';
+    for (var i = 0; i < options.length; i++) {
+        var checked = selectedValues && selectedValues.indexOf(options[i]) !== -1;
+        var cls = 'pn-checkbox-label' + (checked ? ' checked' : '');
+        html += '<label class="' + cls + '">' +
+            '<input type="checkbox" value="' + escapeAttr(options[i]) + '"' + (checked ? ' checked' : '') + '>' +
+            '<span class="pn-checkbox-indicator"></span>' +
+            escapeHtml(options[i]) +
+        '</label>';
+    }
+    html += '</div></div>';
+    return html;
+}
+
+function pnSlider(id, label, min, max, value, unit, required) {
+    var req = required !== false;
+    return '<div class="pn-form-group full-width">' +
+        '<label class="pn-label">' + label + (req ? ' <span class="pn-required">*</span>' : '') + '</label>' +
+        '<div class="pn-slider-container">' +
+            '<div class="pn-slider-row">' +
+                '<input type="range" class="pn-slider" id="pn-' + id + '" data-field="' + id + '" ' +
+                    'min="' + min + '" max="' + max + '" value="' + value + '" step="1">' +
+                '<span class="pn-slider-value" id="pn-' + id + '-value">' + value + (unit || '') + '</span>' +
+            '</div>' +
+            '<div class="pn-slider-labels">' +
+                '<span>' + min + (unit || '') + '</span>' +
+                '<span>' + max + (unit || '') + '</span>' +
+            '</div>' +
+        '</div>' +
+    '</div>';
+}
+
+
+// =========================================================================
+// RENDER FUNCTIONS
+// =========================================================================
+
+function renderPage() {
+    return '<div class="pn-wizard" id="pn-wizard">' +
+        renderStepIndicator() +
+        '<div class="pn-wizard-body" id="pn-wizard-body">' +
+            renderCurrentStep() +
+        '</div>' +
+        renderWizardFooter() +
+    '</div>';
+}
+
+function renderStepIndicator() {
+    var html = '<div class="pn-step-indicator">';
+    for (var i = 0; i < PN_STEP_LABELS.length; i++) {
+        var s = PN_STEP_LABELS[i];
+        var cls = 'pn-step-dot';
+        if (s.num === pnState.currentStep) cls += ' active';
+        if (s.num < pnState.currentStep) cls += ' completed';
+        if (s.num <= pnState.maxStepReached) cls += ' reachable';
+        html += '<div class="' + cls + '" data-step="' + s.num + '">';
+        html += '<div class="pn-step-num"><span class="pn-step-num-text">' + s.num + '</span></div>';
+        html += '<div class="pn-step-title">' + s.title + '</div>';
+        html += '<div class="pn-step-subtitle">' + s.subtitle + '</div>';
+        html += '</div>';
+        if (i < PN_STEP_LABELS.length - 1) {
+            var lineClass = 'pn-step-line' + (s.num < pnState.currentStep ? ' completed' : '');
+            html += '<div class="' + lineClass + '"></div>';
+        }
+    }
+    html += '</div>';
+    return html;
+}
+
+function renderCurrentStep() {
+    switch (pnState.currentStep) {
+        case 1: return renderStep1();
+        case 2: return renderStep2();
+        case 3: return renderStep3();
+        case 4: return renderStep4();
+        case 5: return renderStep5();
+        default: return '';
+    }
+}
+
+function renderStep1() {
+    return '<div class="pn-step" data-step="1">' +
+        '<div class="pn-step-header">' +
+            '<h2 class="pn-step-heading">Firm Configuration</h2>' +
+            '<p class="pn-step-desc">Tell us about your institutional context. This determines how signals are filtered and compliance requirements are applied.</p>' +
+        '</div>' +
+        '<div class="pn-form-grid">' +
+            pnTextInput('firm-name', 'Firm Name', pnState.firm.name, 'e.g. Magellan Financial Group') +
+            pnSelect('firm-type', 'Firm Type', PN_FIRM_OPTIONS.type, pnState.firm.type) +
+            pnSelect('firm-aum', 'AUM Range', PN_FIRM_OPTIONS.aum, pnState.firm.aum) +
+            pnSelect('firm-governance', 'Investment Governance', PN_FIRM_OPTIONS.governance, pnState.firm.governance) +
+            pnMultiSelect('firm-regs', 'Regulatory Framework (optional)', PN_FIRM_OPTIONS.regulations, pnState.firm.regulations) +
+        '</div>' +
+    '</div>';
+}
+
+function renderStep2() {
+    return '<div class="pn-step" data-step="2">' +
+        '<div class="pn-step-header">' +
+            '<h2 class="pn-step-heading">Fund & Strategy</h2>' +
+            '<p class="pn-step-desc">Define your fund mandate. This calibrates which signals are relevant and how analysis is framed for your strategy.</p>' +
+        '</div>' +
+        '<div class="pn-form-grid">' +
+            pnTextInput('fund-name', 'Fund Name', pnState.fund.name, 'e.g. Magellan Global Fund') +
+            pnSelect('fund-strategy', 'Strategy Type', PN_FUND_OPTIONS.strategy, pnState.fund.strategy) +
+            pnSelect('fund-geography', 'Geography', PN_FUND_OPTIONS.geography, pnState.fund.geography) +
+            pnSelect('fund-benchmark', 'Benchmark', PN_FUND_OPTIONS.benchmark, pnState.fund.benchmark) +
+            pnSelect('fund-holding', 'Typical Holding Period', PN_FUND_OPTIONS.holdingPeriod, pnState.fund.holdingPeriod) +
+            pnSlider('fund-risk', 'Risk Budget (Tracking Error)', 2, 25, pnState.fund.riskBudget, '%') +
+        '</div>' +
+    '</div>';
+}
+
+function renderStep3() {
+    var holdingsHtml = '';
+    for (var i = 0; i < 5; i++) {
+        var h = pnState.portfolio[i] || { ticker: '', weight: '' };
+        holdingsHtml += '<div class="pn-portfolio-row">' +
+            '<input type="text" class="pn-input pn-ticker-input" data-index="' + i + '" ' +
+                'value="' + escapeAttr(h.ticker || '') + '" placeholder="e.g. BHP" ' +
+                'list="pn-ticker-list" autocomplete="off">' +
+            '<input type="number" class="pn-input pn-weight-input" data-index="' + i + '" ' +
+                'value="' + (h.weight || '') + '" placeholder="%" min="0" max="100" step="0.5">' +
         '</div>';
     }
 
-    // Scenario cards
-    var scenarioHtml = '';
-    var scenarioIds = ['hls', 'min'];
-    for (var s = 0; s < scenarioIds.length; s++) {
-        var sc = PN_SCENARIOS[scenarioIds[s]];
-        var selectedClass = sc.id === 'hls' ? ' selected' : '';
-        scenarioHtml += '<div class="pn-scenario-btn' + selectedClass + '" data-scenario="' + sc.id + '">' +
-            '<div class="pn-scenario-label">' + sc.label + '</div>' +
-            '<div class="pn-scenario-stock">' + sc.stock + '</div>' +
-            '<div class="pn-scenario-signal">' + sc.signal + '</div>' +
-            '<span class="pn-scenario-tag ' + sc.type + '">' + (sc.type === 'negative' ? 'Negative signal' : 'Positive signal') + '</span>' +
-        '</div>';
+    var datalistHtml = '<datalist id="pn-ticker-list">';
+    var tickers = (typeof STOCK_DATA !== 'undefined') ? Object.keys(STOCK_DATA).sort() : [];
+    for (var i = 0; i < tickers.length; i++) {
+        datalistHtml += '<option value="' + tickers[i] + '">';
     }
+    datalistHtml += '</datalist>';
 
-    return '<div class="pn-demo-section" id="pn-demo-anchor">' +
-        '<div class="pn-demo-inner">' +
-            '<div class="pn-section-label">Interactive Demonstration</div>' +
-            '<h2 class="pn-section-title">Personalisation in Action</h2>' +
-            '<p class="pn-section-subtitle">Select a fund manager. Select a scenario. See how the same analysis becomes a different delivery.</p>' +
-            '<div class="pn-manager-grid">' + managerHtml + '</div>' +
-            '<div class="pn-scenario-row">' + scenarioHtml + '</div>' +
-            '<div class="pn-view-controls">' +
-                '<div class="pn-view-toggle" id="pn-view-toggle">' +
-                    '<button class="active" data-mode="single">Single View</button>' +
-                    '<button data-mode="compare">Compare Two</button>' +
-                '</div>' +
-            '</div>' +
-            '<div class="pn-output-panel" id="pn-output-panel">' +
-                '<div class="pn-output-empty">Select a manager above to see their calibrated delivery</div>' +
-            '</div>' +
+    return '<div class="pn-step" data-step="3">' +
+        '<div class="pn-step-header">' +
+            '<h2 class="pn-step-heading">Portfolio Holdings</h2>' +
+            '<p class="pn-step-desc">Enter up to 5 current holdings so the AI can reference your positions in conversation. This step is optional.</p>' +
         '</div>' +
+        datalistHtml +
+        '<div class="pn-portfolio-grid">' +
+            '<div class="pn-portfolio-header"><span>Ticker</span><span>Weight %</span></div>' +
+            holdingsHtml +
+        '</div>' +
+        '<button class="pn-skip-btn" id="pn-skip-portfolio">Skip \u2014 use representative portfolio</button>' +
     '</div>';
 }
 
-// ============================================================
-// RENDER: ASSESSMENT
-// ============================================================
-
-function renderAssessment() {
-    var hexacoTable = '<table class="pn-table">' +
-        '<tr><th>Domain</th><th>PM-Relevant Mapping</th></tr>' +
-        '<tr><td>Honesty-Humility</td><td>Overconfidence tendency, ego investment, fiduciary orientation</td></tr>' +
-        '<tr><td>Emotionality</td><td>Loss processing, stress response, drawdown anxiety</td></tr>' +
-        '<tr><td>Extraversion</td><td>Herding vulnerability, speed to conviction, social influence</td></tr>' +
-        '<tr><td>Agreeableness</td><td>Social calibration style (direct vs indirect feedback)</td></tr>' +
-        '<tr><td>Conscientiousness</td><td>Position sizing discipline, cut-loss patterns, process rigour</td></tr>' +
-        '<tr><td>Openness</td><td>Complexity tolerance, uncertainty tolerance, creative thinking</td></tr>' +
-    '</table>';
-
-    var comparisonTable = '<table class="pn-table">' +
-        '<tr><th>Framework</th><th>Verdict</th><th>Reason</th></tr>' +
-        '<tr><td>MBTI</td><td><span class="pn-verdict-rejected">Rejected</span></td><td>Poor test-retest reliability; no predictive validity in finance</td></tr>' +
-        '<tr><td>Big Five (NEO-PI-R)</td><td><span class="pn-verdict-partial">Strong but incomplete</span></td><td>Requires separate Dark Triad instrument</td></tr>' +
-        '<tr><td>Hogan HPI + HDS</td><td><span class="pn-verdict-partial">Excellent but expensive</span></td><td>US$30-75/admin; requires certified practitioners</td></tr>' +
-        '<tr><td>HEXACO-60</td><td><span class="pn-verdict-selected">Selected</span></td><td>Sixth factor captures dark personality variance natively; strong reliability; low cost</td></tr>' +
-    '</table>';
-
-    return '<div class="pn-assessment-section">' +
-        '<div class="pn-section-label">Psychometric Foundation</div>' +
-        '<h2 class="pn-section-title">Building the Profile</h2>' +
-        '<p class="pn-section-subtitle">A 20-minute assessment combining validated psychological instruments with investment-specific scenarios. No corporate HR exercises. No Likert scale hand-waving.</p>' +
-        '<div class="pn-accordion">' +
-            renderAccordionItem('HEXACO-60 Personality Inventory', '~10 min | 60 items',
-                '<p class="pn-accordion-desc">Six-factor personality model measuring Honesty-Humility, Emotionality, Extraversion, Agreeableness, Conscientiousness, and Openness. The critical sixth factor (Honesty-Humility) captures overconfidence, ego investment, and fiduciary orientation without a separate Dark Triad instrument.</p>' +
-                '<div class="pn-accordion-cred">Cronbach\u2019s \u03b1 = .73\u2013.81 | Replicated across 12+ language lexical studies</div>' +
-                hexacoTable, true) +
-            renderAccordionItem('Cognitive Reflection Test', '~3 min | 4 items',
-                '<p class="pn-accordion-desc">An objective performance test, not self-report. Measures System 1 vs System 2 dominance. Ceiling effect expected (40-60% of PMs score 4/4), but error patterns are diagnostic: an anchoring error reveals different vulnerability than a substitution error.</p>', false) +
-            renderAccordionItem('Investment Philosophy & Delivery Preferences', '~3 min | 8 forced-choice items',
-                '<p class="pn-accordion-desc">No Likert scales. Forced binary choices to defeat social desirability bias. Covers analytical orientation, time horizon, concentration, contrarian tendency, detail appetite, alert preference, format, and decision pace.</p>', false) +
-            renderAccordionItem('Scenario-Based Bias Elicitation', '~4 min | 3 scenarios',
-                '<p class="pn-accordion-desc">Each scenario targets a specific bias cluster. Scenario 1: anchoring + disposition effect via a loss position. Scenario 2: confirmation bias via mixed evidence. Scenario 3: herding + contrarian overcorrection via consensus divergence.</p>', false) +
-        '</div>' +
-        '<div class="pn-assessment-note">Emotional Architecture is derived entirely from HEXACO scores and scenario responses. Zero additional manager time. Every derived dimension is marked \u201cEstimated\u201d and refined through the continuous learning loop.</div>' +
-        '<div class="pn-comparison-table">' +
-            '<div class="pn-section-label">Why HEXACO?</div>' +
-            comparisonTable +
-        '</div>' +
-    '</div>';
-}
-
-function renderAccordionItem(title, time, bodyHtml, openByDefault) {
-    var openClass = openByDefault ? ' open' : '';
-    return '<div class="pn-accordion-item">' +
-        '<div class="pn-accordion-header' + openClass + '">' +
-            '<div><div class="pn-accordion-title">' + title + '</div><div class="pn-accordion-time">' + time + '</div></div>' +
-            '<span class="pn-accordion-chevron">\u25BC</span>' +
-        '</div>' +
-        '<div class="pn-accordion-body' + openClass + '">' +
-            '<div class="pn-accordion-body-inner">' + bodyHtml + '</div>' +
-        '</div>' +
-    '</div>';
-}
-
-// ============================================================
-// RENDER: CONTINUOUS LEARNING
-// ============================================================
-
-function renderLearning() {
-    var dimensions = [
-        { title: 'Signal-Action Mapping', desc: 'Which signals does the manager act on? Dismiss? Read but not act on? Reveals actual cognitive preferences and bias patterns.', threshold: 'Threshold: 20 signal-action pairs' },
-        { title: 'Delivery-Engagement Mapping', desc: 'Which framing styles produced deeper engagement? Which were skimmed? Reveals optimal structural preferences.', threshold: 'Threshold: 15 delivery-engagement pairs' },
-        { title: 'Prediction-Outcome Mapping', desc: 'When the manager expressed high confidence, were they right? Reveals confidence calibration by domain.', threshold: 'Threshold: 10 prediction-outcome pairs' },
-        { title: 'Bias Manifestation Tracking', desc: 'Under what specific conditions do biases actually manifest? Builds conditional modifiers, not categorical labels.', threshold: 'Threshold: 15 bias-context observations' },
-        { title: 'Stress-State Detection', desc: 'Behavioural anomalies suggesting the manager is under pressure. The system never tells the manager they appear stressed. It silently adjusts delivery.', threshold: 'Continuous passive monitoring' }
+function renderStep4() {
+    var progress = pnAssessmentProgress();
+    var blockNames = [
+        { title: 'Personality', items: PN_IPIP_ITEMS.length },
+        { title: 'Cognitive', items: PN_CRT_ITEMS.length },
+        { title: 'Philosophy', items: PN_PHILOSOPHY_ITEMS.length },
+        { title: 'Bias', items: PN_BIAS_ITEMS.length },
+        { title: 'Preferences', items: PN_PREFERENCE_ITEMS.length }
     ];
 
-    var timelineHtml = '';
-    for (var i = 0; i < dimensions.length; i++) {
-        timelineHtml += '<div class="pn-timeline-item">' +
-            '<div class="pn-timeline-dot"></div>' +
-            '<div class="pn-timeline-title">' + dimensions[i].title + '</div>' +
-            '<div class="pn-timeline-desc">' + dimensions[i].desc + '</div>' +
-            '<div class="pn-timeline-threshold">' + dimensions[i].threshold + '</div>' +
-        '</div>';
+    var blockNav = '<div class="pn-assessment-nav">';
+    for (var i = 0; i < blockNames.length; i++) {
+        var cls = 'pn-assessment-nav-item';
+        if (i === pnState.assessmentBlock) cls += ' active';
+        if (pnBlockComplete(i)) cls += ' complete';
+        blockNav += '<button class="' + cls + '" data-block="' + i + '">' +
+            '<span class="pn-assessment-nav-num">' + (i + 1) + '</span> ' +
+            blockNames[i].title + ' <span style="opacity:0.5;font-size:0.68rem">(' + blockNames[i].items + ')</span>' +
+        '</button>';
+    }
+    blockNav += '</div>';
+
+    var contentHtml = '';
+    switch (pnState.assessmentBlock) {
+        case 0: contentHtml = renderIPIPBlock(); break;
+        case 1: contentHtml = renderCRTBlock(); break;
+        case 2: contentHtml = renderPhilosophyBlock(); break;
+        case 3: contentHtml = renderBiasBlock(); break;
+        case 4: contentHtml = renderPreferencesBlock(); break;
     }
 
-    var principlesHtml = '<li>Never alter substance. Framing, emphasis, sequence, detail depth, and counter-bias interventions only.</li>' +
-        '<li>Firm constraints override everything. Layer 1 is a hard filter.</li>' +
-        '<li>Revealed preference over stated preference. After 20+ signal-action pairs, weight observed behaviour 3:1.</li>' +
-        '<li>Counter-bias interventions require evidence. Specific observed patterns in specific conditions.</li>' +
-        '<li>Smart PMs require smart calibration. High-CRT individuals rationalise directive bias warnings.</li>' +
-        '<li>Discomfort is not a delivery failure. The goal is better decisions, not comfortable managers.</li>';
-
-    return '<div class="pn-learning-section">' +
-        '<div class="pn-section-label">Continuous Improvement</div>' +
-        '<h2 class="pn-section-title">The System Learns</h2>' +
-        '<p class="pn-section-subtitle">The 20-minute assessment produces initial priors, not ground truth. After 20+ signal-action pairs, observed behaviour outweighs stated preferences 3:1.</p>' +
-        '<div class="pn-timeline">' + timelineHtml + '</div>' +
-        '<div class="pn-closing">' +
-            '<div class="pn-closing-text">A manager who says \u201cI want full evidence\u201d but consistently skips to the conclusion gets conclusion-first delivery. What managers do reveals more than what they say.</div>' +
+    return '<div class="pn-step" data-step="4">' +
+        '<div class="pn-step-header">' +
+            '<h2 class="pn-step-heading">Cognitive & Behavioural Assessment</h2>' +
+            '<p class="pn-step-desc">This takes approximately 15 minutes. Complete all sections to build your profile.</p>' +
+            '<p class="pn-step-desc-privacy">All scoring happens locally in your browser. Nothing is sent to any server.</p>' +
         '</div>' +
-        '<button class="pn-request-btn" onclick="navigate(\'about\')">Request Access</button>' +
-        '<div class="pn-principles">' +
-            '<div class="pn-principles-title">Six Inviolable Principles</div>' +
-            '<ul class="pn-principles-list">' + principlesHtml + '</ul>' +
+        '<div class="pn-progress-bar">' +
+            '<div class="pn-progress-fill" style="width: ' + progress.percent + '%;"></div>' +
+            '<span class="pn-progress-text">' + progress.answered + ' / ' + progress.total + ' completed</span>' +
+        '</div>' +
+        blockNav +
+        '<div class="pn-assessment-content" id="pn-assessment-content">' +
+            contentHtml +
         '</div>' +
     '</div>';
 }
 
-// ============================================================
-// OUTPUT PANEL RENDERING
-// ============================================================
+function renderIPIPBlock() {
+    var html = '<div class="pn-assessment-block">' +
+        '<div class="pn-assessment-block-title">Mini-IPIP Big Five Personality Assessment</div>' +
+        '<div class="pn-assessment-block-desc">Rate how accurately each statement describes you in general. There are no right or wrong answers.</div>';
+    for (var i = 0; i < PN_IPIP_ITEMS.length; i++) {
+        html += renderLikertItem(PN_IPIP_ITEMS[i], pnState.assessment.ipip[PN_IPIP_ITEMS[i].id], 'ipip');
+    }
+    html += '</div>';
+    return html;
+}
 
-function pnUpdateOutput() {
-    var panel = document.getElementById('pn-output-panel');
-    if (!panel) return;
+function renderCRTBlock() {
+    var html = '<div class="pn-assessment-block">' +
+        '<div class="pn-assessment-block-title">Cognitive Reflection Test</div>' +
+        '<div class="pn-assessment-block-desc">Answer each question with a number. Take your time \u2014 your first instinct may not be correct.</div>';
+    for (var i = 0; i < PN_CRT_ITEMS.length; i++) {
+        var item = PN_CRT_ITEMS[i];
+        var val = pnState.assessment.crt[item.id];
+        html += '<div class="pn-crt-item">' +
+            '<div class="pn-crt-text">' + (i + 1) + '. ' + escapeHtml(item.text) + '</div>' +
+            '<input type="number" class="pn-crt-input" data-id="' + item.id + '" ' +
+                'value="' + (val !== undefined ? val : '') + '" placeholder="Your answer">' +
+        '</div>';
+    }
+    html += '</div>';
+    return html;
+}
 
-    var mgr = pnState.selectedManager;
-    var scn = pnState.selectedScenario;
+function renderPhilosophyBlock() {
+    var html = '<div class="pn-assessment-block">' +
+        '<div class="pn-assessment-block-title">Investment Philosophy</div>' +
+        '<div class="pn-assessment-block-desc">Rate your agreement with each statement. 1 = Strongly Disagree, 5 = Strongly Agree.</div>';
+    for (var i = 0; i < PN_PHILOSOPHY_ITEMS.length; i++) {
+        html += renderLikertItem(PN_PHILOSOPHY_ITEMS[i], pnState.assessment.philosophy[PN_PHILOSOPHY_ITEMS[i].id], 'philosophy');
+    }
+    html += '</div>';
+    return html;
+}
 
-    if (!mgr) {
-        panel.innerHTML = '<div class="pn-output-empty">Select a manager above to see their calibrated delivery</div>';
+function renderBiasBlock() {
+    var html = '<div class="pn-assessment-block">' +
+        '<div class="pn-assessment-block-title">Bias Scenario Assessment</div>' +
+        '<div class="pn-assessment-block-desc">For each scenario, choose the response that best describes what you would actually do (not what you think you should do).</div>';
+    for (var i = 0; i < PN_BIAS_ITEMS.length; i++) {
+        html += renderForcedChoice(PN_BIAS_ITEMS[i], pnState.assessment.bias[PN_BIAS_ITEMS[i].id]);
+    }
+    html += '</div>';
+    return html;
+}
+
+function renderPreferencesBlock() {
+    var html = '<div class="pn-assessment-block">' +
+        '<div class="pn-assessment-block-title">Delivery Preferences</div>' +
+        '<div class="pn-assessment-block-desc">Tell us how you want to receive investment analysis.</div>';
+    for (var i = 0; i < PN_PREFERENCE_ITEMS.length; i++) {
+        var item = PN_PREFERENCE_ITEMS[i];
+        var selectedVal = pnState.assessment.preferences[item.id] || '';
+        html += '<div class="pn-pref-item">' +
+            '<div class="pn-pref-text">' + escapeHtml(item.text) + '</div>' +
+            '<select class="pn-select pn-pref-select" data-id="' + item.id + '">' +
+                '<option value="">Select...</option>';
+        for (var j = 0; j < item.options.length; j++) {
+            var sel = item.options[j] === selectedVal ? ' selected' : '';
+            html += '<option value="' + escapeAttr(item.options[j]) + '"' + sel + '>' + escapeHtml(item.options[j]) + '</option>';
+        }
+        html += '</select></div>';
+    }
+    html += '</div>';
+    return html;
+}
+
+function renderLikertItem(item, currentValue, category) {
+    var labels = ['Very Inaccurate', 'Inaccurate', 'Neutral', 'Accurate', 'Very Accurate'];
+    if (category === 'philosophy') {
+        labels = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'];
+    }
+    var html = '<div class="pn-likert-item">' +
+        '<div class="pn-likert-text">' + escapeHtml(item.text) + '</div>' +
+        '<div class="pn-likert-scale">';
+    for (var i = 1; i <= 5; i++) {
+        var selected = (parseInt(currentValue, 10) === i) ? ' selected' : '';
+        html += '<button class="pn-likert-btn' + selected + '" data-id="' + item.id + '" data-value="' + i + '" data-category="' + category + '" title="' + labels[i - 1] + '">' +
+            '<span class="pn-likert-circle"></span>' +
+            '<span class="pn-likert-label">' + labels[i - 1] + '</span>' +
+        '</button>';
+    }
+    html += '</div></div>';
+    return html;
+}
+
+function renderForcedChoice(item, currentValue) {
+    return '<div class="pn-bias-scenario">' +
+        '<div class="pn-bias-text">' + escapeHtml(item.scenario) + '</div>' +
+        '<div class="pn-bias-options">' +
+            '<button class="pn-bias-option' + (currentValue === 'a' ? ' selected' : '') + '" data-id="' + item.id + '" data-value="a">' +
+                '<span class="pn-bias-label">A</span> ' + escapeHtml(item.optionA.text) +
+            '</button>' +
+            '<button class="pn-bias-option' + (currentValue === 'b' ? ' selected' : '') + '" data-id="' + item.id + '" data-value="b">' +
+                '<span class="pn-bias-label">B</span> ' + escapeHtml(item.optionB.text) +
+            '</button>' +
+        '</div>' +
+    '</div>';
+}
+
+function renderStep5() {
+    if (!pnState.profile) {
+        pnState.profile = pnBuildProfile();
+        pnSaveToLocalStorage();
+    }
+
+    return '<div class="pn-step pn-step-chat" data-step="5">' +
+        '<div class="pn-step-header">' +
+            '<h2 class="pn-step-heading">Calibrated Research Chat</h2>' +
+            '<p class="pn-step-desc">Your cognitive profile is now active. Ask research questions and see how analysis is calibrated to your decision-making style.</p>' +
+        '</div>' +
+        '<div class="pn-chat-layout">' +
+            renderProfileSidebar() +
+            '<div class="pn-chat-main">' +
+                renderChatHeader() +
+                '<div class="pn-chat-messages" id="pn-chat-messages"></div>' +
+                '<div class="pn-chat-input-area">' +
+                    '<textarea class="pn-chat-input" id="pn-chat-input" placeholder="Ask about a stock..." rows="1"></textarea>' +
+                    '<button class="pn-chat-send" id="pn-chat-send" disabled>' +
+                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>' +
+                    '</button>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
+    '</div>';
+}
+
+function renderChatHeader() {
+    var tickers = (typeof STOCK_DATA !== 'undefined') ? Object.keys(STOCK_DATA).sort() : [];
+    var tickerOptions = '';
+    for (var i = 0; i < tickers.length; i++) {
+        var sel = tickers[i] === pnState.chatTicker ? ' selected' : '';
+        var company = '';
+        if (typeof STOCK_DATA !== 'undefined' && STOCK_DATA[tickers[i]]) {
+            company = STOCK_DATA[tickers[i]].company || tickers[i];
+        }
+        tickerOptions += '<option value="' + tickers[i] + '"' + sel + '>' + tickers[i] + (company ? ' \u2014 ' + company : '') + '</option>';
+    }
+
+    return '<div class="pn-chat-header">' +
+        '<h3>Research Chat</h3>' +
+        '<select class="pn-chat-ticker-select" id="pn-chat-ticker">' +
+            '<option value="">Select stock...</option>' +
+            tickerOptions +
+        '</select>' +
+    '</div>';
+}
+
+function renderProfileSidebar() {
+    if (!pnState.profile) {
+        return '<div class="pn-chat-sidebar"><div class="pn-profile-empty">Complete the assessment to see your profile.</div></div>';
+    }
+    var p = pnState.profile;
+
+    var bigFiveHtml = '';
+    var factors = [
+        { key: 'E', label: 'Extraversion' },
+        { key: 'A', label: 'Agreeableness' },
+        { key: 'C', label: 'Conscientiousness' },
+        { key: 'N', label: 'Neuroticism' },
+        { key: 'O', label: 'Openness' }
+    ];
+    for (var i = 0; i < factors.length; i++) {
+        var f = factors[i];
+        var score = p.bigFive[f.key];
+        var pct = Math.round((score / 20) * 100);
+        bigFiveHtml += '<div class="pn-profile-factor">' +
+            '<div class="pn-profile-factor-label">' + f.label + '</div>' +
+            '<div class="pn-profile-bar"><div class="pn-profile-bar-fill" style="width: ' + pct + '%;"></div></div>' +
+            '<div class="pn-profile-factor-score">' + score + '/20</div>' +
+        '</div>';
+    }
+
+    var crtHtml = '<div class="pn-profile-crt">' + p.crt.score + '/6</div>' +
+        '<div class="pn-profile-crt-label">' + p.crt.label + '</div>';
+
+    var biasHtml = '';
+    if (p.biases.length === 0) {
+        biasHtml = '<div class="pn-profile-note">No significant bias vulnerabilities identified.</div>';
+    } else {
+        for (var i = 0; i < p.biases.length; i++) {
+            biasHtml += '<span class="pn-trait pn-trait-bias">' + escapeHtml(p.biases[i].bias) + '</span> ';
+        }
+    }
+
+    var contextHtml = '';
+    if (pnState.firm.name) {
+        contextHtml = '<div class="pn-profile-firm">' +
+            escapeHtml(pnState.firm.name) + '<br>' +
+            '<span style="opacity:0.7">' + escapeHtml(pnState.fund.name || '') + '</span>' +
+        '</div>';
+    }
+
+    return '<div class="pn-chat-sidebar">' +
+        '<div class="pn-profile-summary">' +
+            '<div class="pn-profile-summary-title">Your Profile</div>' +
+            contextHtml +
+            '<div class="pn-profile-section">' +
+                '<div class="pn-profile-section-label">Big Five</div>' +
+                bigFiveHtml +
+            '</div>' +
+            '<div class="pn-profile-section">' +
+                '<div class="pn-profile-section-label">Cognitive Style</div>' +
+                crtHtml +
+            '</div>' +
+            '<div class="pn-profile-section">' +
+                '<div class="pn-profile-section-label">Bias Vulnerabilities</div>' +
+                '<div class="pn-profile-biases">' + biasHtml + '</div>' +
+            '</div>' +
+            '<button class="pn-reset-btn" id="pn-reset-profile">Reset Profile</button>' +
+        '</div>' +
+    '</div>';
+}
+
+function renderWizardFooter() {
+    var isFirst = pnState.currentStep === 1;
+    var isLast = pnState.currentStep === 5;
+    var canAdvance = pnValidateStep(pnState.currentStep);
+
+    var nextLabel = 'Continue';
+    if (pnState.currentStep === 4) nextLabel = 'Build Profile & Chat';
+
+    return '<div class="pn-wizard-footer">' +
+        '<button class="pn-btn pn-btn-secondary" id="pn-prev"' + (isFirst ? ' style="visibility:hidden"' : '') + '>' +
+            '\u2190 Back' +
+        '</button>' +
+        '<div class="pn-wizard-footer-center">' +
+            '<span class="pn-step-counter">Step ' + pnState.currentStep + ' of 5</span>' +
+        '</div>' +
+        (isLast ? '<div></div>' :
+            '<button class="pn-btn pn-btn-primary" id="pn-next"' + (canAdvance ? '' : ' disabled') + '>' +
+                nextLabel + ' \u2192' +
+            '</button>'
+        ) +
+    '</div>';
+}
+
+
+// =========================================================================
+// CHAT LOGIC
+// =========================================================================
+
+function renderChatMessages() {
+    var el = document.getElementById('pn-chat-messages');
+    if (!el) return;
+
+    if (pnState.chatHistory.length === 0) {
+        el.innerHTML = '<div class="pn-chat-welcome">' +
+            '<div class="pn-chat-welcome-title">Your calibrated analyst is ready</div>' +
+            '<div class="pn-chat-welcome-text">Select a stock above and ask any research question. ' +
+                'The AI will deliver analysis calibrated to your cognitive profile, biases, and preferences.</div>' +
+        '</div>';
         return;
     }
 
-    if (pnState.compareMode && pnState.compareManager) {
-        panel.innerHTML = renderCompareView(mgr, pnState.compareManager, scn);
-    } else if (pnState.compareMode && !pnState.compareManager) {
-        panel.innerHTML = renderSingleView(mgr, scn) +
-            '<div class="pn-output-empty" style="border-top: 1px solid var(--border); padding: var(--space-md);">Now select a second manager to compare</div>';
-    } else {
-        panel.innerHTML = renderSingleView(mgr, scn);
+    var html = '';
+    for (var i = 0; i < pnState.chatHistory.length; i++) {
+        var msg = pnState.chatHistory[i];
+        var cls = 'pn-chat-msg ' + msg.role;
+        var content = msg.role === 'assistant' ? formatMarkdown(msg.content) : escapeHtml(msg.content);
+        html += '<div class="' + cls + '">' + content + '</div>';
+    }
+    el.innerHTML = html;
+    el.scrollTop = el.scrollHeight;
+}
+
+function showChatTyping() {
+    var el = document.getElementById('pn-chat-messages');
+    if (!el) return;
+    var typing = document.createElement('div');
+    typing.className = 'pn-chat-typing';
+    typing.id = 'pn-chat-typing';
+    typing.innerHTML = '<span class="pn-chat-typing-dot"></span><span class="pn-chat-typing-dot"></span><span class="pn-chat-typing-dot"></span>';
+    el.appendChild(typing);
+    el.scrollTop = el.scrollHeight;
+}
+
+function hideChatTyping() {
+    var typing = document.getElementById('pn-chat-typing');
+    if (typing) typing.remove();
+}
+
+function appendChatError(message) {
+    var el = document.getElementById('pn-chat-messages');
+    if (!el) return;
+    var err = document.createElement('div');
+    err.className = 'pn-chat-msg error';
+    err.textContent = message;
+    el.appendChild(err);
+    el.scrollTop = el.scrollHeight;
+}
+
+function pnSendChat() {
+    var input = document.getElementById('pn-chat-input');
+    var sendBtn = document.getElementById('pn-chat-send');
+    if (!input || pnState.chatLoading) return;
+
+    var question = input.value.trim();
+    if (!question || !pnState.chatTicker) return;
+
+    pnState.chatHistory.push({ role: 'user', content: question });
+    input.value = '';
+    input.style.height = 'auto';
+    if (sendBtn) sendBtn.disabled = true;
+    pnState.chatLoading = true;
+
+    renderChatMessages();
+    showChatTyping();
+
+    var systemPrompt = pnBuildSystemPrompt(
+        pnState.profile,
+        pnState.firm,
+        pnState.fund,
+        pnState.portfolioSkipped ? [] : pnState.portfolio
+    );
+
+    var history = [];
+    for (var i = 0; i < pnState.chatHistory.length - 1; i++) {
+        history.push({
+            role: pnState.chatHistory[i].role,
+            content: pnState.chatHistory[i].content
+        });
     }
 
-    // Bind annotation toggles
-    panel.querySelectorAll('.pn-annotation-header').forEach(function(header) {
-        header.addEventListener('click', function() {
-            this.classList.toggle('open');
-            this.nextElementSibling.classList.toggle('open');
-        });
+    var PRODUCTION_API = 'https://continuum-intelligence-production.up.railway.app';
+    var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    var isGitHubPages = window.location.hostname.indexOf('github.io') !== -1;
+    var apiOrigin = window.CHAT_API_URL ||
+        (isLocal ? 'http://localhost:8000' :
+         isGitHubPages ? PRODUCTION_API :
+         window.location.origin);
+
+    fetch(apiOrigin + '/api/research-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            ticker: pnState.chatTicker,
+            question: question,
+            conversation_history: history,
+            custom_system_prompt: systemPrompt
+        })
+    })
+    .then(function(res) {
+        if (!res.ok) throw new Error('Request failed (' + res.status + ')');
+        return res.json();
+    })
+    .then(function(data) {
+        hideChatTyping();
+        pnState.chatLoading = false;
+        pnState.chatHistory.push({ role: 'assistant', content: data.response });
+        renderChatMessages();
+        if (sendBtn) sendBtn.disabled = false;
+    })
+    .catch(function(err) {
+        hideChatTyping();
+        pnState.chatLoading = false;
+        appendChatError(err.message || 'Something went wrong. Please try again.');
+        if (sendBtn) sendBtn.disabled = false;
     });
+}
 
-    // Bind compare raw toggle
-    var rawToggle = panel.querySelector('.pn-compare-raw-toggle');
-    if (rawToggle) {
-        rawToggle.addEventListener('click', function() {
-            this.classList.toggle('open');
-            this.nextElementSibling.classList.toggle('open');
+
+// =========================================================================
+// EVENT BINDING
+// =========================================================================
+
+function bindAll() {
+    bindStepIndicator();
+    bindNavigation();
+    bindCurrentStepInputs();
+}
+
+function bindStepIndicator() {
+    var dots = document.querySelectorAll('.pn-step-dot.reachable');
+    for (var i = 0; i < dots.length; i++) {
+        dots[i].addEventListener('click', function() {
+            var step = parseInt(this.getAttribute('data-step'), 10);
+            if (step <= pnState.maxStepReached && step !== pnState.currentStep) {
+                pnState.currentStep = step;
+                pnRefresh();
+            }
         });
     }
 }
 
-function renderSingleView(mgrId, scnId) {
-    var mgr = PN_MANAGERS[mgrId];
-    var scn = PN_SCENARIOS[scnId];
-    var delivery = PN_DELIVERIES[scnId][mgrId];
+function bindNavigation() {
+    var nextBtn = document.getElementById('pn-next');
+    var prevBtn = document.getElementById('pn-prev');
 
-    return '<div class="pn-output-split">' +
-        '<div class="pn-output-raw">' +
-            '<div class="pn-output-header">Upstream Analysis <span class="pn-output-header-badge">Identical for all managers</span></div>' +
-            '<div class="pn-output-body">' + escapeHtml(scn.rawSignal) + '</div>' +
-        '</div>' +
-        '<div class="pn-output-calibrated">' +
-            '<div class="pn-output-header">Calibrated Delivery</div>' +
-            '<div class="pn-output-manager-name">' + mgr.name + ' \u2014 ' + mgr.fund + '</div>' +
-            renderTraits(mgr.traits) +
-            '<div class="pn-output-body">' + escapeHtml(delivery.body) + '</div>' +
-            renderAnnotations(delivery.annotations) +
-        '</div>' +
-    '</div>';
-}
-
-function renderCompareView(mgrId1, mgrId2, scnId) {
-    var mgr1 = PN_MANAGERS[mgrId1];
-    var mgr2 = PN_MANAGERS[mgrId2];
-    var scn = PN_SCENARIOS[scnId];
-    var delivery1 = PN_DELIVERIES[scnId][mgrId1];
-    var delivery2 = PN_DELIVERIES[scnId][mgrId2];
-
-    return '<div class="pn-compare-raw">' +
-            '<button class="pn-compare-raw-toggle">Raw Signal <span class="pn-chevron">\u25BC</span></button>' +
-            '<div class="pn-compare-raw-body">' +
-                '<div class="pn-output-body" style="padding: var(--space-sm) 0; font-family: var(--font-data); font-size: 0.75rem; color: var(--text-muted);">' + escapeHtml(scn.rawSignal) + '</div>' +
-            '</div>' +
-        '</div>' +
-        '<div class="pn-compare-split">' +
-            '<div class="pn-compare-col">' +
-                '<div class="pn-output-header">Manager A</div>' +
-                '<div class="pn-output-manager-name">' + mgr1.name + '</div>' +
-                '<div style="margin-bottom: var(--space-sm); font-size: 0.75rem; color: var(--text-muted);">' + mgr1.fund + '</div>' +
-                renderTraits(mgr1.traits) +
-                '<div class="pn-output-body">' + escapeHtml(delivery1.body) + '</div>' +
-                renderAnnotations(delivery1.annotations) +
-            '</div>' +
-            '<div class="pn-compare-col">' +
-                '<div class="pn-output-header">Manager B</div>' +
-                '<div class="pn-output-manager-name">' + mgr2.name + '</div>' +
-                '<div style="margin-bottom: var(--space-sm); font-size: 0.75rem; color: var(--text-muted);">' + mgr2.fund + '</div>' +
-                renderTraits(mgr2.traits) +
-                '<div class="pn-output-body">' + escapeHtml(delivery2.body) + '</div>' +
-                renderAnnotations(delivery2.annotations) +
-            '</div>' +
-        '</div>';
-}
-
-function renderTraits(traits) {
-    var html = '<div class="pn-manager-traits" style="margin-bottom: var(--space-md);">';
-    for (var i = 0; i < traits.length; i++) {
-        html += '<span class="pn-trait pn-trait-' + traits[i].type + '">' + traits[i].label + '</span>';
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function() {
+            if (!pnValidateStep(pnState.currentStep)) return;
+            if (pnState.currentStep === 4) {
+                pnState.profile = pnBuildProfile();
+            }
+            pnState.currentStep++;
+            if (pnState.currentStep > pnState.maxStepReached) {
+                pnState.maxStepReached = pnState.currentStep;
+            }
+            pnSaveToLocalStorage();
+            pnRefresh();
+        });
     }
-    return html + '</div>';
-}
 
-function renderAnnotations(annotations) {
-    if (!annotations || annotations.length === 0) return '';
-    var html = '<div class="pn-annotations">' +
-        '<div class="pn-annotations-title">Calibration Annotations</div>';
-    for (var i = 0; i < annotations.length; i++) {
-        var a = annotations[i];
-        html += '<div class="pn-annotation">' +
-            '<div class="pn-annotation-header">' +
-                '<span class="pn-badge pn-badge-' + a.type + '">' + a.badge + '</span>' +
-                '<span style="flex: 1; font-size: 0.72rem;">Step ' + a.step + '</span>' +
-                '<span class="pn-chevron">\u25BC</span>' +
-            '</div>' +
-            '<div class="pn-annotation-body">' +
-                '<div class="pn-annotation-body-inner">' + escapeHtml(a.detail) + '</div>' +
-            '</div>' +
-        '</div>';
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function() {
+            if (pnState.currentStep > 1) {
+                pnState.currentStep--;
+                pnSaveToLocalStorage();
+                pnRefresh();
+            }
+        });
     }
-    return html + '</div>';
 }
 
-function escapeHtml(text) {
-    if (!text) return '';
-    return text
+function bindCurrentStepInputs() {
+    switch (pnState.currentStep) {
+        case 1: bindStep1Inputs(); break;
+        case 2: bindStep2Inputs(); break;
+        case 3: bindStep3Inputs(); break;
+        case 4: bindStep4Inputs(); break;
+        case 5: bindStep5Inputs(); break;
+    }
+}
+
+function bindStep1Inputs() {
+    bindTextInput('pn-firm-name', function(val) { pnState.firm.name = val; });
+    bindSelectInput('pn-firm-type', function(val) { pnState.firm.type = val; });
+    bindSelectInput('pn-firm-aum', function(val) { pnState.firm.aum = val; });
+    bindSelectInput('pn-firm-governance', function(val) { pnState.firm.governance = val; });
+
+    var container = document.getElementById('pn-firm-regs');
+    if (container) {
+        var labels = container.querySelectorAll('.pn-checkbox-label');
+        for (var i = 0; i < labels.length; i++) {
+            labels[i].addEventListener('click', function(e) {
+                e.preventDefault();
+                var cb = this.querySelector('input[type="checkbox"]');
+                cb.checked = !cb.checked;
+                this.classList.toggle('checked', cb.checked);
+                pnState.firm.regulations = [];
+                var allCbs = container.querySelectorAll('input[type="checkbox"]:checked');
+                for (var j = 0; j < allCbs.length; j++) {
+                    pnState.firm.regulations.push(allCbs[j].value);
+                }
+                pnSaveToLocalStorage();
+                updateNextButton();
+            });
+        }
+    }
+}
+
+function bindStep2Inputs() {
+    bindTextInput('pn-fund-name', function(val) { pnState.fund.name = val; });
+    bindSelectInput('pn-fund-strategy', function(val) { pnState.fund.strategy = val; });
+    bindSelectInput('pn-fund-geography', function(val) { pnState.fund.geography = val; });
+    bindSelectInput('pn-fund-benchmark', function(val) { pnState.fund.benchmark = val; });
+    bindSelectInput('pn-fund-holding', function(val) { pnState.fund.holdingPeriod = val; });
+
+    var slider = document.getElementById('pn-fund-risk');
+    var sliderVal = document.getElementById('pn-fund-risk-value');
+    if (slider) {
+        slider.addEventListener('input', function() {
+            pnState.fund.riskBudget = parseInt(this.value, 10);
+            if (sliderVal) sliderVal.textContent = this.value + '%';
+            pnSaveToLocalStorage();
+        });
+    }
+}
+
+function bindStep3Inputs() {
+    var tickerInputs = document.querySelectorAll('.pn-ticker-input');
+    for (var i = 0; i < tickerInputs.length; i++) {
+        tickerInputs[i].addEventListener('input', function() {
+            var idx = parseInt(this.getAttribute('data-index'), 10);
+            if (!pnState.portfolio[idx]) pnState.portfolio[idx] = { ticker: '', weight: '' };
+            pnState.portfolio[idx].ticker = this.value.toUpperCase();
+            pnState.portfolioSkipped = false;
+            pnSaveToLocalStorage();
+            updateNextButton();
+        });
+    }
+
+    var weightInputs = document.querySelectorAll('.pn-weight-input');
+    for (var i = 0; i < weightInputs.length; i++) {
+        weightInputs[i].addEventListener('input', function() {
+            var idx = parseInt(this.getAttribute('data-index'), 10);
+            if (!pnState.portfolio[idx]) pnState.portfolio[idx] = { ticker: '', weight: '' };
+            pnState.portfolio[idx].weight = this.value;
+            pnSaveToLocalStorage();
+        });
+    }
+
+    var skipBtn = document.getElementById('pn-skip-portfolio');
+    if (skipBtn) {
+        skipBtn.addEventListener('click', function() {
+            pnState.portfolioSkipped = true;
+            pnSaveToLocalStorage();
+            updateNextButton();
+        });
+    }
+}
+
+function bindStep4Inputs() {
+    var navItems = document.querySelectorAll('.pn-assessment-nav-item');
+    for (var i = 0; i < navItems.length; i++) {
+        navItems[i].addEventListener('click', function() {
+            var block = parseInt(this.getAttribute('data-block'), 10);
+            if (block !== pnState.assessmentBlock) {
+                pnState.assessmentBlock = block;
+                pnSaveToLocalStorage();
+                pnRefreshAssessment();
+            }
+        });
+    }
+    bindAssessmentBlockInputs();
+}
+
+function bindAssessmentBlockInputs() {
+    switch (pnState.assessmentBlock) {
+        case 0: bindLikertInputs('ipip'); break;
+        case 1: bindCRTInputs(); break;
+        case 2: bindLikertInputs('philosophy'); break;
+        case 3: bindBiasInputs(); break;
+        case 4: bindPreferenceInputs(); break;
+    }
+}
+
+function bindLikertInputs(category) {
+    var btns = document.querySelectorAll('.pn-likert-btn[data-category="' + category + '"]');
+    for (var i = 0; i < btns.length; i++) {
+        btns[i].addEventListener('click', function() {
+            var id = this.getAttribute('data-id');
+            var val = parseInt(this.getAttribute('data-value'), 10);
+            pnState.assessment[category][id] = val;
+            var siblings = this.parentNode.querySelectorAll('.pn-likert-btn');
+            for (var j = 0; j < siblings.length; j++) {
+                siblings[j].classList.remove('selected');
+            }
+            this.classList.add('selected');
+            pnSaveToLocalStorage();
+            updateProgress();
+            updateNextButton();
+        });
+    }
+}
+
+function bindCRTInputs() {
+    var inputs = document.querySelectorAll('.pn-crt-input');
+    for (var i = 0; i < inputs.length; i++) {
+        inputs[i].addEventListener('input', function() {
+            var id = this.getAttribute('data-id');
+            pnState.assessment.crt[id] = this.value;
+            pnSaveToLocalStorage();
+            updateProgress();
+            updateNextButton();
+        });
+    }
+}
+
+function bindBiasInputs() {
+    var btns = document.querySelectorAll('.pn-bias-option');
+    for (var i = 0; i < btns.length; i++) {
+        btns[i].addEventListener('click', function() {
+            var id = this.getAttribute('data-id');
+            var val = this.getAttribute('data-value');
+            pnState.assessment.bias[id] = val;
+            var siblings = this.parentNode.querySelectorAll('.pn-bias-option');
+            for (var j = 0; j < siblings.length; j++) {
+                siblings[j].classList.remove('selected');
+            }
+            this.classList.add('selected');
+            pnSaveToLocalStorage();
+            updateProgress();
+            updateNextButton();
+        });
+    }
+}
+
+function bindPreferenceInputs() {
+    var selects = document.querySelectorAll('.pn-pref-select');
+    for (var i = 0; i < selects.length; i++) {
+        selects[i].addEventListener('change', function() {
+            var id = this.getAttribute('data-id');
+            pnState.assessment.preferences[id] = this.value;
+            pnSaveToLocalStorage();
+            updateProgress();
+            updateNextButton();
+        });
+    }
+}
+
+function bindStep5Inputs() {
+    var input = document.getElementById('pn-chat-input');
+    var sendBtn = document.getElementById('pn-chat-send');
+    var tickerSelect = document.getElementById('pn-chat-ticker');
+    var resetBtn = document.getElementById('pn-reset-profile');
+
+    if (!pnState.chatTicker && tickerSelect && tickerSelect.value) {
+        pnState.chatTicker = tickerSelect.value;
+    }
+
+    renderChatMessages();
+
+    if (input) {
+        input.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+            if (sendBtn) sendBtn.disabled = !this.value.trim() || !pnState.chatTicker;
+        });
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                pnSendChat();
+            }
+        });
+    }
+
+    if (sendBtn) {
+        sendBtn.addEventListener('click', function() {
+            pnSendChat();
+        });
+    }
+
+    if (tickerSelect) {
+        tickerSelect.addEventListener('change', function() {
+            pnState.chatTicker = this.value;
+            pnState.chatHistory = [];
+            renderChatMessages();
+            if (sendBtn && input) {
+                sendBtn.disabled = !input.value.trim() || !this.value;
+            }
+        });
+    }
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            if (confirm('This will clear your profile and return to Step 1. Continue?')) {
+                pnClearLocalStorage();
+                pnState.currentStep = 1;
+                pnState.maxStepReached = 1;
+                pnState.firm = { name: '', type: '', aum: '', regulations: [], governance: '' };
+                pnState.fund = { name: '', strategy: '', geography: '', benchmark: '', riskBudget: 10, holdingPeriod: '' };
+                pnState.portfolio = [];
+                pnState.portfolioSkipped = false;
+                pnState.assessment = { ipip: {}, crt: {}, philosophy: {}, bias: {}, preferences: {} };
+                pnState.profile = null;
+                pnState.chatHistory = [];
+                pnState.chatTicker = '';
+                pnState.assessmentBlock = 0;
+                pnRefresh();
+            }
+        });
+    }
+}
+
+
+// =========================================================================
+// HELPERS
+// =========================================================================
+
+function bindTextInput(id, setter) {
+    var el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('input', function() {
+            setter(this.value);
+            pnSaveToLocalStorage();
+            updateNextButton();
+        });
+    }
+}
+
+function bindSelectInput(id, setter) {
+    var el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('change', function() {
+            setter(this.value);
+            pnSaveToLocalStorage();
+            updateNextButton();
+        });
+    }
+}
+
+function updateNextButton() {
+    var btn = document.getElementById('pn-next');
+    if (btn) {
+        btn.disabled = !pnValidateStep(pnState.currentStep);
+    }
+}
+
+function updateProgress() {
+    var progress = pnAssessmentProgress();
+    var fill = document.querySelector('.pn-progress-fill');
+    var text = document.querySelector('.pn-progress-text');
+    if (fill) fill.style.width = progress.percent + '%';
+    if (text) text.textContent = progress.answered + ' / ' + progress.total + ' completed';
+
+    var navItems = document.querySelectorAll('.pn-assessment-nav-item');
+    for (var i = 0; i < navItems.length; i++) {
+        var blockIdx = parseInt(navItems[i].getAttribute('data-block'), 10);
+        if (pnBlockComplete(blockIdx)) {
+            navItems[i].classList.add('complete');
+        } else {
+            navItems[i].classList.remove('complete');
+        }
+    }
+}
+
+function pnRefresh() {
+    var wizard = document.getElementById('pn-wizard');
+    if (!wizard) return;
+    wizard.innerHTML = renderStepIndicator() +
+        '<div class="pn-wizard-body" id="pn-wizard-body">' +
+            renderCurrentStep() +
+        '</div>' +
+        renderWizardFooter();
+    bindAll();
+    wizard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function pnRefreshAssessment() {
+    var contentEl = document.getElementById('pn-assessment-content');
+    if (!contentEl) return;
+
+    var contentHtml = '';
+    switch (pnState.assessmentBlock) {
+        case 0: contentHtml = renderIPIPBlock(); break;
+        case 1: contentHtml = renderCRTBlock(); break;
+        case 2: contentHtml = renderPhilosophyBlock(); break;
+        case 3: contentHtml = renderBiasBlock(); break;
+        case 4: contentHtml = renderPreferencesBlock(); break;
+    }
+    contentEl.innerHTML = contentHtml;
+
+    var navItems = document.querySelectorAll('.pn-assessment-nav-item');
+    for (var i = 0; i < navItems.length; i++) {
+        var blockIdx = parseInt(navItems[i].getAttribute('data-block'), 10);
+        navItems[i].classList.toggle('active', blockIdx === pnState.assessmentBlock);
+    }
+
+    bindAssessmentBlockInputs();
+    updateProgress();
+    updateNextButton();
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/\n/g, '<br>');
+        .replace(/"/g, '&quot;');
 }
 
-// ============================================================
-// INITIALIZATION & EVENT BINDING
-// ============================================================
+function escapeAttr(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function formatMarkdown(text) {
+    if (!text) return '';
+    var html = escapeHtml(text);
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    var paragraphs = html.split(/\n\n+/);
+    if (paragraphs.length > 1) {
+        html = paragraphs.map(function(p) { return '<p>' + p.replace(/\n/g, '<br>') + '</p>'; }).join('');
+    } else {
+        html = html.replace(/\n/g, '<br>');
+    }
+    return html;
+}
+
+
+// =========================================================================
+// WINDOW-EXPOSED FUNCTIONS
+// =========================================================================
+
+window.renderPersonalisationPage = function() {
+    return renderPage();
+};
 
 window.initPersonalisationDemo = function() {
-    // Manager card clicks
-    document.querySelectorAll('.pn-manager-card').forEach(function(card) {
-        card.addEventListener('click', function() {
-            var managerId = this.dataset.manager;
-            if (pnState.compareMode) {
-                if (managerId === pnState.selectedManager) return;
-                pnState.compareManager = managerId;
-                document.querySelectorAll('.pn-manager-card').forEach(function(c) {
-                    c.classList.remove('compare-selected');
-                });
-                this.classList.add('compare-selected');
-            } else {
-                pnState.selectedManager = managerId;
-                pnState.compareManager = null;
-                document.querySelectorAll('.pn-manager-card').forEach(function(c) {
-                    c.classList.remove('selected');
-                    c.classList.remove('compare-selected');
-                });
-                this.classList.add('selected');
-            }
-            pnUpdateOutput();
-        });
-    });
-
-    // Scenario button clicks
-    document.querySelectorAll('.pn-scenario-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            pnState.selectedScenario = this.dataset.scenario;
-            document.querySelectorAll('.pn-scenario-btn').forEach(function(b) {
-                b.classList.remove('selected');
-            });
-            this.classList.add('selected');
-            pnUpdateOutput();
-        });
-    });
-
-    // Compare toggle
-    var viewToggle = document.getElementById('pn-view-toggle');
-    if (viewToggle) {
-        viewToggle.querySelectorAll('button').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                var mode = this.dataset.mode;
-                viewToggle.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
-                this.classList.add('active');
-                pnState.compareMode = (mode === 'compare');
-                if (!pnState.compareMode) {
-                    pnState.compareManager = null;
-                    document.querySelectorAll('.pn-manager-card').forEach(function(c) {
-                        c.classList.remove('compare-selected');
-                    });
-                }
-                pnUpdateOutput();
-            });
-        });
+    pnLoadFromLocalStorage();
+    var wizard = document.getElementById('pn-wizard');
+    if (wizard && pnState.currentStep > 1) {
+        wizard.innerHTML = renderStepIndicator() +
+            '<div class="pn-wizard-body" id="pn-wizard-body">' +
+                renderCurrentStep() +
+            '</div>' +
+            renderWizardFooter();
     }
+    bindAll();
+};
 
-    // CTA scroll button
-    var ctaBtn = document.getElementById('pn-cta-scroll');
-    if (ctaBtn) {
-        ctaBtn.addEventListener('click', function() {
-            var target = document.getElementById('pn-demo-anchor');
-            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
+window.pnOnRouteEnter = function() {
+    if (pnState.currentStep === 5) {
+        renderChatMessages();
     }
-
-    // Accordion headers
-    document.querySelectorAll('.pn-accordion-header').forEach(function(header) {
-        header.addEventListener('click', function() {
-            this.classList.toggle('open');
-            var body = this.nextElementSibling;
-            if (body) body.classList.toggle('open');
-        });
-    });
 };
 
 })();

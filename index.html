@@ -15736,6 +15736,9 @@ function route() {
             renderedPages.add('_personalisation');
         }
     }
+    if (hash === 'personalisation' && renderedPages.has('_personalisation')) {
+        if (typeof pnOnRouteEnter === 'function') pnOnRouteEnter();
+    }
 
     // Lazy render snapshot pages on first visit
     if (hash.startsWith('snapshot-')) {
