@@ -80,5 +80,6 @@ jobs:
           else
             TIMESTAMP=$(TZ='Australia/Sydney' date '+%H:%M %Z')
             git commit -m "Live prices: ${TIMESTAMP} [automated]"
+            git pull --rebase origin main
             git push
           fi
