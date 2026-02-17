@@ -198,24 +198,27 @@ async def research_chat(request: ResearchChatRequest):
     """
     ticker = request.ticker.upper()
 
-    # Validate ticker
+    # Validate ticker — skip for personalised chat with custom system prompt
     available = get_tickers()
-    if ticker not in available:
+    has_research = ticker in available
+
+    if not has_research and not request.custom_system_prompt:
         raise HTTPException(
             status_code=404,
             detail=f"Ticker '{ticker}' not found. Available: {', '.join(available)}",
         )
 
-    # Retrieve relevant passages
-    passages = retrieve(
-        query=request.question,
-        ticker=ticker,
-        thesis_alignment=request.thesis_alignment,
-        max_passages=config.MAX_PASSAGES,
-    )
-
-    # Build research context
-    context = _build_context(passages, ticker)
+    # Retrieve relevant passages (skip if ticker not indexed)
+    passages = []
+    context = ""
+    if has_research:
+        passages = retrieve(
+            query=request.question,
+            ticker=ticker,
+            thesis_alignment=request.thesis_alignment,
+            max_passages=config.MAX_PASSAGES,
+        )
+        context = _build_context(passages, ticker)
 
     # Build messages for Claude
     messages = []
@@ -226,10 +229,13 @@ async def research_chat(request: ResearchChatRequest):
         messages.append({"role": msg.role, "content": msg.content})
 
     # Add the current question with context
-    user_message = (
-        f"<research_context>\n{context}\n</research_context>\n\n"
-        f"**Stock:** {ticker}\n"
-    )
+    if context:
+        user_message = (
+            f"<research_context>\n{context}\n</research_context>\n\n"
+            f"**Stock:** {ticker}\n"
+        )
+    else:
+        user_message = f"**Stock:** {ticker}\n"
     if request.thesis_alignment:
         user_message += f"**Thesis alignment:** {request.thesis_alignment}\n"
     user_message += f"**Question:** {request.question}"
