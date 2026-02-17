@@ -3637,6 +3637,165 @@ a:hover { color: var(--accent-sage); }
 [data-theme="light"] .chat-inline { border-color: #E2E8F0; }
 [data-theme="light"] .chat-inline-input { background: #F7F8FA; }
 [data-theme="light"] .chat-inline-suggestion { background: #F7F8FA; }
+
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+@media print {
+    /* --- Force light colours for readability --- */
+    :root {
+        --bg-page: #fff !important;
+        --bg-surface: #fff !important;
+        --bg-surface-alt: #f8f8f8 !important;
+        --bg-header: #eef5f4 !important;
+        --bg-elevated: #f5f5f5 !important;
+        --bg-card: #fff !important;
+        --text-primary: #1a1f2e !important;
+        --text-secondary: #4a5568 !important;
+        --text-muted: #718096 !important;
+        --border: #dde3ed !important;
+        --border-light: #cbd5e0 !important;
+    }
+
+    /* --- Hide non-print elements --- */
+    .site-nav,
+    .price-ticker-strip,
+    .section-nav,
+    .site-footer,
+    .theme-toggle,
+    .chat-inline,
+    .nfi-alert {
+        display: none !important;
+    }
+
+    /* --- Reset page container --- */
+    .page {
+        padding-top: 0 !important;
+        min-height: auto !important;
+    }
+
+    body {
+        background: #fff !important;
+        color: #1a1f2e !important;
+    }
+
+    /* --- Linearise grid layout — remove sidebar column --- */
+    .report-content {
+        display: block !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+    }
+
+    /* --- Show sidebar as inline block at top, not sticky --- */
+    .hyp-sidebar {
+        display: block !important;
+        position: static !important;
+        max-height: none !important;
+        overflow-y: visible !important;
+        width: 100% !important;
+        margin-bottom: 24px;
+        page-break-inside: avoid;
+    }
+
+    /* --- Remove overflow clipping from content containers --- */
+    .featured-card,
+    .evidence-card,
+    .hyp-card,
+    .tw-card,
+    .callout,
+    .snap-evidence-matrix,
+    .hc-score-bar,
+    .snap-survival-bar,
+    .port-dna-bar {
+        overflow: visible !important;
+    }
+
+    /* --- Force all evidence card bodies open for print --- */
+    .ec-body {
+        display: block !important;
+    }
+
+    /* --- Page break rules — avoid splitting key elements --- */
+    .report-section {
+        page-break-inside: avoid;
+    }
+
+    .evidence-card,
+    .hyp-card,
+    .tw-card,
+    .callout,
+    .identity-table,
+    .evidence-table,
+    .disc-table,
+    .gaps-table,
+    .coverage-table {
+        page-break-inside: avoid;
+    }
+
+    /* Allow page breaks between report sections */
+    .report-section {
+        page-break-after: auto;
+    }
+
+    /* --- Remove fixed heights, sticky, and animations --- */
+    .section-nav-inner {
+        overflow-x: visible !important;
+    }
+
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+
+    /* --- Hero and banner areas — full width, no right padding offset --- */
+    .report-hero-inner,
+    .rsb-inner,
+    .verdict-inner,
+    .section-nav-inner {
+        max-width: 100% !important;
+        padding-right: 24px !important;
+    }
+
+    /* --- Risk skew bar — visible background for print --- */
+    .risk-skew-bar {
+        background: #f0f5f4 !important;
+        border-bottom: 1px solid #dde3ed !important;
+    }
+
+    .verdict-section {
+        background: #f0f5f4 !important;
+    }
+
+    /* --- Tables — ensure they don't break --- */
+    table {
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr {
+        page-break-inside: avoid;
+    }
+
+    /* --- Featured cards on home page — remove hover effects --- */
+    .featured-card {
+        box-shadow: none !important;
+        transform: none !important;
+        border: 1px solid #dde3ed !important;
+    }
+
+    /* --- Ensure images and SVGs don't overflow --- */
+    img, svg {
+        max-width: 100% !important;
+    }
+
+    /* --- Links: show URL for reference --- */
+    a[href]::after {
+        content: none; /* Keep clean — don't append URLs in equity research */
+    }
+}
     </style>
 </head>
 <body>
