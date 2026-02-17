@@ -460,6 +460,118 @@ a:hover { color: var(--accent-sage); }
     color: var(--signal-amber);
     border: 1px solid rgba(212, 160, 60, 0.25);
 }
+
+/* --- Coverage Table: Thesis Skew Bar --- */
+.skew-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+.skew-bar-track {
+    width: 60px;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    flex-shrink: 0;
+    background: var(--bg-elevated);
+}
+.skew-bar-bull {
+    height: 100%;
+    background: var(--signal-green);
+    transition: width 0.3s ease;
+}
+.skew-bar-bear {
+    height: 100%;
+    background: var(--signal-red);
+    transition: width 0.3s ease;
+}
+.skew-score {
+    font-family: var(--font-data);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    min-width: 32px;
+    text-align: right;
+}
+.skew-score.positive { color: var(--signal-green); }
+.skew-score.negative { color: var(--signal-red); }
+.skew-score.neutral { color: var(--signal-amber); }
+
+/* Skew Tooltip */
+.skew-tooltip {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 100;
+    margin-top: 6px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    min-width: 240px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    pointer-events: none;
+}
+.skew-cell:hover .skew-tooltip { display: block; }
+.skew-tooltip-title {
+    font-family: var(--font-data);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+.skew-tooltip-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 0;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+.skew-tooltip-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.skew-tooltip-dot.up { background: var(--signal-green); }
+.skew-tooltip-dot.down { background: var(--signal-red); }
+.skew-tooltip-weight {
+    font-family: var(--font-data);
+    font-weight: 700;
+    min-width: 28px;
+    text-align: right;
+    margin-left: auto;
+}
+.skew-tooltip-rationale {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+/* Coverage Table Sortable Headers */
+.coverage-table thead th.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+.coverage-table thead th.sortable:hover {
+    color: var(--text-primary);
+}
+.sort-arrow {
+    font-size: 0.55rem;
+    margin-left: 3px;
+    opacity: 0.4;
+}
+.sort-arrow.active { opacity: 1; color: var(--accent-sage); }
+
 .fc-skew-rationale {
     font-size: 0.72rem;
     color: var(--text-secondary);
@@ -3716,14 +3828,14 @@ a:hover { color: var(--accent-sage); }
             <div class="section-title">Coverage Universe</div>
         </div>
 
-        <table class="coverage-table">
+        <table class="coverage-table" id="coverage-table">
             <thead>
                 <tr>
                     <th>ASX</th>
                     <th>Company</th>
                     <th>Sector</th>
                     <th>Price</th>
-                    <th>Risk Skew</th>
+                    <th class="sortable" onclick="sortCoverageTable()" id="th-skew">Thesis Skew <span class="sort-arrow" id="skew-sort-arrow">&#9650;</span></th>
                     <th>Updated</th>
                     <th>Status</th>
                 </tr>
@@ -5217,6 +5329,27 @@ function normaliseScores(items) {
   return result;
 }
 
+// Compute skew score from hypothesis weights
+// Returns { bull: 0-100, bear: 0-100, score: -100 to +100, hypotheses: [{title, direction, weight}] }
+function computeSkewScore(data) {
+  if (!data || !data.hypotheses || data.hypotheses.length === 0) {
+    return { bull: 50, bear: 50, score: 0, hypotheses: [] };
+  }
+  var hyps = data.hypotheses;
+  var norm = normaliseScores(hyps);
+  var bull = 0, bear = 0;
+  var breakdown = [];
+  for (var i = 0; i < hyps.length; i++) {
+    var w = norm[i] || 0;
+    var dir = hyps[i].direction || 'downside';
+    if (dir === 'upside') { bull += w; } else { bear += w; }
+    breakdown.push({ title: hyps[i].title || hyps[i].tier, direction: dir, weight: w });
+  }
+  // score: +100 = fully bullish, -100 = fully bearish, 0 = balanced
+  var score = bull - bear;
+  return { bull: bull, bear: bear, score: score, hypotheses: breakdown };
+}
+
 function renderSparkline(prices) {
   if (!prices || prices.length < 2) return '';
   var w = 280, h = 88, pad = 4;
@@ -5288,11 +5421,19 @@ function renderReportHero(data) {
 function renderSkewBar(data) {
   var dir = data.skew.direction;
   var arrow = dir === 'downside' ? '&#9660; DOWNSIDE' : dir === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
+  var skew = computeSkewScore(data);
+  var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
+  var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
 
   return '<div class="risk-skew-bar">' +
     '<div class="rsb-inner">' +
-      '<span class="rsb-label">Risk Skew</span>' +
+      '<span class="rsb-label">Thesis Skew</span>' +
       '<span class="skew-badge ' + dir + '">' + arrow + '</span>' +
+      '<div class="skew-bar-track" style="width:80px;height:8px;margin:0 4px">' +
+        '<div class="skew-bar-bull" style="width:' + skew.bull + '%"></div>' +
+        '<div class="skew-bar-bear" style="width:' + skew.bear + '%"></div>' +
+      '</div>' +
+      '<span class="skew-score ' + scoreCls + '" style="font-size:0.82rem">' + scoreLabel + '</span>' +
       '<span class="rsb-rationale">' + data.skew.rationale + '</span>' +
     '</div>' +
   '</div>';
@@ -6711,7 +6852,7 @@ function buildSnapshotFromStock(ticker) {
     version: 'v1.0',
     reportId: stock.reportId,
     priceMetrics: priceMetrics,
-    riskSkew: { direction: stock.skew.direction, badge: skewBadge, rationale: stock.skew.rationale },
+    riskSkew: { direction: stock.skew.direction, badge: skewBadge, rationale: stock.skew.rationale, computed: computeSkewScore(stock) },
     narrative: { text: stock.narrative.theNarrative || '', verdict: stock.verdict.text || '' },
     survivalBar: survivalBar,
     survivalLegend: survivalLegend,
@@ -6759,7 +6900,13 @@ function renderSnapshotListCard(data) {
       }).join('') +
     '</div>' +
     '<div class="sc-skew">' +
-      '<span class="skew-badge ' + data.riskSkew.direction + '">' + data.riskSkew.badge + '</span>' +
+      (data.riskSkew.computed ?
+        '<div class="skew-bar-track" style="width:48px;height:6px">' +
+          '<div class="skew-bar-bull" style="width:' + data.riskSkew.computed.bull + '%"></div>' +
+          '<div class="skew-bar-bear" style="width:' + data.riskSkew.computed.bear + '%"></div>' +
+        '</div>' +
+        '<span class="skew-score ' + (data.riskSkew.computed.score > 5 ? 'positive' : data.riskSkew.computed.score < -5 ? 'negative' : 'neutral') + '" style="font-size:0.7rem">' + (data.riskSkew.computed.score > 0 ? '+' : '') + data.riskSkew.computed.score + '</span>'
+        : '<span class="skew-badge ' + data.riskSkew.direction + '">' + data.riskSkew.badge + '</span>') +
       '<span class="sc-skew-rationale">' + data.riskSkew.rationale.substring(0, 120) + '&hellip;</span>' +
     '</div>' +
   '</div>';
@@ -6881,8 +7028,15 @@ function renderSnapshotPage(data) {
     '</div>' +
 
     '<div class="snap-risk-skew-bar">' +
-      '<span class="snap-risk-skew-label">Risk Skew</span>' +
+      '<span class="snap-risk-skew-label">Thesis Skew</span>' +
       '<span class="snap-risk-skew-badge ' + data.riskSkew.direction + '">' + data.riskSkew.badge + '</span>' +
+      (data.riskSkew.computed ?
+        '<div class="skew-bar-track" style="width:64px;height:7px;margin:0 4px">' +
+          '<div class="skew-bar-bull" style="width:' + data.riskSkew.computed.bull + '%"></div>' +
+          '<div class="skew-bar-bear" style="width:' + data.riskSkew.computed.bear + '%"></div>' +
+        '</div>' +
+        '<span class="skew-score ' + (data.riskSkew.computed.score > 5 ? 'positive' : data.riskSkew.computed.score < -5 ? 'negative' : 'neutral') + '" style="font-size:0.78rem">' + (data.riskSkew.computed.score > 0 ? '+' : '') + data.riskSkew.computed.score + '</span>'
+        : '') +
       '<span class="snap-risk-skew-rationale">' + data.riskSkew.rationale + '</span>' +
     '</div>' +
 
@@ -6964,7 +7118,9 @@ function renderSnapshotPage(data) {
 
 function renderFeaturedCard(data) {
   var dir = data.skew.direction;
-  var arrow = dir === 'downside' ? '&#9660; DOWNSIDE' : dir === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
+  var skew = computeSkewScore(data);
+  var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
+  var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
 
   var metricsHtml = '';
   for (var i = 0; i < data.featuredMetrics.length; i++) {
@@ -6989,7 +7145,11 @@ function renderFeaturedCard(data) {
     '</div>' +
     '<div class="fc-metrics">' + metricsHtml + '</div>' +
     '<div class="fc-skew">' +
-      '<span class="skew-badge ' + dir + '">' + arrow + '</span>' +
+      '<div class="skew-bar-track" style="width:48px;height:6px">' +
+        '<div class="skew-bar-bull" style="width:' + skew.bull + '%"></div>' +
+        '<div class="skew-bar-bear" style="width:' + skew.bear + '%"></div>' +
+      '</div>' +
+      '<span class="skew-score ' + scoreCls + '" style="font-size:0.7rem">' + scoreLabel + '</span>' +
       '<span class="fc-skew-rationale">' + data.featuredRationale + '</span>' +
     '</div>' +
     '<div class="fc-date">' + data.date + renderFreshnessBadge(data.ticker) + renderCatalystTag(data.ticker) + '</div>' +
@@ -7017,19 +7177,46 @@ function renderCatalystTag(ticker) {
 }
 
 function renderCoverageRow(data) {
-  var dir = data.skew.direction;
-  var arrow = dir === 'downside' ? '&#9660; DOWNSIDE' : dir === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
+  var skew = computeSkewScore(data);
+  var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
+  var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
+
+  // Tooltip hypothesis breakdown
+  var tooltipRows = '';
+  for (var i = 0; i < skew.hypotheses.length; i++) {
+    var h = skew.hypotheses[i];
+    var dotCls = h.direction === 'upside' ? 'up' : 'down';
+    tooltipRows += '<div class="skew-tooltip-row">' +
+      '<span class="skew-tooltip-dot ' + dotCls + '"></span>' +
+      '<span>' + h.title + '</span>' +
+      '<span class="skew-tooltip-weight">' + h.weight + '%</span>' +
+    '</div>';
+  }
+  var tooltipHtml = '<div class="skew-tooltip">' +
+    '<div class="skew-tooltip-title">Hypothesis Weights</div>' +
+    tooltipRows +
+    '<div class="skew-tooltip-rationale">' + data.skew.rationale.substring(0, 160) + (data.skew.rationale.length > 160 ? '&hellip;' : '') + '</div>' +
+  '</div>';
 
   // Format date as short form: "10 Feb 2026"
   var dateParts = data.date.split(' ');
   var shortDate = dateParts[0] + ' ' + (dateParts[1] ? dateParts[1].substring(0, 3) : '') + ' ' + (dateParts[2] || '');
 
-  return '<tr onclick="navigate(\'report-' + data.ticker + '\')">' +
+  return '<tr data-skew-score="' + skew.score + '" onclick="navigate(\'report-' + data.ticker + '\')">' +
     '<td class="td-ticker">' + data.ticker + '</td>' +
     '<td>' + data.company + '</td>' +
     '<td>' + data.sector + '</td>' +
     '<td class="td-price">' + data.currency + data.price + '</td>' +
-    '<td><span class="skew-badge ' + dir + '">' + arrow + '</span></td>' +
+    '<td>' +
+      '<div class="skew-cell">' +
+        '<div class="skew-bar-track">' +
+          '<div class="skew-bar-bull" style="width:' + skew.bull + '%"></div>' +
+          '<div class="skew-bar-bear" style="width:' + skew.bear + '%"></div>' +
+        '</div>' +
+        '<span class="skew-score ' + scoreCls + '">' + scoreLabel + '</span>' +
+        tooltipHtml +
+      '</div>' +
+    '</td>' +
     '<td class="td-date">' + shortDate + '</td>' +
     '<td>' + renderFreshnessBadge(data.ticker) + renderCatalystTag(data.ticker) + '</td>' +
   '</tr>';
@@ -7037,17 +7224,76 @@ function renderCoverageRow(data) {
 
 function renderComingSoonRow(stub) {
   var dir = stub.skew || 'balanced';
-  var arrow = dir === 'downside' ? '&#9660; DOWNSIDE' : dir === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
+  var bull = dir === 'upside' ? 65 : dir === 'downside' ? 35 : 50;
+  var bear = 100 - bull;
+  var score = bull - bear;
+  var scoreCls = score > 5 ? 'positive' : score < -5 ? 'negative' : 'neutral';
+  var scoreLabel = (score > 0 ? '+' : '') + score;
 
-  return '<tr class="stub">' +
+  return '<tr class="stub" data-skew-score="' + score + '">' +
     '<td class="td-ticker">' + stub.ticker + '</td>' +
     '<td>' + stub.company + '</td>' +
     '<td>' + stub.sector + '</td>' +
     '<td class="td-price">' + (stub.currency || 'A$') + stub.price + '</td>' +
-    '<td><span class="skew-badge ' + dir + '">' + arrow + '</span></td>' +
+    '<td>' +
+      '<div class="skew-cell">' +
+        '<div class="skew-bar-track">' +
+          '<div class="skew-bar-bull" style="width:' + bull + '%"></div>' +
+          '<div class="skew-bar-bear" style="width:' + bear + '%"></div>' +
+        '</div>' +
+        '<span class="skew-score ' + scoreCls + '">' + scoreLabel + '</span>' +
+      '</div>' +
+    '</td>' +
     '<td><span class="coming-soon">Coming Soon</span></td>' +
     '<td></td>' +
   '</tr>';
+}
+
+// Coverage table sort state
+var coverageSortDir = 0; // 0 = unsorted (default), 1 = desc (bearish first), -1 = asc (bullish first)
+
+function sortCoverageTable() {
+  var tbody = document.getElementById('coverage-body');
+  if (!tbody) return;
+  var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+  var arrow = document.getElementById('skew-sort-arrow');
+
+  // Cycle: unsorted → desc (bearish first) → asc (bullish first) → unsorted
+  coverageSortDir = coverageSortDir === 0 ? 1 : coverageSortDir === 1 ? -1 : 0;
+
+  if (coverageSortDir === 0) {
+    // Restore default order: re-render
+    if (arrow) { arrow.innerHTML = '&#9650;'; arrow.className = 'sort-arrow'; }
+    tbody.innerHTML = '';
+    FEATURED_ORDER.forEach(function(ticker) {
+      if (STOCK_DATA[ticker]) {
+        tbody.innerHTML += renderCoverageRow(STOCK_DATA[ticker]);
+      }
+    });
+    if (typeof COMING_SOON !== 'undefined') {
+      COMING_SOON.forEach(function(stub) {
+        tbody.innerHTML += renderComingSoonRow(stub);
+      });
+    }
+    return;
+  }
+
+  // Sort by data-skew-score attribute
+  rows.sort(function(a, b) {
+    var sa = parseInt(a.getAttribute('data-skew-score')) || 0;
+    var sb = parseInt(b.getAttribute('data-skew-score')) || 0;
+    return coverageSortDir === 1 ? sa - sb : sb - sa; // desc: bearish first (lowest score), asc: bullish first (highest score)
+  });
+
+  if (arrow) {
+    arrow.className = 'sort-arrow active';
+    arrow.innerHTML = coverageSortDir === 1 ? '&#9660;' : '&#9650;';
+  }
+
+  // Re-append in sorted order
+  for (var i = 0; i < rows.length; i++) {
+    tbody.appendChild(rows[i]);
+  }
 }
 
 function buildCoverageData() {
