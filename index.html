@@ -6493,134 +6493,7 @@ function renderReportPage(data) {
 
 const SNAPSHOT_DATA = {};
 
-SNAPSHOT_DATA.WOW = {
-  ticker: 'WOW',
-  tickerFull: 'WOW.AX',
-  company: 'Woolworths Group Limited',
-  sector: 'Consumer Staples',
-  sectorSub: 'Supermarkets',
-  price: 31.96,
-  currency: 'A$',
-  date: '10 FEB 2026',
-  version: 'v1.0',
-  reportId: 'WOW-2026-001',
-  priceMetrics: [
-    { label: 'Mkt Cap', value: 'A$39B', cls: '' },
-    { label: 'Fwd P/E', value: '23.9x', cls: 'premium' },
-    { label: 'EV/EBITDA', value: '10.5x', cls: '' },
-    { label: 'Div Yield', value: '2.9%', cls: '' },
-    { label: 'NPAT (FY25)', value: '&darr;19%', cls: 'negative' },
-    { label: 'EBIT Margin', value: '4.0% (&darr;70bp)', cls: 'negative' },
-    { label: 'Mkt Share', value: '38% (Duopoly 67%)', cls: '' },
-    { label: 'Next Event', value: '1H FY26 &mdash; 25 Feb', cls: '' }
-  ],
-  riskSkew: {
-    direction: 'downside',
-    badge: '&#9660; DOWNSIDE',
-    rationale: 'Evidence accumulating against the embedded narrative. 5 of 8 domains support erosion (T2); price above consensus target. No valuation cushion if 1H FY26 results disappoint on 25 Feb.'
-  },
-  narrative: {
-    text: 'The market is pricing a <strong>turnaround under new CEO Amanda Bardwell</strong>. 23.9x forward P/E assumes $400M cost-out program delivers, e-commerce scales (penetration now 16.2%), and Australian Food returns to <strong>mid-to-high single-digit EBIT growth</strong>. FY25 was "disappointing" &mdash; FY26 is framed as "transitional."',
-    verdict: 'Turnaround narrative is plausible but unproven. $95M industrial action cost was one-off, but structural headwinds &mdash; mandatory FGCC, ACCC court proceedings, margin pressure from price investment, Aldi expansion &mdash; are not cyclical. Market pricing recovery that management itself calls uncertain.'
-  },
-  survivalBar: [
-    { cls: 'snap-sb-upside', width: '36%', label: 'T1: 36%' },
-    { cls: 'snap-sb-downside', width: '25%', label: 'T2: 25%' },
-    { cls: 'snap-sb-downside', width: '21%', label: 'T3: 21%' },
-    { cls: 'snap-sb-downside', width: '18%', label: 'T4: 18%' }
-  ],
-  survivalLegend: [
-    { color: 'var(--signal-green)', label: 'Turnaround' },
-    { color: 'var(--signal-red)', label: 'Structural Erosion' },
-    { color: 'var(--signal-red)', label: 'Regulatory Squeeze' },
-    { color: 'var(--signal-red)', label: 'Competitive Disruption' }
-  ],
-  hypotheses: [
-    { cls: 'snap-upside', label: 'T1: Managed Turnaround', statusTag: 'snap-tag-priced', statusText: 'Priced', desc: '$400M cost-out delivers. E-commerce scales. Australian Food EBIT grows mid-high single digits. Dividend recovers.', score: '36%', scoreCls: 'priced', direction: 'flat', dirLabel: '&rarr; Awaiting' },
-    { cls: 'snap-downside', label: 'T2: Structural Margin Erosion', statusTag: 'snap-tag-accumulating', statusText: 'Evidence Building', desc: 'Price investment to defend share permanently compresses margins. Duopoly premium erodes. 4% EBIT margin becomes ceiling, not floor.', score: '25%', scoreCls: 'high', direction: 'up', dirLabel: '&uarr; Rising' },
-    { cls: 'snap-downside', label: 'T3: Regulatory Squeeze', statusTag: 'snap-tag-tail', statusText: 'Active', desc: 'Mandatory FGCC + ACCC court action + 20 inquiry recommendations compress supplier margins and impose compliance costs.', score: '21%', scoreCls: 'high', direction: 'up', dirLabel: '&uarr; Rising' },
-    { cls: 'snap-downside', label: 'T4: Competitive Disruption', statusTag: 'snap-tag-minimal', statusText: 'Slow Burn', desc: 'Aldi 10%+ share &amp; expanding. Amazon enters grocery. Online-only disruptors. Duopoly premium structurally threatened.', score: '18%', scoreCls: 'high', direction: 'flat', dirLabel: '&rarr; Steady' }
-  ],
-  evidenceMatrix: {
-    headers: ['Domain', 'T1 Turnaround', 'T2 Erosion', 'T3 Regulatory', 'T4 Disruption'],
-    rows: [
-      { domain: 'Corporate Comms', epistemic: 'Motivated', cells: [
-        { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }
-      ]},
-      { domain: 'Regulatory Filings', epistemic: 'Under oath', cells: [
-        { cls: 'snap-signal-contradict', text: '&#9660;' }, { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-strong-support', text: '&#9650;&#9650;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }
-      ]},
-      { domain: 'Broker Research', epistemic: 'Consensus', cells: [
-        { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-support', text: '&#9650;', style: 'opacity:0.5' }, { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }
-      ]},
-      { domain: 'Competitor Data', epistemic: 'Independent', cells: [
-        { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-strong-support', text: '&#9650;&#9650;' }
-      ]},
-      { domain: 'Economic Data', epistemic: 'Objective', cells: [
-        { cls: 'snap-signal-support', text: '&#9650;', style: 'opacity:0.5' }, { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }
-      ]},
-      { domain: 'Alternative Data', epistemic: 'Behavioural', cells: [
-        { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-support', text: '&#9650;' }
-      ]},
-      { domain: 'Academic Research', epistemic: 'Peer-reviewed', cells: [
-        { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }, { cls: 'snap-signal-support', text: '&#9650;' }
-      ]},
-      { domain: 'Media &amp; Social', epistemic: 'Noise', cells: [
-        { cls: 'snap-signal-contradict', text: '&#9660;' }, { cls: 'snap-signal-support', text: '&#9650;' }, { cls: 'snap-signal-strong-support', text: '&#9650;&#9650;' }, { cls: 'snap-signal-neutral', text: '&mdash;' }
-      ]}
-    ]
-  },
-  discriminators: [
-    { level: 'HIGH', cls: 'high', text: '<strong>1H FY26 results (25 Feb):</strong> Australian Food EBIT growth rate is the single test. Consensus ~11.8% vs mgmt "mid-to-high single digits." A miss confirms T2 structural erosion thesis.' },
-    { level: 'HIGH', cls: 'high', text: '<strong>ACCC court proceedings outcome.</strong> Coles settled for $10.25M for similar conduct. Woolworths is fighting the case. Verdict sets precedent for penalties and remedies under mandatory FGCC.' },
-    { level: 'HIGH', cls: 'high', text: '<strong>$400M cost-out delivery rate.</strong> "On track" per management but unverified. 1H results will show first real evidence. If cost savings are consumed by price investment, T2 strengthens.' },
-    { level: 'MED', cls: 'medium', text: '<strong>Aldi store expansion cadence.</strong> 602 stores. No online. Targeting premium segments. If Aldi launches online grocery, T4 accelerates materially.' }
-  ],
-  nonDiscriminating: [
-    'Revenue +1.7% FY25', 'E-com +17% growth', 'NZ recovery +38%', 'Consensus Hold/Buy', 'Target A$30.45'
-  ],
-  tripwires: [
-    { date: '25 FEB 2026', name: '1H FY26 Results', conditions: [
-      { icon: '&#9650;', iconCls: 'up', text: 'AU Food EBIT growth &ge;8% &rarr; T1 strengthens' },
-      { icon: '&#9660;', iconCls: 'down', text: 'AU Food EBIT growth &lt;5% &rarr; T2 strengthens' }
-    ]},
-    { date: '1H 2026', name: 'ACCC v Woolworths', conditions: [
-      { icon: '&#9650;', iconCls: 'up', text: 'Settlement &lt;$50M, no precedent &rarr; T3 weakens' },
-      { icon: '&#9660;', iconCls: 'down', text: 'Penalties + structural orders &rarr; T3 crystallises' }
-    ]},
-    { date: 'APR 2026', name: 'Mandatory FGCC Impact', conditions: [
-      { icon: '&#9650;', iconCls: 'up', text: 'Compliance cost &lt;$30M pa &rarr; manageable' },
-      { icon: '&#9660;', iconCls: 'down', text: 'Supplier renegotiation wave &rarr; margin headwind' }
-    ]},
-    { date: 'ONGOING', name: 'Aldi Online Launch', conditions: [
-      { icon: '&#9660;', iconCls: 'down', text: 'Aldi launches e-grocery &rarr; T4 accelerates' },
-      { icon: '&#9650;', iconCls: 'up', text: 'Aldi stays offline &rarr; WOW e-com moat holds' }
-    ]}
-  ],
-  evidenceCoverage: [
-    { domain: 'Corporate Comms', status: 'FULL', cls: 'snap-gap-full' },
-    { domain: 'Regulatory Filings', status: 'FULL', cls: 'snap-gap-full' },
-    { domain: 'Broker Research', status: 'FULL', cls: 'snap-gap-full' },
-    { domain: 'Competitor Data', status: 'GOOD', cls: 'snap-gap-full' },
-    { domain: 'Economic Data', status: 'GOOD', cls: 'snap-gap-full' },
-    { domain: 'Alternative Data', status: 'PARTIAL', cls: 'snap-gap-partial' },
-    { domain: 'Academic Research', status: 'LIMITED', cls: 'snap-gap-limited' },
-    { domain: 'Media &amp; Social', status: 'FULL', cls: 'snap-gap-full' }
-  ],
-  questions: [
-    'Can $400M cost-out absorb both price investment AND margin recovery, or is it one or the other?',
-    'Is Aldi\'s lack of online a permanent strategic choice or a timing gap?',
-    'Will mandatory FGCC penalties deter aggressive supplier negotiations, structurally changing gross margins?'
-  ],
-  footerDisclaimer: 'This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using ACH methodology. All data sourced from ASX filings, ACCC publications, broker consensus, and publicly available data as at report date. Hypothesis scores reflect editorial assessment.',
-  footerMeta: [
-    { label: 'ID: WOW-2026-001' },
-    { label: 'MODE: Narrative Intelligence' },
-    { label: 'NEXT: Mar 2026' }
-  ]
-};
-
-// Auto-generate snapshot data from STOCK_DATA for any stock without a manual snapshot
+// Auto-generate snapshot data from STOCK_DATA
 function buildSnapshotFromStock(ticker) {
   var stock = STOCK_DATA[ticker];
   if (!stock) return null;
@@ -18437,15 +18310,10 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Populate snapshot grid
-    const snapshotGrid = document.getElementById('snapshot-grid');
-    if (snapshotGrid) {
-        SNAPSHOT_ORDER.forEach(ticker => {
-            if (SNAPSHOT_DATA[ticker]) {
-                snapshotGrid.innerHTML += renderSnapshotListCard(SNAPSHOT_DATA[ticker]);
-            }
-        });
-    }
+    // Populate snapshot grid after NFI has finished processing
+    // 1.5s delay lets narrative-framework-integration.js complete
+    // weight adjustments, dislocation alerts, and narrative updates
+    setTimeout(function() { initSnapshots('snapshot-grid'); }, 1500);
 
     // Populate thesis comparator stock cards dynamically
     const tcGrid = document.getElementById('tc-stock-grid');
@@ -20861,6 +20729,8 @@ function buildRetailHTML(stock) {
 <script src="scripts/institutional-commentary-engine.js"></script>
 <!-- Narrative Framework v2.0 — Dislocation Alerts & Dynamic Weights -->
 <script src="scripts/narrative-framework-integration.js"></script>
+<!-- Snapshot Generator — rebuilds snapshot grid after NFI processing -->
+<script src="scripts/snapshot-generator.js"></script>
 <script src="js/personalisation.js"></script>
 
 </body>
