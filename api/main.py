@@ -109,6 +109,14 @@ class ResearchChatRequest(BaseModel):
         default_factory=list,
         description="Prior conversation messages for context",
     )
+    custom_system_prompt: str | None = Field(
+        None,
+        description="Optional custom system prompt (overrides default for personalised chat)",
+    )
+    system_prompt: str | None = Field(
+        None,
+        description="Legacy alias for custom_system_prompt (backwards compatibility)",
+    )
 
 
 class SourcePassage(BaseModel):
@@ -230,11 +238,12 @@ async def research_chat(request: ResearchChatRequest):
 
     # Call Claude
     client = _get_client()
+    effective_system = request.custom_system_prompt or request.system_prompt or SYSTEM_PROMPT
     try:
         response = client.messages.create(
             model=config.ANTHROPIC_MODEL,
             max_tokens=1024,
-            system=SYSTEM_PROMPT,
+            system=effective_system,
             messages=messages,
         )
     except anthropic.APIError as e:
