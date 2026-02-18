@@ -7482,7 +7482,7 @@ function buildCoverageData() {
   return coverageData;
 }
 
-const SNAPSHOT_ORDER = Object.keys(STOCK_DATA);
+const SNAPSHOT_ORDER = Object.keys(STOCK_DATA).sort();
 
 // Snapshot data is now generated on-demand when full research data is available.
 // buildSnapshotFromStock requires full hypothesis/evidence/tripwire data,
@@ -8692,7 +8692,7 @@ const MarketFeed = (function() {
 })();
 
 // Featured card display order
-const FEATURED_ORDER = Object.keys(STOCK_DATA);
+const FEATURED_ORDER = Object.keys(STOCK_DATA).sort();
 
 // Coming soon stubs
 const COMING_SOON = [

@@ -23,9 +23,9 @@
 
   // 18-stock coverage universe (excludes micro-caps HRZ, OCL, RFG)
   var COVERAGE_UNIVERSE = [
-    'WOW', 'XRO', 'WTC', 'DRO', 'PME', 'GYG',
-    'CSL', 'MQG', 'GMG', 'WDS', 'SIG', 'FMG',
-    'DXS', 'NAB', 'BHP', 'CBA', 'RIO', 'WOR'
+    'BHP', 'CBA', 'CSL', 'DRO', 'DXS', 'FMG',
+    'GMG', 'GYG', 'MQG', 'NAB', 'PME', 'RIO',
+    'SIG', 'WDS', 'WOR', 'WOW', 'WTC', 'XRO'
   ];
 
   // ─── DATA EXTRACTION ────────────────────────────────────────
