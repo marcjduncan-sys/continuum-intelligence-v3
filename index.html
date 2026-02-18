@@ -8190,6 +8190,8 @@ function updateLiveUI(ticker) {
                 // Init narrative timeline chart after DOM render
                 destroyNarrativeTimelineChart(ticker);
                 initNarrativeTimelineChart(ticker);
+                // Re-populate hypothesis sidebar (cleared by re-render)
+                populateSidebar(ticker);
             }
             renderedPages.add(ticker);
         }
