@@ -584,4 +584,36 @@ function dailyStr(result) {
     result.cumulative.twentyDay.toFixed(1) + '%';
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+// ── Module Exports ──────────────────────────────────────────────────────────
+// Adapter matching the signature expected by update-research.js:
+//   processStock(stock, priceData, taConfig) → { scores, classification, volumeMultiplier, flags, cumulativeMoves }
+
+module.exports = {
+  processStock: function exportedProcessStock(stock, priceData) {
+    const ticker = stock.ticker || '';
+    const livePrice = priceData ? priceData.price : null;
+    const result = processStock(ticker, stock, livePrice);
+    if (!result) return null;
+
+    const scores = {};
+    for (const [tier, upd] of Object.entries(result.updates)) {
+      scores[tier] = upd.survival_score;
+    }
+
+    const flags = [];
+    if (result.results_day) flags.push('RESULTS_DAY');
+    if (result.overcorrection && result.overcorrection.triggered) flags.push('OVERCORRECTION');
+
+    return {
+      scores,
+      classification: result.classification,
+      volumeMultiplier: result.volume_multiplier,
+      flags,
+      cumulativeMoves: result.cumulative
+    };
+  }
+};
