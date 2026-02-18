@@ -64,5 +64,52 @@
   "price_signals": [],
   "editorial_override": null,
   "price_history": [],
-  "weighting": null
+  "weighting": null,
+  "gics_sub_industry": "Steel",
+  "narrative_model": "MATERIALS_IRON_ORE",
+  "narrative_weights": {
+    "macro": 0.1,
+    "sector": 0.6,
+    "idio": 0.3
+  },
+  "commodity_overlay": {
+    "primary_commodity": "iron_ore_62",
+    "breakeven": 20,
+    "breakeven_unit": "USD/wmt",
+    "breakeven_source": "FMG FY25 C1 cost guidance",
+    "breakeven_confidence": "HIGH",
+    "breakeven_note": null,
+    "sensitivity": "+$1/t iron ore ≈ +~$200M annualised EBITDA",
+    "thresholds": {
+      "strong_bearish": {
+        "below": 70,
+        "position_score": -80
+      },
+      "bearish": {
+        "range": [
+          70,
+          90
+        ],
+        "position_score": -30
+      },
+      "neutral": {
+        "range": [
+          90,
+          110
+        ],
+        "position_score": 0
+      },
+      "bullish": {
+        "range": [
+          110,
+          130
+        ],
+        "position_score": 40
+      },
+      "strong_bullish": {
+        "above": 130,
+        "position_score": 70
+      }
+    }
+  }
 }

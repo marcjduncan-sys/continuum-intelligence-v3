@@ -64,5 +64,52 @@
   "price_signals": [],
   "editorial_override": null,
   "price_history": [],
-  "weighting": null
+  "weighting": null,
+  "gics_sub_industry": "Oil & Gas Exploration & Production",
+  "narrative_model": "ENERGY_OIL_GAS",
+  "narrative_weights": {
+    "macro": 0.15,
+    "sector": 0.55,
+    "idio": 0.3
+  },
+  "commodity_overlay": {
+    "primary_commodity": "brent",
+    "breakeven": 35,
+    "breakeven_unit": "USD/boe",
+    "breakeven_source": "Woodside CMD 2025",
+    "breakeven_confidence": "HIGH",
+    "breakeven_note": null,
+    "sensitivity": "+$1/bbl Brent ≈ +$180M annualised FCF",
+    "thresholds": {
+      "strong_bearish": {
+        "below": 45,
+        "position_score": -80
+      },
+      "bearish": {
+        "range": [
+          45,
+          60
+        ],
+        "position_score": -30
+      },
+      "neutral": {
+        "range": [
+          60,
+          75
+        ],
+        "position_score": 0
+      },
+      "bullish": {
+        "range": [
+          75,
+          90
+        ],
+        "position_score": 40
+      },
+      "strong_bullish": {
+        "above": 90,
+        "position_score": 70
+      }
+    }
+  }
 }

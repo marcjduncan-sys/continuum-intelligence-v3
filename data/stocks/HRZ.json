@@ -125,5 +125,54 @@
     1.24,
     1.24
   ],
-  "weighting": null
+  "weighting": null,
+  "gics_sub_industry": "Gold",
+  "narrative_model": "MATERIALS_GOLD",
+  "narrative_weights": {
+    "macro": 0.05,
+    "sector": 0.65,
+    "idio": 0.3
+  },
+  "commodity_overlay": {
+    "primary_commodity": "gold_aud",
+    "breakeven": 2800,
+    "breakeven_unit": "AUD/oz",
+    "breakeven_source": "DFS estimate (pre-production)",
+    "breakeven_confidence": "LOW",
+    "breakeven_note": "HRZ is pre-production. AISC is estimated from DFS. Actual costs unknown until first pour.",
+    "secondary_factor": "aud_usd",
+    "secondary_note": "AUD weakness amplifies gold tailwind for AUD-cost producer",
+    "sensitivity": "+A$100/oz gold ≈ significant FCF uplift (pre-production — sensitivity estimate only)",
+    "thresholds": {
+      "strong_bearish": {
+        "below": 2200,
+        "position_score": -80
+      },
+      "bearish": {
+        "range": [
+          2200,
+          2800
+        ],
+        "position_score": -40
+      },
+      "neutral": {
+        "range": [
+          2800,
+          3500
+        ],
+        "position_score": 0
+      },
+      "bullish": {
+        "range": [
+          3500,
+          4500
+        ],
+        "position_score": 50
+      },
+      "strong_bullish": {
+        "above": 4500,
+        "position_score": 75
+      }
+    }
+  }
 }
