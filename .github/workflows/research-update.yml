@@ -1,0 +1,59 @@
+name: Daily Research Update (Legacy)
+
+# DISABLED: Consolidated into continuum-update.yml
+# Kept for manual dispatch only.
+on:
+  workflow_dispatch:
+    inputs:
+      ticker:
+        description: 'Specific ticker to update (or leave empty for all)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  update-research:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch latest prices
+        run: node scripts/fetch-live-prices.js
+
+      - name: Update stock JSONs with prices
+        run: node scripts/update-stock-json.js
+
+      - name: Run research update
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.ticker }}" ]; then
+            ARGS="--ticker ${{ github.event.inputs.ticker }}"
+          fi
+          node scripts/update-research.js $ARGS
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git add data/stocks/ data/live-prices.json index.html 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Research update — scores + freshness — $(date -u +'%d %b %Y')"
+          git pull --rebase origin main
+          git push

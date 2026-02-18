@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continuum Intelligence — Evidence-Based Equity Research</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           CONTINUUM V2 — MODERN UX DESIGN SYSTEM
+           ============================================ */
+        
+        :root {
+            /* Dark theme (default) */
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1a2332;
+            --bg-elevated: #242d3d;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-tertiary: #64748b;
+            --text-muted: #475569;
+            
+            --accent-teal: #14b8a6;
+            --accent-teal-dark: #0d9488;
+            --accent-gold: #f59e0b;
+            
+            --risk-upside: #22c55e;
+            --risk-downside: #ef4444;
+            --risk-neutral: #f59e0b;
+            
+            --border-subtle: rgba(148, 163, 184, 0.1);
+            --border-default: rgba(148, 163, 184, 0.2);
+            
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5);
+            
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            
+            --font-sans: 'Inter', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --transition-fast: 150ms ease;
+            --transition-base: 250ms ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* ============================================
+           NAVIGATION — Floating Glass Effect
+           ============================================ */
+        
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 15, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        
+        .nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-teal-dark));
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: white;
+        }
+        
+        .logo-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+        
+        .logo-text span {
+            color: var(--accent-teal);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .nav-link {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+        }
+        
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+        
+        .nav-link.active {
+            color: var(--accent-teal);
+            background: rgba(20, 184, 166, 0.1);
+        }
+        
+        /* ============================================
+           LIVE PULSE — Shows System is Active
+           ============================================ */
+        
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--risk-upside);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+        
+        .live-time {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+        
+        /* ============================================
+           HERO — Clean, Bold, Scan-able
+           ============================================ */
+        
+        .hero {
+            padding: 120px 24px 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-default);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--accent-teal);
+            margin-bottom: 24px;
+        }
+        
+        .hero-title {
+            font-size: clamp(40px, 6vw, 64px);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+            max-width: 800px;
+        }
+        
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .hero-stats {
+            display: flex;
+            gap: 48px;
+            flex-wrap: wrap;
+        }
+        
+        .hero-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .hero-stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .hero-stat-label {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* ============================================
+           UNIVERSE GRID — Card-Based Layout
+           ============================================ */
+        
+        .section {
+            padding: 60px 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .section-meta {
+            font-size: 14px;
+            color: var(--text-tertiary);
+        }
+        
+        /* Stock Cards Grid */
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+        
+        .stock-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stock-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: transparent;
+            transition: background var(--transition-base);
+        }
+        
+        .stock-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--border-default);
+        }
+        
+        .stock-card.risk-upside::before { background: var(--risk-upside); }
+        .stock-card.risk-downside::before { background: var(--risk-downside); }
+        .stock-card.risk-neutral::before { background: var(--risk-neutral); }
+        
+        .stock-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .stock-id {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .stock-ticker {
+            font-family: var(--font-mono);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .stock-name {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+        
+        .stock-price {
+            text-align: right;
+        }
+        
+        .stock-price-value {
+            font-family: var(--font-mono);
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .stock-price-change {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .stock-price-change.up { color: var(--risk-upside); }
+        .stock-price-change.down { color: var(--risk-downside); }
+        
+        .stock-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 16px 0;
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 16px;
+        }
+        
+        .stock-metric {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .stock-metric-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .stock-metric-value {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        .stock-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+        
+        .risk-badge.upside {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--risk-upside);
+        }
+        
+        .risk-badge.downside {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--risk-downside);
+        }
+        
+        .risk-badge.neutral {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--risk-neutral);
+        }
+        
+        .freshness-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .freshness-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        
+        .freshness-dot.ok { background: var(--risk-upside); }
+        .freshness-dot.warning { background: var(--risk-neutral); }
+        .freshness-dot.stale { background: var(--risk-downside); }
+        
+        /* ============================================
+           SNAPSHOT CARDS — One-Page Summary View
+           ============================================ */
+        
+        .snapshot-section {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-subtle);
+            padding: 60px 24px;
+        }
+        
+        .snapshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .snapshot-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            transition: all var(--transition-base);
+        }
+        
+        .snapshot-card:hover {
+            border-color: var(--border-default);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .snapshot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        
+        .snapshot-ticker {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .hypothesis-bar {
+            display: flex;
+            height: 8px;
+            background: var(--bg-elevated);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        
+        .hypothesis-segment {
+            height: 100%;
+            transition: width var(--transition-base);
+        }
+        
+        .hypothesis-segment.upside { background: var(--risk-upside); }
+        .hypothesis-segment.downside { background: var(--risk-downside); }
+        .hypothesis-segment.neutral { background: var(--risk-neutral); }
+        
+        .hypothesis-legend {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        
+        .hypothesis-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .hypothesis-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        /* ============================================
+           FILTERS & SEARCH — Interactive Controls
+           ============================================ */
+        
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+            max-width: 400px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all var(--transition-fast);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        
+        .filter-pill {
+            padding: 10px 18px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 100px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .filter-pill:hover {
+            border-color: var(--border-default);
+            color: var(--text-primary);
+        }
+        
+        .filter-pill.active {
+            background: var(--accent-teal);
+            border-color: var(--accent-teal);
+            color: white;
+        }
+        
+        /* ============================================
+           LOADING SKELETON — Better Than Spinners
+           ============================================ */
+        
+        .skeleton {
+            background: linear-gradient(
+                90deg,
+                var(--bg-tertiary) 25%,
+                var(--bg-elevated) 50%,
+                var(--bg-tertiary) 75%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: var(--radius-sm);
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* ============================================
+           EMPTY STATE — Helpful, Not Just Blank
+           ============================================ */
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 24px;
+            color: var(--text-tertiary);
+        }
+        
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 24px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+        
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .empty-desc {
+            font-size: 14px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        /* ============================================
+           MOBILE NAV — Bottom Sheet Pattern
+           ============================================ */
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero {
+                padding-top: 100px;
+            }
+            
+            .hero-title {
+                font-size: 32px;
+            }
+            
+            .stock-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .snapshot-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-stats {
+                gap: 24px;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+        }
+        
+        /* ============================================
+           TOOLTIP — Context on Hover
+           ============================================ */
+        
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            padding: 8px 12px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-fast);
+            z-index: 100;
+        }
+        
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="#" class="logo">
+                <div class="logo-icon">CI</div>
+                <div class="logo-text">Continuum<span>Intelligence</span></div>
+            </a>
+            
+            <div class="nav-links">
+                <a href="#universe" class="nav-link active">Universe</a>
+                <a href="#snapshots" class="nav-link">Snapshots</a>
+                <a href="#portfolio" class="nav-link">Portfolio</a>
+                <a href="#about" class="nav-link">About</a>
+            </div>
+            
+            <div class="live-indicator">
+                <div class="live-dot"></div>
+                <span>Live</span>
+                <span class="live-time" id="lastUpdate">Updating...</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-badge">
+            <span>🔬</span>
+            <span>Independent Cross-Domain Research</span>
+        </div>
+        
+        <h1 class="hero-title">Evidence, not opinions.</h1>
+        
+        <p class="hero-subtitle">
+            Systematic equity analysis across ten evidence domains using the Analysis of 
+            Competing Hypotheses framework. Built by former UBS and Goldman Sachs executives.
+        </p>
+        
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-value">12</div>
+                <div class="hero-stat-label">ASX Coverage</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">10</div>
+                <div class="hero-stat-label">Evidence Domains</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">4</div>
+                <div class="hero-stat-label">Hypotheses/Stock</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">0</div>
+                <div class="hero-stat-label">Price Targets</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Universe Section -->
+    <section class="section" id="universe">
+        <div class="section-header">
+            <h2 class="section-title">Coverage Universe</h2>
+            <span class="section-meta">Real-time risk assessment</span>
+        </div>
+        
+        <!-- Search & Filters -->
+        <div class="controls">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Search ticker or company...">
+            </div>
+            <button class="filter-pill active">All</button>
+            <button class="filter-pill">Downside Skew</button>
+            <button class="filter-pill">Upside Skew</button>
+            <button class="filter-pill">Balanced</button>
+        </div>
+        
+        <!-- Stock Cards -->
+        <div class="stock-grid">
+            <!-- WOW Card -->
+            <div class="stock-card risk-downside">
+                <div class="stock-card-header">
+                    <div class="stock-id">
+                        <div class="stock-ticker">WOW</div>
+                        <div class="stock-name">Woolworths Group</div>
+                    </div>
+                    <div class="stock-price">
+                        <div class="stock-price-value">$31.41</div>
+                        <div class="stock-price-change down">-0.4%</div>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="stock-metric">
+                        <div class="stock-metric-label">Market Cap</div>
+                        <div class="stock-metric-value">A$38.3B</div>
+                    </div>
+                    <div class="stock-metric">
+                        <div class="stock-metric-label">P/E</div>
+                        <div class="stock-metric-value">23.5x</div>
+                    </div>
+                    <div class="stock-metric">
+                        <div class="stock-metric-label">Drawdown</div>
+                        <div class="stock-metric-value">-7.0%</div>
+                    </div>
+                </div>
+                
+                <div class="stock-footer">
+                    <span class="risk-badge downside">Downside Skew</span>
+                    <div class="freshness-indicator">
+                        <span class="freshness-dot ok"></span>
+                        <span>Updated today</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CSL Card -->
+            <div class="stock-card risk-upside">
+                <div class="stock-card-header">
+                    <div class="stock-id">
+                        <div class="stock-ticker">CSL</div>
+                        <div class="stock-name">CSL Limited</div>
+                    </div>
+                    <div class="stock-price">
+                        <div class="stock-price-value">$165.79</div>
+                        <div class="stock-price-change up">+1.2%</div>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="stock-metric">
+                        <div class="stock-metric-label">Market Cap</div>
+                        <div class="stock-metric-value">A$79.8B</div>
+                    </div>
+                    <div class="stock-metric">
+                        <div class="stock-metric-label">P/E</div>
+                        <div class="stock-metric-value">28.4x</div>
+                    </div>
+                    <div class="stock-metric">
+                        <div class="stock-metric-label">Drawdown</div>
+                        <div class="stock-metric-value">-12.3%</div>
+                    </div>
+                </div>
+                
+                <div class="stock-footer">
+                    <span class="risk-badge upside">Upside Skew</span>
+                    <div class="freshness-indicator">
+                        <span class="freshness-dot ok"></span>
+                        <span>Updated today</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- XRO Card -->
+            <div class="stock-card risk-downside">
+                <div class="stock-card-header">
+                    <div class="stock-id">
+                        <div class="stock-ticker">XRO</div>
+                        <div class="stock-name">Xero Limited</div>
+                    </div>
+                    <div class="stock-price">
+                        <div class="stock-price-value">$81.24</div>
+                        <div class="stock-price-change down">-4.1%</div>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="stock-metric">
+                        <div class="stock-metric-label">Market Cap</div>
+                        <div class="stock-metric-value">A$12.4B</div>
+                    </div>
+                    <div class="stock-metric">
+                        <div class="stock-metric-label">P/E</div>
+                        <div class="stock-metric-value">142x</div>
+                    </div>
+                    <div class="stock-metric">
+                        <div class="stock-metric-label">Drawdown</div>
+                        <div class="stock-metric-value">-51.0%</div>
+                    </div>
+                </div>
+                
+                <div class="stock-footer">
+                    <span class="risk-badge downside">Downside Skew</span>
+                    <div class="freshness-indicator">
+                        <span class="freshness-dot warning"></span>
+                        <span>Review due</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- WTC Card -->
+            <div class="stock-card risk-neutral">
+                <div class="stock-card-header">
+                    <div class="stock-id">
+                        <div class="stock-ticker">WTC</div>
+                        <div class="stock-name">WiseTech Global</div>
+                    </div>
+                    <div class="stock-price">
+                        <div class="stock-price-value">$49.10</div>
+                        <div class="stock-price-change up">+0.4%</div>
+                    </div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="stock-metric">
+                        <div class="stock-metric-label">Market Cap</div>
+                        <div class="stock-metric-value">A$16.8B</div>
+                    </div>
+                    <div class="stock-metric">
+                        <div class="stock-metric-label">P/E</div>
+                        <div class="stock-metric-value">58.2x</div>
+                    </div>
+                    <div class="stock-metric">
+                        <div class="stock-metric-label">Drawdown</div>
+                        <div class="stock-metric-value">-35.2%</div>
+                    </div>
+                </div>
+                
+                <div class="stock-footer">
+                    <span class="risk-badge neutral">Balanced</span>
+                    <div class="freshness-indicator">
+                        <span class="freshness-dot ok"></span>
+                        <span>Updated today</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Snapshots Section -->
+    <section class="snapshot-section" id="snapshots">
+        <div class="section-header" style="max-width: 1400px; margin: 0 auto 32px; padding: 0 24px;">
+            <h2 class="section-title">Investment Snapshots</h2>
+            <span class="section-meta">One-page evidence summaries</span>
+        </div>
+        
+        <div class="snapshot-grid">
+            <!-- WOW Snapshot -->
+            <div class="snapshot-card">
+                <div class="snapshot-header">
+                    <div class="snapshot-ticker">WOW</div>
+                    <span class="risk-badge downside">Downside</span>
+                </div>
+                
+                <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Premium multiple pricing turnaround, but FY25 delivered 19% NPAT decline. 
+                    1H FY26 results on 25 Feb are the critical test.
+                </p>
+                
+                <div class="hypothesis-bar">
+                    <div class="hypothesis-segment upside" style="width: 36%"></div>
+                    <div class="hypothesis-segment neutral" style="width: 25%"></div>
+                    <div class="hypothesis-segment downside" style="width: 39%"></div>
+                </div>
+                
+                <div class="hypothesis-legend">
+                    <div class="hypothesis-legend-item">
+                        <span class="hypothesis-dot" style="background: var(--risk-upside)"></span>
+                        <span>T1 Turnaround 36%</span>
+                    </div>
+                    <div class="hypothesis-legend-item">
+                        <span class="hypothesis-dot" style="background: var(--risk-neutral)"></span>
+                        <span>T2-4 Downside 64%</span>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Next Catalyst</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">1H FY26 Results — 25 Feb 2026</div>
+                </div>
+            </div>
+            
+            <!-- XRO Snapshot -->
+            <div class="snapshot-card">
+                <div class="snapshot-header">
+                    <div class="snapshot-ticker">XRO</div>
+                    <span class="risk-badge downside">Downside</span>
+                </div>
+                
+                <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Down 51% from highs. New AI partnership announced. Subscription growth 
+                    slowing but margin expansion thesis intact.
+                </p>
+                
+                <div class="hypothesis-bar">
+                    <div class="hypothesis-segment upside" style="width: 28%"></div>
+                    <div class="hypothesis-segment neutral" style="width: 22%"></div>
+                    <div class="hypothesis-segment downside" style="width: 50%"></div>
+                </div>
+                
+                <div class="hypothesis-legend">
+                    <div class="hypothesis-legend-item">
+                        <span class="hypothesis-dot" style="background: var(--risk-upside)"></span>
+                        <span>T1 Recovery 28%</span>
+                    </div>
+                    <div class="hypothesis-legend-item">
+                        <span class="hypothesis-dot" style="background: var(--risk-downside)"></span>
+                        <span>T2-4 Erosion 72%</span>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Next Catalyst</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">FY26 Results — 14 May 2026</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); padding: 40px 24px; text-align: center;">
+        <p style="font-size: 13px; color: var(--text-muted); max-width: 600px; margin: 0 auto;">
+            Continuum Intelligence provides general information only. Nothing constitutes personal financial advice. 
+            All analysis uses publicly available information and the ACH methodology.
+        </p>
+        <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 16px;">
+            © 2026 Continuum Intelligence
+        </p>
+    </footer>
+
+    <script>
+        // Update timestamp
+        document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('en-AU', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+    </script>
+</body>
+</html>

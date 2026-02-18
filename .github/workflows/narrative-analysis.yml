@@ -1,0 +1,48 @@
+name: Narrative Framework Analysis (Legacy)
+
+# DISABLED: Consolidated into continuum-update.yml
+# Kept for manual dispatch only.
+on:
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: 'Tickers to analyze (or all)'
+        required: true
+        default: 'all'
+
+permissions:
+  contents: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run narrative analysis
+        run: node scripts/run-automated-analysis.js
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git add data/narrative-analysis.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Narrative analysis — $(date -u +'%H:%M UTC %d %b %Y')"
+          git pull --rebase origin main
+          git push

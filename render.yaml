@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: continuum-research-chat
+    runtime: docker
+    dockerfilePath: ./api/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false

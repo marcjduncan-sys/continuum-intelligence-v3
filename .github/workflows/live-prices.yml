@@ -1,0 +1,49 @@
+name: Intraday Price Feed (Legacy)
+
+# DISABLED: Consolidated into continuum-update.yml
+# Kept for manual dispatch only.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-prices:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch live prices
+        run: node scripts/fetch-live-prices.js
+
+      - name: Update stock JSONs with latest prices
+        run: node scripts/update-stock-json.js
+
+      - name: Run narrative analysis
+        run: node scripts/run-automated-analysis.js
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet data/ 2>/dev/null; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/live-prices.json data/narrative-analysis.json data/stocks/
+          git commit -m "Live prices + analysis — $(date -u +'%H:%M UTC %d %b %Y')"
+          git pull --rebase origin main
+          git push

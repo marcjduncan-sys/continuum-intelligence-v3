@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thesis Comparator — Continuum Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+:root {
+    --bg-page: #0B1220;
+    --bg-surface: #111C2E;
+    --bg-elevated: #1A2740;
+    --bg-input: #0E1625;
+    --bg-warning: rgba(212, 160, 60, 0.1);
+    
+    --text-primary: #E8EDF4;
+    --text-secondary: #8B9AB8;
+    --text-muted: #566882;
+    
+    --accent-teal: #1A9E8F;
+    
+    --signal-red: #D45555;
+    --signal-green: #3DAA6D;
+    --signal-amber: #D4A03C;
+    --signal-blue: #4A8ECC;
+    
+    --border: #1E3050;
+    --border-light: #253A58;
+    
+    --font-ui: 'Inter', system-ui, sans-serif;
+    --font-narrative: 'Source Serif 4', Georgia, serif;
+    --font-data: 'JetBrains Mono', monospace;
+    
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--font-ui);
+    background: var(--bg-page);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+.site-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(11, 18, 32, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    height: 56px;
+}
+
+.nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-brand-text {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+}
+
+.nav-brand-text span { color: var(--accent-teal); }
+
+.nav-links {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.nav-links a {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 150ms ease;
+}
+
+.nav-links a:hover {
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+}
+
+.nav-links a.active {
+    color: var(--accent-teal);
+    background: rgba(26, 158, 143, 0.1);
+}
+
+.page { padding-top: 56px; }
+.page-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-lg);
+}
+
+.hero {
+    text-align: center;
+    padding: var(--space-2xl) 0;
+}
+
+.hero-tagline {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    margin-bottom: var(--space-md);
+}
+
+.hero-title {
+    font-family: var(--font-narrative);
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-bottom: var(--space-md);
+}
+
+.hero-subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+/* Upload Section */
+.upload-section {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.step-indicator {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.step-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+    display: block;
+}
+
+/* Stock Grid */
+.stock-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--space-sm);
+}
+
+.stock-card {
+    padding: var(--space-md);
+    background: var(--bg-elevated);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.stock-card:hover {
+    border-color: var(--border-light);
+    background: var(--bg-input);
+}
+
+.stock-card.selected {
+    border-color: var(--accent-teal);
+    background: rgba(26, 158, 143, 0.1);
+}
+
+.stock-card-ticker {
+    font-family: var(--font-data);
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: var(--space-xs);
+}
+
+.stock-card-name {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Step 2 */
+.thesis-input-step {
+    display: none;
+    border-top: 1px solid var(--border);
+    padding-top: var(--space-xl);
+    margin-top: var(--space-xl);
+}
+
+.thesis-input-step.active { display: block; }
+
+.text-input-area {
+    width: 100%;
+    min-height: 250px;
+    padding: var(--space-md);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: var(--font-narrative);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    resize: vertical;
+}
+
+.text-input-area:focus {
+    outline: none;
+    border-color: var(--accent-teal);
+}
+
+.analyze-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+    padding: 14px 32px;
+    background: var(--accent-teal);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.analyze-btn:hover {
+    background: #158a7d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26, 158, 143, 0.3);
+}
+
+/* Results */
+.results-section {
+    display: none;
+}
+
+.results-section.active { display: block; }
+
+/* PRIMARY ALIGNMENT BANNER */
+.alignment-banner {
+    border-radius: 12px;
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+    text-align: center;
+    border: 2px solid;
+}
+
+.alignment-banner.t1 {
+    background: rgba(61, 170, 109, 0.1);
+    border-color: var(--signal-green);
+}
+
+.alignment-banner.t2 {
+    background: rgba(212, 160, 60, 0.1);
+    border-color: var(--signal-amber);
+}
+
+.alignment-banner.t3 {
+    background: rgba(212, 85, 85, 0.1);
+    border-color: var(--signal-red);
+}
+
+.alignment-banner.t4 {
+    background: rgba(74, 142, 204, 0.1);
+    border-color: var(--signal-blue);
+}
+
+.alignment-banner.uphill {
+    background: var(--bg-warning);
+    border-color: var(--signal-amber);
+    border-style: dashed;
+}
+
+.banner-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-sm);
+}
+
+.alignment-banner.t1 .banner-label { color: var(--signal-green); }
+.alignment-banner.t2 .banner-label { color: var(--signal-amber); }
+.alignment-banner.t3 .banner-label { color: var(--signal-red); }
+.alignment-banner.t4 .banner-label { color: var(--signal-blue); }
+.alignment-banner.uphill .banner-label { color: var(--signal-amber); }
+
+.banner-hypothesis {
+    font-family: var(--font-narrative);
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+}
+
+.alignment-banner.t1 .banner-hypothesis { color: var(--signal-green); }
+.alignment-banner.t2 .banner-hypothesis { color: var(--signal-amber); }
+.alignment-banner.t3 .banner-hypothesis { color: var(--signal-red); }
+.alignment-banner.t4 .banner-hypothesis { color: var(--signal-blue); }
+.alignment-banner.uphill .banner-hypothesis { color: var(--signal-amber); }
+
+.banner-description {
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+    color: var(--text-secondary);
+}
+
+/* HYPOTHESIS MAP */
+.hypothesis-map {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+}
+
+.hypothesis-map-header {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
+}
+
+.hypothesis-row {
+    display: flex;
+    align-items: center;
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.hypothesis-row:last-child { border-bottom: none; }
+
+.hypothesis-indicator {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-data);
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-right: var(--space-md);
+    flex-shrink: 0;
+}
+
+.hypothesis-indicator.t1 {
+    background: rgba(61, 170, 109, 0.2);
+    color: var(--signal-green);
+    border: 2px solid var(--signal-green);
+}
+
+.hypothesis-indicator.t2 {
+    background: rgba(212, 160, 60, 0.2);
+    color: var(--signal-amber);
+    border: 2px solid var(--signal-amber);
+}
+
+.hypothesis-indicator.t3 {
+    background: rgba(212, 85, 85, 0.2);
+    color: var(--signal-red);
+    border: 2px solid var(--signal-red);
+}
+
+.hypothesis-indicator.t4 {
+    background: rgba(74, 142, 204, 0.2);
+    color: var(--signal-blue);
+    border: 2px solid var(--signal-blue);
+}
+
+.hypothesis-indicator.match {
+    box-shadow: 0 0 20px currentColor;
+}
+
+.hypothesis-info { flex: 1; }
+
+.hypothesis-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.hypothesis-prob {
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.hypothesis-stance {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.hypothesis-stance.supports {
+    background: rgba(61, 170, 109, 0.15);
+    color: var(--signal-green);
+    border: 1px solid rgba(61, 170, 109, 0.3);
+}
+
+.hypothesis-stance.contradicts {
+    background: rgba(212, 85, 85, 0.15);
+    color: var(--signal-red);
+    border: 1px solid rgba(212, 85, 85, 0.3);
+}
+
+.hypothesis-stance.neutral {
+    background: rgba(100, 116, 139, 0.15);
+    color: var(--text-muted);
+    border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+/* ANALYSIS SECTION */
+.analysis-section {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-xl);
+}
+
+.analysis-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--space-md);
+}
+
+.analysis-text {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+.analysis-text strong { color: var(--text-primary); }
+
+.evidence-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+}
+
+.evidence-column {
+    padding: var(--space-md);
+    background: var(--bg-elevated);
+    border-radius: 8px;
+}
+
+.evidence-column-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: var(--space-md);
+}
+
+.evidence-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.evidence-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    background: var(--bg-surface);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.evidence-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+.evidence-icon.support {
+    background: rgba(61, 170, 109, 0.2);
+    color: var(--signal-green);
+}
+
+.evidence-icon.contradict {
+    background: rgba(212, 85, 85, 0.2);
+    color: var(--signal-red);
+}
+
+/* Footer */
+.site-footer {
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    padding: var(--space-xl) 0;
+    margin-top: var(--space-2xl);
+}
+
+.footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+
+.footer-disclaimer {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .hero-title { font-size: 1.8rem; }
+    .stock-grid { grid-template-columns: repeat(3, 1fr); }
+    .banner-hypothesis { font-size: 1.4rem; }
+    .evidence-grid { grid-template-columns: 1fr; }
+}
+    </style>
+</head>
+<body>
+    <nav class="site-nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-brand-text">C<span>∞</span>ntinuum intelligence</div>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Research</a>
+                <a href="index.html#snapshots">Snapshots</a>
+                <a href="index.html#portfolio">Portfolio</a>
+                <a href="thesis-comparator-v4.html" class="active">Thesis Comparator</a>
+                <a href="index.html#about">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="page-inner">
+            <div class="hero">
+                <div class="hero-tagline">Validate Your Conviction</div>
+                <h1 class="hero-title">Investment Thesis Comparator</h1>
+                <p class="hero-subtitle">Discover which of Continuum's four competing hypotheses your investment thesis aligns with.</p>
+            </div>
+
+            <div class="upload-section">
+                <div class="stock-selection-step" id="step-1">
+                    <div class="section-header">
+                        <h2 class="section-title">Step 1: Select Company</h2>
+                        <span class="step-indicator">1 of 2</span>
+                    </div>
+                    <label class="step-label">Which stock does your thesis analyze?</label>
+                    
+                    <div class="stock-grid">
+                        <div class="stock-card" data-ticker="WOW" onclick="selectStock('WOW')"><div class="stock-card-ticker">WOW</div><div class="stock-card-name">Woolworths</div></div>
+                        <div class="stock-card" data-ticker="CSL" onclick="selectStock('CSL')"><div class="stock-card-ticker">CSL</div><div class="stock-card-name">CSL</div></div>
+                        <div class="stock-card" data-ticker="XRO" onclick="selectStock('XRO')"><div class="stock-card-ticker">XRO</div><div class="stock-card-name">Xero</div></div>
+                        <div class="stock-card" data-ticker="WTC" onclick="selectStock('WTC')"><div class="stock-card-ticker">WTC</div><div class="stock-card-name">WiseTech</div></div>
+                        <div class="stock-card" data-ticker="WDS" onclick="selectStock('WDS')"><div class="stock-card-ticker">WDS</div><div class="stock-card-name">Woodside</div></div>
+                        <div class="stock-card" data-ticker="MQG" onclick="selectStock('MQG')"><div class="stock-card-ticker">MQG</div><div class="stock-card-name">Macquarie</div></div>
+                        <div class="stock-card" data-ticker="DRO" onclick="selectStock('DRO')"><div class="stock-card-ticker">DRO</div><div class="stock-card-name">Droneshield</div></div>
+                        <div class="stock-card" data-ticker="PME" onclick="selectStock('PME')"><div class="stock-card-ticker">PME</div><div class="stock-card-name">Pro Medicus</div></div>
+                        <div class="stock-card" data-ticker="GYG" onclick="selectStock('GYG')"><div class="stock-card-ticker">GYG</div><div class="stock-card-name">Guzman y Gomez</div></div>
+                        <div class="stock-card" data-ticker="GMG" onclick="selectStock('GMG')"><div class="stock-card-ticker">GMG</div><div class="stock-card-name">Goodman</div></div>
+                        <div class="stock-card" data-ticker="SIG" onclick="selectStock('SIG')"><div class="stock-card-ticker">SIG</div><div class="stock-card-name">Sigma</div></div>
+                        <div class="stock-card" data-ticker="FMG" onclick="selectStock('FMG')"><div class="stock-card-ticker">FMG</div><div class="stock-card-name">Fortescue</div></div>
+                    </div>
+                </div>
+
+                <div class="thesis-input-step" id="step-2">
+                    <div class="section-header">
+                        <h2 class="section-title">Step 2: Your Investment Thesis</h2>
+                        <span class="step-indicator">2 of 2</span>
+                    </div>
+                    <textarea class="text-input-area" id="thesis-input" placeholder="Paste your investment thesis here..."></textarea>
+                    <button class="analyze-btn" onclick="analyzeThesis()">
+                        <span>🔍</span>
+                        <span>Discover Alignment</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- RESULTS -->
+            <div class="results-section" id="results">
+                <div class="alignment-banner" id="alignment-banner">
+                    <div class="banner-label" id="banner-label">Your thesis aligns most closely with:</div>
+                    <div class="banner-hypothesis" id="banner-hypothesis"></div>
+                    <div class="banner-description" id="banner-description"></div>
+                </div>
+
+                <div class="hypothesis-map">
+                    <div class="hypothesis-map-header">How Your Thesis Maps to All Four Hypotheses</div>
+                    <div id="hypothesis-rows"></div>
+                </div>
+
+                <div class="analysis-section">
+                    <div class="analysis-title">Detailed Analysis</div>
+                    <div class="analysis-text" id="analysis-text"></div>
+                    <div class="evidence-grid">
+                        <div class="evidence-column">
+                            <div class="evidence-column-header">Evidence Supporting Your View</div>
+                            <div class="evidence-list" id="supporting-evidence"></div>
+                        </div>
+                        <div class="evidence-column">
+                            <div class="evidence-column-header">Evidence You May Be Missing</div>
+                            <div class="evidence-list" id="contradicting-evidence"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p class="footer-disclaimer">This comparator provides analysis based on publicly available research. It does not constitute investment advice.</p>
+        </div>
+    </footer>
+
+    <script>
+// ============================================================================
+// COMPLETE STOCK DATA - T1-T4 HYPOTHESES FOR ALL 12 STOCKS
+// Matches the themes and terminology from the Research pages
+// ============================================================================
+
+const stockData = {
+    WOW: {
+        name: 'Woolworths Group',
+        primary: 't2',
+        t1: { name: 'Managed Turnaround', prob: 36, desc: 'New leadership executes turnaround; margins stabilize' },
+        t2: { name: 'Structural Margin Erosion', prob: 25, desc: 'Price investment and regulatory pressure permanently compress margins' },
+        t3: { name: 'Regulatory Squeeze', prob: 21, desc: 'ACCC/FGCC action intensifies, constraining pricing power' },
+        t4: { name: 'Competitive Disruption', prob: 18, desc: 'Aldi and independents take meaningful share' },
+        supporting: ['ACCC margin findings', 'FGCC compliance costs', 'Aldi expansion data'],
+        contradicting: ['Q1 FY26 trading update', 'NPS improvement', 'Cost-out progress'],
+        analysis: "Your thesis <strong>supports T2 and T3</strong> — the downside scenarios. You believe margin pressure is structural, not cyclical, and regulatory headwinds are underappreciated. This puts you <strong>against consensus</strong> which prices a Bardwell turnaround (T1)."
+    },
+    
+    CSL: {
+        name: 'CSL Limited',
+        primary: 't1',
+        t1: { name: 'Plasma Recovery & Growth', prob: 45, desc: 'Collections normalize; Behring margins expand; Vifor synergies realized' },
+        t2: { name: 'Collection Shortfall', prob: 25, desc: 'US plasma collections fail to recover to target levels' },
+        t3: { name: 'Behring Margin Compression', prob: 18, desc: 'Pricing pressure and input costs squeeze Behring profitability' },
+        t4: { name: 'Competitive Threat', prob: 12, desc: 'Biosimilar competition emerges faster than expected' },
+        supporting: ['Plasma collection trends', 'Behring margin guidance', 'Vifor integration synergies'],
+        contradicting: ['Persistent collection challenges', 'Competitive dynamics', 'Pricing pressure signs'],
+        analysis: "Your thesis <strong>strongly supports T1</strong> — the base case recovery. You believe plasma collections are normalizing and Behring margins will expand. You're <strong>aligned with consensus</strong>. Watch for T2 risks."
+    },
+    
+    XRO: {
+        name: 'Xero Limited',
+        primary: 't1',
+        t1: { name: 'AI-Led Growth Recovery', prob: 28, desc: 'AI investments drive subscriber growth; churn reduces' },
+        t2: { name: 'Structural Margin Pressure', prob: 22, desc: 'Competition forces sustained price investment' },
+        t3: { name: 'Execution Failure', prob: 35, desc: 'Management fails to deliver on AI promises; growth stalls' },
+        t4: { name: 'Competitive Disruption', prob: 15, desc: 'QuickBooks or new entrant disrupts with superior AI' },
+        supporting: ['AI partnership announcement', 'Subscriber growth momentum', 'US market opportunity'],
+        contradicting: ['History of missed guidance', 'QuickBooks AI advancement', 'Microsoft SMB push'],
+        analysis: "Your thesis <strong>supports T1</strong> — the turnaround narrative. However, you <strong>contradict T3 and T4</strong>, representing 50% of probability. High reward if right; significant risk if execution fails."
+    },
+    
+    WTC: {
+        name: 'WiseTech Global',
+        primary: 'uphill',
+        t1: { name: 'Organic Growth & Margins Intact', prob: 30, desc: 'Growth accelerates organically; margins expand' },
+        t2: { name: 'Growth Deceleration', prob: 25, desc: 'Customer acquisition slows; revenue growth moderates' },
+        t3: { name: 'Governance/Execution Risk', prob: 30, desc: 'Founder departure or governance issues impair execution' },
+        t4: { name: 'Competitive Disruption', prob: 15, desc: 'New logistics platform gains traction' },
+        supporting: ['CargoWise platform strength', 'Founder vision alignment', 'Global trade recovery'],
+        contradicting: ['Governance concerns persist', 'Insider selling patterns', 'Competitive pricing pressure'],
+        analysis: "Your thesis is <strong>⚠️ PUSHING UPHILL</strong>. You don't align clearly with T1, yet contradict T2, T3, T4 (70% combined). Requires growth recovery AND governance concerns proving overblown."
+    },
+    
+    WDS: {
+        name: 'Woodside Energy',
+        primary: 't2',
+        t1: { name: 'Energy Transition Delayed', prob: 30, desc: 'Fossil demand persists longer; LNG prices remain elevated' },
+        t2: { name: 'Managed Decline', prob: 35, desc: 'Orderly transition; stable cash flows; disciplined capex' },
+        t3: { name: 'Stranded Asset Risk', prob: 20, desc: 'Accelerated transition strands LNG assets' },
+        t4: { name: 'Execution Failure', prob: 15, desc: 'Scarborough delays; cost overruns; production misses' },
+        supporting: ['LNG demand resilience', 'Asian contract pricing', 'Scarborough progress'],
+        contradicting: ['Energy transition acceleration', 'EU LNG diversification', 'Cost inflation'],
+        analysis: "Your thesis <strong>supports T2</strong> — the managed decline scenario. You expect orderly cash flow generation through transition. Watch T1 (upside) and T3 (downside) scenarios."
+    },
+    
+    MQG: {
+        name: 'Macquarie Group',
+        primary: 't1',
+        t1: { name: 'Green Energy Leadership', prob: 40, desc: 'Green investment bank thesis succeeds; asset realizations strong' },
+        t2: { name: 'Commodities Normalization', prob: 25, desc: 'Commodity earnings normalize; offset by green growth' },
+        t3: { name: 'Asset Realization Shortfall', prob: 20, desc: 'Green asset sales disappoint; valuation gap persists' },
+        t4: { name: 'Competitive Pressure', prob: 15, desc: 'Traditional banks compete effectively on green finance' },
+        supporting: ['Green asset pipeline', 'Commodity earnings resilience', 'Asset realization track record'],
+        contradicting: ['Green asset valuation compression', 'Traditional bank competition', 'Rate headwinds'],
+        analysis: "Your thesis <strong>strongly supports T1</strong> — the green energy bank narrative. You believe Macquarie can pivot successfully. Watch T3 risk on asset realizations."
+    },
+    
+    DRO: {
+        name: 'Droneshield',
+        primary: 't3',
+        t1: { name: 'Mass Adoption', prob: 15, desc: 'Government contracts scale rapidly; commercial adoption accelerates' },
+        t2: { name: 'Defense Budget Dependence', prob: 25, desc: 'Revenue tied to lumpy defense procurement' },
+        t3: { name: 'Competitive Threat', prob: 40, desc: 'Larger defense primes enter; pricing pressure emerges' },
+        t4: { name: 'Technology Obsolescence', prob: 20, desc: 'New counter-drone tech renders products obsolete' },
+        supporting: ['Defense contract wins', 'Counter-drone threat urgency', 'International expansion'],
+        contradicting: ['Defense budget volatility', 'Large prime competition', 'Technology cycle risk'],
+        analysis: "Your thesis <strong>supports T2</strong> but acknowledges T3 risks. Droneshield operates in a niche vulnerable to larger competitors. High conviction required given T3/T4 probability (60%)."
+    },
+    
+    PME: {
+        name: 'Pro Medicus',
+        primary: 't1',
+        t1: { name: 'Continued Dominance', prob: 50, desc: 'Visage AI maintains technical lead; contract renewals at higher rates' },
+        t2: { name: 'Growth Normalization', prob: 25, desc: 'Growth moderates from exceptional to strong levels' },
+        t3: { name: 'Competitive Entry', prob: 15, desc: 'Big Tech or med-tech enters radiology AI effectively' },
+        t4: { name: 'Valuation Compression', prob: 10, desc: 'Multiple derates despite continued execution' },
+        supporting: ['Visage AI technical lead', 'Contract renewal pricing', 'Market expansion'],
+        contradicting: ['Big Tech AI capabilities', 'Healthcare IT budgets', 'Multiple sustainability'],
+        analysis: "Your thesis <strong>strongly supports T1</strong> — the continued dominance scenario. High conviction in technical moat. Watch T3 (competition) as main risk."
+    },
+    
+    GYG: {
+        name: 'Guzman y Gomez',
+        primary: 't2',
+        t1: { name: 'Successful Scale-Up', prob: 25, desc: 'Store rollout succeeds; unit economics improve at scale' },
+        t2: { name: 'Growth vs Profitability Tension', prob: 35, desc: 'Expansion costs weigh; path to profit unclear' },
+        t3: { name: 'Competitive Response', prob: 25, desc: 'Incumbents respond effectively; differentiation erodes' },
+        t4: { name: 'Execution Failure', prob: 15, desc: 'Store openings miss targets; franchisee issues emerge' },
+        supporting: ['Store rollout momentum', 'Brand differentiation', 'Australian market opportunity'],
+        contradicting: ['Unit economics uncertainty', 'Competitive intensity', 'Franchisee model risks'],
+        analysis: "Your thesis <strong>aligns with T2</strong> — the growth vs profitability tension. You believe expansion will strain economics. This is the base case for recent IPOs in competitive markets."
+    },
+    
+    GMG: {
+        name: 'Goodman Group',
+        primary: 't1',
+        t1: { name: 'Logistics Megatrend', prob: 45, desc: 'E-commerce growth sustains; development pipeline delivers' },
+        t2: { name: 'Cyclical Slowdown', prob: 25, desc: 'Development slows; valuations moderate' },
+        t3: { name: 'Oversupply Risk', prob: 18, desc: 'Competitive development creates oversupply' },
+        t4: { name: 'Interest Rate Sensitivity', prob: 12, desc: 'Higher rates impair valuations and development returns' },
+        supporting: ['E-commerce penetration growth', 'Development pipeline', 'Premium asset quality'],
+        contradicting: ['Interest rate environment', 'Development cycle maturity', 'Competitive supply'],
+        analysis: "Your thesis <strong>supports T1</strong> — the logistics megatrend. You believe e-commerce tailwinds persist. Watch T4 (rates) and T3 (oversupply) as cyclical risks."
+    },
+    
+    SIG: {
+        name: 'Sigma Healthcare',
+        primary: 't1',
+        t1: { name: 'Chemist Warehouse Synergies', prob: 40, desc: 'Merger delivers cost synergies; market position strengthens' },
+        t2: { name: 'Integration Challenges', prob: 30, desc: 'Merger execution proves difficult; synergies delayed' },
+        t3: { name: 'Regulatory Block', prob: 15, desc: 'ACCC blocks or conditions merger heavily' },
+        t4: { name: 'Competitive Response', prob: 15, desc: 'EBOS and independents respond effectively' },
+        supporting: ['Synergy targets', 'Market share opportunity', 'Scale advantages'],
+        contradicting: ['Integration complexity', 'Regulatory uncertainty', 'Competitive dynamics'],
+        analysis: "Your thesis <strong>supports T1</strong> — the merger synergy story. You believe Sigma+Chemist Warehouse creates value. Key risk is T2 (integration execution)."
+    },
+    
+    FMG: {
+        name: 'Fortescue',
+        primary: 't2',
+        t1: { name: 'Green Hydrogen Success', prob: 20, desc: 'Fortescue Future Industries becomes viable business' },
+        t2: { name: 'Iron Ore Cash Machine', prob: 45, desc: 'Core iron ore generates cash; green projects scaled back' },
+        t3: { name: 'Iron Ore Price Collapse', prob: 25, desc: 'Chinese demand weakness crushes iron ore prices' },
+        t4: { name: 'Green Capital Destruction', prob: 10, desc: 'Hydrogen investments destroy value with no returns' },
+        supporting: ['Iron ore cost position', 'Chinese demand resilience', 'Green hydrogen optionality'],
+        contradicting: ['Iron ore price volatility', 'Chinese property weakness', 'Hydrogen economics'],
+        analysis: "Your thesis <strong>aligns with T2</strong> — the cash machine scenario. You view green hydrogen as optionality, not core value. Watch T3 (China risk) as main downside."
+    }
+};
+
+// ============================================================================
+// ANALYSIS LOGIC
+// ============================================================================
+
+let selectedTicker = null;
+
+function selectStock(ticker) {
+    selectedTicker = ticker;
+    
+    document.querySelectorAll('.stock-card').forEach(card => {
+        card.classList.toggle('selected', card.dataset.ticker === ticker);
+    });
+    
+    document.getElementById('step-2').classList.add('active');
+    document.getElementById('step-2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function analyzeThesis() {
+    if (!selectedTicker) {
+        alert('Please select a stock first');
+        return;
+    }
+
+    const data = stockData[selectedTicker];
+    if (!data) {
+        alert('Stock data not available');
+        return;
+    }
+
+    // Determine primary alignment based on simple keyword matching
+    const thesis = document.getElementById('thesis-input').value.toLowerCase();
+    let primaryTier = data.primary;
+    
+    // Simple keyword-based alignment detection
+    if (thesis.length > 50) {
+        const scores = { t1: 0, t2: 0, t3: 0, t4: 0 };
+        
+        // T1 keywords
+        if (/growth|recovery|expansion|synergy|dominance|leadership|success/i.test(thesis)) scores.t1 += 2;
+        if (/bull|bullish|outperform|buy/i.test(thesis)) scores.t1 += 1;
+        
+        // T2 keywords  
+        if (/normalize|moderate|decline|cyclical|slowdown|steady|base/i.test(thesis)) scores.t2 += 2;
+        if (/hold|neutral|fair value/i.test(thesis)) scores.t2 += 1;
+        
+        // T3 keywords
+        if (/risk|execution|failure|challenge|problem|concern|bear/i.test(thesis)) scores.t3 += 2;
+        if (/short|sell|underperform|avoid/i.test(thesis)) scores.t3 += 1;
+        
+        // T4 keywords
+        if (/disrupt|competition|threat|obsolete|replace/i.test(thesis)) scores.t4 += 2;
+        
+        // Find highest score
+        const maxScore = Math.max(...Object.values(scores));
+        if (maxScore > 0) {
+            const winner = Object.entries(scores).find(([k, v]) => v === maxScore)[0];
+            primaryTier = winner;
+        }
+    }
+
+    // Update banner
+    const banner = document.getElementById('alignment-banner');
+    banner.className = 'alignment-banner ' + primaryTier;
+    
+    const tierData = data[primaryTier];
+    if (primaryTier === 'uphill') {
+        document.getElementById('banner-label').textContent = 'Your thesis position:';
+        document.getElementById('banner-hypothesis').textContent = '⚠️ PUSHING UPHILL';
+        document.getElementById('banner-description').textContent = "Your view doesn't clearly align with any single hypothesis. You're making a contrarian bet.";
+    } else {
+        document.getElementById('banner-label').textContent = 'Your thesis aligns most closely with:';
+        document.getElementById('banner-hypothesis').textContent = primaryTier.toUpperCase() + ': ' + tierData.name;
+        document.getElementById('banner-description').textContent = tierData.desc;
+    }
+
+    // Build hypothesis rows dynamically
+    const rowsContainer = document.getElementById('hypothesis-rows');
+    const tiers = ['t1', 't2', 't3', 't4'];
+    
+    rowsContainer.innerHTML = tiers.map(tier => {
+        const tData = data[tier];
+        const isMatch = tier === primaryTier;
+        const stance = isMatch ? 'supports' : (tier === 't1' && primaryTier !== 'uphill' ? 'neutral' : 'contradicts');
+        
+        return `
+            <div class="hypothesis-row">
+                <div class="hypothesis-indicator ${tier} ${isMatch ? 'match' : ''}">${tier.toUpperCase()}</div>
+                <div class="hypothesis-info">
+                    <div class="hypothesis-name">${tier.toUpperCase()}: ${tData.name}</div>
+                    <div class="hypothesis-prob">Continuum: ${tData.prob}% probability</div>
+                </div>
+                <span class="hypothesis-stance ${stance}">${stance.toUpperCase()}</span>
+            </div>
+        `;
+    }).join('');
+
+    // Update analysis
+    document.getElementById('analysis-text').innerHTML = data.analysis;
+
+    // Update evidence lists
+    document.getElementById('supporting-evidence').innerHTML = data.supporting.map(item => 
+        `<div class="evidence-item"><span class="evidence-icon support">✓</span><span>${item}</span></div>`
+    ).join('');
+    
+    document.getElementById('contradicting-evidence').innerHTML = data.contradicting.map(item => 
+        `<div class="evidence-item"><span class="evidence-icon contradict">!</span><span>${item}</span></div>`
+    ).join('');
+
+    // Show results
+    document.getElementById('results').classList.add('active');
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+    </script>
+</body>
+</html>
