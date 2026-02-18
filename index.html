@@ -3796,6 +3796,152 @@ a:hover { color: var(--accent-sage); }
         content: none; /* Keep clean — don't append URLs in equity research */
     }
 }
+
+/* ============================================================
+   NARRATIVE TIMELINE CHART
+   ============================================================ */
+.narrative-timeline {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: var(--space-lg);
+    margin-top: var(--space-lg);
+}
+.nt-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+}
+.nt-title {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+.nt-legend {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+.nt-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-data);
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+.nt-legend-swatch {
+    width: 12px;
+    height: 3px;
+    border-radius: 2px;
+}
+.nt-chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 260px;
+}
+.nt-chart-wrap canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+.nt-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 260px;
+    color: var(--text-muted);
+    font-family: var(--font-data);
+    font-size: 12px;
+}
+.nt-range-btns {
+    display: flex;
+    gap: var(--space-xs);
+}
+.nt-range-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-family: var(--font-data);
+    font-size: 11px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.nt-range-btn:hover {
+    border-color: var(--accent-teal);
+    color: var(--text-secondary);
+}
+.nt-range-btn.active {
+    background: var(--accent-teal);
+    border-color: var(--accent-teal);
+    color: #fff;
+}
+.nt-sentiment-wrap {
+    margin-top: var(--space-md);
+    border-top: 1px solid var(--border);
+    padding-top: var(--space-md);
+}
+.nt-sentiment-label {
+    font-family: var(--font-data);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-sm);
+}
+.nt-sentiment-chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 100px;
+}
+.nt-sentiment-chart-wrap canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+.nt-event-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    font-family: var(--font-data);
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+    position: absolute;
+    transform: translateX(-50%);
+    cursor: pointer;
+}
+/* Mobile responsive */
+@media (max-width: 640px) {
+    .narrative-timeline {
+        padding: var(--space-md);
+    }
+    .nt-header {
+        flex-direction: column;
+        gap: var(--space-sm);
+        align-items: flex-start;
+    }
+    .nt-legend {
+        gap: var(--space-sm);
+    }
+    .nt-chart-wrap {
+        height: 200px;
+    }
+    .nt-sentiment-chart-wrap {
+        height: 80px;
+    }
+    .nt-range-btns {
+        flex-wrap: wrap;
+    }
+}
     </style>
 </head>
 <body>
@@ -4291,6 +4437,9 @@ a:hover { color: var(--accent-sage); }
 
 <!-- SheetJS for Excel parsing -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+<!-- Chart.js for narrative timeline -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
 <!-- ============================================================
      JAVASCRIPT: Router, Interactions, Scroll-spy, Portfolio
@@ -5594,6 +5743,47 @@ function renderHypotheses(data) {
     '<div class="rs-number">Section 02</div>' +
     '<div class="rs-title">Competing Hypotheses</div>' +
     cardsHtml +
+    renderNarrativeTimeline(data) +
+  '</div>';
+}
+
+function renderNarrativeTimeline(data) {
+  var t = data.ticker.toLowerCase();
+  var ticker = data.ticker;
+
+  // Build legend from hypothesis directions
+  var dirColors = { upside: 'var(--signal-green)', downside: 'var(--signal-red)', neutral: 'var(--signal-amber)' };
+  var legendHtml = '';
+  for (var i = 0; i < data.hypotheses.length; i++) {
+    var h = data.hypotheses[i];
+    var tier = h.tier.toUpperCase();
+    var color = dirColors[h.direction] || 'var(--signal-amber)';
+    var label = tier + ': ' + h.title.replace(/^T\d+:\s*/, '');
+    legendHtml += '<div class="nt-legend-item"><div class="nt-legend-swatch" style="background:' + color + '"></div>' + label + '</div>';
+  }
+
+  return '<div class="narrative-timeline" id="' + t + '-timeline">' +
+    '<div class="nt-header">' +
+      '<div class="nt-title">Hypothesis Timeline</div>' +
+      '<div class="nt-range-btns" id="' + t + '-range-btns">' +
+        '<button class="nt-range-btn" data-range="30" data-ticker="' + ticker + '">30D</button>' +
+        '<button class="nt-range-btn active" data-range="90" data-ticker="' + ticker + '">90D</button>' +
+        '<button class="nt-range-btn" data-range="180" data-ticker="' + ticker + '">6M</button>' +
+        '<button class="nt-range-btn" data-range="365" data-ticker="' + ticker + '">1Y</button>' +
+        '<button class="nt-range-btn" data-range="0" data-ticker="' + ticker + '">All</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="nt-legend">' + legendHtml + '</div>' +
+    '<div class="nt-chart-wrap" id="' + t + '-chart-wrap">' +
+      '<div class="nt-loading" id="' + t + '-chart-loading">Loading timeline\u2026</div>' +
+      '<canvas id="' + t + '-timeline-canvas" style="display:none"></canvas>' +
+    '</div>' +
+    '<div class="nt-sentiment-wrap" id="' + t + '-sentiment-wrap" style="display:none">' +
+      '<div class="nt-sentiment-label">Net Sentiment (Thesis Skew)</div>' +
+      '<div class="nt-sentiment-chart-wrap">' +
+        '<canvas id="' + t + '-sentiment-canvas"></canvas>' +
+      '</div>' +
+    '</div>' +
   '</div>';
 }
 
@@ -15333,6 +15523,9 @@ function updateLiveUI(ticker) {
                 if (typeof window.applyNarrativeAnalysis === 'function') {
                     window.applyNarrativeAnalysis(ticker);
                 }
+                // Re-init timeline chart (cache cleared on re-render)
+                delete _timelineCache[ticker];
+                initNarrativeTimeline(ticker);
             }
             renderedPages.add(ticker);
         }
@@ -15874,6 +16067,8 @@ function route() {
                 if (typeof window.initInlineChat === 'function') {
                     window.initInlineChat(ticker);
                 }
+                // Initialize narrative timeline chart
+                initNarrativeTimeline(ticker);
             }
         }
         // Apply narrative analysis (alerts, ST/LT weights, market-responsive narrative)
@@ -15991,6 +16186,415 @@ document.addEventListener('click', (e) => {
         if (toggle) toggle.classList.toggle('open');
     }
 });
+
+/* ============================================================
+   NARRATIVE TIMELINE — Chart.js initialisation
+   ============================================================ */
+var _timelineCache = {};    // ticker -> { entries, chart, sentimentChart }
+var _timelineRange = {};    // ticker -> current range in days (0 = all)
+
+// Custom Chart.js plugin: draws dashed vertical lines for narrative flips + event markers
+var flipAndEventPlugin = {
+    id: 'flipAndEventPlugin',
+    afterDraw: function(chart) {
+        var meta = chart.options.plugins.flipAndEventPlugin;
+        if (!meta || !meta.entries) return;
+        var ctx = chart.ctx;
+        var xScale = chart.scales.x;
+        var yScale = chart.scales.y;
+        var entries = meta.entries;
+        var eventColors = { E: '#D4A03C', A: '#4A8ECC', P: '#D45555', O: '#9B59B6', F: '#3DAA6D' };
+
+        for (var i = 0; i < entries.length; i++) {
+            var e = entries[i];
+            var x = xScale.getPixelForValue(i);
+
+            // Flip marker: dashed vertical line
+            if (e.flip) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.setLineDash([4, 4]);
+                ctx.strokeStyle = meta.isLight ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.25)';
+                ctx.lineWidth = 1;
+                ctx.moveTo(x, yScale.top);
+                ctx.lineTo(x, yScale.bottom);
+                ctx.stroke();
+
+                // Flip label at top
+                var flipLabel = e.dominant ? '\u2192 ' + e.dominant : 'Flip';
+                ctx.font = '600 9px "JetBrains Mono", monospace';
+                ctx.fillStyle = meta.isLight ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.45)';
+                ctx.textAlign = 'center';
+                ctx.fillText(flipLabel, x, yScale.top - 4);
+                ctx.restore();
+            }
+
+            // Event markers: small circles at top of chart area
+            if (e.events && e.events.length > 0) {
+                for (var j = 0; j < e.events.length; j++) {
+                    var ev = e.events[j];
+                    var color = eventColors[ev.type] || '#888';
+                    var yPos = yScale.top + 10 + j * 14;
+
+                    ctx.save();
+                    // Circle
+                    ctx.beginPath();
+                    ctx.arc(x, yPos, 7, 0, Math.PI * 2);
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                    // Letter
+                    ctx.font = '700 8px "JetBrains Mono", monospace';
+                    ctx.fillStyle = '#fff';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(ev.type, x, yPos);
+                    ctx.restore();
+                }
+            }
+        }
+    }
+};
+
+function initNarrativeTimeline(ticker) {
+    var t = ticker.toLowerCase();
+    var canvas = document.getElementById(t + '-timeline-canvas');
+    var loading = document.getElementById(t + '-chart-loading');
+    if (!canvas) return;
+
+    // Already initialised — just return
+    if (_timelineCache[ticker] && _timelineCache[ticker].chart) return;
+
+    fetch('data/stocks/' + ticker + '-history.json?t=' + Date.now(), { cache: 'no-store' })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (!data || !data.entries || data.entries.length === 0) {
+                if (loading) loading.textContent = 'No timeline data available';
+                return;
+            }
+            _timelineCache[ticker] = { entries: data.entries, chart: null, sentimentChart: null };
+            _timelineRange[ticker] = 90;
+            buildTimelineChart(ticker, 90);
+            setupRangeButtons(ticker);
+        })
+        .catch(function() {
+            if (loading) loading.textContent = 'Timeline data unavailable';
+        });
+}
+
+function buildTimelineChart(ticker, rangeDays) {
+    var t = ticker.toLowerCase();
+    var canvas = document.getElementById(t + '-timeline-canvas');
+    var loading = document.getElementById(t + '-chart-loading');
+    if (!canvas || !_timelineCache[ticker]) return;
+
+    var allEntries = _timelineCache[ticker].entries;
+    var entries = allEntries;
+
+    // Filter by range
+    if (rangeDays > 0) {
+        var cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - rangeDays);
+        var cutoffStr = cutoff.toISOString().slice(0, 10);
+        entries = allEntries.filter(function(e) { return e.date >= cutoffStr; });
+    }
+
+    if (entries.length === 0) {
+        if (loading) { loading.textContent = 'No data in selected range'; loading.style.display = ''; }
+        canvas.style.display = 'none';
+        var sentWrap = document.getElementById(t + '-sentiment-wrap');
+        if (sentWrap) sentWrap.style.display = 'none';
+        return;
+    }
+
+    // Destroy existing charts
+    if (_timelineCache[ticker].chart) {
+        _timelineCache[ticker].chart.destroy();
+        _timelineCache[ticker].chart = null;
+    }
+    if (_timelineCache[ticker].sentimentChart) {
+        _timelineCache[ticker].sentimentChart.destroy();
+        _timelineCache[ticker].sentimentChart = null;
+    }
+
+    // Get hypothesis keys and direction map from STOCK_DATA
+    var stock = STOCK_DATA[ticker];
+    if (!stock) return;
+
+    var dirColors = { upside: '#3DAA6D', downside: '#D45555', neutral: '#D4A03C' };
+
+    // Map display order: hypotheses are sorted by prepareHypotheses, but history
+    // uses original tier keys. Use _origTierNum to get the correct history key.
+    var hypInfo = [];
+    for (var i = 0; i < stock.hypotheses.length; i++) {
+        var h = stock.hypotheses[i];
+        var origKey = 'T' + (h._origTierNum || h.tier.replace('t', ''));
+        hypInfo.push({ histKey: origKey, direction: h.direction, title: h.title });
+    }
+
+    // Build labels (dates) and datasets
+    var labels = entries.map(function(e) { return e.date; });
+    var datasets = [];
+    var isMobile = window.innerWidth <= 640;
+
+    for (var di = 0; di < hypInfo.length; di++) {
+        var tierKey = hypInfo[di].histKey;
+        var dir = hypInfo[di].direction || 'neutral';
+        var color = dirColors[dir] || dirColors.neutral;
+        var tierLabel = hypInfo[di].title;
+
+        var dataPoints = entries.map(function(e) {
+            var score = e.scores[tierKey];
+            return score != null ? Math.round(score * 100) : null;
+        });
+
+        datasets.push({
+            label: tierLabel,
+            data: dataPoints,
+            borderColor: color,
+            backgroundColor: color + '18',
+            borderWidth: di < 2 ? 2.5 : 1.5,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            pointHoverBackgroundColor: color,
+            tension: 0.3,
+            fill: false,
+            spanGaps: true,
+            hidden: isMobile && di >= 2
+        });
+    }
+
+    // Check theme
+    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    var gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)';
+    var tickColor = isLight ? '#718096' : '#566882';
+
+    if (loading) loading.style.display = 'none';
+    canvas.style.display = '';
+
+    var ctx = canvas.getContext('2d');
+    _timelineCache[ticker].chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: labels, datasets: datasets },
+        plugins: [flipAndEventPlugin],
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: { top: 18 } },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                flipAndEventPlugin: { entries: entries, isLight: isLight },
+                tooltip: {
+                    backgroundColor: isLight ? '#fff' : '#131F33',
+                    titleColor: isLight ? '#1A1F2E' : '#E8EDF4',
+                    bodyColor: isLight ? '#4A5568' : '#8B9AB8',
+                    borderColor: isLight ? '#E2E8F0' : '#1E3050',
+                    borderWidth: 1,
+                    padding: 10,
+                    titleFont: { family: "'JetBrains Mono', monospace", size: 11 },
+                    bodyFont: { family: "'JetBrains Mono', monospace", size: 11 },
+                    callbacks: {
+                        title: function(items) {
+                            if (!items.length) return '';
+                            var idx = items[0].dataIndex;
+                            var entry = entries[idx];
+                            var title = entry.date;
+                            if (entry.flip) title += '  \u26A1 FLIP \u2192 ' + (entry.dominant || '');
+                            return title;
+                        },
+                        label: function(ctx) {
+                            return ctx.dataset.label + ': ' + (ctx.parsed.y != null ? ctx.parsed.y + '%' : 'n/a');
+                        },
+                        afterBody: function(items) {
+                            if (!items.length) return [];
+                            var idx = items[0].dataIndex;
+                            var entry = entries[idx];
+                            var lines = [];
+                            if (entry.events && entry.events.length > 0) {
+                                for (var i = 0; i < entry.events.length; i++) {
+                                    lines.push('[' + entry.events[i].type + '] ' + entry.events[i].label);
+                                }
+                            }
+                            if (entry.classification && entry.classification !== 'NOISE') {
+                                lines.push('Price: ' + entry.classification + (entry.change_pct != null ? ' (' + (entry.change_pct > 0 ? '+' : '') + entry.change_pct + '%)' : ''));
+                            }
+                            return lines;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: gridColor, drawBorder: false },
+                    ticks: {
+                        color: tickColor,
+                        font: { family: "'JetBrains Mono', monospace", size: 10 },
+                        maxTicksLimit: 10,
+                        callback: function(val, idx) {
+                            var d = this.getLabelForValue(val);
+                            var parts = d.split('-');
+                            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                            return parseInt(parts[2]) + ' ' + months[parseInt(parts[1]) - 1];
+                        }
+                    }
+                },
+                y: {
+                    min: 0,
+                    max: 80,
+                    grid: { color: gridColor, drawBorder: false },
+                    ticks: {
+                        color: tickColor,
+                        font: { family: "'JetBrains Mono', monospace", size: 10 },
+                        callback: function(val) { return val + '%'; },
+                        stepSize: 20
+                    }
+                }
+            }
+        }
+    });
+
+    // Build sentiment chart
+    buildSentimentChart(ticker, entries, labels, isLight, gridColor, tickColor);
+}
+
+function buildSentimentChart(ticker, entries, labels, isLight, gridColor, tickColor) {
+    var t = ticker.toLowerCase();
+    var sentWrap = document.getElementById(t + '-sentiment-wrap');
+    var sentCanvas = document.getElementById(t + '-sentiment-canvas');
+    if (!sentWrap || !sentCanvas) return;
+
+    // Skew data: positive = bullish, negative = bearish
+    var skewData = entries.map(function(e) { return e.skew != null ? e.skew : null; });
+
+    // Check if there's any variation in skew
+    var hasVariation = false;
+    for (var i = 1; i < skewData.length; i++) {
+        if (skewData[i] !== skewData[0]) { hasVariation = true; break; }
+    }
+
+    sentWrap.style.display = '';
+
+    // Segment colors: green >+5, red <-5, amber in between
+    var segmentColors = skewData.map(function(v) {
+        if (v == null) return '#888';
+        if (v > 5) return '#3DAA6D';
+        if (v < -5) return '#D45555';
+        return '#D4A03C';
+    });
+
+    var sentCtx = sentCanvas.getContext('2d');
+    _timelineCache[ticker].sentimentChart = new Chart(sentCtx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: skewData,
+                borderColor: function(ctx) {
+                    var idx = ctx.p1DataIndex != null ? ctx.p1DataIndex : ctx.dataIndex;
+                    return segmentColors[idx] || '#D4A03C';
+                },
+                segment: {
+                    borderColor: function(ctx) {
+                        var v = ctx.p1.parsed.y;
+                        if (v > 5) return '#3DAA6D';
+                        if (v < -5) return '#D45555';
+                        return '#D4A03C';
+                    }
+                },
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 3,
+                tension: 0.3,
+                fill: false,
+                spanGaps: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: isLight ? '#fff' : '#131F33',
+                    titleColor: isLight ? '#1A1F2E' : '#E8EDF4',
+                    bodyColor: isLight ? '#4A5568' : '#8B9AB8',
+                    borderColor: isLight ? '#E2E8F0' : '#1E3050',
+                    borderWidth: 1,
+                    padding: 8,
+                    titleFont: { family: "'JetBrains Mono', monospace", size: 10 },
+                    bodyFont: { family: "'JetBrains Mono', monospace", size: 10 },
+                    callbacks: {
+                        label: function(ctx) {
+                            var v = ctx.parsed.y;
+                            var dir = v > 5 ? 'Bullish' : v < -5 ? 'Bearish' : 'Neutral';
+                            return 'Skew: ' + (v > 0 ? '+' : '') + v + ' (' + dir + ')';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    display: false
+                },
+                y: {
+                    grid: { color: gridColor, drawBorder: false },
+                    ticks: {
+                        color: tickColor,
+                        font: { family: "'JetBrains Mono', monospace", size: 9 },
+                        callback: function(val) {
+                            if (val === 0) return '0';
+                            return (val > 0 ? '+' : '') + val;
+                        },
+                        maxTicksLimit: 5
+                    }
+                }
+            }
+        },
+        plugins: [{
+            // Zero line plugin
+            id: 'sentimentZeroLine',
+            afterDraw: function(chart) {
+                var yScale = chart.scales.y;
+                var xScale = chart.scales.x;
+                if (yScale.min <= 0 && yScale.max >= 0) {
+                    var y = yScale.getPixelForValue(0);
+                    var ctx = chart.ctx;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.setLineDash([3, 3]);
+                    ctx.strokeStyle = isLight ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)';
+                    ctx.lineWidth = 1;
+                    ctx.moveTo(xScale.left, y);
+                    ctx.lineTo(xScale.right, y);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        }]
+    });
+}
+
+function setupRangeButtons(ticker) {
+    var t = ticker.toLowerCase();
+    var container = document.getElementById(t + '-range-btns');
+    if (!container) return;
+
+    container.addEventListener('click', function(e) {
+        var btn = e.target.closest('.nt-range-btn');
+        if (!btn) return;
+        var range = parseInt(btn.getAttribute('data-range'));
+
+        // Update active state
+        var btns = container.querySelectorAll('.nt-range-btn');
+        for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+        btn.classList.add('active');
+
+        _timelineRange[ticker] = range;
+        buildTimelineChart(ticker, range);
+    });
+}
 
 /* --- Section Nav Scroll-Spy --- */
 function setupScrollSpy(pageId) {
