@@ -1,0 +1,23 @@
+{
+  "name": "continuum-intelligence-v2",
+  "version": "2.0.0",
+  "description": "Continuum Intelligence — ACH-based equity research platform for ASX stocks",
+  "private": true,
+  "scripts": {
+    "lint": "eslint scripts/ --ext .js",
+    "lint:fix": "eslint scripts/ --ext .js --fix",
+    "test": "jest --verbose",
+    "test:ci": "jest --ci --coverage",
+    "extract-data": "node scripts/extract-stock-data.js",
+    "validate": "npm run lint && npm test"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "UNLICENSED"
+}

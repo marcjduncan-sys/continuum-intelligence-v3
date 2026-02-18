@@ -101,6 +101,29 @@ jobs:
             echo "::warning::Narrative analysis exited with code $ANALYSIS_EXIT"
           fi
 
+      - name: Run price-as-evidence engine
+        if: steps.market-check.outputs.skip != 'true'
+        run: |
+          set +e
+          node scripts/price-evidence-engine.js
+          PEE_EXIT=$?
+          set -e
+          if [ $PEE_EXIT -ne 0 ]; then
+            echo "::warning::Price-evidence engine exited with code $PEE_EXIT"
+          fi
+
+      - name: Log daily narrative history
+        if: steps.market-check.outputs.skip != 'true'
+        run: |
+          DATE=$(TZ='Australia/Sydney' date +%Y-%m-%d)
+          set +e
+          node scripts/log-daily-history.js --date "$DATE"
+          HISTORY_EXIT=$?
+          set -e
+          if [ $HISTORY_EXIT -ne 0 ]; then
+            echo "::warning::History logger exited with code $HISTORY_EXIT"
+          fi
+
       - name: Commit and push changes
         if: steps.market-check.outputs.skip != 'true'
         run: |
@@ -112,7 +135,10 @@ jobs:
                   data/latest-prices.json \
                   data/narrative-analysis.json \
                   data/announcements.json \
-                  data/events/ || true
+                  data/events/ \
+                  data/stocks/*.json \
+                  data/stocks/*-history.json \
+                  data/research/*.json || true
 
           if git diff --cached --quiet; then
             echo "No changes to commit"
