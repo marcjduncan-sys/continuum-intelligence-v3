@@ -468,10 +468,7 @@ function applyNarrativeAnalysis(ticker) {
     }
   }
 
-  // 3. Add ST/LT weight breakdowns to hypothesis cards
-  addWeightBreakdownToCards(reportPage, analysis);
-
-  // 4. Update contradicted hypothesis descriptions
+  // 3. Update contradicted hypothesis descriptions
   if (analysis.inference.contradictedHypothesis) {
     updateContradictedHypothesis(reportPage, analysis);
   }
