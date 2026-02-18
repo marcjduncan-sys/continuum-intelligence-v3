@@ -489,6 +489,34 @@
   line-height: 1.5;
 }
 
+/* ─── Technical Analysis Evidence Section ─────────────────────────────────── */
+#ta-evidence-section { margin: 16px 0 24px; }
+.ta-evidence-header { padding: 14px 18px; background: var(--neutral-bg); border: 1px solid var(--border-light); border-radius: var(--radius); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+.ta-evidence-header-left { display: flex; align-items: center; gap: 10px; }
+.ta-regime-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 10px; border-radius: 3px; color: white; }
+.ta-regime-badge.regime-bullish { background: var(--growth-green); }
+.ta-regime-badge.regime-bearish { background: var(--disruption-red); }
+.ta-regime-badge.regime-neutral { background: #78909C; }
+.ta-evidence-composite { font-size: 13px; color: #455A64; }
+.ta-evidence-composite strong { font-weight: 700; }
+.ta-evidence-meta { font-size: 11px; color: #90A4AE; }
+.ta-evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ta-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; background: white; border: 1px solid var(--border-light); border-radius: var(--radius); font-size: 12px; line-height: 1.5; transition: border-color 0.2s ease; }
+.ta-item:hover { border-color: #B0BEC5; }
+.ta-item-signal { flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; }
+.ta-item-signal.signal-bullish { background: var(--growth-green); }
+.ta-item-signal.signal-bearish { background: var(--disruption-red); }
+.ta-item-signal.signal-neutral { background: #B0BEC5; }
+.ta-item-body { flex: 1; min-width: 0; }
+.ta-item-summary { color: #37474F; font-weight: 500; }
+.ta-item-meta { color: #90A4AE; font-size: 11px; margin-top: 2px; }
+.ta-item-impact { display: flex; gap: 4px; margin-top: 4px; }
+.ta-impact-pill { font-size: 9px; font-weight: 600; padding: 1px 5px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.03em; }
+.ta-impact-pill.impact-consistent { background: #E8F5E9; color: #2E7D32; }
+.ta-impact-pill.impact-inconsistent { background: #FFEBEE; color: #C62828; }
+.ta-impact-pill.impact-neutral { background: #F5F5F5; color: #9E9E9E; }
+.ta-evidence-footer { margin-top: 10px; padding: 8px 14px; font-size: 11px; color: #90A4AE; border-top: 1px solid var(--border-light); }
+
 /* ─── Narrative Flip History Timeline ─────────────────────────────────────── */
 
 #narrative-history {
@@ -983,4 +1011,6 @@
     font-size: 8px;
     padding: 2px 8px;
   }
+  .ta-evidence-grid { grid-template-columns: 1fr; }
+  .ta-evidence-header { flex-direction: column; align-items: flex-start; gap: 6px; }
 }

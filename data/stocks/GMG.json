@@ -1228,7 +1228,7 @@
       "trend": {
         "direction": "Base-building",
         "duration": "3 months",
-        "structure": "Decline from A$36 peak arrested; building base around A$29–A$31",
+        "structure": "Decline from A$36 peak arrested; building base around A$29\u00e2\u20ac\u201cA$31",
         "peak": {
           "price": 36.26,
           "date": "w/c 17 February 2025"
@@ -1242,7 +1242,7 @@
       "keyLevels": {
         "support": {
           "price": 29,
-          "method": "Recent consolidation floor (Nov 2025 – Jan 2026)"
+          "method": "Recent consolidation floor (Nov 2025 \u00e2\u20ac\u201c Jan 2026)"
         },
         "resistance": {
           "price": 32,
@@ -1353,7 +1353,48 @@
   "big_picture": "Goodman Group (ASX: GMG) is a global integrated property group that owns, develops, and manages industrial real estate and data centres across 14 countries. Originally a logistics-focused REIT, Goodman is rapidly transforming into the world's largest listed data centre developer, with 57% of its A$12.9B development pipeline dedicated to hyperscaler data centre facilities.",
   "last_flip": null,
   "narrative_history": [],
-  "evidence_items": [],
+  "evidence_items": [
+    {
+      "id": "TA_OBV_BEARISH_GMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.668342+11:00",
+      "summary": "OBV falling - bearish divergence",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 10
+      },
+      "active": true
+    },
+    {
+      "id": "TA_AD_BEARISH_GMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.668400+11:00",
+      "summary": "AD = -96598643.6864 - bearish signal (strength 50%)",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 10
+      },
+      "active": true
+    }
+  ],
   "price_signals": [],
   "editorial_override": null,
   "weighting": null,

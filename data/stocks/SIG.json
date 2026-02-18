@@ -1364,7 +1364,168 @@
   "big_picture": "Sigma Healthcare (ASX: SIG) is Australia's largest retail pharmacy franchisor and full-line pharmaceutical wholesaler following the transformational merger with Chemist Warehouse, completed in February 2025. The combined entity operates ~880+ stores under the Chemist Warehouse, My Chemist, Amcal, and Discount Drug Stores brands, with wholesale market share of 35-40%.",
   "last_flip": null,
   "narrative_history": [],
-  "evidence_items": [],
+  "evidence_items": [
+    {
+      "id": "TA_MACD_BEARISH_SIG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:44.919272+11:00",
+      "summary": "MACD histogram falling (-0.0185)",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_ADX_BULLISH_SIG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:44.919312+11:00",
+      "summary": "ADX(20.2) - moderate trend, DI+ 18.8 vs DI- 17.8",
+      "diagnosticity": "LOW",
+      "hypothesis_impact": {
+        "T1": "NEUTRAL",
+        "T2": "NEUTRAL",
+        "T3": "NEUTRAL",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_ICHIMOKU_BULLISH_SIG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:44.919476+11:00",
+      "summary": "Ichimoku: price above cloud",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_PSAR_BEARISH_SIG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:44.919600+11:00",
+      "summary": "Parabolic SAR: trend down",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_STOCH_BULLISH_SIG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:44.919638+11:00",
+      "summary": "Stochastic K=8.3 - oversold",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 3,
+        "half_life_days": 7
+      },
+      "active": true
+    },
+    {
+      "id": "TA_ROC_BEARISH_SIG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:44.919665+11:00",
+      "summary": "ROC = -3.2362 - bearish signal (strength 32%)",
+      "diagnosticity": "LOW",
+      "hypothesis_impact": {
+        "T1": "NEUTRAL",
+        "T2": "NEUTRAL",
+        "T3": "NEUTRAL",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 3,
+        "half_life_days": 7
+      },
+      "active": true
+    },
+    {
+      "id": "TA_OBV_BEARISH_SIG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:44.919690+11:00",
+      "summary": "OBV falling - bearish divergence",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 10
+      },
+      "active": true
+    },
+    {
+      "id": "TA_AD_BULLISH_SIG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:44.919709+11:00",
+      "summary": "AD = 114073830.4186 - bullish signal (strength 50%)",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 10
+      },
+      "active": true
+    }
+  ],
   "price_signals": [],
   "editorial_override": null,
   "weighting": null,

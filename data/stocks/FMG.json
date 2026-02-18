@@ -1259,7 +1259,7 @@
         },
         "resistance": {
           "price": 23,
-          "method": "12-month high cluster (Dec 2025 – Jan 2026)"
+          "method": "12-month high cluster (Dec 2025 \u00e2\u20ac\u201c Jan 2026)"
         },
         "fiftyTwoWeekHigh": {
           "price": 22.98,
@@ -1368,13 +1368,314 @@
     "date": "2026-02-17",
     "from": "T1",
     "to": "T2",
-    "trigger": "Automated: survival score shift (Cost Leader Resilience → Iron Ore Structural Decline)",
+    "trigger": "Automated: survival score shift (Cost Leader Resilience \u00e2\u2020\u2019 Iron Ore Structural Decline)",
     "price_at_flip": 20.1,
     "from_survival": 0.29,
     "to_survival": 0.31
   },
   "narrative_history": [],
-  "evidence_items": [],
+  "evidence_items": [
+    {
+      "id": "TA_SMA_20_BEARISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296454+11:00",
+      "summary": "SMA(20): price below (5.5% away), slope falling - bearish",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_SMA_50_BEARISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296500+11:00",
+      "summary": "SMA(50): price below (8.2% away), slope falling - bearish",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_SMA_200_BULLISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296524+11:00",
+      "summary": "SMA(200): price above (6.2% away), slope rising - bullish",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_EMA_9_BEARISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296545+11:00",
+      "summary": "EMA(9): price below (3.3% away), slope  - bearish",
+      "diagnosticity": "LOW",
+      "hypothesis_impact": {
+        "T1": "NEUTRAL",
+        "T2": "NEUTRAL",
+        "T3": "NEUTRAL",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_EMA_21_BEARISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296564+11:00",
+      "summary": "EMA(21): price below (5.3% away), slope  - bearish",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_EMA_50_BEARISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296582+11:00",
+      "summary": "EMA(50): price below (6.1% away), slope  - bearish",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_MACD_BEARISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296600+11:00",
+      "summary": "MACD histogram falling (-0.1487)",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_ICHIMOKU_BEARISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296619+11:00",
+      "summary": "Ichimoku: price below cloud",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_PSAR_BEARISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296636+11:00",
+      "summary": "Parabolic SAR: trend down",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_STOCH_BULLISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296652+11:00",
+      "summary": "Stochastic K=6.8 - oversold",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 3,
+        "half_life_days": 7
+      },
+      "active": true
+    },
+    {
+      "id": "TA_CCI_BULLISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296669+11:00",
+      "summary": "CCI = -191.2699 - bullish signal (strength 96%)",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 3,
+        "half_life_days": 7
+      },
+      "active": true
+    },
+    {
+      "id": "TA_ROC_BEARISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296687+11:00",
+      "summary": "ROC = -4.627 - bearish signal (strength 46%)",
+      "diagnosticity": "LOW",
+      "hypothesis_impact": {
+        "T1": "NEUTRAL",
+        "T2": "NEUTRAL",
+        "T3": "NEUTRAL",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 3,
+        "half_life_days": 7
+      },
+      "active": true
+    },
+    {
+      "id": "TA_BBANDS_BULLISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296704+11:00",
+      "summary": "Bollinger Bands: price near lower (%B=0.03)",
+      "diagnosticity": "LOW",
+      "hypothesis_impact": {
+        "T1": "NEUTRAL",
+        "T2": "NEUTRAL",
+        "T3": "NEUTRAL",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 10
+      },
+      "active": true
+    },
+    {
+      "id": "TA_OBV_BEARISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296722+11:00",
+      "summary": "OBV falling",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 10
+      },
+      "active": true
+    },
+    {
+      "id": "TA_AD_BEARISH_FMG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.296738+11:00",
+      "summary": "AD = 1146443.9501 - bearish signal (strength 50%)",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 10
+      },
+      "active": true
+    }
+  ],
   "price_signals": [],
   "editorial_override": null,
   "weighting": null,

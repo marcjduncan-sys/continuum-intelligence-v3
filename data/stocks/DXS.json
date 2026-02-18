@@ -953,7 +953,7 @@
     "date": "2026-02-18",
     "from": "T2",
     "to": "T1",
-    "trigger": "Automated: survival score shift (Managed/Base Case → Growth/Recovery)",
+    "trigger": "Automated: survival score shift (Managed/Base Case \u00e2\u2020\u2019 Growth/Recovery)",
     "price_at_flip": 6.63,
     "from_survival": 0.44,
     "to_survival": 0.46
@@ -1056,6 +1056,146 @@
       "decay": {
         "full_weight_days": 90,
         "half_life_days": 120
+      },
+      "active": true
+    },
+    {
+      "id": "TA_EMA_9_BULLISH_DXS_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.029060+11:00",
+      "summary": "EMA(9): price above (4.3% away), slope  - bullish",
+      "diagnosticity": "LOW",
+      "hypothesis_impact": {
+        "T1": "NEUTRAL",
+        "T2": "NEUTRAL",
+        "T3": "NEUTRAL",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_ADX_BULLISH_DXS_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.029106+11:00",
+      "summary": "ADX(45.4) - strong trend, DI+ 26.8 vs DI- 24.6",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_ICHIMOKU_BEARISH_DXS_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.029129+11:00",
+      "summary": "Ichimoku: price below cloud",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_PSAR_BULLISH_DXS_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.029148+11:00",
+      "summary": "Parabolic SAR: trend up (FLIP)",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
+      "id": "TA_OBV_BEARISH_DXS_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.029165+11:00",
+      "summary": "OBV falling",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 10
+      },
+      "active": true
+    },
+    {
+      "id": "TA_AD_BEARISH_DXS_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.029182+11:00",
+      "summary": "AD = 8225275.0097 - bearish signal (strength 50%)",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 10
+      },
+      "active": true
+    },
+    {
+      "id": "TA_SUPPORT_RESISTANCE_BULLISH_DXS_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:13:42.029201+11:00",
+      "summary": "Price near support",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 10
       },
       "active": true
     }
