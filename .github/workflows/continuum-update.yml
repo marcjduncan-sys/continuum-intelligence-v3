@@ -39,6 +39,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Fetch live prices
         run: node scripts/fetch-live-prices.js
 
@@ -61,6 +64,11 @@ jobs:
 
       - name: Fetch ASX announcements (non-critical)
         run: node scripts/fetch-announcements.js || true
+
+      - name: Refresh LLM content (non-critical)
+        run: node scripts/refresh-content.js || true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Check for changes
         id: changes
