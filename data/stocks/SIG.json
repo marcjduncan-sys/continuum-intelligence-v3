@@ -1366,18 +1366,18 @@
   "narrative_history": [],
   "evidence_items": [
     {
-      "id": "TA_MACD_BEARISH_SIG_20260219",
+      "id": "TA_MACD_BULLISH_SIG_20260219",
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:44.919272+11:00",
-      "summary": "MACD histogram falling (-0.0185)",
-      "diagnosticity": "MODERATE",
+      "date": "2026-02-19T07:21:24.216072+11:00",
+      "summary": "MACD histogram falling (-0.0185) - bullish divergence",
+      "diagnosticity": "HIGH",
       "hypothesis_impact": {
-        "T1": "INCONSISTENT",
-        "T2": "INCONSISTENT",
-        "T3": "CONSISTENT",
-        "T4": "INCONSISTENT"
+        "T1": "CONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "CONSISTENT"
       },
       "decay": {
         "full_weight_days": 5,
@@ -1390,7 +1390,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:44.919312+11:00",
+      "date": "2026-02-19T07:21:24.216129+11:00",
       "summary": "ADX(20.2) - moderate trend, DI+ 18.8 vs DI- 17.8",
       "diagnosticity": "LOW",
       "hypothesis_impact": {
@@ -1410,7 +1410,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:44.919476+11:00",
+      "date": "2026-02-19T07:21:24.216160+11:00",
       "summary": "Ichimoku: price above cloud",
       "diagnosticity": "HIGH",
       "hypothesis_impact": {
@@ -1430,7 +1430,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:44.919600+11:00",
+      "date": "2026-02-19T07:21:24.216185+11:00",
       "summary": "Parabolic SAR: trend down",
       "diagnosticity": "HIGH",
       "hypothesis_impact": {
@@ -1450,7 +1450,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:44.919638+11:00",
+      "date": "2026-02-19T07:21:24.216208+11:00",
       "summary": "Stochastic K=8.3 - oversold",
       "diagnosticity": "MODERATE",
       "hypothesis_impact": {
@@ -1470,7 +1470,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:44.919665+11:00",
+      "date": "2026-02-19T07:21:24.216232+11:00",
       "summary": "ROC = -3.2362 - bearish signal (strength 32%)",
       "diagnosticity": "LOW",
       "hypothesis_impact": {
@@ -1490,7 +1490,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:44.919690+11:00",
+      "date": "2026-02-19T07:21:24.216263+11:00",
       "summary": "OBV falling - bearish divergence",
       "diagnosticity": "HIGH",
       "hypothesis_impact": {
@@ -1510,7 +1510,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:44.919709+11:00",
+      "date": "2026-02-19T07:21:24.216286+11:00",
       "summary": "AD = 114073830.4186 - bullish signal (strength 50%)",
       "diagnosticity": "MODERATE",
       "hypothesis_impact": {
@@ -1522,6 +1522,26 @@
       "decay": {
         "full_weight_days": 5,
         "half_life_days": 10
+      },
+      "active": true
+    },
+    {
+      "id": "TA_MTF_BEARISH_SIG_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:21:24.216310+11:00",
+      "summary": "Multi-timeframe partial bearish: 0/3 bullish, 2/3 bearish",
+      "diagnosticity": "MODERATE",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 7,
+        "half_life_days": 21
       },
       "active": true
     }

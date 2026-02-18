@@ -760,7 +760,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:41.090406+11:00",
+      "date": "2026-02-19T07:21:21.971170+11:00",
       "summary": "SMA(20): price above (3.7% away), slope rising - bullish",
       "diagnosticity": "LOW",
       "hypothesis_impact": {
@@ -780,7 +780,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:41.090459+11:00",
+      "date": "2026-02-19T07:21:21.971235+11:00",
       "summary": "SMA(50): price above (9.4% away), slope rising - bullish",
       "diagnosticity": "HIGH",
       "hypothesis_impact": {
@@ -800,7 +800,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:41.090486+11:00",
+      "date": "2026-02-19T07:21:21.971271+11:00",
       "summary": "SMA(100): price above (15.7% away), slope rising - bullish",
       "diagnosticity": "HIGH",
       "hypothesis_impact": {
@@ -820,7 +820,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:41.090510+11:00",
+      "date": "2026-02-19T07:21:21.971298+11:00",
       "summary": "SMA(200): price above (24.4% away), slope rising - bullish",
       "diagnosticity": "HIGH",
       "hypothesis_impact": {
@@ -840,7 +840,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:41.090531+11:00",
+      "date": "2026-02-19T07:21:21.971322+11:00",
       "summary": "EMA(21): price above (4.0% away), slope  - bullish",
       "diagnosticity": "LOW",
       "hypothesis_impact": {
@@ -860,7 +860,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:41.090550+11:00",
+      "date": "2026-02-19T07:21:21.971346+11:00",
       "summary": "EMA(50): price above (8.5% away), slope  - bullish",
       "diagnosticity": "HIGH",
       "hypothesis_impact": {
@@ -876,11 +876,31 @@
       "active": true
     },
     {
+      "id": "TA_MACD_BEARISH_BHP_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:21:21.971368+11:00",
+      "summary": "MACD histogram rising (0.0352) - bearish divergence",
+      "diagnosticity": "LOW",
+      "hypothesis_impact": {
+        "T1": "NEUTRAL",
+        "T2": "NEUTRAL",
+        "T3": "NEUTRAL",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 14
+      },
+      "active": true
+    },
+    {
       "id": "TA_ADX_BULLISH_BHP_20260219",
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:41.090567+11:00",
+      "date": "2026-02-19T07:21:21.971393+11:00",
       "summary": "ADX(26.8) - moderate trend, DI+ 38.9 vs DI- 28.6",
       "diagnosticity": "LOW",
       "hypothesis_impact": {
@@ -900,7 +920,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:41.090587+11:00",
+      "date": "2026-02-19T07:21:21.971415+11:00",
       "summary": "Ichimoku: price above cloud",
       "diagnosticity": "HIGH",
       "hypothesis_impact": {
@@ -920,7 +940,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:41.090603+11:00",
+      "date": "2026-02-19T07:21:21.971438+11:00",
       "summary": "Parabolic SAR: trend up",
       "diagnosticity": "HIGH",
       "hypothesis_impact": {
@@ -936,11 +956,31 @@
       "active": true
     },
     {
+      "id": "TA_RSI_BEARISH_BHP_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:21:21.971457+11:00",
+      "summary": "RSI(14) at 59.8 - neutral, bearish divergence",
+      "diagnosticity": "LOW",
+      "hypothesis_impact": {
+        "T1": "NEUTRAL",
+        "T2": "NEUTRAL",
+        "T3": "NEUTRAL",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 3,
+        "half_life_days": 7
+      },
+      "active": true
+    },
+    {
       "id": "TA_CCI_BEARISH_BHP_20260219",
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:41.090619+11:00",
+      "date": "2026-02-19T07:21:21.971480+11:00",
       "summary": "CCI = 101.3876 - bearish signal (strength 51%)",
       "diagnosticity": "MODERATE",
       "hypothesis_impact": {
@@ -960,7 +1000,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:41.090640+11:00",
+      "date": "2026-02-19T07:21:21.971509+11:00",
       "summary": "ROC = 5.8074 - bullish signal (strength 58%)",
       "diagnosticity": "MODERATE",
       "hypothesis_impact": {
@@ -980,7 +1020,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:41.090659+11:00",
+      "date": "2026-02-19T07:21:21.971531+11:00",
       "summary": "KC = 52.29 - bullish signal (strength 33%)",
       "diagnosticity": "LOW",
       "hypothesis_impact": {
@@ -1000,7 +1040,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:41.090677+11:00",
+      "date": "2026-02-19T07:21:21.971552+11:00",
       "summary": "OBV rising",
       "diagnosticity": "MODERATE",
       "hypothesis_impact": {
@@ -1020,7 +1060,7 @@
       "type": "TECHNICAL_SIGNAL",
       "source": "TA Agent",
       "epistemic_tag": "Algorithmic (TA Agent)",
-      "date": "2026-02-19T07:13:41.090693+11:00",
+      "date": "2026-02-19T07:21:21.971572+11:00",
       "summary": "AD = 34137587.1373 - bearish signal (strength 50%)",
       "diagnosticity": "MODERATE",
       "hypothesis_impact": {
@@ -1032,6 +1072,26 @@
       "decay": {
         "full_weight_days": 5,
         "half_life_days": 10
+      },
+      "active": true
+    },
+    {
+      "id": "TA_MTF_BULLISH_BHP_20260219",
+      "type": "TECHNICAL_SIGNAL",
+      "source": "TA Agent",
+      "epistemic_tag": "Algorithmic (TA Agent)",
+      "date": "2026-02-19T07:21:21.971594+11:00",
+      "summary": "Multi-timeframe full bullish: 3/3 bullish, 0/3 bearish",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 7,
+        "half_life_days": 21
       },
       "active": true
     }
