@@ -68,7 +68,7 @@ jobs:
       - name: Refresh LLM content (non-critical)
         run: node scripts/refresh-content.js || true
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.DEPLOY_TOKEN }}
 
       - name: Check for changes
         id: changes
