@@ -7,8 +7,9 @@
   "exchange": "ASX",
   "currency": "A$",
   "reportId": "XRO-2026-001",
-  "current_price": 79.88,
+  "current_price": 80.09,
   "priceHistory": [
+    182.02,
     179.89,
     178.39,
     177.06,
@@ -259,8 +260,7 @@
     78.5,
     80.04,
     80.01,
-    80.09,
-    79.88
+    80.09
   ],
   "reference": {
     "sharesOutstanding": 154,
@@ -291,7 +291,7 @@
     "reviewDate": "12 February 2026",
     "daysSinceReview": 6,
     "priceAtReview": 81.24,
-    "pricePctChange": -1.7,
+    "pricePctChange": -1.4,
     "nearestCatalyst": "FY26 Full Year Results — The Decisive Test",
     "nearestCatalystDate": "14 MAY 2026",
     "nearestCatalystDays": 85,
@@ -307,10 +307,10 @@
       "what_to_watch": "FY26 revenue growth sustained at 18%+ (currently tracking +20%)",
       "upside": "Xero's execution is among the strongest on the ASX: 20%+ revenue growth, ARPU +15%, Rule of 40 at 44.5%, churn at historic lows, subscriber additions positive across all geographies. The platform expansion strategy is working by every measurable metric. But the market is pricing none of it. The stock is down 60% from A$194 despite delivering four consecutive earnings beats. All 15 covering analysts rate Buy with an average target of A$191 (143% upside from A$78.50). The dislocation between price and fundamentals has never been wider in Xero's history.",
       "risk_plain": null,
-      "survival_score": 0.28,
+      "survival_score": 0.34,
       "status": "LOW",
       "weighted_inconsistency": null,
-      "last_updated": "2026-02-17T22:25:04.291Z"
+      "last_updated": "2026-02-18T07:02:28.148Z"
     },
     "T2": {
       "label": "Melio Integration Succeeds",
@@ -319,10 +319,10 @@
       "what_to_watch": "Melio breakeven confirmed by H2 FY28 (currently tracking ahead)",
       "upside": "The US$2.5B Melio acquisition is showing signs of working. Management disclosed that Melio is tracking toward breakeven by H2 FY28, 6-12 months ahead of the original plan. B2B payments are becoming the wedge product for US SMB market penetration. The payments+accounting bundle creates a competitive proposition that QuickBooks cannot match on payments and PayPal cannot match on accounting. At current depressed valuations, the market is assigning near-zero value to Melio &mdash; any evidence of integration success represents pure upside optionality.",
       "risk_plain": null,
-      "survival_score": 0.24,
+      "survival_score": 0.3,
       "status": "LOW",
       "weighted_inconsistency": null,
-      "last_updated": "2026-02-17T22:25:04.291Z"
+      "last_updated": "2026-02-18T07:02:28.148Z"
     },
     "T3": {
       "label": "AI Disruption Re-Prices SaaS",
@@ -331,10 +331,10 @@
       "what_to_watch": null,
       "upside": null,
       "risk_plain": "This thesis has intensified from theoretical to market-moving. The February 2026 sell-off was specifically triggered by Anthropic's Claude AI demonstrations, which the market interpreted as capable of automating core accounting workflows. The ASX IT Index fell 9.4% in a single session. Xero fell from ~A$95 to A$78.50, breaking through every prior support level. The 60% drawdown from A$194 is no longer a generic SaaS re-rating &mdash; it is the market pricing a specific, named AI threat to cloud accounting business models. The absence of churn is noted but considered a lagging indicator by the market. Price leads fundamentals; this is the market front-running a structural shift.",
-      "survival_score": 0.38,
+      "survival_score": 0.3,
       "status": "LOW",
       "weighted_inconsistency": null,
-      "last_updated": "2026-02-17T22:25:04.291Z"
+      "last_updated": "2026-02-18T07:02:28.148Z"
     },
     "T4": {
       "label": "Competitive Displacement",
@@ -343,14 +343,14 @@
       "what_to_watch": null,
       "upside": null,
       "risk_plain": "QuickBooks (Intuit) and MYOB take meaningful market share from Xero in core ANZ and UK markets. This thesis has weakened further: no competitor is demonstrably taking share, Intuit's growth is in tax and mid-market (not SMB cloud), and MYOB remains stagnant under private ownership. The AI disruption thesis (T3) has absorbed this hypothesis's energy &mdash; if Xero is displaced, it will be by AI-native tools, not by existing competitors.",
-      "survival_score": 0.1,
+      "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": null,
-      "last_updated": "2026-02-17T22:25:04.291Z"
+      "last_updated": "2026-02-18T07:02:28.148Z"
     }
   },
-  "dominant": "T3",
-  "confidence": "MODERATE",
+  "dominant": "T1",
+  "confidence": "LOW",
   "alert_state": "NORMAL",
   "alert_started": null,
   "presentation": {
@@ -1590,7 +1590,15 @@
     }
   },
   "big_picture": "Xero Limited (ASX: XRO) is a New Zealand-founded, ASX-listed cloud accounting platform serving 4.6 million subscribers globally. The stock has become ground zero for the AI disruption repricing of SaaS &mdash; down 60% from its A$194 high to A$78.50, with the ASX tech sector collapsing 9.4% in a single session triggered by AI capability demonstrations (Anthropic Claude specifically cited as catalyst). Analyst consensus remains unanimously Buy with an average target of A$191, representing 143% upside. Either the market is right and AI will structurally impair cloud accounting, or this is the widest dislocation between price and fundamentals in Xero's listed history.",
-  "last_flip": null,
+  "last_flip": {
+    "date": "2026-02-18",
+    "from": "T3",
+    "to": "T1",
+    "trigger": "Automated: survival score shift (AI Disruption Re-Prices SaaS → Platform Expansion Delivers)",
+    "price_at_flip": 80.09,
+    "from_survival": 0.3,
+    "to_survival": 0.34
+  },
   "narrative_history": [],
   "evidence_items": [],
   "price_signals": [],
@@ -1598,6 +1606,36 @@
   "weighting": null,
   "last_extracted": "2026-02-17T22:20:28.028Z",
   "last_updated": "12 February 2026",
-  "last_research_update": "2026-02-18T06:44:43.363Z",
-  "last_price_update": "2026-02-18T05:42:01.107Z"
+  "last_research_update": "2026-02-18T07:02:28.148Z",
+  "last_price_update": "2026-02-18T00:00:04.784Z",
+  "overcorrection": null,
+  "price_evidence": {
+    "last_run": "2026-02-18T07:02:28.148Z",
+    "classification": {
+      "category": "NOTABLE",
+      "points": 2,
+      "mandatoryReview": false
+    },
+    "volume_multiplier": 2,
+    "flags": [
+      "full_recalibration"
+    ],
+    "cumulative_moves": {
+      "fiveDay": {
+        "pctChange": 9,
+        "triggered": false,
+        "amplifier": 1
+      },
+      "twentyDay": {
+        "pctChange": -19,
+        "triggered": false,
+        "flag": null
+      },
+      "sixtyDay": {
+        "pctChange": -32.8,
+        "triggered": true,
+        "flag": "full_recalibration"
+      }
+    }
+  }
 }

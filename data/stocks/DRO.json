@@ -7,8 +7,9 @@
   "exchange": "ASX",
   "currency": "A$",
   "reportId": "DRO-2026-001",
-  "current_price": 3.28,
+  "current_price": 3.27,
   "priceHistory": [
+    0.63,
     0.73,
     0.8,
     0.87,
@@ -259,8 +260,7 @@
     3.16,
     3.25,
     3.26,
-    3.27,
-    3.28
+    3.27
   ],
   "reference": {
     "sharesOutstanding": 917,
@@ -288,7 +288,7 @@
     "reviewDate": "10 February 2026",
     "daysSinceReview": 8,
     "priceAtReview": 3.14,
-    "pricePctChange": 4.5,
+    "pricePctChange": 4.1,
     "nearestCatalyst": "FY2025 Full-Year Results — The Definitive Test",
     "nearestCatalystDate": "4 MARCH 2026",
     "nearestCatalystDays": 14,
@@ -1328,6 +1328,37 @@
   "weighting": null,
   "last_extracted": "2026-02-17T22:20:28.062Z",
   "last_updated": "10 February 2026",
-  "last_research_update": "2026-02-18T06:44:43.363Z",
-  "last_price_update": "2026-02-18T05:42:01.095Z"
+  "last_research_update": "2026-02-18T07:02:28.148Z",
+  "last_price_update": "2026-02-17T23:58:30.555Z",
+  "overcorrection": null,
+  "price_evidence": {
+    "last_run": "2026-02-18T07:02:28.148Z",
+    "classification": {
+      "category": "NOISE",
+      "points": 0,
+      "mandatoryReview": false
+    },
+    "volume_multiplier": 1.5,
+    "flags": [
+      "structural_shift",
+      "full_recalibration"
+    ],
+    "cumulative_moves": {
+      "fiveDay": {
+        "pctChange": -3.3,
+        "triggered": false,
+        "amplifier": 1
+      },
+      "twentyDay": {
+        "pctChange": -28.1,
+        "triggered": true,
+        "flag": "structural_shift"
+      },
+      "sixtyDay": {
+        "pctChange": 66,
+        "triggered": true,
+        "flag": "full_recalibration"
+      }
+    }
+  }
 }

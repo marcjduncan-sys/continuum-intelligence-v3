@@ -7,7 +7,7 @@
   "exchange": "ASX",
   "currency": "A$",
   "reportId": "DXS-2026-001",
-  "current_price": 6.74,
+  "current_price": 6.63,
   "priceHistory": [
     7.21,
     7.2,
@@ -71,8 +71,7 @@
     6.3,
     6.31,
     6.64,
-    6.63,
-    6.74
+    6.63
   ],
   "reference": {
     "sharesOutstanding": 1080,
@@ -100,7 +99,7 @@
     "reviewDate": "16 February 2026",
     "daysSinceReview": 2,
     "priceAtReview": 6.19,
-    "pricePctChange": 8.9,
+    "pricePctChange": 7.1,
     "nearestCatalyst": "H1 FY26 Results",
     "nearestCatalystDate": "18 Feb 2026",
     "nearestCatalystDays": 0,
@@ -116,10 +115,10 @@
       "what_to_watch": "H1 FY26 results (18 February 2026): office occupancy, like-for-like income growth, and cap rate movements. Positive net absorption across CBDs would confirm the recovery thesis.",
       "upside": "If office cap rates compress 25-50bps and rents grow 3-5%, Dexus NTA could recover meaningfully, driving a share price re-rating.",
       "risk_plain": "If return-to-office trends stall or reverse, and sublease supply increases, the office recovery could take much longer than expected.",
-      "survival_score": 0.36,
-      "status": "LOW",
+      "survival_score": 0.46,
+      "status": "MODERATE",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-02-18T06:44:43.363Z"
+      "last_updated": "2026-02-18T07:02:28.148Z"
     },
     "T2": {
       "label": "Managed/Base Case",
@@ -128,10 +127,10 @@
       "what_to_watch": "FY26 distribution guidance and AFFO per security. If AFFO holds above 45 cents and distributions are maintained, the base case holds.",
       "upside": "Funds management platform growth to $50B+ AUM could drive fee income and re-rating as a fund manager, not just a REIT.",
       "risk_plain": "If office valuations continue to decline, the NTA discount persists and distributions may come under pressure.",
-      "survival_score": 0.5,
+      "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 1.5,
-      "last_updated": "2026-02-18T05:42:01.210Z"
+      "last_updated": "2026-02-18T07:02:28.148Z"
     },
     "T3": {
       "label": "Risk/Downside",
@@ -140,10 +139,10 @@
       "what_to_watch": "CBD vacancy rates (PCA data), tenant lease expiry profiles, and any major tenant downsizing announcements. Rising sublease availability is the clearest negative signal.",
       "upside": null,
       "risk_plain": "If office valuations decline another 10-15%, Dexus may need to cut distributions to preserve capital and manage gearing.",
-      "survival_score": 0.04,
+      "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-02-18T05:42:01.210Z"
+      "last_updated": "2026-02-18T07:02:28.148Z"
     },
     "T4": {
       "label": "Disruption",
@@ -152,14 +151,14 @@
       "what_to_watch": "RBA cash rate trajectory and bond yields. If the 10-year government bond yield rises above 5%, REIT valuations face further pressure.",
       "upside": null,
       "risk_plain": "Each 50bps increase in borrowing costs reduces Dexus AFFO by approximately 2-3 cents per security.",
-      "survival_score": 0.1,
+      "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-02-18T06:44:43.363Z"
+      "last_updated": "2026-02-18T07:02:28.148Z"
     }
   },
-  "dominant": "T2",
-  "confidence": "MODERATE",
+  "dominant": "T1",
+  "confidence": "LOW",
   "alert_state": "NORMAL",
   "alert_started": null,
   "presentation": {
@@ -951,13 +950,13 @@
   },
   "big_picture": "Dexus is Australia's largest listed office REIT and a leading integrated real asset manager with $50.1 billion in assets under management. The company owns, manages, and develops premium office, industrial, and alternative assets primarily in Australian CBDs.",
   "last_flip": {
-    "date": "2025-08-20",
-    "from": "T3",
-    "to": "T2",
-    "trigger": "FY25 results delivered on AFFO guidance; office occupancy stabilising; positive net absorption in Sydney CBD",
-    "price_at_flip": 6.85,
-    "from_survival": 0.3,
-    "to_survival": 0.65
+    "date": "2026-02-18",
+    "from": "T2",
+    "to": "T1",
+    "trigger": "Automated: survival score shift (Managed/Base Case → Growth/Recovery)",
+    "price_at_flip": 6.63,
+    "from_survival": 0.44,
+    "to_survival": 0.46
   },
   "narrative_history": [
     {
@@ -968,6 +967,15 @@
       "price_at_flip": 7.2,
       "from_survival": 0.4,
       "to_survival": 0.55
+    },
+    {
+      "date": "2025-08-20",
+      "from": "T3",
+      "to": "T2",
+      "trigger": "FY25 results delivered on AFFO guidance; office occupancy stabilising; positive net absorption in Sydney CBD",
+      "price_at_flip": 6.85,
+      "from_survival": 0.3,
+      "to_survival": 0.65
     }
   ],
   "evidence_items": [
@@ -1057,6 +1065,34 @@
   "weighting": null,
   "last_extracted": "2026-02-17T22:20:28.162Z",
   "last_updated": "2026-02-16T09:00:00+11:00",
-  "last_research_update": "2026-02-18T06:44:43.363Z",
-  "last_price_update": "2026-02-18T05:42:01.097Z"
+  "last_research_update": "2026-02-18T07:02:28.148Z",
+  "last_price_update": "2026-02-17T23:58:30.556Z",
+  "overcorrection": null,
+  "price_evidence": {
+    "last_run": "2026-02-18T07:02:28.148Z",
+    "classification": {
+      "category": "SIGNIFICANT",
+      "points": 5,
+      "mandatoryReview": false
+    },
+    "volume_multiplier": 1,
+    "flags": [],
+    "cumulative_moves": {
+      "fiveDay": {
+        "pctChange": 4.9,
+        "triggered": false,
+        "amplifier": 1
+      },
+      "twentyDay": {
+        "pctChange": -3.2,
+        "triggered": false,
+        "flag": null
+      },
+      "sixtyDay": {
+        "pctChange": -6.8,
+        "triggered": false,
+        "flag": null
+      }
+    }
+  }
 }

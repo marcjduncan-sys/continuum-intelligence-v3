@@ -21,132 +21,22 @@
 const fs = require('fs');
 const path = require('path');
 const { findLatestPrices } = require('./find-latest-prices');
+const { processStock, scoreToStatus: engineScoreToStatus } = require('./price-evidence-engine');
 
 const STOCKS_DIR = path.join(__dirname, '..', 'data', 'stocks');
 const INDEX_PATH = path.join(__dirname, '..', 'index.html');
+const TA_CONFIG_PATH = path.join(__dirname, '..', 'data', 'config', 'ta-config.json');
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 const TICKER_FILTER = args.includes('--ticker') ? args[args.indexOf('--ticker') + 1] : null;
 
-// ══════════════════════════════════════════════════════════════════════
-// SURVIVAL SCORE ENGINE
-// ══════════════════════════════════════════════════════════════════════
-
-/**
- * Recalculate survival scores for each hypothesis based on:
- * - Price movement vs hypothesis prediction direction
- * - Evidence decay (time-weighted evidence freshness)
- * - Price dislocation (large moves shift probability mass)
- *
- * Returns new scores as { T1: score, T2: score, ... } where scores sum to ~1.0
- */
-function recalculateSurvivalScores(stock, currentPrice) {
-  const hyps = stock.hypotheses;
-  if (!hyps || Object.keys(hyps).length === 0) return null;
-
-  const now = new Date();
-  const scores = {};
-  let totalRawScore = 0;
-
-  for (const [key, hyp] of Object.entries(hyps)) {
-    let rawScore = hyp.survival_score || 0.25;
-
-    // ── 1. Evidence decay ────────────────────────────────────────
-    // If hypothesis hasn't been updated recently, its confidence decays
-    if (hyp.last_updated) {
-      const lastUpdated = new Date(hyp.last_updated);
-      const daysSinceUpdate = Math.max(0, (now - lastUpdated) / (1000 * 60 * 60 * 24));
-
-      // Gentle decay: lose ~5% confidence per week after 14 days
-      if (daysSinceUpdate > 14) {
-        const weeksStale = (daysSinceUpdate - 14) / 7;
-        const decayFactor = Math.max(0.5, 1 - (weeksStale * 0.05));
-        rawScore *= decayFactor;
-      }
-    }
-
-    // ── 2. Evidence item decay ───────────────────────────────────
-    // Decay individual evidence items and adjust hypothesis score
-    if (stock.evidence_items && stock.evidence_items.length > 0) {
-      let evidenceBoost = 0;
-      for (const ev of stock.evidence_items) {
-        if (!ev.active || !ev.hypothesis_impact) continue;
-
-        const impact = ev.hypothesis_impact[key];
-        if (!impact) continue;
-
-        // Calculate evidence weight based on age
-        const evDate = new Date(ev.date);
-        const evAgeDays = Math.max(0, (now - evDate) / (1000 * 60 * 60 * 24));
-        const fullWeightDays = (ev.decay && ev.decay.full_weight_days) || 90;
-        const halfLifeDays = (ev.decay && ev.decay.half_life_days) || 120;
-
-        let weight = 1.0;
-        if (evAgeDays > fullWeightDays) {
-          const decayDays = evAgeDays - fullWeightDays;
-          weight = Math.pow(0.5, decayDays / halfLifeDays);
-        }
-
-        // Apply diagnosticity multiplier
-        const diagMult = ev.diagnosticity === 'HIGH' ? 1.5 :
-                         ev.diagnosticity === 'MEDIUM' ? 1.0 : 0.5;
-
-        // Impact on this hypothesis
-        if (impact === 'CONSISTENT') evidenceBoost += 0.02 * weight * diagMult;
-        else if (impact === 'INCONSISTENT') evidenceBoost -= 0.02 * weight * diagMult;
-        // NEUTRAL has no effect
-      }
-      rawScore = Math.max(0.05, Math.min(0.95, rawScore + evidenceBoost));
-    }
-
-    // ── 3. Price dislocation impact ──────────────────────────────
-    // Large price moves shift probability toward risk/downside hypotheses
-    if (currentPrice && stock.current_price) {
-      const reviewPrice = stock.freshness && stock.freshness.priceAtReview
-        ? stock.freshness.priceAtReview
-        : stock.current_price;
-      const pctMove = ((currentPrice - reviewPrice) / reviewPrice) * 100;
-
-      // Labels that suggest upside/recovery
-      const label = (hyp.label || '').toLowerCase();
-      const isUpsideHyp = label.includes('growth') || label.includes('recovery') ||
-                           label.includes('turnaround') || label.includes('expansion');
-      const isDownsideHyp = label.includes('risk') || label.includes('downside') ||
-                              label.includes('compression') || label.includes('erosion') ||
-                              label.includes('decline') || label.includes('squeeze');
-      const isDisruptionHyp = label.includes('disruption') || label.includes('disrupt');
-
-      if (pctMove < -10) {
-        // Major drawdown: boost downside/disruption, penalise upside
-        if (isUpsideHyp) rawScore *= 0.85;
-        if (isDownsideHyp) rawScore *= 1.15;
-        if (isDisruptionHyp) rawScore *= 1.10;
-      } else if (pctMove < -5) {
-        if (isUpsideHyp) rawScore *= 0.92;
-        if (isDownsideHyp) rawScore *= 1.08;
-      } else if (pctMove > 10) {
-        // Strong rally: boost upside, penalise downside
-        if (isUpsideHyp) rawScore *= 1.15;
-        if (isDownsideHyp) rawScore *= 0.85;
-      } else if (pctMove > 5) {
-        if (isUpsideHyp) rawScore *= 1.08;
-        if (isDownsideHyp) rawScore *= 0.92;
-      }
-    }
-
-    rawScore = Math.max(0.05, Math.min(0.95, rawScore));
-    scores[key] = rawScore;
-    totalRawScore += rawScore;
-  }
-
-  // Normalise so all scores sum to 1.0
-  if (totalRawScore > 0) {
-    for (const key of Object.keys(scores)) {
-      scores[key] = Math.round(scores[key] / totalRawScore * 100) / 100;
-    }
-  }
-
-  return scores;
+// Load TA config for the V2 price evidence engine
+let taConfig = null;
+try {
+  taConfig = JSON.parse(fs.readFileSync(TA_CONFIG_PATH, 'utf8'));
+} catch (err) {
+  console.warn(`  Warning: Could not load ta-config.json — ${err.message}`);
+  console.warn('  Falling back to score passthrough (no V2 engine adjustments)');
 }
 
 /**
@@ -172,10 +62,9 @@ function determineDominant(scores, currentDominant) {
  * Determine status label from survival score
  */
 function scoreToStatus(score) {
-  if (score >= 0.6) return 'HIGH';
-  if (score >= 0.4) return 'MODERATE';
-  if (score >= 0.2) return 'LOW';
-  return 'VERY_LOW';
+  return engineScoreToStatus ? engineScoreToStatus(score) : (
+    score >= 0.6 ? 'HIGH' : score >= 0.4 ? 'MODERATE' : score >= 0.2 ? 'LOW' : 'VERY_LOW'
+  );
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -384,11 +273,24 @@ function main() {
     const priceData = priceResult && priceResult.prices[ticker];
     const currentPrice = priceData ? priceData.price : stock.current_price;
 
-    // ── 1. Recalculate survival scores ────────────────────────
-    const newScores = recalculateSurvivalScores(stock, currentPrice);
+    // ── 1. Recalculate survival scores (V2 Price Evidence Engine) ──
+    let newScores = null;
+    let engineResult = null;
+
+    if (taConfig) {
+      // V2 engine: price-aware, volume-confirmed, technically informed
+      const enginePriceData = priceData || {
+        price: currentPrice,
+        previousClose: stock.current_price,
+        changePercent: 0
+      };
+      engineResult = processStock(stock, enginePriceData, taConfig);
+      newScores = engineResult.scores;
+    }
+
     let scoreChanged = false;
 
-    if (newScores) {
+    if (newScores && Object.keys(newScores).length > 0) {
       for (const [key, score] of Object.entries(newScores)) {
         if (stock.hypotheses[key]) {
           const oldScore = stock.hypotheses[key].survival_score;
@@ -400,6 +302,17 @@ function main() {
             scoreChanged = true;
           }
         }
+      }
+
+      // Store V2 engine metadata on stock JSON
+      if (engineResult) {
+        stock.price_evidence = {
+          last_run: now.toISOString(),
+          classification: engineResult.classification,
+          volume_multiplier: engineResult.volumeMultiplier,
+          flags: engineResult.flags,
+          cumulative_moves: engineResult.cumulativeMoves
+        };
       }
     }
 
