@@ -1768,6 +1768,32 @@ a:hover { color: var(--accent-sage); }
 .nt-flip-marker.oc { background: var(--signal-red); }
 [data-theme="light"] .nt-chart-container { background: #FFFFFF; border-color: #E2E8F0; }
 
+/* Phase 6.4: Time range controls */
+.nt-controls {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.nt-controls-label {
+    font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-muted); white-space: nowrap;
+}
+.nt-range-btns { display: flex; gap: 4px; }
+.nt-range-btn {
+    font-family: var(--font-data); font-size: 0.65rem; font-weight: 600;
+    padding: 3px 10px; border-radius: 4px; cursor: pointer;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    color: var(--text-muted); transition: all 0.15s;
+}
+.nt-range-btn:hover { border-color: var(--accent-teal); color: var(--accent-teal); }
+.nt-range-btn.active {
+    background: var(--accent-teal); border-color: var(--accent-teal);
+    color: var(--bg-primary);
+}
+
+/* Phase 6.2: Contribution chart sizing */
+.nt-contrib-container .nt-chart-canvas-wrap {
+    height: 200px;
+}
+
 /* --- Tripwire Cards --- */
 .tw-card {
     background: var(--bg-card);
@@ -7057,22 +7083,43 @@ function loadNarrativeHistory(ticker, callback) {
  */
 function renderNarrativeTimeline(data) {
   var t = data.ticker.toLowerCase();
+  var ticker = data.ticker;
   return '<div class="report-section narrative-timeline-section" id="' + t + '-narrative-timeline">' +
     '<div class="rs-number">Timeline</div>' +
     '<div class="rs-title">Narrative Evolution</div>' +
-    '<div class="rs-subtitle">How hypothesis survival scores and price have moved over time</div>' +
+    '<div class="rs-subtitle">How hypothesis survival scores and overall sentiment have moved over time</div>' +
+    // Time range controls (6.4)
+    '<div class="nt-controls">' +
+      '<span class="nt-controls-label">Range:</span>' +
+      '<div class="nt-range-btns" id="nt-range-' + ticker + '">' +
+        '<button class="nt-range-btn" data-days="30">30D</button>' +
+        '<button class="nt-range-btn" data-days="90">90D</button>' +
+        '<button class="nt-range-btn" data-days="180">6M</button>' +
+        '<button class="nt-range-btn" data-days="365">1Y</button>' +
+        '<button class="nt-range-btn active" data-days="0">All</button>' +
+      '</div>' +
+    '</div>' +
+    // Chart 1: Price + Hypothesis lines (6.1)
     '<div class="nt-chart-container">' +
       '<div class="nt-chart-header">' +
         '<div class="nt-chart-title">Price &amp; Hypothesis Survival Scores</div>' +
-        '<div class="nt-chart-badge">60-DAY HISTORY</div>' +
       '</div>' +
-      '<div class="nt-chart-canvas-wrap" id="nt-wrap-' + data.ticker + '">' +
-        '<div class="nt-chart-loading" id="nt-loading-' + data.ticker + '">' +
+      '<div class="nt-chart-canvas-wrap" id="nt-wrap-' + ticker + '">' +
+        '<div class="nt-chart-loading" id="nt-loading-' + ticker + '">' +
           '<div class="spinner"></div> Loading timeline data&hellip;' +
         '</div>' +
-        '<canvas id="nt-canvas-' + data.ticker + '" style="display:none"></canvas>' +
+        '<canvas id="nt-canvas-' + ticker + '" style="display:none"></canvas>' +
       '</div>' +
-      '<div class="nt-flip-legend" id="nt-legend-' + data.ticker + '"></div>' +
+      '<div class="nt-flip-legend" id="nt-legend-' + ticker + '"></div>' +
+    '</div>' +
+    // Chart 2: Three-layer contribution stacked bar (6.2)
+    '<div class="nt-chart-container nt-contrib-container" id="nt-contrib-wrap-' + ticker + '" style="display:none">' +
+      '<div class="nt-chart-header">' +
+        '<div class="nt-chart-title">Macro / Sector / Company Contribution to Overall Sentiment</div>' +
+      '</div>' +
+      '<div class="nt-chart-canvas-wrap">' +
+        '<canvas id="nt-contrib-canvas-' + ticker + '"></canvas>' +
+      '</div>' +
     '</div>' +
   '</div>';
 }
@@ -7098,22 +7145,220 @@ var NT_COLORS = {
  * Initialise a Chart.js narrative timeline for a specific ticker.
  * Called after the report page DOM is rendered.
  */
+// ── Helpers shared by both chart inits ──────────────────────────────────────
+
+/** Format a history entry date as DD/MM label. */
+function _ntDateLabel(dateStr) {
+  var parts = (dateStr || '').split('-');
+  return parts.length === 3 ? parts[2] + '/' + parts[1] : (dateStr || '?');
+}
+
+/** Return last N days of entries from a history array (0 = all). */
+function _ntSliceHistory(history, days) {
+  if (!days || days <= 0 || history.length <= days) return history;
+  return history.slice(history.length - days);
+}
+
+/** Build the vertical flip/OC marker plugin for a chart. */
+function _ntBuildMarkerPlugin(labels, history, flips) {
+  var flipMarkers = [];
+  // Narrative flip lines (amber dashes) with label
+  for (var f = 0; f < flips.length; f++) {
+    var flip = flips[f];
+    var flipLbl = _ntDateLabel(flip.date);
+    var flipIdx = labels.indexOf(flipLbl);
+    if (flipIdx >= 0) {
+      flipMarkers.push({
+        idx: flipIdx,
+        color: NT_COLORS.flip,
+        dash: [4, 3],
+        width: 1.5,
+        text: (flip.from && (flip.from.id || flip.from)) + '\u2192' + (flip.to && (flip.to.id || flip.to))
+      });
+    }
+  }
+  // Overcorrection lines (red short dashes)
+  for (var i = 0; i < history.length; i++) {
+    if (history[i].overcorrection_active) {
+      var ocLbl = _ntDateLabel(history[i].date);
+      var ocIdx = labels.indexOf(ocLbl);
+      if (ocIdx >= 0) {
+        flipMarkers.push({ idx: ocIdx, color: NT_COLORS.overcorrection, dash: [2, 2], width: 2, text: 'OC' });
+      }
+    }
+  }
+  // Event markers (E = earnings, A = announcement, P = price move)
+  var eventTypeMap = { earnings: 'E', announcement: 'A', price_move: 'P' };
+  for (var i = 0; i < history.length; i++) {
+    var evts = history[i].events;
+    if (evts && evts.length > 0) {
+      var evLbl = _ntDateLabel(history[i].date);
+      var evIdx = labels.indexOf(evLbl);
+      if (evIdx >= 0) {
+        var evText = evts.map(function(ev) { return eventTypeMap[ev.type] || ev.type; }).join('/');
+        flipMarkers.push({ idx: evIdx, color: '#A0AEC0', dash: [1, 2], width: 1, text: evText });
+      }
+    }
+  }
+  return {
+    id: 'ntVerticalLines',
+    afterDraw: function(chart) {
+      if (!flipMarkers.length) return;
+      var ctx = chart.ctx;
+      var xScale = chart.scales.x;
+      var yScale = chart.scales.yPrice || chart.scales.y;
+      if (!xScale || !yScale) return;
+      ctx.save();
+      for (var m = 0; m < flipMarkers.length; m++) {
+        var marker = flipMarkers[m];
+        var xPixel = xScale.getPixelForValue(marker.idx);
+        ctx.beginPath();
+        ctx.setLineDash(marker.dash);
+        ctx.strokeStyle = marker.color;
+        ctx.lineWidth = marker.width;
+        ctx.moveTo(xPixel, yScale.top);
+        ctx.lineTo(xPixel, yScale.bottom);
+        ctx.stroke();
+        // Draw label text above the line (6.3)
+        if (marker.text) {
+          ctx.setLineDash([]);
+          ctx.font = '9px monospace';
+          ctx.fillStyle = marker.color;
+          ctx.textAlign = 'center';
+          ctx.fillText(marker.text, xPixel, yScale.top + 10);
+        }
+      }
+      ctx.restore();
+    }
+  };
+}
+
+/** Wire time-range buttons for a chart. Updates both hyp + contrib charts. */
+function _ntWireRangeButtons(ticker, allHistory, allFlips) {
+  var rangeEl = document.getElementById('nt-range-' + ticker);
+  if (!rangeEl) return;
+  var btns = rangeEl.querySelectorAll('.nt-range-btn');
+  for (var b = 0; b < btns.length; b++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        for (var x = 0; x < btns.length; x++) btns[x].classList.remove('active');
+        btn.classList.add('active');
+        var days = parseInt(btn.getAttribute('data-days')) || 0;
+        var sliced = _ntSliceHistory(allHistory, days);
+        _ntUpdateHypChart(ticker, sliced, allFlips);
+        _ntUpdateContribChart(ticker, sliced, allFlips);
+      });
+    })(btns[b]);
+  }
+}
+
+// ── Phase 6.1 / 6.3 / 6.4: Main hypothesis + price chart ───────────────────
+
+function _ntBuildHypChartData(history, flips) {
+  var labels = [];
+  var priceData = [];
+  var hypDatasets = {};
+  var hypIdSet = {};
+  var hypIds = [];
+
+  // Discover all hypothesis IDs
+  for (var i = 0; i < history.length; i++) {
+    if (history[i].hypotheses) {
+      for (var h = 0; h < history[i].hypotheses.length; h++) {
+        var hid = history[i].hypotheses[h].id;
+        if (!hypIdSet[hid]) { hypIdSet[hid] = true; hypIds.push(hid); }
+      }
+    }
+  }
+
+  for (var i = 0; i < history.length; i++) {
+    var entry = history[i];
+    labels.push(_ntDateLabel(entry.date));
+    priceData.push(entry.price);
+    for (var h = 0; h < hypIds.length; h++) {
+      var hid = hypIds[h];
+      if (!hypDatasets[hid]) hypDatasets[hid] = [];
+      var found = null;
+      if (entry.hypotheses) {
+        for (var j = 0; j < entry.hypotheses.length; j++) {
+          if (entry.hypotheses[j].id === hid) { found = entry.hypotheses[j]; break; }
+        }
+      }
+      // Normalise: scores may be 0-100 integers or 0-1 fractions
+      var rawScore = found ? found.survival_score : null;
+      if (rawScore !== null && rawScore > 0 && rawScore < 1.5) rawScore = Math.round(rawScore * 100);
+      hypDatasets[hid].push(rawScore);
+    }
+  }
+
+  // Build hypothesis names from last entry
+  var hypNames = {};
+  var lastEntry = history[history.length - 1];
+  if (lastEntry && lastEntry.hypotheses) {
+    for (var h = 0; h < lastEntry.hypotheses.length; h++) {
+      var lh = lastEntry.hypotheses[h];
+      hypNames[lh.id] = lh.name || lh.label || lh.id;
+    }
+  }
+
+  var datasets = [];
+  datasets.push({
+    label: 'Price',
+    data: priceData,
+    borderColor: NT_COLORS.price,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    pointRadius: 0,
+    pointHitRadius: 6,
+    yAxisID: 'yPrice',
+    tension: 0.3,
+    order: 0
+  });
+  for (var h = 0; h < hypIds.length; h++) {
+    var hid = hypIds[h];
+    var colorSet = NT_COLORS.hypotheses[h] || NT_COLORS.hypotheses[0];
+    datasets.push({
+      label: hid + ': ' + (hypNames[hid] || hid),
+      data: hypDatasets[hid],
+      borderColor: colorSet.border,
+      backgroundColor: colorSet.bg,
+      borderWidth: 1.5,
+      pointRadius: 0,
+      pointHitRadius: 6,
+      yAxisID: 'yScore',
+      fill: false,
+      tension: 0.3,
+      order: h + 1
+    });
+  }
+  return { labels: labels, datasets: datasets };
+}
+
+function _ntUpdateHypChart(ticker, history, flips) {
+  var canvas = document.getElementById('nt-canvas-' + ticker);
+  if (!canvas || !canvas._ntChart) return;
+  var chartData = _ntBuildHypChartData(history, flips);
+  var chart = canvas._ntChart;
+  chart.data.labels = chartData.labels;
+  chart.data.datasets = chartData.datasets;
+  // Rebuild marker plugin with new sliced data
+  canvas._ntMarkers = _ntBuildMarkerPlugin(chartData.labels, history, flips);
+  chart.update('active');
+}
+
 function initNarrativeTimelineChart(ticker) {
   if (typeof Chart === 'undefined') {
     console.warn('[NarrativeTimeline] Chart.js not loaded yet');
     return;
   }
 
-  // Always destroy existing chart before re-init to prevent memory leaks
   destroyNarrativeTimelineChart(ticker);
 
   var canvas = document.getElementById('nt-canvas-' + ticker);
   var loading = document.getElementById('nt-loading-' + ticker);
-  var legend = document.getElementById('nt-legend-' + ticker);
   if (!canvas) return;
 
   loadNarrativeHistory(ticker, function(histData) {
-    // Guard: canvas may have been removed from DOM during async fetch
     var canvasCheck = document.getElementById('nt-canvas-' + ticker);
     if (!canvasCheck) return;
 
@@ -7121,298 +7366,274 @@ function initNarrativeTimelineChart(ticker) {
     canvasCheck.style.display = 'block';
 
     if (!histData || !histData.history || histData.history.length < 2) {
-      // Not enough data — show empty state
       var wrap = document.getElementById('nt-wrap-' + ticker);
-      if (wrap) {
-        wrap.innerHTML = '<div class="nt-chart-empty">Insufficient history data for timeline visualisation.<br>Data accumulates daily via the automated pipeline.</div>';
-      }
+      if (wrap) wrap.innerHTML = '<div class="nt-chart-empty">Insufficient history data for timeline.<br>Data accumulates daily via the automated pipeline.</div>';
       return;
     }
 
-    var history = histData.history;
-    var flips = histData.flips || [];
+    var allHistory = histData.history;
+    var allFlips   = histData.flips || [];
 
-    // Extract labels (dates) and datasets
-    var labels = [];
-    var priceData = [];
-    var hypDatasets = {}; // keyed by hypothesis id
+    var chartData = _ntBuildHypChartData(allHistory, allFlips);
+    var markerPlugin = _ntBuildMarkerPlugin(chartData.labels, allHistory, allFlips);
 
-    // Discover all hypothesis IDs across ALL entries (handles evolving hypotheses)
-    var hypIdSet = {};
-    var hypIds = [];
-    for (var i = 0; i < history.length; i++) {
-      if (history[i].hypotheses) {
-        for (var h = 0; h < history[i].hypotheses.length; h++) {
-          var hid = history[i].hypotheses[h].id;
-          if (!hypIdSet[hid]) {
-            hypIdSet[hid] = true;
-            hypIds.push(hid);
-          }
-        }
-      }
-    }
+    var isDark     = document.documentElement.getAttribute('data-theme') !== 'light';
+    var textColor  = isDark ? '#8B95A5' : '#4A5568';
+    var gridColor  = isDark ? 'rgba(139,149,165,0.1)' : 'rgba(0,0,0,0.06)';
+    var tooltipBg  = isDark ? 'rgba(11,18,32,0.95)'  : 'rgba(255,255,255,0.95)';
 
-    for (var i = 0; i < history.length; i++) {
-      var entry = history[i];
-      // Format date as DD/MM (with validation)
-      var parts = (entry.date || '').split('-');
-      if (parts.length === 3) {
-        labels.push(parts[2] + '/' + parts[1]);
-      } else {
-        labels.push(entry.date || '?');
-      }
-      priceData.push(entry.price);
-
-      // Hypothesis scores
-      for (var h = 0; h < hypIds.length; h++) {
-        var hid = hypIds[h];
-        if (!hypDatasets[hid]) hypDatasets[hid] = [];
-        var found = null;
-        if (entry.hypotheses) {
-          for (var j = 0; j < entry.hypotheses.length; j++) {
-            if (entry.hypotheses[j].id === hid) { found = entry.hypotheses[j]; break; }
-          }
-        }
-        hypDatasets[hid].push(found ? found.survival_score : null);
-      }
-    }
-
-    // Build hypothesis names from the last entry (most current)
-    var hypNames = {};
-    var lastEntry = history[history.length - 1];
-    if (lastEntry.hypotheses) {
-      for (var h = 0; h < lastEntry.hypotheses.length; h++) {
-        hypNames[lastEntry.hypotheses[h].id] = lastEntry.hypotheses[h].name;
-      }
-    }
-
-    // Build Chart.js datasets
-    var datasets = [];
-
-    // Price line (left y-axis)
-    datasets.push({
-      label: 'Price',
-      data: priceData,
-      borderColor: NT_COLORS.price,
-      backgroundColor: 'transparent',
-      borderWidth: 2,
-      pointRadius: 0,
-      pointHitRadius: 6,
-      yAxisID: 'yPrice',
-      tension: 0.3,
-      order: 0
-    });
-
-    // Hypothesis stacked areas (right y-axis)
-    for (var h = 0; h < hypIds.length; h++) {
-      var hid = hypIds[h];
-      var colorSet = NT_COLORS.hypotheses[h] || NT_COLORS.hypotheses[0];
-      datasets.push({
-        label: hid + ': ' + (hypNames[hid] || hid),
-        data: hypDatasets[hid],
-        borderColor: colorSet.border,
-        backgroundColor: colorSet.bg,
-        borderWidth: 1.5,
-        pointRadius: 0,
-        pointHitRadius: 6,
-        yAxisID: 'yScore',
-        fill: true,
-        tension: 0.3,
-        order: h + 1
-      });
-    }
-
-    // Build vertical marker arrays for flip and overcorrection events
-    var flipMarkers = [];
-    for (var f = 0; f < flips.length; f++) {
-      var flip = flips[f];
-      var flipParts = (flip.date || '').split('-');
-      if (flipParts.length === 3) {
-        var flipLabel = flipParts[2] + '/' + flipParts[1];
-        var flipIdx = labels.indexOf(flipLabel);
-        if (flipIdx >= 0) {
-          flipMarkers.push({ idx: flipIdx, color: NT_COLORS.flip, dash: [4, 3], width: 1.5 });
-        }
-      }
-    }
-    for (var i = 0; i < history.length; i++) {
-      if (history[i].overcorrection_active) {
-        var ocParts = (history[i].date || '').split('-');
-        if (ocParts.length === 3) {
-          var ocLabel = ocParts[2] + '/' + ocParts[1];
-          var ocIdx = labels.indexOf(ocLabel);
-          if (ocIdx >= 0) {
-            flipMarkers.push({ idx: ocIdx, color: NT_COLORS.overcorrection, dash: [2, 2], width: 2 });
-          }
-        }
-      }
-    }
-
-    // Custom plugin to draw vertical marker lines (no external annotation plugin needed)
-    var verticalLinePlugin = {
-      id: 'ntVerticalLines',
-      afterDraw: function(chart) {
-        if (!flipMarkers || flipMarkers.length === 0) return;
-        var ctx = chart.ctx;
-        var xScale = chart.scales.x;
-        var yScale = chart.scales.yPrice;
-        ctx.save();
-        for (var m = 0; m < flipMarkers.length; m++) {
-          var marker = flipMarkers[m];
-          var xPixel = xScale.getPixelForValue(marker.idx);
-          ctx.beginPath();
-          ctx.setLineDash(marker.dash);
-          ctx.strokeStyle = marker.color;
-          ctx.lineWidth = marker.width;
-          ctx.moveTo(xPixel, yScale.top);
-          ctx.lineTo(xPixel, yScale.bottom);
-          ctx.stroke();
-        }
-        ctx.restore();
-      }
-    };
-
-    // Theme-aware colours
-    var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-    var textColor = isDark ? '#8B95A5' : '#4A5568';
-    var gridColor = isDark ? 'rgba(139, 149, 165, 0.1)' : 'rgba(0, 0, 0, 0.06)';
-
-    // Create chart (use canvasCheck which is verified still in DOM)
     var ctx = canvasCheck.getContext('2d');
+    var chart;
     try {
-    var chart = new Chart(ctx, {
-      type: 'line',
-      data: { labels: labels, datasets: datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-          mode: 'index',
-          intersect: false
-        },
-        plugins: {
-          legend: {
-            display: true,
-            position: 'bottom',
-            labels: {
-              color: textColor,
-              font: { family: "'JetBrains Mono', 'SF Mono', monospace", size: 10 },
-              boxWidth: 12,
-              padding: 12,
-              usePointStyle: true,
-              pointStyle: 'rectRounded'
-            }
-          },
-          tooltip: {
-            backgroundColor: isDark ? 'rgba(11, 18, 32, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-            titleColor: isDark ? '#E2E8F0' : '#1A202C',
-            bodyColor: isDark ? '#A0AEC0' : '#4A5568',
-            borderColor: isDark ? 'rgba(139, 149, 165, 0.2)' : 'rgba(0, 0, 0, 0.1)',
-            borderWidth: 1,
-            titleFont: { family: "'JetBrains Mono', monospace", size: 11, weight: 'bold' },
-            bodyFont: { family: "'JetBrains Mono', monospace", size: 10 },
-            padding: 10,
-            cornerRadius: 4,
-            callbacks: {
-              label: function(context) {
-                var label = context.dataset.label || '';
-                var value = context.parsed.y;
-                if (context.dataset.yAxisID === 'yPrice') {
-                  return label + ': $' + (value !== null ? value.toFixed(2) : '—');
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              display: true, position: 'bottom',
+              labels: {
+                color: textColor,
+                font: { family: "'JetBrains Mono', monospace", size: 10 },
+                boxWidth: 12, padding: 12,
+                usePointStyle: true, pointStyle: 'rectRounded'
+              }
+            },
+            tooltip: {
+              backgroundColor: tooltipBg,
+              titleColor: isDark ? '#E2E8F0' : '#1A202C',
+              bodyColor:  isDark ? '#A0AEC0' : '#4A5568',
+              borderColor: isDark ? 'rgba(139,149,165,0.2)' : 'rgba(0,0,0,0.1)',
+              borderWidth: 1,
+              titleFont: { family: "'JetBrains Mono', monospace", size: 11, weight: 'bold' },
+              bodyFont:  { family: "'JetBrains Mono', monospace", size: 10 },
+              padding: 10, cornerRadius: 4,
+              callbacks: {
+                label: function(context) {
+                  var val = context.parsed.y;
+                  if (context.dataset.yAxisID === 'yPrice') return context.dataset.label + ': $' + (val !== null ? val.toFixed(2) : '—');
+                  return context.dataset.label + ': ' + (val !== null ? val + '%' : '—');
                 }
-                return label + ': ' + (value !== null ? value + '%' : '—');
               }
             }
+          },
+          scales: {
+            x: {
+              grid: { color: gridColor, drawBorder: false },
+              ticks: { color: textColor, font: { family: "'JetBrains Mono', monospace", size: 9 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 12 }
+            },
+            yPrice: {
+              type: 'linear', position: 'left',
+              grid: { color: gridColor, drawBorder: false },
+              ticks: { color: textColor, font: { family: "'JetBrains Mono', monospace", size: 9 }, callback: function(v) { return '$' + v.toFixed(0); } },
+              title: { display: true, text: 'Price', color: textColor, font: { family: "'JetBrains Mono', monospace", size: 10, weight: 'bold' } }
+            },
+            yScore: {
+              type: 'linear', position: 'right', min: 0, max: 100,
+              grid: { display: false },
+              ticks: { color: textColor, font: { family: "'JetBrains Mono', monospace", size: 9 }, callback: function(v) { return v + '%'; }, stepSize: 20 },
+              title: { display: true, text: 'Survival Score', color: textColor, font: { family: "'JetBrains Mono', monospace", size: 10, weight: 'bold' } }
+            }
           }
         },
-        scales: {
-          x: {
-            grid: { color: gridColor, drawBorder: false },
-            ticks: {
-              color: textColor,
-              font: { family: "'JetBrains Mono', monospace", size: 9 },
-              maxRotation: 0,
-              autoSkip: true,
-              maxTicksLimit: 12
-            }
-          },
-          yPrice: {
-            type: 'linear',
-            position: 'left',
-            grid: { color: gridColor, drawBorder: false },
-            ticks: {
-              color: textColor,
-              font: { family: "'JetBrains Mono', monospace", size: 9 },
-              callback: function(value) { return '$' + value.toFixed(0); }
-            },
-            title: {
-              display: true,
-              text: 'Price',
-              color: textColor,
-              font: { family: "'JetBrains Mono', monospace", size: 10, weight: 'bold' }
-            }
-          },
-          yScore: {
-            type: 'linear',
-            position: 'right',
-            min: 0,
-            max: 100,
-            grid: { display: false },
-            ticks: {
-              color: textColor,
-              font: { family: "'JetBrains Mono', monospace", size: 9 },
-              callback: function(value) { return value + '%'; },
-              stepSize: 20
-            },
-            title: {
-              display: true,
-              text: 'Survival Score',
-              color: textColor,
-              font: { family: "'JetBrains Mono', monospace", size: 10, weight: 'bold' }
-            }
-          }
-        }
-      },
-      plugins: [verticalLinePlugin]
-    });
-    } catch (e) {
-      console.error('[NarrativeTimeline] Chart.js init failed for', ticker, e);
+        plugins: [markerPlugin]
+      });
+    } catch(e) {
+      console.error('[NarrativeTimeline] Chart init failed for', ticker, e);
       return;
     }
 
-    // Store chart reference for cleanup
     canvasCheck._ntChart = chart;
 
-    // Build flip legend (use DOM methods to avoid XSS from data values)
+    // Build flip legend (safe DOM creation)
     var legendEl = document.getElementById('nt-legend-' + ticker);
-    if (legendEl && flips.length > 0) {
+    if (legendEl && allFlips.length > 0) {
       legendEl.innerHTML = '';
-      for (var f = 0; f < flips.length; f++) {
-        var fl = flips[f];
+      for (var f = 0; f < allFlips.length; f++) {
+        var fl = allFlips[f];
         var item = document.createElement('div');
         item.className = 'nt-flip-item';
-        var marker = document.createElement('span');
-        marker.className = 'nt-flip-marker';
-        item.appendChild(marker);
-        item.appendChild(document.createTextNode(
-          ' ' + (fl.date || '') + ': ' + (fl.from && fl.from.id || '?') + ' \u2192 ' + (fl.to && fl.to.id || '?')
-        ));
+        var mk = document.createElement('span');
+        mk.className = 'nt-flip-marker';
+        item.appendChild(mk);
+        var fromId = fl.from && (fl.from.id || fl.from) || '?';
+        var toId   = fl.to   && (fl.to.id   || fl.to)   || '?';
+        item.appendChild(document.createTextNode(' ' + (fl.date || '') + ': ' + fromId + ' \u2192 ' + toId));
         legendEl.appendChild(item);
       }
     } else if (legendEl) {
       legendEl.style.display = 'none';
     }
+
+    // Wire range buttons (6.4)
+    _ntWireRangeButtons(ticker, allHistory, allFlips);
+
+    // Init contribution chart (6.2)
+    initContributionChart(ticker, allHistory, allFlips);
   });
 }
 
+// ── Phase 6.2: Three-layer contribution chart ────────────────────────────────
+
+function _ntBuildContribData(history) {
+  var labels = [];
+  var macroData = [], sectorData = [], idioData = [], overallData = [];
+  var hasAny = false;
+
+  for (var i = 0; i < history.length; i++) {
+    var e = history[i];
+    if (e.overall_sentiment === null || e.overall_sentiment === undefined) continue;
+    hasAny = true;
+    labels.push(_ntDateLabel(e.date));
+    macroData.push(e.macro_signal  !== null ? e.macro_signal  : 0);
+    sectorData.push(e.sector_signal !== null ? e.sector_signal : 0);
+    idioData.push(e.idio_signal    !== null ? e.idio_signal   : 0);
+    overallData.push(e.overall_sentiment);
+  }
+
+  if (!hasAny) return null;
+  return {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Overall Sentiment',
+        data: overallData,
+        borderColor: '#A0AEC0',
+        backgroundColor: 'transparent',
+        borderWidth: 1.5,
+        borderDash: [3, 3],
+        pointRadius: 2,
+        tension: 0.2,
+        type: 'line',
+        order: 0
+      },
+      {
+        label: 'Macro',
+        data: macroData,
+        backgroundColor: 'rgba(74,142,204,0.55)',
+        borderColor: 'rgba(74,142,204,0.8)',
+        borderWidth: 1,
+        stack: 'contrib',
+        order: 1
+      },
+      {
+        label: 'Sector',
+        data: sectorData,
+        backgroundColor: 'rgba(56,178,172,0.55)',
+        borderColor: 'rgba(56,178,172,0.8)',
+        borderWidth: 1,
+        stack: 'contrib',
+        order: 2
+      },
+      {
+        label: 'Company (Idio)',
+        data: idioData,
+        backgroundColor: 'rgba(212,160,60,0.55)',
+        borderColor: 'rgba(212,160,60,0.8)',
+        borderWidth: 1,
+        stack: 'contrib',
+        order: 3
+      }
+    ]
+  };
+}
+
+function _ntUpdateContribChart(ticker, history) {
+  var canvas = document.getElementById('nt-contrib-canvas-' + ticker);
+  if (!canvas || !canvas._ntContribChart) return;
+  var built = _ntBuildContribData(history);
+  if (!built) return;
+  var chart = canvas._ntContribChart;
+  chart.data.labels = built.labels;
+  chart.data.datasets = built.datasets;
+  chart.update('active');
+}
+
+function initContributionChart(ticker, allHistory, allFlips) {
+  var canvas = document.getElementById('nt-contrib-canvas-' + ticker);
+  var wrapEl = document.getElementById('nt-contrib-wrap-' + ticker);
+  if (!canvas || !wrapEl) return;
+
+  var built = _ntBuildContribData(allHistory);
+  if (!built || built.labels.length === 0) return; // no signal data yet
+
+  wrapEl.style.display = '';  // show the container
+
+  var isDark    = document.documentElement.getAttribute('data-theme') !== 'light';
+  var textColor = isDark ? '#8B95A5' : '#4A5568';
+  var gridColor = isDark ? 'rgba(139,149,165,0.1)' : 'rgba(0,0,0,0.06)';
+
+  var markerPlugin = _ntBuildMarkerPlugin(built.labels, allHistory, allFlips || []);
+
+  var ctx = canvas.getContext('2d');
+  var chart;
+  try {
+    chart = new Chart(ctx, {
+      type: 'bar',
+      data: built,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            display: true, position: 'bottom',
+            labels: {
+              color: textColor,
+              font: { family: "'JetBrains Mono', monospace", size: 10 },
+              boxWidth: 12, padding: 10
+            }
+          },
+          tooltip: {
+            backgroundColor: isDark ? 'rgba(11,18,32,0.95)' : 'rgba(255,255,255,0.95)',
+            titleColor: isDark ? '#E2E8F0' : '#1A202C',
+            bodyColor:  isDark ? '#A0AEC0' : '#4A5568',
+            borderColor: isDark ? 'rgba(139,149,165,0.2)' : 'rgba(0,0,0,0.1)',
+            borderWidth: 1,
+            titleFont: { family: "'JetBrains Mono', monospace", size: 11, weight: 'bold' },
+            bodyFont:  { family: "'JetBrains Mono', monospace", size: 10 },
+            padding: 8, cornerRadius: 4
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            grid: { color: gridColor, drawBorder: false },
+            ticks: { color: textColor, font: { family: "'JetBrains Mono', monospace", size: 9 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }
+          },
+          y: {
+            stacked: true,
+            grid: { color: gridColor, drawBorder: false },
+            ticks: { color: textColor, font: { family: "'JetBrains Mono', monospace", size: 9 } },
+            title: { display: true, text: 'Signal (±100)', color: textColor, font: { family: "'JetBrains Mono', monospace", size: 10, weight: 'bold' } }
+          }
+        }
+      },
+      plugins: [markerPlugin]
+    });
+  } catch(e) {
+    console.error('[ContribChart] init failed for', ticker, e);
+    return;
+  }
+  canvas._ntContribChart = chart;
+}
+
 /**
- * Destroy an existing narrative timeline chart (for re-rendering).
+ * Destroy both narrative timeline charts for a ticker.
  */
 function destroyNarrativeTimelineChart(ticker) {
   var canvas = document.getElementById('nt-canvas-' + ticker);
   if (canvas && canvas._ntChart) {
     canvas._ntChart.destroy();
     canvas._ntChart = null;
+  }
+  var cCanvas = document.getElementById('nt-contrib-canvas-' + ticker);
+  if (cCanvas && cCanvas._ntContribChart) {
+    cCanvas._ntContribChart.destroy();
+    cCanvas._ntContribChart = null;
   }
 }
 
