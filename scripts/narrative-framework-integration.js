@@ -449,26 +449,7 @@ function applyNarrativeAnalysis(ticker) {
     }
   }
 
-  // 2. Insert market-responsive narrative section into the Narrative section
-  var narrativeSection = createMarketNarrativeSection(analysis);
-  if (narrativeSection) {
-    var existingNarrative = reportPage.querySelector('.nfi-market-narrative');
-    if (existingNarrative) existingNarrative.remove();
-
-    // Find the Dominant Narrative section and insert at top
-    var t = ticker.toLowerCase();
-    var narrativeSectionEl = reportPage.querySelector('#' + t + '-narrative');
-    if (narrativeSectionEl) {
-      var subtitle = narrativeSectionEl.querySelector('.rs-subtitle');
-      if (subtitle) {
-        narrativeSectionEl.insertBefore(narrativeSection, subtitle);
-      } else {
-        narrativeSectionEl.appendChild(narrativeSection);
-      }
-    }
-  }
-
-  // 3. Update contradicted hypothesis descriptions
+  // 2. Update contradicted hypothesis descriptions
   if (analysis.inference.contradictedHypothesis) {
     updateContradictedHypothesis(reportPage, analysis);
   }
