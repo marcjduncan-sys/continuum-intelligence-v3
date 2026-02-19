@@ -248,6 +248,7 @@ function main() {
   let html = fs.readFileSync(INDEX_PATH, 'utf8');
 
   const allFreshness = {};
+  const allTLS = {}; // three_layer_signal per ticker — injected into _index.json
   let updatedCount = 0;
   let flippedCount = 0;
   const flips = [];
@@ -362,6 +363,7 @@ function main() {
     // ── 3. Update freshness ───────────────────────────────────
     stock.freshness = updateFreshness(stock, currentPrice);
     allFreshness[ticker] = stock.freshness;
+    if (stock.three_layer_signal) allTLS[ticker] = stock.three_layer_signal;
 
     // ── 4. Update price in JSON ───────────────────────────────
     if (currentPrice) {
@@ -406,6 +408,7 @@ function main() {
         if (TICKER_FILTER && ticker !== TICKER_FILTER) continue;
         if (indexJson[ticker]) {
           indexJson[ticker].date = dateStr;
+          if (allTLS[ticker]) indexJson[ticker].three_layer_signal = allTLS[ticker];
           indexChanged = true;
         }
       }
