@@ -10700,6 +10700,82 @@ const TC_DATA = {
     }
 };
 
+// Stock-specific keywords per hypothesis tier (higher weight than generic patterns)
+const TC_KEYWORDS = {
+    WOW: {
+        t1: ['turnaround','bardwell','margin stabiliz','cost.out progress','recovery.*margin','new.*management'],
+        t2: ['accc','fgcc','price investment','structural.*margin','regulatory.*pressure','permanently compress'],
+        t3: ['regulatory.*squeeze','pricing.*power.*constrain','accc.*enforcement','fgcc.*penalty'],
+        t4: ['aldi','independent.*grocer','market.*share.*loss','discount.*grocer']
+    },
+    CSL: {
+        t1: ['plasma.*collect','behring.*margin','vifor.*synerg','collection.*normaliz','plasma.*recover'],
+        t2: ['collection.*shortfall','plasma.*fail','below.*target.*collect','plasma.*challenge'],
+        t3: ['behring.*compress','pricing.*pressure.*behring','input.*cost.*margin'],
+        t4: ['biosimilar','generic.*biologic','competitive.*entry.*plasma']
+    },
+    XRO: {
+        t1: ['ai.*subscrib','subscrib.*growth','arpu.*increas','cloud.*adopt','growth.*recover','churn.*reduc'],
+        t2: ['sbc','share.based compensation','melio','cash flow.*lower','dilut','margin.*pressure','not cheap','equity.*value.*below','above.*intrinsic','40.*lower','net income.*lower'],
+        t3: ['execution.*fail','miss.*guidance','ai.*promise.*undeliver','growth.*stall','unproven'],
+        t4: ['quickbooks','intuit','microsoft.*smb','superior.*ai.*platform','competi.*disrupt']
+    },
+    WTC: {
+        t1: ['cargowise','organic.*growth','margin.*expand','platform.*strength','global.*trade.*recover'],
+        t2: ['growth.*slow','customer.*acqui.*slow','revenue.*moderate','decelerat'],
+        t3: ['governance','founder.*depart','insider.*sell','execution.*risk','management.*concern'],
+        t4: ['new.*logistics.*platform','pricing.*pressure.*cargo','compet.*logistic']
+    },
+    WDS: {
+        t1: ['lng.*demand','energy.*transition.*delay','fossil.*persist','lng.*price.*elevated','asian.*contract'],
+        t2: ['managed.*decline','orderly.*transition','stable.*cash','disciplin.*capex'],
+        t3: ['stranded.*asset','accelerat.*transition','lng.*strand','transition.*faster'],
+        t4: ['scarborough.*delay','cost.*overrun','production.*miss']
+    },
+    MQG: {
+        t1: ['green.*asset','green.*energy.*bank','asset.*realiz','renewable.*pipeline','green.*investment'],
+        t2: ['commodity.*normaliz','commodity.*earn.*moderate','trading.*normaliz'],
+        t3: ['asset.*realiz.*disappoint','valuation.*gap','green.*asset.*disappoint'],
+        t4: ['traditional.*bank.*compet','bank.*green.*finance','compet.*green']
+    },
+    DRO: {
+        t1: ['mass.*adopt','government.*contract.*scale','commercial.*adopt'],
+        t2: ['defense.*budget','lumpy.*procurement','budget.*depend'],
+        t3: ['defense.*prime','larger.*compet','pricing.*pressure.*defense'],
+        t4: ['technology.*obsolet','new.*counter.drone','superior.*tech']
+    },
+    PME: {
+        t1: ['visage','technical.*lead','contract.*renew','radiology.*ai.*lead','moat'],
+        t2: ['growth.*normaliz','growth.*slow','exceptional.*to.*strong'],
+        t3: ['big.*tech.*entry','microsoft.*health','google.*health','competitive.*entry.*radiology'],
+        t4: ['multiple.*derat','valuation.*compress','pe.*compress']
+    },
+    GYG: {
+        t1: ['store.*rollout.*success','unit.*econom.*improve','scale.*benefit'],
+        t2: ['expansion.*cost','path.*to.*profit','unprofitable','cash.*burn'],
+        t3: ['mcdonalds','hungry jacks','competitive.*response','incumbent.*respond'],
+        t4: ['store.*miss','franchisee.*issue','execution.*fail']
+    },
+    GMG: {
+        t1: ['e.commerce.*growth','logistics.*megatrend','development.*pipeline','data.*centre'],
+        t2: ['development.*slow','cyclical.*slow','valuation.*moderate'],
+        t3: ['oversupply','compet.*development','industrial.*oversupply'],
+        t4: ['interest.*rate','higher.*rate.*impair','cap.*rate.*expand']
+    },
+    SIG: {
+        t1: ['chemist.*warehouse','synerg','merger.*deliver','market.*position.*strengthen'],
+        t2: ['integration.*challenge','synerg.*delay','integration.*difficult'],
+        t3: ['accc.*block','regulatory.*block','merger.*condition'],
+        t4: ['ebos','independent.*compet','competitive.*response.*pharmacy']
+    },
+    FMG: {
+        t1: ['green.*hydrogen.*success','ffi','fortescue.*future','hydrogen.*viable'],
+        t2: ['iron.*ore.*cash','cash.*machine','green.*scaled.*back','core.*iron.*ore'],
+        t3: ['iron.*ore.*price.*collapse','china.*demand.*weakness','iron.*ore.*oversupply'],
+        t4: ['hydrogen.*destroy.*value','green.*capital.*destroy','no.*return.*hydrogen']
+    }
+};
+
 let tcSelectedTicker = null;
 let tcCurrentAlignment = null;
 
@@ -10721,31 +10797,81 @@ function tcAnalyze() {
         document.getElementById('tc-results').style.display = 'block';
         return;
     }
-    const thesis = document.getElementById('tc-thesis-input').value.toLowerCase();
+    const thesisRaw = document.getElementById('tc-thesis-input').value;
+    const thesis = thesisRaw.toLowerCase();
+
+    // Returns true if the pattern matches and is NOT immediately preceded by a negation word
+    function matchNotNegated(pattern) {
+        const regex = new RegExp(pattern, 'gi');
+        let m;
+        while ((m = regex.exec(thesis)) !== null) {
+            const before = thesis.slice(Math.max(0, m.index - 50), m.index);
+            if (!/\b(not|no|never|don'?t|cannot|can'?t|isn'?t|aren'?t|wouldn'?t|without|neither|nor)\s*\w{0,12}\s*$/.test(before)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function matchAny(pattern) {
+        return new RegExp(pattern, 'i').test(thesis);
+    }
 
     let primaryTier = data.primary;
+
     if (thesis.length > 50) {
         const scores = { t1: 0, t2: 0, t3: 0, t4: 0 };
-        if (/growth|recovery|expansion|synergy|dominance|leadership|success/i.test(thesis)) scores.t1 += 2;
-        if (/bull|bullish|outperform|buy/i.test(thesis)) scores.t1 += 1;
-        if (/normalize|moderate|decline|cyclical|slowdown|steady|base/i.test(thesis)) scores.t2 += 2;
-        if (/hold|neutral|fair value/i.test(thesis)) scores.t2 += 1;
-        if (/risk|execution|failure|challenge|problem|concern|bear/i.test(thesis)) scores.t3 += 2;
-        if (/short|sell|underperform|avoid/i.test(thesis)) scores.t3 += 1;
-        if (/disrupt|competition|threat|obsolete|replace/i.test(thesis)) scores.t4 += 2;
-        
+
+        // Stock-specific keywords (weight 3) — T1 bullish only when not negated
+        const stockKeys = TC_KEYWORDS[tcSelectedTicker];
+        if (stockKeys) {
+            ['t1', 't2', 't3', 't4'].forEach(tier => {
+                (stockKeys[tier] || []).forEach(pat => {
+                    if (tier === 't1') {
+                        if (matchNotNegated(pat)) scores.t1 += 3;
+                    } else {
+                        if (matchAny(pat)) scores[tier] += 3;
+                    }
+                });
+            });
+        }
+
+        // Generic bearish / valuation signals → T2
+        if (matchAny('not cheap|overvalued|expensive|premium.*valuation|stretched|above.*intrinsic|equity.*value.*below|dilut')) scores.t2 += 2;
+        if (matchAny('share.based compensation|\\bsbc\\b|free cash flow.*weak|cash flow.*low')) scores.t2 += 2;
+        if (matchAny('moderate|normalize|base case|steady|fair value|\\bhold\\b|neutral')) scores.t2 += 1;
+
+        // Generic risk / execution signals → T3
+        if (matchAny('execution risk|miss.*guidance|\\bunproven\\b|structural risk|headwind|bear case|cautious|skeptical')) scores.t3 += 2;
+        if (matchAny('\\bshort\\b|\\bsell\\b|underperform|\\bavoid\\b')) scores.t3 += 2;
+        if (matchAny('\\brisk\\b|\\bproblem\\b|\\bconcern\\b|challenge|\\bworry\\b|\\bfail\\b')) scores.t3 += 1;
+
+        // Generic competitive signals → T4
+        if (matchAny('disrupt|competi.*threat|\\bobsolete\\b|\\breplace\\b|superior.*compet|incumbent.*respond')) scores.t4 += 2;
+
+        // Generic bullish signals — only when NOT negated
+        if (matchNotNegated('\\bgrowth\\b|recovery|expansion|synergy|dominance|leadership')) scores.t1 += 2;
+        if (matchNotNegated('\\bbullish\\b|outperform')) scores.t1 += 1;
+
+        // Conditional buy framing ("what would make us buy") is NOT a bullish signal — penalise
+        if (/what.*would.*make.*us.*buy|would.*consider.*buy|reasons.*to.*buy.*if|before.*we.*buy/i.test(thesisRaw)) {
+            scores.t1 = Math.max(0, scores.t1 - 3);
+        } else if (matchNotNegated('\\bbuy\\b')) {
+            scores.t1 += 1;
+        }
+
         const maxScore = Math.max(...Object.values(scores));
         if (maxScore > 0) {
             const winner = Object.entries(scores).find(([k, v]) => v === maxScore)[0];
             primaryTier = winner;
         }
     }
-    
+
     tcCurrentAlignment = primaryTier;
-    
+
     const banner = document.getElementById('tc-banner');
     banner.className = 'tc-banner ' + primaryTier;
-    
+
     const tierData = data[primaryTier];
     if (primaryTier === 'uphill') {
         document.getElementById('tc-banner-label').textContent = 'Your thesis position:';
@@ -10756,7 +10882,7 @@ function tcAnalyze() {
         document.getElementById('tc-banner-hypothesis').textContent = primaryTier.toUpperCase() + ': ' + tierData.name;
         document.getElementById('tc-banner-desc').textContent = tierData.desc;
     }
-    
+
     const rowsContainer = document.getElementById('tc-map-rows');
     rowsContainer.innerHTML = ['t1','t2','t3','t4'].map(tier => {
         const tData = data[tier];
@@ -10773,15 +10899,28 @@ function tcAnalyze() {
             </div>
         `;
     }).join('');
-    
-    document.getElementById('tc-analysis-text').innerHTML = data.analysis;
-    document.getElementById('tc-supporting').innerHTML = data.supporting.map(item => 
+
+    // Dynamic analysis text based on matched tier vs Continuum's base case
+    const continuumBase = data.primary;
+    let analysisText;
+    if (primaryTier === continuumBase) {
+        analysisText = `Your thesis aligns with Continuum's base case (<strong>${primaryTier.toUpperCase()}: ${tierData.name}</strong>), which carries a ${tierData.prob}% probability weighting. The evidence pattern in your thesis is consistent with Continuum's dominant hypothesis.`;
+    } else if (primaryTier === 't1' && continuumBase !== 't1') {
+        analysisText = `Your thesis is <strong>more bullish</strong> than Continuum's base case. Continuum assigns ${data[continuumBase].prob}% to <strong>${continuumBase.toUpperCase()}: ${data[continuumBase].name}</strong>. You would need the ${data[continuumBase].name.toLowerCase()} risks to resolve favourably to justify your position.`;
+    } else if ((primaryTier === 't3' || primaryTier === 't4') && (continuumBase === 't1' || continuumBase === 't2')) {
+        analysisText = `Your thesis is <strong>more bearish</strong> than Continuum's base case. Continuum assigns ${data[continuumBase].prob}% to <strong>${continuumBase.toUpperCase()}: ${data[continuumBase].name}</strong>. Your view implies a dislocation — the market may be underpricing the downside risks your thesis identifies.`;
+    } else {
+        analysisText = `Your thesis diverges from Continuum's base case (<strong>${continuumBase.toUpperCase()}: ${data[continuumBase].name}</strong>, ${data[continuumBase].prob}% probability). Your view aligns more closely with <strong>${primaryTier.toUpperCase()}: ${tierData.name}</strong> (${tierData.prob}% probability). Consider what evidence would need to change for Continuum's assessment to shift.`;
+    }
+    document.getElementById('tc-analysis-text').innerHTML = analysisText;
+
+    document.getElementById('tc-supporting').innerHTML = data.supporting.map(item =>
         `<div class="tc-evidence-item"><span class="tc-evidence-icon support">&#10003;</span><span>${item}</span></div>`
     ).join('');
-    document.getElementById('tc-contradicting').innerHTML = data.contradicting.map(item => 
+    document.getElementById('tc-contradicting').innerHTML = data.contradicting.map(item =>
         `<div class="tc-evidence-item"><span class="tc-evidence-icon contradict">!</span><span>${item}</span></div>`
     ).join('');
-    
+
     document.getElementById('tc-results').classList.add('active');
     document.getElementById('tc-results').scrollIntoView({ behavior: 'smooth' });
 }
