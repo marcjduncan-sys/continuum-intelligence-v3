@@ -226,6 +226,42 @@ function calcTechSignal(macro) {
   return { signal, detail: 'tech_saas', nasdaqScore, yieldScore };
 }
 
+// ── Diversified asset manager (MQG, etc.) — ASX 200 momentum-led ─────────────
+
+function calcAssetMgrSignal(macro) {
+  const market = macro.market || {};
+  const rates  = macro.rates  || {};
+
+  const asx200  = market.asx200  || {};
+  const us10yr  = rates.us_10yr  || {};
+
+  // ASX 200 20d momentum score — primary driver (65%)
+  let asxScore = 0;
+  const a20 = asx200.change_20d;
+  if (a20 != null) {
+    const pct = a20 * 100;
+    if (pct >  10) asxScore =  50;
+    else if (pct >   3) asxScore =  20;
+    else if (pct >  -3) asxScore =   0;
+    else if (pct > -10) asxScore = -20;
+    else                asxScore = -50;
+  }
+
+  // US 10yr yield direction — rising yields compress multiples (35%)
+  let yieldScore = 0;
+  if (us10yr.change_20d != null && us10yr.close != null) {
+    const yieldChangeBp = us10yr.change_20d * us10yr.close * 100;
+    if (yieldChangeBp < -20) yieldScore =  25;
+    else if (yieldChangeBp >  20) yieldScore = -25;
+    else                         yieldScore =   0;
+  }
+
+  const raw    = asxScore * 0.65 + yieldScore * 0.35;
+  const signal = Math.max(-100, Math.min(100, Math.round(raw)));
+
+  return { signal, detail: 'asset_mgr', asxScore, yieldScore };
+}
+
 // ── Healthcare / COMPANY_DOMINANT: minimal sector signal ─────────────────────
 
 function calcNeutralSignal() {
@@ -241,6 +277,7 @@ const COMMODITY_MODELS = new Set([
 ]);
 const DIVERSIFIED_MODELS = new Set(['MATERIALS_DIVERSIFIED_MINING']);
 const BANK_MODELS        = new Set(['FINANCIALS_MAJOR_BANKS', 'FINANCIALS_INSURANCE']);
+const ASSET_MGR_MODELS   = new Set(['FINANCIALS_DIVERSIFIED_ASSET_MGMT']);
 const REIT_MODELS        = new Set(['REIT_INDUSTRIAL', 'REIT_OFFICE', 'REIT_RETAIL', 'REIT_DIVERSIFIED']);
 const TECH_MODELS        = new Set(['IT_SOFTWARE_SAAS', 'IT_HARDWARE', 'TECHNOLOGY']);
 const NEUTRAL_MODELS     = new Set(['COMPANY_DOMINANT', 'HEALTHCARE_DEVICES_MEDTECH',
@@ -256,6 +293,7 @@ function calcSectorSignal(stock, macro) {
   if (BANK_MODELS.has(model))        return calcRateSignal(macro, false);
   if (REIT_MODELS.has(model))        return calcRateSignal(macro, true);
   if (TECH_MODELS.has(model))        return calcTechSignal(macro);
+  if (ASSET_MGR_MODELS.has(model))   return calcAssetMgrSignal(macro);
   return calcNeutralSignal();
 }
 
