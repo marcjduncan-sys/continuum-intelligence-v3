@@ -520,7 +520,7 @@ a:hover { color: var(--accent-sage); }
     border: 1px solid rgba(212, 160, 60, 0.25);
 }
 
-/* --- Coverage Table: Thesis Skew Bar --- */
+/* --- Coverage Table: Skew Bar (used in featured cards only — ERRATA_003: removed from index table) --- */
 .skew-cell {
     display: flex;
     align-items: center;
@@ -1090,6 +1090,61 @@ a:hover { color: var(--accent-sage); }
 .composite-pending {
     font-size: 0.75rem; color: var(--text-muted); font-style: italic;
 }
+
+/* ── ERRATA_003: Two-Row Sentiment Display (tls = three-layer-signal) ── */
+.tls-positive { color: var(--signal-green); }
+.tls-negative { color: var(--signal-red); }
+.tls-neutral  { color: var(--signal-amber); }
+
+.composite-score.tls-positive { color: var(--signal-green); }
+.composite-score.tls-negative { color: var(--signal-red); }
+.composite-score.tls-neutral  { color: var(--signal-amber); }
+.composite-sent-label.tls-positive { color: var(--signal-green); }
+.composite-sent-label.tls-negative { color: var(--signal-red); }
+.composite-sent-label.tls-neutral  { color: var(--signal-amber); }
+
+.tls-row {
+    margin: 6px 0 0 0; padding: 6px 0 6px 12px;
+    border-left: 2px solid var(--border);
+}
+.tls-row-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
+}
+.tls-row-label {
+    font-size: 0.58rem; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase; color: var(--text-muted);
+    min-width: 140px;
+}
+.tls-row-value {
+    font-family: var(--font-data); font-size: 0.95rem; font-weight: 800;
+    letter-spacing: -0.01em; min-width: 40px;
+}
+.tls-bar-track {
+    flex: 1; max-width: 200px; height: 6px;
+    background: var(--bg-elevated); border-radius: 3px; overflow: hidden;
+}
+.tls-bar-fill {
+    height: 100%; border-radius: 3px;
+    transition: width 0.4s ease;
+}
+.tls-bar-fill.tls-positive { background: var(--signal-green); opacity: 0.75; }
+.tls-bar-fill.tls-negative { background: var(--signal-red);   opacity: 0.75; }
+.tls-bar-fill.tls-neutral  { background: var(--signal-amber); opacity: 0.75; }
+
+.tls-sub {
+    font-size: 0.68rem; color: var(--text-secondary); line-height: 1.4;
+}
+.tls-t1-name {
+    font-weight: 600; color: var(--text-primary);
+}
+.tls-dir-badge {
+    font-size: 0.62rem; font-weight: 700; letter-spacing: 0.05em;
+}
+
+/* ── ERRATA_003: Company column on index table ── */
+.td-company { text-align: center; }
+.sent-chip.positive { background: rgba(61,170,109,0.15); color: var(--signal-green); border: 1px solid rgba(61,170,109,0.35); }
+.sent-chip.negative { background: rgba(212,85,85,0.15);  color: var(--signal-red);   border: 1px solid rgba(212,85,85,0.35);  }
 
 /* ── Phase 5: Hypothesis card colour coding ── */
 .hyp-card.dir-up    { border-left: 3px solid var(--signal-green); }
@@ -4307,7 +4362,7 @@ a:hover { color: var(--accent-sage); }
                     <th>Company</th>
                     <th>Sector</th>
                     <th>Price</th>
-                    <th class="sortable" onclick="sortCoverageTable()" id="th-skew">Thesis Skew <span class="sort-arrow" id="skew-sort-arrow">&#9650;</span></th>
+                    <th class="sortable" onclick="sortCoverageTable()" id="th-company" title="Company Research contribution — independently coloured">Company <span class="sort-arrow" id="company-sort-arrow">&#9650;</span></th>
                     <th class="sortable" onclick="sortCoverageTableBySentiment()" id="th-sentiment" title="Three-layer composite signal">Sentiment <span class="sort-arrow" id="sentiment-sort-arrow">&#9650;</span></th>
                     <th>Updated</th>
                     <th>Status</th>
@@ -5880,6 +5935,27 @@ function renderSectorPanel(data) {
 
 // ── Phase 5.4: Composite Sentiment Bar ──────────────────────────────────────
 
+// ── Phase 5 / ERRATA_003: Two-Row Sentiment Display ───────────────────────────
+// Overall Sentiment headline + External Environment row + Company Research row.
+// Each row independently coloured by its OWN value. This is the platform's
+// highest-value insight: divergence between external factors and company research.
+
+function _sentRowCls(val, isOverall) {
+  // isOverall uses ±8 thresholds; sub-rows use ±5
+  var hi = isOverall ? 8 : 5;
+  return val > hi ? 'tls-positive' : val < -hi ? 'tls-negative' : 'tls-neutral';
+}
+
+function _sentArrow(val) {
+  return val > 3 ? ' &#9650;' : val < -3 ? ' &#9660;' : ' &#9654;';
+}
+
+function _barFill(val, maxAbs) {
+  // Returns width% for a proportional progress bar (0–100)
+  if (!maxAbs || maxAbs === 0) return 0;
+  return Math.min(100, Math.abs(val) / maxAbs * 100).toFixed(1);
+}
+
 function renderCompositeBar(data) {
   var tls = data.three_layer_signal || null;
 
@@ -5895,69 +5971,94 @@ function renderCompositeBar(data) {
     '</div>';
   }
 
-  var score  = tls.overall_sentiment;
-  var label  = tls.sentiment_label || '';
-  var mCont  = tls.macro_contribution  || 0;
-  var sCont  = tls.sector_contribution || 0;
-  var iCont  = tls.idio_contribution   || 0;
+  var score   = tls.overall_sentiment;
+  var label   = tls.sentiment_label || '';
+  var mCont   = tls.macro_contribution   !== undefined ? tls.macro_contribution   : 0;
+  var sCont   = tls.sector_contribution  !== undefined ? tls.sector_contribution  : 0;
+  var tCont   = tls.tech_contribution    !== undefined ? tls.tech_contribution    : 0;
+  var cCont   = tls.company_contribution !== undefined ? tls.company_contribution : (tls.idio_contribution || 0);
 
-  // CSS class for score colour
-  var scoreCls = score > 30 ? 'strong-upside' : score > 10 ? 'upside' : score > -10 ? 'neutral' : score > -30 ? 'downside' : 'strong-downside';
+  // External = macro + sector + tech contributions
+  var extVal  = mCont + sCont + tCont;
 
-  // Contribution bar — show absolute contributions as proportional widths
-  // Total absolute sum drives widths; negatives shown dimmed
-  var absM = Math.abs(mCont);
-  var absS = Math.abs(sCont);
-  var absI = Math.abs(iCont);
-  var absTotal = absM + absS + absI || 1;
-  var wM = (absM / absTotal * 100).toFixed(1);
-  var wS = (absS / absTotal * 100).toFixed(1);
-  var wI = (absI / absTotal * 100).toFixed(1);
+  // ── Overall row colour (thresholds: >+8 green, <-8 red, amber between)
+  var overallCls = _sentRowCls(score, true);
 
-  var contribBarHtml =
-    '<div class="composite-contrib-row">' +
-      (absM > 0 ? '<div class="contrib-seg macro-seg' + (mCont < 0 ? ' neg' : '') + '" style="width:' + wM + '%">' + (absM >= 5 ? 'M' : '') + '</div>' : '') +
-      (absS > 0 ? '<div class="contrib-seg sector-seg' + (sCont < 0 ? ' neg' : '') + '" style="width:' + wS + '%">' + (absS >= 5 ? 'S' : '') + '</div>' : '') +
-      (absI > 0 ? '<div class="contrib-seg idio-seg' + (iCont < 0 ? ' neg' : '') + '" style="width:' + wI + '%">' + (absI >= 5 ? 'C' : '') + '</div>' : '') +
-    '</div>' +
-    '<div class="composite-contrib-legend">' +
-      '<span><span class="contrib-dot macro-dot"></span>Macro (' + (mCont >= 0 ? '+' : '') + mCont + ')</span>' +
-      '<span><span class="contrib-dot sector-dot"></span>Sector (' + (sCont >= 0 ? '+' : '') + sCont + ')</span>' +
-      '<span><span class="contrib-dot idio-dot"></span>Company (' + (iCont >= 0 ? '+' : '') + iCont + ')</span>' +
+  // ── External row colour (thresholds: >+5 green, <-5 red)
+  var extCls = _sentRowCls(extVal, false);
+
+  // ── Company row colour (thresholds: >+5 green, <-5 red)
+  var compCls = _sentRowCls(cCont, false);
+
+  // ── Bar widths: proportional to max possible contribution
+  // External max = sum of absolute contributions from macro+sector+tech
+  var extMaxAbs = Math.abs(mCont) + Math.abs(sCont) + Math.abs(tCont) || 40;
+  var extBarW   = _barFill(extVal, extMaxAbs);
+
+  // Company max = absolute company contribution (it IS the company layer)
+  var compMaxAbs = Math.max(Math.abs(cCont), 40); // floor 40 for visual proportionality
+  var compBarW   = _barFill(cCont, compMaxAbs);
+
+  // ── T1 hypothesis summary (first hypothesis in list)
+  var t1Html = '';
+  if (data.hypotheses && data.hypotheses.length > 0) {
+    var t1 = data.hypotheses[0];
+    var t1Name = t1.title || t1.tier || 'Unknown';
+    var t1Dir = t1.direction || '';
+    var t1DirLabel = t1Dir === 'upside' ? 'BULLISH' : t1Dir === 'downside' ? 'BEARISH' : 'NEUTRAL';
+    var t1DirCls = t1Dir === 'upside' ? 'tls-positive' : t1Dir === 'downside' ? 'tls-negative' : 'tls-neutral';
+    var t1Score = '';
+    if (t1.survivalScore !== undefined) t1Score = ', ' + t1.survivalScore + '%';
+    // Count bearish/bullish hypotheses
+    var bearCount = 0, bullCount = 0;
+    for (var hi = 0; hi < data.hypotheses.length; hi++) {
+      var hd = data.hypotheses[hi].direction || '';
+      if (hd === 'downside') bearCount++;
+      else if (hd === 'upside') bullCount++;
+    }
+    var dominantLabel = bearCount > bullCount ? 'bearish' : bullCount > bearCount ? 'bullish' : 'mixed';
+    t1Html = '<div class="tls-sub">' +
+      bearCount + ' of ' + data.hypotheses.length + ' hypotheses ' + dominantLabel +
+      ' &bull; T1: <span class="tls-t1-name">' + t1Name + '</span>' +
+      ' <span class="tls-dir-badge ' + t1DirCls + '">(' + t1DirLabel + t1Score + ')</span>' +
     '</div>';
+  }
 
   return '<div class="composite-bar">' +
     '<div class="composite-bar-inner">' +
+
+      // ── Row 1: Overall Sentiment headline
       '<div class="composite-headline">' +
         '<span class="composite-label">Overall Sentiment</span>' +
-        '<span class="composite-score ' + scoreCls + '">' + (score > 0 ? '+' : '') + score + '</span>' +
-        '<span class="composite-sent-label ' + scoreCls + '">' + label + '</span>' +
+        '<span class="composite-score ' + overallCls + '">' + (score > 0 ? '+' : '') + score + _sentArrow(score) + '</span>' +
+        '<span class="composite-sent-label ' + overallCls + '">' + label + '</span>' +
       '</div>' +
-      contribBarHtml +
+
+      // ── Row 2: External Environment
+      '<div class="tls-row">' +
+        '<div class="tls-row-header">' +
+          '<span class="tls-row-label">External Environment</span>' +
+          '<span class="tls-row-value ' + extCls + '">' + (extVal > 0 ? '+' : '') + extVal + _sentArrow(extVal) + '</span>' +
+          '<div class="tls-bar-track"><div class="tls-bar-fill ' + extCls + '" style="width:' + extBarW + '%"></div></div>' +
+        '</div>' +
+        '<div class="tls-sub">Macro (' + (mCont >= 0 ? '+' : '') + mCont + ') &bull; Sector (' + (sCont >= 0 ? '+' : '') + sCont + ') &bull; Tech (' + (tCont >= 0 ? '+' : '') + tCont + ')</div>' +
+      '</div>' +
+
+      // ── Row 3: Company Research
+      '<div class="tls-row">' +
+        '<div class="tls-row-header">' +
+          '<span class="tls-row-label">Company Research</span>' +
+          '<span class="tls-row-value ' + compCls + '">' + (cCont > 0 ? '+' : '') + cCont + _sentArrow(cCont) + '</span>' +
+          '<div class="tls-bar-track"><div class="tls-bar-fill ' + compCls + '" style="width:' + compBarW + '%"></div></div>' +
+        '</div>' +
+        t1Html +
+      '</div>' +
+
     '</div>' +
   '</div>';
 }
 
-function renderSkewBar(data) {
-  var skew = computeSkewScore(data);
-  var dir = skew.direction;
-  var arrow = dir === 'downside' ? '&#9660; DOWNSIDE' : dir === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
-  var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
-  var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
-
-  return '<div class="risk-skew-bar">' +
-    '<div class="rsb-inner">' +
-      '<span class="rsb-label">Thesis Skew</span>' +
-      '<span class="skew-badge ' + dir + '">' + arrow + '</span>' +
-      '<div class="skew-bar-track" style="width:80px;height:8px;margin:0 4px">' +
-        '<div class="skew-bar-bull" style="width:' + skew.bull + '%"></div>' +
-        '<div class="skew-bar-bear" style="width:' + skew.bear + '%"></div>' +
-      '</div>' +
-      '<span class="skew-score ' + scoreCls + '" style="font-size:0.82rem">' + scoreLabel + '</span>' +
-      '<span class="rsb-rationale">' + data.skew.rationale + '</span>' +
-    '</div>' +
-  '</div>';
-}
+// renderSkewBar removed — ERRATA_003: thesis skew eliminated from platform
 
 function renderVerdict(data) {
   var v = data.verdict;
@@ -7999,6 +8100,7 @@ function buildSnapshotFromStock(ticker) {
     reportId: stock.reportId,
     priceMetrics: priceMetrics,
     riskSkew: { direction: skewComputed.direction, badge: skewBadge, rationale: stock.skew.rationale, computed: skewComputed },
+    three_layer_signal: stock.three_layer_signal || null,
     narrative: { text: stock.narrative.theNarrative || '', verdict: stock.verdict.text || '' },
     survivalBar: survivalBar,
     survivalLegend: survivalLegend,
@@ -8173,18 +8275,36 @@ function renderSnapshotPage(data) {
       '<div class="snap-price-meta">' + priceMetricsHtml + '</div>' +
     '</div>' +
 
-    '<div class="snap-risk-skew-bar">' +
-      '<span class="snap-risk-skew-label">Thesis Skew</span>' +
-      '<span class="snap-risk-skew-badge ' + data.riskSkew.direction + '">' + data.riskSkew.badge + '</span>' +
-      (data.riskSkew.computed ?
-        '<div class="skew-bar-track" style="width:64px;height:7px;margin:0 4px">' +
-          '<div class="skew-bar-bull" style="width:' + data.riskSkew.computed.bull + '%"></div>' +
-          '<div class="skew-bar-bear" style="width:' + data.riskSkew.computed.bear + '%"></div>' +
-        '</div>' +
-        '<span class="skew-score ' + (data.riskSkew.computed.score > 5 ? 'positive' : data.riskSkew.computed.score < -5 ? 'negative' : 'neutral') + '" style="font-size:0.78rem">' + (data.riskSkew.computed.score > 0 ? '+' : '') + data.riskSkew.computed.score + '</span>'
-        : '') +
-      '<span class="snap-risk-skew-rationale">' + data.riskSkew.rationale + '</span>' +
-    '</div>' +
+    (function() {
+      // ERRATA_003: Replace thesis skew bar with composite sentiment decomposition
+      var tls = data.three_layer_signal || null;
+      if (!tls || tls.overall_sentiment === null || tls.overall_sentiment === undefined) {
+        return '<div class="snap-sentiment-bar"><span class="snap-risk-skew-label">Sentiment</span><span class="composite-pending">Computing…</span></div>';
+      }
+      var sScore = tls.overall_sentiment;
+      var sLabel = tls.sentiment_label || '';
+      var sCls = sScore > 8 ? 'tls-positive' : sScore < -8 ? 'tls-negative' : 'tls-neutral';
+      var mC = tls.macro_contribution || 0;
+      var seC = tls.sector_contribution || 0;
+      var tC = tls.tech_contribution || 0;
+      var cC = tls.company_contribution !== undefined ? tls.company_contribution : (tls.idio_contribution || 0);
+      var extV = mC + seC + tC;
+      var extCls = extV > 5 ? 'tls-positive' : extV < -5 ? 'tls-negative' : 'tls-neutral';
+      var compCls = cC > 5 ? 'tls-positive' : cC < -5 ? 'tls-negative' : 'tls-neutral';
+      return '<div class="snap-risk-skew-bar">' +
+        '<span class="snap-risk-skew-label">Sentiment</span>' +
+        '<span class="snap-risk-skew-badge ' + sCls + '" style="background:none;border:none;padding:0">' +
+          '<span class="composite-score ' + sCls + '" style="font-size:1rem">' + (sScore > 0 ? '+' : '') + sScore + '</span>' +
+          ' <span style="font-size:0.75rem;font-weight:600">' + sLabel + '</span>' +
+        '</span>' +
+        '<span class="snap-risk-skew-rationale" style="display:flex;gap:16px">' +
+          '<span>Ext: <span class="' + extCls + '">' + (extV >= 0 ? '+' : '') + extV + '</span>' +
+            ' <span style="font-size:0.65rem;color:var(--text-muted)">M(' + (mC >= 0 ? '+' : '') + mC + ') S(' + (seC >= 0 ? '+' : '') + seC + ') T(' + (tC >= 0 ? '+' : '') + tC + ')</span>' +
+          '</span>' +
+          '<span>Co: <span class="' + compCls + '">' + (cC >= 0 ? '+' : '') + cC + '</span></span>' +
+        '</span>' +
+      '</div>';
+    })() +
 
     '<div class="snap-main-grid">' +
       // LEFT COLUMN
@@ -8332,27 +8452,6 @@ function renderCatalystTag(ticker) {
 }
 
 function renderCoverageRow(data) {
-  var skew = computeSkewScore(data);
-  var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
-  var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
-
-  // Tooltip hypothesis breakdown
-  var tooltipRows = '';
-  for (var i = 0; i < skew.hypotheses.length; i++) {
-    var h = skew.hypotheses[i];
-    var dotCls = h.direction === 'upside' ? 'up' : h.direction === 'downside' ? 'down' : 'neutral';
-    tooltipRows += '<div class="skew-tooltip-row">' +
-      '<span class="skew-tooltip-dot ' + dotCls + '"></span>' +
-      '<span>' + h.title + '</span>' +
-      '<span class="skew-tooltip-weight">' + h.weight + '%</span>' +
-    '</div>';
-  }
-  var tooltipHtml = '<div class="skew-tooltip">' +
-    '<div class="skew-tooltip-title">Hypothesis Weights</div>' +
-    tooltipRows +
-    '<div class="skew-tooltip-rationale">' + data.skew.rationale.substring(0, 160) + (data.skew.rationale.length > 160 ? '&hellip;' : '') + '</div>' +
-  '</div>';
-
   // Format date as short form: "10 Feb 2026"
   var dateParts = data.date.split(' ');
   var shortDate = dateParts[0] + ' ' + (dateParts[1] ? dateParts[1].substring(0, 3) : '') + ' ' + (dateParts[2] || '');
@@ -8360,27 +8459,26 @@ function renderCoverageRow(data) {
   // Sentiment column — from three_layer_signal
   var tls = data.three_layer_signal || null;
   var sentScore = tls ? tls.overall_sentiment : null;
-  var sentLabel = tls ? (tls.sentiment_label || '') : '';
-  var sentCls = sentScore === null ? 'neutral' : sentScore > 30 ? 'positive strong' : sentScore > 10 ? 'positive' : sentScore < -30 ? 'negative strong' : sentScore < -10 ? 'negative' : 'neutral';
+  var sentCls = sentScore === null ? 'neutral' : sentScore > 8 ? 'positive' : sentScore < -8 ? 'negative' : 'neutral';
+  var sentArrow = sentScore === null ? '' : sentScore > 3 ? ' &#9650;' : sentScore < -3 ? ' &#9660;' : ' &#9654;';
   var sentHtml = sentScore !== null
-    ? '<span class="sent-chip ' + sentCls + '">' + (sentScore > 0 ? '+' : '') + sentScore + '</span>'
+    ? '<span class="sent-chip ' + sentCls + '">' + (sentScore > 0 ? '+' : '') + sentScore + sentArrow + '</span>'
     : '<span class="sent-chip neutral">—</span>';
 
-  return '<tr data-skew-score="' + skew.score + '" data-sent-score="' + (sentScore !== null ? sentScore : 0) + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
+  // Company Research column — company_contribution from three_layer_signal (ERRATA_003)
+  var compScore = tls ? (tls.company_contribution !== undefined ? tls.company_contribution : null) : null;
+  var compCls = compScore === null ? 'neutral' : compScore > 5 ? 'positive' : compScore < -5 ? 'negative' : 'neutral';
+  var compArrow = compScore === null ? '' : compScore > 3 ? ' &#9650;' : compScore < -3 ? ' &#9660;' : ' &#9654;';
+  var compHtml = compScore !== null
+    ? '<span class="sent-chip ' + compCls + '">' + (compScore > 0 ? '+' : '') + compScore + compArrow + '</span>'
+    : '<span class="sent-chip neutral">—</span>';
+
+  return '<tr data-company-score="' + (compScore !== null ? compScore : 0) + '" data-sent-score="' + (sentScore !== null ? sentScore : 0) + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
     '<td class="td-ticker">' + data.ticker + '</td>' +
     '<td>' + data.company + '</td>' +
     '<td>' + data.sector + '</td>' +
     '<td class="td-price">' + data.currency + data.price + '</td>' +
-    '<td>' +
-      '<div class="skew-cell">' +
-        '<div class="skew-bar-track">' +
-          '<div class="skew-bar-bull" style="width:' + skew.bull + '%"></div>' +
-          '<div class="skew-bar-bear" style="width:' + skew.bear + '%"></div>' +
-        '</div>' +
-        '<span class="skew-score ' + scoreCls + '">' + scoreLabel + '</span>' +
-        tooltipHtml +
-      '</div>' +
-    '</td>' +
+    '<td class="td-company">' + compHtml + '</td>' +
     '<td class="td-sentiment">' + sentHtml + '</td>' +
     '<td class="td-date">' + shortDate + '</td>' +
     '<td>' + renderFreshnessBadge(data.ticker) + renderCatalystTag(data.ticker) + '</td>' +
@@ -8388,27 +8486,12 @@ function renderCoverageRow(data) {
 }
 
 function renderComingSoonRow(stub) {
-  var dir = stub.skew || 'balanced';
-  var bull = dir === 'upside' ? 65 : dir === 'downside' ? 35 : 50;
-  var bear = 100 - bull;
-  var score = bull - bear;
-  var scoreCls = score > 5 ? 'positive' : score < -5 ? 'negative' : 'neutral';
-  var scoreLabel = (score > 0 ? '+' : '') + score;
-
-  return '<tr class="stub" data-skew-score="' + score + '" data-sent-score="0">' +
+  return '<tr class="stub" data-company-score="0" data-sent-score="0">' +
     '<td class="td-ticker">' + stub.ticker + '</td>' +
     '<td>' + stub.company + '</td>' +
     '<td>' + stub.sector + '</td>' +
     '<td class="td-price">' + (stub.currency || 'A$') + stub.price + '</td>' +
-    '<td>' +
-      '<div class="skew-cell">' +
-        '<div class="skew-bar-track">' +
-          '<div class="skew-bar-bull" style="width:' + bull + '%"></div>' +
-          '<div class="skew-bar-bear" style="width:' + bear + '%"></div>' +
-        '</div>' +
-        '<span class="skew-score ' + scoreCls + '">' + scoreLabel + '</span>' +
-      '</div>' +
-    '</td>' +
+    '<td class="td-company"></td>' +
     '<td class="td-sentiment"></td>' +
     '<td><span class="coming-soon">Coming Soon</span></td>' +
     '<td></td>' +
@@ -8416,15 +8499,15 @@ function renderComingSoonRow(stub) {
 }
 
 // Coverage table sort state
-var coverageSortDir = 0; // 0 = unsorted (default), 1 = desc (bearish first), -1 = asc (bullish first)
+var coverageSortDir = 0; // 0 = unsorted (default), 1 = desc (most negative first), -1 = asc (most positive first)
 
 function sortCoverageTable() {
   var tbody = document.getElementById('coverage-body');
   if (!tbody) return;
   var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
-  var arrow = document.getElementById('skew-sort-arrow');
+  var arrow = document.getElementById('company-sort-arrow');
 
-  // Cycle: unsorted → desc (bearish first) → asc (bullish first) → unsorted
+  // Cycle: unsorted → desc (most negative first) → asc (most positive first) → unsorted
   coverageSortDir = coverageSortDir === 0 ? 1 : coverageSortDir === 1 ? -1 : 0;
 
   if (coverageSortDir === 0) {
@@ -8444,11 +8527,11 @@ function sortCoverageTable() {
     return;
   }
 
-  // Sort by data-skew-score attribute
+  // Sort by data-company-score attribute
   rows.sort(function(a, b) {
-    var sa = parseInt(a.getAttribute('data-skew-score')) || 0;
-    var sb = parseInt(b.getAttribute('data-skew-score')) || 0;
-    return coverageSortDir === 1 ? sa - sb : sb - sa; // desc: bearish first (lowest score), asc: bullish first (highest score)
+    var sa = parseInt(a.getAttribute('data-company-score')) || 0;
+    var sb = parseInt(b.getAttribute('data-company-score')) || 0;
+    return coverageSortDir === 1 ? sa - sb : sb - sa;
   });
 
   if (arrow) {
@@ -8472,9 +8555,9 @@ function sortCoverageTableBySentiment() {
   var arrow = document.getElementById('sentiment-sort-arrow');
 
   sentimentSortDir = sentimentSortDir === 0 ? -1 : sentimentSortDir === -1 ? 1 : 0;
-  coverageSortDir = 0; // reset skew sort
-  var skewArrow = document.getElementById('skew-sort-arrow');
-  if (skewArrow) { skewArrow.innerHTML = '&#9650;'; skewArrow.className = 'sort-arrow'; }
+  coverageSortDir = 0; // reset company sort
+  var companyArrow = document.getElementById('company-sort-arrow');
+  if (companyArrow) { companyArrow.innerHTML = '&#9650;'; companyArrow.className = 'sort-arrow'; }
 
   if (sentimentSortDir === 0) {
     if (arrow) { arrow.innerHTML = '&#9650;'; arrow.className = 'sort-arrow'; }

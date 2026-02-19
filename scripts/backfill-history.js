@@ -245,8 +245,7 @@ function backfillStock(ticker, researchData, backfillDays) {
       volume_ratio: 1.0, // No historical volume data available
       price_classification: moveClass.classification,
       hypotheses: hypotheses,
-      thesis_skew: skew.score,
-      thesis_skew_label: skew.label,
+      // thesis_skew removed — ERRATA_003: use composite sentiment decomposition instead
       dominant_narrative: dominant,
       narrative_flip: narrativeFlip,
       flip_detail: flipDetail,

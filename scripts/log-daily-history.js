@@ -218,8 +218,7 @@ function buildSnapshot(ticker, date, researchData, stocksData, livePrices) {
     overall_sentiment: null,
     price_classification: priceClassification,
     hypotheses: hypotheses,
-    thesis_skew: skew.score,
-    thesis_skew_label: skew.label,
+    // thesis_skew removed — ERRATA_003: use composite sentiment decomposition instead
     dominant_narrative: dominant,
     narrative_flip: false, // set by flip detection below
     flip_detail: null,

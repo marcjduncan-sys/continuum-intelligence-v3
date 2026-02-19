@@ -150,7 +150,9 @@ function main() {
       sector_contribution:  sectorCont,
       tech_contribution:    techCont,
       company_contribution: companyCont,
-      idio_contribution:    companyCont   // backward compat alias
+      idio_contribution:    companyCont,  // backward compat alias
+      // ERRATA_003: external_signal decomposition for display layer
+      external_signal:      macroCont + sectorCont + techCont
     };
 
     // ── Write to today's history entry ──────────────────────────────────────
@@ -175,6 +177,8 @@ function main() {
       entry.tech_contribution    = techCont;
       entry.company_contribution = companyCont;
       entry.idio_contribution    = companyCont;         // backward compat alias
+      // ERRATA_003: external_signal = sum of macro + sector + tech contributions
+      entry.external_signal      = macroCont + sectorCont + techCont;
     }
 
     // ── Write to stock JSON (for display layer) ─────────────────────────────
