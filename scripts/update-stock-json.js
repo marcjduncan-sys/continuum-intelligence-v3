@@ -47,7 +47,7 @@ function main() {
     process.exit(1);
   }
 
-  const jsonFiles = fs.readdirSync(STOCKS_DIR).filter(f => f.endsWith('.json'));
+  const jsonFiles = fs.readdirSync(STOCKS_DIR).filter(f => f.endsWith('.json') && f.indexOf('-history') === -1);
   console.log(`  Stock JSONs found: ${jsonFiles.length}\n`);
 
   let updated = 0;
