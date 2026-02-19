@@ -128,7 +128,7 @@
     "date": "2026-02-19",
     "macro_signal": 12,
     "sector_signal": -13,
-    "idio_signal": 0,
+    "idio_signal": -1,
     "overall_sentiment": -7,
     "sentiment_label": "NEUTRAL",
     "macro_contribution": 1,
@@ -143,8 +143,15 @@
       "momentum_score": -43
     },
     "idio_detail": {
-      "signal": 0,
-      "detail": "no_hypotheses"
+      "signal": -1,
+      "detail": "dominance",
+      "T1": "T2",
+      "T1_score": 30,
+      "T1_sentiment": "BEARISH",
+      "T2": "T1",
+      "T2_score": 29,
+      "lead": 1,
+      "raw_signal": 1.3
     }
   }
 }

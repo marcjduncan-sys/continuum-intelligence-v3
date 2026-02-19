@@ -101,11 +101,16 @@ function main() {
     const history = historyData.history;
     if (!history || history.length === 0) continue;
 
-    // Use today's entry if it exists, otherwise most recent
-    const todayEntry = history.find(e => e.date === date)
-      || history[history.length - 1];
+    // Use today's entry if it has hypotheses, otherwise walk back to find
+    // the most recent entry with a non-empty hypothesis array.
+    // (Today's entry may have been logged before hypotheses were populated.)
+    const todayEntry = history.find(e => e.date === date);
+    const entryWithHyps = (todayEntry && (todayEntry.hypotheses || []).length > 0)
+      ? todayEntry
+      : [...history].reverse().find(e => (e.hypotheses || []).length > 0)
+        || history[history.length - 1];
 
-    const hypotheses = todayEntry.hypotheses || [];
+    const hypotheses = entryWithHyps.hypotheses || [];
     const result     = calcIdioSignal(hypotheses);
 
     results[ticker] = {
