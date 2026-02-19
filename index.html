@@ -13434,8 +13434,8 @@ function buildInstitutionalHTML(ticker) {
       verdictHtml +
       /* Section 01: Identity */
       identityHtml +
-      /* Section 02: Hypotheses — forced break after cover/identity */
-      forcedPageBreak() +
+      /* Section 02: Hypotheses — soft break, flows naturally after cover/identity */
+      pageBreak() +
       pageHeader('Competing Hypotheses') +
       hypHtml +
       /* Section 03: Narrative — soft break, flows naturally */
