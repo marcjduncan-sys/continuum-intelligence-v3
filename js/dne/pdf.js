@@ -63,7 +63,7 @@ function buildInstitutionalReportHTML(stock) {
     'page-break-after: always; ' +
     'font-family: Arial, sans-serif; ' +
     'background: #f8f9fa; ' +
-    'padding: 40mm 18mm; ' +
+    'padding: 25mm 18mm; ' +
     'color: #333; ' +
     'height: 297mm; ' +
     'box-sizing: border-box; ' +
@@ -149,7 +149,7 @@ function buildInstitutionalReportHTML(stock) {
     'page-break-after: always; ' +
     'font-family: Arial, sans-serif; ' +
     'background: #f8f9fa; ' +
-    'padding: 40mm 18mm; ' +
+    'padding: 15mm 18mm; ' +
     'color: #333; ' +
     '">';
 
@@ -205,7 +205,7 @@ function buildInstitutionalReportHTML(stock) {
     'page-break-after: always; ' +
     'font-family: Arial, sans-serif; ' +
     'background: #f8f9fa; ' +
-    'padding: 40mm 18mm; ' +
+    'padding: 15mm 18mm; ' +
     'color: #333; ' +
     '">';
 
@@ -274,7 +274,7 @@ function buildInstitutionalReportHTML(stock) {
   html += '<div style="' +
     'font-family: Arial, sans-serif; ' +
     'background: #f8f9fa; ' +
-    'padding: 40mm 18mm; ' +
+    'padding: 15mm 18mm; ' +
     'color: #333; ' +
     'font-size: 10px; ' +
     'line-height: 1.6; ' +
@@ -348,7 +348,7 @@ function buildRetailReportHTML(stock) {
     'page-break-after: always; ' +
     'font-family: Arial, sans-serif; ' +
     'background: #f8f9fa; ' +
-    'padding: 40mm 18mm; ' +
+    'padding: 25mm 18mm; ' +
     'color: #333; ' +
     'height: 297mm; ' +
     'box-sizing: border-box; ' +
@@ -447,7 +447,7 @@ function buildRetailReportHTML(stock) {
     'page-break-after: always; ' +
     'font-family: Arial, sans-serif; ' +
     'background: #f8f9fa; ' +
-    'padding: 40mm 18mm; ' +
+    'padding: 15mm 18mm; ' +
     'color: #333; ' +
     '">';
 
@@ -487,7 +487,7 @@ function buildRetailReportHTML(stock) {
   html += '<div style="' +
     'font-family: Arial, sans-serif; ' +
     'background: #f8f9fa; ' +
-    'padding: 40mm 18mm; ' +
+    'padding: 15mm 18mm; ' +
     'color: #333; ' +
     'font-size: 11px; ' +
     'line-height: 1.6; ' +
