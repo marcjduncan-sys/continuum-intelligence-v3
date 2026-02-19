@@ -275,8 +275,8 @@ a:hover { color: var(--accent-sage); }
     padding: 0 var(--space-lg);
     height: 100%;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    align-items: stretch;
+    justify-content: flex-start;
 }
 .nav-brand {
     display: flex; align-items: center; gap: 10px;
@@ -289,18 +289,25 @@ a:hover { color: var(--accent-sage); }
     color: var(--text-primary);
 }
 .brand-green { color: #3DAA6D; }
-.nav-links { display: flex; align-items: center; gap: var(--space-lg); }
+.nav-links { display: flex; align-items: stretch; gap: 0; }
 .nav-links a {
-    font-size: 0.75rem; font-weight: 500;
-    letter-spacing: 0.04em; text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0 14px; height: var(--nav-height);
+    font-size: 0.68rem; font-weight: 500;
+    letter-spacing: 0.05em; text-transform: uppercase;
     color: var(--text-secondary);
-    padding: 6px 0;
     border-bottom: 2px solid transparent;
     transition: color 0.2s, border-color 0.2s;
 }
 .nav-links a:hover, .nav-links a.active {
     color: var(--text-primary);
     border-bottom-color: var(--accent-teal);
+}
+.nav-links a svg { width: 12px; height: 12px; opacity: 0.6; flex-shrink: 0; }
+.nav-links a:hover svg, .nav-links a.active svg { opacity: 1; }
+.nav-divider {
+    width: 1px; height: 20px; background: var(--border);
+    align-self: center; margin: 0 2px; flex-shrink: 0;
 }
 /* Hamburger button — hidden on desktop */
 .nav-hamburger {
@@ -312,7 +319,7 @@ a:hover { color: var(--accent-sage); }
 }
 .nav-hamburger:hover { color: var(--text-primary); border-color: var(--text-secondary); }
 .nav-hamburger svg { width: 18px; height: 18px; pointer-events: none; }
-.nav-actions { display: flex; align-items: center; gap: var(--space-sm); }
+.nav-actions { display: flex; align-items: center; gap: var(--space-sm); margin-left: auto; }
 
 /* ============================================================
    INTEGRATIONS BAR
@@ -328,12 +335,18 @@ a:hover { color: var(--accent-sage); }
     border-bottom: 1px solid var(--border);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    display: flex;
-    align-items: stretch;
     overflow-x: auto;
     scrollbar-width: none;
 }
 .integrations-bar::-webkit-scrollbar { display: none; }
+.integ-bar-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+}
 
 .integ-tab {
     display: inline-flex;
@@ -3796,17 +3809,19 @@ a:hover { color: var(--accent-sage); }
         background: rgba(11,18,32,0.98);
         border-bottom: 1px solid var(--border);
         box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-        z-index: 99;
+        z-index: 101;
         backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     }
     .nav-links.open { display: flex; }
     .nav-links a {
+        height: auto;
         padding: 14px 20px;
         border-bottom: 1px solid rgba(255,255,255,0.05);
         font-size: 0.82rem; border-right: none;
     }
     .nav-links a:last-of-type { border-bottom: none; }
     .nav-links a.active { border-bottom-color: rgba(255,255,255,0.05); border-left: 3px solid var(--accent-teal); padding-left: 17px; }
+    .nav-divider { display: none; }
 }
 @media (max-width: 480px) {
     .nav-links a { font-size: 0.65rem; }
@@ -5072,12 +5087,35 @@ a:hover { color: var(--accent-sage); }
             <div class="nav-brand-text">Contin<span class="brand-green">uu</span>m Inte<span class="brand-green">ll</span>igence</div>
         </a>
         <div class="nav-links" id="navLinks">
-            <a href="#home" class="active" data-nav="home">Research</a>
-            <a href="#snapshots" data-nav="snapshots">Snapshots</a>
-            <a href="#portfolio" data-nav="portfolio">Portfolio</a>
-            <a href="#thesis" data-nav="thesis">Comparator</a>
-            <a href="#personalisation" data-nav="personalisation">Profile</a>
-            <a href="#about" data-nav="about">About</a>
+            <a href="#home" class="active" data-nav="home">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Research
+            </a>
+            <span class="nav-divider" aria-hidden="true"></span>
+            <a href="#snapshots" data-nav="snapshots">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Snapshots
+            </a>
+            <span class="nav-divider" aria-hidden="true"></span>
+            <a href="#portfolio" data-nav="portfolio">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                Portfolio
+            </a>
+            <span class="nav-divider" aria-hidden="true"></span>
+            <a href="#thesis" data-nav="thesis">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                Comparator
+            </a>
+            <span class="nav-divider" aria-hidden="true"></span>
+            <a href="#personalisation" data-nav="personalisation">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Profile
+            </a>
+            <span class="nav-divider" aria-hidden="true"></span>
+            <a href="#about" data-nav="about">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                About
+            </a>
         </div>
         <div class="nav-actions">
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
@@ -5094,7 +5132,8 @@ a:hover { color: var(--accent-sage); }
 <!-- ============================================================
      INTEGRATIONS BAR
      ============================================================ -->
-<div class="integrations-bar" id="integrationsBar" role="tablist" aria-label="Platform integrations — coming soon">
+<div class="integrations-bar" id="integrationsBar">
+<div class="integ-bar-inner" role="tablist" aria-label="Platform integrations — coming soon">
 
     <!-- Bloomberg -->
     <button class="integ-tab" id="integ-bloomberg" role="tab" aria-selected="false" aria-controls="integ-page-bloomberg" data-integ="bloomberg">
@@ -5161,7 +5200,8 @@ a:hover { color: var(--accent-sage); }
         <span class="integ-soon-badge">SOON</span>
     </button>
 
-</div>
+</div><!-- /integ-bar-inner -->
+</div><!-- /integrations-bar -->
 
 <!-- ============================================================
      MAIN CONTENT
