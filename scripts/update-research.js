@@ -25,6 +25,7 @@ const { processStock, scoreToStatus: engineScoreToStatus } = require('./price-ev
 
 const STOCKS_DIR = path.join(__dirname, '..', 'data', 'stocks');
 const INDEX_PATH = path.join(__dirname, '..', 'index.html');
+const INDEX_JSON_PATH = path.join(__dirname, '..', 'data', 'research', '_index.json');
 const TA_CONFIG_PATH = path.join(__dirname, '..', 'data', 'config', 'ta-config.json');
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
@@ -393,6 +394,29 @@ function main() {
 
   // ── Update FRESHNESS_DATA in index.html ────────────────────────
   html = updateFreshnessInHtml(html, allFreshness);
+
+  // ── Update _index.json dates ────────────────────────────────────
+  // This is the source of truth for the "Updated" column in the coverage table.
+  if (!DRY_RUN && fs.existsSync(INDEX_JSON_PATH)) {
+    try {
+      const indexJson = JSON.parse(fs.readFileSync(INDEX_JSON_PATH, 'utf8'));
+      let indexChanged = false;
+      for (const file of jsonFiles) {
+        const ticker = file.replace('.json', '');
+        if (TICKER_FILTER && ticker !== TICKER_FILTER) continue;
+        if (indexJson[ticker]) {
+          indexJson[ticker].date = dateStr;
+          indexChanged = true;
+        }
+      }
+      if (indexChanged) {
+        fs.writeFileSync(INDEX_JSON_PATH, JSON.stringify(indexJson, null, 2));
+        console.log(`  ✓ Updated _index.json dates to ${dateStr}`);
+      }
+    } catch (err) {
+      console.warn(`  ⚠ Could not update _index.json: ${err.message}`);
+    }
+  }
 
   // ── Write index.html ───────────────────────────────────────────
   if (!DRY_RUN) {
