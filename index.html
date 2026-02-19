@@ -1086,6 +1086,81 @@ a:hover { color: var(--accent-sage); }
 .hc-sentiment-tag.bearish { background: rgba(212,85,85,0.18);  color: var(--signal-red);   }
 .hc-sentiment-tag.neutral { background: rgba(212,160,60,0.18); color: var(--signal-amber); }
 
+/* ── Phase 5.5: Evidence diagnosticity badges ── */
+.ec-diag-badge {
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.07em;
+    padding: 2px 7px; border-radius: 3px; margin-left: 6px; vertical-align: middle;
+}
+.ec-diag-badge.high   { background: rgba(61,170,109,0.18); color: var(--signal-green); }
+.ec-diag-badge.medium { background: rgba(212,160,60,0.18); color: var(--signal-amber); }
+.ec-diag-badge.low    { background: rgba(139,149,165,0.18); color: var(--text-muted);  }
+.ec-source-badge {
+    font-size: 0.58rem; font-weight: 600; letter-spacing: 0.05em;
+    padding: 1px 6px; border-radius: 3px; margin-left: 4px; vertical-align: middle;
+    background: var(--bg-elevated); color: var(--text-secondary);
+}
+
+/* ── Phase 5.6: Research vs Market Divergence ── */
+.divergence-panel {
+    background: var(--bg-surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: var(--space-md) var(--space-lg);
+    margin-bottom: var(--space-md);
+}
+.divergence-panel-title {
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 10px;
+}
+.divergence-rows { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 10px; }
+.divergence-row  { flex: 1; min-width: 140px; }
+.divergence-row-key {
+    font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);
+    margin-bottom: 3px;
+}
+.divergence-row-val {
+    font-size: 1.1rem; font-weight: 700; font-family: var(--font-data);
+}
+.divergence-flag {
+    font-size: 0.72rem; padding: 4px 10px; border-radius: 4px; display: inline-block;
+}
+.divergence-flag.amber {
+    background: rgba(212,160,60,0.18); color: var(--signal-amber);
+}
+.divergence-flag.ok {
+    background: rgba(61,170,109,0.1); color: var(--text-muted);
+}
+
+/* ── Phase 5.7: Narrative History ── */
+.narrative-history-section {
+    margin-top: var(--space-lg);
+}
+.narrative-history-title {
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 10px;
+}
+.nh-items { display: flex; flex-direction: column; gap: 8px; }
+.nh-item {
+    display: flex; gap: 12px; align-items: flex-start;
+    font-size: 0.78rem; padding: 8px 10px;
+    background: var(--bg-surface-alt); border-radius: 4px;
+    border-left: 3px solid var(--border);
+}
+.nh-date {
+    font-size: 0.67rem; color: var(--text-muted); white-space: nowrap;
+    padding-top: 1px; min-width: 76px;
+}
+.nh-flip {
+    font-weight: 600; color: var(--text-primary); line-height: 1.4;
+}
+.nh-trigger {
+    font-size: 0.71rem; color: var(--text-secondary); margin-top: 2px;
+}
+.nh-from { color: var(--signal-amber); }
+.nh-arrow { color: var(--text-muted); margin: 0 4px; }
+.nh-to   { color: var(--signal-green); }
+.nh-empty { font-size: 0.78rem; color: var(--text-muted); font-style: italic; }
+
 /* --- Report Page: Verdict --- */
 .verdict-section {
     background: var(--bg-surface);
@@ -5234,10 +5309,13 @@ function mergeStocksData(ticker, callback) {
       try {
         var sData = JSON.parse(sxhr.responseText);
         if (STOCK_DATA[ticker]) {
-          if (sData.narrative_model)   STOCK_DATA[ticker].narrative_model   = sData.narrative_model;
-          if (sData.narrative_weights) STOCK_DATA[ticker].narrative_weights = sData.narrative_weights;
+          if (sData.narrative_model)    STOCK_DATA[ticker].narrative_model    = sData.narrative_model;
+          if (sData.narrative_weights)  STOCK_DATA[ticker].narrative_weights  = sData.narrative_weights;
           if (sData.three_layer_signal) STOCK_DATA[ticker].three_layer_signal = sData.three_layer_signal;
-          if (sData.commodity_overlay) STOCK_DATA[ticker].commodity_overlay  = sData.commodity_overlay;
+          if (sData.commodity_overlay)  STOCK_DATA[ticker].commodity_overlay  = sData.commodity_overlay;
+          // Phase 5.7: narrative history and last flip
+          if (sData.narrative_history !== undefined) STOCK_DATA[ticker].narrative_history = sData.narrative_history;
+          if (sData.last_flip !== undefined)         STOCK_DATA[ticker].last_flip         = sData.last_flip;
         }
       } catch(e) { /* parse error — proceed without */ }
     }
@@ -6088,7 +6166,7 @@ function renderEvidenceCard(card) {
 
   return '<div class="evidence-card">' +
     '<div class="ec-header">' +
-      '<div class="ec-title">' + card.title + '</div>' +
+      '<div class="ec-title">' + card.title + (card._diagBadgeHtml || '') + '</div>' +
       '<div class="ec-header-right">' +
         '<span class="ec-epistemic ' + card.epistemicClass + '">' + card.epistemicLabel + '</span>' +
         '<span class="ec-toggle">&#9660;</span>' +
@@ -6159,19 +6237,37 @@ function renderEvidence(data) {
   var t = data.ticker.toLowerCase();
   var ev = data.evidence;
 
+  // Phase 5.5: Sort cards by diagnosticity (HIGH first), then by original order.
+  // Diagnosticity is derived from epistemicClass via EP_DIAG_MAP.
+  var sortedCards = ev.cards.slice();
+  sortedCards.sort(function(a, b) {
+    var aInfo = EP_DIAG_MAP[a.epistemicClass] || { order: 99 };
+    var bInfo = EP_DIAG_MAP[b.epistemicClass] || { order: 99 };
+    return aInfo.order - bInfo.order;
+  });
+
   var cardsHtml = '';
-  for (var i = 0; i < ev.cards.length; i++) {
-    cardsHtml += renderEvidenceCard(ev.cards[i]);
+  for (var i = 0; i < sortedCards.length; i++) {
+    var card = sortedCards[i];
+    var diagInfo = EP_DIAG_MAP[card.epistemicClass] || { diag: 'LOW', srcBadge: 'OTHER' };
+    // Inject diagnosticity + source badges into card before rendering
+    card._diagBadgeHtml = '<span class="ec-diag-badge ' + diagInfo.diag.toLowerCase() + '">' + diagInfo.diag + '</span>' +
+                          '<span class="ec-source-badge">' + diagInfo.srcBadge + '</span>';
+    cardsHtml += renderEvidenceCard(card);
   }
 
   var alignmentHtml = renderAlignmentSummary(data);
+  var divergenceHtml = renderDivergencePanel(data);
+  var narrativeHistoryHtml = renderNarrativeHistory(data);
 
   return '<div class="report-section" id="' + t + '-evidence">' +
     '<div class="rs-number">Section 04</div>' +
     '<div class="rs-title">Cross-Domain Evidence Synthesis</div>' +
     '<p class="rs-text">' + ev.intro + '</p>' +
+    divergenceHtml +
     cardsHtml +
     alignmentHtml +
+    narrativeHistoryHtml +
   '</div>';
 }
 
@@ -7318,6 +7414,120 @@ function destroyNarrativeTimelineChart(ticker) {
     canvas._ntChart.destroy();
     canvas._ntChart = null;
   }
+}
+
+// ── Phase 5.5: Evidence Section — diagnosticity sort + badges ───────────────
+// Map epistemic class to diagnosticity tier (HIGH/MEDIUM/LOW)
+var EP_DIAG_MAP = {
+  'ep-statutory':   { diag: 'HIGH',   order: 1, srcBadge: 'STATUTORY'    },
+  'ep-independent': { diag: 'HIGH',   order: 2, srcBadge: 'INDEPENDENT'  },
+  'ep-peerreviewed':{ diag: 'HIGH',   order: 3, srcBadge: 'PEER-REVIEWED'},
+  'ep-objective':   { diag: 'HIGH',   order: 4, srcBadge: 'MARKET DATA'  },
+  'ep-consensus':   { diag: 'MEDIUM', order: 5, srcBadge: 'BROKER'       },
+  'ep-governance':  { diag: 'MEDIUM', order: 6, srcBadge: 'GOVERNANCE'   },
+  'ep-registry':    { diag: 'MEDIUM', order: 7, srcBadge: 'REGISTRY'     },
+  'ep-behavioural': { diag: 'MEDIUM', order: 8, srcBadge: 'ALTERNATIVE'  },
+  'ep-motivated':   { diag: 'LOW',    order: 9, srcBadge: 'MANAGEMENT'   },
+  'ep-noise':       { diag: 'LOW',    order: 10,'srcBadge': 'MEDIA'      }
+};
+
+// ── Phase 5.6: Research vs Market Divergence ────────────────────────────────
+function renderDivergencePanel(data) {
+  var tls = data.three_layer_signal;
+  if (!tls) return '';
+
+  // Research view = idio_signal normalised to 0-100 scale (it's -100 to +100)
+  // Market view = macro_signal normalised the same way
+  // Divergence = difference between them — signals how much pure research vs macro are aligned
+  var idio = tls.idio_signal;
+  var macro = tls.macro_signal;
+  if (idio === null || idio === undefined || macro === null || macro === undefined) return '';
+
+  // Convert from ±100 scale to 0-100 "confidence" scale for display
+  var researchPct = Math.round((idio + 100) / 2);   // -100→0, 0→50, +100→100
+  var marketPct   = Math.round((macro + 100) / 2);
+  var divergence  = Math.abs(researchPct - marketPct);
+
+  var researchColor = idio > 10 ? 'var(--signal-green)' : idio < -10 ? 'var(--signal-red)' : 'var(--signal-amber)';
+  var marketColor   = macro  > 10 ? 'var(--signal-green)' : macro  < -10 ? 'var(--signal-red)' : 'var(--signal-amber)';
+
+  var flagHtml = '';
+  if (divergence > 10) {
+    flagHtml = '<div class="divergence-flag amber">&#9888; Research and market views diverging materially (' + divergence + ' points)</div>';
+  } else {
+    flagHtml = '<div class="divergence-flag ok">&#10003; Research and market views broadly aligned</div>';
+  }
+
+  return '<div class="divergence-panel">' +
+    '<div class="divergence-panel-title">Research vs Market View</div>' +
+    '<div class="divergence-rows">' +
+      '<div class="divergence-row">' +
+        '<div class="divergence-row-key">Research View</div>' +
+        '<div class="divergence-row-val" style="color:' + researchColor + '">' + researchPct + '</div>' +
+        '<div style="font-size:0.68rem;color:var(--text-muted)">from company-specific evidence</div>' +
+      '</div>' +
+      '<div class="divergence-row">' +
+        '<div class="divergence-row-key">Market / Macro View</div>' +
+        '<div class="divergence-row-val" style="color:' + marketColor + '">' + marketPct + '</div>' +
+        '<div style="font-size:0.68rem;color:var(--text-muted)">from macro + price signals</div>' +
+      '</div>' +
+      '<div class="divergence-row">' +
+        '<div class="divergence-row-key">Divergence</div>' +
+        '<div class="divergence-row-val" style="color:var(--text-primary)">' + divergence + ' pts</div>' +
+        '<div style="font-size:0.68rem;color:var(--text-muted)">| &gt;10pts = material</div>' +
+      '</div>' +
+    '</div>' +
+    flagHtml +
+  '</div>';
+}
+
+// ── Phase 5.7: Narrative History ─────────────────────────────────────────────
+function renderNarrativeHistory(data) {
+  // Draws from data.narrative_history (array) + data.last_flip (object)
+  // Both merged from data/stocks/TICKER.json via mergeStocksData
+  var history = Array.isArray(data.narrative_history) ? data.narrative_history.slice() : [];
+
+  // Append last_flip if not already present in history (dedup by date+from+to)
+  if (data.last_flip) {
+    var lf = data.last_flip;
+    var alreadyIn = history.some(function(h) {
+      return h.date === lf.date && h.from === lf.from && h.to === lf.to;
+    });
+    if (!alreadyIn) history.push(lf);
+  }
+
+  // Sort newest first, cap at 5
+  history.sort(function(a, b) { return b.date > a.date ? 1 : -1; });
+  history = history.slice(0, 5);
+
+  if (history.length === 0) {
+    return '<div class="narrative-history-section">' +
+      '<div class="narrative-history-title">Narrative History</div>' +
+      '<div class="nh-empty">No narrative flips recorded for this stock.</div>' +
+    '</div>';
+  }
+
+  var itemsHtml = '';
+  for (var i = 0; i < history.length; i++) {
+    var h = history[i];
+    var dateStr = h.date ? h.date.substring(0, 10) : '—';
+    itemsHtml += '<div class="nh-item">' +
+      '<div class="nh-date">' + dateStr + '</div>' +
+      '<div>' +
+        '<div class="nh-flip">' +
+          '<span class="nh-from">' + (h.from || '?') + '</span>' +
+          '<span class="nh-arrow">&rarr;</span>' +
+          '<span class="nh-to">' + (h.to || '?') + '</span>' +
+        '</div>' +
+        (h.trigger ? '<div class="nh-trigger">' + h.trigger + '</div>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  return '<div class="narrative-history-section">' +
+    '<div class="narrative-history-title">Narrative History (last ' + history.length + ' T1 changes)</div>' +
+    '<div class="nh-items">' + itemsHtml + '</div>' +
+  '</div>';
 }
 
 function renderReportPage(data) {
