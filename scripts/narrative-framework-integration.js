@@ -217,7 +217,7 @@ function injectStyles() {
   var style = document.createElement('style');
   style.id = 'nfi-styles';
   style.textContent = NFI_STYLES;
-  document.head.appendChild(style);
+  document.head.prepend(style); // Prepend so static CSS always wins the cascade
 }
 
 // ─── ALERT BANNER RENDERING ──────────────────────────────────────────────────
