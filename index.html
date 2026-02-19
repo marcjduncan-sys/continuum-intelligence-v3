@@ -5603,7 +5603,12 @@ function renderReportHero(data) {
     metricsHtml += '<div class="rh-metric"><div class="rh-metric-label">' + m.label + '</div><div class="' + cls + '">' + m.value + '</div></div>';
   }
 
-  var sparklineHtml = data.priceHistory ? renderSparkline(data.priceHistory) : '';
+  var sparkPrices = data.priceHistory ? data.priceHistory.slice() : [];
+  var currentPrice = data._livePrice || data.price;
+  if (sparkPrices.length > 0 && currentPrice && Math.abs(currentPrice - sparkPrices[sparkPrices.length - 1]) > 0.01) {
+    sparkPrices.push(currentPrice);
+  }
+  var sparklineHtml = sparkPrices.length >= 2 ? renderSparkline(sparkPrices) : '';
 
   return '<div class="report-hero">' +
     '<div class="report-hero-inner">' +
@@ -9224,8 +9229,9 @@ function updateLiveUI(ticker) {
     if (stock._livePrice) {
         var priceEl = document.querySelector('#page-report-' + ticker + ' .rh-price');
         if (priceEl) {
-            var change = stock._livePrice - stock.price;
-            var changePct = (change / stock.price) * 100;
+            var baseline = stock._livePrevClose || stock._anchors_price || stock.price;
+            var change = stock._livePrice - baseline;
+            var changePct = (change / baseline) * 100;
             var sign = change >= 0 ? '+' : '';
             var cls = change >= 0 ? 'positive' : 'negative';
             priceEl.innerHTML = '<span class="rh-price-currency">' + stock.currency + '</span>' +
