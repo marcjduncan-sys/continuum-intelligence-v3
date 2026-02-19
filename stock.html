@@ -258,5 +258,24 @@ function generateReport(type) {
 </script>
 <script src="js/dne/app.js"></script>
 
+<!-- Platform delivery layer -->
+<script src="js/portfolio.js"></script>
+<script src="js/alerts.js"></script>
+<script>
+// Wire CI_Alerts into the DNE update loop so every price refresh checks
+// for narrative state changes and fires toasts if needed.
+(function () {
+  var _origUpdate = typeof updateNarrativeUI === 'function' ? updateNarrativeUI : null;
+  if (typeof updateNarrativeUI !== 'undefined') {
+    window.updateNarrativeUI = function (stock) {
+      if (_origUpdate) _origUpdate(stock);
+      if (typeof CI_Alerts !== 'undefined') {
+        CI_Alerts.check(stock);
+      }
+    };
+  }
+})();
+</script>
+
 </body>
 </html>
