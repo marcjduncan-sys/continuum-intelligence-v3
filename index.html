@@ -10859,6 +10859,96 @@ const TC_DATA = {
         supporting: ['Iron ore cost position', 'Chinese demand resilience', 'Green hydrogen optionality'],
         contradicting: ['Iron ore price volatility', 'Chinese property weakness', 'Hydrogen economics'],
         analysis: "Your thesis <strong>aligns with T2</strong> — the cash machine scenario. You view green hydrogen as optionality, not core value. Watch T3 (China risk) as main downside."
+    },
+    BHP: {
+        name: 'BHP Group', primary: 't2',
+        t1: { name: 'Commodity Upcycle', prob: 20, desc: 'Iron ore and copper prices surge on China stimulus and supply constraints' },
+        t2: { name: 'Steady Cash Generation', prob: 45, desc: 'Pilbara and copper assets deliver reliable cash flows; capital returns sustained' },
+        t3: { name: 'China Demand Slowdown', prob: 25, desc: 'Property sector contraction reduces steel demand; iron ore prices fall structurally' },
+        t4: { name: 'Green Steel Disruption', prob: 10, desc: 'Green steel and alternative materials reduce long-term iron ore demand' },
+        supporting: ['Pilbara cost position', 'Copper growth optionality', 'Capital returns track record'],
+        contradicting: ['Chinese property sector weakness', 'Iron ore price volatility', 'Green steel transition risk'],
+        analysis: "Placeholder"
+    },
+    CBA: {
+        name: 'Commonwealth Bank', primary: 't1',
+        t1: { name: 'Digital Franchise Premium', prob: 40, desc: 'Digital-first strategy and market dominance justify sustained premium to peers' },
+        t2: { name: 'NIM Compression', prob: 30, desc: 'RBA rate-cutting cycle compresses net interest margins, reducing earnings' },
+        t3: { name: 'Competitive Disruption', prob: 20, desc: 'Neo-banks and non-bank lenders take meaningful share in key segments' },
+        t4: { name: 'Credit Cycle Normalisation', prob: 10, desc: 'Housing stress emerges; credit losses rise from cyclical lows' },
+        supporting: ['Digital market share leadership', 'Cost efficiency advantage', 'Brand and distribution moat'],
+        contradicting: ['Premium valuation vs peers', 'RBA cutting cycle exposure', 'Mortgage competition intensity'],
+        analysis: "Placeholder"
+    },
+    DXS: {
+        name: 'Dexus', primary: 't2',
+        t1: { name: 'Office Market Recovery', prob: 25, desc: 'CBD net absorption turns positive; occupancy, rents and asset values recover' },
+        t2: { name: 'Diversified Real Assets', prob: 45, desc: 'Strategic pivot from office toward industrial and alternatives delivers stable distributions' },
+        t3: { name: 'Structural Office Decline', prob: 20, desc: 'Hybrid work permanently compresses CBD office demand; asset values fall further' },
+        t4: { name: 'Higher-for-Longer Rates', prob: 10, desc: 'Elevated rates compress REIT valuations and erode distributable earnings' },
+        supporting: ['Managed funds growth', 'Industrial development returns', 'Premium CBD asset quality'],
+        contradicting: ['Office vacancy rates', 'Hybrid work permanence', 'Interest rate sensitivity'],
+        analysis: "Placeholder"
+    },
+    HRZ: {
+        name: 'Horizon Minerals', primary: 't2',
+        t1: { name: 'Discovery Catalyst', prob: 30, desc: 'Major gold resource upgrade or new discovery re-rates the stock' },
+        t2: { name: 'Managed Explorer', prob: 40, desc: 'Steady exploration and development within WA Goldfields; project on track' },
+        t3: { name: 'Exploration Failure', prob: 20, desc: 'Drill results disappoint; resource downgrades impair project economics' },
+        t4: { name: 'Gold Price Collapse', prob: 10, desc: 'Gold price falls or cost overruns render development economics unviable' },
+        supporting: ['WA Goldfields location', 'Gold price support', 'Exploration pipeline'],
+        contradicting: ['Small cap execution risk', 'Exploration uncertainty', 'Funding requirements'],
+        analysis: "Placeholder"
+    },
+    NAB: {
+        name: 'National Australia Bank', primary: 't2',
+        t1: { name: 'SME Lending Recovery', prob: 25, desc: 'Business banking growth and cost discipline deliver earnings above expectations' },
+        t2: { name: 'NIM Compression', prob: 40, desc: 'RBA cuts and mortgage competition compress net interest margins' },
+        t3: { name: 'Credit Cycle Deterioration', prob: 25, desc: 'SME bad debts rise; provisioning increases as business conditions weaken' },
+        t4: { name: 'Regulatory Capital Squeeze', prob: 10, desc: 'APRA increases capital requirements; reduces dividend capacity' },
+        supporting: ['Business banking franchise', 'Cost reduction progress', 'Capital position strength'],
+        contradicting: ['Mortgage market competition', 'SME credit exposure', 'Rate cut NIM headwinds'],
+        analysis: "Placeholder"
+    },
+    OCL: {
+        name: 'Objective Corporation', primary: 't2',
+        t1: { name: 'International Expansion', prob: 30, desc: 'UK, NZ and new government contract wins accelerate growth beyond current expectations' },
+        t2: { name: 'Steady GovTech SaaS', prob: 45, desc: 'Mission-critical government software delivers stable recurring revenue with modest growth' },
+        t3: { name: 'Contract Loss Risk', prob: 15, desc: 'Major government contracts not renewed; open-source alternatives gain traction' },
+        t4: { name: 'Public Sector Austerity', prob: 10, desc: 'Government budget cuts reduce technology spending across jurisdictions' },
+        supporting: ['Mission-critical government software', 'High switching costs', 'Recurring revenue base'],
+        contradicting: ['Concentration in government clients', 'Budget cycle dependency', 'Valuation premium'],
+        analysis: "Placeholder"
+    },
+    RFG: {
+        name: 'Retail Food Group', primary: 't2',
+        t1: { name: 'Franchise Recovery', prob: 30, desc: 'Franchisee profitability improves; store count grows and international royalties expand' },
+        t2: { name: 'Managed Turnaround', prob: 40, desc: 'Stable franchise operations and gradual debt reduction with growing international royalties' },
+        t3: { name: 'Franchisee Distress', prob: 20, desc: 'Franchisee failures accelerate; brand damage and litigation risk intensify' },
+        t4: { name: 'Competitive Displacement', prob: 10, desc: 'Major fast food chains intensify competition; consumer discretionary spending falls' },
+        supporting: ['International royalty diversification', 'Debt reduction progress', 'Brand portfolio breadth'],
+        contradicting: ['Franchisee financial health', 'Consumer discretionary exposure', 'Legacy litigation risk'],
+        analysis: "Placeholder"
+    },
+    RIO: {
+        name: 'Rio Tinto', primary: 't1',
+        t1: { name: 'Iron Ore Cash Generation', prob: 40, desc: 'Pilbara system generates exceptional cash flows as world\'s lowest-cost major operation' },
+        t2: { name: 'Energy Transition Portfolio', prob: 30, desc: 'Copper (Oyu Tolgoi) and lithium (Arcadium) position for energy transition demand surge' },
+        t3: { name: 'China Demand Slowdown', prob: 20, desc: 'Property sector contraction reduces steel and iron ore demand structurally' },
+        t4: { name: 'Growth Capex Risk', prob: 10, desc: 'Simandou, Arcadium and Oyu Tolgoi carry over US$15B execution and integration risk' },
+        supporting: ['Pilbara cost position', 'Copper/lithium optionality', 'Capital returns track record'],
+        contradicting: ['Chinese property sector', 'Simandou execution complexity', 'Arcadium integration risk'],
+        analysis: "Placeholder"
+    },
+    WOR: {
+        name: 'Worley', primary: 't1',
+        t1: { name: 'Energy Transition Winner', prob: 40, desc: 'Sustainability revenue grows to 60%+ as Worley becomes preferred energy transition partner' },
+        t2: { name: 'Traditional Energy Cash Cow', prob: 30, desc: 'LNG and upstream sustain margins while sustainability backlog builds' },
+        t3: { name: 'Margin Pressure', prob: 20, desc: 'Fixed-price legacy contracts and lower sustainability margins compress EBITA below 8% target' },
+        t4: { name: 'Cyclical Downturn', prob: 10, desc: 'Global recession triggers simultaneous capex cuts across traditional and sustainability energy' },
+        supporting: ['Sustainability backlog growth', 'Global engineering scale', 'LNG margin support'],
+        contradicting: ['Fixed-price contract exposure', 'EBITA target miss risk', 'Energy capex cyclicality'],
+        analysis: "Placeholder"
     }
 };
 
@@ -10935,6 +11025,60 @@ const TC_KEYWORDS = {
         t2: ['iron.*ore.*cash','cash.*machine','green.*scaled.*back','core.*iron.*ore'],
         t3: ['iron.*ore.*price.*collapse','china.*demand.*weakness','iron.*ore.*oversupply'],
         t4: ['hydrogen.*destroy.*value','green.*capital.*destroy','no.*return.*hydrogen']
+    },
+    BHP: {
+        t1: ['china.*stimulus','iron.*ore.*recover','copper.*surge','supercycle','commodity.*recover','pilbara.*recover'],
+        t2: ['steady.*cash','reliable.*dividend','stable.*iron','capital.*return','consistent.*cash.*flow'],
+        t3: ['china.*property','steel.*demand.*fall','iron.*ore.*price.*fall','property.*sector.*drag'],
+        t4: ['green.*steel','alternative.*material','iron.*ore.*obsolete','decarboni.*steel']
+    },
+    CBA: {
+        t1: ['digital.*franchise','digital.*leader','market.*position.*justify','premium.*justify','quality.*justify','dominant.*bank'],
+        t2: ['nim.*compress','net.*interest.*margin','rate.*cut.*squeeze','rba.*cut','margin.*compress'],
+        t3: ['neo.bank','non.bank.*lender','fintech.*threat','mortgage.*compet','digital.*challenger'],
+        t4: ['credit.*loss','housing.*stress','bad.*debt','mortgage.*default','credit.*cycle.*normal']
+    },
+    DXS: {
+        t1: ['office.*recover','cbd.*recover','occupancy.*recover','rent.*recover','net.*absorption','office.*demand.*return'],
+        t2: ['industrial.*pivot','diversif.*real.*asset','managed.*fund.*growth','pivot.*from.*office','alternatives.*portfolio'],
+        t3: ['hybrid.*work.*permanent','structural.*decline.*office','permanent.*hybrid','office.*obsolete','wfh.*permanent'],
+        t4: ['higher.*for.*longer','rate.*compress.*reit','cap.*rate.*expand','discount.*rate.*higher','reit.*valuat.*compress']
+    },
+    HRZ: {
+        t1: ['discovery','resource.*upgrade','drill.*result.*positive','new.*find','resource.*re.rate','feasibility.*positive'],
+        t2: ['steady.*exploration','exploration.*on.*track','project.*develop','wa.*goldfields','managed.*explorer'],
+        t3: ['drill.*disappoint','resource.*downgrade','miss.*target','exploration.*fail','poor.*drill'],
+        t4: ['gold.*price.*fall','cost.*overrun','development.*unviable','gold.*collapse','project.*economics']
+    },
+    NAB: {
+        t1: ['sme.*recover','business.*bank.*grow','cost.*disciplin','earnings.*surprise','sme.*lending.*grow'],
+        t2: ['nim.*compress','margin.*compress','rate.*cut','mortgage.*compet','net.*interest.*margin'],
+        t3: ['bad.*debt','sme.*credit','rising.*provision','credit.*deteriorat','business.*failure.*rate'],
+        t4: ['apra.*capital','regulatory.*capital','capital.*requirement.*increase','dividend.*reduce.*capital']
+    },
+    OCL: {
+        t1: ['international.*expand','uk.*contract','new.*government.*win','overseas.*grow','international.*contract'],
+        t2: ['recurring.*government','stable.*government','govtech','mission.*critical','switching.*cost','government.*saas'],
+        t3: ['contract.*not.*renew','contract.*loss','open.*source.*alternative','non.renewal','contract.*expire'],
+        t4: ['government.*budget.*cut','austerity','public.*sector.*cut','it.*spend.*reduc','government.*freeze']
+    },
+    RFG: {
+        t1: ['franchisee.*profit','store.*count.*grow','international.*royalt','brand.*recover','new.*store.*open'],
+        t2: ['managed.*turnaround','debt.*reduc','stable.*franchise','royalt.*grow','orderly.*reduc'],
+        t3: ['franchisee.*fail','franchisee.*distress','litigation','brand.*damage','class.*action'],
+        t4: ['mcdonalds.*compet','fast.*food.*compet','consumer.*discretionary.*fall','competitive.*displacement']
+    },
+    RIO: {
+        t1: ['pilbara','iron.*ore.*cash','cash.*generat','exceptional.*cash','lowest.*cost.*iron','pilbara.*system'],
+        t2: ['oyu.*tolgoi','copper.*optionality','arcadium','lithium.*position','energy.*transition.*copper','copper.*growth'],
+        t3: ['china.*property','steel.*demand.*fall','iron.*ore.*demand.*fall','china.*slowdown.*steel'],
+        t4: ['simandou','capex.*risk.*growth','arcadium.*integrat','execution.*risk.*simandou']
+    },
+    WOR: {
+        t1: ['sustainability.*revenue','energy.*transition.*partner','transition.*backlog','60.*percent.*sustain','preferred.*partner'],
+        t2: ['lng.*margin','traditional.*energy.*sustain','upstream.*sustain','oil.*gas.*cash','traditional.*cash'],
+        t3: ['fixed.*price.*contract','ebita.*miss','margin.*compress.*worley','below.*8.*percent.*ebita'],
+        t4: ['capex.*correction','energy.*recession','downturn.*capex','cyclical.*downturn.*energy']
     }
 };
 
