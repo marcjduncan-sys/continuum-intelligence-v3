@@ -66,6 +66,7 @@ function buildInstitutionalReportHTML(stock) {
     'padding: 40mm 18mm; ' +
     'color: #333; ' +
     'height: 297mm; ' +
+    'box-sizing: border-box; ' +
     'display: flex; ' +
     'flex-direction: column; ' +
     'justify-content: space-between; ' +
@@ -135,7 +136,7 @@ function buildInstitutionalReportHTML(stock) {
   // Footer
   html += '<div style="border-top: 1px solid #ddd; padding-top: 12px;">';
   html += '<div style="font-size: 8px; color: #999; line-height: 1.4;">' +
-    '© 2026 Continuum Intelligence. This is not personal financial advice. ' +
+    '© ' + new Date().getFullYear() + ' Continuum Intelligence. This is not personal financial advice. ' +
     'Analysis uses the Analysis of Competing Hypotheses (ACH) methodology. ' +
     'Consult a licensed financial adviser before making investment decisions.' +
     '</div>';
@@ -315,7 +316,7 @@ function buildInstitutionalReportHTML(stock) {
     '</div>';
 
   html += '<div style="border-top: 1px solid #ddd; padding-top: 12px; margin-top: 24px; font-size: 9px; color: #999;">' +
-    '© 2026 Continuum Intelligence. All rights reserved.' +
+    '© ' + new Date().getFullYear() + ' Continuum Intelligence. All rights reserved.' +
     '</div>';
 
   html += '</div>';
@@ -350,6 +351,7 @@ function buildRetailReportHTML(stock) {
     'padding: 40mm 18mm; ' +
     'color: #333; ' +
     'height: 297mm; ' +
+    'box-sizing: border-box; ' +
     'display: flex; ' +
     'flex-direction: column; ' +
     'justify-content: space-between; ' +
@@ -433,7 +435,7 @@ function buildRetailReportHTML(stock) {
   // Footer
   html += '<div style="border-top: 1px solid #ddd; padding-top: 12px;">';
   html += '<div style="font-size: 8px; color: #999; line-height: 1.4;">' +
-    '© 2026 Continuum Intelligence. This is not personal financial advice. ' +
+    '© ' + new Date().getFullYear() + ' Continuum Intelligence. This is not personal financial advice. ' +
     'Consult a licensed financial adviser before making investment decisions.' +
     '</div>';
   html += '</div>';
@@ -516,7 +518,7 @@ function buildRetailReportHTML(stock) {
     '</div>';
 
   html += '<div style="border-top: 1px solid #ddd; padding-top: 12px; margin-top: 24px; font-size: 9px; color: #999;">' +
-    '© 2026 Continuum Intelligence. All rights reserved.' +
+    '© ' + new Date().getFullYear() + ' Continuum Intelligence. All rights reserved.' +
     '</div>';
 
   html += '</div>';
@@ -536,8 +538,6 @@ window.generateReport = function (format) {
     return;
   }
 
-  console.log('[PDF] Starting report generation for:', stock.ticker, 'format:', format);
-
   // 2. Build the HTML
   var reportHTML = format === 'retail'
     ? buildRetailReportHTML(stock)
@@ -549,8 +549,6 @@ window.generateReport = function (format) {
     return;
   }
 
-  console.log('[PDF] HTML generated, length:', reportHTML.length);
-
   // 3. Create a complete standalone HTML document
   var fullDocument = '<!DOCTYPE html>' +
     '<html>' +
@@ -559,7 +557,7 @@ window.generateReport = function (format) {
     '<title>' + escapeHtmlForPdf(stock.ticker) + ' Report</title>' +
     '<style>' +
     'body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: white; color: #333; }' +
-    '@page { size: A4; margin: 20mm; }' +
+    '@page { size: A4; margin: 0; }' +
     '</style>' +
     '</head>' +
     '<body>' +
@@ -569,8 +567,6 @@ window.generateReport = function (format) {
 
   // 4. Open a new window and write the complete document directly
   var printWindow = window.open('', 'PrintReport_' + Date.now());
-  
-  console.log('[PDF] Print window opened');
 
   if (!printWindow) {
     alert('Unable to open print window. Please check if popups are blocked in your browser.');
@@ -582,19 +578,14 @@ window.generateReport = function (format) {
   printWindow.document.write(fullDocument);
   printWindow.document.close();
 
-  console.log('[PDF] Document written and closed');
-
-  // 5. Wait for rendering, then trigger print dialog
+  // 5. Wait for rendering to complete, then trigger print dialog (~300ms for fonts/layout)
   setTimeout(function() {
     try {
       printWindow.focus();
       printWindow.print();
-      console.log('[PDF] Print dialog triggered');
-      
-      // Close window after print completes
+      // Close window after user dismisses the print dialog (~1000ms grace period)
       setTimeout(function() {
         printWindow.close();
-        console.log('[PDF] Window closed after print');
       }, 1000);
     } catch (err) {
       console.error('[PDF] Error during print:', err);

@@ -797,6 +797,29 @@ a:hover { color: var(--accent-sage); }
     font-size: 0.72rem;
     color: var(--text-muted);
 }
+/* Coverage search bar */
+.coverage-search-bar {
+    margin-bottom: 10px;
+}
+#coverage-search {
+    width: 100%;
+    padding: 8px var(--space-md);
+    font-size: 0.82rem;
+    font-family: var(--font-ui);
+    color: var(--text-primary);
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+}
+#coverage-search:focus {
+    border-color: var(--accent-teal);
+}
+#coverage-search::placeholder {
+    color: var(--text-muted);
+}
 .coming-soon {
     font-size: 0.6rem; font-weight: 600;
     letter-spacing: 0.06em; text-transform: uppercase;
@@ -4255,9 +4278,7 @@ a:hover { color: var(--accent-sage); }
     background: #FFFFFF;
 }
 
-/* --- Hide FAB and floating panel — chat is now inline --- */
-.chat-fab { display: none !important; }
-.chat-panel { display: none !important; }
+/* FAB and panel are active — global research chat available on all pages */
 
 /* --- Inline Research Chat (within report sections) --- */
 .chat-inline {
@@ -4432,6 +4453,10 @@ a:hover { color: var(--accent-sage); }
             <div class="section-title">Coverage Universe</div>
         </div>
 
+        <div class="coverage-search-bar">
+            <input type="search" id="coverage-search" placeholder="Search by ticker or company..." autocomplete="off" aria-label="Search coverage universe">
+        </div>
+
         <table class="coverage-table" id="coverage-table">
             <thead>
                 <tr>
@@ -4476,7 +4501,7 @@ a:hover { color: var(--accent-sage); }
             </div>
             <div class="footer-bottom">
                 <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the Analysis of Competing Hypotheses (ACH) methodology. No buy, sell, or hold recommendations are made. Readers should consult their own financial advisors.</div>
-                <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
+                <div class="footer-meta">&copy; <span class="year-auto"></span> Continuum Intelligence</div>
             </div>
         </div>
     </footer>
@@ -4500,7 +4525,7 @@ a:hover { color: var(--accent-sage); }
         <div class="footer-inner">
             <div class="footer-bottom">
                 <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the ACH methodology.</div>
-                <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
+                <div class="footer-meta">&copy; <span class="year-auto"></span> Continuum Intelligence</div>
             </div>
         </div>
     </footer>
@@ -4702,7 +4727,7 @@ a:hover { color: var(--accent-sage); }
         <div class="footer-inner">
             <div class="footer-bottom">
                 <div class="footer-disclaimer">This portal does not constitute personal financial advice. Position alignment analysis uses publicly available information and the Analysis of Competing Hypotheses (ACH) methodology. No buy, sell, or hold recommendations are made.</div>
-                <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
+                <div class="footer-meta">&copy; <span class="year-auto"></span> Continuum Intelligence</div>
             </div>
         </div>
     </footer>
@@ -4750,7 +4775,7 @@ a:hover { color: var(--accent-sage); }
         <div class="footer-inner">
             <div class="footer-bottom">
                 <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the ACH methodology.</div>
-                <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
+                <div class="footer-meta">&copy; <span class="year-auto"></span> Continuum Intelligence</div>
             </div>
         </div>
     </footer>
@@ -4831,7 +4856,7 @@ a:hover { color: var(--accent-sage); }
         <div class="footer-inner">
             <div class="footer-bottom">
                 <div class="footer-disclaimer">This comparator provides analysis based on publicly available research. It does not constitute investment advice.</div>
-                <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
+                <div class="footer-meta">&copy; <span class="year-auto"></span> Continuum Intelligence</div>
             </div>
         </div>
     </footer>
@@ -8594,7 +8619,7 @@ function renderCoverageRow(data) {
     var dp = data.date.split(' ');
     if (dp.length >= 3) dateTs = new Date(dp[1] + ' ' + dp[0] + ', ' + dp[2]).getTime() || 0;
   }
-  return '<tr data-company-score="' + (compScore !== null ? compScore : 0) + '" data-sent-score="' + (sentScore !== null ? sentScore : 0) + '" data-sector="' + (data.sector || '') + '" data-price-val="' + (parseFloat(data.price) || 0) + '" data-date-val="' + dateTs + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
+  return '<tr data-ticker="' + data.ticker + '" data-company="' + (data.company || '').toLowerCase() + '" data-company-score="' + (compScore !== null ? compScore : 0) + '" data-sent-score="' + (sentScore !== null ? sentScore : 0) + '" data-sector="' + (data.sector || '') + '" data-price-val="' + (parseFloat(data.price) || 0) + '" data-date-val="' + dateTs + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
     '<td class="td-ticker">' + data.ticker + '</td>' +
     '<td>' + data.company + '</td>' +
     '<td>' + data.sector + '</td>' +
@@ -8618,6 +8643,56 @@ function renderComingSoonRow(stub) {
     '<td></td>' +
   '</tr>';
 }
+
+// ─── Coverage search ────────────────────────────────────────────────────────
+(function () {
+  var _searchTimer = null;
+
+  window.filterCoverageTable = function (query) {
+    var q = (query || '').toLowerCase().trim();
+    var rows = document.querySelectorAll('#coverage-body tr');
+    var matchCount = 0;
+    rows.forEach(function (row) {
+      if (row.classList.contains('skeleton-row')) return;
+      var ticker = (row.getAttribute('data-ticker') || '').toLowerCase();
+      var company = (row.getAttribute('data-company') || '');
+      var match = !q || ticker.indexOf(q) !== -1 || company.indexOf(q) !== -1;
+      row.style.display = match ? '' : 'none';
+      if (match) matchCount++;
+    });
+    // No-results row
+    var noResults = document.getElementById('coverage-no-results');
+    if (q && matchCount === 0) {
+      if (!noResults) {
+        var tbody = document.getElementById('coverage-body');
+        var nr = document.createElement('tr');
+        nr.id = 'coverage-no-results';
+        nr.innerHTML = '<td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.82rem;">No stocks match &ldquo;' + query.replace(/[&<>"']/g, '') + '&rdquo;</td>';
+        tbody.appendChild(nr);
+      }
+    } else if (noResults) {
+      noResults.remove();
+    }
+    // Filter featured cards
+    var cards = document.querySelectorAll('#featured-grid [data-ticker-card]');
+    cards.forEach(function (card) {
+      var t = (card.getAttribute('data-ticker-card') || '').toLowerCase();
+      var match = !q || t.indexOf(q) !== -1;
+      card.style.display = match ? '' : 'none';
+    });
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var input = document.getElementById('coverage-search');
+    if (!input) return;
+    input.addEventListener('input', function () {
+      clearTimeout(_searchTimer);
+      _searchTimer = setTimeout(function () {
+        filterCoverageTable(input.value);
+      }, 150);
+    });
+  });
+}());
 
 // Coverage table sort state
 var coverageSortDir = 0; // 0 = unsorted (default), 1 = desc, -1 = asc
@@ -10207,6 +10282,12 @@ window.addEventListener('hashchange', function() {
 });
 window.addEventListener('DOMContentLoaded', route);
 
+/* --- Dynamic copyright year --- */
+document.addEventListener('DOMContentLoaded', function () {
+    var yr = new Date().getFullYear();
+    document.querySelectorAll('.year-auto').forEach(function (el) { el.textContent = yr; });
+});
+
 /* --- Sticky Nav Shadow --- */
 window.addEventListener('scroll', () => {
     const nav = document.getElementById('siteNav');
@@ -10761,9 +10842,9 @@ function renderReweighting(positions, totalValue) {
         if (cd.skew === 'upside') multiplier = 1.3;
         else if (cd.skew === 'downside') multiplier = 0.7;
 
-        // Adjust for hypothesis strength from TC_DATA
+        // Adjust for hypothesis strength — reads live STOCK_DATA, falls back to TC_DATA
         if (tc) {
-            const probs = [tc.t1.prob, tc.t2.prob, tc.t3.prob, tc.t4.prob];
+            const probs = [tcGetProb(p.ticker, 't1'), tcGetProb(p.ticker, 't2'), tcGetProb(p.ticker, 't3'), tcGetProb(p.ticker, 't4')];
             const maxProb = Math.max(...probs);
             // High conviction in dominant thesis = slight boost
             if (maxProb > 40) multiplier *= 1.05;
@@ -11387,6 +11468,31 @@ function tcSelectStock(ticker) {
     document.getElementById('tc-step-2').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// Returns live pipeline probability (%) for a ticker/tier, falling back to TC_DATA.
+// tier must be lowercase: 't1', 't2', 't3', 't4'
+// Normalises survival_score across all four tiers so probabilities sum to 100%.
+function tcGetProb(ticker, tier) {
+    try {
+        var sd = typeof STOCK_DATA !== 'undefined' && STOCK_DATA && STOCK_DATA[ticker];
+        if (sd && sd.hypotheses) {
+            var tKeys = ['T1', 'T2', 'T3', 'T4'];
+            var sum = 0;
+            tKeys.forEach(function (t) {
+                var h = sd.hypotheses[t];
+                if (h && typeof h.survival_score === 'number') sum += h.survival_score;
+            });
+            if (sum > 0) {
+                var hyp = sd.hypotheses[tier.toUpperCase()];
+                if (hyp && typeof hyp.survival_score === 'number') {
+                    return Math.round((hyp.survival_score / sum) * 100);
+                }
+            }
+        }
+    } catch (e) {}
+    var tcEntry = TC_DATA[ticker];
+    return tcEntry && tcEntry[tier] ? tcEntry[tier].prob : 0;
+}
+
 function tcAnalyze() {
     if (!tcSelectedTicker) { alert('Please select a stock first'); return; }
 
@@ -11492,7 +11598,7 @@ function tcAnalyze() {
                 <div class="tc-indicator ${tier} ${isMatch ? 'match' : ''}">${tier.toUpperCase()}</div>
                 <div class="tc-info">
                     <div class="tc-name">${tier.toUpperCase()}: ${tData.name}</div>
-                    <div class="tc-prob">Continuum: ${tData.prob}% probability</div>
+                    <div class="tc-prob">Continuum: ${tcGetProb(tcSelectedTicker, tier)}% probability</div>
                 </div>
                 <span class="tc-stance ${stance}">${stance.toUpperCase()}</span>
             </div>
@@ -11503,13 +11609,13 @@ function tcAnalyze() {
     const continuumBase = data.primary;
     let analysisText;
     if (primaryTier === continuumBase) {
-        analysisText = `Your thesis aligns with Continuum's base case (<strong>${primaryTier.toUpperCase()}: ${tierData.name}</strong>), which carries a ${tierData.prob}% probability weighting. The evidence pattern in your thesis is consistent with Continuum's dominant hypothesis.`;
+        analysisText = `Your thesis aligns with Continuum's base case (<strong>${primaryTier.toUpperCase()}: ${tierData.name}</strong>), which carries a ${tcGetProb(tcSelectedTicker, primaryTier)}% probability weighting. The evidence pattern in your thesis is consistent with Continuum's dominant hypothesis.`;
     } else if (primaryTier === 't1' && continuumBase !== 't1') {
-        analysisText = `Your thesis is <strong>more bullish</strong> than Continuum's base case. Continuum assigns ${data[continuumBase].prob}% to <strong>${continuumBase.toUpperCase()}: ${data[continuumBase].name}</strong>. You would need the ${data[continuumBase].name.toLowerCase()} risks to resolve favourably to justify your position.`;
+        analysisText = `Your thesis is <strong>more bullish</strong> than Continuum's base case. Continuum assigns ${tcGetProb(tcSelectedTicker, continuumBase)}% to <strong>${continuumBase.toUpperCase()}: ${data[continuumBase].name}</strong>. You would need the ${data[continuumBase].name.toLowerCase()} risks to resolve favourably to justify your position.`;
     } else if ((primaryTier === 't3' || primaryTier === 't4') && (continuumBase === 't1' || continuumBase === 't2')) {
-        analysisText = `Your thesis is <strong>more bearish</strong> than Continuum's base case. Continuum assigns ${data[continuumBase].prob}% to <strong>${continuumBase.toUpperCase()}: ${data[continuumBase].name}</strong>. Your view implies a dislocation — the market may be underpricing the downside risks your thesis identifies.`;
+        analysisText = `Your thesis is <strong>more bearish</strong> than Continuum's base case. Continuum assigns ${tcGetProb(tcSelectedTicker, continuumBase)}% to <strong>${continuumBase.toUpperCase()}: ${data[continuumBase].name}</strong>. Your view implies a dislocation — the market may be underpricing the downside risks your thesis identifies.`;
     } else {
-        analysisText = `Your thesis diverges from Continuum's base case (<strong>${continuumBase.toUpperCase()}: ${data[continuumBase].name}</strong>, ${data[continuumBase].prob}% probability). Your view aligns more closely with <strong>${primaryTier.toUpperCase()}: ${tierData.name}</strong> (${tierData.prob}% probability). Consider what evidence would need to change for Continuum's assessment to shift.`;
+        analysisText = `Your thesis diverges from Continuum's base case (<strong>${continuumBase.toUpperCase()}: ${data[continuumBase].name}</strong>, ${tcGetProb(tcSelectedTicker, continuumBase)}% probability). Your view aligns more closely with <strong>${primaryTier.toUpperCase()}: ${tierData.name}</strong> (${tcGetProb(tcSelectedTicker, primaryTier)}% probability). Consider what evidence would need to change for Continuum's assessment to shift.`;
     }
     document.getElementById('tc-analysis-text').innerHTML = analysisText;
 
@@ -13094,7 +13200,7 @@ function buildRetailHTML(stock) {
       '<p style="margin-bottom:10px;">We use a method called Analysis of Competing Hypotheses to weigh evidence for and against different possible outcomes for each company. This is a structured way of thinking about investments — it is not a prediction of what will happen.</p>' +
       '<p style="margin-bottom:10px;">All information comes from public sources including company announcements, regulatory filings, and market data. We do not have access to inside information.</p>' +
       '<p style="margin-bottom:10px;">Before making any investment decision, you should do your own research and speak with a licensed financial adviser who understands your personal circumstances.</p>' +
-      '<p style="margin-bottom:10px;">&copy; 2026 Continuum Intelligence. All rights reserved.</p>' +
+      '<p style="margin-bottom:10px;">&copy; <span class="year-auto"></span> Continuum Intelligence. All rights reserved.</p>' +
       '<p>Generated: ' + pdfEsc(genDate) + '</p>' +
     '</div>' +
     pageFooter(3, 3);
