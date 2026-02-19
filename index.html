@@ -125,6 +125,8 @@
     /* Sizing */
     --max-width: 1120px;
     --nav-height: 56px;
+    --integrations-bar-height: 40px;
+    --header-total: calc(var(--nav-height) + var(--integrations-bar-height));
 }
 
 /* Light theme overrides */
@@ -312,8 +314,176 @@ a:hover { color: var(--accent-sage); }
 .nav-hamburger svg { width: 18px; height: 18px; pointer-events: none; }
 .nav-actions { display: flex; align-items: center; gap: var(--space-sm); }
 
+/* ============================================================
+   INTEGRATIONS BAR
+   ============================================================ */
+
+.integrations-bar {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0; right: 0;
+    z-index: 99;
+    height: var(--integrations-bar-height);
+    background: rgba(7, 12, 22, 0.97);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    align-items: stretch;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.integrations-bar::-webkit-scrollbar { display: none; }
+
+.integ-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 16px;
+    height: 100%;
+    font-family: var(--font-ui);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+}
+.integ-tab:hover { color: var(--text-secondary); }
+.integ-tab.active {
+    color: var(--text-primary);
+    border-bottom-color: var(--accent-teal);
+}
+.integ-tab:focus-visible {
+    outline: 2px solid var(--accent-teal);
+    outline-offset: -2px;
+}
+.integ-tab svg { width: 12px; height: 12px; opacity: 0.6; flex-shrink: 0; }
+.integ-tab:hover svg, .integ-tab.active svg { opacity: 1; }
+
+.integ-soon-badge {
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    color: var(--accent-gold);
+    background: rgba(201, 169, 110, 0.1);
+    border: 1px solid rgba(201, 169, 110, 0.25);
+    border-radius: 3px;
+    padding: 1px 4px;
+    line-height: 1.4;
+    flex-shrink: 0;
+}
+
+.integ-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    align-self: center;
+    margin: 0 4px;
+    flex-shrink: 0;
+}
+
+/* Light theme */
+[data-theme="light"] .integrations-bar {
+    background: rgba(240, 241, 244, 0.97);
+    border-bottom-color: #E2E8F0;
+}
+[data-theme="light"] .integ-soon-badge {
+    background: rgba(180, 130, 50, 0.08);
+}
+[data-theme="light"] .integ-divider {
+    background: #E2E8F0;
+}
+
+/* ============================================================
+   INTEGRATION PLACEHOLDER PAGES
+   ============================================================ */
+
+.integ-page {
+    display: none;
+    min-height: calc(100vh - var(--header-total));
+    padding-top: var(--header-total);
+    background: var(--bg-page);
+}
+.integ-page.active { display: block; }
+
+.integ-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - var(--header-total));
+    padding: var(--space-3xl) var(--space-lg);
+    text-align: center;
+}
+.integ-placeholder-illustration {
+    width: 280px;
+    height: 180px;
+    margin-bottom: var(--space-xl);
+    opacity: 0.75;
+}
+.integ-placeholder-eyebrow {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    margin-bottom: var(--space-sm);
+}
+.integ-placeholder-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+    letter-spacing: -0.01em;
+}
+.integ-placeholder-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    max-width: 420px;
+    line-height: 1.6;
+    margin-bottom: var(--space-xl);
+}
+.integ-placeholder-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--accent-gold);
+    background: rgba(201, 169, 110, 0.08);
+    border: 1px solid rgba(201, 169, 110, 0.2);
+    border-radius: 20px;
+    padding: 6px 16px;
+    margin-bottom: var(--space-lg);
+}
+.integ-placeholder-badge svg { width: 12px; height: 12px; }
+.integ-back-btn {
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+.integ-back-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--border-light);
+}
+
 /* --- Page Container --- */
-.page { display: none; min-height: calc(100vh - var(--nav-height)); padding-top: var(--nav-height); }
+.page { display: none; min-height: calc(100vh - var(--header-total)); padding-top: var(--header-total); }
 .page.active { display: block; }
 .page-inner {
     max-width: var(--max-width);
@@ -833,8 +1003,8 @@ a:hover { color: var(--accent-sage); }
 .report-hero {
     background: var(--bg-header);
     padding: var(--space-xl) 0;
-    margin-top: calc(-1 * var(--nav-height));
-    padding-top: calc(var(--nav-height) + var(--space-xl));
+    margin-top: calc(-1 * var(--header-total));
+    padding-top: calc(var(--header-total) + var(--space-xl));
 }
 .report-hero-inner,
 .nfi-alert-inner {
@@ -4920,6 +5090,78 @@ a:hover { color: var(--accent-sage); }
         </div>
     </div>
 </nav>
+
+<!-- ============================================================
+     INTEGRATIONS BAR
+     ============================================================ -->
+<div class="integrations-bar" id="integrationsBar" role="tablist" aria-label="Platform integrations — coming soon">
+
+    <!-- Bloomberg -->
+    <button class="integ-tab" id="integ-bloomberg" role="tab" aria-selected="false" aria-controls="integ-page-bloomberg" data-integ="bloomberg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+        Bloomberg
+        <span class="integ-soon-badge">SOON</span>
+    </button>
+
+    <div class="integ-divider" aria-hidden="true"></div>
+
+    <!-- Risk -->
+    <button class="integ-tab" id="integ-risk" role="tab" aria-selected="false" aria-controls="integ-page-risk" data-integ="risk">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Risk
+        <span class="integ-soon-badge">SOON</span>
+    </button>
+
+    <div class="integ-divider" aria-hidden="true"></div>
+
+    <!-- Team Chat -->
+    <button class="integ-tab" id="integ-teamchat" role="tab" aria-selected="false" aria-controls="integ-page-teamchat" data-integ="teamchat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Team Chat
+        <span class="integ-soon-badge">SOON</span>
+    </button>
+
+    <div class="integ-divider" aria-hidden="true"></div>
+
+    <!-- Trading -->
+    <button class="integ-tab" id="integ-trading" role="tab" aria-selected="false" aria-controls="integ-page-trading" data-integ="trading">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+        </svg>
+        Trading
+        <span class="integ-soon-badge">SOON</span>
+    </button>
+
+    <div class="integ-divider" aria-hidden="true"></div>
+
+    <!-- Analyst Chat -->
+    <button class="integ-tab" id="integ-analystchat" role="tab" aria-selected="false" aria-controls="integ-page-analystchat" data-integ="analystchat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="22 12 18 12 15 3 9 21 6 12 2 12"/>
+        </svg>
+        Analyst Chat
+        <span class="integ-soon-badge">SOON</span>
+    </button>
+
+    <div class="integ-divider" aria-hidden="true"></div>
+
+    <!-- News -->
+    <button class="integ-tab" id="integ-news" role="tab" aria-selected="false" aria-controls="integ-page-news" data-integ="news">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+            <path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/>
+        </svg>
+        News
+        <span class="integ-soon-badge">SOON</span>
+    </button>
+
+</div>
 
 <!-- ============================================================
      MAIN CONTENT
@@ -12276,6 +12518,339 @@ function tcAnalyze() {
 }
 </script>
 
+<!-- ============================================================
+     INTEGRATION PLACEHOLDER PAGES
+     ============================================================ -->
+
+<!-- Bloomberg -->
+<div class="integ-page" id="integ-page-bloomberg" role="tabpanel" aria-labelledby="integ-bloomberg">
+    <div class="integ-placeholder">
+        <svg class="integ-placeholder-illustration" viewBox="0 0 280 180" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Terminal frame -->
+            <rect x="10" y="10" width="260" height="160" rx="6" fill="#0B1A12" stroke="#1E5C2E" stroke-width="1.5"/>
+            <rect x="10" y="10" width="260" height="24" rx="6" fill="#143D1E"/>
+            <rect x="10" y="28" width="260" height="6" fill="#143D1E"/>
+            <!-- Window dots -->
+            <circle cx="26" cy="22" r="4" fill="#D45555" opacity="0.7"/>
+            <circle cx="40" cy="22" r="4" fill="#D4A03C" opacity="0.7"/>
+            <circle cx="54" cy="22" r="4" fill="#3DAA6D" opacity="0.7"/>
+            <!-- Terminal text lines -->
+            <rect x="22" y="48" width="60" height="5" rx="2" fill="#FF9A00" opacity="0.9"/>
+            <rect x="88" y="48" width="40" height="5" rx="2" fill="#22B8A7" opacity="0.7"/>
+            <rect x="134" y="48" width="50" height="5" rx="2" fill="#E8EDF4" opacity="0.25"/>
+            <rect x="22" y="62" width="80" height="4" rx="2" fill="#E8EDF4" opacity="0.15"/>
+            <rect x="108" y="62" width="30" height="4" rx="2" fill="#3DAA6D" opacity="0.6"/>
+            <rect x="22" y="74" width="50" height="4" rx="2" fill="#E8EDF4" opacity="0.12"/>
+            <rect x="78" y="74" width="70" height="4" rx="2" fill="#E8EDF4" opacity="0.12"/>
+            <!-- Data grid -->
+            <rect x="22" y="90" width="236" height="1" fill="#1E5C2E" opacity="0.6"/>
+            <rect x="22" y="102" width="236" height="1" fill="#1E5C2E" opacity="0.4"/>
+            <rect x="22" y="114" width="236" height="1" fill="#1E5C2E" opacity="0.4"/>
+            <rect x="22" y="126" width="236" height="1" fill="#1E5C2E" opacity="0.4"/>
+            <!-- Grid columns -->
+            <rect x="80" y="90" width="1" height="48" fill="#1E5C2E" opacity="0.5"/>
+            <rect x="140" y="90" width="1" height="48" fill="#1E5C2E" opacity="0.5"/>
+            <rect x="200" y="90" width="1" height="48" fill="#1E5C2E" opacity="0.5"/>
+            <!-- Data values -->
+            <rect x="26" y="94" width="40" height="4" rx="1" fill="#FF9A00" opacity="0.7"/>
+            <rect x="86" y="94" width="28" height="4" rx="1" fill="#3DAA6D" opacity="0.8"/>
+            <rect x="146" y="94" width="32" height="4" rx="1" fill="#E8EDF4" opacity="0.2"/>
+            <rect x="206" y="94" width="24" height="4" rx="1" fill="#D45555" opacity="0.7"/>
+            <rect x="26" y="106" width="36" height="4" rx="1" fill="#E8EDF4" opacity="0.15"/>
+            <rect x="86" y="106" width="30" height="4" rx="1" fill="#D45555" opacity="0.6"/>
+            <rect x="146" y="106" width="28" height="4" rx="1" fill="#E8EDF4" opacity="0.2"/>
+            <rect x="206" y="106" width="32" height="4" rx="1" fill="#3DAA6D" opacity="0.7"/>
+            <rect x="26" y="118" width="44" height="4" rx="1" fill="#E8EDF4" opacity="0.15"/>
+            <rect x="86" y="118" width="24" height="4" rx="1" fill="#3DAA6D" opacity="0.5"/>
+            <rect x="146" y="118" width="36" height="4" rx="1" fill="#E8EDF4" opacity="0.2"/>
+            <rect x="206" y="118" width="28" height="4" rx="1" fill="#D4A03C" opacity="0.6"/>
+            <!-- Cursor blink -->
+            <rect x="22" y="146" width="8" height="10" rx="1" fill="#FF9A00" opacity="0.8"/>
+        </svg>
+        <div class="integ-placeholder-eyebrow">Coming Soon</div>
+        <h2 class="integ-placeholder-title">Bloomberg</h2>
+        <p class="integ-placeholder-desc">Live Bloomberg Terminal data piped directly into your research context — prices, news, estimates, and event calendars alongside your ACH analysis.</p>
+        <div class="integ-placeholder-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Planned 2026
+        </div>
+        <button class="integ-back-btn" onclick="integrations.close()">Back to Research</button>
+    </div>
+</div>
+
+<!-- Risk -->
+<div class="integ-page" id="integ-page-risk" role="tabpanel" aria-labelledby="integ-risk">
+    <div class="integ-placeholder">
+        <svg class="integ-placeholder-illustration" viewBox="0 0 280 180" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Risk matrix grid -->
+            <rect x="30" y="20" width="220" height="140" rx="4" fill="#111C2E" stroke="#1E3050" stroke-width="1"/>
+            <!-- Axis labels -->
+            <rect x="30" y="10" width="44" height="6" rx="2" fill="#7A8FAD" opacity="0.4"/>
+            <rect x="80" y="10" width="44" height="6" rx="2" fill="#D4A03C" opacity="0.5"/>
+            <rect x="130" y="10" width="44" height="6" rx="2" fill="#D45555" opacity="0.5"/>
+            <rect x="180" y="10" width="44" height="6" rx="2" fill="#D45555" opacity="0.8"/>
+            <!-- Heatmap cells: 3x4 grid -->
+            <!-- Row 1: Low likelihood -->
+            <rect x="32" y="22" width="52" height="32" rx="2" fill="#3DAA6D" opacity="0.15"/>
+            <rect x="88" y="22" width="52" height="32" rx="2" fill="#3DAA6D" opacity="0.25"/>
+            <rect x="144" y="22" width="52" height="32" rx="2" fill="#D4A03C" opacity="0.2"/>
+            <rect x="200" y="22" width="48" height="32" rx="2" fill="#D4A03C" opacity="0.3"/>
+            <!-- Row 2: Medium likelihood -->
+            <rect x="32" y="58" width="52" height="32" rx="2" fill="#3DAA6D" opacity="0.2"/>
+            <rect x="88" y="58" width="52" height="32" rx="2" fill="#D4A03C" opacity="0.25"/>
+            <rect x="144" y="58" width="52" height="32" rx="2" fill="#D45555" opacity="0.25"/>
+            <rect x="200" y="58" width="48" height="32" rx="2" fill="#D45555" opacity="0.4"/>
+            <!-- Row 3: High likelihood -->
+            <rect x="32" y="94" width="52" height="32" rx="2" fill="#D4A03C" opacity="0.2"/>
+            <rect x="88" y="94" width="52" height="32" rx="2" fill="#D45555" opacity="0.3"/>
+            <rect x="144" y="94" width="52" height="32" rx="2" fill="#D45555" opacity="0.5"/>
+            <rect x="200" y="94" width="48" height="32" rx="2" fill="#D45555" opacity="0.7"/>
+            <!-- Active cell highlight -->
+            <rect x="144" y="94" width="52" height="32" rx="2" stroke="#D45555" stroke-width="2" fill="none"/>
+            <!-- Cell dot markers -->
+            <circle cx="58" cy="38" r="5" fill="#3DAA6D" opacity="0.5"/>
+            <circle cx="220" cy="74" r="6" fill="#D45555" opacity="0.8"/>
+            <circle cx="170" cy="110" r="7" fill="#D45555" opacity="0.9"/>
+            <circle cx="114" cy="38" r="4" fill="#D4A03C" opacity="0.6"/>
+            <!-- Legend -->
+            <rect x="32" y="140" width="10" height="10" rx="2" fill="#3DAA6D" opacity="0.5"/>
+            <rect x="46" y="143" width="30" height="4" rx="1" fill="#7A8FAD" opacity="0.5"/>
+            <rect x="100" y="140" width="10" height="10" rx="2" fill="#D4A03C" opacity="0.5"/>
+            <rect x="114" y="143" width="30" height="4" rx="1" fill="#7A8FAD" opacity="0.5"/>
+            <rect x="168" y="140" width="10" height="10" rx="2" fill="#D45555" opacity="0.6"/>
+            <rect x="182" y="143" width="30" height="4" rx="1" fill="#7A8FAD" opacity="0.5"/>
+        </svg>
+        <div class="integ-placeholder-eyebrow">Coming Soon</div>
+        <h2 class="integ-placeholder-title">Risk</h2>
+        <p class="integ-placeholder-desc">Portfolio-level risk dashboards mapping concentration, factor exposure, and scenario analysis directly against your hypothesis-weighted positions.</p>
+        <div class="integ-placeholder-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Planned 2026
+        </div>
+        <button class="integ-back-btn" onclick="integrations.close()">Back to Research</button>
+    </div>
+</div>
+
+<!-- Team Chat -->
+<div class="integ-page" id="integ-page-teamchat" role="tabpanel" aria-labelledby="integ-teamchat">
+    <div class="integ-placeholder">
+        <svg class="integ-placeholder-illustration" viewBox="0 0 280 180" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Chat panel frame -->
+            <rect x="10" y="10" width="260" height="160" rx="8" fill="#111C2E" stroke="#1E3050" stroke-width="1"/>
+            <!-- Left sidebar: user list -->
+            <rect x="10" y="10" width="70" height="160" rx="8" fill="#0E1828"/>
+            <rect x="10" y="10" width="70" height="160" rx="0" fill="#0E1828"/>
+            <rect x="10" y="10" width="70" height="8" rx="0" fill="#0E1828"/>
+            <!-- User avatars -->
+            <circle cx="32" cy="36" r="10" fill="#1A2740"/>
+            <circle cx="32" cy="36" r="10" stroke="#22B8A7" stroke-width="1.5"/>
+            <rect x="48" y="30" width="24" height="4" rx="1" fill="#E8EDF4" opacity="0.25"/>
+            <rect x="48" y="38" width="18" height="3" rx="1" fill="#7A8FAD" opacity="0.3"/>
+            <circle cx="32" cy="70" r="10" fill="#1A2740"/>
+            <rect x="48" y="64" width="22" height="4" rx="1" fill="#E8EDF4" opacity="0.2"/>
+            <rect x="48" y="72" width="16" height="3" rx="1" fill="#7A8FAD" opacity="0.3"/>
+            <circle cx="32" cy="104" r="10" fill="#1A2740"/>
+            <rect x="48" y="98" width="20" height="4" rx="1" fill="#E8EDF4" opacity="0.2"/>
+            <rect x="48" y="106" width="24" height="3" rx="1" fill="#7A8FAD" opacity="0.3"/>
+            <!-- Online indicators -->
+            <circle cx="42" cy="44" r="4" fill="#3DAA6D"/>
+            <circle cx="42" cy="78" r="4" fill="#7A8FAD" opacity="0.5"/>
+            <circle cx="42" cy="112" r="4" fill="#3DAA6D"/>
+            <!-- Active state on first user -->
+            <rect x="10" y="22" width="3" height="28" rx="0" fill="#22B8A7"/>
+            <!-- Main chat area -->
+            <!-- Incoming bubble 1 -->
+            <rect x="90" y="24" width="120" height="22" rx="10" rx-bottom-left="3" fill="#1A2740"/>
+            <rect x="90" y="34" width="80" height="4" rx="1" fill="#E8EDF4" opacity="0.2"/>
+            <rect x="90" y="24" width="120" height="22" rx="8" fill="#1A2740"/>
+            <!-- Outgoing bubble -->
+            <rect x="150" y="56" width="100" height="22" rx="8" fill="#22B8A7" opacity="0.2"/>
+            <rect x="160" y="64" width="70" height="4" rx="1" fill="#22B8A7" opacity="0.5"/>
+            <!-- Incoming bubble 2 -->
+            <rect x="90" y="88" width="140" height="32" rx="8" fill="#1A2740"/>
+            <rect x="100" y="96" width="100" height="4" rx="1" fill="#E8EDF4" opacity="0.2"/>
+            <rect x="100" y="104" width="80" height="4" rx="1" fill="#E8EDF4" opacity="0.15"/>
+            <!-- Input bar -->
+            <rect x="90" y="142" width="168" height="20" rx="6" fill="#0B1220" stroke="#1E3050" stroke-width="1"/>
+            <rect x="98" y="149" width="80" height="4" rx="1" fill="#7A8FAD" opacity="0.2"/>
+            <circle cx="248" cy="152" r="8" fill="#22B8A7" opacity="0.3"/>
+        </svg>
+        <div class="integ-placeholder-eyebrow">Coming Soon</div>
+        <h2 class="integ-placeholder-title">Team Chat</h2>
+        <p class="integ-placeholder-desc">Internal messaging and research collaboration for the investment team — share findings, annotate reports, and run deal threads alongside your live research.</p>
+        <div class="integ-placeholder-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Planned 2026
+        </div>
+        <button class="integ-back-btn" onclick="integrations.close()">Back to Research</button>
+    </div>
+</div>
+
+<!-- Trading -->
+<div class="integ-page" id="integ-page-trading" role="tabpanel" aria-labelledby="integ-trading">
+    <div class="integ-placeholder">
+        <svg class="integ-placeholder-illustration" viewBox="0 0 280 180" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Chart frame -->
+            <rect x="10" y="10" width="260" height="160" rx="6" fill="#111C2E" stroke="#1E3050" stroke-width="1"/>
+            <!-- Grid lines -->
+            <line x1="20" y1="40" x2="270" y2="40" stroke="#1E3050" stroke-width="1" stroke-dasharray="4 4"/>
+            <line x1="20" y1="70" x2="270" y2="70" stroke="#1E3050" stroke-width="1" stroke-dasharray="4 4"/>
+            <line x1="20" y1="100" x2="270" y2="100" stroke="#1E3050" stroke-width="1" stroke-dasharray="4 4"/>
+            <line x1="20" y1="130" x2="270" y2="130" stroke="#1E3050" stroke-width="1" stroke-dasharray="4 4"/>
+            <!-- Y-axis price labels -->
+            <rect x="248" y="36" width="22" height="4" rx="1" fill="#7A8FAD" opacity="0.3"/>
+            <rect x="248" y="66" width="22" height="4" rx="1" fill="#7A8FAD" opacity="0.3"/>
+            <rect x="248" y="96" width="22" height="4" rx="1" fill="#7A8FAD" opacity="0.3"/>
+            <rect x="248" y="126" width="22" height="4" rx="1" fill="#7A8FAD" opacity="0.3"/>
+            <!-- Candlestick bars -->
+            <!-- Bar 1: green -->
+            <line x1="40" y1="80" x2="40" y2="115" stroke="#3DAA6D" stroke-width="1.5"/>
+            <rect x="35" y="88" width="10" height="20" rx="1" fill="#3DAA6D" opacity="0.8"/>
+            <!-- Bar 2: red -->
+            <line x1="62" y1="75" x2="62" y2="105" stroke="#D45555" stroke-width="1.5"/>
+            <rect x="57" y="82" width="10" height="16" rx="1" fill="#D45555" opacity="0.8"/>
+            <!-- Bar 3: green -->
+            <line x1="84" y1="68" x2="84" y2="100" stroke="#3DAA6D" stroke-width="1.5"/>
+            <rect x="79" y="76" width="10" height="18" rx="1" fill="#3DAA6D" opacity="0.8"/>
+            <!-- Bar 4: green -->
+            <line x1="106" y1="55" x2="106" y2="90" stroke="#3DAA6D" stroke-width="1.5"/>
+            <rect x="101" y="63" width="10" height="22" rx="1" fill="#3DAA6D" opacity="0.9"/>
+            <!-- Bar 5: red -->
+            <line x1="128" y1="58" x2="128" y2="88" stroke="#D45555" stroke-width="1.5"/>
+            <rect x="123" y="62" width="10" height="18" rx="1" fill="#D45555" opacity="0.7"/>
+            <!-- Bar 6: green (large) -->
+            <line x1="150" y1="44" x2="150" y2="85" stroke="#3DAA6D" stroke-width="1.5"/>
+            <rect x="145" y="52" width="10" height="28" rx="1" fill="#3DAA6D" opacity="0.9"/>
+            <!-- Bar 7: red -->
+            <line x1="172" y1="50" x2="172" y2="80" stroke="#D45555" stroke-width="1.5"/>
+            <rect x="167" y="54" width="10" height="18" rx="1" fill="#D45555" opacity="0.7"/>
+            <!-- Bar 8: green -->
+            <line x1="194" y1="42" x2="194" y2="72" stroke="#3DAA6D" stroke-width="1.5"/>
+            <rect x="189" y="48" width="10" height="20" rx="1" fill="#3DAA6D" opacity="0.8"/>
+            <!-- Bar 9 (latest): green, highlighted -->
+            <line x1="216" y1="35" x2="216" y2="68" stroke="#22B8A7" stroke-width="1.5"/>
+            <rect x="211" y="40" width="10" height="24" rx="1" fill="#22B8A7" opacity="0.9"/>
+            <!-- Volume bars at bottom -->
+            <rect x="35" y="148" width="10" height="10" rx="1" fill="#3DAA6D" opacity="0.4"/>
+            <rect x="57" y="152" width="10" height="6" rx="1" fill="#D45555" opacity="0.4"/>
+            <rect x="79" y="146" width="10" height="12" rx="1" fill="#3DAA6D" opacity="0.4"/>
+            <rect x="101" y="144" width="10" height="14" rx="1" fill="#3DAA6D" opacity="0.5"/>
+            <rect x="123" y="150" width="10" height="8" rx="1" fill="#D45555" opacity="0.3"/>
+            <rect x="145" y="142" width="10" height="16" rx="1" fill="#3DAA6D" opacity="0.5"/>
+            <rect x="167" y="150" width="10" height="8" rx="1" fill="#D45555" opacity="0.3"/>
+            <rect x="189" y="144" width="10" height="14" rx="1" fill="#3DAA6D" opacity="0.4"/>
+            <rect x="211" y="140" width="10" height="18" rx="1" fill="#22B8A7" opacity="0.5"/>
+        </svg>
+        <div class="integ-placeholder-eyebrow">Coming Soon</div>
+        <h2 class="integ-placeholder-title">Trading</h2>
+        <p class="integ-placeholder-desc">Execution-ready order flow integrated with your ACH hypothesis weights — research-to-trade workflow with full audit trail and position tracking.</p>
+        <div class="integ-placeholder-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Planned 2026
+        </div>
+        <button class="integ-back-btn" onclick="integrations.close()">Back to Research</button>
+    </div>
+</div>
+
+<!-- Analyst Chat -->
+<div class="integ-page" id="integ-page-analystchat" role="tabpanel" aria-labelledby="integ-analystchat">
+    <div class="integ-placeholder">
+        <svg class="integ-placeholder-illustration" viewBox="0 0 280 180" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Panel background -->
+            <rect x="10" y="10" width="260" height="160" rx="8" fill="#111C2E" stroke="#1E3050" stroke-width="1"/>
+            <!-- Header bar -->
+            <rect x="10" y="10" width="260" height="36" rx="8" fill="#0E1828"/>
+            <rect x="10" y="34" width="260" height="12" fill="#0E1828"/>
+            <!-- Analyst icon -->
+            <rect x="22" y="18" width="20" height="20" rx="6" fill="rgba(34,184,167,0.15)" stroke="rgba(34,184,167,0.3)" stroke-width="1"/>
+            <polyline points="38 28 35 28 33.5 24 30.5 32 28.5 27 27 28 24 28" stroke="#22B8A7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <rect x="48" y="20" width="70" height="5" rx="2" fill="#E8EDF4" opacity="0.3"/>
+            <rect x="48" y="28" width="100" height="4" rx="1" fill="#7A8FAD" opacity="0.25"/>
+            <!-- Analyst message 1 -->
+            <rect x="22" y="56" width="180" height="32" rx="8" fill="#1A2740"/>
+            <rect x="32" y="64" width="120" height="4" rx="1" fill="#E8EDF4" opacity="0.2"/>
+            <rect x="32" y="74" width="100" height="4" rx="1" fill="#E8EDF4" opacity="0.15"/>
+            <!-- User message -->
+            <rect x="108" y="98" width="150" height="22" rx="8" fill="rgba(34,184,167,0.15)" stroke="rgba(34,184,167,0.2)" stroke-width="1"/>
+            <rect x="118" y="106" width="100" height="4" rx="1" fill="#22B8A7" opacity="0.4"/>
+            <!-- Analyst message 2 (with structured data) -->
+            <rect x="22" y="130" width="200" height="32" rx="8" fill="#1A2740"/>
+            <rect x="32" y="138" width="80" height="4" rx="1" fill="#E8EDF4" opacity="0.2"/>
+            <rect x="118" y="138" width="40" height="4" rx="1" fill="#3DAA6D" opacity="0.5"/>
+            <rect x="32" y="148" width="140" height="4" rx="1" fill="#E8EDF4" opacity="0.12"/>
+            <!-- Waveform pulse in header -->
+            <polyline points="200 28 196 28 194 22 191 34 189 26 187 28 183 28" stroke="#22B8A7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
+            <circle cx="246" cy="20" r="5" fill="#3DAA6D" opacity="0.6"/>
+            <rect x="238" y="27" width="20" height="3" rx="1" fill="#3DAA6D" opacity="0.3"/>
+        </svg>
+        <div class="integ-placeholder-eyebrow">Coming Soon</div>
+        <h2 class="integ-placeholder-title">Analyst Chat</h2>
+        <p class="integ-placeholder-desc">Shared analyst workspace for multi-user AI-assisted research sessions — co-author hypotheses, review evidence chains, and annotate reports with your team in real time.</p>
+        <div class="integ-placeholder-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Planned 2026
+        </div>
+        <button class="integ-back-btn" onclick="integrations.close()">Back to Research</button>
+    </div>
+</div>
+
+<!-- News -->
+<div class="integ-page" id="integ-page-news" role="tabpanel" aria-labelledby="integ-news">
+    <div class="integ-placeholder">
+        <svg class="integ-placeholder-illustration" viewBox="0 0 280 180" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Newspaper frame -->
+            <rect x="10" y="10" width="260" height="160" rx="6" fill="#111C2E" stroke="#1E3050" stroke-width="1"/>
+            <!-- Masthead -->
+            <rect x="10" y="10" width="260" height="28" rx="6" fill="#0E1828"/>
+            <rect x="10" y="28" width="260" height="10" fill="#0E1828"/>
+            <rect x="20" y="17" width="100" height="7" rx="2" fill="#22B8A7" opacity="0.5"/>
+            <rect x="200" y="19" width="60" height="4" rx="1" fill="#7A8FAD" opacity="0.3"/>
+            <rect x="200" y="27" width="40" height="3" rx="1" fill="#7A8FAD" opacity="0.2"/>
+            <!-- Divider rule -->
+            <line x1="20" y1="42" x2="260" y2="42" stroke="#1E3050" stroke-width="1"/>
+            <!-- Left column: lead story -->
+            <rect x="20" y="50" width="150" height="7" rx="2" fill="#E8EDF4" opacity="0.35"/>
+            <rect x="20" y="62" width="130" height="5" rx="2" fill="#E8EDF4" opacity="0.2"/>
+            <rect x="20" y="72" width="140" height="4" rx="1" fill="#7A8FAD" opacity="0.2"/>
+            <rect x="20" y="80" width="120" height="4" rx="1" fill="#7A8FAD" opacity="0.2"/>
+            <rect x="20" y="88" width="135" height="4" rx="1" fill="#7A8FAD" opacity="0.18"/>
+            <!-- Tag -->
+            <rect x="20" y="98" width="32" height="10" rx="3" fill="#22B8A7" opacity="0.15"/>
+            <rect x="24" y="101" width="24" height="4" rx="1" fill="#22B8A7" opacity="0.5"/>
+            <!-- Right column: news feed -->
+            <line x1="182" y1="48" x2="182" y2="164" stroke="#1E3050" stroke-width="1"/>
+            <rect x="190" y="50" width="80" height="5" rx="2" fill="#E8EDF4" opacity="0.25"/>
+            <rect x="190" y="60" width="70" height="3" rx="1" fill="#7A8FAD" opacity="0.18"/>
+            <rect x="190" y="67" width="60" height="3" rx="1" fill="#7A8FAD" opacity="0.15"/>
+            <line x1="190" y1="76" x2="264" y2="76" stroke="#1E3050" stroke-width="0.5"/>
+            <rect x="190" y="82" width="75" height="5" rx="2" fill="#E8EDF4" opacity="0.2"/>
+            <rect x="190" y="92" width="65" height="3" rx="1" fill="#7A8FAD" opacity="0.15"/>
+            <rect x="190" y="99" width="55" height="3" rx="1" fill="#7A8FAD" opacity="0.12"/>
+            <line x1="190" y1="108" x2="264" y2="108" stroke="#1E3050" stroke-width="0.5"/>
+            <rect x="190" y="114" width="70" height="5" rx="2" fill="#E8EDF4" opacity="0.2"/>
+            <rect x="190" y="124" width="60" height="3" rx="1" fill="#7A8FAD" opacity="0.15"/>
+            <!-- Signal tag: red -->
+            <rect x="190" y="134" width="28" height="9" rx="3" fill="#D45555" opacity="0.15"/>
+            <rect x="193" y="137" width="22" height="3" rx="1" fill="#D45555" opacity="0.5"/>
+            <!-- Bottom story teaser -->
+            <line x1="20" y1="118" x2="172" y2="118" stroke="#1E3050" stroke-width="0.5"/>
+            <rect x="20" y="126" width="110" height="5" rx="2" fill="#E8EDF4" opacity="0.2"/>
+            <rect x="20" y="136" width="140" height="3" rx="1" fill="#7A8FAD" opacity="0.15"/>
+            <rect x="20" y="143" width="120" height="3" rx="1" fill="#7A8FAD" opacity="0.12"/>
+            <rect x="20" y="153" width="28" height="9" rx="3" fill="#D4A03C" opacity="0.15"/>
+            <rect x="23" y="156" width="22" height="3" rx="1" fill="#D4A03C" opacity="0.5"/>
+        </svg>
+        <div class="integ-placeholder-eyebrow">Coming Soon</div>
+        <h2 class="integ-placeholder-title">News</h2>
+        <p class="integ-placeholder-desc">Curated news feed filtered by your covered stocks and hypotheses — ASX announcements, broker notes, and macro events scored against your active thesis weights.</p>
+        <div class="integ-placeholder-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Planned 2026
+        </div>
+        <button class="integ-back-btn" onclick="integrations.close()">Back to Research</button>
+    </div>
+</div>
+
 </main><!-- /main-content -->
 
 <!-- ============================================================
@@ -12768,6 +13343,95 @@ function tcAnalyze() {
             if (isOpen) { renderConversation(); updateSubtitle(); }
         }
     };
+})();
+</script>
+
+<!-- Integrations Bar Controller -->
+<script>
+(function() {
+    'use strict';
+
+    var tabs      = document.querySelectorAll('.integ-tab');
+    var pages     = document.querySelectorAll('.integ-page');
+    var mainPages = document.querySelectorAll('.page');
+    var activeInteg = null;
+
+    function openInteg(key) {
+        // Hide all native pages
+        mainPages.forEach(function(p) { p.classList.remove('active'); });
+        // Deactivate primary nav
+        document.querySelectorAll('.nav-links a').forEach(function(a) {
+            a.classList.remove('active');
+            a.removeAttribute('aria-current');
+        });
+
+        // Hide all integ pages, show target
+        pages.forEach(function(p) { p.classList.remove('active'); });
+        var target = document.getElementById('integ-page-' + key);
+        if (target) target.classList.add('active');
+
+        // Mark tab active
+        tabs.forEach(function(t) {
+            var isActive = t.getAttribute('data-integ') === key;
+            t.classList.toggle('active', isActive);
+            t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+
+        activeInteg = key;
+        window.scrollTo(0, 0);
+    }
+
+    function closeInteg() {
+        pages.forEach(function(p) { p.classList.remove('active'); });
+        tabs.forEach(function(t) {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+        });
+        activeInteg = null;
+
+        // Restore the previously active native page, defaulting to home
+        var currentHash = window.location.hash.slice(1) || 'home';
+        var restoredPage = document.getElementById('page-' + currentHash) || document.getElementById('page-home');
+        if (restoredPage) restoredPage.classList.add('active');
+
+        // Re-mark primary nav active link
+        document.querySelectorAll('.nav-links a').forEach(function(a) {
+            if (a.getAttribute('data-nav') === currentHash || (currentHash === 'home' && a.getAttribute('data-nav') === 'home')) {
+                a.classList.add('active');
+                a.setAttribute('aria-current', 'page');
+            }
+        });
+        window.scrollTo(0, 0);
+    }
+
+    // Bind tab clicks
+    tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            var key = tab.getAttribute('data-integ');
+            if (activeInteg === key) {
+                closeInteg();
+            } else {
+                openInteg(key);
+            }
+        });
+    });
+
+    // Close integrations when a primary nav link is clicked
+    document.querySelectorAll('.nav-links a').forEach(function(a) {
+        a.addEventListener('click', function() {
+            if (activeInteg) {
+                pages.forEach(function(p) { p.classList.remove('active'); });
+                tabs.forEach(function(t) {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                activeInteg = null;
+            }
+        });
+    });
+
+    // Public API (used by "Back to Research" buttons)
+    window.integrations = { close: closeInteg };
 })();
 </script>
 
