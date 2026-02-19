@@ -279,17 +279,11 @@ function main() {
     .filter(t => tickerConfig.tickers[t].status === 'active');
   console.log('  Active tickers:', tickers.length);
 
-  // Load live prices — the file has shape: [{...},{...},{ticker:'prices', WOW:{...}, ...}]
+  // Load live prices — file is { updated, market, count, prices: { WOW: {...}, ... } }
   let prices = {};
   try {
     const raw = JSON.parse(fs.readFileSync(LIVE_PRICES_PATH, 'utf8'));
-    const pricesEntry = Array.isArray(raw)
-      ? raw.find(e => e.ticker === 'prices')
-      : raw;
-    if (pricesEntry) {
-      const { ticker: _, ...rest } = pricesEntry;
-      prices = rest;
-    }
+    prices = (raw && raw.prices && typeof raw.prices === 'object') ? raw.prices : raw;
   } catch (e) {
     console.warn('  [WARN] Cannot read live-prices.json:', e.message);
   }
@@ -355,7 +349,11 @@ function main() {
     const resultsMult  = resultsDay ? 2.0 : 1.0;  // spec: results-day evidence gets 2x weight
 
     // ── §3.3: Cumulative moves ───────────────────────────────────────────────
-    const pricesForCumul = pastEntries.map(e => e.price || 0).filter(p => p > 0);
+    // Exclude reconstructed entries — backfilled prices may be synthetic
+    const pricesForCumul = pastEntries
+      .filter(e => !e.reconstructed)
+      .map(e => e.price || 0)
+      .filter(p => p > 0);
     const cumulativeMoves = pricesForCumul.length >= 2
       ? (() => {
           const cur = currentPrice;
