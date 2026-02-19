@@ -4044,25 +4044,73 @@ a:hover { color: var(--accent-sage); }
     bottom: 24px;
     right: 24px;
     z-index: 200;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
+    height: 44px;
+    width: auto;
+    padding: 0 20px 0 16px;
+    border-radius: 22px;
     background: var(--accent-teal);
     color: #fff;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.35);
     transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
 }
 .chat-fab:hover {
-    transform: scale(1.08);
-    box-shadow: 0 6px 28px rgba(0,0,0,0.45);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(26,158,143,0.45);
 }
-.chat-fab svg { width: 24px; height: 24px; }
+.chat-fab:focus-visible {
+    outline: 3px solid var(--accent-teal);
+    outline-offset: 3px;
+}
+.chat-fab svg { width: 16px; height: 16px; flex-shrink: 0; }
 .chat-fab.hidden { display: none; }
+
+/* FAB mobile: collapse to icon-only circle */
+@media (max-width: 480px) {
+    .chat-fab {
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        border-radius: 50%;
+        justify-content: center;
+    }
+    .chat-fab-label { display: none; }
+}
+
+/* --- Analyst Status Indicator --- */
+.chat-analyst-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.62rem;
+    color: var(--accent-teal);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+.chat-analyst-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-teal);
+    flex-shrink: 0;
+    animation: statusPulse 2.4s ease-in-out infinite;
+}
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.75); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .chat-analyst-status-dot { animation: none; }
+}
 
 /* --- Chat Panel --- */
 .chat-panel {
@@ -4103,25 +4151,30 @@ a:hover { color: var(--accent-sage); }
     gap: 10px;
 }
 .chat-header-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    background: var(--accent-teal);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(26,158,143,0.22) 0%, rgba(26,158,143,0.08) 100%);
+    border: 1px solid rgba(26,158,143,0.25);
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
-.chat-header-icon svg { width: 16px; height: 16px; color: #fff; }
+.chat-header-icon svg { width: 15px; height: 15px; color: var(--accent-teal); }
 .chat-header-title {
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     font-weight: 700;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.01em;
     color: var(--text-primary);
 }
 .chat-header-subtitle {
-    font-size: 0.65rem;
+    font-size: 0.63rem;
     color: var(--text-muted);
-    margin-top: 1px;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 .chat-close-btn {
     background: none;
@@ -5311,9 +5364,9 @@ a:hover { color: var(--accent-sage); }
             </div>
 
             <div class="tc-chat-cta">
-                <button class="tc-chat-cta-btn" onclick="window.openResearchChat && window.openResearchChat()" aria-label="Open Research Chat to discuss this analysis">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    Discuss this analysis with Research Chat
+                <button class="tc-chat-cta-btn" onclick="window.openResearchChat && window.openResearchChat()" aria-label="Chat to the Analyst about this analysis">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 3 9 21 6 12 2 12"/></svg>
+                    Chat to the Analyst
                 </button>
             </div>
         </div>
@@ -6706,7 +6759,7 @@ function renderSectionNav(data) {
     ['tripwires', 'Tripwires'],
     ['gaps', 'Gaps'],
     ['technical', 'Technical'],
-    ['chat', 'Research Chat']
+    ['chat', 'Chat to the Analyst']
   ];
 
   // Only include Technical if data exists
@@ -8454,8 +8507,8 @@ function renderReportPage(data) {
     renderTechnicalAnalysis(data) +
     '<div class="report-section" id="' + t + '-chat">' +
       '<div class="rs-number">Research</div>' +
-      '<div class="rs-title">Research Chat</div>' +
-      '<div class="rs-subtitle">Ask questions about ' + data.company + ' grounded in structured research data</div>' +
+      '<div class="rs-title">Chat to the Analyst</div>' +
+      '<div class="rs-subtitle">Ask questions about ' + data.company + ' grounded in structured ACH research data</div>' +
       '<div class="chat-inline" data-ticker="' + data.ticker + '">' +
         '<div class="chat-inline-messages" id="chat-inline-' + data.ticker + '" aria-live="polite" aria-relevant="additions"></div>' +
         '<div class="chat-inline-input-area">' +
@@ -12230,10 +12283,11 @@ function tcAnalyze() {
      ============================================================ -->
 
 <!-- FAB Button -->
-<button class="chat-fab" id="chatFab" title="Ask the research analyst" aria-label="Open research chat" aria-expanded="false" aria-controls="chatPanel">
+<button class="chat-fab" id="chatFab" title="Chat to the Analyst" aria-label="Open Chat to the Analyst" aria-expanded="false" aria-controls="chatPanel">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        <polyline points="22 12 18 12 15 3 9 21 6 12 2 12"/>
     </svg>
+    <span class="chat-fab-label">Analyst</span>
 </button>
 
 <!-- Chat Panel -->
@@ -12242,12 +12296,15 @@ function tcAnalyze() {
         <div class="chat-header-left">
             <div class="chat-header-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    <polyline points="22 12 18 12 15 3 9 21 6 12 2 12"/>
                 </svg>
             </div>
             <div>
-                <div class="chat-header-title">Research Chat</div>
-                <div class="chat-header-subtitle" id="chatSubtitle">Ask about any covered stock</div>
+                <div class="chat-header-title">Chat to the Analyst</div>
+                <div class="chat-header-subtitle" id="chatSubtitle">
+                    <span class="chat-analyst-status"><span class="chat-analyst-status-dot"></span>Live</span>
+                    &middot; Grounded in ACH research
+                </div>
             </div>
         </div>
         <button class="chat-close-btn" id="chatClose" aria-label="Close chat">
@@ -12268,7 +12325,7 @@ function tcAnalyze() {
 
     <div class="chat-input-area">
         <label for="chatInput" class="sr-only">Ask a question about this stock</label>
-        <textarea class="chat-input" id="chatInput" placeholder="Ask about this stock..." rows="1" aria-label="Ask a question about this stock"></textarea>
+        <textarea class="chat-input" id="chatInput" placeholder="Ask the analyst..." rows="1" aria-label="Ask the analyst a question about this stock"></textarea>
         <button class="chat-send-btn" id="chatSend" disabled aria-label="Send message">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -12360,15 +12417,15 @@ function tcAnalyze() {
         var ticker = currentTicker;
         var company = STOCK_DATA[ticker] ? STOCK_DATA[ticker].company : ticker;
         var hasCtx = !!chatContextByTicker[ticker];
-        var titleText = hasCtx ? 'Thesis Analysis Ready' : 'Research Chat';
+        var titleText = hasCtx ? 'Thesis Analysis Ready' : 'Ask the Analyst';
         var bodyText = hasCtx
             ? 'Your Comparator analysis for <strong>' + ticker + '</strong> is loaded. Ask me how your thesis compares, what evidence you\'re missing, or where you diverge from our research.'
-            : 'Ask questions about <strong>' + company + '</strong> grounded in our structured research data.';
+            : 'Questions about <strong>' + company + '</strong> answered directly from structured ACH research data — hypotheses, evidence weights, and survival scores.';
         var html =
             '<div class="chat-welcome">' +
                 '<div class="chat-welcome-icon">' +
                     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-                        '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' +
+                        '<polyline points="22 12 18 12 15 3 9 21 6 12 2 12"/>' +
                     '</svg>' +
                 '</div>' +
                 '<div class="chat-welcome-title">' + titleText + '</div>' +
@@ -12635,13 +12692,14 @@ function tcAnalyze() {
     }
 
     function updateSubtitle() {
+        var statusHtml = '<span class="chat-analyst-status"><span class="chat-analyst-status-dot"></span>Live</span> &middot; ';
         var hash = window.location.hash.slice(1) || '';
         if (hash === 'thesis') {
-            subtitle.textContent = 'Thesis Comparator · ' + (currentTicker || 'select a stock above');
+            subtitle.innerHTML = statusHtml + 'Thesis Comparator &middot; ' + (currentTicker || 'select a stock above');
             return;
         }
         var company = STOCK_DATA[currentTicker] ? STOCK_DATA[currentTicker].company : currentTicker;
-        subtitle.textContent = company;
+        subtitle.innerHTML = statusHtml + company;
     }
 
     // --- Inject Comparator analysis as chat context ---
