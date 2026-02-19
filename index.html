@@ -1410,6 +1410,36 @@ a:hover { color: var(--accent-sage); }
 .hc-sentiment-tag.bearish { background: rgba(212,85,85,0.18);  color: var(--signal-red);   }
 .hc-sentiment-tag.neutral { background: rgba(212,160,60,0.18); color: var(--signal-amber); }
 
+/* ── BUGFIX_001A: Dominant narrative block ── */
+.dominant-narrative-block {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px; padding: 10px 14px; margin-bottom: 14px;
+    display: flex; flex-direction: column; gap: 4px;
+}
+.dn-label {
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-secondary); margin-bottom: 2px;
+}
+.dn-name {
+    font-size: 0.9rem; font-weight: 700; color: var(--text-primary);
+}
+.dn-sentiment {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; margin-left: 6px;
+}
+.dn-bullish { color: var(--signal-green); }
+.dn-bearish { color: var(--signal-red); }
+.dn-neutral { color: var(--signal-amber); }
+.dn-prev {
+    font-size: 0.68rem; color: var(--text-secondary); margin-top: 2px;
+}
+.dn-prev-name {
+    font-weight: 600; color: var(--text-primary);
+}
+/* Coverage table: Dominant column */
+.td-dominant {
+    font-size: 0.75rem; text-align: center; white-space: nowrap;
+}
+
 /* ── Phase 5.5: Evidence diagnosticity badges ── */
 .ec-diag-badge {
     font-size: 0.6rem; font-weight: 700; letter-spacing: 0.07em;
@@ -5262,16 +5292,17 @@ a:hover { color: var(--accent-sage); }
                     <th class="sortable" onclick="sortCoverageTableByPrice()" id="th-price" title="Sort by price">Price <span class="sort-arrow" id="price-sort-arrow">&#9650;</span></th>
                     <th class="sortable" onclick="sortCoverageTable()" id="th-company" title="Company Research contribution — independently coloured">Company <span class="sort-arrow" id="company-sort-arrow">&#9650;</span></th>
                     <th class="sortable" onclick="sortCoverageTableBySentiment()" id="th-sentiment" title="Three-layer composite signal">Sentiment <span class="sort-arrow" id="sentiment-sort-arrow">&#9650;</span></th>
+                    <th title="Current dominant hypothesis">Dominant</th>
                     <th class="sortable" onclick="sortCoverageTableByDate()" id="th-date" title="Sort by research date">Updated <span class="sort-arrow" id="date-sort-arrow">&#9650;</span></th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody id="coverage-body">
-                <tr class="skeleton-row"><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:8rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:3.5rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:4rem"></span></td></tr>
-                <tr class="skeleton-row"><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:7rem"></span></td><td><span class="shimmer" style="width:6rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:3.5rem"></span></td></tr>
-                <tr class="skeleton-row"><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:9rem"></span></td><td><span class="shimmer" style="width:4.5rem"></span></td><td><span class="shimmer" style="width:4rem"></span></td><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:4rem"></span></td></tr>
-                <tr class="skeleton-row"><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:6rem"></span></td><td><span class="shimmer" style="width:5.5rem"></span></td><td><span class="shimmer" style="width:3.5rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:4.5rem"></span></td><td><span class="shimmer" style="width:3.5rem"></span></td></tr>
-                <tr class="skeleton-row"><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:8.5rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:4rem"></span></td></tr>
+                <tr class="skeleton-row"><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:8rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:3.5rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:4rem"></span></td></tr>
+                <tr class="skeleton-row"><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:7rem"></span></td><td><span class="shimmer" style="width:6rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:3.5rem"></span></td></tr>
+                <tr class="skeleton-row"><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:9rem"></span></td><td><span class="shimmer" style="width:4.5rem"></span></td><td><span class="shimmer" style="width:4rem"></span></td><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:4rem"></span></td></tr>
+                <tr class="skeleton-row"><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:6rem"></span></td><td><span class="shimmer" style="width:5.5rem"></span></td><td><span class="shimmer" style="width:3.5rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:4.5rem"></span></td><td><span class="shimmer" style="width:3.5rem"></span></td></tr>
+                <tr class="skeleton-row"><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:8.5rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:4rem"></span></td></tr>
             </tbody>
         </table>
     </div>
@@ -6402,7 +6433,12 @@ function computeSkewScore(data) {
   // Round to avoid floating point display issues
   bull = Math.round(bull);
   bear = Math.round(bear);
-  var score = bull - bear;
+  // Bug 2 fix: sqrt-amplified formula prevents distortion when multiple hypotheses
+  // fragment the minority view (e.g. 1 bull vs 3 bear scenarios).
+  // Simple bull-bear sum double-counts fragmented minority; sqrt compression corrects this.
+  var raw_balance = bull - bear;
+  var amplified = Math.sqrt(Math.abs(raw_balance) / 100) * 80;
+  var score = Math.round(raw_balance >= 0 ? Math.min(amplified, 80) : -Math.min(amplified, 80));
   // Derive direction mechanically from score — never from static data
   var direction = score > 5 ? 'upside' : score < -5 ? 'downside' : 'balanced';
   return { bull: bull, bear: bear, score: score, direction: direction, hypotheses: breakdown };
@@ -6514,9 +6550,10 @@ function renderMacroBar(data) {
   if (macroSignal !== null) {
     badgeCls = macroSignal > 15 ? 'bullish' : macroSignal < -15 ? 'bearish' : 'neutral';
   }
+  // Bug 3 fix: semantic label (POSITIVE/NEUTRAL/NEGATIVE) not raw numeric
   var badgeLabel = macroSignal !== null
-    ? 'MACRO ' + (macroSignal > 0 ? '+' : '') + macroSignal
-    : 'MACRO';
+    ? (macroSignal > 15 ? 'POSITIVE' : macroSignal < -15 ? 'NEGATIVE' : 'NEUTRAL')
+    : 'NEUTRAL';
 
   function fmtChg(v, digits) {
     if (v == null) return '';
@@ -6945,12 +6982,17 @@ function renderCompositeBar(data) {
     });
   }
   if (hypsArr && hypsArr.length > 0) {
-    var t1 = hypsArr[0];
-    var t1Name = t1.title || 'Unknown';
-    var t1Dir = t1.direction || '';
-    var t1DirLabel = t1Dir === 'upside' ? 'BULLISH' : t1Dir === 'downside' ? 'BEARISH' : 'NEUTRAL';
-    var t1DirCls = t1Dir === 'upside' ? 'tls-positive' : t1Dir === 'downside' ? 'tls-negative' : 'tls-neutral';
-    var t1Score = (t1.survivalScore !== null && t1.survivalScore !== undefined) ? ', ' + t1.survivalScore + '%' : '';
+    // Bug 1 fix (001A): show DOMINANT hypothesis (highest score), not always T1
+    var domHypIdx = 0;
+    for (var dhi = 1; dhi < hypsArr.length; dhi++) {
+      if ((hypsArr[dhi].survivalScore || 0) > (hypsArr[domHypIdx].survivalScore || 0)) domHypIdx = dhi;
+    }
+    var domH = hypsArr[domHypIdx];
+    var domHName = domH.title || 'Unknown';
+    var domHDir = domH.direction || '';
+    var domHDirLabel = domHDir === 'upside' ? 'BULLISH' : domHDir === 'downside' ? 'BEARISH' : 'NEUTRAL';
+    var domHDirCls = domHDir === 'upside' ? 'tls-positive' : domHDir === 'downside' ? 'tls-negative' : 'tls-neutral';
+    var domHScore = (domH.survivalScore !== null && domH.survivalScore !== undefined) ? ', ' + domH.survivalScore + '%' : '';
     // Count bear/bull — only count hypotheses where direction is known
     var bearCount = 0, bullCount = 0, knownCount = 0;
     for (var hi = 0; hi < hypsArr.length; hi++) {
@@ -6961,10 +7003,15 @@ function renderCompositeBar(data) {
     var countPrefix = knownCount > 0
       ? (bearCount + ' bear / ' + bullCount + ' bull &bull; ')
       : (hypsArr.length + ' hypotheses &bull; ');
+    // Flag when dominant leads but opposing hypotheses collectively outweigh it
+    var domIsPositive = domHDir === 'upside';
+    var outweighedSuffix = (domIsPositive && cCont < 0) || (!domIsPositive && domHDir === 'downside' && cCont > 0)
+      ? ' leads but outweighed' : '';
     t1Html = '<div class="tls-sub">' +
       countPrefix +
-      'T1: <span class="tls-t1-name">' + t1Name + '</span>' +
-      ' <span class="tls-dir-badge ' + t1DirCls + '">(' + t1DirLabel + t1Score + ')</span>' +
+      'Dominant: <span class="tls-t1-name">' + domHName + '</span>' +
+      ' <span class="tls-dir-badge ' + domHDirCls + '">(' + domHDirLabel + domHScore + ')</span>' +
+      outweighedSuffix +
     '</div>';
   }
 
@@ -7093,6 +7140,47 @@ function renderHypotheses(data) {
   var cardsHtml = '';
   var norm = normaliseScores(data.hypotheses);
 
+  // Bug 1 fix (001A): dominant = highest normalised score, NOT always index 0.
+  // Hypothesis IDs are permanent (T1 always T1). Dominance is dynamic.
+  var domIdx = 0;
+  for (var j = 1; j < norm.length; j++) {
+    if (norm[j] > norm[domIdx]) domIdx = j;
+  }
+
+  // Build DOMINANT NARRATIVE block from dominant hypothesis + flip history
+  var domHyp = data.hypotheses[domIdx];
+  var domName = domHyp ? (domHyp.title || ('T' + (domIdx + 1))) : '—';
+  var domDir  = domHyp ? (domHyp.direction || '') : '';
+  var domSentLabel = domDir === 'upside' ? 'BULLISH' : domDir === 'downside' ? 'BEARISH' : 'NEUTRAL';
+  var domSentCls   = domDir === 'upside' ? 'dn-bullish' : domDir === 'downside' ? 'dn-bearish' : 'dn-neutral';
+  var domScore = norm[domIdx] || 0;
+
+  // Previous dominant: most recent entry in narrative_history (sorted newest first)
+  var prevDominantHtml = '';
+  var flipSource = null;
+  if (data.last_flip && data.last_flip.from) {
+    flipSource = data.last_flip;
+  } else if (Array.isArray(data.narrative_history) && data.narrative_history.length > 0) {
+    var sortedHist = data.narrative_history.slice().sort(function(a, b) {
+      return (b.date || '') > (a.date || '') ? 1 : -1;
+    });
+    flipSource = sortedHist[0];
+  }
+  if (flipSource && flipSource.from) {
+    var flipDate = flipSource.date ? flipSource.date.substring(0, 10) : '';
+    prevDominantHtml = '<div class="dn-prev">Previously dominant: <span class="dn-prev-name">' +
+      flipSource.from + '</span>' +
+      (flipDate ? ' \u2013 overtaken ' + flipDate : '') +
+    '</div>';
+  }
+
+  var domNarrHtml = '<div class="dominant-narrative-block">' +
+    '<span class="dn-label">DOMINANT NARRATIVE</span>' +
+    '<span class="dn-name">' + domName + '</span>' +
+    '<span class="dn-sentiment ' + domSentCls + '">(' + domSentLabel + ', ' + domScore + '%)</span>' +
+    prevDominantHtml +
+  '</div>';
+
   for (var i = 0; i < data.hypotheses.length; i++) {
     var h = data.hypotheses[i];
     var normScore = norm[i] + '%';
@@ -7134,7 +7222,7 @@ function renderHypotheses(data) {
     var sentLabel = sentDir === 'upside' ? 'BULLISH' : sentDir === 'downside' ? 'BEARISH' : 'NEUTRAL';
     var sentimentTagHtml = '<span class="hc-sentiment-tag ' + sentClass + '">' + sentLabel + '</span>';
 
-    var dominantCls = (i === 0) ? ' dominant' : '';
+    var dominantCls = (i === domIdx) ? ' dominant' : '';  // Bug 1 fix: was (i === 0)
     cardsHtml += '<div class="hyp-card ' + h.dirClass + dominantCls + '">' +
       '<div class="hc-header"><div class="hc-title">' + h.title + sentimentTagHtml + '</div><div class="hc-status ' + h.statusClass + '">' + h.statusText + '</div></div>' +
       '<div class="hc-score-row"><div class="hc-score-number">' + normScore + '</div><div class="hc-score-bar"><div class="hc-score-fill" style="width:' + normWidth + '"></div></div><div class="hc-score-meta">' + h.scoreMeta + '</div></div>' +
@@ -7148,6 +7236,7 @@ function renderHypotheses(data) {
   return '<div class="report-section" id="' + t + '-hypotheses">' +
     '<div class="rs-number">Section 02</div>' +
     '<div class="rs-title">Competing Hypotheses</div>' +
+    domNarrHtml +
     cardsHtml +
   '</div>';
 }
@@ -9423,6 +9512,21 @@ function renderCoverageRow(data) {
     ? '<span class="sent-chip ' + compCls + '">' + (compScore > 0 ? '+' : '') + compScore + compArrow + '</span>'
     : '<span class="sent-chip neutral">—</span>';
 
+  // Bug 1 fix (001A): Dominant column — highest normalised score hypothesis
+  var domHtml = '<span style="color:var(--text-muted)">—</span>';
+  if (Array.isArray(data.hypotheses) && data.hypotheses.length > 0) {
+    var covNorm = normaliseScores(data.hypotheses);
+    var covDomIdx = 0;
+    for (var cdi = 1; cdi < covNorm.length; cdi++) {
+      if (covNorm[cdi] > covNorm[covDomIdx]) covDomIdx = cdi;
+    }
+    var covDomH = data.hypotheses[covDomIdx];
+    var covDomDir = covDomH.direction || '';
+    var covDomCls = covDomDir === 'upside' ? 'tls-positive' : covDomDir === 'downside' ? 'tls-negative' : 'tls-neutral';
+    var covDomName = covDomH.title || ('T' + (covDomIdx + 1));
+    domHtml = '<span class="' + covDomCls + '" style="font-size:0.75rem">' + covDomName + '</span>';
+  }
+
   var dateTs = 0;
   if (data.date) {
     var dp = data.date.split(' ');
@@ -9435,6 +9539,7 @@ function renderCoverageRow(data) {
     '<td class="td-price">' + data.currency + data.price + '</td>' +
     '<td class="td-company">' + compHtml + '</td>' +
     '<td class="td-sentiment">' + sentHtml + '</td>' +
+    '<td class="td-dominant">' + domHtml + '</td>' +
     '<td class="td-date">' + shortDate + '</td>' +
     '<td>' + renderFreshnessBadge(data.ticker) + renderCatalystTag(data.ticker) + '</td>' +
   '</tr>';
@@ -9448,6 +9553,7 @@ function renderComingSoonRow(stub) {
     '<td class="td-price">' + (stub.currency || 'A$') + stub.price + '</td>' +
     '<td class="td-company"></td>' +
     '<td class="td-sentiment"></td>' +
+    '<td class="td-dominant"></td>' +
     '<td><span class="coming-soon">Coming Soon</span></td>' +
     '<td></td>' +
   '</tr>';
