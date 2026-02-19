@@ -12174,6 +12174,11 @@ function tcAnalyze() {
 
     // --- Simple markdown renderer ---
     function renderMarkdown(text) {
+        // Sanitise LLM-style artefacts before any rendering
+        text = text
+            .replace(/\u2014/g, '\u2013')       // em-dash → en-dash
+            .replace(/^#{1,6}\s+/gm, '');        // strip ## heading markers (render as plain para text)
+
         // If marked + DOMPurify available, use them for richer rendering
         if (typeof marked !== 'undefined' && marked.parse && typeof DOMPurify !== 'undefined') {
             return DOMPurify.sanitize(marked.parse(text));
