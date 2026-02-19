@@ -151,6 +151,9 @@
 [data-theme="light"] .site-nav {
     background: rgba(245, 246, 248, 0.95);
 }
+[data-theme="light"] .nav-links { background: rgba(245,246,248,0.98); }
+[data-theme="light"] .nav-links a { border-bottom-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .nav-hamburger { border-color: var(--border); color: var(--text-muted); }
 [data-theme="light"] .site-nav.scrolled {
     background: rgba(245, 246, 248, 0.98);
     box-shadow: 0 2px 20px rgba(0,0,0,0.08);
@@ -297,6 +300,17 @@ a:hover { color: var(--accent-sage); }
     color: var(--text-primary);
     border-bottom-color: var(--accent-teal);
 }
+/* Hamburger button — hidden on desktop */
+.nav-hamburger {
+    display: none; align-items: center; justify-content: center;
+    width: 36px; height: 36px; flex-shrink: 0;
+    background: transparent; border: 1px solid var(--border); border-radius: 6px;
+    cursor: pointer; color: var(--text-muted);
+    transition: color 0.2s, border-color 0.2s;
+}
+.nav-hamburger:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+.nav-hamburger svg { width: 18px; height: 18px; pointer-events: none; }
+.nav-actions { display: flex; align-items: center; gap: var(--space-sm); }
 
 /* --- Page Container --- */
 .page { display: none; min-height: calc(100vh - var(--nav-height)); padding-top: var(--nav-height); }
@@ -636,6 +650,10 @@ a:hover { color: var(--accent-sage); }
     font-size: 0.72rem;
     color: var(--text-secondary);
     line-height: 1.4;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 .fc-date {
     font-family: var(--font-data);
@@ -729,6 +747,19 @@ a:hover { color: var(--accent-sage); }
 .coverage-table tbody tr:hover { background: var(--bg-surface-alt); }
 .coverage-table tbody tr.stub { opacity: 0.6; cursor: default; }
 .coverage-table tbody tr.stub:hover { background: transparent; }
+/* Skeleton loading rows */
+.coverage-table tbody tr.skeleton-row { cursor: default; pointer-events: none; }
+.coverage-table tbody tr.skeleton-row:hover { background: transparent; }
+.shimmer {
+    display: inline-block; height: 10px; border-radius: 3px;
+    background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--border) 50%, var(--bg-elevated) 75%);
+    background-size: 200% 100%;
+    animation: shimmerAnim 1.5s infinite;
+}
+@keyframes shimmerAnim {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
 .coverage-table tbody td {
     padding: 10px var(--space-md);
     font-size: 0.82rem;
@@ -795,6 +826,20 @@ a:hover { color: var(--accent-sage); }
     display: inline-block;
 }
 .report-back:hover { color: var(--text-primary); }
+.rh-stock-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: var(--space-sm);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.rh-stock-prev, .rh-stock-next {
+    font-family: var(--font-data); font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent-teal); padding: 4px 8px;
+    border-radius: 4px; transition: background 0.2s;
+}
+.rh-stock-prev:hover, .rh-stock-next:hover { background: rgba(26,158,143,0.12); color: var(--accent-teal); }
+.rh-stock-prev.disabled, .rh-stock-next.disabled { visibility: hidden; }
 .rh-main {
     display: flex;
     justify-content: space-between;
@@ -2070,6 +2115,14 @@ a:hover { color: var(--accent-sage); }
     color: var(--text-secondary);
     max-width: 600px;
     margin: 0 auto;
+}
+.tc-hero-explainer {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    max-width: 560px;
+    margin: var(--space-md) auto 0;
+    line-height: 1.6;
+    font-style: italic;
 }
 
 .tc-card-container {
@@ -3363,7 +3416,6 @@ a:hover { color: var(--accent-sage); }
     :root { --space-lg: 16px; --space-xl: 24px; --space-2xl: 32px; --space-3xl: 48px; }
     .hero-title { font-size: 1.8rem; }
     .featured-grid { grid-template-columns: 1fr; }
-    .nav-links { gap: var(--space-md); }
     .fc-metrics { flex-wrap: wrap; gap: var(--space-sm); }
     .rh-ticker { font-size: 1.6rem; }
     .rh-price { font-size: 1.4rem; }
@@ -3372,6 +3424,26 @@ a:hover { color: var(--accent-sage); }
     .portfolio-table { display: block; overflow-x: auto; white-space: nowrap; }
     .portfolio-summary-bar { gap: var(--space-sm); }
     .portfolio-summary-item { min-width: 100px; }
+    /* Mobile nav drawer */
+    .nav-hamburger { display: flex; }
+    .nav-links {
+        display: none;
+        position: fixed; top: var(--nav-height); left: 0; right: 0;
+        flex-direction: column; align-items: stretch; gap: 0; padding: 0;
+        background: rgba(11,18,32,0.98);
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        z-index: 99;
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    }
+    .nav-links.open { display: flex; }
+    .nav-links a {
+        padding: 14px 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        font-size: 0.82rem; border-right: none;
+    }
+    .nav-links a:last-of-type { border-bottom: none; }
+    .nav-links a.active { border-bottom-color: rgba(255,255,255,0.05); border-left: 3px solid var(--accent-teal); padding-left: 17px; }
 }
 @media (max-width: 480px) {
     .nav-links a { font-size: 0.65rem; }
@@ -4294,16 +4366,21 @@ a:hover { color: var(--accent-sage); }
         <a class="nav-brand" onclick="navigate('home')">
             <div class="nav-brand-text">Contin<span class="brand-green">uu</span>m Inte<span class="brand-green">ll</span>igence</div>
         </a>
-        <div class="nav-links">
+        <div class="nav-links" id="navLinks">
             <a href="#home" class="active" data-nav="home">Research</a>
             <a href="#snapshots" data-nav="snapshots">Snapshots</a>
             <a href="#portfolio" data-nav="portfolio">Portfolio</a>
             <a href="#thesis" data-nav="thesis">Comparator</a>
-            <a href="#personalisation" data-nav="personalisation">Personalisation</a>
+            <a href="#personalisation" data-nav="personalisation">Profile</a>
             <a href="#about" data-nav="about">About</a>
+        </div>
+        <div class="nav-actions">
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
                 <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            </button>
+            <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navLinks">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
         </div>
     </div>
@@ -4360,15 +4437,21 @@ a:hover { color: var(--accent-sage); }
                 <tr>
                     <th>ASX</th>
                     <th>Company</th>
-                    <th>Sector</th>
-                    <th>Price</th>
+                    <th class="sortable" onclick="sortCoverageTableBySector()" id="th-sector" title="Sort by sector">Sector <span class="sort-arrow" id="sector-sort-arrow">&#9650;</span></th>
+                    <th class="sortable" onclick="sortCoverageTableByPrice()" id="th-price" title="Sort by price">Price <span class="sort-arrow" id="price-sort-arrow">&#9650;</span></th>
                     <th class="sortable" onclick="sortCoverageTable()" id="th-company" title="Company Research contribution — independently coloured">Company <span class="sort-arrow" id="company-sort-arrow">&#9650;</span></th>
                     <th class="sortable" onclick="sortCoverageTableBySentiment()" id="th-sentiment" title="Three-layer composite signal">Sentiment <span class="sort-arrow" id="sentiment-sort-arrow">&#9650;</span></th>
-                    <th>Updated</th>
+                    <th class="sortable" onclick="sortCoverageTableByDate()" id="th-date" title="Sort by research date">Updated <span class="sort-arrow" id="date-sort-arrow">&#9650;</span></th>
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody id="coverage-body"></tbody>
+            <tbody id="coverage-body">
+                <tr class="skeleton-row"><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:8rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:3.5rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:4rem"></span></td></tr>
+                <tr class="skeleton-row"><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:7rem"></span></td><td><span class="shimmer" style="width:6rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:3.5rem"></span></td></tr>
+                <tr class="skeleton-row"><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:9rem"></span></td><td><span class="shimmer" style="width:4.5rem"></span></td><td><span class="shimmer" style="width:4rem"></span></td><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:4rem"></span></td></tr>
+                <tr class="skeleton-row"><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:6rem"></span></td><td><span class="shimmer" style="width:5.5rem"></span></td><td><span class="shimmer" style="width:3.5rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:4.5rem"></span></td><td><span class="shimmer" style="width:3.5rem"></span></td></tr>
+                <tr class="skeleton-row"><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:8.5rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:3rem"></span></td><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:2.5rem"></span></td><td><span class="shimmer" style="width:5rem"></span></td><td><span class="shimmer" style="width:4rem"></span></td></tr>
+            </tbody>
         </table>
     </div>
 
@@ -4683,6 +4766,7 @@ a:hover { color: var(--accent-sage); }
             <div class="tc-hero-tagline">Validate Your Conviction</div>
             <h1 class="tc-hero-title">Investment Thesis Comparator</h1>
             <p class="tc-hero-subtitle">Discover which of Continuum's four competing hypotheses your investment thesis aligns with — or if you're pushing uphill against all of them.</p>
+            <p class="tc-hero-explainer">Paste your investment thesis and we'll map it to our evidence-weighted hypotheses — revealing where you agree with our research, where you diverge, and what evidence you may be missing.</p>
         </div>
 
         <div class="tc-card-container">
@@ -5548,8 +5632,20 @@ function renderReportHero(data) {
   }
   var sparklineHtml = sparkPrices.length >= 2 ? renderSparkline(sparkPrices) : '';
 
+  var order = (typeof FEATURED_ORDER !== 'undefined') ? FEATURED_ORDER : [];
+  var idx = order.indexOf(data.ticker);
+  var prevTicker = idx > 0 ? order[idx - 1] : null;
+  var nextTicker = idx < order.length - 1 ? order[idx + 1] : null;
+  var prevLink = prevTicker
+    ? '<a class="rh-stock-prev" href="#report-' + prevTicker + '" onclick="navigate(\'report-' + prevTicker + '\')">\u2039 ' + prevTicker + '</a>'
+    : '<span class="rh-stock-prev disabled"></span>';
+  var nextLink = nextTicker
+    ? '<a class="rh-stock-next" href="#report-' + nextTicker + '" onclick="navigate(\'report-' + nextTicker + '\')">' + nextTicker + ' \u203a</a>'
+    : '<span class="rh-stock-next disabled"></span>';
+
   return '<div class="report-hero">' +
     '<div class="report-hero-inner">' +
+      '<div class="rh-stock-nav">' + prevLink + nextLink + '</div>' +
       '<a class="report-back" href="#home" onclick="navigate(\'home\')">&larr; Back to Coverage</a>' +
       '<div class="rh-main">' +
         '<div class="rh-left">' +
@@ -8493,7 +8589,12 @@ function renderCoverageRow(data) {
     ? '<span class="sent-chip ' + compCls + '">' + (compScore > 0 ? '+' : '') + compScore + compArrow + '</span>'
     : '<span class="sent-chip neutral">—</span>';
 
-  return '<tr data-company-score="' + (compScore !== null ? compScore : 0) + '" data-sent-score="' + (sentScore !== null ? sentScore : 0) + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
+  var dateTs = 0;
+  if (data.date) {
+    var dp = data.date.split(' ');
+    if (dp.length >= 3) dateTs = new Date(dp[1] + ' ' + dp[0] + ', ' + dp[2]).getTime() || 0;
+  }
+  return '<tr data-company-score="' + (compScore !== null ? compScore : 0) + '" data-sent-score="' + (sentScore !== null ? sentScore : 0) + '" data-sector="' + (data.sector || '') + '" data-price-val="' + (parseFloat(data.price) || 0) + '" data-date-val="' + dateTs + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
     '<td class="td-ticker">' + data.ticker + '</td>' +
     '<td>' + data.company + '</td>' +
     '<td>' + data.sector + '</td>' +
@@ -8519,7 +8620,43 @@ function renderComingSoonRow(stub) {
 }
 
 // Coverage table sort state
-var coverageSortDir = 0; // 0 = unsorted (default), 1 = desc (most negative first), -1 = asc (most positive first)
+var coverageSortDir = 0; // 0 = unsorted (default), 1 = desc, -1 = asc
+var sentimentSortDir = 0;
+var sectorSortDir = 0;
+var priceSortDir = 0;
+var dateSortDir = 0;
+
+// Reset all sort arrows except the one currently being activated
+function _resetCoverageSortArrows(exceptId) {
+  var arrows = {
+    'company-sort-arrow': 'coverageSortDir',
+    'sentiment-sort-arrow': 'sentimentSortDir',
+    'sector-sort-arrow': 'sectorSortDir',
+    'price-sort-arrow': 'priceSortDir',
+    'date-sort-arrow': 'dateSortDir'
+  };
+  for (var id in arrows) {
+    if (id !== exceptId) {
+      var el = document.getElementById(id);
+      if (el) { el.innerHTML = '&#9650;'; el.className = 'sort-arrow'; }
+    }
+  }
+  if (exceptId !== 'company-sort-arrow') coverageSortDir = 0;
+  if (exceptId !== 'sentiment-sort-arrow') sentimentSortDir = 0;
+  if (exceptId !== 'sector-sort-arrow') sectorSortDir = 0;
+  if (exceptId !== 'price-sort-arrow') priceSortDir = 0;
+  if (exceptId !== 'date-sort-arrow') dateSortDir = 0;
+}
+
+function _restoreCoverageDefaultOrder(tbody) {
+  tbody.innerHTML = '';
+  FEATURED_ORDER.forEach(function(ticker) {
+    if (STOCK_DATA[ticker]) tbody.innerHTML += renderCoverageRow(STOCK_DATA[ticker]);
+  });
+  if (typeof COMING_SOON !== 'undefined') {
+    COMING_SOON.forEach(function(stub) { tbody.innerHTML += renderComingSoonRow(stub); });
+  }
+}
 
 function sortCoverageTable() {
   var tbody = document.getElementById('coverage-body');
@@ -8527,27 +8664,16 @@ function sortCoverageTable() {
   var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
   var arrow = document.getElementById('company-sort-arrow');
 
-  // Cycle: unsorted → desc (most negative first) → asc (most positive first) → unsorted
+  // Cycle: unsorted → desc → asc → unsorted
   coverageSortDir = coverageSortDir === 0 ? 1 : coverageSortDir === 1 ? -1 : 0;
+  _resetCoverageSortArrows('company-sort-arrow');
 
   if (coverageSortDir === 0) {
-    // Restore default order: re-render
     if (arrow) { arrow.innerHTML = '&#9650;'; arrow.className = 'sort-arrow'; }
-    tbody.innerHTML = '';
-    FEATURED_ORDER.forEach(function(ticker) {
-      if (STOCK_DATA[ticker]) {
-        tbody.innerHTML += renderCoverageRow(STOCK_DATA[ticker]);
-      }
-    });
-    if (typeof COMING_SOON !== 'undefined') {
-      COMING_SOON.forEach(function(stub) {
-        tbody.innerHTML += renderComingSoonRow(stub);
-      });
-    }
+    _restoreCoverageDefaultOrder(tbody);
     return;
   }
 
-  // Sort by data-company-score attribute
   rows.sort(function(a, b) {
     var sa = parseInt(a.getAttribute('data-company-score')) || 0;
     var sb = parseInt(b.getAttribute('data-company-score')) || 0;
@@ -8558,15 +8684,8 @@ function sortCoverageTable() {
     arrow.className = 'sort-arrow active';
     arrow.innerHTML = coverageSortDir === 1 ? '&#9660;' : '&#9650;';
   }
-
-  // Re-append in sorted order
-  for (var i = 0; i < rows.length; i++) {
-    tbody.appendChild(rows[i]);
-  }
+  for (var i = 0; i < rows.length; i++) tbody.appendChild(rows[i]);
 }
-
-// Sentiment column sort (separate sort state from skew sort)
-var sentimentSortDir = 0;
 
 function sortCoverageTableBySentiment() {
   var tbody = document.getElementById('coverage-body');
@@ -8575,19 +8694,11 @@ function sortCoverageTableBySentiment() {
   var arrow = document.getElementById('sentiment-sort-arrow');
 
   sentimentSortDir = sentimentSortDir === 0 ? -1 : sentimentSortDir === -1 ? 1 : 0;
-  coverageSortDir = 0; // reset company sort
-  var companyArrow = document.getElementById('company-sort-arrow');
-  if (companyArrow) { companyArrow.innerHTML = '&#9650;'; companyArrow.className = 'sort-arrow'; }
+  _resetCoverageSortArrows('sentiment-sort-arrow');
 
   if (sentimentSortDir === 0) {
     if (arrow) { arrow.innerHTML = '&#9650;'; arrow.className = 'sort-arrow'; }
-    tbody.innerHTML = '';
-    FEATURED_ORDER.forEach(function(ticker) {
-      if (STOCK_DATA[ticker]) tbody.innerHTML += renderCoverageRow(STOCK_DATA[ticker]);
-    });
-    if (typeof COMING_SOON !== 'undefined') {
-      COMING_SOON.forEach(function(stub) { tbody.innerHTML += renderComingSoonRow(stub); });
-    }
+    _restoreCoverageDefaultOrder(tbody);
     return;
   }
 
@@ -8600,6 +8711,90 @@ function sortCoverageTableBySentiment() {
   if (arrow) {
     arrow.className = 'sort-arrow active';
     arrow.innerHTML = sentimentSortDir === -1 ? '&#9660;' : '&#9650;';
+  }
+  for (var i = 0; i < rows.length; i++) tbody.appendChild(rows[i]);
+}
+
+function sortCoverageTableBySector() {
+  var tbody = document.getElementById('coverage-body');
+  if (!tbody) return;
+  var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+  var arrow = document.getElementById('sector-sort-arrow');
+
+  sectorSortDir = sectorSortDir === 0 ? 1 : sectorSortDir === 1 ? -1 : 0;
+  _resetCoverageSortArrows('sector-sort-arrow');
+
+  if (sectorSortDir === 0) {
+    if (arrow) { arrow.innerHTML = '&#9650;'; arrow.className = 'sort-arrow'; }
+    _restoreCoverageDefaultOrder(tbody);
+    return;
+  }
+
+  rows.sort(function(a, b) {
+    var sa = (a.getAttribute('data-sector') || '').toLowerCase();
+    var sb = (b.getAttribute('data-sector') || '').toLowerCase();
+    return sectorSortDir === 1 ? sa.localeCompare(sb) : sb.localeCompare(sa);
+  });
+
+  if (arrow) {
+    arrow.className = 'sort-arrow active';
+    arrow.innerHTML = sectorSortDir === 1 ? '&#9660;' : '&#9650;';
+  }
+  for (var i = 0; i < rows.length; i++) tbody.appendChild(rows[i]);
+}
+
+function sortCoverageTableByPrice() {
+  var tbody = document.getElementById('coverage-body');
+  if (!tbody) return;
+  var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+  var arrow = document.getElementById('price-sort-arrow');
+
+  priceSortDir = priceSortDir === 0 ? -1 : priceSortDir === -1 ? 1 : 0;
+  _resetCoverageSortArrows('price-sort-arrow');
+
+  if (priceSortDir === 0) {
+    if (arrow) { arrow.innerHTML = '&#9650;'; arrow.className = 'sort-arrow'; }
+    _restoreCoverageDefaultOrder(tbody);
+    return;
+  }
+
+  rows.sort(function(a, b) {
+    var sa = parseFloat(a.getAttribute('data-price-val')) || 0;
+    var sb = parseFloat(b.getAttribute('data-price-val')) || 0;
+    return priceSortDir === -1 ? sb - sa : sa - sb;
+  });
+
+  if (arrow) {
+    arrow.className = 'sort-arrow active';
+    arrow.innerHTML = priceSortDir === -1 ? '&#9660;' : '&#9650;';
+  }
+  for (var i = 0; i < rows.length; i++) tbody.appendChild(rows[i]);
+}
+
+function sortCoverageTableByDate() {
+  var tbody = document.getElementById('coverage-body');
+  if (!tbody) return;
+  var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+  var arrow = document.getElementById('date-sort-arrow');
+
+  dateSortDir = dateSortDir === 0 ? -1 : dateSortDir === -1 ? 1 : 0;
+  _resetCoverageSortArrows('date-sort-arrow');
+
+  if (dateSortDir === 0) {
+    if (arrow) { arrow.innerHTML = '&#9650;'; arrow.className = 'sort-arrow'; }
+    _restoreCoverageDefaultOrder(tbody);
+    return;
+  }
+
+  rows.sort(function(a, b) {
+    var sa = parseInt(a.getAttribute('data-date-val')) || 0;
+    var sb = parseInt(b.getAttribute('data-date-val')) || 0;
+    return dateSortDir === -1 ? sb - sa : sa - sb;
+  });
+
+  if (arrow) {
+    arrow.className = 'sort-arrow active';
+    arrow.innerHTML = dateSortDir === -1 ? '&#9660;' : '&#9650;';
   }
   for (var i = 0; i < rows.length; i++) tbody.appendChild(rows[i]);
 }
@@ -10022,6 +10217,41 @@ window.addEventListener('scroll', () => {
     }
 });
 
+/* --- Mobile Hamburger Nav --- */
+(function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        var hamburger = document.getElementById('navHamburger');
+        var navLinks = document.getElementById('navLinks');
+        if (!hamburger || !navLinks) return;
+
+        function closeNav() {
+            navLinks.classList.remove('open');
+            hamburger.setAttribute('aria-expanded', 'false');
+        }
+
+        hamburger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var isOpen = navLinks.classList.toggle('open');
+            hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        // Close on link click
+        navLinks.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A') closeNav();
+        });
+
+        // Close on outside click
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.site-nav')) closeNav();
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeNav();
+        });
+    });
+})();
+
 /* --- Theme Toggle (Light / Dark) --- */
 (function() {
     var saved = localStorage.getItem('continuum_theme');
@@ -10132,9 +10362,10 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Populate coverage table
+    // Populate coverage table (clear skeleton rows first)
     const coverageBody = document.getElementById('coverage-body');
     if (coverageBody) {
+        coverageBody.innerHTML = '';
         FEATURED_ORDER.forEach(ticker => {
             if (STOCK_DATA[ticker]) {
                 coverageBody.innerHTML += renderCoverageRow(STOCK_DATA[ticker]);
