@@ -21,12 +21,18 @@
 (function(global) {
   'use strict';
 
-  // 18-stock coverage universe (excludes micro-caps HRZ, OCL, RFG)
-  var COVERAGE_UNIVERSE = [
-    'BHP', 'CBA', 'CSL', 'DRO', 'DXS', 'FMG',
-    'GMG', 'GYG', 'MQG', 'NAB', 'PME', 'RIO',
-    'SIG', 'WDS', 'WOR', 'WOW', 'WTC', 'XRO'
-  ];
+  // Derive coverage universe from STOCK_DATA keys — always in sync with index.html
+  // Falls back to a known list only if STOCK_DATA is unavailable at initialisation time
+  var COVERAGE_UNIVERSE = (typeof STOCK_DATA !== 'undefined' && STOCK_DATA)
+    ? Object.keys(STOCK_DATA).filter(function(k) {
+        return k !== '_meta' && typeof STOCK_DATA[k] === 'object' && STOCK_DATA[k] !== null;
+      })
+    : [
+        'BHP', 'CBA', 'CSL', 'DRO', 'DXS', 'FMG',
+        'GMG', 'GYG', 'HRZ', 'MQG', 'NAB', 'OCL',
+        'PME', 'RFG', 'RIO', 'SIG', 'WDS', 'WOR',
+        'WOW', 'WTC', 'XRO'
+      ];
 
   // ─── DATA EXTRACTION ────────────────────────────────────────
 
