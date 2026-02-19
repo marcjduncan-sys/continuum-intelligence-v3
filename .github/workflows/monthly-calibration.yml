@@ -1,0 +1,71 @@
+name: Monthly Weight Calibration
+
+on:
+  schedule:
+    # 1st of each month at 07:00 AEST (20:00 UTC on the last day of prior month
+    # in UTC, but GitHub uses UTC — so 21:00 UTC = 07:00 AEDT or 07:00 AEST+1h)
+    # Simpler: run at 22:00 UTC on the 1st, which is 08:00 AEDT or 07:00 AEST
+    - cron: '0 22 1 * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — compute weights but do not write files'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "monthly-calibration"
+  cancel-in-progress: false
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.DEPLOY_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run weight calibration regression
+        id: calibrate
+        run: |
+          DRY_FLAG=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            DRY_FLAG="--dry-run"
+          fi
+          set +e
+          node scripts/calibrate-weights.js $DRY_FLAG
+          CAL_EXIT=$?
+          set -e
+          echo "exit_code=$CAL_EXIT" >> $GITHUB_OUTPUT
+          if [ $CAL_EXIT -eq 2 ]; then
+            echo "::warning::Some commodity stocks have low sector R² — manual weight review recommended"
+          elif [ $CAL_EXIT -ne 0 ]; then
+            echo "::error::Weight calibration failed with exit code $CAL_EXIT"
+            exit 1
+          fi
+
+      - name: Commit calibrated weights
+        if: inputs.dry_run != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add data/stocks/*.json || true
+
+          if git diff --cached --quiet; then
+            echo "No weight changes to commit"
+          else
+            MONTH=$(date +%Y-%m)
+            git commit -m "Monthly weight calibration: ${MONTH} [automated]"
+            git push
+          fi

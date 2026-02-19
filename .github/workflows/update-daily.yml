@@ -123,6 +123,19 @@ jobs:
             echo "::warning::Price-evidence engine exited with code $PEE_EXIT"
           fi
 
+      - name: Ingest TA signals (Phase 7.2)
+        if: steps.market-check.outputs.skip != 'true'
+        run: |
+          set +e
+          node scripts/ingest-ta-signals.js
+          TA_EXIT=$?
+          set -e
+          if [ $TA_EXIT -eq 1 ]; then
+            echo "::warning::TA signal ingestion encountered errors (non-fatal)"
+          fi
+        env:
+          TA_SIGNALS_ENABLED: ${{ vars.TA_SIGNALS_ENABLED || 'false' }}
+
       - name: Log daily narrative history
         if: steps.market-check.outputs.skip != 'true'
         run: |
@@ -171,7 +184,8 @@ jobs:
                   data/events/ \
                   data/stocks/*.json \
                   data/stocks/*-history.json \
-                  data/research/*.json || true
+                  data/research/*.json \
+                  data/ta-signals/*.json || true
 
           if git diff --cached --quiet; then
             echo "No changes to commit"
