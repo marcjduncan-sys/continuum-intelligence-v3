@@ -83,33 +83,87 @@ function categoriseAnnouncement(headline) {
   return 'Announcement';
 }
 
-// Primary source: Yahoo Finance search endpoint — returns recent news articles for the ticker.
-// Endpoint: /v1/finance/search?q={TICKER}.AX&quotesCount=0&newsCount=N
-// Each news item: { uuid, title, publisher, link, providerPublishTime, type }
+// Primary source: Yahoo Finance RSS headline feed — company-specific news.
+// Endpoint: feeds.finance.yahoo.com/rss/2.0/headline?s={TICKER}.AX
+// Returns only news tagged to that specific ticker, unlike the search endpoint
+// which returns general market articles shared across many tickers.
+function parseRSS(xml) {
+  const items = [];
+  const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+  let m;
+  while ((m = itemRegex.exec(xml)) !== null) {
+    const block = m[1];
+    const get = (tag) => {
+      // Handle both plain text and CDATA-wrapped content
+      const plain = block.match(new RegExp('<' + tag + '[^>]*>([\\s\\S]*?)<\\/' + tag + '>'));
+      if (!plain) return '';
+      const inner = plain[1].trim();
+      const cdata = inner.match(/^<!\[CDATA\[([\s\S]*?)\]\]>$/);
+      return cdata ? cdata[1].trim() : inner;
+    };
+    const title = get('title');
+    if (!title) continue;
+    items.push({ guid: get('guid'), title, link: get('link'), pubDate: get('pubDate') });
+  }
+  return items;
+}
+
 async function fetchYahooNews(ticker) {
   const yahooTicker = ticker + '.AX';
-  const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${yahooTicker}&lang=en-AU&region=AU&quotesCount=0&newsCount=${ANNOUNCEMENTS_PER_TICKER}&enableFuzzyQuery=false`;
 
+  // Primary: RSS feed — ticker-specific
+  const rssUrl = `https://feeds.finance.yahoo.com/rss/2.0/headline?s=${yahooTicker}&region=AU&lang=en-AU`;
   try {
-    const raw = await fetchURL(url);
-    const data = JSON.parse(raw);
-    const items = (data && Array.isArray(data.news)) ? data.news : [];
-    if (items.length === 0) return [];
-
-    return items
-      .filter(n => n.type === 'STORY' && n.title)
-      .map(n => ({
-        id:        n.uuid || null,
-        date:      n.providerPublishTime
-                     ? new Date(n.providerPublishTime * 1000).toISOString()
-                     : null,
-        headline:  n.title || '',
-        type:      categoriseAnnouncement(n.title || ''),
+    const raw = await fetchURL(rssUrl);
+    const items = parseRSS(raw);
+    if (items.length > 0) {
+      return items.slice(0, ANNOUNCEMENTS_PER_TICKER).map(n => ({
+        id:        n.guid || null,
+        date:      n.pubDate ? new Date(n.pubDate).toISOString() : null,
+        headline:  n.title,
+        type:      categoriseAnnouncement(n.title),
         sensitive: false,
         pages:     null,
         url:       n.link || null,
-        publisher: n.publisher || null
+        publisher: null
       }));
+    }
+  } catch (e) {
+    // Fall through to search fallback
+  }
+
+  // Fallback: JSON search endpoint — less reliable, filter by company name
+  const searchUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${yahooTicker}&lang=en-AU&region=AU&quotesCount=1&newsCount=${ANNOUNCEMENTS_PER_TICKER}&enableFuzzyQuery=false`;
+  try {
+    const raw = await fetchURL(searchUrl);
+    const data = JSON.parse(raw);
+    const quotes = (data && Array.isArray(data.quotes)) ? data.quotes : [];
+    const companyName = quotes.length > 0 ? (quotes[0].longname || quotes[0].shortname || '') : '';
+    const tickerLower = ticker.toLowerCase();
+    const companyWords = companyName.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+
+    const items = (data && Array.isArray(data.news)) ? data.news : [];
+    if (items.length === 0) { console.error(`  [WARN] No news found for ${ticker}`); return []; }
+
+    // Filter to articles that mention the ticker or company name — rejects generic market noise
+    const relevant = items.filter(n => {
+      if (!n.title) return false;
+      const t = n.title.toLowerCase();
+      return t.includes(tickerLower) || companyWords.some(w => t.includes(w));
+    });
+    const source = relevant.length > 0 ? relevant : [];
+    if (source.length === 0) { console.warn(`  [WARN] ${ticker}: all search results were generic market noise — skipping`); return []; }
+
+    return source.filter(n => n.title).slice(0, ANNOUNCEMENTS_PER_TICKER).map(n => ({
+      id:        n.uuid || null,
+      date:      n.providerPublishTime ? new Date(n.providerPublishTime * 1000).toISOString() : null,
+      headline:  n.title,
+      type:      categoriseAnnouncement(n.title),
+      sensitive: false,
+      pages:     null,
+      url:       n.link || null,
+      publisher: n.publisher || null
+    }));
   } catch (e) {
     console.error(`  [WARN] Yahoo fetch failed for ${ticker}: ${e.message}`);
     return [];
