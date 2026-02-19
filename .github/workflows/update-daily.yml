@@ -51,6 +51,17 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Fetch macro factors
+        if: steps.market-check.outputs.skip != 'true'
+        run: |
+          set +e
+          node scripts/fetch-macro-factors.js
+          MACRO_EXIT=$?
+          set -e
+          if [ $MACRO_EXIT -ne 0 ]; then
+            echo "::warning::Macro factor fetch failed — downstream signals will use stale data"
+          fi
+
       - name: Run orchestrator pipeline
         if: steps.market-check.outputs.skip != 'true'
         id: orchestrator
@@ -131,6 +142,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           git add index.html \
+                  data/macro-factors.json \
                   data/live-prices.json \
                   data/latest-prices.json \
                   data/narrative-analysis.json \

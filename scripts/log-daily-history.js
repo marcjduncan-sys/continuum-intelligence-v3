@@ -3,15 +3,17 @@
  * log-daily-history.js
  *
  * Continuum Intelligence — Daily Narrative History Logger
- * Per NARRATIVE_FRAMEWORK_V3.md and NARRATIVE_TIMELINE_SPEC.md
+ * Per MASTER_IMPLEMENTATION_INSTRUCTIONS.md (Phase 1.3)
  *
  * For each stock in coverage, appends a daily snapshot to
  * data/stocks/{TICKER}-history.json containing:
  *   - date, price, daily_change_pct, volume_ratio
+ *   - three-layer signals: macro_signal, sector_signal, idio_signal, overall_sentiment
+ *     (null until Phase 2 calculators are built; slots preserved in schema)
  *   - all hypothesis scores and ranks
- *   - thesis_skew, dominant narrative ID
- *   - whether a narrative flip occurred
+ *   - dominant narrative ID, narrative_flip flag
  *   - any events from the events pipeline
+ *   - reconstructed: false (true only for backfilled historical entries)
  *
  * Usage:
  *   node scripts/log-daily-history.js [--date YYYY-MM-DD] [--dry-run]
@@ -208,6 +210,12 @@ function buildSnapshot(ticker, date, researchData, stocksData, livePrices) {
     price: price,
     daily_change_pct: dailyChangePct,
     volume_ratio: Math.round(volumeRatio * 100) / 100,
+    // Three-layer signals — null until Phase 2 calculators populate these fields.
+    // Schema is locked here; downstream writers merge by key without touching others.
+    macro_signal:      null,
+    sector_signal:     null,
+    idio_signal:       null,
+    overall_sentiment: null,
     price_classification: priceClassification,
     hypotheses: hypotheses,
     thesis_skew: skew.score,
@@ -216,7 +224,8 @@ function buildSnapshot(ticker, date, researchData, stocksData, livePrices) {
     narrative_flip: false, // set by flip detection below
     flip_detail: null,
     events: events,
-    overcorrection_active: false
+    overcorrection_active: false,
+    reconstructed: false
   };
 }
 
@@ -389,8 +398,11 @@ function main() {
 
     logged++;
     const arrow = snapshot.daily_change_pct > 0 ? '↑' : snapshot.daily_change_pct < 0 ? '↓' : '→';
+    const sentStr = snapshot.overall_sentiment !== null
+      ? '| Sentiment: ' + snapshot.overall_sentiment
+      : '| Sentiment: (pending Ph2)';
     console.log('  [LOG]', ticker, ':', snapshot.price, arrow, snapshot.daily_change_pct + '%',
-      '| T1:', snapshot.dominant_narrative, '| Skew:', snapshot.thesis_skew, snapshot.thesis_skew_label);
+      '| T1:', snapshot.dominant_narrative, sentStr);
   }
 
   console.log('');
