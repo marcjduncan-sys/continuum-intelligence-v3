@@ -8994,8 +8994,23 @@ function renderSnapshotPage(data) {
 function renderFeaturedCard(data) {
   var skew = computeSkewScore(data);
   var dir = skew.direction;
-  var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
-  var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
+
+  // Sentiment chip — read TLS first so score badge matches research page
+  var fcTls = data.three_layer_signal || null;
+  var fcSent = fcTls ? fcTls.overall_sentiment : null;
+  var fcSentCls = fcSent === null ? 'neutral' : fcSent > 30 ? 'positive strong' : fcSent > 10 ? 'positive' : fcSent < -30 ? 'negative strong' : fcSent < -10 ? 'negative' : 'neutral';
+  var fcSentLabel = fcTls ? (fcTls.sentiment_label || '') : '';
+  var fcSentChip = fcSent !== null
+    ? '<span class="sent-chip ' + fcSentCls + '" title="Overall Sentiment (' + fcSentLabel + ')">' + (fcSent > 0 ? '+' : '') + fcSent + '</span>'
+    : '';
+
+  // Score badge in fc-skew: use overall_sentiment (matches research page); fall back to skew.score only when TLS unavailable
+  var scoreCls = fcSent !== null
+    ? (fcSent > 5 ? 'positive' : fcSent < -5 ? 'negative' : 'neutral')
+    : (skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral');
+  var scoreLabel = fcSent !== null
+    ? (fcSent > 0 ? '+' : '') + fcSent
+    : (skew.score > 0 ? '+' : '') + skew.score;
 
   var metricsHtml = '';
   for (var i = 0; i < data.featuredMetrics.length; i++) {
@@ -9006,15 +9021,6 @@ function renderFeaturedCard(data) {
 
   var priceColor = data.featuredPriceColor || '';
   var priceStyle = priceColor ? ' style="color: ' + priceColor + '"' : '';
-
-  // Sentiment chip for featured card
-  var fcTls = data.three_layer_signal || null;
-  var fcSent = fcTls ? fcTls.overall_sentiment : null;
-  var fcSentCls = fcSent === null ? 'neutral' : fcSent > 30 ? 'positive strong' : fcSent > 10 ? 'positive' : fcSent < -30 ? 'negative strong' : fcSent < -10 ? 'negative' : 'neutral';
-  var fcSentLabel = fcTls ? (fcTls.sentiment_label || '') : '';
-  var fcSentChip = fcSent !== null
-    ? '<span class="sent-chip ' + fcSentCls + '" title="Overall Sentiment (' + fcSentLabel + ')">' + (fcSent > 0 ? '+' : '') + fcSent + '</span>'
-    : '';
 
   return '<div class="featured-card skew-' + dir + '" data-ticker-card="' + data.ticker + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
     '<div class="fc-top">' +
