@@ -2470,6 +2470,36 @@ a:hover { color: var(--accent-sage); }
     .tc-evidence-grid { grid-template-columns: 1fr; }
 }
 
+.tc-chat-cta {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--border);
+}
+.tc-chat-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 12px 28px;
+    background: var(--accent-teal);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+.tc-chat-cta-btn:hover {
+    background: #158a7d;
+    transform: translateY(-1px);
+}
+.tc-chat-cta-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
 .about-cred {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -4927,6 +4957,13 @@ a:hover { color: var(--accent-sage); }
                         <div class="tc-evidence-list" id="tc-contradicting"></div>
                     </div>
                 </div>
+            </div>
+
+            <div class="tc-chat-cta">
+                <button class="tc-chat-cta-btn" onclick="window.openResearchChat && window.openResearchChat()" aria-label="Open Research Chat to discuss this analysis">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    Discuss this analysis with Research Chat
+                </button>
             </div>
         </div>
 
@@ -11546,6 +11583,7 @@ function tcSelectStock(ticker) {
     });
     document.getElementById('tc-step-2').classList.add('active');
     document.getElementById('tc-step-2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (window.syncChatTicker) window.syncChatTicker(ticker);
 }
 
 // Returns live pipeline probability (%) for a ticker/tier, falling back to TC_DATA.
@@ -11796,10 +11834,11 @@ function tcAnalyze() {
     var subtitle  = document.getElementById('chatSubtitle');
 
     // --- State ---
-    var isOpen          = false;
-    var isLoading       = false;
-    var conversations   = {};   // { ticker: [ {role, content}, ... ] }
-    var currentTicker   = '';
+    var isOpen              = false;
+    var isLoading           = false;
+    var conversations       = {};   // { ticker: [ {role, content}, ... ] }
+    var currentTicker       = '';
+    var chatContextByTicker = {};   // { ticker: contextString } — Comparator analysis context
 
     // --- Populate ticker dropdown ---
     function populateTickerSelect() {
@@ -11816,6 +11855,7 @@ function tcAnalyze() {
         var detected = '';
         if (hash.startsWith('report-')) detected = hash.replace('report-', '').toUpperCase();
         if (hash.startsWith('snapshot-')) detected = hash.replace('snapshot-', '').toUpperCase();
+        if (hash === 'thesis' && typeof tcSelectedTicker !== 'undefined' && tcSelectedTicker) detected = tcSelectedTicker;
         if (detected && STOCK_DATA[detected]) {
             select.value = detected;
         }
@@ -11824,6 +11864,15 @@ function tcAnalyze() {
 
     // --- Suggestions per stock ---
     function getSuggestions(ticker) {
+        var hash = window.location.hash.slice(1) || '';
+        if (hash === 'thesis') {
+            return [
+                'How does my thesis compare to your top hypothesis?',
+                'What evidence supports or challenges my view?',
+                'What am I missing in my analysis of ' + ticker + '?',
+                'Where do I diverge most from your research?'
+            ];
+        }
         return [
             'What is the bull case for ' + ticker + '?',
             'What are the key risks?',
@@ -11836,6 +11885,11 @@ function tcAnalyze() {
     function renderWelcome() {
         var ticker = currentTicker;
         var company = STOCK_DATA[ticker] ? STOCK_DATA[ticker].company : ticker;
+        var hasCtx = !!chatContextByTicker[ticker];
+        var titleText = hasCtx ? 'Thesis Analysis Ready' : 'Research Chat';
+        var bodyText = hasCtx
+            ? 'Your Comparator analysis for <strong>' + ticker + '</strong> is loaded. Ask me how your thesis compares, what evidence you\'re missing, or where you diverge from our research.'
+            : 'Ask questions about <strong>' + company + '</strong> grounded in our structured research data.';
         var html =
             '<div class="chat-welcome">' +
                 '<div class="chat-welcome-icon">' +
@@ -11843,8 +11897,8 @@ function tcAnalyze() {
                         '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' +
                     '</svg>' +
                 '</div>' +
-                '<div class="chat-welcome-title">Research Chat</div>' +
-                '<div class="chat-welcome-text">Ask questions about <strong>' + company + '</strong> grounded in our structured research data.</div>' +
+                '<div class="chat-welcome-title">' + titleText + '</div>' +
+                '<div class="chat-welcome-text">' + bodyText + '</div>' +
                 '<div class="chat-suggestions">' +
                     getSuggestions(ticker).map(function(s) {
                         return '<button class="chat-suggestion-btn" data-q="' + s.replace(/"/g, '&quot;') + '">' + s + '</button>';
@@ -11990,6 +12044,13 @@ function tcAnalyze() {
         var history = convo.slice(0, -1).map(function(m) {
             return { role: m.role, content: m.content };
         });
+        // Prepend Comparator context as initial grounding if available
+        if (chatContextByTicker[currentTicker]) {
+            history = [
+                { role: 'user', content: chatContextByTicker[currentTicker] },
+                { role: 'assistant', content: 'Understood. I have your thesis and the comparator analysis in context.' }
+            ].concat(history);
+        }
 
         // Guard: file:// protocol cannot reach the API
         if (isFile) {
@@ -12079,6 +12140,9 @@ function tcAnalyze() {
         fab.classList.add('hidden');
         fab.setAttribute('aria-expanded', 'true');
         isOpen = true;
+        // Pre-load Comparator analysis context when user opens chat from thesis page
+        var hash = window.location.hash.slice(1) || '';
+        if (hash === 'thesis' && currentTicker) injectComparatorContext(currentTicker);
         renderConversation();
         input.focus();
         updateSubtitle();
@@ -12092,8 +12156,27 @@ function tcAnalyze() {
     }
 
     function updateSubtitle() {
+        var hash = window.location.hash.slice(1) || '';
+        if (hash === 'thesis') {
+            subtitle.textContent = 'Thesis Comparator · ' + (currentTicker || 'select a stock above');
+            return;
+        }
         var company = STOCK_DATA[currentTicker] ? STOCK_DATA[currentTicker].company : currentTicker;
         subtitle.textContent = company;
+    }
+
+    // --- Inject Comparator analysis as chat context ---
+    function injectComparatorContext(ticker) {
+        if (!ticker) return;
+        var hypothesis = (document.getElementById('tc-banner-hypothesis') || {}).textContent || '';
+        var analysis = (document.getElementById('tc-analysis-text') || {}).textContent || '';
+        if (!hypothesis && !analysis) return;
+        var thesis = ((document.getElementById('tc-thesis-input') || {}).value || '').trim();
+        var ctx = 'COMPARATOR CONTEXT — use as background grounding, do not repeat verbatim:\n';
+        if (thesis) ctx += 'User thesis: ' + thesis + '\n';
+        ctx += 'Closest matching hypothesis: ' + hypothesis + '\n';
+        if (analysis) ctx += 'Analysis summary: ' + analysis.slice(0, 800);
+        chatContextByTicker[ticker] = ctx;
     }
 
     // --- Event listeners ---
@@ -12138,6 +12221,16 @@ function tcAnalyze() {
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && isOpen) closeChat();
     });
+
+    // --- Public API ---
+    window.openResearchChat = openChat;
+    window.syncChatTicker = function(ticker) {
+        if (ticker && STOCK_DATA[ticker]) {
+            select.value = ticker;
+            currentTicker = ticker;
+            if (isOpen) { renderConversation(); updateSubtitle(); }
+        }
+    };
 })();
 </script>
 
