@@ -889,6 +889,203 @@ a:hover { color: var(--accent-sage); }
     flex: 1;
 }
 
+/* ── Phase 5: Macro Context Bar ── */
+.macro-bar {
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
+}
+.macro-bar-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+.macro-bar-label {
+    font-size: 0.55rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-muted); white-space: nowrap;
+}
+.macro-bar-badge {
+    font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.06em; padding: 2px 10px;
+    border-radius: 4px; white-space: nowrap;
+}
+.macro-bar-badge.bullish  { background: rgba(61,170,109,0.18); color: var(--signal-green); }
+.macro-bar-badge.neutral  { background: rgba(212,160,60,0.18); color: var(--signal-amber); }
+.macro-bar-badge.bearish  { background: rgba(212,85,85,0.18);  color: var(--signal-red);   }
+.macro-bar-stat {
+    font-size: 0.75rem; color: var(--text-secondary);
+    display: flex; gap: 5px; align-items: center; white-space: nowrap;
+}
+.macro-bar-stat .mbs-key {
+    color: var(--text-muted); font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.macro-bar-stat .mbs-val { font-weight: 600; color: var(--text-primary); }
+.macro-bar-stat .mbs-chg { font-size: 0.68rem; }
+.mbs-up   { color: var(--signal-green); }
+.mbs-down { color: var(--signal-red);   }
+
+/* ── Phase 5: Sector Narrative Panel ── */
+.sector-panel {
+    background: var(--bg-surface-alt);
+    border-bottom: 1px solid var(--border);
+    padding: var(--space-md) 0;
+}
+.sector-panel-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+.sector-panel-header {
+    display: flex; align-items: baseline; gap: 12px;
+    margin-bottom: 10px;
+}
+.sector-panel-title {
+    font-size: 0.6rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-muted);
+}
+.sector-panel-model {
+    font-size: 0.72rem; font-weight: 600;
+    color: var(--text-secondary);
+}
+.sector-panel-rows {
+    display: flex; flex-wrap: wrap; gap: 10px 24px;
+    margin-bottom: 10px;
+}
+.sector-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.77rem;
+}
+.sector-row-key { color: var(--text-muted); }
+.sector-row-val { font-weight: 600; color: var(--text-primary); }
+.sector-row-chg { font-size: 0.7rem; }
+.sector-row-badge {
+    font-size: 0.64rem; font-weight: 700; padding: 1px 7px;
+    border-radius: 3px; letter-spacing: 0.05em;
+}
+.sector-row-badge.bull { background: rgba(61,170,109,0.15); color: var(--signal-green); }
+.sector-row-badge.bear { background: rgba(212,85,85,0.15);  color: var(--signal-red);   }
+.sector-row-badge.neut { background: rgba(212,160,60,0.15); color: var(--signal-amber); }
+.sector-gauge-box {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px 14px;
+    margin-bottom: 10px;
+}
+.sector-gauge-title {
+    font-size: 0.58rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 8px;
+}
+.sector-gauge-rows { display: flex; flex-wrap: wrap; gap: 6px 24px; margin-bottom: 8px; }
+.sector-gauge-row { font-size: 0.75rem; color: var(--text-secondary); }
+.sector-gauge-row strong { color: var(--text-primary); }
+.sector-gauge-track {
+    height: 10px; background: var(--bg-elevated);
+    border-radius: 5px; overflow: hidden; margin: 6px 0 4px;
+    position: relative;
+}
+.sector-gauge-fill {
+    height: 100%; border-radius: 5px;
+    transition: width 0.4s ease;
+}
+.sector-gauge-fill.strong-bear { background: #8B2020; }
+.sector-gauge-fill.bear        { background: var(--signal-red); }
+.sector-gauge-fill.neut        { background: var(--signal-amber); }
+.sector-gauge-fill.bull        { background: var(--signal-green); }
+.sector-gauge-fill.strong-bull { background: #1A7A46; }
+.sector-gauge-labels {
+    display: flex; justify-content: space-between;
+    font-size: 0.62rem; color: var(--text-muted);
+}
+.sector-signal-footer {
+    display: flex; gap: 18px; flex-wrap: wrap;
+    font-size: 0.75rem; color: var(--text-secondary);
+}
+.sector-signal-footer strong { color: var(--text-primary); }
+
+/* ── Phase 5: Composite Sentiment Bar ── */
+.composite-bar {
+    background: var(--bg-surface);
+    border-bottom: 2px solid var(--border);
+    padding: var(--space-md) 0;
+}
+.composite-bar-inner {
+    max-width: var(--max-width); margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+.composite-headline {
+    display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px;
+}
+.composite-label {
+    font-size: 0.55rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-muted);
+}
+.composite-score {
+    font-size: 1.3rem; font-weight: 800; letter-spacing: -0.01em;
+}
+.composite-score.strong-upside   { color: #1A7A46; }
+.composite-score.upside          { color: var(--signal-green); }
+.composite-score.neutral         { color: var(--signal-amber); }
+.composite-score.downside        { color: var(--signal-red); }
+.composite-score.strong-downside { color: #8B2020; }
+.composite-sent-label {
+    font-size: 0.8rem; font-weight: 600;
+}
+.composite-sent-label.strong-upside   { color: #1A7A46; }
+.composite-sent-label.upside          { color: var(--signal-green); }
+.composite-sent-label.neutral         { color: var(--signal-amber); }
+.composite-sent-label.downside        { color: var(--signal-red); }
+.composite-sent-label.strong-downside { color: #8B2020; }
+.composite-contrib-row {
+    display: flex; align-items: center; gap: 0; height: 16px;
+    border-radius: 4px; overflow: hidden; margin-bottom: 6px;
+    background: var(--bg-elevated);
+}
+.contrib-seg {
+    height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.6rem; font-weight: 700; color: rgba(255,255,255,0.85);
+    white-space: nowrap; overflow: hidden;
+    transition: width 0.4s ease;
+    min-width: 0;
+}
+.contrib-seg.macro-seg  { background: #4A8ECC; }
+.contrib-seg.sector-seg { background: var(--accent-teal); }
+.contrib-seg.idio-seg   { background: var(--accent-gold); }
+.contrib-seg.neg        { opacity: 0.7; }
+.composite-contrib-legend {
+    display: flex; gap: 16px; font-size: 0.71rem; color: var(--text-secondary);
+}
+.contrib-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block; margin-right: 4px; vertical-align: middle;
+}
+.contrib-dot.macro-dot  { background: #4A8ECC; }
+.contrib-dot.sector-dot { background: var(--accent-teal); }
+.contrib-dot.idio-dot   { background: var(--accent-gold); }
+.composite-pending {
+    font-size: 0.75rem; color: var(--text-muted); font-style: italic;
+}
+
+/* ── Phase 5: Hypothesis card colour coding ── */
+.hyp-card.dir-up    { border-left: 3px solid var(--signal-green); }
+.hyp-card.dir-down  { border-left: 3px solid var(--signal-red);   }
+.hyp-card.dir-neutral { border-left: 3px solid var(--signal-amber); }
+.hyp-card.dominant  { border-left-width: 5px; }
+.hc-sentiment-tag {
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.07em;
+    padding: 2px 8px; border-radius: 3px; margin-left: 8px;
+}
+.hc-sentiment-tag.bullish { background: rgba(61,170,109,0.18); color: var(--signal-green); }
+.hc-sentiment-tag.bearish { background: rgba(212,85,85,0.18);  color: var(--signal-red);   }
+.hc-sentiment-tag.neutral { background: rgba(212,160,60,0.18); color: var(--signal-amber); }
+
 /* --- Report Page: Verdict --- */
 .verdict-section {
     background: var(--bg-surface);
@@ -5009,6 +5206,47 @@ const REFERENCE_DATA = {
   }
 })();
 
+// Load macro-factors.json synchronously into global MACRO_FACTORS (for renderMacroBar / renderSectorPanel)
+var MACRO_FACTORS = null;
+(function() {
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'data/macro-factors.json', false); // synchronous
+    xhr.send();
+    if (xhr.status === 200) {
+      MACRO_FACTORS = JSON.parse(xhr.responseText);
+      console.log('[MacroLoader] Loaded macro-factors.json (date:', MACRO_FACTORS && MACRO_FACTORS.date, ')');
+    } else {
+      console.warn('[MacroLoader] macro-factors.json not available (HTTP ' + xhr.status + ')');
+    }
+  } catch (err) {
+    console.warn('[MacroLoader] Could not load macro-factors.json:', err.message || err);
+  }
+})();
+
+// Merge narrative_model, narrative_weights, three_layer_signal from data/stocks/TICKER.json
+// Called after research JSON is loaded; non-blocking — callback fires even on failure.
+function mergeStocksData(ticker, callback) {
+  var sxhr = new XMLHttpRequest();
+  sxhr.open('GET', 'data/stocks/' + ticker + '.json', true);
+  sxhr.onload = function() {
+    if (sxhr.status === 200) {
+      try {
+        var sData = JSON.parse(sxhr.responseText);
+        if (STOCK_DATA[ticker]) {
+          if (sData.narrative_model)   STOCK_DATA[ticker].narrative_model   = sData.narrative_model;
+          if (sData.narrative_weights) STOCK_DATA[ticker].narrative_weights = sData.narrative_weights;
+          if (sData.three_layer_signal) STOCK_DATA[ticker].three_layer_signal = sData.three_layer_signal;
+          if (sData.commodity_overlay) STOCK_DATA[ticker].commodity_overlay  = sData.commodity_overlay;
+        }
+      } catch(e) { /* parse error — proceed without */ }
+    }
+    if (callback) callback();
+  };
+  sxhr.onerror = function() { if (callback) callback(); };
+  sxhr.send();
+}
+
 // Async loader for full research data (called before rendering a report page)
 function loadFullResearchData(ticker, callback) {
   if (STOCK_DATA[ticker] && !STOCK_DATA[ticker]._indexOnly) {
@@ -5045,7 +5283,10 @@ function loadFullResearchData(ticker, callback) {
           SNAPSHOT_DATA[ticker] = buildSnapshotFromStock(ticker);
         }
         console.log('[StockDataLoader] Loaded full research data for ' + ticker);
-        if (callback) callback(STOCK_DATA[ticker]);
+        // Merge three-layer signal fields from data/stocks/TICKER.json (narrative_model, three_layer_signal, narrative_weights)
+        mergeStocksData(ticker, function() {
+          if (callback) callback(STOCK_DATA[ticker]);
+        });
       } catch (err) {
         console.error('[StockDataLoader] Error parsing research data for ' + ticker + ':', err);
         if (callback) callback(null);
@@ -5075,7 +5316,10 @@ function normaliseScores(items) {
   var CEILING = 80;
   var raw = [];
   for (var i = 0; i < items.length; i++) {
-    var val = parseInt(items[i].score) || 0;
+    // Scores may be decimal fractions (0.5 = 50%) or integers (50).
+    // Detect by value: anything < 1.5 and not 0 is treated as a fraction.
+    var parsed = parseFloat(items[i].score) || 0;
+    var val = (parsed > 0 && parsed < 1.5) ? Math.round(parsed * 100) : Math.round(parsed);
     raw.push(val);
   }
   if (raw.length === 0) return raw;
@@ -5276,6 +5520,345 @@ function renderReportHero(data) {
   '</div>';
 }
 
+// ── Phase 5.1: Macro Context Bar ────────────────────────────────────────────
+
+function renderMacroBar(data) {
+  // Read from stock's three_layer_signal (written by calc-composite-sentiment.js)
+  // Falls back gracefully when signals are not yet computed
+  var tls = data.three_layer_signal || null;
+  var macroSignal = tls ? tls.macro_signal : null;
+
+  // Macro factors from global MACRO_FACTORS (loaded separately if available)
+  var mf = (typeof MACRO_FACTORS !== 'undefined') ? MACRO_FACTORS : null;
+  var asx   = mf && mf.market && mf.market.asx200  ? mf.market.asx200  : null;
+  var aud   = mf && mf.fx    && mf.fx.aud_usd      ? mf.fx.aud_usd     : null;
+  var vix   = mf && mf.market && mf.market.vix     ? mf.market.vix     : null;
+  var rba   = mf && mf.rates ? mf.rates.rba_cash   : null;
+  var rtraj = mf && mf.rates ? mf.rates.rba_trajectory : null;
+
+  // Badge class
+  var badgeCls = 'neutral';
+  if (macroSignal !== null) {
+    badgeCls = macroSignal > 15 ? 'bullish' : macroSignal < -15 ? 'bearish' : 'neutral';
+  }
+  var badgeLabel = macroSignal !== null
+    ? 'MACRO ' + (macroSignal > 0 ? '+' : '') + macroSignal
+    : 'MACRO';
+
+  function fmtChg(v, digits) {
+    if (v == null) return '';
+    var pct = v * 100;
+    var s = (pct >= 0 ? '+' : '') + pct.toFixed(digits || 1) + '%';
+    return '<span class="mbs-chg ' + (pct >= 0 ? 'mbs-up' : 'mbs-down') + '">' + s + '</span>';
+  }
+
+  var statsHtml = '';
+
+  if (asx) {
+    statsHtml += '<div class="macro-bar-stat">' +
+      '<span class="mbs-key">ASX200</span>' +
+      '<span class="mbs-val">' + (asx.close ? Math.round(asx.close).toLocaleString() : '—') + '</span>' +
+      fmtChg(asx.change_20d) + '<span class="mbs-chg" style="color:var(--text-muted)"> 1mo</span>' +
+    '</div>';
+  }
+
+  if (aud) {
+    statsHtml += '<div class="macro-bar-stat">' +
+      '<span class="mbs-key">AUD/USD</span>' +
+      '<span class="mbs-val">' + (aud.close ? aud.close.toFixed(4) : '—') + '</span>' +
+      fmtChg(aud.change_20d) +
+    '</div>';
+  }
+
+  if (vix) {
+    statsHtml += '<div class="macro-bar-stat">' +
+      '<span class="mbs-key">VIX</span>' +
+      '<span class="mbs-val">' + (vix.close ? vix.close.toFixed(1) : '—') + '</span>' +
+    '</div>';
+  }
+
+  if (rba != null || rtraj) {
+    var rbaTxt = rba != null ? rba.toFixed(2) + '%' : '—';
+    if (rtraj) rbaTxt += ' (' + rtraj.replace(/_/g, ' ') + ')';
+    statsHtml += '<div class="macro-bar-stat">' +
+      '<span class="mbs-key">RBA</span>' +
+      '<span class="mbs-val">' + rbaTxt + '</span>' +
+    '</div>';
+  }
+
+  return '<div class="macro-bar">' +
+    '<div class="macro-bar-inner">' +
+      '<span class="macro-bar-label">Market Context</span>' +
+      '<span class="macro-bar-badge ' + badgeCls + '">' + badgeLabel + '</span>' +
+      statsHtml +
+    '</div>' +
+  '</div>';
+}
+
+// ── Phase 5.2: Sector Narrative Panel ───────────────────────────────────────
+
+function renderSectorPanel(data) {
+  var model = data.narrative_model || 'COMPANY_DOMINANT';
+  var tls   = data.three_layer_signal || null;
+  var sectorSignal = tls ? tls.sector_signal : null;
+  var sectorContrib = tls ? tls.sector_contribution : null;
+  var wSector = data.narrative_weights ? data.narrative_weights.sector : null;
+
+  var mf = (typeof MACRO_FACTORS !== 'undefined') ? MACRO_FACTORS : null;
+  var comms = mf && mf.commodities ? mf.commodities : {};
+  var rates = mf && mf.rates       ? mf.rates       : {};
+
+  // Commodity models
+  var COMMODITY_MODELS = ['ENERGY_OIL_GAS','MATERIALS_IRON_ORE','MATERIALS_GOLD',
+    'MATERIALS_COPPER','MATERIALS_ALUMINIUM','MATERIALS_LITHIUM','MATERIALS_COAL',
+    'MATERIALS_URANIUM','MATERIALS_DIVERSIFIED_MINING'];
+  var BANK_MODELS = ['FINANCIALS_MAJOR_BANKS','FINANCIALS_INSURANCE'];
+  var REIT_MODELS = ['REIT_INDUSTRIAL','REIT_OFFICE','REIT_RETAIL','REIT_DIVERSIFIED'];
+  var TECH_MODELS = ['IT_SOFTWARE_SAAS','IT_HARDWARE','TECHNOLOGY'];
+
+  function fmtPct(v, label) {
+    if (v == null) return '';
+    var pct = v * 100;
+    var cls = pct >= 0 ? 'mbs-up' : 'mbs-down';
+    return ' <span class="sector-row-chg ' + cls + '">' + (pct >= 0 ? '+' : '') + pct.toFixed(1) + '% ' + (label||'') + '</span>';
+  }
+  function badge(v, pos, neg) {
+    if (v == null) return '';
+    var cls = v > pos ? 'bull' : v < neg ? 'bear' : 'neut';
+    var label = v > pos ? 'BULLISH' : v < neg ? 'BEARISH' : 'NEUTRAL';
+    return '<span class="sector-row-badge ' + cls + '">' + label + '</span>';
+  }
+
+  var rowsHtml = '';
+  var gaugeHtml = '';
+  var modelLabel = model.replace(/_/g, ' ');
+
+  if (COMMODITY_MODELS.indexOf(model) !== -1) {
+    var overlay = data.commodity_overlay || {};
+    var primary = overlay.primary_commodity || '';
+
+    // Pick the relevant commodity data
+    var cData = null;
+    var cLabel = '';
+    var cUnit = '';
+    if (primary === 'brent' || primary === 'oil') { cData = comms.brent; cLabel = 'Brent Crude'; cUnit = 'US$/bbl'; }
+    else if (primary === 'iron_ore' || primary === 'iron_ore_62') { cData = comms.iron_ore_62; cLabel = 'Iron Ore 62%'; cUnit = 'US$/dmt'; }
+    else if (primary === 'gold' || primary === 'gold_aud') { cData = comms.gold_aud; cLabel = 'Gold (AUD)'; cUnit = 'A$/oz'; }
+    else if (primary === 'gold_usd') { cData = comms.gold_usd; cLabel = 'Gold (USD)'; cUnit = 'US$/oz'; }
+    else if (primary === 'copper') { cData = comms.copper; cLabel = 'Copper'; cUnit = 'US$/lb'; }
+    else if (primary === 'nat_gas' || primary === 'natural_gas') { cData = comms.nat_gas; cLabel = 'Nat Gas'; cUnit = 'US$/mmBtu'; }
+    else if (primary === 'aluminium') { cData = comms.aluminium; cLabel = 'Aluminium'; cUnit = 'US$/t'; }
+
+    if (cData && cData.close != null) {
+      rowsHtml += '<div class="sector-row">' +
+        '<span class="sector-row-key">' + cLabel + '</span>' +
+        '<span class="sector-row-val">' + cUnit + ' ' + cData.close.toLocaleString(undefined,{maximumFractionDigits:2}) + '</span>' +
+        fmtPct(cData.change_5d, '5d') + fmtPct(cData.change_20d, '1mo') +
+        badge(cData.change_5d, 0.02, -0.02) +
+      '</div>';
+    }
+
+    // AUD for gold stocks
+    if ((primary === 'gold' || primary === 'gold_aud') && mf && mf.fx && mf.fx.aud_usd) {
+      var aud = mf.fx.aud_usd;
+      var audChg20 = aud.change_20d;
+      var amplifierCls = audChg20 != null && audChg20 < -0.01 ? 'bull' : audChg20 > 0.01 ? 'bear' : 'neut';
+      var amplifierLabel = audChg20 != null && audChg20 < -0.01 ? 'AMPLIFIER' : audChg20 > 0.01 ? 'HEADWIND' : 'NEUTRAL';
+      rowsHtml += '<div class="sector-row">' +
+        '<span class="sector-row-key">AUD/USD</span>' +
+        '<span class="sector-row-val">' + aud.close.toFixed(4) + '</span>' +
+        fmtPct(aud.change_20d, '1mo') +
+        '<span class="sector-row-badge ' + amplifierCls + '">' + amplifierLabel + '</span>' +
+      '</div>';
+    }
+
+    // Operating leverage gauge
+    if (overlay.breakeven != null && cData && cData.close != null) {
+      var be   = overlay.breakeven;
+      var curr = cData.close;
+      var margin = ((curr - be) / be * 100);
+      var thresholds = overlay.thresholds || {};
+      // Determine zone
+      var zone = 'neut', zoneLabel = 'NEUTRAL';
+      if (thresholds.strong_bearish && curr < thresholds.strong_bearish.below) { zone = 'strong-bear'; zoneLabel = 'STRONG BEARISH'; }
+      else if (thresholds.bearish && curr < thresholds.bearish.range[1]) { zone = 'bear'; zoneLabel = 'BEARISH'; }
+      else if (thresholds.bullish && curr >= thresholds.bullish.range[0]) {
+        if (thresholds.strong_bullish && curr >= thresholds.strong_bullish.above) { zone = 'strong-bull'; zoneLabel = 'STRONG BULLISH'; }
+        else { zone = 'bull'; zoneLabel = 'BULLISH'; }
+      }
+      // Gauge fill %: map curr against the range from 0.5x breakeven to 2x breakeven
+      var gaugeMin = be * 0.5, gaugeMax = be * 2.0;
+      var gaugeFill = Math.max(5, Math.min(95, ((curr - gaugeMin) / (gaugeMax - gaugeMin)) * 100));
+
+      gaugeHtml = '<div class="sector-gauge-box">' +
+        '<div class="sector-gauge-title">Commodity Operating Leverage</div>' +
+        '<div class="sector-gauge-rows">' +
+          '<div class="sector-gauge-row"><strong>Breakeven:</strong> ' + (cUnit||'') + ' ' + be.toLocaleString() + (overlay.breakeven_note ? ' (' + overlay.breakeven_note + ')' : '') + '</div>' +
+          '<div class="sector-gauge-row"><strong>Current price:</strong> ' + (cUnit||'') + ' ' + curr.toLocaleString(undefined,{maximumFractionDigits:2}) + '</div>' +
+          (margin > 0
+            ? '<div class="sector-gauge-row"><strong>Margin of safety:</strong> ' + margin.toFixed(0) + '% above breakeven</div>'
+            : '<div class="sector-gauge-row" style="color:var(--signal-red)"><strong>Below breakeven</strong> by ' + Math.abs(margin).toFixed(0) + '%</div>') +
+          (overlay.sensitivity ? '<div class="sector-gauge-row"><strong>Sensitivity:</strong> ' + overlay.sensitivity + '</div>' : '') +
+        '</div>' +
+        '<div class="sector-gauge-track">' +
+          '<div class="sector-gauge-fill ' + zone + '" style="width:' + gaugeFill.toFixed(0) + '%"></div>' +
+        '</div>' +
+        '<div class="sector-gauge-labels">' +
+          '<span>← Bearish</span><span>' + zoneLabel + '</span><span>Bullish →</span>' +
+        '</div>' +
+      '</div>';
+    }
+
+  } else if (BANK_MODELS.indexOf(model) !== -1 || REIT_MODELS.indexOf(model) !== -1) {
+    var isReit = REIT_MODELS.indexOf(model) !== -1;
+    if (rates.rba_cash != null) {
+      var rtraj = rates.rba_trajectory || '';
+      rowsHtml += '<div class="sector-row">' +
+        '<span class="sector-row-key">RBA Cash Rate</span>' +
+        '<span class="sector-row-val">' + rates.rba_cash.toFixed(2) + '%</span>' +
+        (rtraj ? '<span class="sector-row-badge neut">' + rtraj.replace(/_/g,' ').toUpperCase() + '</span>' : '') +
+      '</div>';
+    }
+    if (rates.au_10yr != null) {
+      rowsHtml += '<div class="sector-row">' +
+        '<span class="sector-row-key">AU 10yr</span>' +
+        '<span class="sector-row-val">' + rates.au_10yr.toFixed(2) + '%</span>' +
+      '</div>';
+    }
+    if (rates.yield_curve_2s10s != null) {
+      var curve = rates.yield_curve_2s10s;
+      var curveCls = curve > 50 ? 'bull' : curve > 0 ? 'neut' : 'bear';
+      rowsHtml += '<div class="sector-row">' +
+        '<span class="sector-row-key">Yield Curve (2s10s)</span>' +
+        '<span class="sector-row-val ' + curveCls + '">' + (curve > 0 ? '+' : '') + curve + 'bp</span>' +
+      '</div>';
+    }
+    // Gauge for rate zone
+    var rateLabel = isReit ? 'Rate Sensitivity (inverted for REIT)' : 'Rate Sensitivity';
+    var rateZone = 'neut', rateZoneLabel = 'NEUTRAL';
+    var rtraj = rates.rba_trajectory || '';
+    if (!isReit) {
+      if (rtraj === 'cutting_aggressively') { rateZone = 'strong-bull'; rateZoneLabel = 'STRONG POSITIVE'; }
+      else if (rtraj === 'cutting_gradually') { rateZone = 'bull'; rateZoneLabel = 'POSITIVE'; }
+      else if (rtraj === 'hiking') { rateZone = 'bear'; rateZoneLabel = 'NEGATIVE'; }
+    } else {
+      if (rtraj === 'cutting_aggressively') { rateZone = 'strong-bear'; rateZoneLabel = 'STRONG NEGATIVE'; }
+      else if (rtraj === 'cutting_gradually') { rateZone = 'neut'; rateZoneLabel = 'NEUTRAL-POSITIVE'; }
+      else if (rtraj === 'hiking') { rateZone = 'bull'; rateZoneLabel = 'POSITIVE (REIT)'; }
+    }
+    var gaugeFill = rateZone === 'strong-bull' ? 92 : rateZone === 'bull' ? 70 : rateZone === 'neut' ? 50 : rateZone === 'bear' ? 28 : 8;
+    gaugeHtml = '<div class="sector-gauge-box">' +
+      '<div class="sector-gauge-title">' + rateLabel + '</div>' +
+      '<div class="sector-gauge-track">' +
+        '<div class="sector-gauge-fill ' + rateZone + '" style="width:' + gaugeFill + '%"></div>' +
+      '</div>' +
+      '<div class="sector-gauge-labels"><span>← Bear</span><span>' + rateZoneLabel + '</span><span>Bull →</span></div>' +
+    '</div>';
+
+  } else if (TECH_MODELS.indexOf(model) !== -1) {
+    var nasdaq = mf && mf.market && mf.market.nasdaq ? mf.market.nasdaq : null;
+    var us10yr = mf && mf.rates  && mf.rates.us_10yr  ? mf.rates.us_10yr  : null;
+    if (nasdaq) {
+      rowsHtml += '<div class="sector-row">' +
+        '<span class="sector-row-key">NASDAQ</span>' +
+        '<span class="sector-row-val">' + Math.round(nasdaq.close).toLocaleString() + '</span>' +
+        fmtPct(nasdaq.change_20d, '1mo') +
+        badge(nasdaq.change_20d, 0.03, -0.03) +
+      '</div>';
+    }
+    if (us10yr) {
+      rowsHtml += '<div class="sector-row">' +
+        '<span class="sector-row-key">US 10yr Yield</span>' +
+        '<span class="sector-row-val">' + us10yr.close.toFixed(2) + '%</span>' +
+        fmtPct(us10yr.change_20d, '1mo') +
+      '</div>';
+    }
+  }
+  // COMPANY_DOMINANT: minimal panel — just signal footer below
+
+  var signalFooterHtml = '';
+  if (sectorSignal !== null) {
+    var sigCls = sectorSignal > 15 ? 'mbs-up' : sectorSignal < -15 ? 'mbs-down' : '';
+    signalFooterHtml = '<div class="sector-signal-footer">' +
+      '<span>Sector Signal: <strong class="' + sigCls + '">' + (sectorSignal > 0 ? '+' : '') + sectorSignal + '</strong></span>' +
+      (wSector != null ? '<span>Weight: <strong>' + Math.round(wSector * 100) + '%</strong></span>' : '') +
+      (sectorContrib !== null ? '<span>Contribution: <strong>' + (sectorContrib > 0 ? '+' : '') + sectorContrib + '</strong></span>' : '') +
+    '</div>';
+  }
+
+  return '<div class="sector-panel">' +
+    '<div class="sector-panel-inner">' +
+      '<div class="sector-panel-header">' +
+        '<span class="sector-panel-title">Sector Narrative</span>' +
+        '<span class="sector-panel-model">' + modelLabel + '</span>' +
+      '</div>' +
+      (rowsHtml ? '<div class="sector-panel-rows">' + rowsHtml + '</div>' : '') +
+      gaugeHtml +
+      signalFooterHtml +
+    '</div>' +
+  '</div>';
+}
+
+// ── Phase 5.4: Composite Sentiment Bar ──────────────────────────────────────
+
+function renderCompositeBar(data) {
+  var tls = data.three_layer_signal || null;
+
+  // If no computed signals yet — show pending state
+  if (!tls || tls.overall_sentiment === null || tls.overall_sentiment === undefined) {
+    return '<div class="composite-bar">' +
+      '<div class="composite-bar-inner">' +
+        '<div class="composite-headline">' +
+          '<span class="composite-label">Overall Sentiment</span>' +
+          '<span class="composite-pending">Signals computing — check back after next daily update</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  var score  = tls.overall_sentiment;
+  var label  = tls.sentiment_label || '';
+  var mCont  = tls.macro_contribution  || 0;
+  var sCont  = tls.sector_contribution || 0;
+  var iCont  = tls.idio_contribution   || 0;
+
+  // CSS class for score colour
+  var scoreCls = score > 30 ? 'strong-upside' : score > 10 ? 'upside' : score > -10 ? 'neutral' : score > -30 ? 'downside' : 'strong-downside';
+
+  // Contribution bar — show absolute contributions as proportional widths
+  // Total absolute sum drives widths; negatives shown dimmed
+  var absM = Math.abs(mCont);
+  var absS = Math.abs(sCont);
+  var absI = Math.abs(iCont);
+  var absTotal = absM + absS + absI || 1;
+  var wM = (absM / absTotal * 100).toFixed(1);
+  var wS = (absS / absTotal * 100).toFixed(1);
+  var wI = (absI / absTotal * 100).toFixed(1);
+
+  var contribBarHtml =
+    '<div class="composite-contrib-row">' +
+      (absM > 0 ? '<div class="contrib-seg macro-seg' + (mCont < 0 ? ' neg' : '') + '" style="width:' + wM + '%">' + (absM >= 5 ? 'M' : '') + '</div>' : '') +
+      (absS > 0 ? '<div class="contrib-seg sector-seg' + (sCont < 0 ? ' neg' : '') + '" style="width:' + wS + '%">' + (absS >= 5 ? 'S' : '') + '</div>' : '') +
+      (absI > 0 ? '<div class="contrib-seg idio-seg' + (iCont < 0 ? ' neg' : '') + '" style="width:' + wI + '%">' + (absI >= 5 ? 'C' : '') + '</div>' : '') +
+    '</div>' +
+    '<div class="composite-contrib-legend">' +
+      '<span><span class="contrib-dot macro-dot"></span>Macro (' + (mCont >= 0 ? '+' : '') + mCont + ')</span>' +
+      '<span><span class="contrib-dot sector-dot"></span>Sector (' + (sCont >= 0 ? '+' : '') + sCont + ')</span>' +
+      '<span><span class="contrib-dot idio-dot"></span>Company (' + (iCont >= 0 ? '+' : '') + iCont + ')</span>' +
+    '</div>';
+
+  return '<div class="composite-bar">' +
+    '<div class="composite-bar-inner">' +
+      '<div class="composite-headline">' +
+        '<span class="composite-label">Overall Sentiment</span>' +
+        '<span class="composite-score ' + scoreCls + '">' + (score > 0 ? '+' : '') + score + '</span>' +
+        '<span class="composite-sent-label ' + scoreCls + '">' + label + '</span>' +
+      '</div>' +
+      contribBarHtml +
+    '</div>' +
+  '</div>';
+}
+
 function renderSkewBar(data) {
   var skew = computeSkewScore(data);
   var dir = skew.direction;
@@ -5421,9 +6004,15 @@ function renderHypotheses(data) {
       contradictHtml += '</ul>';
     }
 
+    // Sentiment tag derived from direction
+    var sentDir = h.direction || 'neutral';
+    var sentClass = sentDir === 'upside' ? 'bullish' : sentDir === 'downside' ? 'bearish' : 'neutral';
+    var sentLabel = sentDir === 'upside' ? 'BULLISH' : sentDir === 'downside' ? 'BEARISH' : 'NEUTRAL';
+    var sentimentTagHtml = '<span class="hc-sentiment-tag ' + sentClass + '">' + sentLabel + '</span>';
+
     var dominantCls = (i === 0) ? ' dominant' : '';
     cardsHtml += '<div class="hyp-card ' + h.dirClass + dominantCls + '">' +
-      '<div class="hc-header"><div class="hc-title">' + h.title + '</div><div class="hc-status ' + h.statusClass + '">' + h.statusText + '</div></div>' +
+      '<div class="hc-header"><div class="hc-title">' + h.title + sentimentTagHtml + '</div><div class="hc-status ' + h.statusClass + '">' + h.statusText + '</div></div>' +
       '<div class="hc-score-row"><div class="hc-score-number">' + normScore + '</div><div class="hc-score-bar"><div class="hc-score-fill" style="width:' + normWidth + '"></div></div><div class="hc-score-meta">' + h.scoreMeta + '</div></div>' +
       '<p class="hc-desc">' + h.description + '</p>' +
       requiresHtml +
@@ -6738,6 +7327,7 @@ function renderReportPage(data) {
   var mainContent =
     renderOvercorrectionBanner(data) +
     renderIdentity(data) +
+    renderSectorPanel(data) +
     renderHypotheses(data) +
     renderNarrativeTimeline(data) +
     renderNarrative(data) +
@@ -6762,7 +7352,8 @@ function renderReportPage(data) {
     '</div>';
 
   return renderReportHero(data) +
-    renderSkewBar(data) +
+    renderMacroBar(data) +
+    renderCompositeBar(data) +
     renderVerdict(data) +
     renderSectionNav(data) +
     '<div class="report-content">' +
