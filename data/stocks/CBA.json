@@ -145,9 +145,10 @@
   "gics_sub_industry": "Diversified Banks",
   "narrative_model": "FINANCIALS_MAJOR_BANKS",
   "narrative_weights": {
-    "macro": 0.15,
-    "sector": 0.35,
-    "idio": 0.5
+    "macro": 0.08,
+    "sector": 0.17,
+    "tech": 0.1,
+    "company": 0.65
   },
   "commodity_overlay": null,
   "priceHistory": [
@@ -161,17 +162,21 @@
     "badge": "ok"
   },
   "last_price_update": "2026-02-19T02:11:31.944Z",
-  "last_research_update": "2026-02-19T02:11:32.047Z",
+  "last_research_update": "2026-02-19T03:27:45.960Z",
   "three_layer_signal": {
     "date": "2026-02-19",
     "macro_signal": 12,
     "sector_signal": 15,
-    "idio_signal": 9,
-    "overall_sentiment": 12,
+    "tech_signal": 0,
+    "idio_signal": 24,
+    "company_signal": 24,
+    "overall_sentiment": 19,
     "sentiment_label": "UPSIDE",
-    "macro_contribution": 2,
-    "sector_contribution": 5,
-    "idio_contribution": 5,
+    "macro_contribution": 1,
+    "sector_contribution": 3,
+    "tech_contribution": 0,
+    "company_contribution": 16,
+    "idio_contribution": 16,
     "sector_detail": {
       "signal": 15,
       "detail": "bank_rate",
@@ -180,15 +185,15 @@
       "creditScore": 15
     },
     "idio_detail": {
-      "signal": 9,
-      "detail": "dominance",
+      "signal": 24,
+      "detail": "dominance_sqrt",
       "T1": "T1",
       "T1_score": 35,
       "T1_sentiment": "BULLISH",
       "T2": "T2",
       "T2_score": 28,
       "lead": 7,
-      "raw_signal": 9.3
+      "raw_signal": 24.4
     }
   }
 }

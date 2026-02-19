@@ -130,8 +130,9 @@
   "narrative_model": "MATERIALS_GOLD",
   "narrative_weights": {
     "macro": 0.05,
-    "sector": 0.65,
-    "idio": 0.3
+    "sector": 0.25,
+    "tech": 0.1,
+    "company": 0.6
   },
   "commodity_overlay": {
     "primary_commodity": "gold_aud",
@@ -186,17 +187,21 @@
     "badge": "ok"
   },
   "last_price_update": "2026-02-19T02:11:31.947Z",
-  "last_research_update": "2026-02-19T02:11:32.047Z",
+  "last_research_update": "2026-02-19T03:27:45.960Z",
   "three_layer_signal": {
     "date": "2026-02-19",
     "macro_signal": 12,
     "sector_signal": 50,
-    "idio_signal": 8,
-    "overall_sentiment": 36,
+    "tech_signal": 0,
+    "idio_signal": 23,
+    "company_signal": 23,
+    "overall_sentiment": 27,
     "sentiment_label": "STRONG UPSIDE",
     "macro_contribution": 1,
-    "sector_contribution": 33,
-    "idio_contribution": 2,
+    "sector_contribution": 13,
+    "tech_contribution": 0,
+    "company_contribution": 14,
+    "idio_contribution": 14,
     "sector_detail": {
       "signal": 50,
       "detail": "commodity",
@@ -206,15 +211,15 @@
       "momentum_score": -10
     },
     "idio_detail": {
-      "signal": 8,
-      "detail": "dominance",
+      "signal": 23,
+      "detail": "dominance_sqrt",
       "T1": "T1",
       "T1_score": 34,
       "T1_sentiment": "BULLISH",
       "T2": "T2",
       "T2_score": 28,
       "lead": 6,
-      "raw_signal": 8
+      "raw_signal": 22.6
     }
   }
 }

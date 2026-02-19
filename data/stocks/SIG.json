@@ -68,9 +68,10 @@
   "gics_sub_industry": "Health Care Distributors",
   "narrative_model": "HEALTHCARE_PHARMACY",
   "narrative_weights": {
-    "macro": 0.05,
-    "sector": 0.05,
-    "idio": 0.9
+    "macro": 0.03,
+    "sector": 0.02,
+    "tech": 0.1,
+    "company": 0.85
   },
   "commodity_overlay": null,
   "priceHistory": [
@@ -84,31 +85,35 @@
     "badge": "ok"
   },
   "last_price_update": "2026-02-19T02:11:31.949Z",
-  "last_research_update": "2026-02-19T02:11:32.047Z",
+  "last_research_update": "2026-02-19T03:27:45.960Z",
   "three_layer_signal": {
     "date": "2026-02-19",
     "macro_signal": 12,
     "sector_signal": 0,
-    "idio_signal": -9,
-    "overall_sentiment": -7,
-    "sentiment_label": "NEUTRAL",
-    "macro_contribution": 1,
+    "tech_signal": 0,
+    "idio_signal": -24,
+    "company_signal": -24,
+    "overall_sentiment": -20,
+    "sentiment_label": "DOWNSIDE",
+    "macro_contribution": 0,
     "sector_contribution": 0,
-    "idio_contribution": -8,
+    "tech_contribution": 0,
+    "company_contribution": -20,
+    "idio_contribution": -20,
     "sector_detail": {
       "signal": 0,
       "detail": "company_dominant"
     },
     "idio_detail": {
-      "signal": -9,
-      "detail": "dominance",
+      "signal": -24,
+      "detail": "dominance_sqrt",
       "T1": "T2",
       "T1_score": 33,
       "T1_sentiment": "BEARISH",
       "T2": "T1",
       "T2_score": 26,
       "lead": 7,
-      "raw_signal": 9.3
+      "raw_signal": 24.4
     }
   }
 }

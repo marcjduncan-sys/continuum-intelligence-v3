@@ -131,7 +131,8 @@
   "narrative_weights": {
     "macro": 0.05,
     "sector": 0.05,
-    "idio": 0.9
+    "tech": 0.1,
+    "company": 0.8
   },
   "commodity_overlay": null,
   "priceHistory": [
@@ -145,31 +146,35 @@
     "badge": "ok"
   },
   "last_price_update": "2026-02-19T02:11:31.949Z",
-  "last_research_update": "2026-02-19T02:11:32.047Z",
+  "last_research_update": "2026-02-19T03:27:45.960Z",
   "three_layer_signal": {
     "date": "2026-02-19",
     "macro_signal": 12,
     "sector_signal": 0,
-    "idio_signal": -4,
-    "overall_sentiment": -3,
-    "sentiment_label": "NEUTRAL",
+    "tech_signal": 0,
+    "idio_signal": -16,
+    "company_signal": -16,
+    "overall_sentiment": -12,
+    "sentiment_label": "DOWNSIDE",
     "macro_contribution": 1,
     "sector_contribution": 0,
-    "idio_contribution": -4,
+    "tech_contribution": 0,
+    "company_contribution": -13,
+    "idio_contribution": -13,
     "sector_detail": {
       "signal": 0,
       "detail": "company_dominant"
     },
     "idio_detail": {
-      "signal": -4,
-      "detail": "dominance",
+      "signal": -16,
+      "detail": "dominance_sqrt",
       "T1": "T3",
       "T1_score": 30,
       "T1_sentiment": "BEARISH",
       "T2": "T2",
       "T2_score": 27,
       "lead": 3,
-      "raw_signal": 4
+      "raw_signal": 16
     }
   }
 }

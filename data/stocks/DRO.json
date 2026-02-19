@@ -68,9 +68,10 @@
   "gics_sub_industry": "Aerospace & Defence",
   "narrative_model": "INDUSTRIALS_DEFENCE",
   "narrative_weights": {
-    "macro": 0.05,
-    "sector": 0.03,
-    "idio": 0.92
+    "macro": 0.03,
+    "sector": 0.02,
+    "tech": 0.1,
+    "company": 0.85
   },
   "commodity_overlay": null,
   "priceHistory": [
@@ -84,31 +85,35 @@
     "badge": "ok"
   },
   "last_price_update": "2026-02-19T02:11:31.945Z",
-  "last_research_update": "2026-02-19T02:11:32.047Z",
+  "last_research_update": "2026-02-19T03:27:45.960Z",
   "three_layer_signal": {
     "date": "2026-02-19",
     "macro_signal": 12,
     "sector_signal": 0,
-    "idio_signal": 4,
-    "overall_sentiment": 4,
-    "sentiment_label": "NEUTRAL",
-    "macro_contribution": 1,
+    "tech_signal": 0,
+    "idio_signal": 16,
+    "company_signal": 16,
+    "overall_sentiment": 14,
+    "sentiment_label": "UPSIDE",
+    "macro_contribution": 0,
     "sector_contribution": 0,
-    "idio_contribution": 4,
+    "tech_contribution": 0,
+    "company_contribution": 14,
+    "idio_contribution": 14,
     "sector_detail": {
       "signal": 0,
       "detail": "company_dominant"
     },
     "idio_detail": {
-      "signal": 4,
-      "detail": "dominance",
+      "signal": 16,
+      "detail": "dominance_sqrt",
       "T1": "T1",
       "T1_score": 29,
       "T1_sentiment": "BULLISH",
       "T2": "T2",
       "T2_score": 26,
       "lead": 3,
-      "raw_signal": 4
+      "raw_signal": 16
     }
   }
 }

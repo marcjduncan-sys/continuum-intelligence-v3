@@ -143,9 +143,10 @@
   "gics_sub_industry": "Oil & Gas Equipment & Services",
   "narrative_model": "INDUSTRIALS_ENGINEERING_CONSTRUCTION",
   "narrative_weights": {
-    "macro": 0.1,
-    "sector": 0.2,
-    "idio": 0.7
+    "macro": 0.05,
+    "sector": 0.1,
+    "tech": 0.1,
+    "company": 0.75
   },
   "commodity_overlay": null,
   "priceHistory": [
@@ -159,31 +160,35 @@
     "badge": "ok"
   },
   "last_price_update": "2026-02-19T02:11:31.950Z",
-  "last_research_update": "2026-02-19T02:11:32.047Z",
+  "last_research_update": "2026-02-19T03:27:45.960Z",
   "three_layer_signal": {
     "date": "2026-02-19",
     "macro_signal": 12,
     "sector_signal": 0,
-    "idio_signal": 3,
-    "overall_sentiment": 3,
-    "sentiment_label": "NEUTRAL",
+    "tech_signal": 0,
+    "idio_signal": 13,
+    "company_signal": 13,
+    "overall_sentiment": 10,
+    "sentiment_label": "UPSIDE",
     "macro_contribution": 1,
     "sector_contribution": 0,
-    "idio_contribution": 2,
+    "tech_contribution": 0,
+    "company_contribution": 10,
+    "idio_contribution": 10,
     "sector_detail": {
       "signal": 0,
       "detail": "company_dominant"
     },
     "idio_detail": {
-      "signal": 3,
-      "detail": "dominance",
+      "signal": 13,
+      "detail": "dominance_sqrt",
       "T1": "T2",
       "T1_score": 30,
       "T1_sentiment": "BULLISH",
       "T2": "T3",
       "T2_score": 28,
       "lead": 2,
-      "raw_signal": 2.7
+      "raw_signal": 13.1
     }
   }
 }

@@ -191,9 +191,10 @@
   "gics_sub_industry": "Food Retail",
   "narrative_model": "CONSUMER_STAPLES_GROCERY",
   "narrative_weights": {
-    "macro": 0.08,
-    "sector": 0.07,
-    "idio": 0.85
+    "macro": 0.05,
+    "sector": 0.05,
+    "tech": 0.1,
+    "company": 0.8
   },
   "commodity_overlay": null,
   "priceHistory": [
@@ -207,31 +208,35 @@
     "badge": "ok"
   },
   "last_price_update": "2026-02-19T02:11:31.950Z",
-  "last_research_update": "2026-02-19T02:11:32.047Z",
+  "last_research_update": "2026-02-19T03:27:45.960Z",
   "three_layer_signal": {
     "date": "2026-02-19",
     "macro_signal": 12,
     "sector_signal": 0,
-    "idio_signal": 15,
-    "overall_sentiment": 14,
+    "tech_signal": 0,
+    "idio_signal": 31,
+    "company_signal": 31,
+    "overall_sentiment": 25,
     "sentiment_label": "UPSIDE",
     "macro_contribution": 1,
     "sector_contribution": 0,
-    "idio_contribution": 13,
+    "tech_contribution": 0,
+    "company_contribution": 25,
+    "idio_contribution": 25,
     "sector_detail": {
       "signal": 0,
       "detail": "company_dominant"
     },
     "idio_detail": {
-      "signal": 15,
-      "detail": "dominance",
+      "signal": 31,
+      "detail": "dominance_sqrt",
       "T1": "T1",
       "T1_score": 36,
       "T1_sentiment": "BULLISH",
       "T2": "T2",
       "T2_score": 25,
       "lead": 11,
-      "raw_signal": 14.7
+      "raw_signal": 30.6
     }
   }
 }

@@ -129,9 +129,10 @@
   "gics_sub_industry": "Diversified Metals & Mining",
   "narrative_model": "MATERIALS_DIVERSIFIED_MINING",
   "narrative_weights": {
-    "macro": 0.1,
-    "sector": 0.45,
-    "idio": 0.45
+    "macro": 0.05,
+    "sector": 0.2,
+    "tech": 0.1,
+    "company": 0.65
   },
   "commodity_overlay": {
     "tier": 1,
@@ -154,31 +155,35 @@
     "badge": "ok"
   },
   "last_price_update": "2026-02-19T02:11:31.944Z",
-  "last_research_update": "2026-02-19T02:11:32.047Z",
+  "last_research_update": "2026-02-19T03:27:45.960Z",
   "three_layer_signal": {
     "date": "2026-02-19",
     "macro_signal": 12,
     "sector_signal": -31,
-    "idio_signal": 5,
-    "overall_sentiment": -10,
-    "sentiment_label": "DOWNSIDE",
+    "tech_signal": 0,
+    "idio_signal": 18,
+    "company_signal": 18,
+    "overall_sentiment": 6,
+    "sentiment_label": "NEUTRAL",
     "macro_contribution": 1,
-    "sector_contribution": -14,
-    "idio_contribution": 2,
+    "sector_contribution": -6,
+    "tech_contribution": 0,
+    "company_contribution": 12,
+    "idio_contribution": 12,
     "sector_detail": {
       "signal": -31,
       "detail": "diversified_blend"
     },
     "idio_detail": {
-      "signal": 5,
-      "detail": "dominance",
+      "signal": 18,
+      "detail": "dominance_sqrt",
       "T1": "T1",
       "T1_score": 34,
       "T1_sentiment": "BULLISH",
       "T2": "T2",
       "T2_score": 30,
       "lead": 4,
-      "raw_signal": 5.3
+      "raw_signal": 18.5
     }
   }
 }

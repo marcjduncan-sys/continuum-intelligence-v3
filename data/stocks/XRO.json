@@ -68,9 +68,10 @@
   "gics_sub_industry": "Application Software",
   "narrative_model": "IT_SOFTWARE_SAAS",
   "narrative_weights": {
-    "macro": 0.1,
-    "sector": 0.2,
-    "idio": 0.7
+    "macro": 0.05,
+    "sector": 0.1,
+    "tech": 0.1,
+    "company": 0.75
   },
   "commodity_overlay": null,
   "priceHistory": [
@@ -84,17 +85,21 @@
     "badge": "ok"
   },
   "last_price_update": "2026-02-19T02:11:31.951Z",
-  "last_research_update": "2026-02-19T02:11:32.047Z",
+  "last_research_update": "2026-02-19T03:27:45.960Z",
   "three_layer_signal": {
     "date": "2026-02-19",
     "macro_signal": 12,
     "sector_signal": 9,
-    "idio_signal": -13,
-    "overall_sentiment": -6,
-    "sentiment_label": "NEUTRAL",
+    "tech_signal": 0,
+    "idio_signal": -29,
+    "company_signal": -29,
+    "overall_sentiment": -20,
+    "sentiment_label": "DOWNSIDE",
     "macro_contribution": 1,
-    "sector_contribution": 2,
-    "idio_contribution": -9,
+    "sector_contribution": 1,
+    "tech_contribution": 0,
+    "company_contribution": -22,
+    "idio_contribution": -22,
     "sector_detail": {
       "signal": 9,
       "detail": "tech_saas",
@@ -102,15 +107,15 @@
       "yieldScore": 25
     },
     "idio_detail": {
-      "signal": -13,
-      "detail": "dominance",
+      "signal": -29,
+      "detail": "dominance_sqrt",
       "T1": "T3",
       "T1_score": 38,
       "T1_sentiment": "BEARISH",
       "T2": "T1",
       "T2_score": 28,
       "lead": 10,
-      "raw_signal": 13.3
+      "raw_signal": 29.2
     }
   }
 }

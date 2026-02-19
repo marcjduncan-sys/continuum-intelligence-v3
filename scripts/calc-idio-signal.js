@@ -9,8 +9,9 @@
  * sentiments). Computes Idio_Signal via T1-vs-T2 dominance method.
  * Writes per-stock results to data/idio-signals.json.
  *
- * T1-vs-T2 dominance replaces the broken bull-minus-bear summation.
- * Example: WDS T1 BULLISH 29, T2 BEARISH 25 → lead=4, Idio_Signal=+5.3→+5
+ * T1-vs-T2 dominance with square-root amplification (ERRATA_002).
+ * sqrt scaling gives small leads meaningful voice without over-convicting.
+ * Example: WDS T1 BULLISH 29, T2 25 → lead=4 → sqrt(4/75)x80 = +18.5→+19
  *
  * Usage:
  *   node scripts/calc-idio-signal.js [--dry-run] [--verbose]
@@ -33,7 +34,17 @@ const verbose = args.includes('--verbose');
 const MAX_POSSIBLE_LEAD = 75; // ceiling(80) - floor(5)
 const CAP               = 80; // spec: cap Idio_Signal at ±80
 
-// ── Core formula ─────────────────────────────────────────────────────────────
+// ── Core formula (ERRATA_002: square-root amplification) ─────────────────────
+//
+// Idio_Signal = sign(T1.sentiment) × sqrt(T1_lead / MAX_POSSIBLE_LEAD) × 80
+//
+// Why sqrt: typical T1-T2 leads are 3-15 points. Linear mapping compresses
+// these into ±4 to ±20 — crushed by even modest sector signals.
+// Sqrt amplifies small leads (where differentiation matters most) and
+// flattens at high leads (diminishing returns on conviction).
+//
+// Lead →  3: ±16.0   Lead →  8: ±26.1   Lead → 15: ±35.8
+// Lead →  5: ±20.7   Lead → 12: ±32.0   Lead → 25: ±46.2
 
 function calcIdioSignal(hypotheses) {
   if (!hypotheses || hypotheses.length === 0) {
@@ -53,26 +64,26 @@ function calcIdioSignal(hypotheses) {
     return { signal, detail: 'single_hypothesis', T1: T1.id, T1_sentiment: T1.sentiment };
   }
 
-  const lead = T1.survival_score - T2.survival_score;
-  const raw  = (lead / MAX_POSSIBLE_LEAD) * 100;
+  const lead    = T1.survival_score - T2.survival_score;
+  const sqrtRaw = Math.sqrt(lead / MAX_POSSIBLE_LEAD) * 80;
 
   let signal;
-  if (T1.sentiment === 'BULLISH')      signal =  raw;
-  else if (T1.sentiment === 'BEARISH') signal = -raw;
+  if (T1.sentiment === 'BULLISH')      signal =  sqrtRaw;
+  else if (T1.sentiment === 'BEARISH') signal = -sqrtRaw;
   else                                 signal =  0;
 
   signal = Math.max(-CAP, Math.min(CAP, Math.round(signal)));
 
   return {
     signal,
-    detail:       'dominance',
+    detail:       'dominance_sqrt',
     T1:           T1.id,
     T1_score:     T1.survival_score,
     T1_sentiment: T1.sentiment,
     T2:           T2.id,
     T2_score:     T2.survival_score,
     lead,
-    raw_signal:   Math.round(raw * 10) / 10
+    raw_signal:   Math.round(sqrtRaw * 10) / 10
   };
 }
 

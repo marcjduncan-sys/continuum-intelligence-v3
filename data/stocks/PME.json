@@ -68,9 +68,10 @@
   "gics_sub_industry": "Health Care Equipment",
   "narrative_model": "HEALTHCARE_DEVICES_MEDTECH",
   "narrative_weights": {
-    "macro": 0.05,
-    "sector": 0.03,
-    "idio": 0.92
+    "macro": 0.03,
+    "sector": 0.02,
+    "tech": 0.1,
+    "company": 0.85
   },
   "commodity_overlay": null,
   "priceHistory": [
@@ -84,31 +85,35 @@
     "badge": "ok"
   },
   "last_price_update": "2026-02-19T02:11:31.948Z",
-  "last_research_update": "2026-02-19T02:11:32.047Z",
+  "last_research_update": "2026-02-19T03:27:45.960Z",
   "three_layer_signal": {
     "date": "2026-02-19",
     "macro_signal": 12,
     "sector_signal": 0,
-    "idio_signal": 9,
-    "overall_sentiment": 9,
-    "sentiment_label": "NEUTRAL",
-    "macro_contribution": 1,
+    "tech_signal": 0,
+    "idio_signal": 24,
+    "company_signal": 24,
+    "overall_sentiment": 21,
+    "sentiment_label": "UPSIDE",
+    "macro_contribution": 0,
     "sector_contribution": 0,
-    "idio_contribution": 8,
+    "tech_contribution": 0,
+    "company_contribution": 20,
+    "idio_contribution": 20,
     "sector_detail": {
       "signal": 0,
       "detail": "company_dominant"
     },
     "idio_detail": {
-      "signal": 9,
-      "detail": "dominance",
+      "signal": 24,
+      "detail": "dominance_sqrt",
       "T1": "T1",
       "T1_score": 37,
       "T1_sentiment": "BULLISH",
       "T2": "T4",
       "T2_score": 30,
       "lead": 7,
-      "raw_signal": 9.3
+      "raw_signal": 24.4
     }
   }
 }

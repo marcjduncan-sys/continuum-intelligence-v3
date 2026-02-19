@@ -202,9 +202,10 @@
   "gics_sub_industry": "Office REITs",
   "narrative_model": "REIT_OFFICE",
   "narrative_weights": {
-    "macro": 0.1,
-    "sector": 0.25,
-    "idio": 0.65
+    "macro": 0.08,
+    "sector": 0.17,
+    "tech": 0.1,
+    "company": 0.65
   },
   "commodity_overlay": null,
   "priceHistory": [
@@ -218,16 +219,20 @@
     "badge": "ok"
   },
   "last_price_update": "2026-02-19T02:11:31.945Z",
-  "last_research_update": "2026-02-19T02:11:32.047Z",
+  "last_research_update": "2026-02-19T03:27:45.960Z",
   "three_layer_signal": {
     "date": "2026-02-19",
     "macro_signal": 12,
     "sector_signal": -5,
+    "tech_signal": 0,
     "idio_signal": 0,
+    "company_signal": 0,
     "overall_sentiment": 0,
     "sentiment_label": "NEUTRAL",
     "macro_contribution": 1,
     "sector_contribution": -1,
+    "tech_contribution": 0,
+    "company_contribution": 0,
     "idio_contribution": 0,
     "sector_detail": {
       "signal": -5,
@@ -238,14 +243,14 @@
     },
     "idio_detail": {
       "signal": 0,
-      "detail": "dominance",
+      "detail": "dominance_sqrt",
       "T1": "T2",
       "T1_score": 33,
       "T1_sentiment": "NEUTRAL",
       "T2": "T1",
       "T2_score": 26,
       "lead": 7,
-      "raw_signal": 9.3
+      "raw_signal": 24.4
     }
   }
 }

@@ -68,9 +68,10 @@
   "gics_sub_industry": "Oil & Gas Exploration & Production",
   "narrative_model": "ENERGY_OIL_GAS",
   "narrative_weights": {
-    "macro": 0.1,
-    "sector": 0.55,
-    "idio": 0.35
+    "macro": 0.05,
+    "sector": 0.25,
+    "tech": 0.1,
+    "company": 0.6
   },
   "commodity_overlay": {
     "primary_commodity": "brent",
@@ -123,17 +124,21 @@
     "badge": "ok"
   },
   "last_price_update": "2026-02-19T02:11:31.950Z",
-  "last_research_update": "2026-02-19T02:11:32.047Z",
+  "last_research_update": "2026-02-19T03:27:45.960Z",
   "three_layer_signal": {
     "date": "2026-02-19",
     "macro_signal": 12,
     "sector_signal": 15,
-    "idio_signal": 5,
-    "overall_sentiment": 11,
+    "tech_signal": 0,
+    "idio_signal": 18,
+    "company_signal": 18,
+    "overall_sentiment": 15,
     "sentiment_label": "UPSIDE",
     "macro_contribution": 1,
-    "sector_contribution": 8,
-    "idio_contribution": 2,
+    "sector_contribution": 4,
+    "tech_contribution": 0,
+    "company_contribution": 11,
+    "idio_contribution": 11,
     "sector_detail": {
       "signal": 15,
       "detail": "commodity",
@@ -143,15 +148,15 @@
       "momentum_score": 50
     },
     "idio_detail": {
-      "signal": 5,
-      "detail": "dominance",
+      "signal": 18,
+      "detail": "dominance_sqrt",
       "T1": "T1",
       "T1_score": 29,
       "T1_sentiment": "BULLISH",
       "T2": "T2",
       "T2_score": 25,
       "lead": 4,
-      "raw_signal": 5.3
+      "raw_signal": 18.5
     }
   }
 }

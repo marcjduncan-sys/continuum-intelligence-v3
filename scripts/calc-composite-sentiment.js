@@ -6,9 +6,15 @@
  * Per MASTER_IMPLEMENTATION_INSTRUCTIONS.md
  *
  * Reads data/macro-signal.json, data/sector-signals.json,
- * data/idio-signals.json. For each stock, computes:
+ * data/idio-signals.json. For each stock, computes the four-component
+ * composite per ERRATA_002_IDIO_AMPLIFICATION.md:
  *
- *   Overall_Sentiment = (w_macro × Macro) + (w_sector × Sector) + (w_idio × Idio)
+ *   Overall_Sentiment = (w_macro × Macro) + (w_sector × Sector)
+ *                     + (w_tech × Tech) + (w_company × Company)
+ *
+ * w_tech = 0.10 reserved for TA agent (Tech_Signal = 0 until live).
+ * External cap: w_macro + w_sector + w_tech ≤ 0.40
+ * Research floor: w_company ≥ 0.60
  *
  * Writes signal values back into each stock's today history entry AND
  * onto the stock JSON (for the display layer).
@@ -38,10 +44,11 @@ const dateArg   = dateIdx !== -1 && args[dateIdx + 1] ? args[dateIdx + 1] : null
 // ── Display label mapping ────────────────────────────────────────────────────
 
 function sentimentLabel(score) {
-  if (score >  30) return 'STRONG UPSIDE';
-  if (score >  10) return 'UPSIDE';
-  if (score > -10) return 'NEUTRAL';
-  if (score > -30) return 'DOWNSIDE';
+  // Thresholds per ERRATA_002 composite display mapping
+  if (score >  25) return 'STRONG UPSIDE';
+  if (score >   8) return 'UPSIDE';
+  if (score >  -8) return 'NEUTRAL';
+  if (score > -25) return 'DOWNSIDE';
   return 'STRONG DOWNSIDE';
 }
 
@@ -97,39 +104,53 @@ function main() {
     const sectorSignal = sectorEntry.sector_signal;
     const idioSignal   = idioEntry.idio_signal;
 
-    // Weights from stock config
-    const weights = stock.narrative_weights || { macro: 0.20, sector: 0.30, idio: 0.50 };
-    const wMacro  = weights.macro  || 0;
-    const wSector = weights.sector || 0;
-    const wIdio   = weights.idio   || 0;
+    // Four-component weights from stock config (ERRATA_002)
+    // Falls back gracefully: 'company' replaces legacy 'idio', tech defaults 0.10
+    const weights   = stock.narrative_weights || { macro: 0.05, sector: 0.25, tech: 0.10, company: 0.60 };
+    const wMacro    = weights.macro   || 0;
+    const wSector   = weights.sector  || 0;
+    const wTech     = weights.tech    !== undefined ? weights.tech : 0.10;
+    const wCompany  = weights.company || weights.idio || 0;  // 'idio' is legacy alias
 
-    // Composite formula
-    const raw     = (wMacro * macroSignal) + (wSector * sectorSignal) + (wIdio * idioSignal);
+    // Tech_Signal = 0 until TA agent is live (weight reserved, contributes nothing)
+    const techSignal    = 0;
+    const companySignal = idioSignal;  // Company layer = idio signal (sqrt-amplified)
+
+    // Four-component composite
+    const raw     = (wMacro * macroSignal)
+                  + (wSector * sectorSignal)
+                  + (wTech  * techSignal)
+                  + (wCompany * companySignal);
     const overall = Math.max(-100, Math.min(100, Math.round(raw)));
     const label   = sentimentLabel(overall);
 
-    const macroCont  = Math.round(wMacro  * macroSignal);
-    const sectorCont = Math.round(wSector * sectorSignal);
-    const idioCont   = Math.round(wIdio   * idioSignal);
+    const macroCont   = Math.round(wMacro   * macroSignal);
+    const sectorCont  = Math.round(wSector  * sectorSignal);
+    const techCont    = Math.round(wTech    * techSignal);     // always 0 until TA live
+    const companyCont = Math.round(wCompany * companySignal);
 
     if (verbose) {
       console.log(' ', ticker.padEnd(6),
         '| M:', String(macroSignal).padStart(4),
         'S:', String(sectorSignal).padStart(4),
-        'I:', String(idioSignal).padStart(4),
-        '| w:', wMacro.toFixed(2), wSector.toFixed(2), wIdio.toFixed(2),
+        'C:', String(companySignal).padStart(4),
+        '| w:', wMacro.toFixed(2), wSector.toFixed(2), wTech.toFixed(2), wCompany.toFixed(2),
         '→', String(overall).padStart(4), label);
     }
 
     const signalPayload = {
-      macro_signal:        macroSignal,
-      sector_signal:       sectorSignal,
-      idio_signal:         idioSignal,
-      overall_sentiment:   overall,
-      sentiment_label:     label,
-      macro_contribution:  macroCont,
-      sector_contribution: sectorCont,
-      idio_contribution:   idioCont
+      macro_signal:         macroSignal,
+      sector_signal:        sectorSignal,
+      tech_signal:          techSignal,
+      idio_signal:          idioSignal,   // kept for backward compat
+      company_signal:       companySignal,
+      overall_sentiment:    overall,
+      sentiment_label:      label,
+      macro_contribution:   macroCont,
+      sector_contribution:  sectorCont,
+      tech_contribution:    techCont,
+      company_contribution: companyCont,
+      idio_contribution:    companyCont   // backward compat alias
     };
 
     // ── Write to today's history entry ──────────────────────────────────────
@@ -142,14 +163,18 @@ function main() {
 
     if (entryIdx >= 0) {
       const entry = history[entryIdx];
-      entry.macro_signal        = macroSignal;
-      entry.sector_signal       = sectorSignal;
-      entry.idio_signal         = idioSignal;
-      entry.overall_sentiment   = overall;
-      entry.sentiment_label     = label;
-      entry.macro_contribution  = macroCont;
-      entry.sector_contribution = sectorCont;
-      entry.idio_contribution   = idioCont;
+      entry.macro_signal         = macroSignal;
+      entry.sector_signal        = sectorSignal;
+      entry.tech_signal          = techSignal;
+      entry.idio_signal          = idioSignal;          // backward compat
+      entry.company_signal       = companySignal;
+      entry.overall_sentiment    = overall;
+      entry.sentiment_label      = label;
+      entry.macro_contribution   = macroCont;
+      entry.sector_contribution  = sectorCont;
+      entry.tech_contribution    = techCont;
+      entry.company_contribution = companyCont;
+      entry.idio_contribution    = companyCont;         // backward compat alias
     }
 
     // ── Write to stock JSON (for display layer) ─────────────────────────────
@@ -168,7 +193,7 @@ function main() {
     updated++;
     console.log(' ', ticker.padEnd(6),
       '| Sentiment:', String(overall).padStart(4), label,
-      `(M:${macroCont} S:${sectorCont} I:${idioCont})`);
+      `(M:${macroCont} S:${sectorCont} T:${techCont} C:${companyCont})`);
   }
 
   console.log('[calc-composite-sentiment] Updated', updated, 'stocks',
