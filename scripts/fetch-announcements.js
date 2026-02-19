@@ -59,30 +59,10 @@ function fetchURL(url) {
 }
 
 async function fetchASXAnnouncements(ticker) {
-  // ASX public announcements API
-  const url = `https://www.asx.com.au/asx/1/company/${ticker}/announcements?count=${ANNOUNCEMENTS_PER_TICKER}&market_sensitive=false`;
-
-  try {
-    const raw = await fetchURL(url);
-    const data = JSON.parse(raw);
-
-    if (!data.data || !Array.isArray(data.data)) {
-      return [];
-    }
-
-    return data.data.map(ann => ({
-      id: ann.id || null,
-      date: ann.document_date || ann.document_release_date || null,
-      headline: ann.header || ann.title || '',
-      type: categoriseAnnouncement(ann.header || ''),
-      sensitive: ann.market_sensitive || false,
-      pages: ann.number_of_pages || null,
-      url: ann.url ? `https://www.asx.com.au${ann.url}` : null
-    }));
-  } catch (e) {
-    console.error(`  [WARN] Failed to fetch ${ticker}: ${e.message}`);
-    return [];
-  }
+  // NOTE: The ASX public announcements API (asx.com.au/asx/1/company/{code}/announcements)
+  // was retired in 2024/2025 and returns 404 for all requests.
+  // Primary source is now Yahoo Finance search news — see fetchYahooNews().
+  return [];
 }
 
 function categoriseAnnouncement(headline) {
@@ -103,17 +83,35 @@ function categoriseAnnouncement(headline) {
   return 'Announcement';
 }
 
-// Fallback: Try Yahoo Finance for recent news if ASX API fails
+// Primary source: Yahoo Finance search endpoint — returns recent news articles for the ticker.
+// Endpoint: /v1/finance/search?q={TICKER}.AX&quotesCount=0&newsCount=N
+// Each news item: { uuid, title, publisher, link, providerPublishTime, type }
 async function fetchYahooNews(ticker) {
   const yahooTicker = ticker + '.AX';
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooTicker}?range=1d&interval=1d`;
+  const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${yahooTicker}&lang=en-AU&region=AU&quotesCount=0&newsCount=${ANNOUNCEMENTS_PER_TICKER}&enableFuzzyQuery=false`;
 
   try {
     const raw = await fetchURL(url);
     const data = JSON.parse(raw);
-    // Yahoo chart endpoint doesn't include news, but confirms the ticker is valid
-    return [];
+    const items = (data && Array.isArray(data.news)) ? data.news : [];
+    if (items.length === 0) return [];
+
+    return items
+      .filter(n => n.type === 'STORY' && n.title)
+      .map(n => ({
+        id:        n.uuid || null,
+        date:      n.providerPublishTime
+                     ? new Date(n.providerPublishTime * 1000).toISOString()
+                     : null,
+        headline:  n.title || '',
+        type:      categoriseAnnouncement(n.title || ''),
+        sensitive: false,
+        pages:     null,
+        url:       n.link || null,
+        publisher: n.publisher || null
+      }));
   } catch (e) {
+    console.error(`  [WARN] Yahoo fetch failed for ${ticker}: ${e.message}`);
     return [];
   }
 }
@@ -176,7 +174,7 @@ async function main() {
 
   const output = {
     updated: new Date().toISOString(),
-    source: 'ASX',
+    source: 'Yahoo Finance',
     tickerCount: Object.keys(merged).length,
     totalAnnouncements: Object.values(merged).reduce((sum, arr) => sum + arr.length, 0),
     announcements: merged

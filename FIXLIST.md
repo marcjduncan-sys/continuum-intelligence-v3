@@ -13,16 +13,24 @@
 - Kept on external API calls (fetch-live-prices, fetch-announcements) and secondary steps
 
 ## 3. Add concurrency groups to all workflows that commit to the repo
-**Status**: PENDING
-- Prevents race conditions when multiple workflows run simultaneously
-- All committing workflows need `concurrency:` with cancel-in-progress
+**Status**: DONE
+- All active committing workflows already have `concurrency:` groups:
+  `update-daily.yml`, `monthly-calibration.yml`, `continuum-update.yml`, `deploy.yml`, `update-intraday.yml`
+- Remaining workflows (`event-monitor.yml`, `live-prices.yml`, `narrative-analysis.yml`,
+  `research-update.yml`, `update-prices.yml`) are all marked DISABLED/Legacy with
+  `workflow_dispatch` only — no scheduled triggers, no race risk
 
 ## 4. Fix announcements scraper
-**Status**: PENDING
-- `fetch-announcements.js` returns zero results
-- Diagnose root cause locally, then fix
+**Status**: DONE
+- Root cause: ASX public API (`asx.com.au/asx/1/company/{code}/announcements`) was retired
+  in 2024/2025 — returns HTTP 404 for all tickers
+- Fix: replaced dead ASX API with Yahoo Finance search endpoint
+  (`/v1/finance/search?q={TICKER}.AX&newsCount=5`)
+- Verified: 21/21 tickers return 5 news items each (105 total), correct schema preserved
+- `publisher` field added to each item (new, non-breaking)
 
 ## 5. Make STOCK_CONFIG data-driven
-**Status**: PENDING
-- `run-automated-analysis.js` hardcodes stock config (base weights, characteristics)
-- Extract to a JSON config file so adding/removing stocks doesn't require code changes
+**Status**: DONE (already completed before this audit)
+- `run-automated-analysis.js` imports `getAnalysisConfig()` from `scripts/lib/registry.js`
+- Registry reads from `data/config/tickers.json` — fully data-driven
+- No hardcoded stock config in the script
