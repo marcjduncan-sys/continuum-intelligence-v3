@@ -3666,64 +3666,44 @@ a:hover { color: var(--accent-sage); }
 .pt-change.positive { color: var(--signal-green); }
 .pt-change.negative { color: var(--signal-red); }
 
-/* Announcements panel */
-.announcements-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: var(--space-md);
-    margin-bottom: var(--space-lg);
-}
-.ann-header {
+/* Stock card announcement banner */
+.fc-ann-banner {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: var(--space-sm);
+    gap: 6px;
+    margin-top: 8px;
+    padding: 5px 8px;
+    background: rgba(26, 158, 143, 0.06);
+    border-left: 2px solid var(--accent-teal);
+    border-radius: 0 4px 4px 0;
+    font-size: 0.62rem;
+    line-height: 1.3;
+    overflow: hidden;
 }
-.ann-title {
-    font-family: var(--font-data);
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+.fc-ann-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent-teal);
+    flex-shrink: 0;
+}
+.fc-ann-text {
     color: var(--text-secondary);
-}
-.ann-list { list-style: none; padding: 0; margin: 0; }
-.ann-item {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-sm);
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.7rem;
-}
-.ann-item:last-child { border-bottom: none; }
-.ann-ticker {
-    font-family: var(--font-data);
-    font-weight: 700;
-    color: var(--accent-teal);
-    min-width: 32px;
-    flex-shrink: 0;
-}
-.ann-headline { color: var(--text-primary); flex: 1; line-height: 1.4; }
-.ann-time {
-    font-family: var(--font-data);
-    font-size: 0.6rem;
-    color: var(--text-muted);
+    flex: 1;
+    overflow: hidden;
     white-space: nowrap;
-    flex-shrink: 0;
+    text-overflow: ellipsis;
 }
-.ann-type {
+.fc-ann-tag {
     font-family: var(--font-data);
     font-size: 0.5rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    padding: 1px 5px;
+    padding: 1px 4px;
     border-radius: 2px;
     background: rgba(26, 158, 143, 0.1);
     color: var(--accent-teal);
-    white-space: nowrap;
     flex-shrink: 0;
 }
 .ann-empty {
@@ -4306,17 +4286,6 @@ a:hover { color: var(--accent-sage); }
                 <span class="msb-updated" id="msb-feed-status">Loading prices...</span>
                 <button class="msb-refresh-btn" id="msb-refresh" onclick="MarketFeed.refreshNow()" title="Refresh prices">REFRESH</button>
             </div>
-        </div>
-
-        <!-- Announcements Panel -->
-        <div class="announcements-panel" id="announcements-panel" style="display:none">
-            <div class="ann-header">
-                <div class="ann-title">Latest News</div>
-                <span class="msb-updated" id="ann-updated"></span>
-            </div>
-            <ul class="ann-list" id="ann-list">
-                <li class="ann-empty">No announcements loaded yet</li>
-            </ul>
         </div>
 
         <!-- Featured Reports -->
@@ -9694,7 +9663,7 @@ const MarketFeed = (function() {
         });
     }
 
-    // Load and display announcements
+    // Load announcements and inject banners into stock cards
     async function loadAnnouncements() {
         try {
             var resp = await fetch('data/announcements.json?t=' + Date.now(), { cache: 'no-store' });
@@ -9702,48 +9671,37 @@ const MarketFeed = (function() {
             var data = await resp.json();
             if (!data || !data.announcements) return;
 
-            var panel = document.getElementById('announcements-panel');
-            var list = document.getElementById('ann-list');
-            var updatedEl = document.getElementById('ann-updated');
-            if (!panel || !list) return;
-
             var anns = data.announcements;
-            var allItems = [];
+            var latestByTicker = {};
 
-            // Flatten all announcements across tickers
+            // Get most recent announcement per ticker
             for (var ticker in anns) {
                 var items = anns[ticker];
-                if (!Array.isArray(items)) continue;
-                items.forEach(function(item) {
-                    allItems.push(Object.assign({ ticker: ticker }, item));
+                if (!Array.isArray(items) || items.length === 0) continue;
+                var sorted = items.slice().sort(function(a, b) {
+                    return new Date(b.date || 0) - new Date(a.date || 0);
                 });
+                latestByTicker[ticker] = sorted[0];
             }
 
-            if (allItems.length === 0) return;
-
-            // Sort by date descending
-            allItems.sort(function(a, b) {
-                return new Date(b.date || 0) - new Date(a.date || 0);
+            // Inject banner into each stock card that has a recent announcement
+            document.querySelectorAll('[data-ticker-card]').forEach(function(card) {
+                var t = card.getAttribute('data-ticker-card');
+                var ann = latestByTicker[t];
+                if (!ann) return;
+                // Remove any previously injected banner
+                var existing = card.querySelector('.fc-ann-banner');
+                if (existing) existing.remove();
+                var headline = (ann.headline || ann.title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                var type = ann.type || '';
+                var tagHtml = type ? '<span class="fc-ann-tag">' + type + '</span>' : '';
+                var banner = document.createElement('div');
+                banner.className = 'fc-ann-banner';
+                banner.innerHTML = '<span class="fc-ann-dot"></span>' +
+                    '<span class="fc-ann-text">' + headline + '</span>' +
+                    tagHtml;
+                card.appendChild(banner);
             });
-
-            // Show latest 8
-            var html = '';
-            allItems.slice(0, 8).forEach(function(item) {
-                var timeStr = item.date ? new Date(item.date).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }) : '';
-                html += '<li class="ann-item">' +
-                    '<span class="ann-ticker">' + item.ticker + '</span>' +
-                    '<span class="ann-headline">' + (item.headline || item.title || '') + '</span>' +
-                    (item.type ? '<span class="ann-type">' + item.type + '</span>' : '') +
-                    '<span class="ann-time">' + timeStr + '</span>' +
-                '</li>';
-            });
-
-            list.innerHTML = html;
-            panel.style.display = 'block';
-
-            if (updatedEl && data.updated) {
-                updatedEl.textContent = 'Updated ' + new Date(data.updated).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-            }
         } catch(e) {
             // Announcements are optional — fail silently
         }
