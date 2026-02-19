@@ -202,6 +202,12 @@ function main() {
     let history;
     try {
       history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
+      // Normalise: log-daily-history.js uses key 'history', this script uses 'entries'.
+      // If the file was written by log-daily-history.js, alias history.history → entries.
+      if (!history.entries && Array.isArray(history.history)) {
+        history.entries = history.history;
+      }
+      if (!history.entries) history.entries = [];
     } catch {
       history = { ticker, schema_version: SCHEMA_VERSION, entries: [] };
     }
