@@ -5,9 +5,14 @@
  * Continuum Intelligence — Phase 2.1: Macro Signal Calculator
  * Per MASTER_IMPLEMENTATION_INSTRUCTIONS.md
  *
- * Reads data/macro-factors.json, produces a single Macro_Signal (-100..+100).
+ * Reads data/macro-factors.json, produces a single Macro_Signal (-50..+50).
+ * Range capped at -50/+50 by design — macro is context, not conviction.
  * The same value applies to ALL stocks on any given day.
  * Writes result to data/macro-signal.json.
+ *
+ * Scoring bands per ERRATA_001_MACRO_WEIGHTS.md Fix A.
+ * Normal benign conditions (ASX +3%, VIX 19, AUD flat, RBA cutting) → ~+16.
+ * Only GFC-level stress or dot-com euphoria should push beyond +/-35.
  *
  * Usage:
  *   node scripts/calc-macro-signal.js [--dry-run] [--verbose]
@@ -26,55 +31,56 @@ const args    = process.argv.slice(2);
 const dryRun  = args.includes('--dry-run');
 const verbose = args.includes('--verbose');
 
-// ── Score lookup helpers ─────────────────────────────────────────────────────
+// ── Score lookup helpers (ERRATA_001 Fix A — compressed bands) ───────────────
 
 function asx200Score(change20d) {
   // change20d is a decimal fraction (0.03 = +3%)
   if (change20d === null || change20d === undefined) return 0;
   const pct = change20d * 100;
-  if (pct >  5) return  30;
-  if (pct >  2) return  15;
-  if (pct > -2) return   0;
-  if (pct > -5) return -15;
-  return -30;
+  if (pct >  8) return  15;
+  if (pct >  3) return   8;
+  if (pct > -3) return   0;
+  if (pct > -8) return  -8;
+  return -15;
 }
 
 function vixScore(vix) {
   if (vix === null || vix === undefined) return 0;
-  if (vix < 15) return  20;
-  if (vix < 20) return  10;
+  if (vix < 13) return   8;
+  if (vix < 18) return   4;
   if (vix < 25) return   0;
-  if (vix < 35) return -15;
-  return -30;
+  if (vix < 32) return  -8;
+  return -15;
 }
 
 function audScore(change20d) {
   if (change20d === null || change20d === undefined) return 0;
   const pct = change20d * 100;
-  if (pct >  3) return  15;
-  if (pct > -3) return   0;
-  return -15;
+  if (pct >  5) return   7;
+  if (pct > -5) return   0;
+  return -7;
 }
 
 function rbaScore(trajectory) {
-  // trajectory is one of: 'cutting_aggressively', 'cutting_gradually',
-  //                        'on_hold', 'hiking'
+  // trajectory: 'cutting_aggressively' | 'cutting_gradually' |
+  //             'on_hold' | 'hiking_gradually' | 'hiking'
   if (!trajectory) return 0;
   switch (trajectory) {
-    case 'cutting_aggressively': return  15;
-    case 'cutting_gradually':    return  10;
+    case 'cutting_aggressively': return   8;
+    case 'cutting_gradually':    return   4;
     case 'on_hold':              return   0;
-    case 'hiking':               return -15;
+    case 'hiking_gradually':     return  -8;
+    case 'hiking':               return  -8;
     default:                     return   0;
   }
 }
 
 function chinaScore(pmi) {
   if (pmi === null || pmi === undefined) return 0;
-  if (pmi > 52) return  20;
-  if (pmi > 50) return  10;
-  if (pmi > 48) return -10;
-  return -25;
+  if (pmi > 52) return   7;
+  if (pmi > 50) return   4;
+  if (pmi > 48) return  -4;
+  return -10;
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -113,7 +119,7 @@ function main() {
   if (x.china_mfg_pmi == null)     nulled.push('china_pmi');
 
   const raw = s_asx200 + s_vix + s_aud + s_rba + s_china;
-  const signal = Math.max(-100, Math.min(100, raw));
+  const signal = Math.max(-50, Math.min(50, raw));  // Errata 001: capped at -50/+50
 
   if (verbose) {
     console.log('[calc-macro-signal]');
