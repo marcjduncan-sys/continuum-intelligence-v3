@@ -1553,6 +1553,146 @@ a:hover { color: var(--accent-sage); }
     color: var(--text-muted);
     margin-bottom: 4px;
 }
+/* Hypothesis Tracker — enriched sections */
+.hs-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-top: 3px;
+}
+.hs-price {
+    font-family: var(--font-data);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.hs-price-chg {
+    font-family: var(--font-data);
+    font-size: 0.64rem;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 3px;
+}
+.hs-price-chg.chg-up   { color: var(--signal-green); background: rgba(0,200,117,0.12); }
+.hs-price-chg.chg-down { color: var(--signal-red);   background: rgba(233,45,45,0.12); }
+.hs-price-chg.chg-flat { color: var(--text-muted);   background: var(--bg-elevated); }
+.hs-section {
+    font-size: 0.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin: var(--space-md) 0 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+}
+.hs-sentiment-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+.hs-sentiment-badge {
+    font-size: 0.63rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+.hs-sentiment-badge.dir-up      { color: var(--signal-green); }
+.hs-sentiment-badge.dir-down    { color: var(--signal-red); }
+.hs-sentiment-badge.dir-neutral { color: var(--signal-amber); }
+.hs-sentiment-num {
+    font-family: var(--font-data);
+    font-size: 0.63rem;
+    color: var(--text-muted);
+}
+.hs-bar-track {
+    width: 100%;
+    height: 4px;
+    background: var(--bg-elevated);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.hs-bar-fill.dir-up      { background: var(--signal-green); }
+.hs-bar-fill.dir-down    { background: var(--signal-red); }
+.hs-bar-fill.dir-neutral { background: var(--signal-amber); }
+.hs-env-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(30,48,80,0.3);
+}
+.hs-env-row:last-child { border-bottom: none; }
+.hs-env-key {
+    font-size: 0.58rem;
+    color: var(--text-muted);
+    width: 40px;
+    flex-shrink: 0;
+}
+.hs-env-val {
+    font-family: var(--font-data);
+    font-size: 0.64rem;
+    font-weight: 700;
+    width: 26px;
+    text-align: right;
+    flex-shrink: 0;
+}
+.hs-env-val.dir-up      { color: var(--signal-green); }
+.hs-env-val.dir-down    { color: var(--signal-red); }
+.hs-env-val.dir-neutral { color: var(--text-muted); }
+.hs-env-track {
+    flex: 1;
+    height: 3px;
+    background: var(--bg-elevated);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+}
+.hs-env-fill {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-radius: 2px;
+}
+.hs-env-fill.dir-up   { left: 50%; background: var(--signal-green); }
+.hs-env-fill.dir-down { right: 50%; background: var(--signal-red); }
+.hs-env-fill.dir-neutral { left: 49%; width: 2px !important; background: var(--text-muted); }
+.hs-kv-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(30,48,80,0.3);
+}
+.hs-kv-row:last-child { border-bottom: none; }
+.hs-kv-key {
+    font-size: 0.58rem;
+    color: var(--text-muted);
+}
+.hs-kv-val {
+    font-family: var(--font-data);
+    font-size: 0.64rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: right;
+}
+.hs-kv-val.dir-up      { color: var(--signal-green); }
+.hs-kv-val.dir-down    { color: var(--signal-red); }
+.hs-kv-val.dir-neutral { color: var(--signal-amber); }
+.hs-consensus {
+    display: flex;
+    gap: 3px;
+}
+.hs-cpill {
+    font-family: var(--font-data);
+    font-size: 0.57rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+}
+.hs-cpill.buy  { background: rgba(0,200,117,0.15); color: var(--signal-green); }
+.hs-cpill.hold { background: rgba(183,121,31,0.15); color: var(--signal-amber); }
+.hs-cpill.sell { background: rgba(233,45,45,0.15);  color: var(--signal-red); }
 
 /* --- Evidence Domain Cards --- */
 .evidence-card {
@@ -10485,6 +10625,7 @@ function route() {
                             if (typeof window.applyNarrativeAnalysis === 'function') window.applyNarrativeAnalysis(ticker);
                             initNarrativeTimelineChart(ticker);
                             fetchAndPatchLive(ticker);
+                            populateSidebar(ticker);
                         }
                     });
                 } else {
@@ -11374,26 +11515,26 @@ function clearPortfolio() {
 
 /* --- Hypothesis Sidebar Population --- */
 function populateSidebar(ticker) {
-    const sidebarId = ticker.toLowerCase() + '-sidebar';
-    const sidebar = document.getElementById(sidebarId);
+    var sidebarId = ticker.toLowerCase() + '-sidebar';
+    var sidebar = document.getElementById(sidebarId);
     if (!sidebar) return;
 
     // Don't re-populate if already filled
     if (sidebar.children.length > 0) return;
 
-    const page = document.getElementById('page-report-' + ticker);
+    var page = document.getElementById('page-report-' + ticker);
     if (!page) return;
 
-    // Extract T1-T4 data from verdict-scores
-    const verdictScores = page.querySelector('.verdict-scores');
+    // Extract T1-T4 data from rendered verdict-scores DOM
+    var verdictScores = page.querySelector('.verdict-scores');
     if (!verdictScores) return;
 
-    const vsItems = verdictScores.querySelectorAll('.vs-item');
-    const hypotheses = [];
-    vsItems.forEach((item, i) => {
-        const label = item.querySelector('.vs-label');
-        const score = item.querySelector('.vs-score');
-        const dirClass = item.getAttribute('data-dir') || 'dir-neutral';
+    var vsItems = verdictScores.querySelectorAll('.vs-item');
+    var hypotheses = [];
+    vsItems.forEach(function(item) {
+        var label = item.querySelector('.vs-label');
+        var score = item.querySelector('.vs-score');
+        var dirClass = item.getAttribute('data-dir') || 'dir-neutral';
         hypotheses.push({
             dirClass: dirClass,
             label: label ? label.textContent.trim() : '',
@@ -11401,38 +11542,154 @@ function populateSidebar(ticker) {
         });
     });
 
-    // Extract skew badge
-    const skewBar = page.querySelector('.risk-skew-bar .skew-badge');
-    let skewClass = '';
-    let skewHTML = '';
-    if (skewBar) {
-        if (skewBar.classList.contains('upside')) skewClass = 'upside';
-        else if (skewBar.classList.contains('downside')) skewClass = 'downside';
-        else if (skewBar.classList.contains('balanced')) skewClass = 'balanced';
-        skewHTML = skewBar.outerHTML;
+    // Extract skew badge from rendered DOM
+    var skewBar = page.querySelector('.risk-skew-bar .skew-badge');
+    var skewHTML = skewBar ? skewBar.outerHTML : '';
+
+    // Data references
+    var stock = STOCK_DATA[ticker] || {};
+    var fd  = (typeof FRESHNESS_DATA  !== 'undefined' && FRESHNESS_DATA[ticker])  ? FRESHNESS_DATA[ticker]  : {};
+    var rd  = (typeof REFERENCE_DATA  !== 'undefined' && REFERENCE_DATA[ticker])  ? REFERENCE_DATA[ticker]  : {};
+    var tls = stock.three_layer_signal || null;
+
+    // ── 1. STOCK IDENTITY + PRICE ──────────────────────────────────
+    var rawPrice = (stock._livePrice != null) ? stock._livePrice : (stock.price || 0);
+    var currency = stock.currency || 'A$';
+    var pricePct = (fd.pricePctChange != null) ? fd.pricePctChange : null;
+    var priceStr = rawPrice ? (currency + rawPrice.toFixed(2)) : '';
+    var chgClass = 'chg-flat', chgStr = '';
+    if (pricePct != null) {
+        chgStr  = (pricePct >= 0 ? '+' : '') + pricePct.toFixed(1) + '%';
+        chgClass = pricePct > 0.05 ? 'chg-up' : (pricePct < -0.05 ? 'chg-down' : 'chg-flat');
     }
 
-    // Build sidebar HTML
-    const stock = STOCK_DATA[ticker];
-    let html = '';
-    if (stock) {
-        html += '<div class="hs-stock-id">' +
-            '<div class="hs-stock-ticker">' + stock.tickerFull + '</div>' +
-            '<div class="hs-stock-name">' + stock.company + '</div>' +
+    // ── 2. OVERALL SENTIMENT ───────────────────────────────────────
+    var sentLabel = '', sentDir = 'dir-neutral', sentScore = 0, sentBarW = '0%';
+    if (tls) {
+        sentScore = tls.overall_sentiment || 0;
+        var lbl = (tls.sentiment_label || '').toUpperCase();
+        sentLabel = lbl;
+        sentDir   = lbl === 'UPSIDE' ? 'dir-up' : (lbl === 'DOWNSIDE' ? 'dir-down' : 'dir-neutral');
+        sentBarW  = Math.min(Math.abs(sentScore) * 2, 100) + '%';
+    } else if (stock.skew) {
+        var sd = (stock.skew.direction || '').toLowerCase();
+        sentLabel = sd === 'upside' ? 'UPSIDE' : (sd === 'downside' ? 'DOWNSIDE' : 'BALANCED');
+        sentDir   = sd === 'upside' ? 'dir-up' : (sd === 'downside' ? 'dir-down' : 'dir-neutral');
+        sentBarW  = '40%';
+    }
+
+    // ── 3. EXT. ENVIRONMENT helpers ────────────────────────────────
+    function envRow(key, val) {
+        if (val == null) return '';
+        var eDir  = val > 5 ? 'dir-up' : (val < -5 ? 'dir-down' : 'dir-neutral');
+        var fillW = Math.min(Math.abs(val) / 50 * 50, 50) + '%';
+        var valStr = val > 0 ? ('+' + val) : (val === 0 ? '—' : String(val));
+        return '<div class="hs-env-row">' +
+            '<span class="hs-env-key">' + key + '</span>' +
+            '<span class="hs-env-val ' + eDir + '">' + valStr + '</span>' +
+            '<div class="hs-env-track">' +
+                '<div class="hs-env-fill ' + eDir + '" style="width:' + fillW + '"></div>' +
+            '</div>' +
         '</div>';
     }
+
+    // ── 4. COMPANY RESEARCH helpers ────────────────────────────────
+    function kvRow(key, val, cls) {
+        if (val == null || val === '') return '';
+        return '<div class="hs-kv-row">' +
+            '<span class="hs-kv-key">' + key + '</span>' +
+            '<span class="hs-kv-val' + (cls ? ' ' + cls : '') + '">' + val + '</span>' +
+        '</div>';
+    }
+
+    var anchors   = rd._anchors || {};
+    var researchH = '';
+
+    // Fwd P/E or P/E
+    if (anchors.fwdPE != null) {
+        researchH += kvRow('Fwd P/E', anchors.fwdPE + 'x', '');
+    } else if (anchors.pe != null) {
+        researchH += kvRow('P/E', anchors.pe + 'x', '');
+    }
+
+    // Dividend yield
+    if (anchors.divYield != null && anchors.divYield > 0) {
+        researchH += kvRow('Div Yield', anchors.divYield + '%', '');
+    }
+
+    // Revenue growth
+    if (rd.revenueGrowth != null) {
+        var rvCls = rd.revenueGrowth > 10 ? 'dir-up' : (rd.revenueGrowth < 0 ? 'dir-down' : '');
+        researchH += kvRow('Rev Growth', (rd.revenueGrowth > 0 ? '+' : '') + rd.revenueGrowth + '%', rvCls);
+    }
+
+    // Analyst target + implied upside
+    if (rd.analystTarget != null) {
+        var tgtStr = currency + rd.analystTarget.toFixed(2);
+        var upside = rawPrice ? ((rd.analystTarget - rawPrice) / rawPrice * 100) : null;
+        var upStr  = (upside != null) ? ' (' + (upside >= 0 ? '+' : '') + upside.toFixed(0) + '%)' : '';
+        var tgtCls = (upside == null) ? '' : (upside > 5 ? 'dir-up' : (upside < -5 ? 'dir-down' : 'dir-neutral'));
+        researchH += kvRow('Target', tgtStr + upStr, tgtCls);
+    }
+
+    // Analyst consensus pills
+    var consensusH = '';
+    if (rd.analystBuys != null || rd.analystHolds != null || rd.analystSells != null) {
+        consensusH = '<div class="hs-kv-row"><span class="hs-kv-key">Consensus</span><div class="hs-consensus">';
+        if (rd.analystBuys  != null) consensusH += '<span class="hs-cpill buy">'  + rd.analystBuys  + 'B</span>';
+        if (rd.analystHolds != null) consensusH += '<span class="hs-cpill hold">' + rd.analystHolds + 'H</span>';
+        if (rd.analystSells != null) consensusH += '<span class="hs-cpill sell">' + rd.analystSells + 'S</span>';
+        consensusH += '</div></div>';
+    }
+
+    // ── BUILD HTML ─────────────────────────────────────────────────
+    var html = '';
+
+    // Stock identity + price
+    html += '<div class="hs-stock-id">';
+    html += '<div class="hs-stock-ticker">' + (stock.tickerFull || ticker) + '</div>';
+    if (priceStr) {
+        html += '<div class="hs-price-row">';
+        html += '<span class="hs-price">' + priceStr + '</span>';
+        if (chgStr) html += '<span class="hs-price-chg ' + chgClass + '">' + chgStr + '</span>';
+        html += '</div>';
+    }
+    html += '<div class="hs-stock-name">' + (stock.company || '') + '</div>';
+    html += '</div>';
+
+    // Hypothesis tracker (T1-T4 + skew)
     html += '<div class="hs-title">Hypothesis Tracker</div>';
-    hypotheses.forEach(h => {
+    hypotheses.forEach(function(h) {
         html += '<div class="hs-item">' +
             '<div class="hs-dot ' + h.dirClass + '"></div>' +
             '<div class="hs-label">' + h.label + '</div>' +
             '<div class="hs-score ' + h.dirClass + '">' + h.score + '</div>' +
         '</div>';
     });
-    html += '<div class="hs-skew">' +
-        '<div class="hs-skew-label">Risk Skew</div>' +
-        skewHTML +
-    '</div>';
+    html += '<div class="hs-skew"><div class="hs-skew-label">Risk Skew</div>' + skewHTML + '</div>';
+
+    // Overall Sentiment
+    if (sentLabel) {
+        html += '<div class="hs-section">Overall Sentiment</div>';
+        html += '<div class="hs-sentiment-row">';
+        html += '<span class="hs-sentiment-badge ' + sentDir + '">' + sentLabel + '</span>';
+        if (tls) html += '<span class="hs-sentiment-num">' + (sentScore >= 0 ? '+' : '') + sentScore + '</span>';
+        html += '</div>';
+        html += '<div class="hs-bar-track"><div class="hs-bar-fill ' + sentDir + '" style="width:' + sentBarW + '"></div></div>';
+    }
+
+    // External Environment
+    if (tls && (tls.macro_signal != null || tls.sector_signal != null)) {
+        html += '<div class="hs-section">Ext. Environment</div>';
+        if (tls.macro_signal  != null) html += envRow('Macro',  tls.macro_signal);
+        if (tls.sector_signal != null) html += envRow('Sector', tls.sector_signal);
+    }
+
+    // Company Research
+    if (researchH || consensusH) {
+        html += '<div class="hs-section">Company</div>';
+        html += researchH + consensusH;
+    }
 
     sidebar.innerHTML = html;
 }
