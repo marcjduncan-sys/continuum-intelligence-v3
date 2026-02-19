@@ -5999,27 +5999,47 @@ function renderCompositeBar(data) {
   var compMaxAbs = Math.max(Math.abs(cCont), 40); // floor 40 for visual proportionality
   var compBarW   = _barFill(cCont, compMaxAbs);
 
-  // ── T1 hypothesis summary (first hypothesis in list)
+  // ── T1 hypothesis summary
+  // Handles two formats:
+  //   Array (snapshot): [{title, direction, survivalScore}, ...]
+  //   Object (raw stock): {T1:{label, survival_score, ...}, T2:{...}}
   var t1Html = '';
-  if (data.hypotheses && data.hypotheses.length > 0) {
-    var t1 = data.hypotheses[0];
-    var t1Name = t1.title || t1.tier || 'Unknown';
+  var hypsRaw = data.hypotheses || null;
+  var hypsArr = null;
+  if (Array.isArray(hypsRaw) && hypsRaw.length > 0) {
+    hypsArr = hypsRaw;
+  } else if (hypsRaw && typeof hypsRaw === 'object') {
+    // Raw stock format — derive direction from tls.idio_detail/company_detail
+    var idioDetail = tls ? (tls.idio_detail || tls.company_detail || null) : null;
+    hypsArr = Object.keys(hypsRaw).map(function(k) {
+      var h = hypsRaw[k];
+      var sentStr = idioDetail ? (idioDetail[k + '_sentiment'] || '') : '';
+      var dir = sentStr === 'BULLISH' ? 'upside' : sentStr === 'BEARISH' ? 'downside' : '';
+      var scoreVal = idioDetail ? (idioDetail[k + '_score'] || null) : null;
+      if (scoreVal === null && h.survival_score !== undefined) scoreVal = Math.round(h.survival_score * 100);
+      return { title: h.label || k, direction: dir, survivalScore: scoreVal };
+    });
+  }
+  if (hypsArr && hypsArr.length > 0) {
+    var t1 = hypsArr[0];
+    var t1Name = t1.title || 'Unknown';
     var t1Dir = t1.direction || '';
     var t1DirLabel = t1Dir === 'upside' ? 'BULLISH' : t1Dir === 'downside' ? 'BEARISH' : 'NEUTRAL';
     var t1DirCls = t1Dir === 'upside' ? 'tls-positive' : t1Dir === 'downside' ? 'tls-negative' : 'tls-neutral';
-    var t1Score = '';
-    if (t1.survivalScore !== undefined) t1Score = ', ' + t1.survivalScore + '%';
-    // Count bearish/bullish hypotheses
-    var bearCount = 0, bullCount = 0;
-    for (var hi = 0; hi < data.hypotheses.length; hi++) {
-      var hd = data.hypotheses[hi].direction || '';
-      if (hd === 'downside') bearCount++;
-      else if (hd === 'upside') bullCount++;
+    var t1Score = (t1.survivalScore !== null && t1.survivalScore !== undefined) ? ', ' + t1.survivalScore + '%' : '';
+    // Count bear/bull — only count hypotheses where direction is known
+    var bearCount = 0, bullCount = 0, knownCount = 0;
+    for (var hi = 0; hi < hypsArr.length; hi++) {
+      var hd = hypsArr[hi].direction || '';
+      if (hd === 'downside') { bearCount++; knownCount++; }
+      else if (hd === 'upside') { bullCount++; knownCount++; }
     }
-    var dominantLabel = bearCount > bullCount ? 'bearish' : bullCount > bearCount ? 'bullish' : 'mixed';
+    var countPrefix = knownCount > 0
+      ? (bearCount + ' bear / ' + bullCount + ' bull &bull; ')
+      : (hypsArr.length + ' hypotheses &bull; ');
     t1Html = '<div class="tls-sub">' +
-      bearCount + ' of ' + data.hypotheses.length + ' hypotheses ' + dominantLabel +
-      ' &bull; T1: <span class="tls-t1-name">' + t1Name + '</span>' +
+      countPrefix +
+      'T1: <span class="tls-t1-name">' + t1Name + '</span>' +
       ' <span class="tls-dir-badge ' + t1DirCls + '">(' + t1DirLabel + t1Score + ')</span>' +
     '</div>';
   }
