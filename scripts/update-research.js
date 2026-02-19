@@ -284,8 +284,8 @@ function main() {
         previousClose: stock.current_price,
         changePercent: 0
       };
-      engineResult = processStock(stock, enginePriceData, taConfig);
-      newScores = engineResult.scores;
+      engineResult = processStock(ticker, stock, enginePriceData.price);
+      newScores = engineResult ? engineResult.scores : null;
     }
 
     let scoreChanged = false;
