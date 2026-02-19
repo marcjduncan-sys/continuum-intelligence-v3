@@ -25,9 +25,7 @@ const NFI_STYLES = `
   border-bottom: 1px solid var(--border, #1E3050);
 }
 .nfi-alert-inner {
-  max-width: var(--max-width, 1120px);
-  margin: 0 auto;
-  padding: 0 var(--space-lg, 24px);
+  /* Layout (max-width, margin, padding) is owned by index.html static CSS + @media rule */
 }
 .nfi-alert-row {
   display: flex;
