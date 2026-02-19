@@ -202,6 +202,10 @@ async function updateStockNarrative(stock, priceEvidenceRules) {
     stock.price_history = stock.price_history.slice(-25);
   }
 
+  // Record the time of this successful fetch for the freshness timestamp UI
+  _lastPriceFetch = new Date();
+  window.DNE_LAST_PRICE_FETCH = _lastPriceFetch;
+
   evaluatePriceSignals(stock, priceData, priceEvidenceRules);
 
   // evaluatePriceSignals calls recalculateSurvival internally,
@@ -227,6 +231,41 @@ async function updateStockNarrative(stock, priceEvidenceRules) {
 // ─── Refresh Scheduler ──────────────────────────────────────────────────────
 
 var _refreshInterval = null;
+var _liveJsonInterval = null;
+var _lastPriceFetch = null;
+
+/**
+ * Poll data/live-prices.json every 60 seconds (post-close pipeline prices).
+ *
+ * If the pipeline-committed price differs from the in-memory price by >0.1%,
+ * update the stock and re-render the UI immediately — no page reload required.
+ *
+ * @param {Object} stock  Stock evidence data object (mutated in place)
+ */
+async function pollLivePricesJson(stock) {
+  try {
+    var response = await fetch('data/live-prices.json?t=' + Date.now());
+    if (!response.ok) return;
+    var liveData = await response.json();
+    var key = stock.ticker ? stock.ticker.replace('.AX', '') : null;
+    if (!key) return;
+    var entry = liveData[key] || liveData[stock.ticker];
+    if (!entry || !entry.price) return;
+
+    var newPrice = parseFloat(entry.price);
+    var currentPrice = stock.current_price || newPrice;
+    var diffPct = Math.abs(newPrice - currentPrice) / currentPrice;
+
+    if (diffPct > 0.001) {
+      stock.current_price = newPrice;
+      if (typeof updateNarrativeUI === 'function') {
+        updateNarrativeUI(stock);
+      }
+    }
+  } catch (_e) {
+    // Silent failure — live-prices.json may be absent in development
+  }
+}
 
 /**
  * Start the 15-minute refresh loop for a stock during ASX market hours.
@@ -237,6 +276,7 @@ var _refreshInterval = null;
  */
 function startNarrativeRefresh(stock, priceEvidenceRules, intervalMs) {
   if (_refreshInterval) clearInterval(_refreshInterval);
+  if (_liveJsonInterval) clearInterval(_liveJsonInterval);
 
   var interval = intervalMs || 15 * 60 * 1000; // 15 minutes
 
@@ -254,6 +294,12 @@ function startNarrativeRefresh(stock, priceEvidenceRules, intervalMs) {
       updateStockNarrative(stock, priceEvidenceRules);
     }
   }, interval);
+
+  // Secondary 60-second poll of data/live-prices.json (pipeline-committed prices).
+  // Catches post-close GitHub commits without requiring a full Yahoo Finance fetch.
+  _liveJsonInterval = setInterval(function () {
+    pollLivePricesJson(stock);
+  }, 60 * 1000);
 }
 
 /**
@@ -263,6 +309,10 @@ function stopNarrativeRefresh() {
   if (_refreshInterval) {
     clearInterval(_refreshInterval);
     _refreshInterval = null;
+  }
+  if (_liveJsonInterval) {
+    clearInterval(_liveJsonInterval);
+    _liveJsonInterval = null;
   }
 }
 
@@ -274,6 +324,7 @@ if (typeof module !== 'undefined' && module.exports) {
     fetchPriceData: fetchPriceData,
     updateStockNarrative: updateStockNarrative,
     startNarrativeRefresh: startNarrativeRefresh,
-    stopNarrativeRefresh: stopNarrativeRefresh
+    stopNarrativeRefresh: stopNarrativeRefresh,
+    pollLivePricesJson: pollLivePricesJson
   };
 }

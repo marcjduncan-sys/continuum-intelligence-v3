@@ -52,6 +52,8 @@ function updateNarrativeUI(stock) {
   updateOverrideBanner(stock);
   updateDislocationIndicator(stock);
   renderCompetingHypotheses(stock);
+  renderFreshnessBanner(stock);
+  renderPriceTimestamp(stock);
 }
 
 // ─── Alert Banner ────────────────────────────────────────────────────────────
@@ -340,6 +342,103 @@ function renderCompetingHypotheses(stock) {
   container.innerHTML = html;
 }
 
+// ─── Price Timestamp Badge ────────────────────────────────────────────────────
+// Renders "A$45.67 · live as of 14:32 AEST" below the survival bar.
+// Creates #price-timestamp if absent, inserting it after #narrative-bar.
+
+function formatAEST(date) {
+  return date.toLocaleTimeString('en-AU', {
+    timeZone: 'Australia/Sydney',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+}
+
+function renderPriceTimestamp(stock) {
+  var el = document.getElementById('price-timestamp');
+  if (!el) {
+    var bar = document.getElementById('narrative-bar');
+    if (!bar) return;
+    el = document.createElement('div');
+    el.id = 'price-timestamp';
+    el.className = 'price-timestamp';
+    bar.parentNode.insertBefore(el, bar.nextSibling);
+  }
+
+  var price = stock.current_price;
+  if (!price) { el.style.display = 'none'; return; }
+  el.style.display = '';
+
+  var lastFetch = window.DNE_LAST_PRICE_FETCH;
+  var now = new Date();
+  var ageMs = lastFetch ? (now - lastFetch) : null;
+  var stale = ageMs !== null && ageMs > 15 * 60 * 1000;
+  var timeStr = lastFetch ? formatAEST(lastFetch) : 'pending';
+  var pulseClass = stale ? 'price-pulse price-pulse-stale' : 'price-pulse price-pulse-live';
+
+  el.innerHTML = '<span class="' + pulseClass + '"></span>' +
+    'A$' + Number(price).toFixed(2) + ' &middot; live as of ' + timeStr + ' AEST';
+}
+
+// ─── Research Freshness Banner ────────────────────────────────────────────────
+// Reads FRESHNESS_DATA[ticker] and renders a coloured banner showing staleness,
+// price drift since last review, urgency, and nearest catalyst countdown.
+// Status "ok" hides the banner. Inserted before #narrative-bar.
+
+function renderFreshnessBanner(stock) {
+  var el = document.getElementById('freshness-banner');
+  if (!el) {
+    var bar = document.getElementById('narrative-bar');
+    if (!bar) return;
+    el = document.createElement('div');
+    el.id = 'freshness-banner';
+    bar.parentNode.insertBefore(el, bar);
+  }
+
+  var fd = null;
+  if (typeof FRESHNESS_DATA !== 'undefined' && FRESHNESS_DATA) {
+    var key = stock.ticker ? stock.ticker.replace('.AX', '') : null;
+    fd = (key && FRESHNESS_DATA[key]) || FRESHNESS_DATA[stock.ticker] || null;
+  }
+
+  if (!fd || fd.status === 'ok' || fd.status === 'OK') {
+    el.style.display = 'none';
+    return;
+  }
+
+  var statusMap = { moderate: 'freshness-moderate', high: 'freshness-high', critical: 'freshness-critical' };
+  var statusClass = statusMap[(fd.status || '').toLowerCase()] || 'freshness-moderate';
+  el.className = 'freshness-banner ' + statusClass;
+  el.style.display = 'flex';
+
+  var parts = [];
+  if (fd.daysSinceReview != null) {
+    parts.push('Research reviewed ' + fd.daysSinceReview + ' day' + (fd.daysSinceReview !== 1 ? 's' : '') + ' ago');
+  }
+  if (fd.pricePctChange != null && Math.abs(fd.pricePctChange) >= 0.01) {
+    var sign = fd.pricePctChange >= 0 ? '+' : '';
+    parts.push('Price ' + sign + (fd.pricePctChange * 100).toFixed(1) + '% since review');
+  }
+  if (fd.urgency != null) {
+    var urgencyLabel = fd.urgency >= 70 ? 'HIGH' : fd.urgency >= 40 ? 'MODERATE' : 'LOW';
+    parts.push('Urgency: ' + urgencyLabel);
+  }
+
+  var catalystHtml = '';
+  if (fd.nearestCatalyst && fd.nearestCatalystDays != null && fd.nearestCatalystDays <= 14) {
+    var d = fd.nearestCatalystDays;
+    catalystHtml = '<div class="freshness-catalyst">' +
+      escapeHtml(fd.nearestCatalyst) + ' in ' + d + ' day' + (d !== 1 ? 's' : '') + '</div>';
+  }
+
+  el.innerHTML = '<span class="freshness-icon">&#9432;</span>' +
+    '<div class="freshness-content">' +
+    '<div class="freshness-main">' + parts.join(' &middot; ') + '</div>' +
+    catalystHtml +
+    '</div>';
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     updateNarrativeUI: updateNarrativeUI,
@@ -348,6 +447,8 @@ if (typeof module !== 'undefined' && module.exports) {
     updateOverrideBanner: updateOverrideBanner,
     updateDislocationIndicator: updateDislocationIndicator,
     renderCompetingHypotheses: renderCompetingHypotheses,
-    renderNarrativeHistory: renderNarrativeHistory
+    renderNarrativeHistory: renderNarrativeHistory,
+    renderPriceTimestamp: renderPriceTimestamp,
+    renderFreshnessBanner: renderFreshnessBanner
   };
 }
