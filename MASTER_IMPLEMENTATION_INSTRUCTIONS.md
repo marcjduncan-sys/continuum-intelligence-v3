@@ -32,6 +32,7 @@ Read these specification documents in this exact order before writing any code:
 **Errata chain (apply in order, later errata supersede earlier):**
 - ERRATA_001_MACRO_WEIGHTS.md – compresses Macro Signal to -50/+50, reduces w_macro across all stocks
 - ERRATA_002_IDIO_AMPLIFICATION.md – establishes the 40/60 rule (external cap 40%, research floor 60%), four-component weights, sqrt Idio Signal amplification, technical signal placeholder at w_tech = 0.10. **This is the authoritative weight table.**
+- ERRATA_003_OPTICAL_COHERENCE.md – removes thesis skew entirely, replaces with two-row sentiment display (External Environment + Company Research, independently coloured). Adds Company column to index page. **This is the authoritative display specification.**
 
 ---
 
