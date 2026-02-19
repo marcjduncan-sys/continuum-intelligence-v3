@@ -23,8 +23,49 @@ const ROOT = path.join(__dirname, '..');
 const INDEX_PATH = path.join(ROOT, 'index.html');
 const REGISTRY_PATH = path.join(ROOT, 'data', 'config', 'tickers.json');
 const STOCKS_DIR = path.join(ROOT, 'data', 'stocks');
+const TEMPLATES_PATH = path.join(ROOT, 'data', 'config', 'hypothesis-templates.json');
 
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+// ANSI colour helpers for terminal output
+const C = {
+  green:  s => `\x1b[32m${s}\x1b[0m`,
+  yellow: s => `\x1b[33m${s}\x1b[0m`,
+  red:    s => `\x1b[31m${s}\x1b[0m`,
+  bold:   s => `\x1b[1m${s}\x1b[0m`,
+  dim:    s => `\x1b[2m${s}\x1b[0m`,
+};
+
+// ============================================================
+// HYPOTHESIS TEMPLATE LOOKUP
+// ============================================================
+
+function loadHypothesisTemplates() {
+  try {
+    return JSON.parse(fs.readFileSync(TEMPLATES_PATH, 'utf8'));
+  } catch (_e) {
+    return null;
+  }
+}
+
+/**
+ * Look up hypothesis templates for a sector/sectorSub combination.
+ * Returns { T1, T2, T3, T4 } template object or null if no match found.
+ */
+function lookupTemplates(sector, sectorSub) {
+  const tmpl = loadHypothesisTemplates();
+  if (!tmpl) return null;
+
+  // Try "sector/sectorSub" first, then just "sector"
+  const key1 = sectorSub ? `${sector}/${sectorSub}` : null;
+  const key2 = sector;
+
+  const lookup = tmpl.sector_lookup || {};
+  const modelKey = (key1 && lookup[key1]) || lookup[key2] || null;
+
+  if (!modelKey) return null;
+  return tmpl.templates[modelKey] || null;
+}
 
 // ============================================================
 // PARSE INPUTS
@@ -157,6 +198,17 @@ function updateRegistry(ticker, company, sector, sectorSub, marketData) {
     console.log(`  [WARN] ${ticker} already exists in registry — updating`);
   }
 
+  const templates = lookupTemplates(sector, sectorSub);
+  const hypothesisNames = templates
+    ? { T1: templates.T1.label, T2: templates.T2.label, T3: templates.T3.label, T4: templates.T4.label }
+    : { T1: 'Growth/Recovery', T2: 'Base Case/Compression', T3: 'Risk/Downside', T4: 'Disruption/Catalyst' };
+
+  if (templates) {
+    console.log(`  [OK] Hypothesis template applied: ${sector}/${sectorSub || 'generic'}`);
+  } else {
+    console.log(`  [WARN] No hypothesis template found for ${sector}/${sectorSub || ''} — using generic defaults`);
+  }
+
   registry.tickers[ticker] = {
     company,
     sector,
@@ -172,12 +224,7 @@ function updateRegistry(ticker, company, sector, sectorSub, marketData) {
       high52Week: marketData.yearHigh,
       baseWeights: { T1: 50, T2: 35, T3: 30, T4: 35 },
       characteristics: { highMultiple: false, growthStock: false, hasAIExposure: false },
-      hypothesisNames: {
-        T1: 'Growth/Recovery',
-        T2: 'Base Case/Compression',
-        T3: 'Risk/Downside',
-        T4: 'Disruption/Catalyst'
-      }
+      hypothesisNames
     }
   };
 
@@ -190,11 +237,29 @@ function updateRegistry(ticker, company, sector, sectorSub, marketData) {
 // STOCK JSON FILE
 // ============================================================
 
-function createStockJSON(ticker, company, sector, marketData) {
+function createStockJSON(ticker, company, sector, sectorSub, marketData) {
   const stockFile = path.join(STOCKS_DIR, `${ticker}.json`);
   if (fs.existsSync(stockFile)) {
     console.log(`  [SKIP] ${stockFile} already exists`);
     return;
+  }
+
+  const templates = lookupTemplates(sector, sectorSub);
+  const now = new Date().toISOString();
+
+  function buildHyp(id, tmpl, defaults) {
+    return {
+      label: tmpl ? tmpl.label : defaults.label,
+      description: tmpl ? tmpl.description : defaults.description,
+      plain_english: tmpl ? tmpl.plain_english : defaults.plain_english,
+      what_to_watch: tmpl ? tmpl.what_to_watch : defaults.what_to_watch,
+      upside: defaults.upside || null,
+      risk_plain: defaults.risk_plain || null,
+      survival_score: defaults.survival_score,
+      status: defaults.status,
+      weighted_inconsistency: defaults.weighted_inconsistency,
+      last_updated: now
+    };
   }
 
   const stockData = {
@@ -205,54 +270,42 @@ function createStockJSON(ticker, company, sector, marketData) {
       ? (marketData.sharesOutstanding * marketData.currentPrice / 1e9).toFixed(1) + 'B'
       : null,
     hypotheses: {
-      T1: {
+      T1: buildHyp('T1', templates && templates.T1, {
         label: 'Growth/Recovery',
         description: `${company} executes on growth strategy; earnings accelerate`,
         plain_english: `This is the bull case — ${company} delivers on its key initiatives and the market rewards it.`,
         what_to_watch: 'Next earnings result and forward guidance.',
         upside: 'Material re-rating if execution surprises to the upside.',
         risk_plain: 'If growth disappoints, this narrative weakens.',
-        survival_score: 0.50,
-        status: 'MODERATE',
-        weighted_inconsistency: 3.0,
-        last_updated: new Date().toISOString()
-      },
-      T2: {
+        survival_score: 0.50, status: 'MODERATE', weighted_inconsistency: 3.0
+      }),
+      T2: buildHyp('T2', templates && templates.T2, {
         label: 'Base Case/Managed',
         description: `${company} delivers steady-state results; valuation holds`,
         plain_english: 'The company continues on its current trajectory — neither surprising positively nor negatively.',
         what_to_watch: 'Margin trends and competitive dynamics.',
         upside: null,
         risk_plain: 'If the base case is already priced in, limited upside from here.',
-        survival_score: 0.60,
-        status: 'MODERATE',
-        weighted_inconsistency: 2.0,
-        last_updated: new Date().toISOString()
-      },
-      T3: {
+        survival_score: 0.60, status: 'MODERATE', weighted_inconsistency: 2.0
+      }),
+      T3: buildHyp('T3', templates && templates.T3, {
         label: 'Risk/Downside',
         description: `${company} faces headwinds; earnings or multiples compress`,
         plain_english: 'This is the bear case — something goes wrong and the stock de-rates.',
         what_to_watch: 'Cost pressures, competitive threats, or macro headwinds.',
         upside: null,
         risk_plain: 'Material downside if multiple risks crystallise simultaneously.',
-        survival_score: 0.30,
-        status: 'LOW',
-        weighted_inconsistency: 4.0,
-        last_updated: new Date().toISOString()
-      },
-      T4: {
+        survival_score: 0.30, status: 'LOW', weighted_inconsistency: 4.0
+      }),
+      T4: buildHyp('T4', templates && templates.T4, {
         label: 'Disruption/Catalyst',
         description: `A structural shift changes the investment case for ${company}`,
         plain_english: 'An external force — technology, regulation, or competition — fundamentally alters the business.',
         what_to_watch: 'Industry disruption signals and regulatory changes.',
         upside: null,
         risk_plain: 'If disruption materialises, prior assumptions become invalid.',
-        survival_score: 0.15,
-        status: 'LOW',
-        weighted_inconsistency: 5.0,
-        last_updated: new Date().toISOString()
-      }
+        survival_score: 0.15, status: 'LOW', weighted_inconsistency: 5.0
+      })
     },
     dominant: 'T2',
     confidence: 'LOW',
@@ -532,6 +585,120 @@ STOCK_DATA.${short} = {
 }
 
 // ============================================================
+// POST-ONBOARDING VALIDATION
+// ============================================================
+
+const GENERIC_LABELS = new Set([
+  'Growth/Recovery', 'Base Case/Compression', 'Base Case/Managed',
+  'Risk/Downside', 'Disruption/Catalyst'
+]);
+
+function validateStock(ticker) {
+  const stockFile = path.join(STOCKS_DIR, `${ticker}.json`);
+  let stock;
+  try {
+    stock = JSON.parse(fs.readFileSync(stockFile, 'utf8'));
+  } catch (_e) {
+    console.log(C.red(`  ✗ Could not read ${stockFile}`));
+    return;
+  }
+
+  const checks = [];
+
+  // Required top-level fields
+  const required = ['ticker', 'company', 'sector', 'hypotheses', 'evidence_items', 'price_signals', 'dominant'];
+  const missingFields = required.filter(f => stock[f] == null);
+  checks.push({
+    label: 'Required top-level fields present',
+    pass: missingFields.length === 0,
+    warn: false,
+    detail: missingFields.length > 0 ? `Missing: ${missingFields.join(', ')}` : null
+  });
+
+  // Hypothesis labels not generic defaults
+  const hyps = stock.hypotheses || {};
+  const genericCount = ['T1', 'T2', 'T3', 'T4'].filter(id =>
+    hyps[id] && GENERIC_LABELS.has(hyps[id].label)
+  ).length;
+  checks.push({
+    label: 'Hypothesis labels are sector-specific (not generic)',
+    pass: genericCount === 0,
+    warn: genericCount > 0 && genericCount < 4,
+    detail: genericCount > 0 ? `${genericCount} of 4 hypotheses still have generic labels` : null
+  });
+
+  // Hypothesis plain_english populated
+  const missingPlain = ['T1', 'T2', 'T3', 'T4'].filter(id =>
+    hyps[id] && !hyps[id].plain_english
+  ).length;
+  checks.push({
+    label: 'Hypothesis plain-English descriptions present',
+    pass: missingPlain === 0,
+    warn: false,
+    detail: missingPlain > 0 ? `${missingPlain} of 4 are missing plain_english` : null
+  });
+
+  // Price history depth
+  const histLen = (stock.price_history || []).length;
+  checks.push({
+    label: `Price history depth (${histLen} days)`,
+    pass: histLen >= 30,
+    warn: histLen > 0 && histLen < 30,
+    detail: histLen < 30 ? `Only ${histLen} data points — recommend 30+` : null
+  });
+
+  // Evidence items (warn if empty — acceptable at onboarding)
+  const evidenceCount = (stock.evidence_items || []).length;
+  checks.push({
+    label: `Evidence items (${evidenceCount})`,
+    pass: evidenceCount >= 1,
+    warn: evidenceCount === 0,
+    detail: evidenceCount === 0 ? 'No evidence items yet — add analyst research evidence to activate scoring' : null
+  });
+
+  // big_picture populated beyond default
+  const defaultBp = `${stock.company} (ASX: ${ticker}) — coverage initiated. Full analysis pending.`;
+  checks.push({
+    label: 'Big picture narrative populated',
+    pass: stock.big_picture && stock.big_picture !== defaultBp,
+    warn: stock.big_picture === defaultBp,
+    detail: stock.big_picture === defaultBp ? 'Still using auto-generated placeholder' : null
+  });
+
+  // Print checklist
+  console.log(`\n${C.bold('=== Post-Onboarding Validation: ' + ticker + ' ===')}`);
+  let failures = 0;
+  let warnings = 0;
+  for (const c of checks) {
+    let icon, label;
+    if (c.pass) {
+      icon = C.green('✓');
+      label = C.green(c.label);
+    } else if (c.warn) {
+      icon = C.yellow('⚠');
+      label = C.yellow(c.label);
+      warnings++;
+    } else {
+      icon = C.red('✗');
+      label = C.red(c.label);
+      failures++;
+    }
+    console.log(`  ${icon} ${label}`);
+    if (c.detail) {
+      console.log(`      ${C.dim(c.detail)}`);
+    }
+  }
+
+  console.log('');
+  if (failures === 0 && warnings === 0) {
+    console.log(C.green('  All checks passed. Stock is ready for analysis population.'));
+  } else {
+    if (failures > 0) console.log(C.red(`  ${failures} check(s) failed — review before committing.`));
+    if (warnings > 0) console.log(C.yellow(`  ${warnings} warning(s) — action recommended before deploying.`));
+  }
+}
+
+// ============================================================
 // MAIN
 // ============================================================
 
@@ -569,13 +736,17 @@ async function main() {
 
   // 3. Create stock JSON
   console.log('\nStep 3: Creating stock data file...');
-  createStockJSON(ticker, company, sector, marketData);
+  createStockJSON(ticker, company, sector, sectorSub, marketData);
 
   // 4. Inject into index.html
   console.log('\nStep 4: Injecting into index.html...');
   injectIntoIndexHTML(ticker, company, sector, sectorSub, marketData);
 
-  // 5. Summary
+  // 5. Post-onboarding validation
+  console.log('\nStep 5: Validating stock file...');
+  validateStock(ticker);
+
+  // 6. Summary
   console.log('\n=== Summary ===');
   console.log(`  Registry:  data/config/tickers.json  [UPDATED]`);
   console.log(`  Stock JSON: data/stocks/${ticker}.json [CREATED]`);

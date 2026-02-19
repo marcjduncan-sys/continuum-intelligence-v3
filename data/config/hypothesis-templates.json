@@ -1,0 +1,393 @@
+{
+  "_meta": {
+    "version": 1,
+    "description": "Sector-specific hypothesis description templates for add-stock.js onboarding",
+    "usage": "Keyed by narrative_model. Sector lookup maps sector/sectorSub strings to model keys."
+  },
+
+  "sector_lookup": {
+    "Materials/Iron Ore Mining": "MATERIALS_IRON_ORE",
+    "Materials/Iron Ore": "MATERIALS_IRON_ORE",
+    "Materials/Diversified Metals": "MATERIALS_DIVERSIFIED",
+    "Materials/Diversified": "MATERIALS_DIVERSIFIED",
+    "Materials/Mining": "MATERIALS_DIVERSIFIED",
+    "Financial Services/Banking": "FINANCIALS_BANKING",
+    "Financial Services/Retail Banking": "FINANCIALS_BANKING",
+    "Financials/Banking": "FINANCIALS_BANKING",
+    "Financial Services/Diversified Financial": "FINANCIALS_DIVERSIFIED",
+    "Financial Services/Investment Banking": "FINANCIALS_DIVERSIFIED",
+    "Technology/SaaS": "TECHNOLOGY_SAAS",
+    "Technology/Cloud Software": "TECHNOLOGY_SAAS",
+    "Technology/Software": "TECHNOLOGY_SAAS",
+    "Healthcare/Biotech": "HEALTHCARE_BIOTECH",
+    "Healthcare/Biopharmaceutical": "HEALTHCARE_BIOTECH",
+    "Consumer Staples/Grocery": "CONSUMER_STAPLES_GROCERY",
+    "Consumer Staples/Supermarkets": "CONSUMER_STAPLES_GROCERY",
+    "Consumer Discretionary/Quick Service Restaurant": "CONSUMER_DISCRETIONARY_QSR",
+    "Consumer Discretionary/Restaurants": "CONSUMER_DISCRETIONARY_QSR",
+    "Real Estate/Industrial REIT": "REAL_ESTATE_INDUSTRIAL",
+    "Real Estate/Logistics": "REAL_ESTATE_INDUSTRIAL",
+    "Real Estate/Commercial Office": "REAL_ESTATE_COMMERCIAL",
+    "Real Estate/Office": "REAL_ESTATE_COMMERCIAL",
+    "Energy/LNG": "ENERGY_LNG",
+    "Energy/Oil & Gas": "ENERGY_LNG",
+    "Defence/Technology": "DEFENCE_TECHNOLOGY",
+    "Defence/Aerospace": "DEFENCE_TECHNOLOGY",
+    "Engineering/Services": "ENGINEERING_SERVICES",
+    "Industrials/Engineering": "ENGINEERING_SERVICES"
+  },
+
+  "templates": {
+
+    "MATERIALS_IRON_ORE": {
+      "T1": {
+        "label": "Iron Ore Supercycle",
+        "description": "Iron ore prices remain structurally elevated; Chinese steel demand sustains above-consensus volumes; margins expand",
+        "plain_english": "The bull case: China's steel demand stays stronger for longer, iron ore prices hold up, and the miner earns well above what the market currently expects.",
+        "what_to_watch": "Monthly Chinese steel production data, iron ore spot price vs. futures curve, port inventory levels at Qingdao."
+      },
+      "T2": {
+        "label": "Managed Transition",
+        "description": "Iron ore prices normalise toward $85-100/t long-run; volumes grow modestly; returns held up by capital discipline",
+        "plain_english": "The base case: prices drift lower but the company manages costs and capital allocation well enough to maintain solid shareholder returns.",
+        "what_to_watch": "C1 cash costs per tonne, quarterly production guidance, dividend payout ratio vs. peers."
+      },
+      "T3": {
+        "label": "China Demand Destruction",
+        "description": "Structural decline in Chinese property sector reduces steel intensity; iron ore prices fall below $80/t; margins compress sharply",
+        "plain_english": "The bear case: Chinese construction stays in a prolonged slump, steel demand falls, and iron ore prices collapse to levels where margins are thin.",
+        "what_to_watch": "Chinese property starts and completions data, blast furnace utilisation rates, Chinese government stimulus announcements."
+      },
+      "T4": {
+        "label": "Green Steel Disruption",
+        "description": "Accelerating shift to electric arc furnaces and direct reduced iron reduces high-grade coking coal/iron ore premium; stranded asset risk emerges",
+        "plain_english": "The structural shift case: the global steel industry decarbonises faster than expected, changing which type of iron ore is most valuable.",
+        "what_to_watch": "Global DRI capacity additions, green hydrogen cost curve, EU carbon border adjustment mechanism timeline."
+      }
+    },
+
+    "MATERIALS_DIVERSIFIED": {
+      "T1": {
+        "label": "Commodity Super-Cycle",
+        "description": "Broad commodity price strength driven by supply discipline and energy transition demand; earnings beat consensus",
+        "plain_english": "The bull case: commodity prices stay strong, energy transition demand for copper and other metals offsets any China weakness.",
+        "what_to_watch": "Copper/nickel/lithium spot prices, LME inventory levels, Chinese manufacturing PMI."
+      },
+      "T2": {
+        "label": "Through-Cycle Compounder",
+        "description": "Commodity prices cycle around long-run averages; company maintains margins through disciplined cost management and portfolio diversification",
+        "plain_english": "The base case: commodity prices cycle as expected and the company's diversified portfolio buffers through downturns.",
+        "what_to_watch": "Cost-per-unit across major segments, portfolio mix vs. spot price moves, capital allocation decisions."
+      },
+      "T3": {
+        "label": "Commodity Price Collapse",
+        "description": "Commodity prices fall materially below consensus on demand shock or supply surge; earnings and dividends cut",
+        "plain_english": "The bear case: commodity prices fall enough to force dividend cuts and capex deferrals.",
+        "what_to_watch": "Global manufacturing activity, inventory build at major customers, supply-side production decisions by majors."
+      },
+      "T4": {
+        "label": "Critical Minerals Re-Rating",
+        "description": "Energy transition creates structural demand surge for specific commodities (copper, lithium, nickel); company re-rates as critical minerals supplier",
+        "plain_english": "The upside catalyst: the market reprices the company as a key energy transition supplier, re-rating the stock.",
+        "what_to_watch": "EV penetration rates, battery gigafactory build-out, government critical minerals policy."
+      }
+    },
+
+    "FINANCIALS_BANKING": {
+      "T1": {
+        "label": "NIM Expansion + Credit Quality",
+        "description": "Rate environment sustains above-cycle net interest margins; credit losses remain contained; ROE expands toward top-of-cycle",
+        "plain_english": "The bull case: the bank earns strong margins, bad debts stay low, and capital is returned to shareholders at an above-average rate.",
+        "what_to_watch": "Net interest margin trajectory at results, mortgage pricing vs. funding costs, 90-day arrears trend."
+      },
+      "T2": {
+        "label": "Steady Returns, Compressed Margins",
+        "description": "NIMs gradually normalise as rate cuts flow through; credit quality holds; ROE settles at mid-cycle; fully priced at current levels",
+        "plain_english": "The base case: the bank delivers steady but unexciting returns as margins compress from cycle highs.",
+        "what_to_watch": "RBA rate decisions and timing of first cut, mortgage market competition and switching rates, CET1 capital ratios."
+      },
+      "T3": {
+        "label": "Credit Cycle Deterioration",
+        "description": "Unemployment rises; mortgage stress increases; credit losses spike above provisioning; ROE falls; capital position pressured",
+        "plain_english": "The bear case: the Australian economy weakens enough that mortgage defaults and business failures hit bank earnings.",
+        "what_to_watch": "Monthly ABS unemployment data, household debt serviceability ratios, business insolvency filings."
+      },
+      "T4": {
+        "label": "Fintech Margin Compression",
+        "description": "Digital-first banks and buy-now-pay-later platforms structurally erode retail banking margins; incumbent loses market share in key segments",
+        "plain_english": "The structural threat: new entrants gradually take profitable customers, eroding the franchise's long-term earning power.",
+        "what_to_watch": "New entrant deposit/mortgage market share data, regulatory treatment of neobanks, customer acquisition cost trends."
+      }
+    },
+
+    "FINANCIALS_DIVERSIFIED": {
+      "T1": {
+        "label": "Capital Markets Re-Rating",
+        "description": "Capital markets activity accelerates; deal flow, ECM, and M&A advisory revenues surge; asset management AUM grows above expectations",
+        "plain_english": "The bull case: deal markets reopen, AUM grows, and the diversified revenue model earns above-cycle returns.",
+        "what_to_watch": "ASX IPO pipeline, M&A transaction volumes, AUM flows by asset class, investment banking revenue vs. peers."
+      },
+      "T2": {
+        "label": "Through-Cycle Franchise",
+        "description": "Diversified revenue model buffers through market cycles; returns stay above cost of capital; capital allocation remains disciplined",
+        "plain_english": "The base case: the diversified model keeps generating solid returns even when individual segments soften.",
+        "what_to_watch": "ROE vs. cost of equity, dividend payout sustainability, credit provision levels in lending book."
+      },
+      "T3": {
+        "label": "Capital Markets Winter",
+        "description": "Sustained market volatility and high rates suppress deal activity; trading losses; AUM redemptions; earnings fall sharply",
+        "plain_english": "The bear case: a prolonged market downturn kills deal flow and hits trading and AUM revenues simultaneously.",
+        "what_to_watch": "Global M&A deal volumes, equity market volatility (VIX), fund outflow trends, credit spread widening."
+      },
+      "T4": {
+        "label": "Platform Disruption",
+        "description": "Technology platforms compress advisory margins; passive investing growth reduces AUM fee rates; structural revenue pool shrinks",
+        "plain_english": "The structural threat: technology and passive investing trends permanently reduce the revenue available to traditional financial intermediaries.",
+        "what_to_watch": "Fee rate trends across AUM, ETF market share vs. active management, robo-advice platform growth."
+      }
+    },
+
+    "TECHNOLOGY_SAAS": {
+      "T1": {
+        "label": "Rule-of-40 Compounder",
+        "description": "Revenue growth + FCF margin consistently exceeds 40; international expansion lands above expectations; multiple expansion justified",
+        "plain_english": "The bull case: the company grows fast and generates cash at the same time, justifying a premium valuation that keeps expanding.",
+        "what_to_watch": "ARR growth rate vs. consensus, net revenue retention rate, international segment growth vs. domestic."
+      },
+      "T2": {
+        "label": "Profitable Growth Normalisation",
+        "description": "Growth moderates as market matures; margins expand as growth investment slows; FCF improves but re-rating limited",
+        "plain_english": "The base case: growth is good but not exceptional, and the stock is fairly valued for what it delivers.",
+        "what_to_watch": "Customer churn rate, sales efficiency metrics, FCF conversion vs. EBITDA margin progression."
+      },
+      "T3": {
+        "label": "Growth Deceleration De-rating",
+        "description": "Competitive pressure or market saturation slows growth below 20%; premium multiple contracts sharply; earnings disappoint",
+        "plain_english": "The bear case: growth disappoints and the market brutally reprices a high-multiple stock downward.",
+        "what_to_watch": "Net new ARR each quarter, customer acquisition cost trends, competitive win/loss rates in key verticals."
+      },
+      "T4": {
+        "label": "AI Platform Disruption",
+        "description": "AI-native competitors or incumbents building AI-first products undercut pricing and product differentiation; TAM assumptions challenged",
+        "plain_english": "The existential threat: AI makes core functionality commoditised or enables a cheaper alternative to win customers.",
+        "what_to_watch": "AI feature launches by direct competitors, customer survey data on AI tool usage, pricing pressure in key segments."
+      }
+    },
+
+    "HEALTHCARE_BIOTECH": {
+      "T1": {
+        "label": "Pipeline Catalyst + Market Expansion",
+        "description": "Clinical or commercial milestones beat expectations; geographic expansion drives above-consensus revenue; R&D pipeline de-risked",
+        "plain_english": "The bull case: key products perform above expectations and the pipeline delivers the next growth leg.",
+        "what_to_watch": "Clinical trial readout dates, US/international revenue growth rates, pipeline milestone events."
+      },
+      "T2": {
+        "label": "Steady Compounder",
+        "description": "Core products grow in line with market; franchise durability maintained; R&D spend held at sustainable levels; FCF generation solid",
+        "plain_english": "The base case: the company compounds steadily, growing in line with the market without any major surprises.",
+        "what_to_watch": "Product volume and pricing trends, patent cliff timeline, biosimilar competition."
+      },
+      "T3": {
+        "label": "Competitive Erosion",
+        "description": "Biosimilar entry or competitive products erode key franchise revenue; pricing pressure compresses margins; R&D fails to replace revenue",
+        "plain_english": "The bear case: competition (biosimilars, new entrants) takes market share from core products faster than the pipeline can offset.",
+        "what_to_watch": "Biosimilar approval timelines, competitor product launches, pricing trends in core markets."
+      },
+      "T4": {
+        "label": "Regulatory or Clinical Setback",
+        "description": "FDA/TGA rejection or clinical failure of key pipeline asset; revenue assumptions reset; multiple contracts sharply",
+        "plain_english": "The tail risk: a negative regulatory or clinical outcome forces a major revision of revenue and valuation assumptions.",
+        "what_to_watch": "Regulatory agency decision dates, Phase 3 trial interim data, FDA advisory committee meetings."
+      }
+    },
+
+    "CONSUMER_STAPLES_GROCERY": {
+      "T1": {
+        "label": "Volume Recovery + Margin Expansion",
+        "description": "Cost-of-living pressures ease; consumer confidence recovers; private label mix improvement drives margin; loyalty platform monetised",
+        "plain_english": "The bull case: cost pressures ease, customers return to premium products, and the loyalty/data platform becomes a meaningful earnings driver.",
+        "what_to_watch": "Same-store sales growth vs. volume/price split, private label penetration rate, Everyday Rewards/loyalty platform metrics."
+      },
+      "T2": {
+        "label": "Managed Competitive Position",
+        "description": "Duopoly maintains pricing discipline; gross margins stable; e-commerce growing; international remains stable contributor",
+        "plain_english": "The base case: the supermarket holds its market position and earns stable returns, with e-commerce gradually becoming more important.",
+        "what_to_watch": "Market share data (Woolworths/Coles/Aldi/Costco split), EBIT margin by segment, e-commerce penetration."
+      },
+      "T3": {
+        "label": "Margin Squeeze + Market Share Loss",
+        "description": "Aldi/Costco/online players take share; supplier negotiations fail; regulatory scrutiny increases costs; earnings disappoint",
+        "plain_english": "The bear case: the discounters keep winning share, and regulatory pressure on supermarket pricing further limits margin recovery.",
+        "what_to_watch": "ACCC supermarket pricing review outcomes, Aldi store count growth, customer satisfaction scores."
+      },
+      "T4": {
+        "label": "Grocery Platform Disruption",
+        "description": "Quick-commerce, direct-to-consumer FMCG brands, or AI-powered meal planning platforms structurally reduce basket size and frequency",
+        "plain_english": "The structural threat: technology changes how Australians shop for food, eroding the supermarket's role as the default destination.",
+        "what_to_watch": "Quick-commerce delivery penetration (HelloFresh, DoorDash Grocery), direct-brand D2C growth, meal kit market size."
+      }
+    },
+
+    "CONSUMER_DISCRETIONARY_QSR": {
+      "T1": {
+        "label": "Franchisee Network Expansion",
+        "description": "New store rollout exceeds plan; same-store sales accelerate above inflation; franchisee economics attract new partners; margin expands at corporate level",
+        "plain_english": "The bull case: the store network grows fast, sales per store are strong, and the franchise model generates more cash than the market expects.",
+        "what_to_watch": "Net new store openings vs. plan, same-store sales growth (volume vs. price), franchisee profitability metrics."
+      },
+      "T2": {
+        "label": "Steady Growth at Fair Value",
+        "description": "Network expansion on plan; same-store sales grow in line with food inflation; franchisee renewal rates healthy; returns on new stores meet hurdle",
+        "plain_english": "The base case: the business executes its growth plan at an acceptable pace and is fairly priced for what it delivers.",
+        "what_to_watch": "System sales growth, store renewal and attrition rates, digital/app ordering penetration."
+      },
+      "T3": {
+        "label": "Consumer Spending Slowdown",
+        "description": "Cost-of-living pressures reduce discretionary food spend; same-store sales turn negative; franchisee profitability squeezed; rollout slows",
+        "plain_english": "The bear case: a consumer spending squeeze forces customers to cook at home, hurting both sales and franchisee viability.",
+        "what_to_watch": "Monthly consumer confidence data, hospitality industry sales data, franchisee closure rates."
+      },
+      "T4": {
+        "label": "Delivery Platform Margin Capture",
+        "description": "UberEats, DoorDash platform fees structurally compress QSR restaurant economics; delivery becomes loss-making for franchisees; pricing power limited",
+        "plain_english": "The structural threat: third-party delivery apps capture more economics from each transaction, pressuring franchise profitability.",
+        "what_to_watch": "Delivery app fee rate trends, in-store vs. delivery order mix, franchisee unit economics disclosure."
+      }
+    },
+
+    "REAL_ESTATE_INDUSTRIAL": {
+      "T1": {
+        "label": "E-Commerce Tailwind + Rental Growth",
+        "description": "Structural logistics demand from e-commerce drives above-market rental growth; development pipeline pre-committed at strong yields; NTA expands",
+        "plain_english": "The bull case: demand for warehouse and logistics space stays structurally strong, and rents keep growing well above inflation.",
+        "what_to_watch": "Leasing spreads on renewals vs. expiries, development pipeline pre-commitment rates, vacancy rates in key markets."
+      },
+      "T2": {
+        "label": "Stable REIT Compounder",
+        "description": "Portfolio fully leased; rental growth tracks CPI; development pipeline at acceptable returns; distribution maintained; no balance sheet stress",
+        "plain_english": "The base case: the trust delivers steady income and modest capital growth, as expected for a quality industrial REIT.",
+        "what_to_watch": "WALE (weighted average lease expiry), occupancy rate, gearing vs. covenant headroom, cost of debt."
+      },
+      "T3": {
+        "label": "Cap Rate Expansion + Vacancy Rise",
+        "description": "Higher-for-longer interest rates push capitalisation rates higher; valuations fall; new supply enters; vacancies rise; NTA declines",
+        "plain_english": "The bear case: rising interest rates erode property valuations and soften the tight vacancy conditions that drove recent outperformance.",
+        "what_to_watch": "Cap rate benchmarks in comparable transactions, pipeline supply additions, refinancing cost on upcoming debt expiry."
+      },
+      "T4": {
+        "label": "Near-Shoring + Automation Shift",
+        "description": "Automation of warehousing reduces space requirements per unit of goods moved; near-shoring reshuffles global logistics geography",
+        "plain_english": "The structural threat: robots need less warehouse space per dollar of goods, and supply chain reshuffling changes which locations are most valuable.",
+        "what_to_watch": "Robotic warehouse penetration rates, supply chain announcements by major tenants, port infrastructure investment."
+      }
+    },
+
+    "REAL_ESTATE_COMMERCIAL": {
+      "T1": {
+        "label": "Occupancy Recovery + Rental Growth",
+        "description": "Return-to-office momentum drives occupancy above expectations; premium rents for ESG-compliant space; development yields hold up",
+        "plain_english": "The bull case: office demand recovers more than the market expects as employers mandate more days in the office.",
+        "what_to_watch": "Building access card swipe data, new lease deals and terms, % of leases with return-to-office clauses."
+      },
+      "T2": {
+        "label": "Managed Portfolio, Stable Income",
+        "description": "Prime assets maintain high occupancy; rental income stable; balance sheet managed conservatively; distribution maintained",
+        "plain_english": "The base case: the high-quality portfolio keeps performing, even as the overall office market faces structural headwinds.",
+        "what_to_watch": "WALE by building tier, cap rate movement in comparable transactions, tenant credit quality."
+      },
+      "T3": {
+        "label": "Hybrid Work Structural Oversupply",
+        "description": "Persistent hybrid work norms; tenants renew at smaller footprints; new supply adds vacancy; rents fall; NTA declines materially",
+        "plain_english": "The bear case: companies permanently reduce office space, and the combination of lower demand and new supply crushes rents and valuations.",
+        "what_to_watch": "Subleasing volumes (canary for future downsizing), lease expiry profile, CBD vacancy rates."
+      },
+      "T4": {
+        "label": "Conversion Opportunity / Stranded Assets",
+        "description": "Non-prime office stock stranded by ESG requirements; conversion to residential/hotel creates value OR delays recognition of impairments",
+        "plain_english": "The bifurcation: prime ESG-rated space wins tenants; everything else faces structural obsolescence or costly conversion.",
+        "what_to_watch": "NABERS ratings across portfolio, government planning policy on residential conversion, tenant ESG commitments."
+      }
+    },
+
+    "ENERGY_LNG": {
+      "T1": {
+        "label": "LNG Price Strength + Volume Growth",
+        "description": "Asian LNG prices remain elevated; global supply disruptions extend structural tightness; new volumes ramp on plan; margins expand",
+        "plain_english": "The bull case: LNG prices stay high, supply stays tight globally, and the company's volumes grow as planned.",
+        "what_to_watch": "Asian LNG spot price (JKM), European gas storage levels, global LNG supply additions schedule."
+      },
+      "T2": {
+        "label": "Managed Long-Cycle Assets",
+        "description": "LNG prices normalise as new supply enters; long-term contracts provide revenue floor; assets maintained; returns above cost of capital",
+        "plain_english": "The base case: spot prices soften but long-term contracts protect earnings, and returns stay above the cost of capital.",
+        "what_to_watch": "Contract vs. spot revenue mix, operating costs per barrel of oil equivalent, debt maturity profile."
+      },
+      "T3": {
+        "label": "LNG Oversupply + Price Collapse",
+        "description": "Wave of new US/Qatar LNG supply drives prices below long-run cost support; spot revenue falls; returns on capital diminish",
+        "plain_english": "The bear case: a global LNG supply glut drives prices down to levels where returns are poor.",
+        "what_to_watch": "US LNG export capacity coming online, Qatar North Field expansion timeline, Asian demand elasticity."
+      },
+      "T4": {
+        "label": "Energy Transition Stranded Asset Risk",
+        "description": "Accelerated renewable energy adoption reduces gas demand faster than consensus; LNG assets face shorter-than-modelled reserve life; write-downs",
+        "plain_english": "The long-term threat: the energy transition happens faster than assumed in the reserve life, stranding long-lived assets.",
+        "what_to_watch": "IEA and IRENA energy transition scenario updates, Asian government net-zero commitments, renewable capacity additions."
+      }
+    },
+
+    "DEFENCE_TECHNOLOGY": {
+      "T1": {
+        "label": "Defence Spending Supercycle",
+        "description": "Global defence budget increases accelerate contract wins; domestic sovereign capability spending drives multi-year order book growth",
+        "plain_english": "The bull case: rising geopolitical tensions drive higher defence budgets globally, and the company wins a disproportionate share.",
+        "what_to_watch": "Australian Defence Strategic Review funding allocations, NATO defence spending commitments, contract announcement pipeline."
+      },
+      "T2": {
+        "label": "Steady Contract Delivery",
+        "description": "Existing contract backlog delivers to schedule; renewal rates high; organic growth from contract extensions; margins stable",
+        "plain_english": "The base case: the company executes its existing backlog competently and wins enough new work to sustain growth.",
+        "what_to_watch": "Order backlog size and duration, contract margin at completion vs. bid, headcount and capability growth."
+      },
+      "T3": {
+        "label": "Program Delays + Cost Overruns",
+        "description": "Defence program complexity leads to cost overruns; government budget reallocations delay contracts; cash conversion disappoints",
+        "plain_english": "The bear case: the complexity of defence programs leads to delays and cost overruns that erode margins and strain cash flow.",
+        "what_to_watch": "Project milestone vs. schedule, government budget review outcomes, subcontractor cost escalation."
+      },
+      "T4": {
+        "label": "Autonomous Systems Disruption",
+        "description": "Autonomous drones and AI-driven systems replace traditional platforms; company's technology stack becomes obsolete; contract renewals at risk",
+        "plain_english": "The technology threat: rapid advances in autonomous and AI warfare systems render current capabilities less competitive.",
+        "what_to_watch": "Defence department autonomous systems strategy, competitor capability announcements, R&D spend as % of revenue."
+      }
+    },
+
+    "ENGINEERING_SERVICES": {
+      "T1": {
+        "label": "Infrastructure Boom Execution",
+        "description": "Government infrastructure pipeline drives strong order intake; margins expand on project selectivity; offshore growth adds diversification",
+        "plain_english": "The bull case: the infrastructure spending pipeline stays full, the company wins profitable work, and margins expand through better project selection.",
+        "what_to_watch": "Order backlog growth, new contract win rate, margin at completion vs. bid margin, resources vs. infrastructure revenue split."
+      },
+      "T2": {
+        "label": "Steady Through-Cycle Compounder",
+        "description": "Diversified end markets buffer sector cycles; contract book provides revenue visibility; returns on capital above cost of capital",
+        "plain_english": "The base case: the diversified exposure to different infrastructure types buffers against any single sector slowdown.",
+        "what_to_watch": "Revenue diversification by sector, contract length and backlog cover, staff utilisation rates."
+      },
+      "T3": {
+        "label": "Project Write-downs + Labour Cost Inflation",
+        "description": "Fixed-price contracts in inflationary environment lead to margin erosion; skill shortages create cost overruns; earnings disappoint",
+        "plain_english": "The bear case: labour shortages and fixed-price contract exposure combine to produce project write-downs and margin disappointments.",
+        "what_to_watch": "Fixed-price vs. cost-plus contract mix, wage inflation vs. contract escalation clauses, project completion risk disclosure."
+      },
+      "T4": {
+        "label": "Autonomous Construction Disruption",
+        "description": "Robotic construction and AI-driven project management reduce labour content; traditional engineering model faces structural margin compression",
+        "plain_english": "The long-term structural threat: automation of construction and design reduces the value of traditional engineering labour models.",
+        "what_to_watch": "BIM/digital twin adoption rates, competitor automation investment, government autonomous infrastructure pilots."
+      }
+    }
+  }
+}
