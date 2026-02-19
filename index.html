@@ -744,6 +744,23 @@ a:hover { color: var(--accent-sage); }
     font-family: var(--font-data);
     font-weight: 600;
 }
+.coverage-table .td-sentiment { white-space: nowrap; }
+.sent-chip {
+    display: inline-block;
+    font-family: var(--font-data);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 2px 8px;
+    border-radius: 3px;
+    min-width: 36px;
+    text-align: center;
+}
+.sent-chip.positive { background: rgba(61,170,109,0.12); color: var(--signal-green); border: 1px solid rgba(61,170,109,0.25); }
+.sent-chip.positive.strong { background: rgba(61,170,109,0.2); border-color: rgba(61,170,109,0.4); }
+.sent-chip.negative { background: rgba(212,85,85,0.12); color: var(--signal-red); border: 1px solid rgba(212,85,85,0.25); }
+.sent-chip.negative.strong { background: rgba(212,85,85,0.2); border-color: rgba(212,85,85,0.4); }
+.sent-chip.neutral { background: rgba(212,160,60,0.10); color: var(--signal-amber); border: 1px solid rgba(212,160,60,0.2); }
 .coverage-table .td-date {
     font-family: var(--font-data);
     font-size: 0.72rem;
@@ -4293,7 +4310,7 @@ a:hover { color: var(--accent-sage); }
         <!-- Announcements Panel -->
         <div class="announcements-panel" id="announcements-panel" style="display:none">
             <div class="ann-header">
-                <div class="ann-title">Latest ASX Announcements</div>
+                <div class="ann-title">Latest News</div>
                 <span class="msb-updated" id="ann-updated"></span>
             </div>
             <ul class="ann-list" id="ann-list">
@@ -4321,6 +4338,7 @@ a:hover { color: var(--accent-sage); }
                     <th>Sector</th>
                     <th>Price</th>
                     <th class="sortable" onclick="sortCoverageTable()" id="th-skew">Thesis Skew <span class="sort-arrow" id="skew-sort-arrow">&#9650;</span></th>
+                    <th class="sortable" onclick="sortCoverageTableBySentiment()" id="th-sentiment" title="Three-layer composite signal">Sentiment <span class="sort-arrow" id="sentiment-sort-arrow">&#9650;</span></th>
                     <th>Updated</th>
                     <th>Status</th>
                 </tr>
@@ -5617,10 +5635,12 @@ function renderSectorPanel(data) {
   // Commodity models
   var COMMODITY_MODELS = ['ENERGY_OIL_GAS','MATERIALS_IRON_ORE','MATERIALS_GOLD',
     'MATERIALS_COPPER','MATERIALS_ALUMINIUM','MATERIALS_LITHIUM','MATERIALS_COAL',
-    'MATERIALS_URANIUM','MATERIALS_DIVERSIFIED_MINING'];
+    'MATERIALS_URANIUM'];
+  var DIVERSIFIED_MODELS = ['MATERIALS_DIVERSIFIED_MINING'];
   var BANK_MODELS = ['FINANCIALS_MAJOR_BANKS','FINANCIALS_INSURANCE'];
   var REIT_MODELS = ['REIT_INDUSTRIAL','REIT_OFFICE','REIT_RETAIL','REIT_DIVERSIFIED'];
   var TECH_MODELS = ['IT_SOFTWARE_SAAS','IT_HARDWARE','TECHNOLOGY'];
+  var ASSET_MGR_MODELS = ['FINANCIALS_DIVERSIFIED_ASSET_MGMT'];
 
   function fmtPct(v, label) {
     if (v == null) return '';
@@ -5637,9 +5657,80 @@ function renderSectorPanel(data) {
 
   var rowsHtml = '';
   var gaugeHtml = '';
-  var modelLabel = model.replace(/_/g, ' ');
+  var modelLabelMap = {
+    'MATERIALS_DIVERSIFIED_MINING': 'Diversified Mining',
+    'FINANCIALS_DIVERSIFIED_ASSET_MGMT': 'Asset Management',
+    'FINANCIALS_MAJOR_BANKS': 'Major Banks',
+    'FINANCIALS_INSURANCE': 'Insurance',
+    'REIT_INDUSTRIAL': 'Industrial REIT',
+    'REIT_OFFICE': 'Office REIT',
+    'REIT_RETAIL': 'Retail REIT',
+    'REIT_DIVERSIFIED': 'Diversified REIT',
+    'IT_SOFTWARE_SAAS': 'Software / SaaS',
+    'ENERGY_OIL_GAS': 'Oil & Gas',
+    'MATERIALS_GOLD': 'Gold Mining',
+    'MATERIALS_IRON_ORE': 'Iron Ore',
+    'MATERIALS_COPPER': 'Copper',
+    'MATERIALS_ALUMINIUM': 'Aluminium',
+    'MATERIALS_COAL': 'Coal',
+    'HEALTHCARE_PHARMA_BIOTECH': 'Healthcare / Pharma',
+    'HEALTHCARE_PHARMACY': 'Pharmacy / Distribution',
+    'HEALTHCARE_DEVICES_MEDTECH': 'MedTech / Devices',
+    'CONSUMER_DISC_RESTAURANTS_QSR': 'Restaurants / QSR',
+    'CONSUMER_STAPLES_GROCERY': 'Grocery / Staples',
+    'INDUSTRIALS_DEFENCE': 'Defence / Industrials',
+    'INDUSTRIALS_ENGINEERING_CONSTRUCTION': 'Engineering & Construction'
+  };
+  var modelLabel = modelLabelMap[model] || model.replace(/_/g, ' ');
 
-  if (COMMODITY_MODELS.indexOf(model) !== -1) {
+  if (DIVERSIFIED_MODELS.indexOf(model) !== -1) {
+    // Diversified miner — show weighted commodity breakdown
+    var divOverlay = data.commodity_overlay || {};
+    var divSplit   = divOverlay.revenue_commodity_split || {};
+    var divCommMap = {
+      iron_ore:  { data: comms.iron_ore_62, label: 'Iron Ore 62%', unit: 'US$/dmt' },
+      copper:    { data: comms.copper,      label: 'Copper',        unit: 'US$/lb'  },
+      aluminium: { data: comms.aluminium,   label: 'Aluminium',     unit: 'US$/t'   },
+      coal:      { data: comms.coking_coal || comms.thermal_coal, label: 'Coal', unit: 'US$/t' },
+      gold:      { data: comms.gold_usd,    label: 'Gold',          unit: 'US$/oz'  }
+    };
+    var divEntries = Object.keys(divSplit);
+    for (var di = 0; di < divEntries.length; di++) {
+      var dComm = divEntries[di];
+      if (dComm === 'other') continue;
+      var dWeight = divSplit[dComm];
+      var dInfo = divCommMap[dComm];
+      if (!dInfo || !dInfo.data || dInfo.data.close == null) continue;
+      var dData = dInfo.data;
+      rowsHtml += '<div class="sector-row">' +
+        '<span class="sector-row-key">' + dInfo.label + ' <span style="font-size:0.55rem;color:var(--text-muted)">(' + Math.round(dWeight * 100) + '%)</span></span>' +
+        '<span class="sector-row-val">' + dInfo.unit + ' ' + dData.close.toLocaleString(undefined,{maximumFractionDigits:2}) + '</span>' +
+        fmtPct(dData.change_5d, '5d') + fmtPct(dData.change_20d, '1mo') +
+        badge(dData.change_5d, 0.02, -0.02) +
+      '</div>';
+    }
+
+  } else if (ASSET_MGR_MODELS.indexOf(model) !== -1) {
+    // Asset manager — show ASX 200 and US yields
+    var amAsx200 = mf && mf.market && mf.market.asx200 ? mf.market.asx200 : null;
+    var amUs10yr = mf && mf.rates  && mf.rates.us_10yr  ? mf.rates.us_10yr  : null;
+    if (amAsx200) {
+      rowsHtml += '<div class="sector-row">' +
+        '<span class="sector-row-key">ASX 200</span>' +
+        '<span class="sector-row-val">' + Math.round(amAsx200.close).toLocaleString() + '</span>' +
+        fmtPct(amAsx200.change_20d, '1mo') +
+        badge(amAsx200.change_20d, 0.03, -0.03) +
+      '</div>';
+    }
+    if (amUs10yr) {
+      rowsHtml += '<div class="sector-row">' +
+        '<span class="sector-row-key">US 10yr Yield</span>' +
+        '<span class="sector-row-val">' + amUs10yr.close.toFixed(2) + '%</span>' +
+        fmtPct(amUs10yr.change_20d, '1mo') +
+      '</div>';
+    }
+
+  } else if (COMMODITY_MODELS.indexOf(model) !== -1) {
     var overlay = data.commodity_overlay || {};
     var primary = overlay.primary_commodity || '';
 
@@ -5719,10 +5810,22 @@ function renderSectorPanel(data) {
     var isReit = REIT_MODELS.indexOf(model) !== -1;
     if (rates.rba_cash != null) {
       var rtraj = rates.rba_trajectory || '';
+      var rtrajCls = 'neut';
+      var rtrajLabel = '';
+      if (rtraj) {
+        rtrajLabel = rtraj === 'cutting_aggressively' ? 'Cutting ▼▼' :
+                     rtraj === 'cutting_gradually'    ? 'Cutting ▼'   :
+                     rtraj === 'on_hold'              ? 'On Hold'      :
+                     rtraj === 'hiking_gradually'     ? 'Hiking ▲'    :
+                     rtraj === 'hiking'               ? 'Hiking ▲▲'   :
+                     rtraj.replace(/_/g,' ');
+        rtrajCls = (rtraj === 'cutting_aggressively' || rtraj === 'cutting_gradually') ? 'bull' :
+                   (rtraj === 'hiking' || rtraj === 'hiking_gradually') ? 'bear' : 'neut';
+      }
       rowsHtml += '<div class="sector-row">' +
         '<span class="sector-row-key">RBA Cash Rate</span>' +
         '<span class="sector-row-val">' + rates.rba_cash.toFixed(2) + '%</span>' +
-        (rtraj ? '<span class="sector-row-badge neut">' + rtraj.replace(/_/g,' ').toUpperCase() + '</span>' : '') +
+        (rtrajLabel ? '<span class="sector-row-badge ' + rtrajCls + '">' + rtrajLabel + '</span>' : '') +
       '</div>';
     }
     if (rates.au_10yr != null) {
@@ -8205,10 +8308,19 @@ function renderFeaturedCard(data) {
   var priceColor = data.featuredPriceColor || '';
   var priceStyle = priceColor ? ' style="color: ' + priceColor + '"' : '';
 
+  // Sentiment chip for featured card
+  var fcTls = data.three_layer_signal || null;
+  var fcSent = fcTls ? fcTls.overall_sentiment : null;
+  var fcSentCls = fcSent === null ? 'neutral' : fcSent > 30 ? 'positive strong' : fcSent > 10 ? 'positive' : fcSent < -30 ? 'negative strong' : fcSent < -10 ? 'negative' : 'neutral';
+  var fcSentLabel = fcTls ? (fcTls.sentiment_label || '') : '';
+  var fcSentChip = fcSent !== null
+    ? '<span class="sent-chip ' + fcSentCls + '" title="Overall Sentiment (' + fcSentLabel + ')">' + (fcSent > 0 ? '+' : '') + fcSent + '</span>'
+    : '';
+
   return '<div class="featured-card skew-' + dir + '" data-ticker-card="' + data.ticker + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
     '<div class="fc-top">' +
       '<div>' +
-        '<div class="fc-ticker">' + data.tickerFull + '</div>' +
+        '<div class="fc-ticker">' + data.tickerFull + ' ' + fcSentChip + '</div>' +
         '<div class="fc-company">' + data.company + '</div>' +
         '<div class="fc-sector">' + data.sector + ' &bull; ' + data.sectorSub + '</div>' +
       '</div>' +
@@ -8275,7 +8387,16 @@ function renderCoverageRow(data) {
   var dateParts = data.date.split(' ');
   var shortDate = dateParts[0] + ' ' + (dateParts[1] ? dateParts[1].substring(0, 3) : '') + ' ' + (dateParts[2] || '');
 
-  return '<tr data-skew-score="' + skew.score + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
+  // Sentiment column — from three_layer_signal
+  var tls = data.three_layer_signal || null;
+  var sentScore = tls ? tls.overall_sentiment : null;
+  var sentLabel = tls ? (tls.sentiment_label || '') : '';
+  var sentCls = sentScore === null ? 'neutral' : sentScore > 30 ? 'positive strong' : sentScore > 10 ? 'positive' : sentScore < -30 ? 'negative strong' : sentScore < -10 ? 'negative' : 'neutral';
+  var sentHtml = sentScore !== null
+    ? '<span class="sent-chip ' + sentCls + '">' + (sentScore > 0 ? '+' : '') + sentScore + '</span>'
+    : '<span class="sent-chip neutral">—</span>';
+
+  return '<tr data-skew-score="' + skew.score + '" data-sent-score="' + (sentScore !== null ? sentScore : 0) + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
     '<td class="td-ticker">' + data.ticker + '</td>' +
     '<td>' + data.company + '</td>' +
     '<td>' + data.sector + '</td>' +
@@ -8290,6 +8411,7 @@ function renderCoverageRow(data) {
         tooltipHtml +
       '</div>' +
     '</td>' +
+    '<td class="td-sentiment">' + sentHtml + '</td>' +
     '<td class="td-date">' + shortDate + '</td>' +
     '<td>' + renderFreshnessBadge(data.ticker) + renderCatalystTag(data.ticker) + '</td>' +
   '</tr>';
@@ -8303,7 +8425,7 @@ function renderComingSoonRow(stub) {
   var scoreCls = score > 5 ? 'positive' : score < -5 ? 'negative' : 'neutral';
   var scoreLabel = (score > 0 ? '+' : '') + score;
 
-  return '<tr class="stub" data-skew-score="' + score + '">' +
+  return '<tr class="stub" data-skew-score="' + score + '" data-sent-score="0">' +
     '<td class="td-ticker">' + stub.ticker + '</td>' +
     '<td>' + stub.company + '</td>' +
     '<td>' + stub.sector + '</td>' +
@@ -8317,6 +8439,7 @@ function renderComingSoonRow(stub) {
         '<span class="skew-score ' + scoreCls + '">' + scoreLabel + '</span>' +
       '</div>' +
     '</td>' +
+    '<td class="td-sentiment"></td>' +
     '<td><span class="coming-soon">Coming Soon</span></td>' +
     '<td></td>' +
   '</tr>';
@@ -8367,6 +8490,45 @@ function sortCoverageTable() {
   for (var i = 0; i < rows.length; i++) {
     tbody.appendChild(rows[i]);
   }
+}
+
+// Sentiment column sort (separate sort state from skew sort)
+var sentimentSortDir = 0;
+
+function sortCoverageTableBySentiment() {
+  var tbody = document.getElementById('coverage-body');
+  if (!tbody) return;
+  var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+  var arrow = document.getElementById('sentiment-sort-arrow');
+
+  sentimentSortDir = sentimentSortDir === 0 ? -1 : sentimentSortDir === -1 ? 1 : 0;
+  coverageSortDir = 0; // reset skew sort
+  var skewArrow = document.getElementById('skew-sort-arrow');
+  if (skewArrow) { skewArrow.innerHTML = '&#9650;'; skewArrow.className = 'sort-arrow'; }
+
+  if (sentimentSortDir === 0) {
+    if (arrow) { arrow.innerHTML = '&#9650;'; arrow.className = 'sort-arrow'; }
+    tbody.innerHTML = '';
+    FEATURED_ORDER.forEach(function(ticker) {
+      if (STOCK_DATA[ticker]) tbody.innerHTML += renderCoverageRow(STOCK_DATA[ticker]);
+    });
+    if (typeof COMING_SOON !== 'undefined') {
+      COMING_SOON.forEach(function(stub) { tbody.innerHTML += renderComingSoonRow(stub); });
+    }
+    return;
+  }
+
+  rows.sort(function(a, b) {
+    var sa = parseInt(a.getAttribute('data-sent-score')) || 0;
+    var sb = parseInt(b.getAttribute('data-sent-score')) || 0;
+    return sentimentSortDir === -1 ? sb - sa : sa - sb;
+  });
+
+  if (arrow) {
+    arrow.className = 'sort-arrow active';
+    arrow.innerHTML = sentimentSortDir === -1 ? '&#9660;' : '&#9650;';
+  }
+  for (var i = 0; i < rows.length; i++) tbody.appendChild(rows[i]);
 }
 
 function buildCoverageData() {
