@@ -17,39 +17,17 @@
 /* global
   recalculateSurvival, updateNarrativeUI, renderNarrativeHistory,
   startNarrativeRefresh, evaluatePriceSignals, fetchPriceData,
-  computeNarrativeWeighting
+  computeNarrativeWeighting, DataService
 */
 
 (function () {
   'use strict';
 
-  var DATA_BASE_URL = 'data/stocks/';
-  var CONFIG_URL = 'data/config/price_rules.json';
-
-  /**
-   * Load a JSON file via fetch.
-   *
-   * @param {string} url  Relative or absolute URL
-   * @returns {Object|null}
-   */
-  async function loadJSON(url) {
-    try {
-      var response = await fetch(url);
-      if (!response.ok) throw new Error('HTTP ' + response.status);
-      return await response.json();
-    } catch (err) {
-      console.error('[DNE] Failed to load ' + url + ':', err);
-      return null;
-    }
-  }
-
   /**
    * Persist updated stock data back to storage.
-   * In Phase 1 (static site), this is a no-op / logs to console.
-   * Replace with actual persistence when a backend is available.
+   * Logs state changes; real persistence handled by backend when available.
    */
   window.saveStockData = async function (stock) {
-    // Phase 1: log to console for debugging. No server-side persistence yet.
     console.log('[DNE] Stock data updated:', stock.ticker,
       '| Dominant:', stock.dominant,
       '| Confidence:', stock.confidence,
@@ -66,20 +44,29 @@
       return;
     }
 
-    // Derive the JSON filename from ticker (strip .AX suffix)
-    var baseTicker = ticker.replace('.AX', '');
-    var stockUrl = DATA_BASE_URL + baseTicker + '.json';
-
     console.log('[DNE] Initialising for ' + ticker);
 
-    // Load stock data and config in parallel
-    var results = await Promise.all([
-      loadJSON(stockUrl),
-      loadJSON(CONFIG_URL)
-    ]);
-
-    var stock = results[0];
-    var config = results[1];
+    // Use DataService if loaded; otherwise fall back to direct fetch
+    var stock, config;
+    if (typeof DataService !== 'undefined') {
+      var results = await Promise.all([
+        DataService.getStock(ticker),
+        DataService.getConfig()
+      ]);
+      stock = results[0];
+      config = results[1];
+    } else {
+      // Fallback: fetch directly (DataService not loaded)
+      var baseTicker = ticker.replace('.AX', '');
+      try {
+        var sr = await fetch('data/stocks/' + baseTicker + '.json');
+        stock = sr.ok ? await sr.json() : null;
+      } catch (_e) { stock = null; }
+      try {
+        var cr = await fetch('data/config/price_rules.json');
+        config = cr.ok ? await cr.json() : null;
+      } catch (_e) { config = null; }
+    }
 
     if (!stock) {
       console.error('[DNE] Could not load stock data for ' + ticker);
