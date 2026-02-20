@@ -6917,6 +6917,25 @@ function _barFill(val, maxAbs) {
   return Math.min(100, Math.abs(val) / maxAbs * 100).toFixed(1);
 }
 
+// BUGFIX_002: compute company contribution dynamically from hypothesis weights
+// Replaces stale tls.company_contribution which was computed with old T1-vs-T2 formula
+function _computeCompanyContrib(data) {
+  var skew = computeSkewScore(data);
+  var w = (data.narrative_weights && data.narrative_weights.company != null)
+    ? data.narrative_weights.company : 0.80;
+  return Math.round(w * skew.score);
+}
+function _computeOverallSentiment(data) {
+  var tls = data.three_layer_signal || {};
+  var mC = tls.macro_contribution || 0;
+  var sC = tls.sector_contribution || 0;
+  var tC = tls.tech_contribution || 0;
+  return Math.round(mC + sC + tC + _computeCompanyContrib(data));
+}
+function _overallLabel(score) {
+  return score > 5 ? 'UPSIDE' : score < -5 ? 'DOWNSIDE' : 'BALANCED';
+}
+
 function renderCompositeBar(data) {
   var tls = data.three_layer_signal || null;
 
@@ -6932,12 +6951,13 @@ function renderCompositeBar(data) {
     '</div>';
   }
 
-  var score   = tls.overall_sentiment;
-  var label   = tls.sentiment_label || '';
   var mCont   = tls.macro_contribution   !== undefined ? tls.macro_contribution   : 0;
   var sCont   = tls.sector_contribution  !== undefined ? tls.sector_contribution  : 0;
   var tCont   = tls.tech_contribution    !== undefined ? tls.tech_contribution    : 0;
-  var cCont   = tls.company_contribution !== undefined ? tls.company_contribution : (tls.idio_contribution || 0);
+  // BUGFIX_002: compute company contribution dynamically (replaces stale tls.company_contribution)
+  var cCont   = _computeCompanyContrib(data);
+  var score   = Math.round(mCont + sCont + tCont + cCont);
+  var label   = _overallLabel(score);
 
   // External = macro + sector + tech contributions
   var extVal  = mCont + sCont + tCont;
@@ -7056,8 +7076,14 @@ function renderVerdict(data) {
   var borderStyle = v.borderColor ? ' style="border-color: ' + v.borderColor + '"' : '';
   var norm = normaliseScores(v.scores);
 
+  // BUGFIX_002: sort verdict score chips by score descending (dominant narrative first)
+  var displayIdxs = [];
+  for (var di = 0; di < v.scores.length; di++) displayIdxs.push(di);
+  displayIdxs.sort(function(a, b) { return norm[b] - norm[a]; });
+
   var scoresHtml = '';
-  for (var i = 0; i < v.scores.length; i++) {
+  for (var di = 0; di < displayIdxs.length; di++) {
+    var i = displayIdxs[di];
     var s = v.scores[i];
     var dirStyle = s.dirColor ? ' style="color:' + s.dirColor + '"' : '';
     var dirAttr = data.hypotheses[i] ? ' data-dir="' + (data.hypotheses[i].dirClass || 'dir-neutral') + '"' : '';
@@ -7147,6 +7173,11 @@ function renderHypotheses(data) {
     if (norm[j] > norm[domIdx]) domIdx = j;
   }
 
+  // BUGFIX_002: display order sorted by score descending (IDs/storage unchanged)
+  var displayOrder = [];
+  for (var di = 0; di < data.hypotheses.length; di++) displayOrder.push(di);
+  displayOrder.sort(function(a, b) { return norm[b] - norm[a]; });
+
   // Build DOMINANT NARRATIVE block from dominant hypothesis + flip history
   var domHyp = data.hypotheses[domIdx];
   var domName = domHyp ? (domHyp.title || ('T' + (domIdx + 1))) : '—';
@@ -7181,7 +7212,8 @@ function renderHypotheses(data) {
     prevDominantHtml +
   '</div>';
 
-  for (var i = 0; i < data.hypotheses.length; i++) {
+  for (var oi = 0; oi < displayOrder.length; oi++) {
+    var i = displayOrder[oi];
     var h = data.hypotheses[i];
     var normScore = norm[i] + '%';
     var normWidth = norm[i] + '%';
@@ -9314,13 +9346,17 @@ function renderSnapshotPage(data) {
       if (!tls || tls.overall_sentiment === null || tls.overall_sentiment === undefined) {
         return '<div class="snap-sentiment-bar"><span class="snap-risk-skew-label">Sentiment</span><span class="composite-pending">Computing…</span></div>';
       }
-      var sScore = tls.overall_sentiment;
-      var sLabel = tls.sentiment_label || '';
-      var sCls = sScore > 8 ? 'tls-positive' : sScore < -8 ? 'tls-negative' : 'tls-neutral';
       var mC = tls.macro_contribution || 0;
       var seC = tls.sector_contribution || 0;
       var tC = tls.tech_contribution || 0;
-      var cC = tls.company_contribution !== undefined ? tls.company_contribution : (tls.idio_contribution || 0);
+      // BUGFIX_002: snapshot data.hypotheses uses 'up'/'down' directions, not 'upside'/'downside'.
+      // Use pre-computed skew score stored in data.riskSkew.computed (from computeSkewScore(stock)).
+      var skewScoreForSnap = (data.riskSkew && data.riskSkew.computed) ? data.riskSkew.computed.score : 0;
+      var wComp = (data.narrative_weights && data.narrative_weights.company != null) ? data.narrative_weights.company : 0.80;
+      var cC = Math.round(wComp * skewScoreForSnap);
+      var sScore = Math.round(mC + seC + tC + cC);
+      var sLabel = _overallLabel(sScore);
+      var sCls = sScore > 8 ? 'tls-positive' : sScore < -8 ? 'tls-negative' : 'tls-neutral';
       var extV = mC + seC + tC;
       var extCls = extV > 5 ? 'tls-positive' : extV < -5 ? 'tls-negative' : 'tls-neutral';
       var compCls = cC > 5 ? 'tls-positive' : cC < -5 ? 'tls-negative' : 'tls-neutral';
@@ -9495,17 +9531,17 @@ function renderCoverageRow(data) {
   var dateParts = data.date.split(' ');
   var shortDate = dateParts[0] + ' ' + (dateParts[1] ? dateParts[1].substring(0, 3) : '') + ' ' + (dateParts[2] || '');
 
-  // Sentiment column — from three_layer_signal
+  // Sentiment column — BUGFIX_002: computed dynamically from hypothesis weights
   var tls = data.three_layer_signal || null;
-  var sentScore = tls ? tls.overall_sentiment : null;
+  var sentScore = tls ? _computeOverallSentiment(data) : null;
   var sentCls = sentScore === null ? 'neutral' : sentScore > 8 ? 'positive' : sentScore < -8 ? 'negative' : 'neutral';
   var sentArrow = sentScore === null ? '' : sentScore > 3 ? ' &#9650;' : sentScore < -3 ? ' &#9660;' : ' &#9654;';
   var sentHtml = sentScore !== null
     ? '<span class="sent-chip ' + sentCls + '">' + (sentScore > 0 ? '+' : '') + sentScore + sentArrow + '</span>'
     : '<span class="sent-chip neutral">—</span>';
 
-  // Company Research column — company_contribution from three_layer_signal (ERRATA_003)
-  var compScore = tls ? (tls.company_contribution !== undefined ? tls.company_contribution : null) : null;
+  // Company Research column — BUGFIX_002: computed dynamically (replaces stale tls.company_contribution)
+  var compScore = tls ? _computeCompanyContrib(data) : null;
   var compCls = compScore === null ? 'neutral' : compScore > 5 ? 'positive' : compScore < -5 ? 'negative' : 'neutral';
   var compArrow = compScore === null ? '' : compScore > 3 ? ' &#9650;' : compScore < -3 ? ' &#9660;' : ' &#9654;';
   var compHtml = compScore !== null
@@ -12013,8 +12049,9 @@ function populateSidebar(ticker) {
     // ── 2. OVERALL SENTIMENT ───────────────────────────────────────
     var sentLabel = '', sentDir = 'dir-neutral', sentScore = 0, sentBarW = '0%';
     if (tls) {
-        sentScore = tls.overall_sentiment || 0;
-        var lbl = (tls.sentiment_label || '').toUpperCase();
+        // BUGFIX_002: compute overall sentiment dynamically from hypothesis weights
+        sentScore = _computeOverallSentiment(stock);
+        var lbl = _overallLabel(sentScore);
         sentLabel = lbl;
         sentDir   = lbl === 'UPSIDE' ? 'dir-up' : (lbl === 'DOWNSIDE' ? 'dir-down' : 'dir-neutral');
         sentBarW  = Math.min(Math.abs(sentScore) * 2, 100) + '%';
