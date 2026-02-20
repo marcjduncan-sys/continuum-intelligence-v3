@@ -1,0 +1,99 @@
+/* ============================================================
+   CONTINUUM INTELLIGENCE — DESIGN SYSTEM TOKENS
+   Migrated from index.html :root block
+   ============================================================ */
+
+:root {
+  /* Background */
+  --bg-page: #0B1220;
+  --bg-surface: #111C2E;
+  --bg-surface-alt: #162236;
+  --bg-header: #0E3A42;
+  --bg-elevated: #1A2740;
+  --bg-card: #131F33;
+
+  /* Text */
+  --text-primary: #E8EDF4;
+  --text-secondary: #8B9AB8;
+  --text-muted: #7A8FAD;
+
+  /* Brand */
+  --accent-teal: #22B8A7;
+  --accent-sage: #4A9E7E;
+  --accent-gold: #C9A96E;
+
+  /* Semantic */
+  --signal-red: #D45555;
+  --signal-amber: #D4A03C;
+  --signal-green: #3DAA6D;
+  --signal-blue: #4A8ECC;
+
+  /* Borders */
+  --border: #1E3050;
+  --border-light: #253A58;
+
+  /* Typography */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-narrative: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-data: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* Sizing */
+  --max-width: 1120px;
+  --nav-height: 56px;
+  --integrations-bar-height: 40px;
+  --header-total: calc(var(--nav-height) + var(--integrations-bar-height));
+}
+
+/* Light theme overrides */
+[data-theme="light"] {
+  --bg-page: #F5F6F8;
+  --bg-surface: #FFFFFF;
+  --bg-surface-alt: #F0F1F4;
+  --bg-header: #E8F5F3;
+  --bg-elevated: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1F2E;
+  --text-secondary: #4A5568;
+  --text-muted: #718096;
+  --border: #E2E8F0;
+  --border-light: #CBD5E0;
+  --accent-teal: #0E8A7D;
+  --accent-sage: #38815E;
+  --signal-red: #C53030;
+  --signal-amber: #B7791F;
+  --signal-green: #2F855A;
+  --signal-blue: #2B6CB0;
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}

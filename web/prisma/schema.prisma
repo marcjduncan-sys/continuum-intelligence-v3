@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String    @id
+  email            String    @unique
+  role             String    @default("free")
+  stripeCustomerId String?   @unique
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  watchlists         Watchlist[]
+  alertSubscriptions AlertSubscription[]
+  apiKeys            ApiKey[]
+  auditLogs          AuditLog[]
+
+  @@map("users")
+}
+
+model Watchlist {
+  id      String   @id @default(cuid())
+  userId  String
+  ticker  String
+  addedAt DateTime @default(now())
+  note    String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, ticker])
+  @@map("watchlists")
+}
+
+model AlertSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  ticker    String
+  alertType String
+  threshold Float?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("alert_subscriptions")
+}
+
+model ApiKey {
+  id        String    @id @default(cuid())
+  userId    String
+  keyHash   String    @unique
+  label     String
+  lastUsed  DateTime?
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("api_keys")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  ticker    String?
+  metadata  Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_logs")
+}
