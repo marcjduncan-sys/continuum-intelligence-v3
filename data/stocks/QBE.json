@@ -1,0 +1,118 @@
+{
+  "ticker": "QBE.AX",
+  "company": "QBE Insurance Group",
+  "sector": "Financials",
+  "market_cap": 30200,
+  "hypotheses": {
+    "T1": {
+      "label": "Hard Market Sustains COR <94%",
+      "description": "Commercial insurance pricing remains above loss cost trends; QBE sustains COR below 94% and re-rates as a consistently profitable insurer",
+      "plain_english": "This is the bull case — QBE's FY25 underwriting beat is structural, not cyclical. Hard market pricing holds and investment income continues at elevated levels.",
+      "what_to_watch": "1H FY26 COR update and commercial insurance pricing surveys (CIAB, Aon).",
+      "upside": "Re-rating toward 14-15x P/E if COR sustains below 93% for FY26.",
+      "risk_plain": "If a severe cat season or cycle turn pushes COR above 97%, this narrative collapses.",
+      "survival_score": 0.40,
+      "status": "MODERATE",
+      "weighted_inconsistency": 2,
+      "last_updated": "2026-02-20T00:00:00.000Z"
+    },
+    "T2": {
+      "label": "Investment Portfolio Outperforms",
+      "description": "US$28.9B portfolio generates 4.9%+ returns; structurally elevated rates provide durable investment income tailwind",
+      "plain_english": "Higher-for-longer US rates are a structural benefit to QBE's bond portfolio. Investment income cushions underwriting volatility.",
+      "what_to_watch": "US Federal Reserve rate decisions and portfolio yield disclosures in ASX updates.",
+      "upside": "Investment income sustains above US$1.5B pa, supporting EPS growth independent of underwriting.",
+      "risk_plain": "If the Fed cuts rates aggressively, reinvestment yields decline and this contribution fades.",
+      "survival_score": 0.30,
+      "status": "LOW",
+      "weighted_inconsistency": 3,
+      "last_updated": "2026-02-20T00:00:00.000Z"
+    },
+    "T3": {
+      "label": "Catastrophe Season Overwhelms Rate Gains",
+      "description": "Above-budget natural catastrophe losses drive COR above 97%, eliminating underwriting profit and eroding investment income buffer",
+      "plain_english": "This is the key tail risk — a severe North Atlantic hurricane season or multiple secondary perils above budget forces QBE to report a poor year despite the hard market.",
+      "what_to_watch": "North Atlantic hurricane season (June-November 2026); QBE cat loss updates.",
+      "upside": null,
+      "risk_plain": "Cat losses above US$1B net would push FY26 COR toward 97-100%, severely de-rating the stock.",
+      "survival_score": 0.30,
+      "status": "LOW",
+      "weighted_inconsistency": 3,
+      "last_updated": "2026-02-20T00:00:00.000Z"
+    },
+    "T4": {
+      "label": "Premium Cycle Reversal / North America Deteriorates",
+      "description": "Global insurance market softens faster than expected; new capital erodes pricing discipline; North America COR returns above 100%",
+      "plain_english": "This is the structural bear case — insurance cycles always revert, and QBE's North America has a history of being the problem segment.",
+      "what_to_watch": "Commercial insurance pricing surveys turning negative; North America segment COR in next results.",
+      "upside": null,
+      "risk_plain": "If the cycle turns and North America deteriorates simultaneously, QBE could revert to its pre-2022 earnings profile.",
+      "survival_score": 0.25,
+      "status": "LOW",
+      "weighted_inconsistency": 4,
+      "last_updated": "2026-02-20T00:00:00.000Z"
+    }
+  },
+  "dominant": "T1",
+  "confidence": "MODERATE",
+  "alert_state": "NORMAL",
+  "current_price": 21.78,
+  "big_picture": "QBE Insurance Group (ASX: QBE) — FY25 results beat: COR 91.9% vs 93-95% guidance, NPAT US$2,157M (+21%), DPS +25%. Hard market and elevated investment income sustain the bull case at 12x P/E.",
+  "last_flip": null,
+  "narrative_history": [],
+  "evidence_items": [],
+  "price_signals": [],
+  "editorial_override": null,
+  "price_history": [],
+  "weighting": null,
+  "gics_sub_industry": "Property & Casualty Insurance",
+  "narrative_model": "FINANCIALS_INSURERS",
+  "narrative_weights": {
+    "macro": 0.20,
+    "sector": 0.25,
+    "tech": 0.10,
+    "company": 0.45
+  },
+  "commodity_overlay": null,
+  "priceHistory": [
+    20.05, 20.30, 20.55, 21.78
+  ],
+  "freshness": {
+    "pricePctChange": 8.6,
+    "urgency": 15,
+    "status": "MODERATE",
+    "badge": "moderate"
+  },
+  "last_price_update": "2026-02-20T00:00:00.000Z",
+  "last_research_update": "2026-02-20T00:00:00.000Z",
+  "three_layer_signal": {
+    "date": "2026-02-20",
+    "macro_signal": 15,
+    "sector_signal": 20,
+    "tech_signal": 0,
+    "idio_signal": 28,
+    "company_signal": 28,
+    "overall_sentiment": 21,
+    "sentiment_label": "UPSIDE",
+    "macro_contribution": 3,
+    "sector_contribution": 5,
+    "tech_contribution": 0,
+    "company_contribution": 13,
+    "idio_contribution": 13,
+    "sector_detail": {
+      "signal": 20,
+      "detail": "hard_market_intact"
+    },
+    "idio_detail": {
+      "signal": 28,
+      "detail": "dominance_sqrt",
+      "T1": "T1",
+      "T1_score": 40,
+      "T1_sentiment": "BULLISH",
+      "T2": "T3",
+      "T2_score": 30,
+      "lead": 10,
+      "raw_signal": 28.0
+    }
+  }
+}

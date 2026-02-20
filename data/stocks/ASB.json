@@ -1,0 +1,118 @@
+{
+  "ticker": "ASB.AX",
+  "company": "Austal Limited",
+  "sector": "Industrials",
+  "market_cap": 2520,
+  "hypotheses": {
+    "T1": {
+      "label": "US Defence Contract Pipeline Secures Multi-Year Revenue",
+      "description": "A$13.1B order book converts at contracted margins; TAGOS-23 and follow-on programmes extend the US revenue runway",
+      "plain_english": "This is the bull case — Austal's near-monopoly in US aluminium naval shipbuilding gives it captive multi-year revenue. The order book covers 15+ years at current delivery rates.",
+      "what_to_watch": "TAGOS-23 contract award (expected H2 2026); US NDAA appropriations for Austal-relevant vessel types.",
+      "upside": "Re-rating toward A$7.50-8.00 if TAGOS-23 awarded and FY26 EBIT guidance delivered.",
+      "risk_plain": "If TAGOS-23 is awarded to a competitor, the US revenue gap becomes structural.",
+      "survival_score": 0.45,
+      "status": "MODERATE",
+      "weighted_inconsistency": 2,
+      "last_updated": "2026-02-20T00:00:00.000Z"
+    },
+    "T2": {
+      "label": "AUKUS/Australian Defence Uplift Creates Domestic Pipeline",
+      "description": "AUKUS and Australian Defence Strategic Review commitments drive domestic surface fleet work to Austal Henderson",
+      "plain_english": "Australia's A$368B AUKUS commitment and defence budget expansion create a long-dated option for Henderson shipyard work. Not a current earnings driver but a structural tailwind.",
+      "what_to_watch": "ADCP surface fleet contract announcements; Henderson shipyard contract awards FY26-FY28.",
+      "upside": "Henderson becomes a material revenue contributor by FY28-FY30 as AUKUS industrial capacity builds.",
+      "risk_plain": "If all defence funding is absorbed by nuclear submarines, surface fleet work at Henderson remains minimal.",
+      "survival_score": 0.30,
+      "status": "LOW",
+      "weighted_inconsistency": 3,
+      "last_updated": "2026-02-20T00:00:00.000Z"
+    },
+    "T3": {
+      "label": "US Revenue Gap Creates Earnings Cliff",
+      "description": "LCS programme wind-down and EPF completion create underutilisation at US facilities before new programmes (TAGOS-23) ramp",
+      "plain_english": "The bear case on revenue timing — if new programmes are delayed or awarded elsewhere, Austal's US yards face a gap between current work rolling off and new work starting.",
+      "what_to_watch": "LCS and EPF delivery completion dates; TAGOS-23 award timeline; Austal Mobile utilisation commentary.",
+      "upside": null,
+      "risk_plain": "US facility underutilisation drives fixed cost absorption issues and EBIT collapse in FY27-FY28.",
+      "survival_score": 0.35,
+      "status": "LOW",
+      "weighted_inconsistency": 3,
+      "last_updated": "2026-02-20T00:00:00.000Z"
+    },
+    "T4": {
+      "label": "Fixed-Price Contracts Recur with Cost Overruns + Governance Issues",
+      "description": "T-ATS accounting error is not isolated; further control failures or cost overruns in US operations destroy earnings quality and management credibility",
+      "plain_english": "The governance bear case — the US$17.1M T-ATS double-counting may signal systemic internal control issues. If a second error emerges, the market will severely punish the stock.",
+      "what_to_watch": "Any further accounting disclosures; FY26 EBIT delivery vs A$110M guidance; DoD audit activity.",
+      "upside": null,
+      "risk_plain": "A second accounting error or DoD audit issue would trigger a 30-40% de-rating and management change.",
+      "survival_score": 0.20,
+      "status": "LOW",
+      "weighted_inconsistency": 5,
+      "last_updated": "2026-02-20T00:00:00.000Z"
+    }
+  },
+  "dominant": "T1",
+  "confidence": "MODERATE",
+  "alert_state": "NORMAL",
+  "current_price": 6.22,
+  "big_picture": "Austal Limited (ASX: ASB) — 1HFY26 EPS A$0.16 (+99% beat), order book A$13.1B. EBIT guidance cut from A$135M to A$110M due to US$17.1M T-ATS accounting error. AUKUS and US Navy pipeline de-risk the revenue case; governance controls are the key watch.",
+  "last_flip": null,
+  "narrative_history": [],
+  "evidence_items": [],
+  "price_signals": [],
+  "editorial_override": null,
+  "price_history": [],
+  "weighting": null,
+  "gics_sub_industry": "Aerospace & Defense",
+  "narrative_model": "INDUSTRIALS_DEFENCE",
+  "narrative_weights": {
+    "macro": 0.10,
+    "sector": 0.15,
+    "tech": 0.10,
+    "company": 0.65
+  },
+  "commodity_overlay": null,
+  "priceHistory": [
+    5.20, 5.40, 5.75, 6.22
+  ],
+  "freshness": {
+    "pricePctChange": 20.0,
+    "urgency": 20,
+    "status": "MODERATE",
+    "badge": "moderate"
+  },
+  "last_price_update": "2026-02-20T00:00:00.000Z",
+  "last_research_update": "2026-02-20T00:00:00.000Z",
+  "three_layer_signal": {
+    "date": "2026-02-20",
+    "macro_signal": 10,
+    "sector_signal": 18,
+    "tech_signal": 10,
+    "idio_signal": 12,
+    "company_signal": 12,
+    "overall_sentiment": 13,
+    "sentiment_label": "UPSIDE",
+    "macro_contribution": 1,
+    "sector_contribution": 3,
+    "tech_contribution": 1,
+    "company_contribution": 8,
+    "idio_contribution": 8,
+    "sector_detail": {
+      "signal": 18,
+      "detail": "defence_spending_elevated"
+    },
+    "idio_detail": {
+      "signal": 12,
+      "detail": "dominance_sqrt",
+      "T1": "T1",
+      "T1_score": 45,
+      "T1_sentiment": "BULLISH",
+      "T2": "T3",
+      "T2_score": 35,
+      "lead": 10,
+      "raw_signal": 12.0
+    }
+  }
+}

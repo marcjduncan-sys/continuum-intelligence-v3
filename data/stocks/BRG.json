@@ -1,0 +1,118 @@
+{
+  "ticker": "BRG.AX",
+  "company": "Breville Group",
+  "sector": "Consumer Discretionary",
+  "market_cap": 4690,
+  "hypotheses": {
+    "T1": {
+      "label": "North American Premiumisation Drives Revenue Re-Acceleration",
+      "description": "Revenue growth sustains 8-10%+ pa; pricing and supply chain diversification restore gross margins to 37%+; operating leverage drives EBIT expansion",
+      "plain_english": "This is the bull case — Breville's premium brand keeps growing despite tariff headwinds, and margins recover as pricing actions and supply chain diversification take hold.",
+      "what_to_watch": "1H FY27 gross margin (recovery above 37%?); FY26 EBIT vs A$204.6M; management commentary on pricing.",
+      "upside": "Re-rating toward A$38-40 if gross margins recover to 37%+ and revenue sustains above 10%.",
+      "risk_plain": "If tariff costs cannot be fully passed through, margins stay compressed and the premium multiple erodes.",
+      "survival_score": 0.40,
+      "status": "MODERATE",
+      "weighted_inconsistency": 2,
+      "last_updated": "2026-02-20T00:00:00.000Z"
+    },
+    "T2": {
+      "label": "European Sage Brand Accelerates Revenue Mix Shift",
+      "description": "Sage brand grows 15%+ pa in Continental Europe; European segment becomes a material contributor to group revenue and earnings",
+      "plain_english": "The European optionality thesis — Sage is where Breville was in North America 10 years ago. As European espresso culture and premium appliance spending grows, Sage captures disproportionate share.",
+      "what_to_watch": "Management commentary on Sage revenue growth; any European segment disclosure.",
+      "upside": "If Sage revenue breaks out, the group growth rate accelerates and justifies the premium multiple.",
+      "risk_plain": "If European consumer sentiment remains weak and Sage growth disappoints, the Europe thesis is delayed.",
+      "survival_score": 0.30,
+      "status": "LOW",
+      "weighted_inconsistency": 3,
+      "last_updated": "2026-02-20T00:00:00.000Z"
+    },
+    "T3": {
+      "label": "Consumer Discretionary Slowdown Pressures Premium Demand",
+      "description": "US and European consumers reduce premium discretionary spending; revenue growth decelerates below 5%; tariff-compressed margins amplify operating deleverage",
+      "plain_english": "The macro bear case — if tariff-driven inflation erodes consumer purchasing power and confidence falls, premium kitchen appliances are discretionary and deferrable.",
+      "what_to_watch": "US consumer confidence; retail channel inventory; De'Longhi revenue growth as a proxy.",
+      "upside": null,
+      "risk_plain": "Revenue deceleration below 5% plus compressed margins would trigger a de-rating to 20-25x P/E.",
+      "survival_score": 0.35,
+      "status": "LOW",
+      "weighted_inconsistency": 3,
+      "last_updated": "2026-02-20T00:00:00.000Z"
+    },
+    "T4": {
+      "label": "US Tariff + Competitive Intensity Erodes Margin Structurally",
+      "description": "US tariffs on China and Vietnam manufactured goods persist or escalate; gross margins structurally erode toward 33-34%; premium multiple collapses",
+      "plain_english": "The structural bear case — if tariff costs cannot be recovered through pricing and supply chain diversification fails to offset the cost impact, Breville's margin profile deteriorates permanently.",
+      "what_to_watch": "US tariff policy developments; 1H FY27 gross margin; Vietnam supply chain progress.",
+      "upside": null,
+      "risk_plain": "Gross margins below 35.5% for 3 consecutive halves would drive P/E compression from 35x to 22-25x.",
+      "survival_score": 0.20,
+      "status": "LOW",
+      "weighted_inconsistency": 4,
+      "last_updated": "2026-02-20T00:00:00.000Z"
+    }
+  },
+  "dominant": "T1",
+  "confidence": "LOW",
+  "alert_state": "NORMAL",
+  "current_price": 32.95,
+  "big_picture": "Breville Group (ASX: BRG) — 1H FY26 revenue A$1,098.7M (+10.1%) with gross margin compression to 35.4% (from 36.7%) from US tariff impacts. FY26 EBIT guidance maintained at slight increase on FY25 A$204.6M. Premium brand resilience intact; margin recovery timeline is the key uncertainty at 35.4x P/E.",
+  "last_flip": null,
+  "narrative_history": [],
+  "evidence_items": [],
+  "price_signals": [],
+  "editorial_override": null,
+  "price_history": [],
+  "weighting": null,
+  "gics_sub_industry": "Household Appliances",
+  "narrative_model": "COMPANY_DOMINANT",
+  "narrative_weights": {
+    "macro": 0.20,
+    "sector": 0.05,
+    "tech": 0.10,
+    "company": 0.65
+  },
+  "commodity_overlay": null,
+  "priceHistory": [
+    31.90, 32.20, 32.60, 32.95
+  ],
+  "freshness": {
+    "pricePctChange": -1.5,
+    "urgency": 10,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_price_update": "2026-02-20T00:00:00.000Z",
+  "last_research_update": "2026-02-20T00:00:00.000Z",
+  "three_layer_signal": {
+    "date": "2026-02-20",
+    "macro_signal": 5,
+    "sector_signal": 0,
+    "tech_signal": 10,
+    "idio_signal": -8,
+    "company_signal": -8,
+    "overall_sentiment": -3,
+    "sentiment_label": "NEUTRAL",
+    "macro_contribution": 1,
+    "sector_contribution": 0,
+    "tech_contribution": 1,
+    "company_contribution": -5,
+    "idio_contribution": -5,
+    "sector_detail": {
+      "signal": 0,
+      "detail": "company_dominant"
+    },
+    "idio_detail": {
+      "signal": -8,
+      "detail": "dominance_sqrt",
+      "T1": "T3",
+      "T1_score": 35,
+      "T1_sentiment": "BEARISH",
+      "T2": "T4",
+      "T2_score": 20,
+      "lead": 15,
+      "raw_signal": -8.0
+    }
+  }
+}

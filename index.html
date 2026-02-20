@@ -5371,6 +5371,9 @@ a:hover { color: var(--accent-sage); }
 <div class="page" id="page-snapshot-WDS"></div>
 <div class="page" id="page-snapshot-SIG"></div>
 <div class="page" id="page-snapshot-FMG"></div>
+<div class="page" id="page-snapshot-QBE"></div>
+<div class="page" id="page-snapshot-ASB"></div>
+<div class="page" id="page-snapshot-BRG"></div>
 
 <!-- ============================================================
      PAGE: PORTFOLIO
@@ -5878,6 +5881,24 @@ const FRESHNESS_DATA = {
     "urgency": 10,
     "status": "OK",
     "badge": "ok"
+  },
+  "QBE": {
+    "pricePctChange": 8.6,
+    "urgency": 15,
+    "status": "MODERATE",
+    "badge": "moderate"
+  },
+  "ASB": {
+    "pricePctChange": 20.0,
+    "urgency": 20,
+    "status": "MODERATE",
+    "badge": "moderate"
+  },
+  "BRG": {
+    "pricePctChange": -1.5,
+    "urgency": 10,
+    "status": "OK",
+    "badge": "ok"
   }
 };
 // === END FRESHNESS_DATA ===
@@ -6157,6 +6178,50 @@ const REFERENCE_DATA = {
     reportingCurrency: 'A$',
     revenue: null,
     _anchors: { price: 1.07, marketCapStr: '67M', pe: null, divYield: null }
+  },
+  QBE: {
+    sharesOutstanding: 1387,          // millions (A$30.2B / A$21.78)
+    analystTarget: 24.20,
+    analystBuys: 8, analystHolds: 4, analystSells: 1,
+    analystCount: 13,
+    epsTrailing: 1.81,                 // A$21.78 / 12.04x = A$1.81
+    epsForward: 2.00,                  // forward estimate ~10.9x fwd P/E
+    divPerShare: 0.94,                 // 4.3% of A$21.78
+    reportingCurrency: 'US$',
+    revenue: 14.6,                     // US$ billions (net earned premium ~FY25)
+    revenueGrowth: 7,
+    cor: 91.9,                         // Combined Operating Ratio FY25
+    investmentReturn: 4.9,             // % FY25
+    _anchors: { price: 21.78, marketCapStr: '30.2B', pe: 12.0, fwdPE: 10.9, divYield: 4.3 }
+  },
+  ASB: {
+    sharesOutstanding: 405,            // millions (A$2.52B / A$6.22)
+    analystTarget: 7.25,
+    analystBuys: 4, analystHolds: 2, analystSells: 0,
+    analystCount: 6,
+    epsTrailing: 0.234,                // A$6.22 / 26.6x
+    epsForward: 0.27,                  // forward estimate based on A$110M EBIT guidance
+    divPerShare: 0,
+    reportingCurrency: 'A$',
+    revenue: 0.845,                    // A$ billions (annualised 1HFY26)
+    revenueGrowth: 12,
+    orderBook: 13.1,                   // A$ billions
+    _anchors: { price: 6.22, marketCapStr: '2.5B', pe: 26.7, drawdown: 30 }
+  },
+  BRG: {
+    sharesOutstanding: 142,            // millions (A$4.69B / A$32.95)
+    analystTarget: 36.80,
+    analystBuys: 7, analystHolds: 2, analystSells: 0,
+    analystCount: 9,
+    epsTrailing: 0.957,                // FY25 NPAT A$135.9M / 142M shares
+    epsForward: 1.05,                  // slight EBIT increase guidance implies ~A$1.05
+    divPerShare: 0.38,                 // 1.2% of A$32.95
+    reportingCurrency: 'A$',
+    revenue: 1.697,                    // A$ billions (FY25)
+    revenueGrowth: 10.9,
+    grossMargin: 35.4,                 // 1H FY26 (compressed from 36.7%)
+    ebitMargin: 12.1,                  // FY25
+    _anchors: { price: 32.95, marketCapStr: '4.7B', pe: 35.4, fwdPE: 31.4, divYield: 1.2 }
   }
 };
 // === END REFERENCE_DATA ===
