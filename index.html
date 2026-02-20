@@ -9146,6 +9146,8 @@ function buildSnapshotFromStock(ticker) {
   var skewComputed = computeSkewScore(stock);
   var skewBadge = skewComputed.direction === 'downside' ? '&#9660; DOWNSIDE' :
                   skewComputed.direction === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
+  // BUGFIX_002: compute overall sentiment here while stock (correct direction format) is in scope
+  var snapOverallSentiment = _computeOverallSentiment(stock);
 
   // 13. Date formatting
   var dateStr = stock.date;
@@ -9164,7 +9166,7 @@ function buildSnapshotFromStock(ticker) {
     version: 'v1.0',
     reportId: stock.reportId,
     priceMetrics: priceMetrics,
-    riskSkew: { direction: skewComputed.direction, badge: skewBadge, rationale: stock.skew.rationale, computed: skewComputed },
+    riskSkew: { direction: skewComputed.direction, badge: skewBadge, rationale: stock.skew.rationale, computed: skewComputed, overallSentiment: snapOverallSentiment },
     three_layer_signal: stock.three_layer_signal || null,
     narrative: { text: stock.narrative.theNarrative || '', verdict: stock.verdict.text || '' },
     survivalBar: survivalBar,
@@ -9218,7 +9220,12 @@ function renderSnapshotListCard(data) {
           '<div class="skew-bar-bull" style="width:' + data.riskSkew.computed.bull + '%"></div>' +
           '<div class="skew-bar-bear" style="width:' + data.riskSkew.computed.bear + '%"></div>' +
         '</div>' +
-        '<span class="skew-score ' + (data.riskSkew.computed.score > 5 ? 'positive' : data.riskSkew.computed.score < -5 ? 'negative' : 'neutral') + '" style="font-size:0.7rem">' + (data.riskSkew.computed.score > 0 ? '+' : '') + data.riskSkew.computed.score + '</span>'
+        (function() {
+          // BUGFIX_002: show overall_sentiment (matches report page), not raw unweighted skew score
+          var os = data.riskSkew.overallSentiment != null ? data.riskSkew.overallSentiment : data.riskSkew.computed.score;
+          var osCls = os > 5 ? 'positive' : os < -5 ? 'negative' : 'neutral';
+          return '<span class="skew-score ' + osCls + '" style="font-size:0.7rem">' + (os > 0 ? '+' : '') + os + '</span>';
+        })()
         : '<span class="skew-badge ' + data.riskSkew.direction + '">' + data.riskSkew.badge + '</span>') +
       '<span class="sc-skew-rationale">' + data.riskSkew.rationale.substring(0, 120) + '&hellip;</span>' +
     '</div>' +
@@ -9455,11 +9462,11 @@ function renderFeaturedCard(data) {
   var skew = computeSkewScore(data);
   var dir = skew.direction;
 
-  // Sentiment chip — read TLS first so score badge matches research page
+  // Sentiment chip — BUGFIX_002: compute dynamically so all cards match the report page
   var fcTls = data.three_layer_signal || null;
-  var fcSent = fcTls ? fcTls.overall_sentiment : null;
+  var fcSent = fcTls ? _computeOverallSentiment(data) : null;
   var fcSentCls = fcSent === null ? 'neutral' : fcSent > 30 ? 'positive strong' : fcSent > 10 ? 'positive' : fcSent < -30 ? 'negative strong' : fcSent < -10 ? 'negative' : 'neutral';
-  var fcSentLabel = fcTls ? (fcTls.sentiment_label || '') : '';
+  var fcSentLabel = fcSent !== null ? _overallLabel(fcSent) : '';
   var fcSentChip = fcSent !== null
     ? '<span class="sent-chip ' + fcSentCls + '" title="Overall Sentiment (' + fcSentLabel + ')">' + (fcSent > 0 ? '+' : '') + fcSent + '</span>'
     : '';
