@@ -79,6 +79,12 @@
       skew = computeSkewScore(stock);
     }
 
+    // BUGFIX_002: compute weighted overall sentiment (matches report page)
+    var overallSentiment = null;
+    if (typeof _computeOverallSentiment === 'function') {
+      overallSentiment = _computeOverallSentiment(stock);
+    }
+
     return {
       ticker: stock.ticker,
       tickerFull: stock.tickerFull,
@@ -95,6 +101,7 @@
       evidenceCount: evidenceCount,
       skew: stock.skew,
       skewComputed: skew,
+      overallSentiment: overallSentiment,
       hasTechnical: !!stock.technicalAnalysis,
       narrative: stock.narrative ? stock.narrative.theNarrative : ''
     };
@@ -197,17 +204,19 @@
       hypBarsHtml += '</div>';
     }
 
-    // Skew indicator
+    // Skew indicator — BUGFIX_002: show overall sentiment (weighted), not raw skew score
     var skewHtml = '';
     if (stock.skewComputed) {
       var sc = stock.skewComputed;
-      var skewCls = sc.score > 5 ? 'positive' : sc.score < -5 ? 'negative' : 'neutral';
+      var displayScore = stock.overallSentiment !== null && stock.overallSentiment !== undefined
+        ? stock.overallSentiment : sc.score;
+      var skewCls = displayScore > 5 ? 'positive' : displayScore < -5 ? 'negative' : 'neutral';
       skewHtml = '<div class="snap-skew">' +
         '<div class="skew-bar-track" style="width:60px;height:5px">' +
           '<div class="skew-bar-bull" style="width:' + sc.bull + '%"></div>' +
           '<div class="skew-bar-bear" style="width:' + sc.bear + '%"></div>' +
         '</div>' +
-        '<span class="skew-score ' + skewCls + '" style="font-size:0.65rem">' + (sc.score > 0 ? '+' : '') + sc.score + '</span>' +
+        '<span class="skew-score ' + skewCls + '" style="font-size:0.65rem">' + (displayScore > 0 ? '+' : '') + displayScore + '</span>' +
       '</div>';
     }
 
