@@ -112,6 +112,17 @@ jobs:
             echo "::warning::Narrative analysis exited with code $ANALYSIS_EXIT"
           fi
 
+      - name: Sync hypothesis scores from research to stocks (Phase 2.5)
+        if: steps.market-check.outputs.skip != 'true'
+        run: |
+          set +e
+          node scripts/sync-hyp-scores.js
+          HYP_EXIT=$?
+          set -e
+          if [ $HYP_EXIT -ne 0 ]; then
+            echo "::warning::Hypothesis score sync exited with code $HYP_EXIT"
+          fi
+
       - name: Run price-as-evidence engine
         if: steps.market-check.outputs.skip != 'true'
         run: |

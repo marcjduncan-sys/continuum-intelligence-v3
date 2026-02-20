@@ -101,6 +101,18 @@ function main() {
           );
         }
       }
+
+      // ── Check 4: placeholder hypothesis pattern ─────────────────────────
+      // All four hypotheses having upside=null means auto-generated placeholder
+      // data. sync-hyp-scores.js should have set upside for bull hypotheses.
+      const stockHyps = stock.hypotheses;
+      if (stockHyps && !Array.isArray(stockHyps)) {
+        const keys = ['T1', 'T2', 'T3', 'T4'];
+        const allNull = keys.every(k => stockHyps[k] && stockHyps[k].upside == null);
+        if (allNull) {
+          issues.push('All T1–T4 have upside=null — placeholder hypothesis data detected. Run: node scripts/sync-hyp-scores.js');
+        }
+      }
     }
 
     if (issues.length > 0) {
