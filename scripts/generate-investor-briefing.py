@@ -1124,9 +1124,10 @@ def build_technical_page(stock, base_dir):
     # ── Upcoming Catalysts ───────────────────────────────────────────────────
     story.append(Paragraph('UPCOMING CATALYSTS', S['section_header']))
 
-    events = stock.get('events', []) or []
-    if events:
+    events = stock.get('events', [])
+    if isinstance(events, list) and len(events) > 0:
         ev_data = [['Date', 'Event']]
+        # Use explicit slicing on a validated list
         for ev in events[:4]:
             if isinstance(ev, dict):
                 ev_data.append([
