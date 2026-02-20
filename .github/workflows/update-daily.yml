@@ -166,6 +166,21 @@ jobs:
             echo "::warning::One or more signal calculators failed (M:$MACRO_EXIT S:$SECTOR_EXIT I:$IDIO_EXIT C:$COMP_EXIT)"
           fi
 
+      - name: Sync _index.json with latest signals
+        if: steps.market-check.outputs.skip != 'true'
+        run: |
+          set +e
+          node scripts/sync-index-signals.js --verbose
+          SYNC_EXIT=$?
+          set -e
+          if [ $SYNC_EXIT -ne 0 ]; then
+            echo "::warning::Index signal sync failed — _index.json may be stale"
+          fi
+
+      - name: Validate score consistency
+        if: steps.market-check.outputs.skip != 'true'
+        run: node scripts/validate-scores.js
+
       - name: Commit and push changes
         if: steps.market-check.outputs.skip != 'true'
         run: |
