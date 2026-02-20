@@ -7,6 +7,7 @@ Usage:
     python scripts/generate-investor-briefing.py WOW
     python scripts/generate-investor-briefing.py BHP
     python scripts/generate-investor-briefing.py DRO
+    python scripts/generate-investor-briefing.py --all   (batch all stocks)
 """
 
 import json
@@ -32,8 +33,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 PAGE_W, PAGE_H = A4
 MARGIN_L = 18 * mm
 MARGIN_R = 18 * mm
-MARGIN_T = 20 * mm   # leaves room for header rule at 10mm
-MARGIN_B = 20 * mm   # leaves room for footer rule at 12mm
+MARGIN_T = 22 * mm   # leaves room for header rule at 11mm
+MARGIN_B = 22 * mm   # leaves room for footer rule at 12mm
 BODY_W = PAGE_W - MARGIN_L - MARGIN_R   # 174mm usable width
 
 BRAND_BLUE  = HexColor('#0078D4')
@@ -48,7 +49,7 @@ NEUTRAL_CLR = HexColor('#EF6C00')
 # ── Font setup ───────────────────────────────────────────────────────────────
 FONT_REG  = 'Helvetica'
 FONT_BOLD = 'Helvetica-Bold'
-FONT_LIGHT = 'Helvetica'   # Helvetica built-in; no Light variant without TTF
+FONT_LIGHT = 'Helvetica'   # Helvetica built-in; Light variant requires TTF
 
 
 # ── Styles ───────────────────────────────────────────────────────────────────
@@ -84,7 +85,7 @@ def make_styles():
         'bullet': ParagraphStyle(
             'bullet', fontName=FONT_LIGHT, fontSize=9.5,
             textColor=BODY_TEXT, leading=13,
-            leftIndent=6 * mm, spaceAfter=1 * mm
+            leftIndent=6 * mm, spaceAfter=1.2 * mm
         ),
         'caption': ParagraphStyle(
             'caption', fontName=FONT_LIGHT, fontSize=8,
@@ -175,17 +176,26 @@ def sentiment_label(value):
     return 'STRONG DOWNSIDE'
 
 
-def hyp_colour(score):
-    """Colour a hypothesis badge by survival score."""
-    if score >= 0.6:
-        return BULLISH
-    if score >= 0.35:
+def hyp_colour_by_inconsistency(weighted_inconsistency):
+    """
+    Colour a hypothesis badge by weighted inconsistency (ACH methodology).
+    Lower inconsistency = dominant = green.
+    """
+    if weighted_inconsistency is None:
         return NEUTRAL_CLR
-    return BEARISH
+    try:
+        wi = float(weighted_inconsistency)
+    except (TypeError, ValueError):
+        return NEUTRAL_CLR
+    if wi <= 2:
+        return BULLISH     # low inconsistency = dominant narrative = green
+    if wi <= 4:
+        return NEUTRAL_CLR # medium inconsistency = amber
+    return BEARISH         # high inconsistency = bearish/unlikely = red
 
 
 def fmt_pct(v, decimals=1):
-    """Format a decimal as percentage string."""
+    """Format a decimal (e.g. 0.0324) as percentage string (3.2%)."""
     if v is None:
         return 'N/A'
     try:
@@ -195,7 +205,7 @@ def fmt_pct(v, decimals=1):
 
 
 def fmt_change(v):
-    """Format a float change with sign."""
+    """Format a decimal change (e.g. 0.0324) as +3.2%."""
     if v is None:
         return 'N/A'
     try:
@@ -222,7 +232,7 @@ def safe_str(v, default='Pending'):
     return str(v)
 
 
-def tbl_cell(text, bold=False, align=TA_LEFT, color=None, font_size=9):
+def tbl_cell(text, bold=False, align=TA_LEFT, color=None, font_size=9, italic=False):
     """Wrap text in a Paragraph suitable for a table cell."""
     style = ParagraphStyle(
         'tc',
@@ -308,15 +318,39 @@ def load_data(ticker_bare, base_dir):
     return stock, macro
 
 
-# ── Sorted hypotheses ────────────────────────────────────────────────────────
+# ── Hypothesis ordering (ACH-correct) ────────────────────────────────────────
 def sorted_hypotheses(stock):
-    """Return list of (key, hyp_dict) sorted by survival_score desc."""
+    """
+    Return list of (key, hyp_dict, is_dominant) sorted by weighted_inconsistency
+    ascending (ACH methodology: fewest inconsistencies = dominant).
+    Falls back to survival_score descending if inconsistency not present.
+    """
     hyps = stock.get('hypotheses', {})
+    dominant_key = stock.get('dominant', '')
     items = []
     for k, v in hyps.items():
         if isinstance(v, dict):
             items.append((k, v))
-    items.sort(key=lambda x: float(x[1].get('survival_score', 0)), reverse=True)
+
+    # Sort: dominant first, then by weighted_inconsistency ascending
+    def sort_key(item):
+        k, v = item
+        if k == dominant_key:
+            return (-1, 0)  # always first
+        wi = v.get('weighted_inconsistency')
+        if wi is not None:
+            try:
+                return (0, float(wi))
+            except (TypeError, ValueError):
+                pass
+        # Fallback: sort by survival_score descending (negate for ascending sort)
+        score = v.get('survival_score', 0)
+        try:
+            return (0, -float(score))
+        except (TypeError, ValueError):
+            return (0, 0)
+
+    items.sort(key=sort_key)
     return items
 
 
@@ -334,9 +368,10 @@ def build_cover(stock, macro, report_date):
     mkt_cap    = stock.get('market_cap')
 
     tls = stock.get('three_layer_signal', {})
-    overall    = tls.get('overall_sentiment')
-    macro_sig  = tls.get('macro_contribution')
-    company_sig = tls.get('company_contribution')
+    overall      = tls.get('overall_sentiment')
+    # External Environment = macro + sector contribution combined
+    external_sig = tls.get('external_signal')  # pre-computed in the signal engine
+    company_sig  = tls.get('company_contribution')
 
     # Brand header
     story.append(Spacer(1, 2 * mm))
@@ -354,27 +389,35 @@ def build_cover(stock, macro, report_date):
     story.append(Paragraph(ticker_line, S['cover_sub']))
     story.append(divider())
 
-    # Key metrics table (2 rows x 4 cols)
+    # ── Key Metrics table (2 rows × 4 cols) ──────────────────────────────────
     story.append(Paragraph('KEY METRICS', S['section_header']))
 
-    price_str  = f'A${price:,.2f}' if price is not None else 'Pending'
-    cap_str    = f'A${mkt_cap}' if mkt_cap else 'Pending'
+    if price is not None:
+        try:
+            price_str = f'A${float(price):,.2f}'
+        except (TypeError, ValueError):
+            price_str = f'A${price}'
+    else:
+        price_str = 'Pending'
 
-    # identity block (many stocks don't have it yet — show Pending)
+    cap_str = f'A${mkt_cap}' if mkt_cap else 'Pending'
+
+    # identity block (many stocks don't have it yet -- show Pending)
     identity = stock.get('identity', {}) or {}
-    pe_str      = safe_str(identity.get('forward_pe'), 'Pending')
-    ev_str      = safe_str(identity.get('ev_ebitda'),  'Pending')
-    wk52_lo     = identity.get('week52_low')
-    wk52_hi     = identity.get('week52_high')
-    wk52_str    = (f'A${wk52_lo:.2f} - A${wk52_hi:.2f}'
-                   if wk52_lo and wk52_hi else 'Pending')
-    div_str     = safe_str(identity.get('div_yield'),  'Pending')
-    rev_str     = safe_str(identity.get('revenue'),    'Pending')
-    npat_str    = safe_str(identity.get('npat'),       'Pending')
-
-    def mc(label, val):
-        return [tbl_cell(label, bold=True, font_size=8),
-                tbl_cell(val,   bold=False, font_size=9)]
+    pe_str   = safe_str(identity.get('forward_pe'), 'Pending')
+    ev_str   = safe_str(identity.get('ev_ebitda'),  'Pending')
+    wk52_lo  = identity.get('week52_low')
+    wk52_hi  = identity.get('week52_high')
+    if wk52_lo and wk52_hi:
+        try:
+            wk52_str = f'A${float(wk52_lo):.2f} - A${float(wk52_hi):.2f}'
+        except (TypeError, ValueError):
+            wk52_str = f'{wk52_lo} - {wk52_hi}'
+    else:
+        wk52_str = 'Pending'
+    div_str  = safe_str(identity.get('div_yield'),  'Pending')
+    rev_str  = safe_str(identity.get('revenue'),    'Pending')
+    npat_str = safe_str(identity.get('npat'),       'Pending')
 
     metrics_data = [
         ['Price', 'Mkt Cap', 'Fwd P/E', 'EV/EBITDA'],
@@ -399,12 +442,16 @@ def build_cover(stock, macro, report_date):
     story.append(metrics_tbl)
     story.append(divider())
 
-    # Sentiment block
+    # ── Sentiment block ───────────────────────────────────────────────────────
     story.append(Paragraph('OVERALL SENTIMENT', S['section_header']))
 
     sent_color = sentiment_colour(overall)
     sent_lbl   = sentiment_label(overall)
-    overall_val = f'{overall:+d}' if isinstance(overall, (int, float)) else 'N/A'
+    overall_val = f'{int(overall):+d}' if isinstance(overall, (int, float)) else 'N/A'
+
+    # Format external and company signals
+    ext_val = f'{int(external_sig):+d}' if isinstance(external_sig, (int, float)) else 'N/A'
+    coy_val = f'{int(company_sig):+d}' if isinstance(company_sig, (int, float)) else 'N/A'
 
     sent_data = [
         [
@@ -412,18 +459,12 @@ def build_cover(stock, macro, report_date):
             tbl_cell(f'{overall_val}  {sent_lbl}', color=sent_color, bold=True),
         ],
         [
-            tbl_cell('External Environment', bold=False),
-            tbl_cell(
-                f'{macro_sig:+d}' if isinstance(macro_sig, (int, float)) else 'N/A',
-                color=sentiment_colour(macro_sig)
-            ),
+            tbl_cell('External Environment'),
+            tbl_cell(ext_val, color=sentiment_colour(external_sig)),
         ],
         [
-            tbl_cell('Company Research', bold=False),
-            tbl_cell(
-                f'{company_sig:+d}' if isinstance(company_sig, (int, float)) else 'N/A',
-                color=sentiment_colour(company_sig)
-            ),
+            tbl_cell('Company Research'),
+            tbl_cell(coy_val, color=sentiment_colour(company_sig)),
         ],
     ]
     sent_tbl = Table(
@@ -434,29 +475,30 @@ def build_cover(stock, macro, report_date):
     story.append(sent_tbl)
     story.append(divider())
 
-    # Key takeaways — derive from big_picture + dominant hypothesis
+    # ── Key takeaways ─────────────────────────────────────────────────────────
     story.append(Paragraph('KEY TAKEAWAYS', S['section_header']))
     hyps = sorted_hypotheses(stock)
     dominant_hyp = hyps[0][1] if hyps else {}
-    dominant_key = hyps[0][0] if hyps else 'T1'
+    dominant_key_val = hyps[0][0] if hyps else 'T1'
 
-    big_picture = stock.get('big_picture', '')
-    t1_desc = dominant_hyp.get('plain_english', dominant_hyp.get('description', ''))
-    t1_risk = dominant_hyp.get('risk_plain', '')
+    big_picture  = stock.get('big_picture', '')
+    t1_desc      = dominant_hyp.get('plain_english', dominant_hyp.get('description', ''))
+    t1_risk      = dominant_hyp.get('risk_plain', '')
 
     # Takeaway 1: dominant narrative
     tk1 = truncate_words(t1_desc, 35) if t1_desc else \
-          f'Dominant narrative: {dominant_key} – {dominant_hyp.get("label", "Pending")}.'
+          f'Dominant narrative: {dominant_key_val} - {dominant_hyp.get("label", "Pending")}.'
     # Takeaway 2: key risk
     tk2 = truncate_words(t1_risk, 35) if t1_risk else \
           'Key risk: monitor execution against current dominant hypothesis thresholds.'
     # Takeaway 3: external context
-    macro_label = sentiment_label(macro_sig)
-    tk3 = (f'External environment is {macro_label.lower()} '
-           f'(score: {macro_sig:+d}). '
-           'Macro contribution is incorporated in the three-layer sentiment model.'
-           if isinstance(macro_sig, (int, float))
-           else 'External environment: pending macro signal update.')
+    ext_label = sentiment_label(external_sig)
+    if isinstance(external_sig, (int, float)):
+        tk3 = (f'External environment is {ext_label.lower()} '
+               f'(score: {int(external_sig):+d}). '
+               'Macro and sector contributions are incorporated in the three-layer sentiment model.')
+    else:
+        tk3 = 'External environment: pending macro signal update.'
 
     for bullet in [tk1, tk2, tk3]:
         story.append(Paragraph(f'- {bullet}', S['bullet']))
@@ -478,9 +520,9 @@ def build_cover(stock, macro, report_date):
 def build_identity_page(stock, macro):
     story = []
 
-    identity   = stock.get('identity', {}) or {}
+    identity    = stock.get('identity', {}) or {}
     big_picture = stock.get('big_picture', '')
-    narrative  = stock.get('narrative', {}) or {}
+    narrative   = stock.get('narrative', {}) or {}
     nat_summary = narrative.get('summary', big_picture)
 
     # Use big_picture as company overview if identity.description missing
@@ -503,12 +545,12 @@ def build_identity_page(stock, macro):
     story.append(Paragraph('MARKET CONTEXT', S['section_header']))
 
     tls = stock.get('three_layer_signal', {})
-    macro_sig = tls.get('macro_contribution', 0)
+    external_sig = tls.get('external_signal', 0)
 
-    # Macro environment
-    rates = macro.get('rates', {})
-    fx    = macro.get('fx', {})
-    mkt   = macro.get('market', {})
+    # Macro environment data
+    rates   = macro.get('rates', {})
+    fx      = macro.get('fx', {})
+    mkt     = macro.get('market', {})
 
     asx200  = mkt.get('asx200', {})
     asx_val = asx200.get('close')
@@ -519,12 +561,12 @@ def build_identity_page(stock, macro):
     aud_chg = aud_usd.get('change_5d')
 
     rba_rate = rates.get('rba_cash')
-    rba_traj = rates.get('rba_trajectory', 'stable').replace('_', ' ')
+    rba_traj = str(rates.get('rba_trajectory', 'stable')).replace('_', ' ')
 
-    vix = mkt.get('vix', {})
+    vix     = mkt.get('vix', {})
     vix_val = vix.get('close')
 
-    macro_env_label = sentiment_label(macro_sig)
+    macro_env_label = sentiment_label(external_sig)
 
     ctx_data = [
         [tbl_cell('Indicator', bold=True), tbl_cell('Value', bold=True), tbl_cell('Change', bold=True)],
@@ -547,8 +589,8 @@ def build_identity_page(stock, macro):
         style=std_table_style()
     )
     story.append(Paragraph(
-        f'Macro Environment: {macro_env_label} (contribution: '
-        f'{macro_sig:+d})' if isinstance(macro_sig, (int, float))
+        f'Macro Environment: {macro_env_label} (external signal: '
+        f'{int(external_sig):+d})' if isinstance(external_sig, (int, float))
         else 'Macro Environment: Pending',
         S['body_left']
     ))
@@ -559,10 +601,10 @@ def build_identity_page(stock, macro):
     story.append(Paragraph('SECTOR CONTEXT', S['sub_header']))
     sector_detail = tls.get('sector_detail', {})
     sector_sig    = tls.get('sector_signal', 0)
-    sector_desc   = sector_detail.get('detail', 'company_dominant').replace('_', ' ')
+    sector_desc   = str(sector_detail.get('detail', 'company_dominant')).replace('_', ' ')
 
     story.append(Paragraph(
-        f'Model: {stock.get("narrative_model", "N/A").replace("_", " ")} | '
+        f'Model: {str(stock.get("narrative_model", "N/A")).replace("_", " ")}  |  '
         f'Sector signal: {sector_sig:+d} ({sector_desc})',
         S['body_left']
     ))
@@ -574,12 +616,27 @@ def build_identity_page(stock, macro):
         comm_data = [[tbl_cell('Commodity', bold=True),
                       tbl_cell('Price', bold=True),
                       tbl_cell('5d Change', bold=True)]]
-        for key in ['iron_ore_62', 'gold_usd', 'copper', 'brent']:
+        primary = commodity.get('primary_commodity', '')
+        # Show primary commodity plus up to 2 others
+        comm_keys = [primary] if primary else []
+        for k in ['iron_ore_62', 'gold_usd', 'copper', 'brent']:
+            if k not in comm_keys:
+                comm_keys.append(k)
+        for key in comm_keys[:4]:
             c = commodities.get(key, {})
             if c:
+                unit = c.get('unit', '')
+                close_val = c.get('close')
+                if close_val:
+                    try:
+                        price_display = f'{float(close_val):,.2f} {unit}'
+                    except (TypeError, ValueError):
+                        price_display = f'{close_val} {unit}'
+                else:
+                    price_display = 'N/A'
                 comm_data.append([
                     tbl_cell(key.replace('_', ' ').title()),
-                    tbl_cell(str(c.get('close', 'N/A'))),
+                    tbl_cell(price_display),
                     tbl_cell(fmt_change(c.get('change_5d'))),
                 ])
         if len(comm_data) > 1:
@@ -587,7 +644,7 @@ def build_identity_page(stock, macro):
             story.append(Paragraph('Commodity Overlay', S['sub_header']))
             story.append(Table(
                 comm_data,
-                colWidths=[BODY_W * 0.4, BODY_W * 0.3, BODY_W * 0.3],
+                colWidths=[BODY_W * 0.4, BODY_W * 0.35, BODY_W * 0.25],
                 style=std_table_style()
             ))
 
@@ -601,15 +658,18 @@ def build_identity_page(stock, macro):
 def build_hypotheses_page(stock):
     story = []
     hyps = sorted_hypotheses(stock)
+    dominant_field = stock.get('dominant', '')
 
     story.append(Paragraph('COMPETING HYPOTHESES', S['section_header']))
 
     if hyps:
         dom_key, dom_hyp = hyps[0]
         dom_score = float(dom_hyp.get('survival_score', 0))
+        dom_wi    = dom_hyp.get('weighted_inconsistency')
+        dom_label = dom_hyp.get('label', '')
         story.append(Paragraph(
-            f'Dominant Narrative: {dom_key}: {dom_hyp.get("label", "")}  '
-            f'({dom_score * 100:.0f}%)',
+            f'Dominant Narrative: {dom_key}: {dom_label}  '
+            f'(survival probability: {dom_score * 100:.0f}%)',
             S['body_left']
         ))
 
@@ -618,22 +678,25 @@ def build_hypotheses_page(stock):
     evidence_items = stock.get('evidence_items', []) or []
 
     for i, (key, hyp) in enumerate(hyps):
-        score = float(hyp.get('survival_score', 0))
-        is_dominant = (i == 0)
+        score  = float(hyp.get('survival_score', 0))
+        wi     = hyp.get('weighted_inconsistency')
+        is_dominant = (key == dominant_field or i == 0)
 
-        # Hypothesis header row
-        badge_colour = hyp_colour(score)
+        # Hypothesis header row with score badge
+        badge_colour = hyp_colour_by_inconsistency(wi)
         label_text = f'{key}: {hyp.get("label", "")}'
+        if is_dominant:
+            label_text += '  [DOMINANT]'
         score_text = f'{score * 100:.0f}%'
 
         hdr_data = [[
-            tbl_cell(label_text, bold=True, font_size=10),
+            tbl_cell(label_text, bold=True, font_size=10, color=badge_colour if is_dominant else None),
             tbl_cell(score_text, bold=True, align=TA_RIGHT,
                      color=badge_colour, font_size=10),
         ]]
         hdr_tbl = Table(
             hdr_data,
-            colWidths=[BODY_W * 0.75, BODY_W * 0.25],
+            colWidths=[BODY_W * 0.78, BODY_W * 0.22],
             style=TableStyle([
                 ('FONT',    (0, 0), (-1, -1), FONT_BOLD, 10),
                 ('VALIGN',  (0, 0), (-1, -1), 'MIDDLE'),
@@ -653,7 +716,7 @@ def build_hypotheses_page(stock):
         # What to watch
         what = hyp.get('what_to_watch', '')
         if what:
-            story.append(Paragraph(f'Watch: {what}', S['hyp_body']))
+            story.append(Paragraph(f'Watch: {truncate_words(what, 40)}', S['hyp_body']))
 
         # Evidence bullets from evidence_items
         supporting = [e for e in evidence_items
@@ -670,18 +733,20 @@ def build_hypotheses_page(stock):
         if supporting:
             story.append(Paragraph('Supporting evidence:', S['hyp_body']))
             for ev in supporting[:sup_limit]:
+                ev_type = ev.get('type', '').replace('_', ' ').title()
+                ev_summ = ev.get('summary', '')
                 story.append(Paragraph(
-                    f'- {ev.get("type", "").replace("_", " ").title()}: '
-                    f'{ev.get("summary", "")}',
+                    f'- {ev_type}: {ev_summ}',
                     S['bullet']
                 ))
 
         if contradicting:
             story.append(Paragraph('Contradicting evidence:', S['hyp_body']))
             for ev in contradicting[:con_limit]:
+                ev_type = ev.get('type', '').replace('_', ' ').title()
+                ev_summ = ev.get('summary', '')
                 story.append(Paragraph(
-                    f'- {ev.get("type", "").replace("_", " ").title()}: '
-                    f'{ev.get("summary", "")}',
+                    f'- {ev_type}: {ev_summ}',
                     S['bullet']
                 ))
 
@@ -715,11 +780,11 @@ def build_evidence_page(stock):
     ))
 
     if evidence_items:
-        # Sort by diagnosticity: HIGH first, then MEDIUM, then LOW
-        diag_order = {'HIGH': 0, 'MEDIUM': 1, 'LOW': 2}
+        # Sort by diagnosticity: CRITICAL first, then HIGH, MEDIUM, LOW
+        diag_order = {'CRITICAL': 0, 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3}
         sorted_ev = sorted(
             [e for e in evidence_items if e.get('active', True)],
-            key=lambda x: diag_order.get(x.get('diagnosticity', 'LOW'), 2)
+            key=lambda x: diag_order.get(x.get('diagnosticity', 'LOW'), 3)
         )[:8]  # top 8
 
         # Header row
@@ -731,16 +796,23 @@ def build_evidence_page(stock):
             row = [tbl_cell(truncate_words(ev.get('summary', ''), 10), font_size=8)]
             for k in hyp_keys:
                 raw = impact.get(k, 'N')
-                row.append(tbl_cell(impact_map.get(raw, 'N'),
-                                    align=TA_CENTER, font_size=8))
-            row.append(tbl_cell(ev.get('diagnosticity', 'N/A'),
-                                 bold=True, font_size=8))
+                mapped = impact_map.get(raw, 'N')
+                # Colour C/I/N appropriately
+                cell_colour = None
+                if mapped == 'C':
+                    cell_colour = BULLISH
+                elif mapped == 'I':
+                    cell_colour = BEARISH
+                row.append(tbl_cell(mapped, align=TA_CENTER, font_size=8, color=cell_colour))
+            diag = ev.get('diagnosticity', 'N/A')
+            diag_colour = BULLISH if diag in ('HIGH', 'CRITICAL') else (NEUTRAL_CLR if diag == 'MEDIUM' else None)
+            row.append(tbl_cell(diag, bold=True, font_size=8, color=diag_colour))
             ev_data.append(row)
 
         n_hyps = len(hyp_keys)
         item_w = BODY_W * 0.42
-        hyp_w  = (BODY_W * 0.38) / max(n_hyps, 1)
-        diag_w = BODY_W * 0.20
+        hyp_w  = (BODY_W * 0.36) / max(n_hyps, 1)
+        diag_w = BODY_W * 0.22
 
         ev_tbl = Table(
             ev_data,
@@ -750,7 +822,7 @@ def build_evidence_page(stock):
         story.append(ev_tbl)
     else:
         story.append(Paragraph(
-            'Evidence matrix pending — no active evidence items recorded.',
+            'Evidence matrix pending - no active evidence items recorded.',
             S['body_left']
         ))
 
@@ -758,7 +830,7 @@ def build_evidence_page(stock):
     story.append(Paragraph(
         'C = Consistent, I = Inconsistent, N = Neutral. '
         'Diagnosticity = ability to discriminate between hypotheses. '
-        'HIGH items are most informative.',
+        'HIGH/CRITICAL items are most informative.',
         S['caption']
     ))
     story.append(divider())
@@ -776,19 +848,30 @@ def build_evidence_page(stock):
             if desc:
                 story.append(Paragraph(desc, S['body_left']))
     else:
-        # Derive discriminators from evidence: items where impact varies most
+        # Derive discriminators from HIGH diagnosticity evidence items
         high_items = [e for e in evidence_items
-                      if e.get('diagnosticity') == 'HIGH' and e.get('active', True)]
+                      if e.get('diagnosticity') in ('CRITICAL', 'HIGH')
+                      and e.get('active', True)]
         if high_items:
+            story.append(Paragraph(
+                'The following high-diagnosticity evidence items are most '
+                'informative for discriminating between hypotheses:',
+                S['body_left']
+            ))
             for ev in high_items[:3]:
+                impact = ev.get('hypothesis_impact', {})
+                consistent_with = [k for k, v in impact.items() if v == 'CONSISTENT']
+                inconsistent_with = [k for k, v in impact.items() if v == 'INCONSISTENT']
+                detail = ev.get('summary', '')
+                if consistent_with or inconsistent_with:
+                    detail += f' (Supports: {", ".join(consistent_with) or "none"}; Contradicts: {", ".join(inconsistent_with) or "none"})'
                 story.append(Paragraph(
-                    f'- {ev.get("summary", "")} '
-                    f'[{ev.get("source", "")}]',
+                    f'- {detail}',
                     S['bullet']
                 ))
         else:
             story.append(Paragraph(
-                'Key discriminator analysis pending — '
+                'Key discriminator analysis pending - '
                 'will be populated as evidence items are assessed.',
                 S['body_left']
             ))
@@ -814,10 +897,10 @@ def build_evidence_page(stock):
         )
         story.append(tw_tbl)
     else:
-        # Derive from hypothesis what_to_watch
-        hyps = sorted_hypotheses(stock)
+        # Derive from hypothesis what_to_watch fields
+        hyps_list = sorted_hypotheses(stock)
         tw_data = [['Condition', 'Trigger', 'Action']]
-        for key, hyp in hyps[:3]:
+        for key, hyp in hyps_list[:3]:
             what = hyp.get('what_to_watch', '')
             if what:
                 tw_data.append([
@@ -853,8 +936,16 @@ def build_technical_page(stock, base_dir):
     ta_path = base_dir / 'data' / 'ta-signals' / f'{ticker_bare}.json'
     ta_data = {}
     if ta_path.exists():
-        with open(ta_path, encoding='utf-8') as f:
-            ta_data = json.load(f)
+        try:
+            with open(ta_path, encoding='utf-8') as f:
+                ta_data = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    # Also check stock's own technical section
+    ta_inline = stock.get('technical', {}) or {}
+    if ta_inline:
+        ta_data = ta_inline
 
     if ta_data:
         ta_rows = [['Indicator', 'Value', 'Signal']]
@@ -870,6 +961,12 @@ def build_technical_page(stock, base_dir):
                 ta_rows,
                 colWidths=[BODY_W * 0.35, BODY_W * 0.25, BODY_W * 0.40],
                 style=std_table_style()
+            ))
+        else:
+            story.append(Paragraph(
+                'Technical analysis pending - signals will be incorporated '
+                'when the TA agent is deployed.',
+                S['body_left']
             ))
     else:
         story.append(Paragraph(
@@ -897,17 +994,17 @@ def build_technical_page(stock, base_dir):
                 text = str(gap)
             story.append(Paragraph(f'- {text}', S['bullet']))
     else:
-        # Generate standard gaps from what's missing
+        # Generate standard gaps from what is missing in the data
         default_gaps = [
-            'Management guidance on forward P/E and revenue trajectory — '
+            'Management guidance on forward P/E and revenue trajectory - '
             'required to validate Growth/Recovery hypothesis.',
-            'Independent market share data — needed to assess competitive '
+            'Independent market share data - needed to assess competitive '
             'dynamics and test downside scenarios.',
-            'Balance sheet composition and net debt position — '
+            'Balance sheet composition and net debt position - '
             'required to stress-test valuation under rate scenarios.',
-            'Analyst consensus estimates and revision trends — '
+            'Analyst consensus estimates and revision trends - '
             'to calibrate sentiment score against market positioning.',
-            'Customer cohort data or NPS trends — '
+            'Customer cohort data or NPS trends - '
             'to validate operational execution claims in company guidance.',
         ]
         for g in default_gaps:
@@ -933,30 +1030,38 @@ def build_technical_page(stock, base_dir):
                 colWidths=[BODY_W * 0.25, BODY_W * 0.75],
                 style=std_table_style()
             ))
+        else:
+            _add_default_catalysts(story, stock)
     else:
-        # Derive from last_flip and narrative_history for context
-        story.append(Paragraph(
-            'Catalyst calendar pending. Key items to monitor:',
-            S['body_left']
-        ))
-        last_flip = stock.get('last_flip')
-        if last_flip:
-            story.append(Paragraph(
-                f'- Last narrative event: {last_flip.get("date", "N/A")} '
-                f'({last_flip.get("trigger", "")})',
-                S['bullet']
-            ))
-        story.append(Paragraph(
-            f'- Next results date: Pending (monitor ASX announcements)',
-            S['bullet']
-        ))
-        story.append(Paragraph(
-            f'- Monitor hypothesis tripwires for narrative change signals.',
-            S['bullet']
-        ))
+        _add_default_catalysts(story, stock)
 
     story.append(PageBreak())
     return story
+
+
+def _add_default_catalysts(story, stock):
+    """Add default catalyst section when no events are in the stock JSON."""
+    story.append(Paragraph(
+        'Catalyst calendar pending. Key items to monitor:',
+        S['body_left']
+    ))
+    last_flip = stock.get('last_flip')
+    if last_flip and isinstance(last_flip, dict):
+        flip_date    = last_flip.get('date', 'N/A')
+        flip_trigger = last_flip.get('trigger', '')
+        story.append(Paragraph(
+            f'- Last narrative event: {flip_date}'
+            + (f' - {truncate_words(flip_trigger, 15)}' if flip_trigger else ''),
+            S['bullet']
+        ))
+    story.append(Paragraph(
+        '- Next results date: Pending (monitor ASX announcements)',
+        S['bullet']
+    ))
+    story.append(Paragraph(
+        '- Monitor hypothesis tripwires for narrative-change signals.',
+        S['bullet']
+    ))
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -964,7 +1069,6 @@ def build_technical_page(stock, base_dir):
 # ══════════════════════════════════════════════════════════════════════════════
 def build_disclaimer(stock, report_date):
     story = []
-    ticker_ax = stock.get('ticker', 'UNKNOWN')
 
     story.append(Paragraph('IMPORTANT INFORMATION', S['section_header']))
     story.append(Paragraph(
@@ -1032,7 +1136,7 @@ def build_disclaimer(stock, report_date):
         S['disclaimer']
     ))
 
-    return story  # No PageBreak — this is the final page
+    return story  # No PageBreak -- this is the final page
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1087,21 +1191,62 @@ def count_pages(pdf_path):
     """Count pages using simple PDF parser (no extra deps)."""
     with open(pdf_path, 'rb') as f:
         content = f.read()
-    # Count /Type /Page entries (not /Pages)
     import re
     pages = re.findall(rb'/Type\s*/Page[^s]', content)
     return len(pages)
+
+
+# ── Batch generation ──────────────────────────────────────────────────────────
+def generate_all(base_dir):
+    """Generate briefings for all stocks in data/stocks/."""
+    stocks_dir = base_dir / 'data' / 'stocks'
+    tickers = []
+    for f in stocks_dir.glob('*.json'):
+        if not f.stem.endswith('-history'):
+            tickers.append(f.stem)
+    tickers.sort()
+
+    results = {'pass': [], 'fail': [], 'wrong_pages': []}
+    for ticker in tickers:
+        try:
+            out = generate(ticker, base_dir)
+            pages = count_pages(out)
+            if pages == 6:
+                results['pass'].append(ticker)
+                print(f'  [PASS] {ticker}: {pages} pages')
+            else:
+                results['wrong_pages'].append((ticker, pages))
+                print(f'  [WARN] {ticker}: {pages} pages (expected 6)')
+        except Exception as e:
+            results['fail'].append((ticker, str(e)))
+            print(f'  [FAIL] {ticker}: {e}')
+
+    print(f'\n=== Batch Summary ===')
+    print(f'Pass: {len(results["pass"])}  |  Wrong pages: {len(results["wrong_pages"])}  |  Fail: {len(results["fail"])}')
+    if results['fail']:
+        print('Failures:')
+        for t, e in results['fail']:
+            print(f'  {t}: {e}')
+    return results
 
 
 # ── CLI entry point ───────────────────────────────────────────────────────────
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print('Usage: python scripts/generate-investor-briefing.py TICKER')
-        print('Example: python scripts/generate-investor-briefing.py WOW')
+        print('       python scripts/generate-investor-briefing.py --all')
+        print('Examples:')
+        print('  python scripts/generate-investor-briefing.py WOW')
+        print('  python scripts/generate-investor-briefing.py BHP')
         sys.exit(1)
 
-    ticker_input = sys.argv[1].upper().replace('.AX', '')
     base = Path(__file__).parent.parent
+
+    if sys.argv[1] == '--all':
+        generate_all(base)
+        sys.exit(0)
+
+    ticker_input = sys.argv[1].upper().replace('.AX', '')
 
     out = generate(ticker_input, base)
 
