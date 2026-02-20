@@ -12,9 +12,12 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 import anthropic
-from fastapi import FastAPI, HTTPException
+import jwt
+import httpx
+from fastapi import Depends, FastAPI, HTTPException, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 
 import config
@@ -87,6 +90,59 @@ def _get_client() -> anthropic.Anthropic:
             )
         _client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
     return _client
+
+
+# ─── Clerk JWT Verification ──────────────────────────────────────────────────
+
+_bearer = HTTPBearer(auto_error=False)
+_jwks_cache: dict = {}
+_jwks_fetched_at: float = 0.0
+
+
+async def _get_jwks() -> dict:
+    """Fetch Clerk JWKS, cached for 1 hour."""
+    global _jwks_cache, _jwks_fetched_at
+    if time.time() - _jwks_fetched_at < 3600 and _jwks_cache:
+        return _jwks_cache
+    async with httpx.AsyncClient() as client:
+        r = await client.get(f"{config.CLERK_JWT_ISSUER}/.well-known/jwks.json", timeout=10.0)
+        r.raise_for_status()
+        _jwks_cache = r.json()
+        _jwks_fetched_at = time.time()
+    return _jwks_cache
+
+
+async def verify_clerk_jwt(
+    credentials: HTTPAuthorizationCredentials = Security(_bearer),
+) -> dict:
+    """Verify Clerk JWT. Returns decoded payload or raises HTTP 401."""
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Missing Authorization header")
+    token = credentials.credentials
+    try:
+        jwks = await _get_jwks()
+    except Exception:
+        raise HTTPException(status_code=503, detail="Unable to fetch auth keys")
+    try:
+        header = jwt.get_unverified_header(token)
+        kid = header.get("kid")
+        key_data = next(
+            (k for k in jwks.get("keys", []) if k.get("kid") == kid), None
+        )
+        if not key_data:
+            raise HTTPException(status_code=401, detail="Unknown JWT key ID")
+        public_key = jwt.algorithms.RSAAlgorithm.from_jwk(key_data)
+        payload = jwt.decode(
+            token,
+            public_key,
+            algorithms=["RS256"],
+            options={"verify_aud": False},
+        )
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError as exc:
+        raise HTTPException(status_code=401, detail=f"Invalid token: {exc}")
 
 
 # ---------------------------------------------------------------------------
@@ -186,7 +242,7 @@ def _build_context(passages: list[dict], ticker: str) -> str:
 # ---------------------------------------------------------------------------
 
 @app.post("/api/research-chat", response_model=ResearchChatResponse)
-async def research_chat(request: ResearchChatRequest):
+async def research_chat(request: ResearchChatRequest, _token: dict = Depends(verify_clerk_jwt)):
     """
     Research chat endpoint.
 
@@ -315,10 +371,11 @@ async def serve_data(filename: str):
     raise HTTPException(status_code=404, detail="File not found")
 
 
-@app.get("/{full_path:path}")
-async def serve_frontend(full_path: str):
-    """Serve index.html for all non-API routes (SPA catch-all)."""
-    return FileResponse(config.INDEX_HTML_PATH, media_type="text/html")
+if config.SERVE_SPA:
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        """Serve index.html for all non-API routes (SPA catch-all)."""
+        return FileResponse(config.INDEX_HTML_PATH, media_type="text/html")
 
 
 # ---------------------------------------------------------------------------

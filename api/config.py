@@ -17,3 +17,5 @@ INDEX_HTML_PATH = os.path.realpath(os.getenv(
 ))
 MAX_PASSAGES = 12
 MAX_CONVERSATION_TURNS = 20
+CLERK_JWT_ISSUER = os.getenv("CLERK_JWT_ISSUER", "https://PLACEHOLDER.clerk.accounts.dev")
+SERVE_SPA = os.getenv("SERVE_SPA", "true").lower() == "true"
