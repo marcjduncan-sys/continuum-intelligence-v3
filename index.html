@@ -5374,6 +5374,15 @@ a:hover { color: var(--accent-sage); }
 <div class="page" id="page-snapshot-QBE"></div>
 <div class="page" id="page-snapshot-ASB"></div>
 <div class="page" id="page-snapshot-BRG"></div>
+<div class="page" id="page-snapshot-BHP"></div>
+<div class="page" id="page-snapshot-CBA"></div>
+<div class="page" id="page-snapshot-DXS"></div>
+<div class="page" id="page-snapshot-HRZ"></div>
+<div class="page" id="page-snapshot-NAB"></div>
+<div class="page" id="page-snapshot-OCL"></div>
+<div class="page" id="page-snapshot-RFG"></div>
+<div class="page" id="page-snapshot-RIO"></div>
+<div class="page" id="page-snapshot-WOR"></div>
 
 <!-- ============================================================
      PAGE: PORTFOLIO
@@ -5717,6 +5726,18 @@ a:hover { color: var(--accent-sage); }
 <div class="page" id="page-report-WDS"></div>
 <div class="page" id="page-report-SIG"></div>
 <div class="page" id="page-report-FMG"></div>
+<div class="page" id="page-report-QBE"></div>
+<div class="page" id="page-report-ASB"></div>
+<div class="page" id="page-report-BRG"></div>
+<div class="page" id="page-report-BHP"></div>
+<div class="page" id="page-report-CBA"></div>
+<div class="page" id="page-report-DXS"></div>
+<div class="page" id="page-report-HRZ"></div>
+<div class="page" id="page-report-NAB"></div>
+<div class="page" id="page-report-OCL"></div>
+<div class="page" id="page-report-RFG"></div>
+<div class="page" id="page-report-RIO"></div>
+<div class="page" id="page-report-WOR"></div>
 
 <!-- SheetJS for Excel parsing — loaded on demand when user uploads portfolio -->
 <script id="sheetjs-placeholder" data-src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
@@ -6290,6 +6311,8 @@ function mergeStocksData(ticker, callback) {
           // Phase 5.7: narrative history and last flip
           if (sData.narrative_history !== undefined) STOCK_DATA[ticker].narrative_history = sData.narrative_history;
           if (sData.last_flip !== undefined)         STOCK_DATA[ticker].last_flip         = sData.last_flip;
+          // Cache full stocks JSON for retail PDF (buildRetailHTML expects stocks-format hypotheses dict)
+          STOCK_DATA[ticker]._stocksData = sData;
         }
       } catch(e) { /* parse error — proceed without */ }
     }
@@ -13959,10 +13982,11 @@ function generatePDFReport(ticker, type) {
     }
     console.log('[PDF] Institutional snapshot from live DOM for', ticker);
   } else {
-    // Retail still reads from STOCK_DATA (simplified view, no NFI overlays)
+    // Retail reads from stocks JSON (_stocksData) which has the hypotheses dict format
+    // buildRetailHTML expects: hypotheses as dict (T1/T2/T3/T4), dominant, big_picture, risk_skew, current_price
     var stock = null;
     if (typeof STOCK_DATA !== 'undefined' && STOCK_DATA[ticker]) {
-      stock = STOCK_DATA[ticker];
+      stock = STOCK_DATA[ticker]._stocksData || STOCK_DATA[ticker];
     }
     if (!stock || stock._indexOnly) {
       alert('Full research data not yet loaded for ' + ticker + '. Please wait for the report to finish loading, then try again.');
