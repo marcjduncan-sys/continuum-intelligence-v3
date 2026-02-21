@@ -116,6 +116,23 @@
       --accent-sage: #4A9E7E;
       --accent-gold: #C9A96E;
 
+      /* Extended signal colours */
+      --signal-green-strong: #1A7A46;
+      --signal-red-strong: #8B2020;
+      --signal-purple: #8B6CC1;
+      --accent-teal-dark: #158a7d;
+
+      /* System state colours (alerts, toasts, badges) */
+      --signal-danger: #EF4444;
+      --signal-warning: #EAB308;
+      --signal-info: #3B82F6;
+      --signal-live: #22C55E;
+      --signal-muted: #64748B;
+      --signal-warning-dark: #CA8A04;
+      --signal-danger-dark: #DC2626;
+      --signal-warning-alt: #F97316;
+      --signal-warning-alt-dark: #EA580C;
+
       /* Semantic */
       --signal-red: #D45555;
       --signal-amber: #D4A03C;
@@ -525,7 +542,7 @@
       left: 0;
       right: 0;
       z-index: var(--z-sticky);
-      background: rgba(11, 18, 32, 0.92);
+      background: rgba(11, 18, 32, 0.92); /* glassmorphism — intentional semi-transparent bg-primary */
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
@@ -661,7 +678,7 @@
       right: 0;
       z-index: var(--z-integrations-bar);
       height: var(--integrations-bar-height);
-      background: rgba(7, 12, 22, 0.97);
+      background: rgba(7, 12, 22, 0.97); /* glassmorphism — intentional semi-transparent bg-primary */
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
@@ -1830,17 +1847,17 @@
     }
 
     .macro-bar-badge.bullish {
-      background: rgba(61, 170, 109, 0.18);
+      background: rgba(61, 170, 109, 0.12);
       color: var(--signal-green);
     }
 
     .macro-bar-badge.neutral {
-      background: rgba(212, 160, 60, 0.18);
+      background: rgba(212, 160, 60, 0.12);
       color: var(--signal-amber);
     }
 
     .macro-bar-badge.bearish {
-      background: rgba(212, 85, 85, 0.18);
+      background: rgba(212, 85, 85, 0.12);
       color: var(--signal-red);
     }
 
@@ -2010,7 +2027,7 @@
     }
 
     .sector-gauge-fill.strong-bear {
-      background: #8B2020;
+      background: var(--signal-red-strong);
     }
 
     .sector-gauge-fill.bear {
@@ -2026,7 +2043,7 @@
     }
 
     .sector-gauge-fill.strong-bull {
-      background: #1A7A46;
+      background: var(--signal-green-strong);
     }
 
     .sector-gauge-labels {
@@ -2083,7 +2100,7 @@
     }
 
     .composite-score.strong-upside {
-      color: #1A7A46;
+      color: var(--signal-green-strong);
     }
 
     .composite-score.upside {
@@ -2099,7 +2116,7 @@
     }
 
     .composite-score.strong-downside {
-      color: #8B2020;
+      color: var(--signal-red-strong);
     }
 
     .composite-sent-label {
@@ -2108,7 +2125,7 @@
     }
 
     .composite-sent-label.strong-upside {
-      color: #1A7A46;
+      color: var(--signal-green-strong);
     }
 
     .composite-sent-label.upside {
@@ -2124,7 +2141,7 @@
     }
 
     .composite-sent-label.strong-downside {
-      color: #8B2020;
+      color: var(--signal-red-strong);
     }
 
     .composite-contrib-row {
@@ -3241,7 +3258,7 @@
 
     .ep-independent {
       background: rgba(140, 100, 200, 0.12);
-      color: #8B6CC1;
+      color: var(--signal-purple);
     }
 
     .ep-objective {
@@ -3256,7 +3273,7 @@
 
     .ep-peerreviewed {
       background: rgba(140, 100, 200, 0.12);
-      color: #8B6CC1;
+      color: var(--signal-purple);
     }
 
     .ep-noise {
@@ -4291,7 +4308,7 @@
     }
 
     .tc-analyze-btn:hover {
-      background: #158a7d;
+      background: var(--accent-teal-dark);
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(26, 158, 143, 0.3);
     }
@@ -4650,7 +4667,7 @@
     }
 
     .tc-chat-cta-btn:hover {
-      background: #158a7d;
+      background: var(--accent-teal-dark);
       transform: translateY(-1px);
     }
 
@@ -8227,7 +8244,7 @@
       height: 16px;
       padding: 0 4px;
       border-radius: 8px;
-      background: #EF4444;
+      background: var(--signal-danger);
       color: #fff;
       font-size: 10px;
       font-weight: 700;
@@ -8362,17 +8379,17 @@
 
     .ci-badge-normal {
       background: rgba(100, 116, 139, 0.12);
-      color: #64748B;
+      color: var(--signal-muted);
     }
 
     .ci-badge-alert {
       background: rgba(234, 179, 8, 0.12);
-      color: #CA8A04;
+      color: var(--signal-warning-dark);
     }
 
     .ci-badge-flip {
       background: rgba(239, 68, 68, 0.12);
-      color: #EF4444;
+      color: var(--signal-danger);
       animation: badgePulse 1.5s infinite;
     }
 
@@ -8401,12 +8418,12 @@
     }
 
     .ci-drift-up {
-      color: #22C55E;
+      color: var(--signal-live);
       font-size: 11px;
     }
 
     .ci-drift-down {
-      color: #EF4444;
+      color: var(--signal-danger);
       font-size: 11px;
     }
 
@@ -8490,15 +8507,15 @@
     }
 
     .ci-alert-flip {
-      border-left-color: #EF4444;
+      border-left-color: var(--signal-danger);
     }
 
     .ci-alert-alert {
-      border-left-color: #EAB308;
+      border-left-color: var(--signal-warning);
     }
 
     .ci-alert-info {
-      border-left-color: #3B82F6;
+      border-left-color: var(--signal-info);
     }
 
     .ci-alert-item-top {
@@ -8549,7 +8566,7 @@
       border-radius: 8px;
       background: var(--bg-surface, #1E293B);
       border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
-      border-left: 4px solid #3B82F6;
+      border-left: 4px solid var(--signal-info);
       font-size: 13px;
       color: var(--text-primary, #F1F5F9);
       min-width: 280px;
@@ -8567,15 +8584,15 @@
     }
 
     .ci-toast-FLIP {
-      border-left-color: #EF4444;
+      border-left-color: var(--signal-danger);
     }
 
     .ci-toast-ALERT {
-      border-left-color: #EAB308;
+      border-left-color: var(--signal-warning);
     }
 
     .ci-toast-info {
-      border-left-color: #3B82F6;
+      border-left-color: var(--signal-info);
     }
 
     .ci-toast-msg {
@@ -8618,20 +8635,20 @@
 
     .freshness-moderate {
       background: rgba(234, 179, 8, 0.08);
-      border-left-color: #EAB308;
-      color: #CA8A04;
+      border-left-color: var(--signal-warning);
+      color: var(--signal-warning-dark);
     }
 
     .freshness-high {
       background: rgba(249, 115, 22, 0.08);
-      border-left-color: #F97316;
-      color: #EA580C;
+      border-left-color: var(--signal-warning-alt);
+      color: var(--signal-warning-alt-dark);
     }
 
     .freshness-critical {
       background: rgba(239, 68, 68, 0.12);
-      border-left-color: #EF4444;
-      color: #DC2626;
+      border-left-color: var(--signal-danger);
+      color: var(--signal-danger-dark);
       animation: freshnessFlicker 3s ease-in-out infinite;
     }
 
@@ -8699,13 +8716,13 @@
     }
 
     .price-pulse-live {
-      background: #22C55E;
+      background: var(--signal-live);
       box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
       animation: pricePulse 2s ease-out infinite;
     }
 
     .price-pulse-stale {
-      background: #EAB308;
+      background: var(--signal-warning);
       animation: none;
     }
 
