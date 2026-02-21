@@ -23,6 +23,29 @@
   var _drawerOpen  = false;
   var _unreadCount = 0;
   var _badge = null;
+  var _releaseTrap = null;
+  var _triggerEl = null;
+
+  // ─── Focus trap utility ──────────────────────────────────────────────────────
+
+  function trapFocus(modalEl) {
+    var focusable = modalEl.querySelectorAll(
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+    );
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (first) first.focus();
+    function onKeyDown(e) {
+      if (e.key !== 'Tab') return;
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+    modalEl.addEventListener('keydown', onKeyDown);
+    return function releaseTrap() { modalEl.removeEventListener('keydown', onKeyDown); };
+  }
 
   // ─── Persistence helpers ──────────────────────────────────────────────────────
 
@@ -102,6 +125,7 @@
     el.id = 'ci-alerts-drawer';
     el.className = 'ci-alerts-drawer';
     el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
     el.setAttribute('aria-label', 'Alert history');
     el.innerHTML =
       '<div class="ci-alerts-header">' +
@@ -116,11 +140,14 @@
 
   function openDrawer() {
     var drawer = getOrCreateDrawer();
+    _triggerEl = document.activeElement;
     _drawerOpen = true;
     drawer.classList.add('ci-alerts-drawer-open');
     _unreadCount = 0;
     updateBadge();
     renderDrawer(drawer.querySelector('#ci-alerts-body'));
+    if (_releaseTrap) { _releaseTrap(); _releaseTrap = null; }
+    _releaseTrap = trapFocus(drawer);
   }
 
   function closeDrawer() {
@@ -128,6 +155,11 @@
     if (!drawer) return;
     _drawerOpen = false;
     drawer.classList.remove('ci-alerts-drawer-open');
+    if (_releaseTrap) { _releaseTrap(); _releaseTrap = null; }
+    if (_triggerEl && typeof _triggerEl.focus === 'function') {
+      _triggerEl.focus();
+      _triggerEl = null;
+    }
   }
 
   function esc(str) {

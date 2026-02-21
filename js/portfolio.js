@@ -22,6 +22,29 @@
   var _backdrop = null;
   var _isOpen = false;
   var _allStocks = null;
+  var _releaseTrap = null;
+  var _triggerEl = null;
+
+  // ─── Focus trap utility ──────────────────────────────────────────────────────
+
+  function trapFocus(modalEl) {
+    var focusable = modalEl.querySelectorAll(
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+    );
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (first) first.focus();
+    function onKeyDown(e) {
+      if (e.key !== 'Tab') return;
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+    modalEl.addEventListener('keydown', onKeyDown);
+    return function releaseTrap() { modalEl.removeEventListener('keydown', onKeyDown); };
+  }
 
   // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -82,6 +105,7 @@
     div.id = 'ci-portfolio-overlay';
     div.className = 'ci-portfolio-overlay';
     div.setAttribute('role', 'dialog');
+    div.setAttribute('aria-modal', 'true');
     div.setAttribute('aria-label', 'Portfolio overview');
     div.innerHTML =
       '<div class="ci-portfolio-header">' +
@@ -191,17 +215,28 @@
 
   function open() {
     if (!_overlay) createOverlay();
+    _triggerEl = document.activeElement;
     _isOpen = true;
     _overlay.classList.add('ci-portfolio-open');
     _backdrop.classList.add('ci-portfolio-backdrop-open');
     _allStocks = null; // refresh on each open
     renderBody();
+    // Delay trap slightly so the body is rendered before we look for focusable elements
+    setTimeout(function () {
+      if (_releaseTrap) { _releaseTrap(); _releaseTrap = null; }
+      _releaseTrap = trapFocus(_overlay);
+    }, 50);
   }
 
   function close() {
     _isOpen = false;
+    if (_releaseTrap) { _releaseTrap(); _releaseTrap = null; }
     if (_overlay) _overlay.classList.remove('ci-portfolio-open');
     if (_backdrop) _backdrop.classList.remove('ci-portfolio-backdrop-open');
+    if (_triggerEl && typeof _triggerEl.focus === 'function') {
+      _triggerEl.focus();
+      _triggerEl = null;
+    }
   }
 
   function toggle() { if (_isOpen) close(); else open(); }
