@@ -564,27 +564,27 @@
     "rows": [
       {
         "diagnosticity": "HIGH",
-        "diagnosticityClass": "diag-high",
+        "diagnosticityClass": "disc-high",
         "evidence": "Next earnings: network store count trend",
         "discriminatesBetween": "T1 (Recovery) vs T4 (Terminal decline)",
         "currentReading": "Store counts still declining &mdash; no stabilisation signal yet",
-        "readingClass": "reading-negative"
+        "readingClass": "td-red"
       },
       {
         "diagnosticity": "HIGH",
-        "diagnosticityClass": "diag-high",
+        "diagnosticityClass": "disc-high",
         "evidence": "Net debt/EBITDA ratio trajectory",
         "discriminatesBetween": "T2 (Deleveraging) vs T3 (Cash flow squeeze)",
         "currentReading": "Declining but still elevated",
-        "readingClass": "reading-neutral"
+        "readingClass": "td-amber"
       },
       {
         "diagnosticity": "MEDIUM",
-        "diagnosticityClass": "diag-medium",
+        "diagnosticityClass": "disc-med",
         "evidence": "Gloria Jean's same-store sales growth",
         "discriminatesBetween": "T1 (Brand recovery) vs T4 (Coffee disruption)",
         "currentReading": "Not publicly disclosed at brand level",
-        "readingClass": "reading-neutral"
+        "readingClass": "td-amber"
       }
     ],
     "nonDiscriminating": "General ASX small-cap sentiment and broad consumer confidence indices are noisy signals that do not specifically discriminate between RFG's competing hypotheses."
@@ -649,43 +649,43 @@
     "coverageRows": [
       {
         "domain": "Company Financials",
-        "coverageLevel": 50,
-        "coverageLabel": "50%",
+        "coverageLevel": "partial",
+        "coverageLabel": "Partial",
         "freshness": "Awaiting H1",
         "confidence": "Medium",
-        "confidenceClass": "conf-medium"
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Franchise Network Data",
-        "coverageLevel": 40,
-        "coverageLabel": "40%",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
         "freshness": "Moderate",
         "confidence": "Low",
-        "confidenceClass": "conf-low"
+        "confidenceClass": "td-red"
       },
       {
         "domain": "Consumer Analysis",
-        "coverageLevel": 55,
-        "coverageLabel": "55%",
+        "coverageLevel": "partial",
+        "coverageLabel": "Partial",
         "freshness": "Current",
         "confidence": "Medium",
-        "confidenceClass": "conf-medium"
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Competitive Landscape",
-        "coverageLevel": 50,
-        "coverageLabel": "50%",
+        "coverageLevel": "partial",
+        "coverageLabel": "Partial",
         "freshness": "Moderate",
         "confidence": "Medium",
-        "confidenceClass": "conf-medium"
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Brand Health",
-        "coverageLevel": 35,
-        "coverageLabel": "35%",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
         "freshness": "Stale",
         "confidence": "Low",
-        "confidenceClass": "conf-low"
+        "confidenceClass": "td-red"
       }
     ],
     "couldntAssess": [
