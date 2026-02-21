@@ -16,6 +16,12 @@ export interface HypothesisScore {
   survival_score: number
   status: 'VERY_LOW' | 'LOW' | 'MODERATE' | 'HIGH'
   weighted_inconsistency: number
+  // Extended fields present in research JSON (absent on older/auto-generated stocks)
+  description?: string
+  plain_english?: string
+  what_to_watch?: string
+  upside?: string | null
+  risk_plain?: string
 }
 
 export interface ThreeLayerSignal {
