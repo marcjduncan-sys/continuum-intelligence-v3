@@ -15593,16 +15593,21 @@
           if (!ticker || isNaN(units) || isNaN(avgCost)) continue;
 
           const covered = COVERAGE_DATA[ticker];
-          const currentPrice = covered ? covered.price : null;
-          const company = covered ? covered.company : ticker;
+          const stock = window.STOCK_DATA ? window.STOCK_DATA[ticker] : null;
+          // Prefer live price over stale COVERAGE_DATA snapshot
+          const currentPrice = stock ? (stock._livePrice || stock.price) : (covered ? covered.price : null);
+          const company = covered ? covered.company : (stock ? stock.company : ticker);
           const skew = covered ? covered.skew : null;
+          const isShort = units < 0;
 
-          const marketValue = currentPrice ? units * currentPrice : null;
-          const costBasis = units * avgCost;
-          const pnlDollar = marketValue !== null ? marketValue - costBasis : null;
+          const marketValue = currentPrice ? Math.abs(units) * currentPrice : null;
+          const costBasis = Math.abs(units) * avgCost;
+          const pnlDollar = (marketValue !== null && costBasis > 0)
+            ? (isShort ? costBasis - marketValue : marketValue - costBasis)
+            : null;
           const pnlPercent = costBasis > 0 && pnlDollar !== null ? (pnlDollar / costBasis) * 100 : null;
 
-          positions.push({ ticker, company, units, avgCost, currentPrice, marketValue, costBasis, pnlDollar, pnlPercent, skew });
+          positions.push({ ticker, company, units, avgCost, currentPrice, marketValue, costBasis, pnlDollar, pnlPercent, skew, isShort });
         }
 
         if (positions.length === 0) {
@@ -15610,22 +15615,36 @@
           return;
         }
 
-        /* Calculate weights */
+        /* Calculate weights using absolute market values (shorts contribute positive weight) */
         const totalValue = positions.reduce((s, p) => s + (p.marketValue || 0), 0);
         positions.forEach(p => {
           p.weight = totalValue > 0 && p.marketValue ? (p.marketValue / totalValue) * 100 : 0;
-          p.alignment = deriveAlignment(p.skew, p.weight);
+          p.alignment = deriveAlignment(p.skew, p.weight, p.isShort);
         });
 
         savePortfolio(positions);
         renderPortfolio(positions, totalValue);
       }
 
-      /* Derive alignment */
-      function deriveAlignment(skew, weight) {
+      /* Derive alignment — accounts for long vs short positioning */
+      function deriveAlignment(skew, weight, isShort) {
         if (!skew) return { label: 'Not covered', cls: 'not-covered' };
-        if (skew === 'upside') return { label: 'Aligned with skew', cls: 'aligned' };
+
+        // Effective direction: long aligns with upside, short aligns with downside
+        var positionBias = isShort ? 'downside' : 'upside';
+
+        if (skew === 'upside') {
+          if (isShort) {
+            // Short + upside skew = contradicts
+            return { label: 'Contradicts skew', cls: 'contradicts' };
+          }
+          return { label: 'Aligned with skew', cls: 'aligned' };
+        }
         if (skew === 'downside') {
+          if (isShort) {
+            // Short + downside skew = aligned (profits from the decline)
+            return { label: 'Aligned with skew', cls: 'aligned' };
+          }
           if (weight > 15) return { label: 'Exposure exceeds conviction', cls: 'exceeds' };
           return { label: 'Contradicts skew', cls: 'contradicts' };
         }
@@ -15654,13 +15673,16 @@
             tr.setAttribute('onclick', "navigate('report-" + p.ticker + "')");
           }
 
-          const pnlClass = p.pnlDollar >= 0 ? 'td-pnl-pos' : 'td-pnl-neg';
+          const pnlClass = (p.pnlDollar !== null && p.pnlDollar >= 0) ? 'td-pnl-pos' : 'td-pnl-neg';
           const skewBadge = p.skew ? '<span class="skew-badge ' + p.skew + '">' + (p.skew === 'upside' ? '&#9650; UPSIDE' : p.skew === 'downside' ? '&#9660; DOWNSIDE' : '&#9670; BALANCED') + '</span>' : '<span style="color:var(--text-muted)">N/A</span>';
+          const dirBadge = p.isShort
+            ? ' <span style="font-size:0.65rem;padding:1px 4px;border-radius:3px;background:rgba(255,77,77,0.15);color:#ff4d4d;font-weight:600;vertical-align:middle">SHORT</span>'
+            : '';
 
           tr.innerHTML =
-            '<td class="td-ticker">' + p.ticker + '</td>' +
+            '<td class="td-ticker">' + p.ticker + dirBadge + '</td>' +
             '<td>' + p.company + '</td>' +
-            '<td class="td-mono">' + formatNum(p.units, 0) + '</td>' +
+            '<td class="td-mono">' + formatNum(Math.abs(p.units), 0) + '</td>' +
             '<td class="td-mono">A$' + formatNum(p.avgCost, 2) + '</td>' +
             '<td class="td-mono">' + (p.currentPrice ? 'A$' + formatNum(p.currentPrice, 2) : 'N/A') + '</td>' +
             '<td class="' + pnlClass + '">' + (p.pnlDollar !== null ? (p.pnlDollar >= 0 ? '+' : '') + 'A$' + formatNum(p.pnlDollar, 0) : 'N/A') + '</td>' +
@@ -15704,9 +15726,31 @@
         renderChangeAlerts(positions);
       }
 
-      /* Render from saved data */
+      /* Render from saved data — refresh prices and recalculate */
       function renderPortfolioFromSaved(positions) {
+        positions.forEach(p => {
+          const stock = window.STOCK_DATA ? window.STOCK_DATA[p.ticker] : null;
+          const covered = COVERAGE_DATA[p.ticker];
+          // Refresh price from latest available source
+          const freshPrice = stock ? (stock._livePrice || stock.price) : (covered ? covered.price : null);
+          if (freshPrice) p.currentPrice = freshPrice;
+          // Ensure isShort is set (handles portfolios saved before this field existed)
+          p.isShort = p.units < 0;
+          // Recalculate market value and PnL with fresh price
+          p.marketValue = p.currentPrice ? Math.abs(p.units) * p.currentPrice : null;
+          p.costBasis = Math.abs(p.units) * p.avgCost;
+          p.pnlDollar = (p.marketValue !== null && p.costBasis > 0)
+            ? (p.isShort ? p.costBasis - p.marketValue : p.marketValue - p.costBasis)
+            : null;
+          p.pnlPercent = p.costBasis > 0 && p.pnlDollar !== null ? (p.pnlDollar / p.costBasis) * 100 : null;
+          // Refresh skew from current engine output
+          if (covered) p.skew = covered.skew;
+        });
         const totalValue = positions.reduce((s, p) => s + (p.marketValue || 0), 0);
+        positions.forEach(p => {
+          p.weight = totalValue > 0 && p.marketValue ? (p.marketValue / totalValue) * 100 : 0;
+          p.alignment = deriveAlignment(p.skew, p.weight, p.isShort);
+        });
         renderPortfolio(positions, totalValue);
       }
 
