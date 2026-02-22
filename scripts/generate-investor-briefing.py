@@ -264,18 +264,39 @@ def std_table_style(extra=None):
 
 
 # ── Synthesis Helpers (Densification Logic) ────────────────────────────────
+def sanitise_prose(text):
+    """Strip LLM artefacts: em-dashes, HTML, markdown, double spaces."""
+    if not text:
+        return text
+    import re
+    s = re.sub(r'<[^>]+>', '', text)           # HTML tags
+    s = s.replace('\u2014', '; ')               # em-dash
+    s = s.replace('\u2013', ', ')               # en-dash
+    s = s.replace('--', '; ')                   # double-hyphen
+    s = re.sub(r'\*\*([^*]+)\*\*', r'\1', s)   # bold markers
+    s = re.sub(r'\*([^*]+)\*', r'\1', s)        # italic markers
+    s = re.sub(r'^#+\s*', '', s, flags=re.MULTILINE)  # heading markers
+    s = re.sub(r'\s{2,}', ' ', s).strip()
+    return s
+
+
 def synthesize_milestones(hyp_label, what_to_watch):
     """Generate a 3-item checklist of what to watch for a hypothesis."""
     milestones = []
     if what_to_watch and len(what_to_watch) > 20:
-        base = what_to_watch.split('.')[0]
-        milestones.append(f"Monitor: {base}.")
+        # Split on sentence boundaries and use the first two meaningful sentences
+        sentences = [s.strip() for s in what_to_watch.split('.') if len(s.strip()) > 10]
+        if sentences:
+            milestones.append(f"{sentences[0]}.")
+        if len(sentences) > 1:
+            milestones.append(f"{sentences[1]}.")
     else:
         milestones.append(f"Confirm execution of {hyp_label} milestones.")
 
-    milestones.append("Assess divergence between price signal and narrative weight.")
-    milestones.append("Audit evidence for incoming contradictory signals (ACH-3).")
-    return milestones
+    milestones.append("Cross-reference price signal divergence with evidence weight.")
+    if len(milestones) < 3:
+        milestones.append("Audit incoming evidence for contradictory diagnosticity (ACH-3).")
+    return milestones[:3]
 
 
 def get_regime_commentary(external_sig):
@@ -594,9 +615,9 @@ def build_identity_page(stock, macro):
     overview_text = identity.get('description', big_picture)
     if not overview_text or len(overview_text) < 50:
         overview_text = (overview_text or "") + " " + get_coverage_status(stock)
-    overview_text = truncate_words(overview_text, 250)
+    overview_text = sanitise_prose(truncate_words(overview_text, 250))
 
-    narrative_text = truncate_words(nat_summary or 'Narrative assessment pending.', 200)
+    narrative_text = sanitise_prose(truncate_words(nat_summary or 'Narrative assessment pending.', 200))
 
     # ── Company Overview ─────────────────────────────────────────────────────
     story.append(Paragraph('COMPANY OVERVIEW', S['section_header']))
@@ -607,13 +628,23 @@ def build_identity_page(stock, macro):
     story.append(Paragraph('NARRATIVE ASSESSMENT', S['section_header']))
     story.append(Paragraph(narrative_text, S['body']))
     
-    # Densification: Add qualitative expansion if narrative is thin
+    # Densification: Add evidence-based expansion if narrative is thin
     if len(narrative_text) < 300:
-        model = str(stock.get("narrative_model", "Standard")).replace("_", " ")
-        expansion = (f"The narrative structure for {stock.get('ticker')} follows the {model} framework. "
-                     "Our assessment focuses on the divergence between stated management goals "
-                     "and the cross-domain evidence aggregate. Current survival scores reflect "
-                     "this probabilistic weighting.")
+        evidence_items = stock.get('evidence_items', [])
+        active_evidence = [e for e in evidence_items if e.get('active', True)][:3]
+        if active_evidence:
+            evidence_lines = '; '.join(
+                f"{e.get('date', '')[:10]}: {e.get('summary', 'N/A')[:80]}"
+                for e in active_evidence
+            )
+            expansion = (f"Key evidence informing current assessment: {evidence_lines}. "
+                         f"Hypothesis survival scores are updated via Bayesian weighting of "
+                         f"{len(active_evidence)} active evidence items with epistemic credibility "
+                         f"and time-decay adjustments.")
+        else:
+            expansion = (f"Coverage for {stock.get('ticker')} is in the evidence accumulation phase. "
+                         "Hypothesis survival scores will sharpen as earnings releases, regulatory "
+                         "filings, and operational data provide diagnostically weighted evidence.")
         story.append(Paragraph(expansion, S['body']))
 
     story.append(divider())
@@ -791,12 +822,12 @@ def build_hypotheses_page(stock):
         story.append(hdr_tbl)
 
         # Description
-        desc = hyp.get('plain_english') or hyp.get('description', '')
+        desc = sanitise_prose(hyp.get('plain_english') or hyp.get('description', ''))
         if desc:
             story.append(Paragraph(desc, S['hyp_body']))
 
         # What to watch
-        what = hyp.get('what_to_watch', '')
+        what = sanitise_prose(hyp.get('what_to_watch', ''))
         if what:
             story.append(Paragraph(f'Watch: {truncate_words(what, 40)}', S['hyp_body']))
 

@@ -366,9 +366,18 @@ Respond with ONLY a JSON object — no markdown, no commentary:
 // ---------------------------------------------------------------------------
 
 const SYSTEM_PROMPTS = {
-  evidence: `You are a senior equity research analyst at a top-tier investment bank. Your role is to extract and classify evidence items from ASX company announcements with rigorous diagnosticity assessment. You think in terms of hypothesis discrimination: evidence matters only to the extent it differentiates between competing explanations. You never extract noise.`,
+  evidence: `You are a senior equity research analyst at a top-tier investment bank. Your role is to extract and classify evidence items from ASX company announcements with rigorous diagnosticity assessment. You think in terms of hypothesis discrimination: evidence matters only to the extent it differentiates between competing explanations. You never extract noise. Write summaries in Australian English. Never use em-dashes; use commas or semicolons instead.`,
 
   narrative: `You are a senior equity research analyst at Goldman Sachs covering ASX-listed equities. Your written output is read by portfolio managers allocating institutional capital. Your prose must meet these non-negotiable standards:
+
+LANGUAGE AND STYLE:
+- Australian English throughout (Macquarie Dictionary conventions): "analyse" not "analyze", "defence" not "defense", "programme" not "program" (except computing), "labour" not "labor", "capitalise" not "capitalize"
+- NEVER use em-dashes. Use commas, semicolons, colons, or full stops instead
+- NEVER use the # symbol in prose. Write "number" or use the specific figure
+- No bullet points, asterisks, or markdown formatting in output text
+- No LLM verbal tics: do not use "delve", "leverage" (as a verb), "notably", "it's worth noting", "in terms of", "moving forward", "robust", "bolster", "underscores", "landscape", "paradigm", "synergy", "holistic"
+- Write in the third person. No "we believe" or "our view"
+- Sentences should be direct and declarative. Vary sentence length. Short sentences for emphasis. Longer sentences for nuanced conditional reasoning
 
 VOICE AND PRECISION:
 - Write with the authority of someone who has covered this sector for 15 years
@@ -511,26 +520,52 @@ function isBoilerplate(text) {
   return !hasSpecificity;
 }
 
+/**
+ * Sanitise LLM output: strip HTML, em-dashes, markdown artefacts, and LLM verbal tics.
+ */
+function sanitiseProse(text) {
+  if (!text || typeof text !== 'string') return text;
+  let s = text;
+  // Strip HTML tags
+  s = s.replace(/<[^>]+>/g, '');
+  // Replace em-dashes and en-dashes with semicolons or commas
+  s = s.replace(/\u2014/g, '; ');  // em-dash
+  s = s.replace(/\u2013/g, ', ');  // en-dash
+  s = s.replace(/--/g, '; ');      // double-hyphen em-dash
+  // Strip markdown bold/italic markers
+  s = s.replace(/\*\*([^*]+)\*\*/g, '$1');
+  s = s.replace(/\*([^*]+)\*/g, '$1');
+  s = s.replace(/__([^_]+)__/g, '$1');
+  s = s.replace(/_([^_]+)_/g, '$1');
+  // Strip # heading markers
+  s = s.replace(/^#+\s*/gm, '');
+  // Strip bullet points
+  s = s.replace(/^[\s]*[-*]\s+/gm, '');
+  // Clean up multiple spaces
+  s = s.replace(/\s{2,}/g, ' ').trim();
+  return s;
+}
+
 function validateNarrativeQuality(updates, ticker) {
   if (!updates || !updates.hypotheses) return updates;
 
   let boilerplateCount = 0;
   for (const [tier, hyp] of Object.entries(updates.hypotheses)) {
     if (hyp.what_to_watch && isBoilerplate(hyp.what_to_watch)) {
-      warn(`[${ticker}] ${tier} what_to_watch is boilerplate — rejecting: "${hyp.what_to_watch.substring(0, 80)}..."`);
+      warn(`[${ticker}] ${tier} what_to_watch is boilerplate, rejecting: "${hyp.what_to_watch.substring(0, 80)}..."`);
       delete hyp.what_to_watch; // Remove so it doesn't overwrite existing (potentially better) text
       boilerplateCount++;
     }
-    // Strip any HTML tags that leak through
+    // Sanitise all prose fields
     if (hyp.plain_english) {
-      hyp.plain_english = hyp.plain_english.replace(/<[^>]+>/g, '');
+      hyp.plain_english = sanitiseProse(hyp.plain_english);
     }
     if (hyp.what_to_watch) {
-      hyp.what_to_watch = hyp.what_to_watch.replace(/<[^>]+>/g, '');
+      hyp.what_to_watch = sanitiseProse(hyp.what_to_watch);
     }
   }
   if (updates.big_picture) {
-    updates.big_picture = updates.big_picture.replace(/<[^>]+>/g, '');
+    updates.big_picture = sanitiseProse(updates.big_picture);
   }
 
   if (boilerplateCount > 0) {
