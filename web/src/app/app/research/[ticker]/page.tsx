@@ -12,7 +12,7 @@ interface Params {
 
 async function getStockData(ticker: string): Promise<StockData | null> {
   try {
-    const res = await fetch(`${FASTAPI_URL}/data/stocks/${ticker}.json`, {
+    const res = await fetch(`${FASTAPI_URL}/data/research/${ticker}.json`, {
       next: { revalidate: 300 },
     })
     if (!res.ok) return null
@@ -68,63 +68,159 @@ export default async function ResearchPage({ params }: Params) {
           </div>
         </div>
 
-        {/* Research grid */}
-        <div className="rp-grid">
-          <div className="rp-col-main">
-            {stock.hypotheses && (
-              <HypothesisPanel
-                hypotheses={stock.hypotheses}
-                dominant={stock.dominant}
-              />
-            )}
-          </div>
-          <div className="rp-col-side">
-            {stock.three_layer_signal && stock.narrative_weights && (
-              <SentimentPanel
-                signal={stock.three_layer_signal}
-                weights={stock.narrative_weights}
-              />
-            )}
-            <div className="rp-meta-card">
-              <h3 className="panel-title">Analysis</h3>
-              <div className="rp-meta-row">
-                <span>Dominant hypothesis</span>
-                <strong>{stock.dominant}</strong>
-              </div>
-              <div className="rp-meta-row">
-                <span>Confidence</span>
-                <strong>{stock.confidence}</strong>
-              </div>
-              <div className="rp-meta-row">
-                <span>Alert state</span>
-                <strong>{stock.alert_state}</strong>
+        {/* Research Sections 01-10 */}
+        <div className="rp-sections">
+          {/* 01 Identity */}
+          <section className="rp-section" id="identity">
+            <div className="section-header">
+              <span className="section-num">01</span>
+              <h2 className="section-title">Identity & Snapshot</h2>
+            </div>
+            <div className="section-content">
+              <p className="business-overview">{stock.identity?.overview}</p>
+            </div>
+          </section>
+
+          {/* 02 Hypotheses */}
+          <section className="rp-section" id="hypotheses">
+            <div className="section-header">
+              <span className="section-num">02</span>
+              <h2 className="section-title">Competing Hypotheses</h2>
+            </div>
+            <div className="section-content">
+              {stock.hypotheses && (
+                <HypothesisPanel
+                  hypotheses={stock.hypotheses}
+                  dominant={stock.dominant}
+                />
+              )}
+            </div>
+          </section>
+
+          {/* 03 Narrative */}
+          <section className="rp-section" id="narrative">
+            <div className="section-header">
+              <span className="section-num">03</span>
+              <h2 className="section-title">Dominant Narrative</h2>
+            </div>
+            <div className="section-content">
+              <p className="narrative-text">{stock.narrative?.theNarrative}</p>
+            </div>
+          </section>
+
+          {/* 04 Evidence */}
+          <section className="rp-section" id="evidence">
+            <div className="section-header">
+              <span className="section-num">04</span>
+              <h2 className="section-title">Primary Evidence Domains (1-8)</h2>
+            </div>
+            <div className="section-content">
+              <p className="evidence-intro">{stock.evidence?.intro}</p>
+              <div className="evidence-cards">
+                {stock.evidence?.cards?.filter(c => parseInt(c.title) <= 8).map((card, i) => (
+                  <div key={i} className="evidence-card-stub">
+                    <strong>{card.title}</strong>: {card.finding.substring(0, 150)}...
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          </section>
+
+          {/* 05 Leadership */}
+          <section className="rp-section" id="leadership">
+            <div className="section-header">
+              <span className="section-num">05</span>
+              <h2 className="section-title">Leadership & Governance</h2>
+            </div>
+            <div className="section-content">
+              {stock.evidence?.cards?.find(c => parseInt(c.title) === 9)?.finding}
+            </div>
+          </section>
+
+          {/* 06 Ownership */}
+          <section className="rp-section" id="ownership">
+            <div className="section-header">
+              <span className="section-num">06</span>
+              <h2 className="section-title">Ownership & Capital Flows</h2>
+            </div>
+            <div className="section-content">
+              {stock.evidence?.cards?.find(c => parseInt(c.title) === 10)?.finding}
+            </div>
+          </section>
+
+          {/* 07 Discriminators */}
+          <section className="rp-section" id="discriminators">
+            <div className="section-header">
+              <span className="section-num">07</span>
+              <h2 className="section-title">What Discriminates</h2>
+            </div>
+            <div className="section-content">
+              <p className="discriminators-intro">{stock.discriminators?.intro}</p>
+            </div>
+          </section>
+
+          {/* 08 Tripwires */}
+          <section className="rp-section" id="tripwires">
+            <div className="section-header">
+              <span className="section-num">08</span>
+              <h2 className="section-title">What We're Watching</h2>
+            </div>
+            <div className="section-content">
+              <p className="tripwires-intro">{stock.tripwires?.intro}</p>
+            </div>
+          </section>
+
+          {/* 09 Gaps */}
+          <section className="rp-section" id="gaps">
+            <div className="section-header">
+              <span className="section-num">09</span>
+              <h2 className="section-title">Evidence Gaps & Integrity</h2>
+            </div>
+            <div className="section-content">
+              <p className="gaps-text">{stock.gaps?.analyticalLimitations}</p>
+            </div>
+          </section>
+
+          {/* 10 Technical */}
+          <section className="rp-section" id="technical">
+            <div className="section-header">
+              <span className="section-num">10</span>
+              <h2 className="section-title">Technical Structure</h2>
+            </div>
+            <div className="section-content">
+              <p className="ta-text">{stock.technicalAnalysis?.regime} - {stock.technicalAnalysis?.trend?.direction}</p>
+              {/* Note: In a real implementation, we would add the Chart component here */}
+            </div>
+          </section>
         </div>
       </div>
 
       <style>{`
-        .research-page { max-width: 1100px; }
+        .research-page { max-width: 1100px; margin: 0 auto; padding: var(--space-xl); }
         .rp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-2xl); padding-bottom: var(--space-xl); border-bottom: 1px solid var(--border); }
-        .rp-title-group { }
-        .rp-ticker { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; }
-        .rp-company { font-size: 16px; color: var(--text-secondary); margin-top: 2px; }
-        .rp-meta { display: flex; align-items: center; gap: var(--space-sm); margin-top: var(--space-sm); }
-        .rp-sector { font-size: 12px; color: var(--text-muted); }
+        .rp-ticker { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+        .rp-company { font-size: 16px; color: var(--text-secondary); margin-top: 4px; }
+        .rp-meta { display: flex; align-items: center; gap: var(--space-sm); margin-top: var(--space-md); }
+        .rp-sector { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
         .rp-price-group { text-align: right; }
-        .rp-price { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
-        .rp-sentiment { font-size: 13px; font-weight: 600; margin-top: 4px; }
-        .rp-grid { display: grid; grid-template-columns: 1fr 340px; gap: var(--space-xl); align-items: start; }
-        @media (max-width: 900px) { .rp-grid { grid-template-columns: 1fr; } }
-        .rp-col-main { display: flex; flex-direction: column; gap: var(--space-lg); }
-        .rp-col-side { display: flex; flex-direction: column; gap: var(--space-lg); }
-        .rp-meta-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: var(--space-lg); }
-        .panel-title { font-size: 15px; font-weight: 600; margin-bottom: var(--space-lg); color: var(--text-primary); }
-        .rp-meta-row { display: flex; justify-content: space-between; font-size: 13px; padding: var(--space-xs) 0; border-bottom: 1px solid var(--border); }
-        .rp-meta-row:last-child { border-bottom: none; }
-        .rp-meta-row span { color: var(--text-secondary); }
-        .rp-meta-row strong { color: var(--text-primary); }
+        .rp-price { font-size: 32px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+        .rp-sentiment { font-size: 14px; font-weight: 600; margin-top: 8px; }
+        
+        .rp-sections { display: flex; flex-direction: column; gap: var(--space-3xl); }
+        .rp-section { scroll-margin-top: 100px; }
+        .section-header { display: flex; align-items: baseline; gap: var(--space-md); margin-bottom: var(--space-xl); border-bottom: 1px solid var(--border); padding-bottom: var(--space-sm); }
+        .section-num { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .section-title { font-size: 18px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.02em; }
+        
+        .section-content { font-size: 15px; line-height: 1.6; color: var(--text-secondary); }
+        .business-overview, .narrative-text { max-width: 800px; }
+        .evidence-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--space-lg); margin-top: var(--space-lg); }
+        .evidence-card-stub { background: var(--bg-surface); border: 1px solid var(--border); padding: var(--space-lg); border-radius: 8px; font-size: 13px; }
+        
+        @media (max-width: 900px) {
+          .rp-header { flex-direction: column; gap: var(--space-lg); }
+          .rp-price-group { text-align: left; }
+        }
       `}</style>
     </>
   )
