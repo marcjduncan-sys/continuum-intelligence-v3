@@ -70,6 +70,7 @@
     :focus {
       outline: none;
     }
+
     *:focus-visible {
       outline: 3px solid var(--accent-teal, #1A9E8F);
       outline-offset: 2px;
@@ -542,7 +543,8 @@
       left: 0;
       right: 0;
       z-index: var(--z-sticky);
-      background: rgba(11, 18, 32, 0.92); /* glassmorphism — intentional semi-transparent bg-primary */
+      background: rgba(11, 18, 32, 0.92);
+      /* glassmorphism — intentional semi-transparent bg-primary */
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
@@ -678,7 +680,8 @@
       right: 0;
       z-index: var(--z-integrations-bar);
       height: var(--integrations-bar-height);
-      background: rgba(7, 12, 22, 0.97); /* glassmorphism — intentional semi-transparent bg-primary */
+      background: rgba(7, 12, 22, 0.97);
+      /* glassmorphism — intentional semi-transparent bg-primary */
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
@@ -4226,7 +4229,8 @@
 
     .tc-stock-card {
       padding: var(--space-md);
-      background: var(--bg-elevated); /* Intentionally elevated — stock tile sits above body content */
+      background: var(--bg-elevated);
+      /* Intentionally elevated — stock tile sits above body content */
       border: 2px solid transparent;
       border-radius: 8px;
       text-align: center;
@@ -8740,75 +8744,82 @@
       }
     }
 
-/* === Back to Top Button === */
-.back-to-top-btn {
-  position: fixed;
-  bottom: var(--space-6, 1.5rem);
-  right: var(--space-6, 1.5rem);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--accent-teal);
-  color: var(--bg-primary);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity var(--transition-base), transform var(--transition-base), filter var(--transition-fast);
-  z-index: var(--z-toast);
-  pointer-events: none;
-}
-.back-to-top-btn.visible {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-.back-to-top-btn:hover {
-  filter: brightness(1.15);
-}
+    /* === Back to Top Button === */
+    .back-to-top-btn {
+      position: fixed;
+      bottom: var(--space-6, 1.5rem);
+      right: var(--space-6, 1.5rem);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent-teal);
+      color: var(--bg-primary);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity var(--transition-base), transform var(--transition-base), filter var(--transition-fast);
+      z-index: var(--z-toast);
+      pointer-events: none;
+    }
 
-/* === Empty States === */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-12, 3rem) var(--space-6, 1.5rem);
-  text-align: center;
-  color: var(--text-muted);
-  gap: var(--space-3, 0.75rem);
-}
-.empty-state-icon {
-  font-size: 2rem;
-  opacity: 0.5;
-}
-.empty-state-title {
-  font-size: var(--text-md, 0.875rem);
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-.empty-state-desc {
-  font-size: var(--text-sm, 0.75rem);
-  color: var(--text-muted);
-}
-.empty-state-action {
-  margin-top: var(--space-2, 0.5rem);
-  padding: 0.375rem 0.875rem;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text-secondary);
-  font-size: var(--text-sm, 0.75rem);
-  cursor: pointer;
-  transition: border-color var(--transition-fast), color var(--transition-fast);
-}
-.empty-state-action:hover {
-  border-color: var(--accent-teal);
-  color: var(--accent-teal);
-}
+    .back-to-top-btn.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .back-to-top-btn:hover {
+      filter: brightness(1.15);
+    }
+
+    /* === Empty States === */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-12, 3rem) var(--space-6, 1.5rem);
+      text-align: center;
+      color: var(--text-muted);
+      gap: var(--space-3, 0.75rem);
+    }
+
+    .empty-state-icon {
+      font-size: 2rem;
+      opacity: 0.5;
+    }
+
+    .empty-state-title {
+      font-size: var(--text-md, 0.875rem);
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-desc {
+      font-size: var(--text-sm, 0.75rem);
+      color: var(--text-muted);
+    }
+
+    .empty-state-action {
+      margin-top: var(--space-2, 0.5rem);
+      padding: 0.375rem 0.875rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      font-size: var(--text-sm, 0.75rem);
+      cursor: pointer;
+      transition: border-color var(--transition-fast), color var(--transition-fast);
+    }
+
+    .empty-state-action:hover {
+      border-color: var(--accent-teal);
+      color: var(--accent-teal);
+    }
   </style>
 </head>
 
@@ -9053,9 +9064,10 @@
             <span class="msb-updated" id="msb-updated"></span>
           </div>
           <div class="msb-right">
-            <span class="msb-updated" id="msb-feed-status" aria-live="polite" aria-atomic="true">Loading prices...</span>
-            <button class="msb-refresh-btn" id="msb-refresh" onclick="MarketFeed.refreshNow()"
-              title="Refresh prices" aria-label="Refresh prices">REFRESH</button>
+            <span class="msb-updated" id="msb-feed-status" aria-live="polite" aria-atomic="true">Loading
+              prices...</span>
+            <button class="msb-refresh-btn" id="msb-refresh" onclick="MarketFeed.refreshNow()" title="Refresh prices"
+              aria-label="Refresh prices">REFRESH</button>
           </div>
         </div>
 
@@ -9082,7 +9094,8 @@
               <th>ASX</th>
               <th>Company</th>
               <th class="sortable" onclick="sortCoverageTableBySector()" id="th-sector" title="Sort by sector">Sector
-                <span class="sort-arrow" id="sector-sort-arrow">&#9650;</span></th>
+                <span class="sort-arrow" id="sector-sort-arrow">&#9650;</span>
+              </th>
               <th class="sortable" onclick="sortCoverageTableByPrice()" id="th-price" title="Sort by price">Price <span
                   class="sort-arrow" id="price-sort-arrow">&#9650;</span></th>
               <th class="sortable" onclick="sortCoverageTable()" id="th-company"
@@ -9483,7 +9496,8 @@
           (peer-reviewed base rates), <strong>media and social</strong> (noise, but directionally informative),
           <strong>leadership and governance</strong> (board composition, skin in game, succession), and
           <strong>ownership and capital flows</strong> (register composition, substantial holder movements, short
-          interest).</p>
+          interest).
+        </p>
 
         <p class="about-text">Each domain receives an <strong>epistemic tag</strong> reflecting its reliability and
           motivation. Corporate communications are "Motivated." Regulatory filings are "Under Oath." Media is "Noise."
@@ -11107,16 +11121,16 @@
       function renderSectionNav(data) {
         var t = data.ticker.toLowerCase();
         var sections = [
-          ['identity', 'Identity'],
-          ['hypotheses', 'Hypotheses'],
-          ['narrative-timeline', 'Timeline'],
-          ['narrative', 'Narrative'],
-          ['evidence', 'Evidence'],
-          ['discriminates', 'Discriminates'],
-          ['tripwires', 'Tripwires'],
-          ['gaps', 'Gaps'],
-          ['technical', 'Technical'],
-          ['chat', 'Chat to the Analyst']
+          ['identity', '01 Identity'],
+          ['hypotheses', '02 Hypotheses'],
+          ['narrative', '03 Narrative'],
+          ['evidence', '04 Evidence'],
+          ['leadership', '05 Leadership'],
+          ['ownership', '06 Ownership'],
+          ['discriminates', '07 Discriminators'],
+          ['tripwires', '08 Tripwires'],
+          ['gaps', '09 Gaps'],
+          ['technical', '10 Technical']
         ];
 
         // Only include Technical if data exists
@@ -11406,18 +11420,19 @@
         var t = data.ticker.toLowerCase();
         var ev = data.evidence;
 
-        // Phase 5.5: Sort cards by diagnosticity (HIGH first), then by original order.
-        // Diagnosticity is derived from epistemicClass via EP_DIAG_MAP.
+        // Sort cards by numerical domain order (1-8).
         var sortedCards = ev.cards.slice();
         sortedCards.sort(function (a, b) {
-          var aInfo = EP_DIAG_MAP[a.epistemicClass] || { order: 99 };
-          var bInfo = EP_DIAG_MAP[b.epistemicClass] || { order: 99 };
-          return aInfo.order - bInfo.order;
+          return parseInt(a.title) - parseInt(b.title);
         });
 
         var cardsHtml = '';
         for (var i = 0; i < sortedCards.length; i++) {
           var card = sortedCards[i];
+          // Only show domains 1-8 in this section
+          var cardNum = parseInt(card.title);
+          if (isNaN(cardNum) || cardNum > 8) continue;
+
           var diagInfo = EP_DIAG_MAP[card.epistemicClass] || { diag: 'LOW', srcBadge: 'OTHER' };
           // Inject diagnosticity + source badges into card before rendering
           card._diagBadgeHtml = '<span class="ec-diag-badge ' + diagInfo.diag.toLowerCase() + '">' + diagInfo.diag + '</span>' +
@@ -11431,12 +11446,46 @@
 
         return '<div class="report-section" id="' + t + '-evidence">' +
           '<div class="rs-number">Section 04</div>' +
-          '<div class="rs-title">Cross-Domain Evidence Synthesis</div>' +
+          '<div class="rs-title">Primary Evidence Domains (1-8)</div>' +
           '<p class="rs-text">' + ev.intro + '</p>' +
           divergenceHtml +
           cardsHtml +
           alignmentHtml +
           narrativeHistoryHtml +
+          '</div>';
+      }
+
+      function renderLeadership(data) {
+        var t = data.ticker.toLowerCase();
+        var ev = data.evidence;
+        var card = ev.cards.find(function (c) { return parseInt(c.title) === 9; });
+        if (!card) return '';
+
+        var diagInfo = EP_DIAG_MAP[card.epistemicClass] || { diag: 'LOW', srcBadge: 'OTHER' };
+        card._diagBadgeHtml = '<span class="ec-diag-badge ' + diagInfo.diag.toLowerCase() + '">' + diagInfo.diag + '</span>' +
+          '<span class="ec-source-badge">' + diagInfo.srcBadge + '</span>';
+
+        return '<div class="report-section" id="' + t + '-leadership">' +
+          '<div class="rs-number">Section 05</div>' +
+          '<div class="rs-title">Leadership & Governance</div>' +
+          renderEvidenceCard(card) +
+          '</div>';
+      }
+
+      function renderOwnership(data) {
+        var t = data.ticker.toLowerCase();
+        var ev = data.evidence;
+        var card = ev.cards.find(function (c) { return parseInt(c.title) === 10; });
+        if (!card) return '';
+
+        var diagInfo = EP_DIAG_MAP[card.epistemicClass] || { diag: 'LOW', srcBadge: 'OTHER' };
+        card._diagBadgeHtml = '<span class="ec-diag-badge ' + diagInfo.diag.toLowerCase() + '">' + diagInfo.diag + '</span>' +
+          '<span class="ec-source-badge">' + diagInfo.srcBadge + '</span>';
+
+        return '<div class="report-section" id="' + t + '-ownership">' +
+          '<div class="rs-number">Section 06</div>' +
+          '<div class="rs-title">Ownership & Capital Flows</div>' +
+          renderEvidenceCard(card) +
           '</div>';
       }
 
@@ -11456,7 +11505,7 @@
         }
 
         return '<div class="report-section" id="' + t + '-discriminates">' +
-          '<div class="rs-number">Section 05</div>' +
+          '<div class="rs-number">Section 07</div>' +
           '<div class="rs-title">What Discriminates</div>' +
           '<p class="rs-text">' + d.intro + '</p>' +
           '<table class="disc-table">' +
@@ -11495,7 +11544,7 @@
         }
 
         return '<div class="report-section" id="' + t + '-tripwires">' +
-          '<div class="rs-number">Section 06</div>' +
+          '<div class="rs-number">Section 08</div>' +
           '<div class="rs-title">What We\'re Watching</div>' +
           '<p class="rs-text">' + tw.intro + '</p>' +
           cardsHtml +
@@ -11526,7 +11575,7 @@
         }
 
         return '<div class="report-section" id="' + t + '-gaps">' +
-          '<div class="rs-number">Section 07</div>' +
+          '<div class="rs-number">Section 09</div>' +
           '<div class="rs-title">Evidence Gaps &amp; Integrity Notes</div>' +
           '<div class="rs-subtitle">Domain Coverage Assessment</div>' +
           '<table class="gaps-table">' +
@@ -11912,7 +11961,7 @@
           '</div>';
 
         return '<div class="report-section ta-section" id="' + t + '-technical">' +
-          '<div class="rs-number">Section 08</div>' +
+          '<div class="rs-number">Section 10</div>' +
           '<div class="rs-title">Technical Structure</div>' +
           chartHtml +
           regimeHtml +
@@ -12906,6 +12955,8 @@
           renderNarrativeTimeline(data) +
           renderNarrative(data) +
           renderEvidence(data) +
+          renderLeadership(data) +
+          renderOwnership(data) +
           renderDiscriminators(data) +
           renderTripwires(data) +
           renderGaps(data) +
@@ -16751,17 +16802,17 @@
       }
 
       // Back to top button
-      (function() {
+      (function () {
         var btn = document.getElementById('back-to-top');
         if (!btn) return;
-        window.addEventListener('scroll', function() {
+        window.addEventListener('scroll', function () {
           if (window.scrollY > 400) {
             btn.classList.add('visible');
           } else {
             btn.classList.remove('visible');
           }
         }, { passive: true });
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         });
       })();
@@ -19046,12 +19097,12 @@
     }
   </script>
 
-<!-- Back to Top Button -->
-<button id="back-to-top" class="back-to-top-btn" aria-label="Back to top">
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-    <path d="M8 3.5L2.5 9h11L8 3.5z"/>
-  </svg>
-</button>
+  <!-- Back to Top Button -->
+  <button id="back-to-top" class="back-to-top-btn" aria-label="Back to top">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <path d="M8 3.5L2.5 9h11L8 3.5z" />
+    </svg>
+  </button>
 
 </body>
 
