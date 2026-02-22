@@ -35,6 +35,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Run confidence calibration tracker
+        run: node scripts/calibration-tracker.js --lookback 90 --verbose || true
+
       - name: Run weight calibration regression
         id: calibrate
         run: |
@@ -60,7 +63,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/stocks/*.json || true
+          git add data/stocks/*.json data/calibration/*.json || true
 
           if git diff --cached --quiet; then
             echo "No weight changes to commit"

@@ -129,10 +129,25 @@ function isResultsDay(ticker) {
   return false;
 }
 
+// ── Epistemic weight multipliers ──────────────────────────────────────────────
+// Evidence from higher-credibility sources gets proportionally more weight
+// in score adjustments. Statutory filings carry more weight than media speculation.
+const EPISTEMIC_WEIGHT = {
+  'Under Oath (statutory)':    1.5,   // Audited financials, regulatory filings
+  'Independent (third-party)': 1.2,   // Analyst reports, independent research
+  'Motivated (corporate)':     1.0,   // Company announcements, management guidance
+  'Speculative (media)':       0.6,   // Media reports, rumours
+  'Proprietary (internal)':    1.3,   // Internal analysis, proprietary data
+};
+
+function getEpistemicWeight(tag) {
+  return EPISTEMIC_WEIGHT[tag] || 1.0;
+}
+
 // ── §3.5: Evidence matrix evaluation (rows-before-columns ACH) ────────────────
 // Positive move → BULLISH hypotheses increase, BEARISH decrease
 // Negative move → BEARISH hypotheses increase, BULLISH decrease
-// NEUTRAL hypotheses: no change unless MATERIAL (then ½ adjustment)
+// NEUTRAL hypotheses: no change unless MATERIAL (then 1/2 adjustment)
 
 function applyEvidenceToHypotheses(hypotheses, direction, effectiveAdj, classification) {
   return hypotheses.map(h => {
@@ -149,6 +164,63 @@ function applyEvidenceToHypotheses(hypotheses, direction, effectiveAdj, classifi
     }
     return { ...h, _rawScore: (h.survival_score || 0) + adj };
   });
+}
+
+/**
+ * Apply LLM-extracted evidence items to hypothesis scores with epistemic weighting.
+ * This runs AFTER price-based adjustments to layer in fundamental evidence.
+ * Each evidence item's diagnosticity and epistemic credibility determine its weight.
+ */
+function applyEvidenceItemsToScores(stockData) {
+  const hyps = stockData.hypotheses;
+  if (!hyps) return null;
+
+  const evidence = stockData.evidence_items || [];
+  if (evidence.length === 0) return null;
+
+  const now = Date.now();
+  const tiers = Object.keys(hyps);
+  const adjustments = {};
+  tiers.forEach(t => { adjustments[t] = 0; });
+
+  // Diagnosticity multiplier
+  const DIAG_MULT = { VERY_HIGH: 3.0, HIGH: 2.0, MEDIUM: 1.0, LOW: 0.5, VERY_LOW: 0.2 };
+
+  for (const item of evidence) {
+    if (!item.active) continue;
+
+    // Calculate time decay
+    const itemDate = item.date ? new Date(item.date).getTime() : 0;
+    const daysSince = (now - itemDate) / (1000 * 60 * 60 * 24);
+    const fullWeightDays = (item.decay && item.decay.full_weight_days) || 90;
+    const halfLifeDays = (item.decay && item.decay.half_life_days) || 90;
+
+    let decayFactor = 1.0;
+    if (daysSince > fullWeightDays) {
+      const decayDays = daysSince - fullWeightDays;
+      decayFactor = Math.pow(0.5, decayDays / halfLifeDays);
+    }
+    if (decayFactor < 0.05) continue; // Fully decayed, skip
+
+    // Evidence weight = diagnosticity * epistemic credibility * decay
+    const diagMult = DIAG_MULT[item.diagnosticity] || 1.0;
+    const epistemicMult = getEpistemicWeight(item.epistemic_tag);
+    const weight = diagMult * epistemicMult * decayFactor;
+
+    // Apply to each hypothesis
+    const impact = item.hypothesis_impact || {};
+    for (const tier of tiers) {
+      const impactVal = impact[tier];
+      if (impactVal === 'CONSISTENT') {
+        adjustments[tier] += weight * 0.5; // Evidence supports this hypothesis
+      } else if (impactVal === 'INCONSISTENT') {
+        adjustments[tier] -= weight * 0.5; // Evidence contradicts this hypothesis
+      }
+      // NEUTRAL: no adjustment
+    }
+  }
+
+  return adjustments;
 }
 
 // ── §3.6: Score normalisation ─────────────────────────────────────────────────
@@ -576,6 +648,8 @@ module.exports = {
   volumeMultiplier,
   normaliseScores,
   applyEvidenceToHypotheses,
+  applyEvidenceItemsToScores,
+  getEpistemicWeight,
   main,
   // Legacy adapter for callers that pass (stock, priceData, taConfig)
   processStock: function adapterProcessStock(stock, priceData) {
@@ -600,6 +674,17 @@ module.exports = {
     }));
 
     const updated = applyEvidenceToHypotheses(hypsArray, direction, effectiveAdj, moveClass.label);
+
+    // Layer in LLM-extracted evidence with epistemic weighting and time decay
+    const evidenceAdj = applyEvidenceItemsToScores(stock);
+    if (evidenceAdj) {
+      for (const h of updated) {
+        if (evidenceAdj[h.id] !== undefined) {
+          h._rawScore += evidenceAdj[h.id];
+        }
+      }
+    }
+
     const norm    = normaliseScores(updated.map(h => h._rawScore));
     const scores  = {};
     tiers.forEach((t, i) => { scores[t] = norm[i] / 100; });
@@ -608,7 +693,7 @@ module.exports = {
       scores,
       classification: moveClass.label,
       volumeMultiplier: volMult,
-      flags: [],
+      flags: evidenceAdj ? ['evidence_weighted'] : [],
       cumulativeMoves: { fiveDay: null, twentyDay: null, sixtyDay: null }
     };
   }
