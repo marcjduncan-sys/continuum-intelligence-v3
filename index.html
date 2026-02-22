@@ -14629,6 +14629,7 @@
       function prefetchAllLiveData() {
         var tickers = Object.keys(STOCK_DATA);
         var delay = 0;
+        var remaining = tickers.length;
         tickers.forEach(function (ticker) {
           setTimeout(function () {
             var stock = STOCK_DATA[ticker];
@@ -14654,7 +14655,15 @@
                     }
                   }
                 }
-              }).catch(function () { });
+              }).catch(function () { }).finally(function () {
+                remaining--;
+                if (remaining <= 0) {
+                  // All tickers fetched — refresh portfolio with live prices
+                  if (typeof refreshPortfolioPrices === 'function') refreshPortfolioPrices();
+                }
+              });
+            } else {
+              remaining--;
             }
           }, delay);
           delay += 500; // Stagger by 500ms to avoid rate limiting
@@ -14890,6 +14899,8 @@
                 updateLiveUI(ticker);
               }
             }
+            // Refresh portfolio with new prices
+            if (typeof refreshPortfolioPrices === 'function') refreshPortfolioPrices();
             return;
           }
 
@@ -14945,6 +14956,8 @@
               _lastFetchTime = Date.now();
               _errorCount = 0;
               updateStatusBar(fetched + ' prices via live feed');
+              // Refresh portfolio with new prices
+              if (typeof refreshPortfolioPrices === 'function') refreshPortfolioPrices();
             } else {
               _errorCount++;
               updateStatusBar('Using cached prices');
@@ -15724,6 +15737,15 @@
         renderPortfolioDiagnostics(positions, totalValue);
         renderReweighting(positions, totalValue);
         renderChangeAlerts(positions);
+      }
+
+      /* Refresh portfolio prices after live data arrives */
+      function refreshPortfolioPrices() {
+        var saved = loadPortfolio();
+        if (!saved || saved.length === 0) return;
+        var table = document.getElementById('portfolioTable');
+        if (!table || table.style.display === 'none') return;
+        renderPortfolioFromSaved(saved);
       }
 
       /* Render from saved data — refresh prices and recalculate */
