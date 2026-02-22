@@ -10274,9 +10274,7 @@
                 STOCK_DATA[ticker]._livePrice = livePrice;
                 STOCK_DATA[ticker].price = livePrice;
               }
-              if (livePriceHistory) {
-                STOCK_DATA[ticker].priceHistory = livePriceHistory;
-              }
+              // Do NOT restore livePriceHistory here; we want the rich data from research JSON
               // Re-hydrate with ContinuumDynamics if available
               if (typeof ContinuumDynamics !== 'undefined' && ContinuumDynamics.hydrate) {
                 ContinuumDynamics.hydrate(ticker);
@@ -11125,17 +11123,16 @@
           ['hypotheses', '02 Hypotheses'],
           ['narrative', '03 Narrative'],
           ['evidence', '04 Evidence'],
-          ['leadership', '05 Leadership'],
-          ['ownership', '06 Ownership'],
-          ['discriminates', '07 Discriminators'],
-          ['tripwires', '08 Tripwires'],
-          ['gaps', '09 Gaps'],
-          ['technical', '10 Technical']
+          ['discriminates', '05 Discriminators'],
+          ['tripwires', '06 Tripwires'],
+          ['gaps', '07 Evidence Gaps & Integrity'],
+          ['technical', '08 Technical'],
+          ['chat', 'Chat to the Analyst']
         ];
 
         // Only include Technical if data exists
         if (!data.technicalAnalysis) {
-          sections.splice(sections.length - 2, 1); // remove technical, keep chat
+          sections = sections.filter(function (s) { return s[0] !== 'technical'; });
         }
 
         var linksHtml = '';
@@ -11420,7 +11417,7 @@
         var t = data.ticker.toLowerCase();
         var ev = data.evidence;
 
-        // Sort cards by numerical domain order (1-8).
+        // Sort cards by numerical domain order (1-10).
         var sortedCards = ev.cards.slice();
         sortedCards.sort(function (a, b) {
           return parseInt(a.title) - parseInt(b.title);
@@ -11429,9 +11426,8 @@
         var cardsHtml = '';
         for (var i = 0; i < sortedCards.length; i++) {
           var card = sortedCards[i];
-          // Only show domains 1-8 in this section
           var cardNum = parseInt(card.title);
-          if (isNaN(cardNum) || cardNum > 8) continue;
+          if (isNaN(cardNum) || cardNum > 10) continue;
 
           var diagInfo = EP_DIAG_MAP[card.epistemicClass] || { diag: 'LOW', srcBadge: 'OTHER' };
           // Inject diagnosticity + source badges into card before rendering
@@ -11446,46 +11442,12 @@
 
         return '<div class="report-section" id="' + t + '-evidence">' +
           '<div class="rs-number">Section 04</div>' +
-          '<div class="rs-title">Primary Evidence Domains (1-8)</div>' +
+          '<div class="rs-title">Primary Evidence Domains</div>' +
           '<p class="rs-text">' + ev.intro + '</p>' +
           divergenceHtml +
           cardsHtml +
           alignmentHtml +
           narrativeHistoryHtml +
-          '</div>';
-      }
-
-      function renderLeadership(data) {
-        var t = data.ticker.toLowerCase();
-        var ev = data.evidence;
-        var card = ev.cards.find(function (c) { return parseInt(c.title) === 9; });
-        if (!card) return '';
-
-        var diagInfo = EP_DIAG_MAP[card.epistemicClass] || { diag: 'LOW', srcBadge: 'OTHER' };
-        card._diagBadgeHtml = '<span class="ec-diag-badge ' + diagInfo.diag.toLowerCase() + '">' + diagInfo.diag + '</span>' +
-          '<span class="ec-source-badge">' + diagInfo.srcBadge + '</span>';
-
-        return '<div class="report-section" id="' + t + '-leadership">' +
-          '<div class="rs-number">Section 05</div>' +
-          '<div class="rs-title">Leadership & Governance</div>' +
-          renderEvidenceCard(card) +
-          '</div>';
-      }
-
-      function renderOwnership(data) {
-        var t = data.ticker.toLowerCase();
-        var ev = data.evidence;
-        var card = ev.cards.find(function (c) { return parseInt(c.title) === 10; });
-        if (!card) return '';
-
-        var diagInfo = EP_DIAG_MAP[card.epistemicClass] || { diag: 'LOW', srcBadge: 'OTHER' };
-        card._diagBadgeHtml = '<span class="ec-diag-badge ' + diagInfo.diag.toLowerCase() + '">' + diagInfo.diag + '</span>' +
-          '<span class="ec-source-badge">' + diagInfo.srcBadge + '</span>';
-
-        return '<div class="report-section" id="' + t + '-ownership">' +
-          '<div class="rs-number">Section 06</div>' +
-          '<div class="rs-title">Ownership & Capital Flows</div>' +
-          renderEvidenceCard(card) +
           '</div>';
       }
 
@@ -11505,7 +11467,7 @@
         }
 
         return '<div class="report-section" id="' + t + '-discriminates">' +
-          '<div class="rs-number">Section 07</div>' +
+          '<div class="rs-number">Section 05</div>' +
           '<div class="rs-title">What Discriminates</div>' +
           '<p class="rs-text">' + d.intro + '</p>' +
           '<table class="disc-table">' +
@@ -11544,7 +11506,7 @@
         }
 
         return '<div class="report-section" id="' + t + '-tripwires">' +
-          '<div class="rs-number">Section 08</div>' +
+          '<div class="rs-number">Section 06</div>' +
           '<div class="rs-title">What We\'re Watching</div>' +
           '<p class="rs-text">' + tw.intro + '</p>' +
           cardsHtml +
@@ -11575,8 +11537,8 @@
         }
 
         return '<div class="report-section" id="' + t + '-gaps">' +
-          '<div class="rs-number">Section 09</div>' +
-          '<div class="rs-title">Evidence Gaps &amp; Integrity Notes</div>' +
+          '<div class="rs-number">Section 07</div>' +
+          '<div class="rs-title">Evidence Gaps &amp; Integrity</div>' +
           '<div class="rs-subtitle">Domain Coverage Assessment</div>' +
           '<table class="gaps-table">' +
           '<thead><tr><th>Domain</th><th>Coverage</th><th>Freshness</th><th>Confidence</th></tr></thead>' +
@@ -11961,7 +11923,7 @@
           '</div>';
 
         return '<div class="report-section ta-section" id="' + t + '-technical">' +
-          '<div class="rs-number">Section 10</div>' +
+          '<div class="rs-number">Section 08</div>' +
           '<div class="rs-title">Technical Structure</div>' +
           chartHtml +
           regimeHtml +
@@ -12955,8 +12917,6 @@
           renderNarrativeTimeline(data) +
           renderNarrative(data) +
           renderEvidence(data) +
-          renderLeadership(data) +
-          renderOwnership(data) +
           renderDiscriminators(data) +
           renderTripwires(data) +
           renderGaps(data) +
@@ -18088,7 +18048,7 @@
      *   2. Section 01: Identity & Snapshot
      *   3. Section 02: Competing Hypotheses (with NFI weight overlays)
      *   4. Section 03: Dominant Narrative (with NFI market-responsive update)
-     *   5. Section 04: Cross-Domain Evidence Synthesis (10 domains + matrix)
+     *   5. Section 04: Primary Evidence Domains (10 domains + matrix)
      *   6. Section 05: What Discriminates
      *   7. Section 06: What We're Watching (tripwires)
      *   8. Section 07: Evidence Gaps & Integrity Notes
@@ -18763,7 +18723,7 @@
         pageBreak() +
         pageHeader('Dominant Narrative') +
         narrativeHtml +
-        /* Section 04: Evidence — soft break */
+        /* Section 04: Primary Evidence Domains (1-10) — soft break */
         pageBreak() +
         pageHeader('Evidence Synthesis') +
         evidenceHtml +
