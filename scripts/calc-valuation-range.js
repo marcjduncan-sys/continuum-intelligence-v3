@@ -172,7 +172,7 @@ function calculateHypothesisAdjustment(companySignal, historicalPriceRange) {
 }
 
 // ─── Component 6: Composite range assembly ────────────────────────────────────
-function assembleValuationRange(hypothesisAdj, forecastData, historicalPriceRange, currentPrice) {
+function assembleValuationRange(hypothesisAdj, forecastData, historicalPriceRange, currentPrice, overallSentiment, sentimentLabel) {
   // Use forecast agent output as primary (if available); fall back to hypothesis-adjusted range
   let low, fairLow, fairHigh, high;
 
@@ -198,18 +198,50 @@ function assembleValuationRange(hypothesisAdj, forecastData, historicalPriceRang
     return null;
   }
 
-  // Determine zone
+  // Determine zone: colour follows platform SKEW (evidence direction), not price position.
+  // The bar shows where price sits vs fair value (that is the positional information).
+  // The zone badge shows whether the evidence weight says upside, neutral, or downside.
+  //
+  // Skew-first logic:
+  //   UPSIDE sentiment   -> GREEN  (evidence supports upside)
+  //   DOWNSIDE sentiment -> RED    (evidence supports downside)
+  //   NEUTRAL sentiment  -> AMBER  (balanced evidence)
+  //
+  // Intensity modifiers based on price position:
+  //   If skew is GREEN and price is below fair low  -> DEEP_GREEN (cheap + upside evidence)
+  //   If skew is RED   and price is above fair high -> DEEP_RED   (expensive + downside evidence)
+  //   If skew contradicts position (e.g. RED but price below fair) -> plain RED with cautionary label
+  const sent = overallSentiment || 0;
+  const sLabel = (sentimentLabel || 'NEUTRAL').toUpperCase();
   let zone, zoneLabel;
-  if (currentPrice > high) {
-    zone = 'DEEP_RED'; zoneLabel = 'Significantly above valuation range';
-  } else if (currentPrice > fairHigh) {
-    zone = 'RED';      zoneLabel = 'Above fair value – downside skew';
-  } else if (currentPrice < low) {
-    zone = 'DEEP_GREEN'; zoneLabel = 'Significantly below valuation range';
-  } else if (currentPrice < fairLow) {
-    zone = 'GREEN';    zoneLabel = 'Below fair value – upside skew';
+
+  if (sLabel === 'DOWNSIDE' || sLabel === 'BEARISH' || sent <= -10) {
+    // Evidence weight points down
+    if (currentPrice > fairHigh) {
+      zone = 'DEEP_RED'; zoneLabel = 'Above fair value; downside skew';
+    } else if (currentPrice < fairLow) {
+      zone = 'RED';      zoneLabel = 'Below fair value but downside skew; potential value trap';
+    } else {
+      zone = 'RED';      zoneLabel = 'Within fair value; downside skew';
+    }
+  } else if (sLabel === 'UPSIDE' || sLabel === 'BULLISH' || sent >= 10) {
+    // Evidence weight points up
+    if (currentPrice < fairLow) {
+      zone = 'DEEP_GREEN'; zoneLabel = 'Below fair value; upside skew';
+    } else if (currentPrice > fairHigh) {
+      zone = 'GREEN';      zoneLabel = 'Above fair value but upside skew; momentum carry';
+    } else {
+      zone = 'GREEN';      zoneLabel = 'Within fair value; upside skew';
+    }
   } else {
-    zone = 'AMBER';    zoneLabel = 'Within fair value range';
+    // Neutral evidence
+    if (currentPrice > high) {
+      zone = 'RED';        zoneLabel = 'Significantly above range; neutral skew';
+    } else if (currentPrice < low) {
+      zone = 'GREEN';      zoneLabel = 'Significantly below range; neutral skew';
+    } else {
+      zone = 'AMBER';      zoneLabel = 'Within range; balanced evidence';
+    }
   }
 
   const midpoint   = (fairLow + fairHigh) / 2;
@@ -459,8 +491,10 @@ async function processStock(tickerBase) {
     }
   }
 
-  // ── Component 6: assemble composite range
-  const compositeRange = assembleValuationRange(hypAdj, forecastData, historicalPriceRange, currentPrice);
+  // ── Component 6: assemble composite range (pass overall sentiment for skew-first zone logic)
+  const overallSentiment = tls.overall_sentiment || 0;
+  const sentimentLabel   = tls.sentiment_label || stockData.risk_skew || 'NEUTRAL';
+  const compositeRange   = assembleValuationRange(hypAdj, forecastData, historicalPriceRange, currentPrice, overallSentiment, sentimentLabel);
 
   if (!compositeRange) {
     console.log(`[SKIP] ${tickerBase}: insufficient data to produce valuation range`);

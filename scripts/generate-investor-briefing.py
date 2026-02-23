@@ -536,7 +536,7 @@ def build_cover(stock, macro, report_date):
 
     sent_data = [
         [
-            tbl_cell('Overall Sentiment', bold=True),
+            tbl_cell('Overall Skew', bold=True),
             tbl_cell(f'{overall_val}  {sent_lbl}', color=sent_color, bold=True),
         ],
         [

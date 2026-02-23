@@ -11287,26 +11287,29 @@
       // fair-value range, and the 52-week price position. This eliminates the
       // stale-JSON problem and accounts for stocks trading at record highs.
       //
-      // Formula:  zoneScore = w1*skewSignal + w2*priceSignal + w3*rangeSignal
-      //   skewSignal   [-1,+1]  from _computeOverallSentiment  (>0 = bullish)
-      //   priceSignal  [-1,+1]  midpoint of fair range vs price (>0 = cheap)
-      //   rangeSignal  [-1,+1]  52-week position inverted       (>0 = near lows)
+      // Three normalised inputs [-1, +1]:
+      //   skewSignal   from _computeOverallSentiment  (>0 = bullish)
+      //   priceSignal  midpoint of fair range vs price (>0 = cheap)
+      //   rangeSignal  52-week position inverted       (>0 = near lows)
       //
-      // Weights: skew 50%, price position 30%, 52wk position 20%
-      // Thresholds: > +0.15 GREEN, < -0.15 RED, else AMBER
-      //             > +0.40 DEEP_GREEN, < -0.40 DEEP_RED
+      // Gated by skew direction (colour follows skew, always):
+      //   DOWNSIDE skew: zone in {DEEP_RED, RED, AMBER}  -- GREEN impossible
+      //   UPSIDE skew:   zone in {AMBER, GREEN, DEEP_GREEN} -- RED impossible
+      //   BALANCED:      full range, price/52wk signals determine zone
+      //
+      // Within each gate, price + 52wk signals determine intensity.
 
       function _computeZone(data, vr) {
         // 1. Skew signal: use same computation as composite bar
         var rawSkew = _computeOverallSentiment(data);
-        // Normalise: ±30 maps to ±1.0, clamped
+        var skewLabel = _overallLabel(rawSkew); // UPSIDE / DOWNSIDE / BALANCED
+        // Normalise: +/-30 maps to +/-1.0, clamped
         var skewSignal = Math.max(-1, Math.min(1, rawSkew / 30));
 
         // 2. Price-to-fair signal: how far price is from fair midpoint
         var fairMid = (vr.fair_low + vr.fair_high) / 2;
         var cur = data._livePrice || data.price || vr.current_price;
         // Positive = below fair (cheap), negative = above fair (expensive)
-        // Normalise by fair range width so a 15% deviation maps to ~±1.0
         var fairWidth = vr.fair_high - vr.fair_low;
         var priceDeviation = (fairMid - cur) / (fairWidth > 0 ? fairWidth : fairMid * 0.15);
         var priceSignal = Math.max(-1, Math.min(1, priceDeviation * 0.4));
@@ -11316,28 +11319,62 @@
         var rangePos = computed.rangePosition; // 0 = at 52w low, 100 = at 52w high
         var rangeSignal = 0;
         if (rangePos != null) {
-          // Invert: 0% position → +1.0 (bullish), 100% position → -1.0 (bearish)
           rangeSignal = 1 - (rangePos / 50);
           rangeSignal = Math.max(-1, Math.min(1, rangeSignal));
         }
 
-        // Composite score
-        var score = 0.50 * skewSignal + 0.30 * priceSignal + 0.20 * rangeSignal;
+        // Intensity score from price + 52wk (used within gated range)
+        var intensityScore = 0.60 * priceSignal + 0.40 * rangeSignal;
 
-        // Zone thresholds
-        var zone, zoneLabel;
-        var skewLabel = _overallLabel(rawSkew).toLowerCase();
+        // Price description for label
         var priceDesc = cur > vr.fair_high ? 'above fair value'
           : cur < vr.fair_low ? 'below fair value' : 'within fair value';
 
-        if (score > 0.40)       { zone = 'DEEP_GREEN'; zoneLabel = priceDesc + '; strong upside skew'; }
-        else if (score > 0.15)  { zone = 'GREEN';      zoneLabel = priceDesc + '; ' + skewLabel + ' skew'; }
-        else if (score < -0.40) { zone = 'DEEP_RED';   zoneLabel = priceDesc + '; strong downside skew'; }
-        else if (score < -0.15) { zone = 'RED';        zoneLabel = priceDesc + '; ' + skewLabel + ' skew'; }
-        else                    { zone = 'AMBER';      zoneLabel = priceDesc + '; balanced evidence'; }
+        var zone, zoneLabel;
 
-        return { zone: zone, zoneLabel: zoneLabel, score: score,
-                 debug: { skewSignal: skewSignal, priceSignal: priceSignal, rangeSignal: rangeSignal, rawSkew: rawSkew } };
+        if (skewLabel === 'DOWNSIDE') {
+          // Gate: RED family only. Intensity determines depth.
+          // intensityScore < -0.25 (expensive + at highs) = DEEP_RED
+          // intensityScore > +0.40 (cheap + at lows) = AMBER (value trap territory)
+          // Otherwise RED
+          if (intensityScore < -0.25) {
+            zone = 'DEEP_RED';
+            zoneLabel = priceDesc + '; downside skew, overextended';
+          } else if (intensityScore > 0.40) {
+            zone = 'AMBER';
+            zoneLabel = priceDesc + '; downside skew, but deeply discounted';
+          } else {
+            zone = 'RED';
+            zoneLabel = priceDesc + '; downside skew';
+          }
+        } else if (skewLabel === 'UPSIDE') {
+          // Gate: GREEN family only. Intensity determines depth.
+          // intensityScore > +0.25 (cheap + at lows) = DEEP_GREEN
+          // intensityScore < -0.40 (expensive + at highs) = AMBER (momentum risk)
+          // Otherwise GREEN
+          if (intensityScore > 0.25) {
+            zone = 'DEEP_GREEN';
+            zoneLabel = priceDesc + '; upside skew, discounted';
+          } else if (intensityScore < -0.40) {
+            zone = 'AMBER';
+            zoneLabel = priceDesc + '; upside skew, but near highs';
+          } else {
+            zone = 'GREEN';
+            zoneLabel = priceDesc + '; upside skew';
+          }
+        } else {
+          // BALANCED: full range driven by composite of all three signals
+          var composite = 0.40 * skewSignal + 0.35 * priceSignal + 0.25 * rangeSignal;
+          if (composite > 0.30)       { zone = 'DEEP_GREEN'; zoneLabel = priceDesc + '; balanced skew, strong value signal'; }
+          else if (composite > 0.10)  { zone = 'GREEN';      zoneLabel = priceDesc + '; balanced skew, tilting positive'; }
+          else if (composite < -0.30) { zone = 'DEEP_RED';   zoneLabel = priceDesc + '; balanced skew, strong caution signal'; }
+          else if (composite < -0.10) { zone = 'RED';        zoneLabel = priceDesc + '; balanced skew, tilting negative'; }
+          else                        { zone = 'AMBER';      zoneLabel = priceDesc + '; balanced evidence'; }
+        }
+
+        return { zone: zone, zoneLabel: zoneLabel,
+                 debug: { rawSkew: rawSkew, skewLabel: skewLabel, skewSignal: skewSignal,
+                          priceSignal: priceSignal, rangeSignal: rangeSignal, intensityScore: intensityScore } };
       }
 
       function renderValuationRange(data) {
