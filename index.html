@@ -9259,7 +9259,7 @@
                 title="Company Research contribution — independently coloured">Company <span class="sort-arrow"
                   id="company-sort-arrow">&#9650;</span></th>
               <th class="sortable" onclick="sortCoverageTableBySentiment()" id="th-sentiment"
-                title="Three-layer composite signal">Sentiment <span class="sort-arrow"
+                title="Three-layer composite signal">Skew <span class="sort-arrow"
                   id="sentiment-sort-arrow">&#9650;</span></th>
               <th title="Current dominant hypothesis">Dominant</th>
               <th title="Valuation zone — where price sits relative to fair value range">Zone</th>
@@ -11281,6 +11281,65 @@
           '</div>';
       }
 
+      // ── Composite Zone Score ─────────────────────────────────────────────────
+      // Determines valuation range zone colour at render time using the SAME
+      // overall skew the composite bar displays, the price position within the
+      // fair-value range, and the 52-week price position. This eliminates the
+      // stale-JSON problem and accounts for stocks trading at record highs.
+      //
+      // Formula:  zoneScore = w1*skewSignal + w2*priceSignal + w3*rangeSignal
+      //   skewSignal   [-1,+1]  from _computeOverallSentiment  (>0 = bullish)
+      //   priceSignal  [-1,+1]  midpoint of fair range vs price (>0 = cheap)
+      //   rangeSignal  [-1,+1]  52-week position inverted       (>0 = near lows)
+      //
+      // Weights: skew 50%, price position 30%, 52wk position 20%
+      // Thresholds: > +0.15 GREEN, < -0.15 RED, else AMBER
+      //             > +0.40 DEEP_GREEN, < -0.40 DEEP_RED
+
+      function _computeZone(data, vr) {
+        // 1. Skew signal: use same computation as composite bar
+        var rawSkew = _computeOverallSentiment(data);
+        // Normalise: ±30 maps to ±1.0, clamped
+        var skewSignal = Math.max(-1, Math.min(1, rawSkew / 30));
+
+        // 2. Price-to-fair signal: how far price is from fair midpoint
+        var fairMid = (vr.fair_low + vr.fair_high) / 2;
+        var cur = data._livePrice || data.price || vr.current_price;
+        // Positive = below fair (cheap), negative = above fair (expensive)
+        // Normalise by fair range width so a 15% deviation maps to ~±1.0
+        var fairWidth = vr.fair_high - vr.fair_low;
+        var priceDeviation = (fairMid - cur) / (fairWidth > 0 ? fairWidth : fairMid * 0.15);
+        var priceSignal = Math.max(-1, Math.min(1, priceDeviation * 0.4));
+
+        // 3. 52-week range signal: at lows = positive, at highs = negative
+        var computed = data._computed || {};
+        var rangePos = computed.rangePosition; // 0 = at 52w low, 100 = at 52w high
+        var rangeSignal = 0;
+        if (rangePos != null) {
+          // Invert: 0% position → +1.0 (bullish), 100% position → -1.0 (bearish)
+          rangeSignal = 1 - (rangePos / 50);
+          rangeSignal = Math.max(-1, Math.min(1, rangeSignal));
+        }
+
+        // Composite score
+        var score = 0.50 * skewSignal + 0.30 * priceSignal + 0.20 * rangeSignal;
+
+        // Zone thresholds
+        var zone, zoneLabel;
+        var skewLabel = _overallLabel(rawSkew).toLowerCase();
+        var priceDesc = cur > vr.fair_high ? 'above fair value'
+          : cur < vr.fair_low ? 'below fair value' : 'within fair value';
+
+        if (score > 0.40)       { zone = 'DEEP_GREEN'; zoneLabel = priceDesc + '; strong upside skew'; }
+        else if (score > 0.15)  { zone = 'GREEN';      zoneLabel = priceDesc + '; ' + skewLabel + ' skew'; }
+        else if (score < -0.40) { zone = 'DEEP_RED';   zoneLabel = priceDesc + '; strong downside skew'; }
+        else if (score < -0.15) { zone = 'RED';        zoneLabel = priceDesc + '; ' + skewLabel + ' skew'; }
+        else                    { zone = 'AMBER';      zoneLabel = priceDesc + '; balanced evidence'; }
+
+        return { zone: zone, zoneLabel: zoneLabel, score: score,
+                 debug: { skewSignal: skewSignal, priceSignal: priceSignal, rangeSignal: rangeSignal, rawSkew: rawSkew } };
+      }
+
       function renderValuationRange(data) {
         // Read valuation_range from stock data (written by calc-valuation-range.js)
         var vr = data.valuation_range;
@@ -11290,9 +11349,12 @@
         var fairLow  = vr.fair_low;
         var fairHigh = vr.fair_high;
         var high     = vr.high;
-        var cur      = vr.current_price;
-        var zone     = vr.zone || 'AMBER';
-        var zoneLabel = vr.zone_label || 'Within fair value range';
+        var cur      = data._livePrice || data.price || vr.current_price;
+
+        // Compute zone dynamically — uses same skew as composite bar + 52wk position
+        var zoneResult = _computeZone(data, vr);
+        var zone      = zoneResult.zone;
+        var zoneLabel = zoneResult.zoneLabel;
 
         // Compute segment widths as % of full range
         var totalRange = high - low;
@@ -11863,7 +11925,17 @@
         var ma50Arr = useLive && liveTA ? liveTA.ma50Arr : computeMA(closes, 50);
         var ma200Arr = useLive && liveTA ? liveTA.ma200Arr : computeMA(closes, 200);
 
-        var chartTitle = (n > 620 ? '3' : n > 350 ? '2' : '1') + '-Year Daily Price &amp; Moving Averages';
+        // Determine chart time span from actual dates when available, fall back to point count
+        var chartYears = 1;
+        if (useLive && bars.length > 1 && bars[0].date && bars[bars.length - 1].date) {
+          var spanMs = new Date(bars[bars.length - 1].date) - new Date(bars[0].date);
+          var spanDays = spanMs / (1000 * 60 * 60 * 24);
+          chartYears = spanDays > 900 ? 3 : spanDays > 540 ? 2 : 1;
+        } else if (!useLive && data.priceHistory) {
+          // Static: ~252 trading days per year
+          chartYears = n > 630 ? 3 : n > 378 ? 2 : 1;
+        }
+        var chartTitle = chartYears + '-Year Daily Price &amp; Moving Averages';
         var liveLabel = useLive ? '<span class="ta-chart-live-badge">LIVE</span>' : '<span class="ta-chart-static-badge">STATIC</span>';
 
         // Chart dimensions
@@ -13635,7 +13707,7 @@
             // ERRATA_003: Replace thesis skew bar with composite sentiment decomposition
             var tls = data.three_layer_signal || null;
             if (!tls || tls.overall_sentiment === null || tls.overall_sentiment === undefined) {
-              return '<div class="snap-sentiment-bar"><span class="snap-risk-skew-label">Sentiment</span><span class="composite-pending">Computing…</span></div>';
+              return '<div class="snap-sentiment-bar"><span class="snap-risk-skew-label">Skew</span><span class="composite-pending">Computing…</span></div>';
             }
             var mC = tls.macro_contribution || 0;
             var seC = tls.sector_contribution || 0;
@@ -13652,7 +13724,7 @@
             var extCls = extV > 5 ? 'tls-positive' : extV < -5 ? 'tls-negative' : 'tls-neutral';
             var compCls = cC > 5 ? 'tls-positive' : cC < -5 ? 'tls-negative' : 'tls-neutral';
             return '<div class="snap-risk-skew-bar">' +
-              '<span class="snap-risk-skew-label">Sentiment</span>' +
+              '<span class="snap-risk-skew-label">Skew</span>' +
               '<span class="snap-risk-skew-badge ' + sCls + '" style="background:none;border:none;padding:0">' +
               '<span class="composite-score ' + sCls + '" style="font-size:1rem">' + (sScore > 0 ? '+' : '') + sScore + '</span>' +
               ' <span style="font-size:0.75rem;font-weight:600">' + sLabel + '</span>' +
@@ -13866,14 +13938,15 @@
           domHtml = '<span class="' + covDomCls + '" style="font-size:0.75rem">' + covDomName + '</span>';
         }
 
-        // Valuation zone column
+        // Valuation zone column — compute dynamically (same skew as composite bar)
         var zoneHtml = '<span style="color:var(--text-muted);font-size:0.6rem">—</span>';
         var vr = data.valuation_range;
-        if (vr && vr.zone) {
-          var vrZoneCls = vr.zone.toLowerCase().replace('_', '-');
-          var vrZoneShort = vr.zone === 'DEEP_GREEN' ? 'DEEP GRN'
-            : vr.zone === 'DEEP_RED' ? 'DEEP RED'
-            : vr.zone;
+        if (vr && vr.low && vr.high) {
+          var covZone = _computeZone(data, vr);
+          var vrZoneCls = covZone.zone.toLowerCase().replace('_', '-');
+          var vrZoneShort = covZone.zone === 'DEEP_GREEN' ? 'DEEP GRN'
+            : covZone.zone === 'DEEP_RED' ? 'DEEP RED'
+            : covZone.zone;
           zoneHtml = '<span class="cov-zone-badge zone-' + vrZoneCls + '">' + vrZoneShort + '</span>';
         }
 
@@ -16555,13 +16628,14 @@
           html += researchH + consensusH;
         }
 
-        // Valuation Range (compact sidebar widget)
+        // Valuation Range (compact sidebar widget) — compute zone dynamically
         var vr = stock.valuation_range;
         if (vr && vr.low && vr.high && vr.current_price) {
-          var vrZoneCls = (vr.zone || 'AMBER').toLowerCase().replace('_', '-');
-          var vrZoneShort = vr.zone === 'DEEP_GREEN' ? 'DEEP GREEN'
-            : vr.zone === 'DEEP_RED' ? 'DEEP RED'
-            : (vr.zone || 'AMBER');
+          var sideZone = _computeZone(stock, vr);
+          var vrZoneCls = sideZone.zone.toLowerCase().replace('_', '-');
+          var vrZoneShort = sideZone.zone === 'DEEP_GREEN' ? 'DEEP GREEN'
+            : sideZone.zone === 'DEEP_RED' ? 'DEEP RED'
+            : sideZone.zone;
           var vrTotalW = vr.high - vr.low;
           var vrGreenW = vrTotalW > 0 ? Math.max(0, ((vr.fair_low - vr.low) / vrTotalW) * 100) : 33;
           var vrAmberW = vrTotalW > 0 ? Math.max(0, ((vr.fair_high - vr.fair_low) / vrTotalW) * 100) : 34;

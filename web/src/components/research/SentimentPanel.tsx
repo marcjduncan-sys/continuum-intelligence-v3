@@ -32,7 +32,7 @@ export function SentimentPanel({ signal, weights }: SentimentPanelProps) {
   const rows = [
     { label: 'External Environment', value: signal.macro_signal, weight: weights.macro + weights.sector, description: 'Macro + Sector' },
     { label: 'Company Research', value: signal.idio_signal, weight: weights.company, description: 'Idiosyncratic signals' },
-    { label: 'Overall Sentiment', value: signal.overall_sentiment, weight: 1, description: 'Composite score', isTotal: true },
+    { label: 'Overall Skew', value: signal.overall_sentiment, weight: 1, description: 'Composite score', isTotal: true },
   ]
 
   return (
