@@ -11073,7 +11073,7 @@
       // ── Phase 5.4: Composite Sentiment Bar ──────────────────────────────────────
 
       // ── Phase 5 / ERRATA_003: Two-Row Sentiment Display ───────────────────────────
-      // Overall Sentiment headline + External Environment row + Company Research row.
+      // Overall Skew headline + External Environment row + Company Research row.
       // Each row independently coloured by its OWN value. This is the platform's
       // highest-value insight: divergence between external factors and company research.
 
@@ -11120,7 +11120,7 @@
           return '<div class="composite-bar">' +
             '<div class="composite-bar-inner">' +
             '<div class="composite-headline">' +
-            '<span class="composite-label">Overall Sentiment</span>' +
+            '<span class="composite-label">Overall Skew</span>' +
             '<span class="composite-pending">Signals computing — check back after next daily update</span>' +
             '</div>' +
             '</div>' +
@@ -11214,9 +11214,9 @@
         return '<div class="composite-bar">' +
           '<div class="composite-bar-inner">' +
 
-          // ── Row 1: Overall Sentiment headline
+          // ── Row 1: Overall Skew headline
           '<div class="composite-headline">' +
-          '<span class="composite-label">Overall Sentiment</span>' +
+          '<span class="composite-label">Overall Skew</span>' +
           '<span class="composite-score ' + overallCls + '">' + (score > 0 ? '+' : '') + score + _sentArrow(score) + '</span>' +
           '<span class="composite-sent-label ' + overallCls + '">' + label + '</span>' +
           '</div>' +
@@ -12538,7 +12538,7 @@
           // Chart 2: Three-layer contribution stacked bar (6.2)
           '<div class="nt-chart-container nt-contrib-container" id="nt-contrib-wrap-' + ticker + '" style="display:none">' +
           '<div class="nt-chart-header">' +
-          '<div class="nt-chart-title">Macro / Sector / Company Contribution to Overall Sentiment</div>' +
+          '<div class="nt-chart-title">Macro / Sector / Company Contribution to Overall Skew</div>' +
           '</div>' +
           '<div class="nt-chart-canvas-wrap">' +
           '<canvas id="nt-contrib-canvas-' + ticker + '"></canvas>' +
@@ -12922,7 +12922,7 @@
           labels: labels,
           datasets: [
             {
-              label: 'Overall Sentiment',
+              label: 'Overall Skew',
               data: overallData,
               borderColor: '#A0AEC0',
               backgroundColor: 'transparent',
@@ -13752,7 +13752,7 @@
         var fcSentCls = fcSent === null ? 'neutral' : fcSent > 30 ? 'positive strong' : fcSent > 10 ? 'positive' : fcSent < -30 ? 'negative strong' : fcSent < -10 ? 'negative' : 'neutral';
         var fcSentLabel = fcSent !== null ? _overallLabel(fcSent) : '';
         var fcSentChip = fcSent !== null
-          ? '<span class="sent-chip ' + fcSentCls + '" title="Overall Sentiment (' + fcSentLabel + ')">' + (fcSent > 0 ? '+' : '') + fcSent + '</span>'
+          ? '<span class="sent-chip ' + fcSentCls + '" title="Overall Skew (' + fcSentLabel + ')">' + (fcSent > 0 ? '+' : '') + fcSent + '</span>'
           : '';
 
         // Score badge in fc-skew: use overall_sentiment (matches research page); fall back to skew.score only when TLS unavailable
@@ -13773,6 +13773,17 @@
         var priceColor = data.featuredPriceColor || '';
         var priceStyle = priceColor ? ' style="color: ' + priceColor + '"' : '';
 
+        // Static price change from FRESHNESS_DATA — replaced by live data when it arrives
+        var fcStaticChangeHtml = '';
+        var fcFresh = (typeof FRESHNESS_DATA !== 'undefined' && FRESHNESS_DATA[data.ticker]) ? FRESHNESS_DATA[data.ticker] : null;
+        if (fcFresh && fcFresh.pricePctChange !== undefined) {
+          var fcPct = fcFresh.pricePctChange;
+          var fcAmt = parseFloat(data.price) * fcPct / 100;
+          var fcSign = fcPct >= 0 ? '+' : '';
+          var fcChgCls = fcPct >= 0 ? 'positive' : 'negative';
+          fcStaticChangeHtml = '<div class="fc-price-change ' + fcChgCls + '">' + fcSign + fcAmt.toFixed(2) + ' (' + fcSign + fcPct.toFixed(1) + '%)</div>';
+        }
+
         return '<div class="featured-card skew-' + dir + '" data-ticker-card="' + data.ticker + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
           '<div class="fc-top">' +
           '<div>' +
@@ -13782,6 +13793,7 @@
           '</div>' +
           '<div class="fc-price"' + priceStyle + '>' +
           '<span style="font-size:0.8rem; color:var(--text-muted)">' + data.currency + '</span>' + data.price +
+          fcStaticChangeHtml +
           '</div>' +
           '</div>' +
           '<div class="fc-metrics">' + metricsHtml + '</div>' +
@@ -16520,9 +16532,9 @@
         });
         html += '<div class="hs-skew"><div class="hs-skew-label">Risk Skew</div>' + skewHTML + '</div>';
 
-        // Overall Sentiment
+        // Overall Skew
         if (sentLabel) {
-          html += '<div class="hs-section">Overall Sentiment</div>';
+          html += '<div class="hs-section">Overall Skew</div>';
           html += '<div class="hs-sentiment-row">';
           html += '<span class="hs-sentiment-badge ' + sentDir + '">' + sentLabel + '</span>';
           if (tls) html += '<span class="hs-sentiment-num">' + (sentScore >= 0 ? '+' : '') + sentScore + '</span>';
