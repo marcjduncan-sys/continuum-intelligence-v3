@@ -1,9 +1,9 @@
 {
   "summary": {
-    "runAt": "2026-02-22T21:50:16.765Z",
+    "runAt": "2026-02-23T00:00:13.522Z",
     "tickersAnalyzed": 24,
-    "criticalDislocations": 12,
-    "highDislocations": 5,
+    "criticalDislocations": 13,
+    "highDislocations": 4,
     "moderateDislocations": 4,
     "normal": 3
   },
@@ -13,10 +13,10 @@
       "dislocation": {
         "severity": "HIGH",
         "metrics": {
-          "currentPrice": 31.23,
-          "todayReturn": -2.28,
-          "drawdownFromPeak": -21.9,
-          "zScore": -1.98,
+          "currentPrice": 31.17,
+          "todayReturn": -0.19,
+          "drawdownFromPeak": -22.1,
+          "zScore": -0.19,
           "volumeRatio": 1.2
         },
         "pattern": "STEADY_DECLINE"
@@ -24,30 +24,30 @@
       "weights": {
         "T1": {
           "longTerm": 50,
-          "shortTerm": 27.200000000000003,
-          "blended": 41,
-          "adjustment": -23,
+          "shortTerm": 48.1,
+          "blended": 49,
+          "adjustment": -2,
           "confidence": "HIGH"
         },
         "T2": {
           "longTerm": 35,
-          "shortTerm": 95,
-          "blended": 59,
-          "adjustment": 308,
-          "confidence": "LOW"
+          "shortTerm": 60.650000000000006,
+          "blended": 45,
+          "adjustment": 26,
+          "confidence": "MEDIUM"
         },
         "T3": {
           "longTerm": 30,
-          "shortTerm": 95,
-          "blended": 56,
-          "adjustment": 171,
-          "confidence": "LOW"
+          "shortTerm": 44.25,
+          "blended": 36,
+          "adjustment": 14,
+          "confidence": "HIGH"
         },
         "T4": {
           "longTerm": 25,
-          "shortTerm": 5,
-          "blended": 17,
-          "adjustment": -23,
+          "shortTerm": 23.1,
+          "blended": 24,
+          "adjustment": -2,
           "confidence": "HIGH"
         }
       },
@@ -60,37 +60,37 @@
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "HIGH: 2.3% move with 22% drawdown signals elevated concern around Structural Margin Erosion. Watch for acceleration or reversal.",
-        "longTermView": "Research-market divergence in Regulatory Squeeze (65pts), Structural Margin Erosion (60pts), Managed Turnaround (22.799999999999997pts), Competitive Disruption (20pts). All hypotheses show divergence.",
-        "commentary": "The 22% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Regulatory Squeeze between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Accelerate review cycle.",
+        "shortTermView": "HIGH: 0.2% move with 22% drawdown signals elevated concern around Structural Margin Erosion. Watch for acceleration or reversal.",
+        "longTermView": "Research-market divergence in Structural Margin Erosion (25.650000000000006pts). Regulatory Squeeze, Managed Turnaround, Competitive Disruption remain aligned.",
+        "commentary": "The 22% drawdown from peak is not matched by the static research thesis weights. Action: Accelerate review cycle.",
         "divergences": [
-          {
-            "tier": "T3",
-            "name": "Regulatory Squeeze",
-            "gap": 65,
-            "direction": "market elevated"
-          },
           {
             "tier": "T2",
             "name": "Structural Margin Erosion",
-            "gap": 60,
+            "gap": 25.650000000000006,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T3",
+            "name": "Regulatory Squeeze",
+            "gap": 14.25,
             "direction": "market elevated"
           },
           {
             "tier": "T1",
             "name": "Managed Turnaround",
-            "gap": 22.799999999999997,
+            "gap": 1.8999999999999986,
             "direction": "market discounting"
           },
           {
             "tier": "T4",
             "name": "Competitive Disruption",
-            "gap": 20,
+            "gap": 1.8999999999999986,
             "direction": "market discounting"
           }
         ],
-        "maxDivergence": 65,
-        "regimeChangeRisk": true
+        "maxDivergence": 25.650000000000006,
+        "regimeChangeRisk": false
       },
       "hypothesisNames": {
         "T1": "Managed Turnaround",
@@ -109,10 +109,10 @@
       "dislocation": {
         "severity": "CRITICAL",
         "metrics": {
-          "currentPrice": 77.54,
-          "todayReturn": -3.74,
-          "drawdownFromPeak": -48.3,
-          "zScore": -2.8,
+          "currentPrice": 75.79,
+          "todayReturn": -2.26,
+          "drawdownFromPeak": -49.5,
+          "zScore": -2.34,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -120,30 +120,30 @@
       "weights": {
         "T1": {
           "longTerm": 55,
-          "shortTerm": 17.599999999999994,
-          "blended": 40,
-          "adjustment": -37,
+          "shortTerm": 32.400000000000006,
+          "blended": 46,
+          "adjustment": -23,
           "confidence": "MEDIUM"
         },
         "T2": {
           "longTerm": 40,
           "shortTerm": 95,
           "blended": 62,
-          "adjustment": 673,
+          "adjustment": 407,
           "confidence": "LOW"
         },
         "T3": {
           "longTerm": 30,
           "shortTerm": 95,
           "blended": 56,
-          "adjustment": 374,
+          "adjustment": 226,
           "confidence": "LOW"
         },
         "T4": {
           "longTerm": 35,
-          "shortTerm": 5,
-          "blended": 23,
-          "adjustment": -37,
+          "shortTerm": 12.400000000000002,
+          "blended": 26,
+          "adjustment": -23,
           "confidence": "MEDIUM"
         }
       },
@@ -152,13 +152,13 @@
         "secondaryHypothesis": "T3",
         "contradictedHypothesis": null,
         "confidence": 0.7,
-        "reasoning": "Severe drawdown (48.31%) from peak indicates narrative regime change. High multiple stock declining = valuation compression narrative"
+        "reasoning": "Severe drawdown (49.47%) from peak indicates narrative regime change. High multiple stock declining = valuation compression narrative"
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "CRITICAL: 3.7% daily decline with 48% peak drawdown. Market is repricing around Valuation Compression (T2). Multiple hypotheses under pressure.",
-        "longTermView": "Research-market divergence in AI Disruption Risk (65pts), Valuation Compression (55pts), Platform Expansion (37.400000000000006pts), Competitive Pressure (30pts). All hypotheses show divergence.",
-        "commentary": "The 48% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in AI Disruption Risk between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
+        "shortTermView": "CRITICAL: 2.3% daily decline with 49% peak drawdown. Market is repricing around Valuation Compression (T2). Multiple hypotheses under pressure.",
+        "longTermView": "Research-market divergence in AI Disruption Risk (65pts), Valuation Compression (55pts), Competitive Pressure (22.599999999999998pts), Platform Expansion (22.599999999999994pts). All hypotheses show divergence.",
+        "commentary": "The 49% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in AI Disruption Risk between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
         "divergences": [
           {
             "tier": "T3",
@@ -173,15 +173,15 @@
             "direction": "market elevated"
           },
           {
-            "tier": "T1",
-            "name": "Platform Expansion",
-            "gap": 37.400000000000006,
+            "tier": "T4",
+            "name": "Competitive Pressure",
+            "gap": 22.599999999999998,
             "direction": "market discounting"
           },
           {
-            "tier": "T4",
-            "name": "Competitive Pressure",
-            "gap": 30,
+            "tier": "T1",
+            "name": "Platform Expansion",
+            "gap": 22.599999999999994,
             "direction": "market discounting"
           }
         ],
@@ -205,10 +205,10 @@
       "dislocation": {
         "severity": "CRITICAL",
         "metrics": {
-          "currentPrice": 47.1,
-          "todayReturn": -3.8,
-          "drawdownFromPeak": -41.1,
-          "zScore": -3.68,
+          "currentPrice": 46.04,
+          "todayReturn": -2.25,
+          "drawdownFromPeak": -42.4,
+          "zScore": -2.08,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -216,30 +216,30 @@
       "weights": {
         "T1": {
           "longTerm": 55,
-          "shortTerm": 17,
-          "blended": 40,
-          "adjustment": -38,
+          "shortTerm": 32.5,
+          "blended": 46,
+          "adjustment": -22,
           "confidence": "MEDIUM"
         },
         "T2": {
           "longTerm": 40,
           "shortTerm": 95,
           "blended": 62,
-          "adjustment": 684,
+          "adjustment": 405,
           "confidence": "LOW"
         },
         "T3": {
           "longTerm": 20,
           "shortTerm": 95,
           "blended": 50,
-          "adjustment": 380,
+          "adjustment": 225,
           "confidence": "LOW"
         },
         "T4": {
           "longTerm": 45,
           "shortTerm": 5,
           "blended": 29,
-          "adjustment": -2052,
+          "adjustment": -1215,
           "confidence": "MEDIUM"
         }
       },
@@ -248,13 +248,13 @@
         "secondaryHypothesis": "T3",
         "contradictedHypothesis": "T4",
         "confidence": 0.7,
-        "reasoning": "Severe drawdown (41.13%) from peak indicates narrative regime change. High multiple stock declining = valuation compression narrative. Previous bull thesis (T4) being contradicted by price action"
+        "reasoning": "Severe drawdown (42.45%) from peak indicates narrative regime change. High multiple stock declining = valuation compression narrative. Previous bull thesis (T4) being contradicted by price action"
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "CRITICAL: 3.8% daily decline with 41% peak drawdown. Market is repricing around Valuation Mean-Reversion (T2). The AI/Logistics Moat thesis (T4) is being actively contradicted by price action.",
-        "longTermView": "Research-market divergence in Competitive Disruption (75pts), Valuation Mean-Reversion (55pts), AI/Logistics Moat (40pts), Platform Dominance (38pts). All hypotheses show divergence.",
-        "commentary": "The 41% drawdown from peak is not matched by the static research thesis weights. The 75-point spread in Competitive Disruption between research (20%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. AI/Logistics Moat (research weight: 45%) is being actively contradicted — market-implied weight has fallen to 5%. Action: Deep-dive review within 48 hours.",
+        "shortTermView": "CRITICAL: 2.3% daily decline with 42% peak drawdown. Market is repricing around Valuation Mean-Reversion (T2). The AI/Logistics Moat thesis (T4) is being actively contradicted by price action.",
+        "longTermView": "Research-market divergence in Competitive Disruption (75pts), Valuation Mean-Reversion (55pts), AI/Logistics Moat (40pts), Platform Dominance (22.5pts). All hypotheses show divergence.",
+        "commentary": "The 42% drawdown from peak is not matched by the static research thesis weights. The 75-point spread in Competitive Disruption between research (20%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. AI/Logistics Moat (research weight: 45%) is being actively contradicted — market-implied weight has fallen to 5%. Action: Deep-dive review within 48 hours.",
         "divergences": [
           {
             "tier": "T3",
@@ -277,7 +277,7 @@
           {
             "tier": "T1",
             "name": "Platform Dominance",
-            "gap": 38,
+            "gap": 22.5,
             "direction": "market discounting"
           }
         ],
@@ -301,10 +301,10 @@
       "dislocation": {
         "severity": "CRITICAL",
         "metrics": {
-          "currentPrice": 3.22,
-          "todayReturn": 1.9,
-          "drawdownFromPeak": -35.6,
-          "zScore": 2.43,
+          "currentPrice": 3.18,
+          "todayReturn": -1.24,
+          "drawdownFromPeak": -36.4,
+          "zScore": -1.16,
           "volumeRatio": 1.2
         },
         "pattern": "STEADY_DECLINE"
@@ -312,30 +312,30 @@
       "weights": {
         "T1": {
           "longTerm": 60,
-          "shortTerm": 41,
-          "blended": 52,
-          "adjustment": -19,
+          "shortTerm": 47.6,
+          "blended": 55,
+          "adjustment": -12,
           "confidence": "MEDIUM"
         },
         "T2": {
           "longTerm": 25,
           "shortTerm": 95,
           "blended": 53,
-          "adjustment": 190,
+          "adjustment": 124,
           "confidence": "LOW"
         },
         "T3": {
           "longTerm": 30,
           "shortTerm": 95,
           "blended": 56,
-          "adjustment": 380,
+          "adjustment": 372,
           "confidence": "LOW"
         },
         "T4": {
           "longTerm": 45,
           "shortTerm": 5,
           "blended": 29,
-          "adjustment": -684,
+          "adjustment": -670,
           "confidence": "MEDIUM"
         }
       },
@@ -344,12 +344,12 @@
         "secondaryHypothesis": "T2",
         "contradictedHypothesis": "T4",
         "confidence": 0.6,
-        "reasoning": "Severe drawdown (35.6%) from peak indicates narrative regime change. Previous bull thesis (T4) being contradicted by price action"
+        "reasoning": "Severe drawdown (36.4%) from peak indicates narrative regime change. Previous bull thesis (T4) being contradicted by price action"
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "CRITICAL: 1.9% daily decline with 36% peak drawdown. Market is repricing around Execution Risk (T3). The Autonomous Systems Moat thesis (T4) is being actively contradicted by price action.",
-        "longTermView": "Research-market divergence in Speculative Premium Unwind (70pts), Execution Risk (65pts), Autonomous Systems Moat (40pts), Defence Contract Pipeline (19pts). All hypotheses show divergence.",
+        "shortTermView": "CRITICAL: 1.2% daily decline with 36% peak drawdown. Market is repricing around Execution Risk (T3). The Autonomous Systems Moat thesis (T4) is being actively contradicted by price action.",
+        "longTermView": "Research-market divergence in Speculative Premium Unwind (70pts), Execution Risk (65pts), Autonomous Systems Moat (40pts). Defence Contract Pipeline remains aligned.",
         "commentary": "The 36% drawdown from peak is not matched by the static research thesis weights. The 70-point spread in Speculative Premium Unwind between research (25%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Autonomous Systems Moat (research weight: 45%) is being actively contradicted — market-implied weight has fallen to 5%. Action: Deep-dive review within 48 hours.",
         "divergences": [
           {
@@ -373,7 +373,7 @@
           {
             "tier": "T1",
             "name": "Defence Contract Pipeline",
-            "gap": 19,
+            "gap": 12.399999999999999,
             "direction": "market discounting"
           }
         ],
@@ -397,10 +397,10 @@
       "dislocation": {
         "severity": "CRITICAL",
         "metrics": {
-          "currentPrice": 126.51,
-          "todayReturn": -2.05,
-          "drawdownFromPeak": -62.3,
-          "zScore": -2.24,
+          "currentPrice": 120.32,
+          "todayReturn": -4.89,
+          "drawdownFromPeak": -64.2,
+          "zScore": -5.17,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -408,30 +408,30 @@
       "weights": {
         "T1": {
           "longTerm": 60,
-          "shortTerm": 39.5,
-          "blended": 52,
-          "adjustment": -20,
-          "confidence": "MEDIUM"
+          "shortTerm": 11.100000000000001,
+          "blended": 40,
+          "adjustment": -49,
+          "confidence": "LOW"
         },
         "T2": {
           "longTerm": 35,
           "shortTerm": 95,
           "blended": 59,
-          "adjustment": 369,
+          "adjustment": 880,
           "confidence": "LOW"
         },
         "T3": {
           "longTerm": 20,
           "shortTerm": 95,
           "blended": 50,
-          "adjustment": 205,
+          "adjustment": 489,
           "confidence": "LOW"
         },
         "T4": {
           "longTerm": 50,
           "shortTerm": 5,
           "blended": 32,
-          "adjustment": -1107,
+          "adjustment": -2641,
           "confidence": "LOW"
         }
       },
@@ -440,13 +440,13 @@
         "secondaryHypothesis": "T3",
         "contradictedHypothesis": "T4",
         "confidence": 0.75,
-        "reasoning": "Severe drawdown (62.35%) from peak indicates narrative regime change. High multiple stock declining = valuation compression narrative. Previous bull thesis (T4) being contradicted by price action"
+        "reasoning": "Severe drawdown (64.19%) from peak indicates narrative regime change. High multiple stock declining = valuation compression narrative. Previous bull thesis (T4) being contradicted by price action"
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "CRITICAL: 2.0% daily decline with 62% peak drawdown. Market is repricing around Valuation Mean-Reversion (T2). The AI Amplifies the Moat thesis (T4) is being actively contradicted by price action.",
-        "longTermView": "Research-market divergence in Competitive Disruption (75pts), Valuation Mean-Reversion (60pts), AI Amplifies the Moat (45pts), US Expansion Accelerates (20.5pts). All hypotheses show divergence.",
-        "commentary": "The 62% drawdown from peak is not matched by the static research thesis weights. The 75-point spread in Competitive Disruption between research (20%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. AI Amplifies the Moat (research weight: 50%) is being actively contradicted — market-implied weight has fallen to 5%. Action: Deep-dive review within 48 hours.",
+        "shortTermView": "CRITICAL: 4.9% daily decline with 64% peak drawdown. Market is repricing around Valuation Mean-Reversion (T2). The AI Amplifies the Moat thesis (T4) is being actively contradicted by price action.",
+        "longTermView": "Research-market divergence in Competitive Disruption (75pts), Valuation Mean-Reversion (60pts), US Expansion Accelerates (48.9pts), AI Amplifies the Moat (45pts). All hypotheses show divergence.",
+        "commentary": "The 64% drawdown from peak is not matched by the static research thesis weights. The 75-point spread in Competitive Disruption between research (20%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. AI Amplifies the Moat (research weight: 50%) is being actively contradicted — market-implied weight has fallen to 5%. Action: Deep-dive review within 48 hours.",
         "divergences": [
           {
             "tier": "T3",
@@ -461,15 +461,15 @@
             "direction": "market elevated"
           },
           {
-            "tier": "T4",
-            "name": "AI Amplifies the Moat",
-            "gap": 45,
+            "tier": "T1",
+            "name": "US Expansion Accelerates",
+            "gap": 48.9,
             "direction": "market discounting"
           },
           {
-            "tier": "T1",
-            "name": "US Expansion Accelerates",
-            "gap": 20.5,
+            "tier": "T4",
+            "name": "AI Amplifies the Moat",
+            "gap": 45,
             "direction": "market discounting"
           }
         ],
@@ -493,61 +493,61 @@
       "dislocation": {
         "severity": "CRITICAL",
         "metrics": {
-          "currentPrice": 17.53,
-          "todayReturn": -13.94,
-          "drawdownFromPeak": -41.6,
-          "zScore": -11.93,
+          "currentPrice": 18.63,
+          "todayReturn": 6.27,
+          "drawdownFromPeak": -37.9,
+          "zScore": 5.44,
           "volumeRatio": 2.5
         },
-        "pattern": "GAP_DOWN"
+        "pattern": "DISTRIBUTION"
       },
       "weights": {
         "T1": {
           "longTerm": 55,
           "shortTerm": 5,
           "blended": 35,
-          "adjustment": -139,
+          "adjustment": -63,
           "confidence": "LOW"
         },
         "T2": {
           "longTerm": 35,
           "shortTerm": 95,
           "blended": 59,
-          "adjustment": 2509,
+          "adjustment": 627,
           "confidence": "LOW"
         },
         "T3": {
           "longTerm": 25,
-          "shortTerm": 95,
-          "blended": 53,
-          "adjustment": 1394,
-          "confidence": "LOW"
+          "shortTerm": 5,
+          "blended": 17,
+          "adjustment": -63,
+          "confidence": "MEDIUM"
         },
         "T4": {
           "longTerm": 30,
-          "shortTerm": 5,
-          "blended": 20,
-          "adjustment": -139,
-          "confidence": "MEDIUM"
+          "shortTerm": 95,
+          "blended": 56,
+          "adjustment": 1505,
+          "confidence": "LOW"
         }
       },
       "inference": {
-        "primaryHypothesis": "T2",
-        "secondaryHypothesis": "T3",
+        "primaryHypothesis": "T4",
+        "secondaryHypothesis": "T2",
         "contradictedHypothesis": null,
-        "confidence": 0.8500000000000001,
-        "reasoning": "Large gap down (-13.94%) on high volume suggests shock event. Severe drawdown (41.57%) from peak indicates narrative regime change. High multiple stock declining = valuation compression narrative"
+        "confidence": 0.7,
+        "reasoning": "Severe drawdown (37.9%) from peak indicates narrative regime change"
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "CRITICAL: 13.9% daily decline with 42% peak drawdown. Market is repricing around Growth Premium Unwind (T2). Multiple hypotheses under pressure.",
-        "longTermView": "Research-market divergence in QSR Competition (70pts), Growth Premium Unwind (60pts), Store Rollout Acceleration (50pts), Unit Economics Erosion (25pts). All hypotheses show divergence.",
-        "commentary": "The 42% drawdown from peak is not matched by the static research thesis weights. The 70-point spread in QSR Competition between research (25%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
+        "shortTermView": "CRITICAL: 6.3% daily decline with 38% peak drawdown. Market is repricing around Unit Economics Erosion (T4). Multiple hypotheses under pressure.",
+        "longTermView": "Research-market divergence in Unit Economics Erosion (65pts), Growth Premium Unwind (60pts), Store Rollout Acceleration (50pts), QSR Competition (20pts). All hypotheses show divergence.",
+        "commentary": "The 38% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Unit Economics Erosion between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
         "divergences": [
           {
-            "tier": "T3",
-            "name": "QSR Competition",
-            "gap": 70,
+            "tier": "T4",
+            "name": "Unit Economics Erosion",
+            "gap": 65,
             "direction": "market elevated"
           },
           {
@@ -563,13 +563,13 @@
             "direction": "market discounting"
           },
           {
-            "tier": "T4",
-            "name": "Unit Economics Erosion",
-            "gap": 25,
+            "tier": "T3",
+            "name": "QSR Competition",
+            "gap": 20,
             "direction": "market discounting"
           }
         ],
-        "maxDivergence": 70,
+        "maxDivergence": 65,
         "regimeChangeRisk": true
       },
       "hypothesisNames": {
@@ -589,10 +589,10 @@
       "dislocation": {
         "severity": "CRITICAL",
         "metrics": {
-          "currentPrice": 153.27,
-          "todayReturn": -0.6,
-          "drawdownFromPeak": -48.9,
-          "zScore": -0.73,
+          "currentPrice": 150.42,
+          "todayReturn": -1.86,
+          "drawdownFromPeak": -49.9,
+          "zScore": -2.25,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -600,30 +600,30 @@
       "weights": {
         "T1": {
           "longTerm": 55,
-          "shortTerm": 49,
-          "blended": 53,
-          "adjustment": -6,
+          "shortTerm": 36.4,
+          "blended": 48,
+          "adjustment": -19,
           "confidence": "MEDIUM"
         },
         "T2": {
           "longTerm": 30,
           "shortTerm": 95,
           "blended": 56,
-          "adjustment": 108,
+          "adjustment": 335,
           "confidence": "LOW"
         },
         "T3": {
           "longTerm": 25,
-          "shortTerm": 19,
-          "blended": 23,
-          "adjustment": -6,
+          "shortTerm": 6.399999999999999,
+          "blended": 18,
+          "adjustment": -19,
           "confidence": "MEDIUM"
         },
         "T4": {
           "longTerm": 40,
           "shortTerm": 95,
           "blended": 62,
-          "adjustment": 60,
+          "adjustment": 186,
           "confidence": "LOW"
         }
       },
@@ -632,13 +632,13 @@
         "secondaryHypothesis": "T4",
         "contradictedHypothesis": null,
         "confidence": 0.7,
-        "reasoning": "Severe drawdown (48.91%) from peak indicates narrative regime change. High multiple stock declining = valuation compression narrative"
+        "reasoning": "Severe drawdown (49.86%) from peak indicates narrative regime change. High multiple stock declining = valuation compression narrative"
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "CRITICAL: 0.6% daily decline with 49% peak drawdown. Market is repricing around Multiple Compression (T2). Multiple hypotheses under pressure.",
-        "longTermView": "Research-market divergence in Multiple Compression (65pts), Vifor Integration (55pts). Pipeline Delivery, Competitive Threat remain aligned.",
-        "commentary": "The 49% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Multiple Compression between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
+        "shortTermView": "CRITICAL: 1.9% daily decline with 50% peak drawdown. Market is repricing around Multiple Compression (T2). Multiple hypotheses under pressure.",
+        "longTermView": "Research-market divergence in Multiple Compression (65pts), Vifor Integration (55pts), Pipeline Delivery (18.6pts), Competitive Threat (18.6pts). All hypotheses show divergence.",
+        "commentary": "The 50% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Multiple Compression between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
         "divergences": [
           {
             "tier": "T2",
@@ -655,13 +655,13 @@
           {
             "tier": "T1",
             "name": "Pipeline Delivery",
-            "gap": 6,
+            "gap": 18.6,
             "direction": "market discounting"
           },
           {
             "tier": "T3",
             "name": "Competitive Threat",
-            "gap": 6,
+            "gap": 18.6,
             "direction": "market discounting"
           }
         ],
@@ -685,10 +685,10 @@
       "dislocation": {
         "severity": "MODERATE",
         "metrics": {
-          "currentPrice": 219.39,
-          "todayReturn": -1.62,
-          "drawdownFromPeak": -12.2,
-          "zScore": -1.69,
+          "currentPrice": 218.29,
+          "todayReturn": -0.5,
+          "drawdownFromPeak": -12.7,
+          "zScore": -0.38,
           "volumeRatio": 1.2
         },
         "pattern": "NORMAL"
@@ -696,30 +696,30 @@
       "weights": {
         "T1": {
           "longTerm": 50,
-          "shortTerm": 33.8,
-          "blended": 44,
-          "adjustment": -16,
+          "shortTerm": 45,
+          "blended": 48,
+          "adjustment": -5,
           "confidence": "HIGH"
         },
         "T2": {
           "longTerm": 30,
-          "shortTerm": 95,
-          "blended": 56,
-          "adjustment": 146,
+          "shortTerm": 75,
+          "blended": 48,
+          "adjustment": 45,
           "confidence": "LOW"
         },
         "T3": {
           "longTerm": 25,
-          "shortTerm": 95,
-          "blended": 53,
-          "adjustment": 81,
-          "confidence": "LOW"
+          "shortTerm": 50,
+          "blended": 35,
+          "adjustment": 25,
+          "confidence": "HIGH"
         },
         "T4": {
           "longTerm": 40,
-          "shortTerm": 23.799999999999997,
-          "blended": 34,
-          "adjustment": -16,
+          "shortTerm": 35,
+          "blended": 38,
+          "adjustment": -5,
           "confidence": "HIGH"
         }
       },
@@ -733,35 +733,35 @@
       "narrativeShift": {
         "hasShift": true,
         "shortTermView": "MODERATE: Price action suggests growing attention to Cycle Normalisation. Research thesis not yet invalidated but under pressure.",
-        "longTermView": "Research-market divergence in Regulatory Tightening (70pts), Cycle Normalisation (65pts), MAM & CGM Growth (16.200000000000003pts), Green Energy Transition (16.200000000000003pts). All hypotheses show divergence.",
+        "longTermView": "Research-market divergence in Cycle Normalisation (45pts), Regulatory Tightening (25pts). MAM & CGM Growth, Green Energy Transition remain aligned.",
         "commentary": "",
         "divergences": [
           {
-            "tier": "T3",
-            "name": "Regulatory Tightening",
-            "gap": 70,
+            "tier": "T2",
+            "name": "Cycle Normalisation",
+            "gap": 45,
             "direction": "market elevated"
           },
           {
-            "tier": "T2",
-            "name": "Cycle Normalisation",
-            "gap": 65,
+            "tier": "T3",
+            "name": "Regulatory Tightening",
+            "gap": 25,
             "direction": "market elevated"
           },
           {
             "tier": "T1",
             "name": "MAM & CGM Growth",
-            "gap": 16.200000000000003,
+            "gap": 5,
             "direction": "market discounting"
           },
           {
             "tier": "T4",
             "name": "Green Energy Transition",
-            "gap": 16.200000000000003,
+            "gap": 5,
             "direction": "market discounting"
           }
         ],
-        "maxDivergence": 70,
+        "maxDivergence": 45,
         "regimeChangeRisk": true
       },
       "hypothesisNames": {
@@ -779,44 +779,44 @@
     "GMG": {
       "ticker": "GMG",
       "dislocation": {
-        "severity": "MODERATE",
+        "severity": "CRITICAL",
         "metrics": {
-          "currentPrice": 30.32,
-          "todayReturn": 1.68,
-          "drawdownFromPeak": -13.4,
-          "zScore": 1.22,
+          "currentPrice": 29.23,
+          "todayReturn": -3.59,
+          "drawdownFromPeak": -16.5,
+          "zScore": -4.12,
           "volumeRatio": 1.2
         },
-        "pattern": "NORMAL"
+        "pattern": "STEADY_DECLINE"
       },
       "weights": {
         "T1": {
           "longTerm": 55,
-          "shortTerm": 38.2,
-          "blended": 48,
-          "adjustment": -17,
-          "confidence": "HIGH"
+          "shortTerm": 19.1,
+          "blended": 41,
+          "adjustment": -36,
+          "confidence": "MEDIUM"
         },
         "T2": {
           "longTerm": 30,
           "shortTerm": 95,
           "blended": 56,
-          "adjustment": 101,
+          "adjustment": 646,
           "confidence": "LOW"
         },
         "T3": {
           "longTerm": 20,
           "shortTerm": 95,
           "blended": 50,
-          "adjustment": 84,
+          "adjustment": 359,
           "confidence": "LOW"
         },
         "T4": {
           "longTerm": 50,
-          "shortTerm": 33.2,
-          "blended": 43,
-          "adjustment": -17,
-          "confidence": "HIGH"
+          "shortTerm": 14.100000000000001,
+          "blended": 36,
+          "adjustment": -36,
+          "confidence": "MEDIUM"
         }
       },
       "inference": {
@@ -824,13 +824,13 @@
         "secondaryHypothesis": "T3",
         "contradictedHypothesis": null,
         "confidence": 0.65,
-        "reasoning": ""
+        "reasoning": "High multiple stock declining = valuation compression narrative"
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "MODERATE: Price action suggests growing attention to Cap Rate Expansion. Research thesis not yet invalidated but under pressure.",
-        "longTermView": "Research-market divergence in Supply Overshoot (75pts), Cap Rate Expansion (65pts), Data Centre Expansion (16.799999999999997pts), AI Infrastructure Moat (16.799999999999997pts). All hypotheses show divergence.",
-        "commentary": "",
+        "shortTermView": "CRITICAL: 3.6% daily decline with 16% peak drawdown. Market is repricing around Cap Rate Expansion (T2). Multiple hypotheses under pressure.",
+        "longTermView": "Research-market divergence in Supply Overshoot (75pts), Cap Rate Expansion (65pts), Data Centre Expansion (35.9pts), AI Infrastructure Moat (35.9pts). All hypotheses show divergence.",
+        "commentary": "The 16% drawdown from peak is not matched by the static research thesis weights. The 75-point spread in Supply Overshoot between research (20%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
         "divergences": [
           {
             "tier": "T3",
@@ -847,13 +847,13 @@
           {
             "tier": "T1",
             "name": "Data Centre Expansion",
-            "gap": 16.799999999999997,
+            "gap": 35.9,
             "direction": "market discounting"
           },
           {
             "tier": "T4",
             "name": "AI Infrastructure Moat",
-            "gap": 16.799999999999997,
+            "gap": 35.9,
             "direction": "market discounting"
           }
         ],
@@ -877,10 +877,10 @@
       "dislocation": {
         "severity": "HIGH",
         "metrics": {
-          "currentPrice": 27.43,
-          "todayReturn": 1.22,
-          "drawdownFromPeak": -21.6,
-          "zScore": 1.4,
+          "currentPrice": 27.17,
+          "todayReturn": -0.95,
+          "drawdownFromPeak": -22.4,
+          "zScore": -0.75,
           "volumeRatio": 1.2
         },
         "pattern": "STEADY_DECLINE"
@@ -888,30 +888,30 @@
       "weights": {
         "T1": {
           "longTerm": 40,
-          "shortTerm": 27.8,
-          "blended": 35,
-          "adjustment": -12,
+          "shortTerm": 30.5,
+          "blended": 36,
+          "adjustment": -9,
           "confidence": "HIGH"
         },
         "T2": {
           "longTerm": 35,
           "shortTerm": 95,
           "blended": 59,
-          "adjustment": 110,
+          "adjustment": 128,
           "confidence": "LOW"
         },
         "T3": {
           "longTerm": 40,
           "shortTerm": 95,
           "blended": 62,
-          "adjustment": 92,
+          "adjustment": 71,
           "confidence": "LOW"
         },
         "T4": {
           "longTerm": 30,
-          "shortTerm": 17.8,
-          "blended": 25,
-          "adjustment": -12,
+          "shortTerm": 20.5,
+          "blended": 26,
+          "adjustment": -9,
           "confidence": "HIGH"
         }
       },
@@ -924,7 +924,7 @@
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "HIGH: 1.2% move with 22% drawdown signals elevated concern around Commodity Price Risk. Watch for acceleration or reversal.",
+        "shortTermView": "HIGH: 0.9% move with 22% drawdown signals elevated concern around Commodity Price Risk. Watch for acceleration or reversal.",
         "longTermView": "Research-market divergence in Commodity Price Risk (60pts), Energy Transition Risk (55pts). LNG Volume Growth, Scarborough Delivery remain aligned.",
         "commentary": "The 22% drawdown from peak is not matched by the static research thesis weights. The 60-point spread in Commodity Price Risk between research (35%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Accelerate review cycle.",
         "divergences": [
@@ -943,13 +943,13 @@
           {
             "tier": "T1",
             "name": "LNG Volume Growth",
-            "gap": 12.2,
+            "gap": 9.5,
             "direction": "market discounting"
           },
           {
             "tier": "T4",
             "name": "Scarborough Delivery",
-            "gap": 12.2,
+            "gap": 9.5,
             "direction": "market discounting"
           }
         ],
@@ -973,10 +973,10 @@
       "dislocation": {
         "severity": "CRITICAL",
         "metrics": {
-          "currentPrice": 2.94,
-          "todayReturn": -1.34,
-          "drawdownFromPeak": -41.2,
-          "zScore": -1.57,
+          "currentPrice": 2.95,
+          "todayReturn": 0.34,
+          "drawdownFromPeak": -41,
+          "zScore": 0.28,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -984,30 +984,30 @@
       "weights": {
         "T1": {
           "longTerm": 55,
-          "shortTerm": 41.6,
-          "blended": 50,
-          "adjustment": -13,
+          "shortTerm": 51.6,
+          "blended": 54,
+          "adjustment": -3,
           "confidence": "MEDIUM"
         },
         "T2": {
           "longTerm": 30,
-          "shortTerm": 16.6,
-          "blended": 25,
-          "adjustment": -13,
+          "shortTerm": 26.6,
+          "blended": 29,
+          "adjustment": -3,
           "confidence": "MEDIUM"
         },
         "T3": {
           "longTerm": 35,
           "shortTerm": 95,
           "blended": 59,
-          "adjustment": 402,
+          "adjustment": 68,
           "confidence": "LOW"
         },
         "T4": {
           "longTerm": 40,
           "shortTerm": 5,
           "blended": 26,
-          "adjustment": -590,
+          "adjustment": -88,
           "confidence": "MEDIUM"
         }
       },
@@ -1016,11 +1016,11 @@
         "secondaryHypothesis": "T4",
         "contradictedHypothesis": "T4",
         "confidence": 0.7,
-        "reasoning": "Severe drawdown (41.2%) from peak indicates narrative regime change. Previous bull thesis (T4) being contradicted by price action"
+        "reasoning": "Severe drawdown (41%) from peak indicates narrative regime change. Previous bull thesis (T4) being contradicted by price action"
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "CRITICAL: 1.3% daily decline with 41% peak drawdown. Market is repricing around Competition Intensifies (T3). The AI Analytics Moat thesis (T4) is being actively contradicted by price action.",
+        "shortTermView": "CRITICAL: 0.3% daily decline with 41% peak drawdown. Market is repricing around Competition Intensifies (T3). The AI Analytics Moat thesis (T4) is being actively contradicted by price action.",
         "longTermView": "Research-market divergence in Competition Intensifies (60pts), AI Analytics Moat (35pts). Network Growth, Cash Burn Risk remain aligned.",
         "commentary": "The 41% drawdown from peak is not matched by the static research thesis weights. The 60-point spread in Competition Intensifies between research (35%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. AI Analytics Moat (research weight: 40%) is being actively contradicted — market-implied weight has fallen to 5%. Action: Deep-dive review within 48 hours.",
         "divergences": [
@@ -1039,13 +1039,13 @@
           {
             "tier": "T1",
             "name": "Network Growth",
-            "gap": 13.399999999999999,
+            "gap": 3.3999999999999986,
             "direction": "market discounting"
           },
           {
             "tier": "T2",
             "name": "Cash Burn Risk",
-            "gap": 13.399999999999999,
+            "gap": 3.3999999999999986,
             "direction": "market discounting"
           }
         ],
@@ -1069,10 +1069,10 @@
       "dislocation": {
         "severity": "MODERATE",
         "metrics": {
-          "currentPrice": 20.04,
-          "todayReturn": -1.33,
-          "drawdownFromPeak": -19.8,
-          "zScore": -1.25,
+          "currentPrice": 20.02,
+          "todayReturn": -0.1,
+          "drawdownFromPeak": -19.9,
+          "zScore": -0.41,
           "volumeRatio": 1.2
         },
         "pattern": "STEADY_DECLINE"
@@ -1080,30 +1080,30 @@
       "weights": {
         "T1": {
           "longTerm": 45,
-          "shortTerm": 31.7,
-          "blended": 40,
-          "adjustment": -13,
+          "shortTerm": 44,
+          "blended": 45,
+          "adjustment": -1,
           "confidence": "HIGH"
         },
         "T2": {
           "longTerm": 40,
-          "shortTerm": 95,
-          "blended": 62,
-          "adjustment": 120,
-          "confidence": "LOW"
+          "shortTerm": 49,
+          "blended": 44,
+          "adjustment": 9,
+          "confidence": "HIGH"
         },
         "T3": {
           "longTerm": 30,
-          "shortTerm": 95,
-          "blended": 56,
-          "adjustment": 67,
-          "confidence": "LOW"
+          "shortTerm": 35,
+          "blended": 32,
+          "adjustment": 5,
+          "confidence": "HIGH"
         },
         "T4": {
           "longTerm": 35,
-          "shortTerm": 21.7,
-          "blended": 30,
-          "adjustment": -13,
+          "shortTerm": 34,
+          "blended": 35,
+          "adjustment": -1,
           "confidence": "HIGH"
         }
       },
@@ -1117,36 +1117,36 @@
       "narrativeShift": {
         "hasShift": true,
         "shortTermView": "MODERATE: Price action suggests growing attention to Commodity Cycle Risk. Research thesis not yet invalidated but under pressure.",
-        "longTermView": "Research-market divergence in Green Energy Execution (65pts), Commodity Cycle Risk (55pts). Iron Ore Volume/Price, FFI Capital Drain remain aligned.",
+        "longTermView": "Research and market views broadly aligned across all hypotheses.",
         "commentary": "",
         "divergences": [
           {
-            "tier": "T3",
-            "name": "Green Energy Execution",
-            "gap": 65,
+            "tier": "T2",
+            "name": "Commodity Cycle Risk",
+            "gap": 9,
             "direction": "market elevated"
           },
           {
-            "tier": "T2",
-            "name": "Commodity Cycle Risk",
-            "gap": 55,
+            "tier": "T3",
+            "name": "Green Energy Execution",
+            "gap": 5,
             "direction": "market elevated"
           },
           {
             "tier": "T1",
             "name": "Iron Ore Volume/Price",
-            "gap": 13.3,
+            "gap": 1,
             "direction": "market discounting"
           },
           {
             "tier": "T4",
             "name": "FFI Capital Drain",
-            "gap": 13.3,
+            "gap": 1,
             "direction": "market discounting"
           }
         ],
-        "maxDivergence": 65,
-        "regimeChangeRisk": true
+        "maxDivergence": 9,
+        "regimeChangeRisk": false
       },
       "hypothesisNames": {
         "T1": "Iron Ore Volume/Price",
@@ -1165,56 +1165,56 @@
       "dislocation": {
         "severity": "CRITICAL",
         "metrics": {
-          "currentPrice": 6.69,
-          "todayReturn": 0.75,
-          "drawdownFromPeak": -44.2,
-          "zScore": 0.55,
+          "currentPrice": 6.59,
+          "todayReturn": -1.49,
+          "drawdownFromPeak": -45.1,
+          "zScore": -1.59,
           "volumeRatio": 1.2
         },
-        "pattern": "STEADY_DECLINE"
+        "pattern": "DISTRIBUTION"
       },
       "weights": {
         "T1": {
           "longTerm": 50,
-          "shortTerm": 42.5,
-          "blended": 47,
-          "adjustment": -7,
+          "shortTerm": 35.1,
+          "blended": 44,
+          "adjustment": -15,
           "confidence": "MEDIUM"
         },
         "T2": {
           "longTerm": 40,
-          "shortTerm": 95,
-          "blended": 62,
-          "adjustment": 90,
-          "confidence": "LOW"
+          "shortTerm": 25.1,
+          "blended": 34,
+          "adjustment": -15,
+          "confidence": "MEDIUM"
         },
         "T3": {
           "longTerm": 35,
           "shortTerm": 95,
           "blended": 59,
-          "adjustment": 75,
+          "adjustment": 149,
           "confidence": "LOW"
         },
         "T4": {
           "longTerm": 45,
-          "shortTerm": 37.5,
-          "blended": 42,
-          "adjustment": -7,
-          "confidence": "MEDIUM"
+          "shortTerm": 95,
+          "blended": 65,
+          "adjustment": 536,
+          "confidence": "LOW"
         }
       },
       "inference": {
-        "primaryHypothesis": "T2",
+        "primaryHypothesis": "T4",
         "secondaryHypothesis": "T3",
         "contradictedHypothesis": null,
-        "confidence": 0.65,
-        "reasoning": "Severe drawdown (44.25%) from peak indicates narrative regime change"
+        "confidence": 0.75,
+        "reasoning": "Severe drawdown (45.08%) from peak indicates narrative regime change"
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "CRITICAL: 0.8% daily decline with 44% peak drawdown. Market is repricing around Structural Office Decline (T2). Multiple hypotheses under pressure.",
-        "longTermView": "Research-market divergence in Funds Management Growth (60pts), Structural Office Decline (55pts). Office Recovery, Interest Rate Risk remain aligned.",
-        "commentary": "The 44% drawdown from peak is not matched by the static research thesis weights. The 60-point spread in Funds Management Growth between research (35%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
+        "shortTermView": "CRITICAL: 1.5% daily decline with 45% peak drawdown. Market is repricing around Interest Rate Risk (T4). Multiple hypotheses under pressure.",
+        "longTermView": "Research-market divergence in Funds Management Growth (60pts), Interest Rate Risk (50pts). Office Recovery, Structural Office Decline remain aligned.",
+        "commentary": "The 45% drawdown from peak is not matched by the static research thesis weights. The 60-point spread in Funds Management Growth between research (35%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
         "divergences": [
           {
             "tier": "T3",
@@ -1223,21 +1223,21 @@
             "direction": "market elevated"
           },
           {
-            "tier": "T2",
-            "name": "Structural Office Decline",
-            "gap": 55,
+            "tier": "T4",
+            "name": "Interest Rate Risk",
+            "gap": 50,
             "direction": "market elevated"
           },
           {
             "tier": "T1",
             "name": "Office Recovery",
-            "gap": 7.5,
+            "gap": 14.899999999999999,
             "direction": "market discounting"
           },
           {
-            "tier": "T4",
-            "name": "Interest Rate Risk",
-            "gap": 7.5,
+            "tier": "T2",
+            "name": "Structural Office Decline",
+            "gap": 14.899999999999999,
             "direction": "market discounting"
           }
         ],
@@ -1261,10 +1261,10 @@
       "dislocation": {
         "severity": "NORMAL",
         "metrics": {
-          "currentPrice": 48.32,
-          "todayReturn": 0.08,
-          "drawdownFromPeak": 2.3,
-          "zScore": 0.59,
+          "currentPrice": 48.5,
+          "todayReturn": 0.37,
+          "drawdownFromPeak": 2.6,
+          "zScore": 0.38,
           "volumeRatio": 1.2
         },
         "pattern": "NORMAL"
@@ -1272,30 +1272,30 @@
       "weights": {
         "T1": {
           "longTerm": 50,
-          "shortTerm": 49.2,
-          "blended": 50,
-          "adjustment": -1,
+          "shortTerm": 46.3,
+          "blended": 49,
+          "adjustment": -4,
           "confidence": "HIGH"
         },
         "T2": {
           "longTerm": 35,
-          "shortTerm": 37.4,
-          "blended": 36,
-          "adjustment": 2,
+          "shortTerm": 46.1,
+          "blended": 39,
+          "adjustment": 11,
           "confidence": "HIGH"
         },
         "T3": {
           "longTerm": 30,
-          "shortTerm": 32,
-          "blended": 31,
-          "adjustment": 2,
+          "shortTerm": 39.25,
+          "blended": 34,
+          "adjustment": 9,
           "confidence": "HIGH"
         },
         "T4": {
           "longTerm": 35,
-          "shortTerm": 34.2,
-          "blended": 35,
-          "adjustment": -1,
+          "shortTerm": 31.3,
+          "blended": 34,
+          "adjustment": -4,
           "confidence": "HIGH"
         }
       },
@@ -1329,10 +1329,10 @@
       "dislocation": {
         "severity": "NORMAL",
         "metrics": {
-          "currentPrice": 53.33,
-          "todayReturn": 0.19,
-          "drawdownFromPeak": 1.8,
-          "zScore": -0.08,
+          "currentPrice": 53.84,
+          "todayReturn": 0.96,
+          "drawdownFromPeak": 2.7,
+          "zScore": 0.68,
           "volumeRatio": 1.2
         },
         "pattern": "NORMAL"
@@ -1340,30 +1340,30 @@
       "weights": {
         "T1": {
           "longTerm": 50,
-          "shortTerm": 48.1,
-          "blended": 49,
-          "adjustment": -2,
+          "shortTerm": 40.4,
+          "blended": 46,
+          "adjustment": -10,
           "confidence": "HIGH"
         },
         "T2": {
           "longTerm": 35,
-          "shortTerm": 40.7,
-          "blended": 37,
-          "adjustment": 6,
-          "confidence": "HIGH"
+          "shortTerm": 63.8,
+          "blended": 47,
+          "adjustment": 29,
+          "confidence": "MEDIUM"
         },
         "T3": {
           "longTerm": 30,
-          "shortTerm": 34.75,
-          "blended": 32,
-          "adjustment": 5,
+          "shortTerm": 54,
+          "blended": 40,
+          "adjustment": 24,
           "confidence": "HIGH"
         },
         "T4": {
           "longTerm": 35,
-          "shortTerm": 33.1,
-          "blended": 34,
-          "adjustment": -2,
+          "shortTerm": 25.4,
+          "blended": 31,
+          "adjustment": -10,
           "confidence": "HIGH"
         }
       },
@@ -1395,12 +1395,12 @@
     "HRZ": {
       "ticker": "HRZ",
       "dislocation": {
-        "severity": "HIGH",
+        "severity": "CRITICAL",
         "metrics": {
-          "currentPrice": 1.11,
-          "todayReturn": 0,
-          "drawdownFromPeak": -26.5,
-          "zScore": -0.02,
+          "currentPrice": 1.15,
+          "todayReturn": 3.6,
+          "drawdownFromPeak": -23.8,
+          "zScore": 3.16,
           "volumeRatio": 1.2
         },
         "pattern": "STEADY_DECLINE"
@@ -1408,31 +1408,31 @@
       "weights": {
         "T1": {
           "longTerm": 50,
-          "shortTerm": 50,
-          "blended": 50,
-          "adjustment": 0,
-          "confidence": "HIGH"
+          "shortTerm": 14,
+          "blended": 36,
+          "adjustment": -36,
+          "confidence": "MEDIUM"
         },
         "T2": {
           "longTerm": 35,
-          "shortTerm": 35,
-          "blended": 35,
-          "adjustment": 0,
-          "confidence": "HIGH"
+          "shortTerm": 95,
+          "blended": 59,
+          "adjustment": 432,
+          "confidence": "LOW"
         },
         "T3": {
           "longTerm": 30,
-          "shortTerm": 30,
-          "blended": 30,
-          "adjustment": 0,
-          "confidence": "HIGH"
+          "shortTerm": 95,
+          "blended": 56,
+          "adjustment": 360,
+          "confidence": "LOW"
         },
         "T4": {
           "longTerm": 35,
-          "shortTerm": 35,
-          "blended": 35,
-          "adjustment": 0,
-          "confidence": "HIGH"
+          "shortTerm": 5,
+          "blended": 23,
+          "adjustment": -36,
+          "confidence": "MEDIUM"
         }
       },
       "inference": {
@@ -1444,37 +1444,37 @@
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "HIGH: 0.0% move with 26% drawdown signals elevated concern around Base Case/Compression. Watch for acceleration or reversal.",
-        "longTermView": "Research and market views broadly aligned across all hypotheses.",
-        "commentary": "The 26% drawdown from peak is not matched by the static research thesis weights. Action: Accelerate review cycle.",
+        "shortTermView": "CRITICAL: 3.6% daily decline with 24% peak drawdown. Market is repricing around Base Case/Compression (T2). Multiple hypotheses under pressure.",
+        "longTermView": "Research-market divergence in Risk/Downside (65pts), Base Case/Compression (60pts), Growth/Recovery (36pts), Disruption/Catalyst (30pts). All hypotheses show divergence.",
+        "commentary": "The 24% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Risk/Downside between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
         "divergences": [
           {
-            "tier": "T1",
-            "name": "Growth/Recovery",
-            "gap": 0,
-            "direction": "market discounting"
+            "tier": "T3",
+            "name": "Risk/Downside",
+            "gap": 65,
+            "direction": "market elevated"
           },
           {
             "tier": "T2",
             "name": "Base Case/Compression",
-            "gap": 0,
-            "direction": "market discounting"
+            "gap": 60,
+            "direction": "market elevated"
           },
           {
-            "tier": "T3",
-            "name": "Risk/Downside",
-            "gap": 0,
+            "tier": "T1",
+            "name": "Growth/Recovery",
+            "gap": 36,
             "direction": "market discounting"
           },
           {
             "tier": "T4",
             "name": "Disruption/Catalyst",
-            "gap": 0,
+            "gap": 30,
             "direction": "market discounting"
           }
         ],
-        "maxDivergence": 0,
-        "regimeChangeRisk": false
+        "maxDivergence": 65,
+        "regimeChangeRisk": true
       },
       "hypothesisNames": {
         "T1": "Growth/Recovery",
@@ -1493,10 +1493,10 @@
       "dislocation": {
         "severity": "CRITICAL",
         "metrics": {
-          "currentPrice": 14,
-          "todayReturn": -2.3,
-          "drawdownFromPeak": -38.9,
-          "zScore": -2.12,
+          "currentPrice": 14.1,
+          "todayReturn": 0.71,
+          "drawdownFromPeak": -38.4,
+          "zScore": 1.04,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -1504,30 +1504,30 @@
       "weights": {
         "T1": {
           "longTerm": 50,
-          "shortTerm": 27,
-          "blended": 41,
-          "adjustment": -23,
+          "shortTerm": 42.9,
+          "blended": 47,
+          "adjustment": -7,
           "confidence": "MEDIUM"
         },
         "T2": {
           "longTerm": 35,
-          "shortTerm": 12,
-          "blended": 26,
-          "adjustment": -23,
+          "shortTerm": 27.9,
+          "blended": 32,
+          "adjustment": -7,
           "confidence": "MEDIUM"
         },
         "T3": {
           "longTerm": 30,
           "shortTerm": 95,
           "blended": 56,
-          "adjustment": 230,
+          "adjustment": 71,
           "confidence": "LOW"
         },
         "T4": {
           "longTerm": 35,
           "shortTerm": 95,
           "blended": 59,
-          "adjustment": 828,
+          "adjustment": 170,
           "confidence": "LOW"
         }
       },
@@ -1536,13 +1536,13 @@
         "secondaryHypothesis": "T3",
         "contradictedHypothesis": null,
         "confidence": 0.75,
-        "reasoning": "Severe drawdown (38.86%) from peak indicates narrative regime change"
+        "reasoning": "Severe drawdown (38.43%) from peak indicates narrative regime change"
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "CRITICAL: 2.3% daily decline with 39% peak drawdown. Market is repricing around Disruption/Catalyst (T4). Multiple hypotheses under pressure.",
-        "longTermView": "Research-market divergence in Risk/Downside (65pts), Disruption/Catalyst (60pts), Growth/Recovery (23pts), Base Case/Compression (23pts). All hypotheses show divergence.",
-        "commentary": "The 39% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Risk/Downside between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
+        "shortTermView": "CRITICAL: 0.7% daily decline with 38% peak drawdown. Market is repricing around Disruption/Catalyst (T4). Multiple hypotheses under pressure.",
+        "longTermView": "Research-market divergence in Risk/Downside (65pts), Disruption/Catalyst (60pts). Growth/Recovery, Base Case/Compression remain aligned.",
+        "commentary": "The 38% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Risk/Downside between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
         "divergences": [
           {
             "tier": "T3",
@@ -1559,13 +1559,13 @@
           {
             "tier": "T1",
             "name": "Growth/Recovery",
-            "gap": 23,
+            "gap": 7.100000000000001,
             "direction": "market discounting"
           },
           {
             "tier": "T2",
             "name": "Base Case/Compression",
-            "gap": 23,
+            "gap": 7.100000000000001,
             "direction": "market discounting"
           }
         ],
@@ -1589,10 +1589,10 @@
       "dislocation": {
         "severity": "CRITICAL",
         "metrics": {
-          "currentPrice": 1.06,
-          "todayReturn": -1.85,
-          "drawdownFromPeak": -55.5,
-          "zScore": -1.62,
+          "currentPrice": 1.07,
+          "todayReturn": 0.94,
+          "drawdownFromPeak": -55,
+          "zScore": 0.55,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -1600,30 +1600,30 @@
       "weights": {
         "T1": {
           "longTerm": 50,
-          "shortTerm": 31.5,
-          "blended": 43,
-          "adjustment": -18,
+          "shortTerm": 40.6,
+          "blended": 46,
+          "adjustment": -9,
           "confidence": "MEDIUM"
         },
         "T2": {
           "longTerm": 35,
-          "shortTerm": 16.5,
-          "blended": 28,
-          "adjustment": -18,
+          "shortTerm": 25.6,
+          "blended": 31,
+          "adjustment": -9,
           "confidence": "MEDIUM"
         },
         "T3": {
           "longTerm": 30,
           "shortTerm": 95,
           "blended": 56,
-          "adjustment": 185,
+          "adjustment": 94,
           "confidence": "LOW"
         },
         "T4": {
           "longTerm": 35,
           "shortTerm": 95,
           "blended": 59,
-          "adjustment": 666,
+          "adjustment": 226,
           "confidence": "LOW"
         }
       },
@@ -1632,12 +1632,12 @@
         "secondaryHypothesis": "T3",
         "contradictedHypothesis": null,
         "confidence": 0.75,
-        "reasoning": "Severe drawdown (55.46%) from peak indicates narrative regime change"
+        "reasoning": "Severe drawdown (55.04%) from peak indicates narrative regime change"
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "CRITICAL: 1.9% daily decline with 55% peak drawdown. Market is repricing around Disruption/Catalyst (T4). Multiple hypotheses under pressure.",
-        "longTermView": "Research-market divergence in Risk/Downside (65pts), Disruption/Catalyst (60pts), Growth/Recovery (18.5pts), Base Case/Compression (18.5pts). All hypotheses show divergence.",
+        "shortTermView": "CRITICAL: 0.9% daily decline with 55% peak drawdown. Market is repricing around Disruption/Catalyst (T4). Multiple hypotheses under pressure.",
+        "longTermView": "Research-market divergence in Risk/Downside (65pts), Disruption/Catalyst (60pts). Growth/Recovery, Base Case/Compression remain aligned.",
         "commentary": "The 55% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Risk/Downside between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
         "divergences": [
           {
@@ -1655,13 +1655,13 @@
           {
             "tier": "T1",
             "name": "Growth/Recovery",
-            "gap": 18.5,
+            "gap": 9.399999999999999,
             "direction": "market discounting"
           },
           {
             "tier": "T2",
             "name": "Base Case/Compression",
-            "gap": 18.5,
+            "gap": 9.399999999999999,
             "direction": "market discounting"
           }
         ],
@@ -1685,10 +1685,10 @@
       "dislocation": {
         "severity": "NORMAL",
         "metrics": {
-          "currentPrice": 179.67,
-          "todayReturn": 0.83,
-          "drawdownFromPeak": 5.5,
-          "zScore": 0.76,
+          "currentPrice": 180.08,
+          "todayReturn": 0.23,
+          "drawdownFromPeak": 5.8,
+          "zScore": 0.25,
           "volumeRatio": 1.2
         },
         "pattern": "NORMAL"
@@ -1696,30 +1696,30 @@
       "weights": {
         "T1": {
           "longTerm": 50,
-          "shortTerm": 41.7,
-          "blended": 47,
-          "adjustment": -8,
+          "shortTerm": 47.7,
+          "blended": 49,
+          "adjustment": -2,
           "confidence": "HIGH"
         },
         "T2": {
           "longTerm": 35,
-          "shortTerm": 59.9,
-          "blended": 45,
-          "adjustment": 25,
+          "shortTerm": 41.9,
+          "blended": 38,
+          "adjustment": 7,
           "confidence": "HIGH"
         },
         "T3": {
           "longTerm": 30,
-          "shortTerm": 50.75,
-          "blended": 38,
-          "adjustment": 21,
+          "shortTerm": 35.75,
+          "blended": 32,
+          "adjustment": 6,
           "confidence": "HIGH"
         },
         "T4": {
           "longTerm": 25,
-          "shortTerm": 16.700000000000003,
-          "blended": 22,
-          "adjustment": -8,
+          "shortTerm": 22.7,
+          "blended": 24,
+          "adjustment": -2,
           "confidence": "HIGH"
         }
       },
@@ -1751,12 +1751,12 @@
     "RIO": {
       "ticker": "RIO",
       "dislocation": {
-        "severity": "HIGH",
+        "severity": "MODERATE",
         "metrics": {
-          "currentPrice": 163.3,
-          "todayReturn": -3.11,
-          "drawdownFromPeak": 37.6,
-          "zScore": -2.97,
+          "currentPrice": 159.65,
+          "todayReturn": -2.24,
+          "drawdownFromPeak": 34.6,
+          "zScore": -1.52,
           "volumeRatio": 1.2
         },
         "pattern": "STEADY_DECLINE"
@@ -1764,30 +1764,30 @@
       "weights": {
         "T1": {
           "longTerm": 45,
-          "shortTerm": 13.900000000000002,
-          "blended": 33,
-          "adjustment": -31,
-          "confidence": "MEDIUM"
+          "shortTerm": 22.599999999999998,
+          "blended": 36,
+          "adjustment": -22,
+          "confidence": "HIGH"
         },
         "T2": {
           "longTerm": 40,
           "shortTerm": 95,
           "blended": 62,
-          "adjustment": 420,
+          "adjustment": 202,
           "confidence": "LOW"
         },
         "T3": {
           "longTerm": 35,
           "shortTerm": 95,
           "blended": 59,
-          "adjustment": 233,
+          "adjustment": 112,
           "confidence": "LOW"
         },
         "T4": {
           "longTerm": 30,
-          "shortTerm": 5,
-          "blended": 20,
-          "adjustment": -31,
+          "shortTerm": 7.599999999999998,
+          "blended": 21,
+          "adjustment": -22,
           "confidence": "HIGH"
         }
       },
@@ -1796,13 +1796,13 @@
         "secondaryHypothesis": "T3",
         "contradictedHypothesis": null,
         "confidence": 0.65,
-        "reasoning": "Severe drawdown (-37.63%) from peak indicates narrative regime change"
+        "reasoning": "Severe drawdown (-34.56%) from peak indicates narrative regime change"
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "HIGH: 3.1% move with 38% drawdown signals elevated concern around Energy Transition Portfolio. Watch for acceleration or reversal.",
-        "longTermView": "Research-market divergence in China Demand Slowdown (60pts), Energy Transition Portfolio (55pts), Iron Ore Cash Generation (31.099999999999998pts), Growth Capex Risk (25pts). All hypotheses show divergence.",
-        "commentary": "The 38% drawdown from peak is not matched by the static research thesis weights. The 60-point spread in China Demand Slowdown between research (35%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Accelerate review cycle.",
+        "shortTermView": "MODERATE: Price action suggests growing attention to Energy Transition Portfolio. Research thesis not yet invalidated but under pressure.",
+        "longTermView": "Research-market divergence in China Demand Slowdown (60pts), Energy Transition Portfolio (55pts), Iron Ore Cash Generation (22.400000000000002pts), Growth Capex Risk (22.400000000000002pts). All hypotheses show divergence.",
+        "commentary": "",
         "divergences": [
           {
             "tier": "T3",
@@ -1819,13 +1819,13 @@
           {
             "tier": "T1",
             "name": "Iron Ore Cash Generation",
-            "gap": 31.099999999999998,
+            "gap": 22.400000000000002,
             "direction": "market discounting"
           },
           {
             "tier": "T4",
             "name": "Growth Capex Risk",
-            "gap": 25,
+            "gap": 22.400000000000002,
             "direction": "market discounting"
           }
         ],
@@ -1849,10 +1849,10 @@
       "dislocation": {
         "severity": "HIGH",
         "metrics": {
-          "currentPrice": 13.39,
-          "todayReturn": 0.45,
-          "drawdownFromPeak": -24.4,
-          "zScore": 0.16,
+          "currentPrice": 13.24,
+          "todayReturn": -1.12,
+          "drawdownFromPeak": -25.3,
+          "zScore": -0.54,
           "volumeRatio": 1.2
         },
         "pattern": "STEADY_DECLINE"
@@ -1860,30 +1860,30 @@
       "weights": {
         "T1": {
           "longTerm": 50,
-          "shortTerm": 45.5,
-          "blended": 48,
-          "adjustment": -4,
+          "shortTerm": 38.8,
+          "blended": 46,
+          "adjustment": -11,
           "confidence": "HIGH"
         },
         "T2": {
           "longTerm": 35,
-          "shortTerm": 75.5,
-          "blended": 51,
-          "adjustment": 41,
+          "shortTerm": 95,
+          "blended": 59,
+          "adjustment": 151,
           "confidence": "LOW"
         },
         "T3": {
           "longTerm": 30,
-          "shortTerm": 63.75,
-          "blended": 44,
-          "adjustment": 34,
-          "confidence": "MEDIUM"
+          "shortTerm": 95,
+          "blended": 56,
+          "adjustment": 84,
+          "confidence": "LOW"
         },
         "T4": {
           "longTerm": 35,
-          "shortTerm": 30.5,
-          "blended": 33,
-          "adjustment": -4,
+          "shortTerm": 23.799999999999997,
+          "blended": 31,
+          "adjustment": -11,
           "confidence": "HIGH"
         }
       },
@@ -1896,36 +1896,36 @@
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "HIGH: 0.5% move with 24% drawdown signals elevated concern around Traditional Energy Cash Cow. Watch for acceleration or reversal.",
-        "longTermView": "Research-market divergence in Traditional Energy Cash Cow (40.5pts), Margin Pressure (33.75pts). Energy Transition Winner, Cyclical Downturn remain aligned.",
-        "commentary": "The 24% drawdown from peak is not matched by the static research thesis weights. The 40.5-point spread in Traditional Energy Cash Cow between research (35%) and market-implied (75.5%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Accelerate review cycle.",
+        "shortTermView": "HIGH: 1.1% move with 25% drawdown signals elevated concern around Traditional Energy Cash Cow. Watch for acceleration or reversal.",
+        "longTermView": "Research-market divergence in Margin Pressure (65pts), Traditional Energy Cash Cow (60pts). Energy Transition Winner, Cyclical Downturn remain aligned.",
+        "commentary": "The 25% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Margin Pressure between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Accelerate review cycle.",
         "divergences": [
-          {
-            "tier": "T2",
-            "name": "Traditional Energy Cash Cow",
-            "gap": 40.5,
-            "direction": "market elevated"
-          },
           {
             "tier": "T3",
             "name": "Margin Pressure",
-            "gap": 33.75,
+            "gap": 65,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "T2",
+            "name": "Traditional Energy Cash Cow",
+            "gap": 60,
             "direction": "market elevated"
           },
           {
             "tier": "T1",
             "name": "Energy Transition Winner",
-            "gap": 4.5,
+            "gap": 11.200000000000003,
             "direction": "market discounting"
           },
           {
             "tier": "T4",
             "name": "Cyclical Downturn",
-            "gap": 4.5,
+            "gap": 11.200000000000003,
             "direction": "market discounting"
           }
         ],
-        "maxDivergence": 40.5,
+        "maxDivergence": 65,
         "regimeChangeRisk": true
       },
       "hypothesisNames": {
@@ -1943,44 +1943,44 @@
     "QBE": {
       "ticker": "QBE",
       "dislocation": {
-        "severity": "CRITICAL",
+        "severity": "HIGH",
         "metrics": {
-          "currentPrice": 21.48,
-          "todayReturn": 7.08,
-          "drawdownFromPeak": -4.5,
-          "zScore": 6.79,
-          "volumeRatio": 2.5
+          "currentPrice": 22.13,
+          "todayReturn": 3.03,
+          "drawdownFromPeak": -1.6,
+          "zScore": 2.57,
+          "volumeRatio": 1.2
         },
         "pattern": "NORMAL"
       },
       "weights": {
         "T1": {
           "longTerm": 40,
-          "shortTerm": 5,
-          "blended": 26,
-          "adjustment": -71,
+          "shortTerm": 9.700000000000003,
+          "blended": 28,
+          "adjustment": -30,
           "confidence": "MEDIUM"
         },
         "T2": {
           "longTerm": 30,
           "shortTerm": 95,
           "blended": 56,
-          "adjustment": 850,
+          "adjustment": 273,
           "confidence": "LOW"
         },
         "T3": {
           "longTerm": 30,
           "shortTerm": 95,
           "blended": 56,
-          "adjustment": 708,
+          "adjustment": 227,
           "confidence": "LOW"
         },
         "T4": {
           "longTerm": 25,
           "shortTerm": 5,
           "blended": 17,
-          "adjustment": -71,
-          "confidence": "MEDIUM"
+          "adjustment": -30,
+          "confidence": "HIGH"
         }
       },
       "inference": {
@@ -1992,9 +1992,9 @@
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "CRITICAL: 7.1% daily decline with 5% peak drawdown. Market is repricing around Investment Portfolio Outperforms (T2). Multiple hypotheses under pressure.",
-        "longTermView": "Research-market divergence in Investment Portfolio Outperforms (65pts), Catastrophe Season Overwhelms Rate Gains (65pts), Hard Market Sustains COR <94% (35pts), Premium Cycle Reversal (20pts). All hypotheses show divergence.",
-        "commentary": "The 5% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Investment Portfolio Outperforms between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
+        "shortTermView": "HIGH: 3.0% move with 2% drawdown signals elevated concern around Investment Portfolio Outperforms. Watch for acceleration or reversal.",
+        "longTermView": "Research-market divergence in Investment Portfolio Outperforms (65pts), Catastrophe Season Overwhelms Rate Gains (65pts), Hard Market Sustains COR <94% (30.299999999999997pts), Premium Cycle Reversal (20pts). All hypotheses show divergence.",
+        "commentary": "The 2% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Investment Portfolio Outperforms between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Accelerate review cycle.",
         "divergences": [
           {
             "tier": "T2",
@@ -2011,7 +2011,7 @@
           {
             "tier": "T1",
             "name": "Hard Market Sustains COR <94%",
-            "gap": 35,
+            "gap": 30.299999999999997,
             "direction": "market discounting"
           },
           {
@@ -2041,56 +2041,56 @@
       "dislocation": {
         "severity": "CRITICAL",
         "metrics": {
-          "currentPrice": 6.3,
-          "todayReturn": 5.53,
-          "drawdownFromPeak": -21.3,
-          "zScore": 5.38,
+          "currentPrice": 5.9,
+          "todayReturn": -6.35,
+          "drawdownFromPeak": -26.2,
+          "zScore": -6.27,
           "volumeRatio": 2.5
         },
-        "pattern": "STEADY_DECLINE"
+        "pattern": "GAP_DOWN"
       },
       "weights": {
         "T1": {
           "longTerm": 45,
           "shortTerm": 5,
           "blended": 29,
-          "adjustment": -55,
+          "adjustment": -63,
           "confidence": "MEDIUM"
         },
         "T2": {
           "longTerm": 30,
           "shortTerm": 95,
           "blended": 56,
-          "adjustment": 664,
+          "adjustment": 635,
           "confidence": "LOW"
         },
         "T3": {
           "longTerm": 35,
           "shortTerm": 95,
           "blended": 59,
-          "adjustment": 553,
+          "adjustment": 1905,
           "confidence": "LOW"
         },
         "T4": {
           "longTerm": 20,
           "shortTerm": 5,
           "blended": 14,
-          "adjustment": -55,
+          "adjustment": -63,
           "confidence": "MEDIUM"
         }
       },
       "inference": {
-        "primaryHypothesis": "T2",
-        "secondaryHypothesis": "T3",
+        "primaryHypothesis": "T3",
+        "secondaryHypothesis": "T2",
         "contradictedHypothesis": null,
-        "confidence": 0.65,
-        "reasoning": ""
+        "confidence": 0.8500000000000001,
+        "reasoning": "Large gap down (-6.35%) on high volume suggests shock event"
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "CRITICAL: 5.5% daily decline with 21% peak drawdown. Market is repricing around AUKUS Domestic Pipeline (T2). Multiple hypotheses under pressure.",
+        "shortTermView": "CRITICAL: 6.3% daily decline with 26% peak drawdown. Market is repricing around US Revenue Gap Earnings Cliff (T3). Multiple hypotheses under pressure.",
         "longTermView": "Research-market divergence in AUKUS Domestic Pipeline (65pts), US Revenue Gap Earnings Cliff (60pts), US Defence Contract Pipeline (40pts), Fixed-Price Contract Overruns (15pts). All hypotheses show divergence.",
-        "commentary": "The 21% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in AUKUS Domestic Pipeline between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
+        "commentary": "The 26% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in AUKUS Domestic Pipeline between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Deep-dive review within 48 hours.",
         "divergences": [
           {
             "tier": "T2",
@@ -2137,10 +2137,10 @@
       "dislocation": {
         "severity": "MODERATE",
         "metrics": {
-          "currentPrice": 32.6,
-          "todayReturn": 0.68,
-          "drawdownFromPeak": -18.5,
-          "zScore": 0.49,
+          "currentPrice": 32.08,
+          "todayReturn": -1.6,
+          "drawdownFromPeak": -19.8,
+          "zScore": -1.19,
           "volumeRatio": 1.2
         },
         "pattern": "STEADY_DECLINE"
@@ -2148,30 +2148,30 @@
       "weights": {
         "T1": {
           "longTerm": 40,
-          "shortTerm": 33.2,
-          "blended": 37,
-          "adjustment": -7,
+          "shortTerm": 24,
+          "blended": 34,
+          "adjustment": -16,
           "confidence": "HIGH"
         },
         "T2": {
           "longTerm": 30,
-          "shortTerm": 70.8,
-          "blended": 46,
-          "adjustment": 41,
+          "shortTerm": 95,
+          "blended": 56,
+          "adjustment": 144,
           "confidence": "LOW"
         },
         "T3": {
           "longTerm": 35,
-          "shortTerm": 69,
-          "blended": 49,
-          "adjustment": 34,
-          "confidence": "MEDIUM"
+          "shortTerm": 95,
+          "blended": 59,
+          "adjustment": 80,
+          "confidence": "LOW"
         },
         "T4": {
           "longTerm": 20,
-          "shortTerm": 13.2,
-          "blended": 17,
-          "adjustment": -7,
+          "shortTerm": 5,
+          "blended": 14,
+          "adjustment": -16,
           "confidence": "HIGH"
         }
       },
@@ -2180,40 +2180,40 @@
         "secondaryHypothesis": "T3",
         "contradictedHypothesis": null,
         "confidence": 0.65,
-        "reasoning": ""
+        "reasoning": "High multiple stock declining = valuation compression narrative"
       },
       "narrativeShift": {
         "hasShift": true,
         "shortTermView": "MODERATE: Price action suggests growing attention to European Sage Brand Expansion. Research thesis not yet invalidated but under pressure.",
-        "longTermView": "Research-market divergence in European Sage Brand Expansion (40.8pts), Consumer Discretionary Slowdown (34pts). US Tariff Margin Erosion, North American Premiumisation remain aligned.",
+        "longTermView": "Research-market divergence in European Sage Brand Expansion (65pts), Consumer Discretionary Slowdown (60pts), North American Premiumisation (16pts), US Tariff Margin Erosion (15pts). All hypotheses show divergence.",
         "commentary": "",
         "divergences": [
           {
             "tier": "T2",
             "name": "European Sage Brand Expansion",
-            "gap": 40.8,
+            "gap": 65,
             "direction": "market elevated"
           },
           {
             "tier": "T3",
             "name": "Consumer Discretionary Slowdown",
-            "gap": 34,
+            "gap": 60,
             "direction": "market elevated"
-          },
-          {
-            "tier": "T4",
-            "name": "US Tariff Margin Erosion",
-            "gap": 6.800000000000001,
-            "direction": "market discounting"
           },
           {
             "tier": "T1",
             "name": "North American Premiumisation",
-            "gap": 6.799999999999997,
+            "gap": 16,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "T4",
+            "name": "US Tariff Margin Erosion",
+            "gap": 15,
             "direction": "market discounting"
           }
         ],
-        "maxDivergence": 40.8,
+        "maxDivergence": 65,
         "regimeChangeRisk": true
       },
       "hypothesisNames": {
@@ -2229,5 +2229,5 @@
       }
     }
   },
-  "generatedAt": "2026-02-22T21:50:16.772Z"
+  "generatedAt": "2026-02-23T00:00:13.529Z"
 }
