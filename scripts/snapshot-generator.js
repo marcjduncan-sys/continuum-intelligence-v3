@@ -196,7 +196,7 @@
                        h.direction === 'downside' ? 'var(--signal-red)' : 'var(--signal-amber)';
         var titleShort = h.title.length > 25 ? h.title.substring(0, 22) + '...' : h.title;
         hypBarsHtml += '<div class="snap-hyp-bar-row">' +
-          '<span class="snap-hyp-bar-label">T' + (i + 1) + '</span>' +
+          '<span class="snap-hyp-bar-label">D' + (i + 1) + '</span>' +
           '<div class="snap-hyp-bar-track"><div class="snap-hyp-bar-fill" style="width:' + pct + '%;background:' + barColor + '"></div></div>' +
           '<span class="snap-hyp-bar-pct">' + pct + '%</span>' +
         '</div>';
@@ -250,7 +250,7 @@
         '<div class="snap-metrics">' + metricsHtml + '</div>' +
         hypBarsHtml +
       '</div>' +
-      '<div class="snap-footer">' +
+      '<div class="snap-card-footer">' +
         '<span class="snap-ev-badge ' + evBadgeCls + '">' + stock.evidenceCount + '/10 domains</span>' +
         (stock.hasTechnical ? '<span class="snap-tech-badge">&#9679; Technical</span>' : '') +
         skewHtml +
@@ -367,10 +367,10 @@
       '.snap-hyp-bars { margin-top:8px; }' +
       '.snap-hyp-bar-row { display:flex; align-items:center; gap:6px; margin-bottom:3px; }' +
       '.snap-hyp-bar-label { font-size:0.6rem; color:var(--text-muted, #6b7280); width:18px; flex-shrink:0; font-weight:600; }' +
-      '.snap-hyp-bar-track { flex:1; height:4px; background:rgba(255,255,255,0.05); border-radius:2px; overflow:hidden; }' +
-      '.snap-hyp-bar-fill { height:100%; border-radius:2px; transition:width 0.3s; }' +
+      '.snap-hyp-bar-track { flex:1; min-width:0; height:6px; background:rgba(255,255,255,0.07); border-radius:3px; overflow:hidden; }' +
+      '.snap-hyp-bar-fill { height:100%; border-radius:3px; transition:width 0.3s; }' +
       '.snap-hyp-bar-pct { font-size:0.6rem; color:var(--text-muted, #6b7280); width:28px; text-align:right; flex-shrink:0; font-variant-numeric:tabular-nums; }' +
-      '.snap-footer { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding-top:10px; ' +
+      '.snap-card-footer { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding-top:10px; margin-top:4px; ' +
         'border-top:1px solid var(--border-subtle, rgba(255,255,255,0.06)); }' +
       '.snap-ev-badge { font-size:0.6rem; padding:2px 8px; border-radius:3px; font-weight:500; }' +
       '.snap-ev-full { background:rgba(16,185,129,0.1); color:#10b981; }' +
