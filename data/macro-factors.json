@@ -1,6 +1,28 @@
 {
   "date": "2026-02-23",
   "fetched_at": "2026-02-23T08:06:11.761Z",
+  "rba": {
+    "cash_rate": 3.85,
+    "cash_rate_formatted": "3.85%",
+    "direction": "hiking",
+    "last_decision": "2026-02-04",
+    "last_action": "+25bps",
+    "previous_rate": 3.60,
+    "trajectory_label": "hiking (inflation concerns)",
+    "next_meeting": "2026-03-17",
+    "forward_guidance": "Board will be attentive to data. Inflation picked up materially in H2 2025. Capacity pressures stronger than previously assessed. Further hikes possible if inflation persists.",
+    "market_pricing_next_hike_may": "77%",
+    "macro_score_component": -8,
+    "rate_history": [
+      {"date": "2025-02-18", "rate": 4.10, "action": "cut_25bps", "from": 4.35},
+      {"date": "2025-05-20", "rate": 3.85, "action": "cut_25bps", "from": 4.10},
+      {"date": "2025-08-05", "rate": 3.60, "action": "cut_25bps", "from": 3.85},
+      {"date": "2025-09-16", "rate": 3.60, "action": "hold",      "from": 3.60},
+      {"date": "2025-11-04", "rate": 3.60, "action": "hold",      "from": 3.60},
+      {"date": "2025-12-09", "rate": 3.60, "action": "hold",      "from": 3.60},
+      {"date": "2026-02-04", "rate": 3.85, "action": "hike_25bps","from": 3.60}
+    ]
+  },
   "market": {
     "asx200": {
       "close": 9026,
@@ -39,8 +61,12 @@
       "stale": false,
       "ticker": "^TNX"
     },
-    "rba_cash": 4.1,
-    "rba_trajectory": "cutting_gradually",
+    "rba_cash": 3.85,
+    "rba_trajectory": "hiking",
+    "rba_decision_date": "2026-02-04",
+    "rba_last_action": "+25bps",
+    "rba_trajectory_label": "hiking (inflation concerns)",
+    "rba_stale": false,
     "au_2yr": 3.98,
     "au_10yr": 4.41,
     "yield_curve_2s10s": 43
@@ -135,14 +161,14 @@
     "lithium_carb": null
   },
   "macro": {
-    "china_mfg_pmi": null,
+    "china_mfg_pmi": 50.5,
     "au_unemployment": null,
     "consumer_confidence": null,
     "au_building_approvals_yoy": null,
     "system_credit_growth_yoy": 5.5
   },
   "benchmark_returns": {
-    "asx200_12m": 0.0864,
+    "asx200_12m": 0.0686,
     "asx200_6m": 0.00597,
     "asx200_3m": 0.05534,
     "asx_small_ords_12m": 0.156,

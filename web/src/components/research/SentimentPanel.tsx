@@ -35,11 +35,30 @@ export function SentimentPanel({ signal, weights }: SentimentPanelProps) {
     { label: 'Overall Skew', value: signal.overall_sentiment, weight: 1, description: 'Composite score', isTotal: true },
   ]
 
+  const rbaRate      = signal.rba_rate ?? null
+  const rbaTrajLabel = signal.rba_trajectory_label ?? null
+  const rbaStale     = signal.rba_stale === true
+
   return (
     <>
       <div className="sentiment-panel">
         <h3 className="panel-title">Three-Layer Signal</h3>
         <div className="signal-date">As of {signal.date}</div>
+
+        {/* RBA context bar — shows current rate and trajectory; amber border when stale */}
+        {rbaRate != null && (
+          <div className={`rba-context-bar${rbaStale ? ' rba-stale' : ''}`}>
+            <span className="rba-label">RBA</span>
+            <span className="rba-rate">{rbaRate.toFixed(2)}%</span>
+            {rbaTrajLabel && (
+              <span className="rba-traj">{rbaTrajLabel}</span>
+            )}
+            {rbaStale && (
+              <span className="rba-stale-badge">stale macro data</span>
+            )}
+          </div>
+        )}
+
         <div className="signal-rows">
           {rows.map(row => (
             <div key={row.label} className={`signal-row ${row.isTotal ? 'signal-total' : ''}`}>
@@ -69,7 +88,13 @@ export function SentimentPanel({ signal, weights }: SentimentPanelProps) {
       </div>
       <style>{`
         .sentiment-panel { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: var(--space-lg); }
-        .signal-date { font-size: 11px; color: var(--text-muted); margin-bottom: var(--space-lg); margin-top: -8px; }
+        .signal-date { font-size: 11px; color: var(--text-muted); margin-bottom: var(--space-sm); margin-top: -8px; }
+        .rba-context-bar { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 6px; background: var(--bg-elevated); border: 1px solid var(--border); margin-bottom: var(--space-md); font-size: 11px; }
+        .rba-context-bar.rba-stale { border-color: var(--signal-amber); }
+        .rba-label { font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+        .rba-rate { font-family: var(--font-data, monospace); font-weight: 700; color: var(--text-primary); }
+        .rba-traj { color: var(--text-secondary); }
+        .rba-stale-badge { margin-left: auto; color: var(--signal-amber); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
         .signal-rows { display: flex; flex-direction: column; gap: var(--space-md); }
         .signal-row { padding: var(--space-sm) 0; }
         .signal-total { border-top: 1px solid var(--border); padding-top: var(--space-md); margin-top: var(--space-xs); }

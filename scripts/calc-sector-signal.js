@@ -142,13 +142,24 @@ function calcDiversifiedSignal(stock, macro) {
   return { signal, detail: 'diversified_blend' };
 }
 
-// ── Rate-sensitive model (banks, insurers) ───────────────────────────────────
+// ── Rate-sensitive model (banks, insurers, REITs) ────────────────────────────
+//
+// Rate trajectory table is directionally consistent for all rate-sensitive stocks:
+//   cutting = positive (lower debt costs, soft landing, improving credit quality)
+//   hiking  = negative (higher debt costs, credit stress, cap rate compression)
+//
+// Note: an earlier implementation inverted the rate score for REITs via `* -1`
+// on the assumption the table was oriented with hiking = positive for banks.
+// The table is in fact oriented with cutting = positive, so the REIT inversion
+// was doubly wrong: it made hiking positive for REITs (the opposite of reality).
+// Fix: same table direction for both banks and REITs. The `invertForREIT` param
+// is retained for the function signature but the inversion is NOT applied.
 
-function calcRateSignal(macro, invertForREIT) {
+function calcRateSignal(macro, invertForREIT) {  // eslint-disable-line no-unused-vars
   const rates = macro.rates  || {};
   const x     = macro.macro  || {};
 
-  // Rate trajectory score
+  // Rate trajectory score — cutting positive, hiking negative (applies to both banks and REITs)
   let rateScore = 0;
   const traj = rates.rba_trajectory;
   if (traj === 'cutting_aggressively') rateScore =  40;
@@ -178,9 +189,6 @@ function calcRateSignal(macro, invertForREIT) {
     else if (credit > -4) creditScore = -20;
     else                  creditScore = -30;
   }
-
-  // REIT inversion: rising rates bearish for REITs
-  if (invertForREIT) rateScore *= -1;
 
   const raw    = rateScore * 0.40 + curveScore * 0.30 + creditScore * 0.30;
   const signal = Math.max(-100, Math.min(100, Math.round(raw)));

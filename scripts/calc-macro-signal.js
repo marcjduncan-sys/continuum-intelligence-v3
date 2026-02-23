@@ -31,6 +31,15 @@ const args    = process.argv.slice(2);
 const dryRun  = args.includes('--dry-run');
 const verbose = args.includes('--verbose');
 
+// ── Staleness check ──────────────────────────────────────────────────────────
+
+function rbaDecisionAgeDays(decisionDateStr) {
+  if (!decisionDateStr) return null;
+  const then = new Date(decisionDateStr);
+  const now  = new Date();
+  return Math.floor((now - then) / (1000 * 60 * 60 * 24));
+}
+
 // ── Score lookup helpers (ERRATA_001 Fix A — compressed bands) ───────────────
 
 function asx200Score(change20d) {
@@ -110,6 +119,10 @@ function main() {
   const s_rba    = rbaScore(r.rba_trajectory);
   const s_china  = chinaScore(x.china_mfg_pmi);
 
+  // Stale RBA detection: flag if last decision is >30 days ago
+  const rbaAgeDays  = rbaDecisionAgeDays(r.rba_decision_date);
+  const rbaStale    = rbaAgeDays !== null && rbaAgeDays > 30;
+
   // Which components have live data vs defaulted to 0
   const nulled = [];
   if (asx200.change_20d == null)   nulled.push('asx200_20d');
@@ -132,10 +145,20 @@ function main() {
     if (nulled.length) console.log('  Null inputs (scored 0):', nulled.join(', '));
   }
 
+  if (rbaStale) {
+    console.warn('[calc-macro-signal] WARNING: RBA data is stale (' + rbaAgeDays + ' days since last decision: ' + r.rba_decision_date + ')');
+  }
+
   const output = {
     date:        macro.date,
     computed_at: new Date().toISOString(),
     macro_signal: signal,
+    rba_stale:   rbaStale,
+    rba_rate:    r.rba_cash       ?? null,
+    rba_trajectory: r.rba_trajectory ?? null,
+    rba_trajectory_label: r.rba_trajectory_label ?? null,
+    rba_decision_date: r.rba_decision_date ?? null,
+    rba_age_days: rbaAgeDays,
     components: {
       asx200_score:  s_asx200,
       vix_score:     s_vix,

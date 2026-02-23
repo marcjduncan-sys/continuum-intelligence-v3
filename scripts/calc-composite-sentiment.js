@@ -68,6 +68,9 @@ function main() {
 
   const today      = dateArg || new Date().toISOString().split('T')[0];
   const macroSignal = macroSigData.macro_signal;
+  const rbaStale   = macroSigData.rba_stale || false;
+  const rbaRate    = macroSigData.rba_rate  ?? null;
+  const rbaTrajLabel = macroSigData.rba_trajectory_label ?? macroSigData.rba_trajectory ?? null;
 
   const tickerConfig = JSON.parse(fs.readFileSync(TICKERS_PATH, 'utf8'));
   const tickers = Object.keys(tickerConfig.tickers)
@@ -152,7 +155,11 @@ function main() {
       company_contribution: companyCont,
       idio_contribution:    companyCont,  // backward compat alias
       // ERRATA_003: external_signal decomposition for display layer
-      external_signal:      macroCont + sectorCont + techCont
+      external_signal:      macroCont + sectorCont + techCont,
+      // RBA context for display and stale warning
+      rba_rate:             rbaRate,
+      rba_trajectory_label: rbaTrajLabel,
+      rba_stale:            rbaStale
     };
 
     // ── Write to today's history entry ──────────────────────────────────────
