@@ -12013,7 +12013,7 @@
 
         // Tag each hypothesis with its original tier number before sorting
         for (var i = 0; i < hyps.length; i++) {
-          hyps[i]._origTierNum = hyps[i].tier.replace('t', '');
+          hyps[i]._origTierNum = hyps[i].tier.replace(/^[td]/, '');
         }
 
         // Sort by fewest contradictions (disconfirmation-based ranking), then raw score as tiebreaker
@@ -12037,10 +12037,10 @@
         // Reassign tiers, dirClass, and title prefixes
         for (var i = 0; i < hyps.length; i++) {
           var h = hyps[i];
-          var oldPrefix = /^T\d+:\s*/;
-          h.tier = 't' + (i + 1);
+          var oldPrefix = /^[TD]\d+:\s*/;
+          h.tier = 'd' + (i + 1);
           h.dirClass = dirMap[h.direction] || 'dir-neutral';
-          h.title = 'T' + (i + 1) + ': ' + h.title.replace(oldPrefix, '');
+          h.title = 'D' + (i + 1) + ': ' + h.title.replace(oldPrefix, '');
         }
 
         // Reorder verdict scores to match and update colours
@@ -12058,7 +12058,7 @@
               }
             }
             if (matched) {
-              matched.label = 'T' + (i + 1) + ' ' + matched.label.replace(/^T\d+\s*/, '');
+              matched.label = 'D' + (i + 1) + ' ' + matched.label.replace(/^[TD]\d+\s*/, '');
               matched.scoreColor = colorMap[hyps[i].dirClass] || matched.scoreColor;
               newScores.push(matched);
             }
@@ -12074,7 +12074,7 @@
             var nonTCount = as.headers.length - hyps.length;
             var newHeaders = as.headers.slice(0, nonTCount);
             for (var i = 0; i < hyps.length; i++) {
-              newHeaders.push('T' + (i + 1) + ' ' + hyps[i].title.replace(/^T\d+:\s*/, '').substring(0, 15));
+              newHeaders.push('D' + (i + 1) + ' ' + hyps[i].title.replace(/^[TD]\d+:\s*/, '').substring(0, 15));
             }
             as.headers = newHeaders;
 
@@ -12117,9 +12117,9 @@
           var scoreStr = '';
           for (var i = 0; i < hyps.length; i++) {
             if (i > 0) scoreStr += ', ';
-            scoreStr += 'T' + (i + 1) + ': ' + norm[i] + '%';
+            scoreStr += 'D' + (i + 1) + ': ' + norm[i] + '%';
           }
-          lim = lim.replace(/\(T1:.*?\)/, '(' + scoreStr + ')');
+          lim = lim.replace(/\([TD]1:.*?\)/, '(' + scoreStr + ')');
           data.gaps.analyticalLimitations = lim;
         }
 
@@ -12128,8 +12128,8 @@
           // Replace T-number references atomically (handles swaps correctly)
           var remapT = function (text) {
             if (!text || typeof text !== 'string') return text;
-            return text.replace(/\bT([1-4])\b/g, function (m, n) {
-              return 'T' + (tierMap[n] || n);
+            return text.replace(/\b[TD]([1-4])\b/g, function (m, n) {
+              return 'D' + (tierMap[n] || n);
             });
           };
 
@@ -12987,7 +12987,7 @@
           hyps.push({
             originalTier: h.tier,
             direction: h.direction,
-            title: h.title.replace(/^T\d+:\s*/, ''),
+            title: h.title.replace(/^[TD]\d+:\s*/, ''),
             statusClass: h.statusClass,
             statusText: h.statusText,
             score: parseInt(h.score) || 0,
@@ -13006,10 +13006,10 @@
         // Build T-reference remapper for snapshot text fields
         var snapRemapT = function (text) {
           if (!text || typeof text !== 'string') return text;
-          return text.replace(/\bT([1-4])\b/g, function (m, n) {
-            var oldTier = 't' + n;
+          return text.replace(/\b[TD]([1-4])\b/g, function (m, n) {
+            var oldTier = 'd' + n;
             var newIdx = tierMap[oldTier];
-            return newIdx !== undefined ? 'T' + (newIdx + 1) : m;
+            return newIdx !== undefined ? 'D' + (newIdx + 1) : m;
           });
         };
 
@@ -13040,7 +13040,7 @@
           survivalBar.push({
             cls: dirSbCls[hyps[i].direction] || 'snap-sb-neutral',
             width: normScores[i] + '%',
-            label: 'T' + (i + 1) + ': ' + normScores[i] + '%'
+            label: 'D' + (i + 1) + ': ' + normScores[i] + '%'
           });
           survivalLegend.push({
             color: dirColor[hyps[i].direction] || 'var(--signal-amber)',
@@ -13056,7 +13056,7 @@
           if (desc.length > 200) desc = desc.substring(0, 197) + '...';
           snapHyps.push({
             cls: dirCls[hyps[i].direction] || 'snap-neutral',
-            label: 'T' + (i + 1) + ': ' + hyps[i].title,
+            label: 'D' + (i + 1) + ': ' + hyps[i].title,
             statusTag: statusTagMap[hyps[i].statusClass] || 'snap-tag-minimal',
             statusText: hyps[i].statusText,
             desc: desc,
@@ -13070,7 +13070,7 @@
         // 6. Build evidence matrix from evidence card tags
         var matrixHeaders = ['Domain'];
         for (var i = 0; i < hyps.length; i++) {
-          matrixHeaders.push('T' + (i + 1) + ' ' + hyps[i].title.substring(0, 12));
+          matrixHeaders.push('D' + (i + 1) + ' ' + hyps[i].title.substring(0, 12));
         }
 
         var matrixRows = [];
@@ -13085,9 +13085,9 @@
           if (card.tags) {
             for (var t = 0; t < card.tags.length; t++) {
               var tag = card.tags[t];
-              var tierMatch = tag.text.match(/T(\d)/);
+              var tierMatch = tag.text.match(/[TD](\d)/);
               if (tierMatch) {
-                var origTier = 't' + tierMatch[1];
+                var origTier = 'd' + tierMatch[1];
                 var newPos = tierMap[origTier];
                 if (newPos !== undefined) {
                   if (tag.class === 'strong') {
