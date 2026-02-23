@@ -165,5 +165,124 @@
       "raw_signal": 9.2
     }
   },
-  "risk_skew": "DOWNSIDE"
+  "risk_skew": "DOWNSIDE",
+  "valuation_anchors": {
+    "eps_forward": null,
+    "eps_trailing": {
+      "value": 1.633,
+      "period": "FY25A",
+      "source": "annual_report",
+      "updated": "2026-02-15"
+    },
+    "ebitda_forward": {
+      "value": 8000,
+      "unit": "A$M",
+      "period": "FY26E",
+      "source": "estimate",
+      "updated": "2026-02-15"
+    },
+    "book_value_per_share": {
+      "value": 12,
+      "period": "FY25A",
+      "source": "estimate",
+      "updated": "2026-02-15"
+    },
+    "shares_outstanding": 3203,
+    "net_debt": 4000,
+    "primary_multiple": "ev_ebitda",
+    "secondary_multiple": "pb",
+    "sector_multiples": {
+      "ev_ebitda": {
+        "median": 7,
+        "p25": 5,
+        "p75": 10
+      },
+      "pb": {
+        "median": 2,
+        "p25": 1.3,
+        "p75": 3
+      },
+      "pe_forward": {
+        "median": 13,
+        "p25": 9,
+        "p75": 18
+      }
+    },
+    "market_multiples": {
+      "pe_forward": {
+        "median": 19,
+        "p25": 14,
+        "p75": 25
+      },
+      "ev_ebitda": {
+        "median": 11,
+        "p25": 7,
+        "p75": 16
+      },
+      "pb": {
+        "median": 2.2,
+        "p25": 1.4,
+        "p75": 3.2
+      },
+      "ev_revenue": {
+        "median": 2,
+        "p25": 1,
+        "p75": 4
+      }
+    }
+  },
+  "valuation_range": {
+    "low": 14.92,
+    "fair_low": 16.87,
+    "fair_high": 19.47,
+    "high": 21.41,
+    "current_price": 20.02,
+    "zone": "RED",
+    "zone_label": "Above fair value – downside skew",
+    "skew_pct": 28.51,
+    "upside_to_fair_high": -2.76,
+    "downside_to_fair_low": -15.72,
+    "upside_to_bull": 6.94,
+    "downside_to_bear": -25.47,
+    "source": "hypothesis_adjusted",
+    "generated_at": "2026-02-23T03:44:16.096Z",
+    "diagnostics": {
+      "price_history_points": 252,
+      "multiple_range": {
+        "p10": 6.6577675,
+        "p25": 6.9620524999999995,
+        "p50": 8.027050000000001,
+        "p75": 8.70368375,
+        "p90": 9.3482875,
+        "current": 8.5475375,
+        "multiple_type": "ev_ebitda",
+        "sample_size": 252
+      },
+      "historical_price_range": {
+        "low": 15.379999999999999,
+        "low_mid": 16.14,
+        "mid": 18.800000000000004,
+        "high_mid": 20.490000000000002,
+        "high": 22.1
+      },
+      "relative_benchmark": {
+        "blended_median": 7.8,
+        "blended_p25": 5.4,
+        "blended_p75": 11.2,
+        "current_multiple": 8.55,
+        "premium_discount_pct": 9.58,
+        "mean_reversion_force": -9.58,
+        "multiple_type": "ev_ebitda"
+      },
+      "hypothesis_adjustment": {
+        "centre_shift": -0.63,
+        "centre_shift_pct": -3.37,
+        "width_multiplier": 0.97,
+        "adjusted_low": 14.92,
+        "adjusted_mid": 18.17,
+        "adjusted_high": 21.41,
+        "company_signal": -9
+      }
+    }
+  }
 }

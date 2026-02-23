@@ -120,5 +120,124 @@
       "lead": 5,
       "raw_signal": 28
     }
+  },
+  "valuation_anchors": {
+    "eps_forward": {
+      "value": 1.05,
+      "period": "FY26E",
+      "source": "consensus",
+      "updated": "2026-02-15"
+    },
+    "eps_trailing": {
+      "value": 0.957,
+      "period": "FY25A",
+      "source": "annual_report",
+      "updated": "2026-02-15"
+    },
+    "ebitda_forward": {
+      "value": 250,
+      "unit": "A$M",
+      "period": "FY26E",
+      "source": "estimate",
+      "updated": "2026-02-15"
+    },
+    "book_value_per_share": null,
+    "shares_outstanding": 142,
+    "net_debt": 200,
+    "primary_multiple": "pe_forward",
+    "secondary_multiple": "ev_ebitda",
+    "sector_multiples": {
+      "pe_forward": {
+        "median": 20,
+        "p25": 14,
+        "p75": 28
+      },
+      "ev_ebitda": {
+        "median": 9,
+        "p25": 6,
+        "p75": 13
+      },
+      "pb": {
+        "median": 3,
+        "p25": 2,
+        "p75": 4.5
+      }
+    },
+    "market_multiples": {
+      "pe_forward": {
+        "median": 19,
+        "p25": 14,
+        "p75": 25
+      },
+      "ev_ebitda": {
+        "median": 11,
+        "p25": 7,
+        "p75": 16
+      },
+      "pb": {
+        "median": 2.2,
+        "p25": 1.4,
+        "p75": 3.2
+      },
+      "ev_revenue": {
+        "median": 2,
+        "p25": 1,
+        "p75": 4
+      }
+    }
+  },
+  "valuation_range": {
+    "low": 32.04,
+    "fair_low": 33.9,
+    "fair_high": 36.38,
+    "high": 38.24,
+    "current_price": 32.08,
+    "zone": "GREEN",
+    "zone_label": "Below fair value – upside skew",
+    "skew_pct": -49.35,
+    "upside_to_fair_high": 13.4,
+    "downside_to_fair_low": 5.67,
+    "upside_to_bull": 19.2,
+    "downside_to_bear": -0.12,
+    "source": "hypothesis_adjusted",
+    "generated_at": "2026-02-23T03:44:16.081Z",
+    "diagnostics": {
+      "price_history_points": 252,
+      "multiple_range": {
+        "p10": 27.466666666666665,
+        "p25": 28.55238095238095,
+        "p50": 30.285714285714285,
+        "p75": 32.60952380952381,
+        "p90": 34.06666666666667,
+        "current": 30.93333333333333,
+        "multiple_type": "pe_forward",
+        "sample_size": 252
+      },
+      "historical_price_range": {
+        "low": 28.84,
+        "low_mid": 29.98,
+        "mid": 31.8,
+        "high_mid": 34.24,
+        "high": 35.77
+      },
+      "relative_benchmark": {
+        "blended_median": 19.8,
+        "blended_p25": 14,
+        "blended_p75": 27.4,
+        "current_multiple": 30.93,
+        "premium_discount_pct": 56.23,
+        "mean_reversion_force": -56.23,
+        "multiple_type": "pe_forward"
+      },
+      "hypothesis_adjustment": {
+        "centre_shift": 3.34,
+        "centre_shift_pct": 10.5,
+        "width_multiplier": 0.9,
+        "adjusted_low": 32.04,
+        "adjusted_mid": 35.14,
+        "adjusted_high": 38.24,
+        "company_signal": 28
+      }
+    }
   }
 }

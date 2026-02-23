@@ -2704,6 +2704,147 @@
     .verdict-scores-inline .vs-item { min-width: 50px; }
     .verdict-scores-inline .vs-score { font-size: 0.95rem; }
 
+    /* --- Valuation Range Bar --- */
+    .vr-section {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: var(--space-lg) 0;
+    }
+    .vr-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--space-xl);
+    }
+    .vr-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    .vr-title {
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .vr-zone-badge {
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+    .vr-zone-badge.zone-green, .vr-zone-badge.zone-deep-green {
+      background: rgba(61, 170, 109, 0.12);
+      color: var(--signal-green);
+      border: 1px solid rgba(61, 170, 109, 0.3);
+    }
+    .vr-zone-badge.zone-amber {
+      background: rgba(212, 160, 60, 0.12);
+      color: var(--signal-amber);
+      border: 1px solid rgba(212, 160, 60, 0.3);
+    }
+    .vr-zone-badge.zone-red, .vr-zone-badge.zone-deep-red {
+      background: rgba(212, 85, 85, 0.12);
+      color: var(--signal-red);
+      border: 1px solid rgba(212, 85, 85, 0.3);
+    }
+    .vr-bar-wrap {
+      position: relative;
+      margin-bottom: var(--space-md);
+    }
+    .vr-bar {
+      display: flex;
+      height: 12px;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .vr-seg-green  { background: rgba(61,  170, 109, 0.35); }
+    .vr-seg-amber  { background: rgba(212, 160,  60, 0.45); }
+    .vr-seg-red    { background: rgba(212,  85,  85, 0.35); }
+    .vr-marker {
+      position: absolute;
+      top: -4px;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .vr-marker-pin {
+      width: 2px;
+      height: 20px;
+      background: var(--text-primary);
+      margin: 0 auto;
+    }
+    .vr-marker-label {
+      font-family: var(--font-data);
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      text-align: center;
+      margin-top: 2px;
+    }
+    .vr-endpoints {
+      display: flex;
+      justify-content: space-between;
+      margin-top: var(--space-sm);
+    }
+    .vr-endpoint {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      font-family: var(--font-data);
+    }
+    .vr-endpoint.bear { color: var(--signal-red); }
+    .vr-endpoint.bull { color: var(--signal-green); }
+    .vr-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      margin-top: var(--space-sm);
+    }
+    .vr-meta-item strong { color: var(--text-primary); }
+    .vr-stale-warning {
+      font-size: 0.6rem;
+      color: var(--signal-amber);
+      margin-top: var(--space-xs, 4px);
+    }
+    /* Coverage table Zone column */
+    .td-zone { text-align: center; white-space: nowrap; }
+    .cov-zone-badge {
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+    .cov-zone-badge.zone-green, .cov-zone-badge.zone-deep-green {
+      background: rgba(61, 170, 109, 0.15);
+      color: var(--signal-green);
+    }
+    .cov-zone-badge.zone-amber {
+      background: rgba(212, 160, 60, 0.15);
+      color: var(--signal-amber);
+    }
+    .cov-zone-badge.zone-red, .cov-zone-badge.zone-deep-red {
+      background: rgba(212, 85, 85, 0.15);
+      color: var(--signal-red);
+    }
+    /* Sidebar valuation section */
+    .hs-vr-compact { margin-top: var(--space-sm); }
+    .hs-vr-bar {
+      display: flex;
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 4px 0;
+    }
+    .hs-vr-bar .vr-seg-green  { background: rgba(61,  170, 109, 0.5); }
+    .hs-vr-bar .vr-seg-amber  { background: rgba(212, 160,  60, 0.6); }
+    .hs-vr-bar .vr-seg-red    { background: rgba(212,  85,  85, 0.5); }
+
     /* --- Report Page: Section Nav --- */
     .section-nav {
       background: var(--bg-page);
@@ -9120,6 +9261,7 @@
                 title="Three-layer composite signal">Sentiment <span class="sort-arrow"
                   id="sentiment-sort-arrow">&#9650;</span></th>
               <th title="Current dominant hypothesis">Dominant</th>
+              <th title="Valuation zone — where price sits relative to fair value range">Zone</th>
               <th class="sortable" onclick="sortCoverageTableByDate()" id="th-date" title="Sort by research date">
                 Updated <span class="sort-arrow" id="date-sort-arrow">&#9650;</span></th>
               <th>Status</th>
@@ -10253,6 +10395,10 @@
                 // Phase 5.7: narrative history and last flip
                 if (sData.narrative_history !== undefined) STOCK_DATA[ticker].narrative_history = sData.narrative_history;
                 if (sData.last_flip !== undefined) STOCK_DATA[ticker].last_flip = sData.last_flip;
+                // Valuation range engine
+                if (sData.valuation_range) STOCK_DATA[ticker].valuation_range = sData.valuation_range;
+                if (sData.valuation_anchors) STOCK_DATA[ticker].valuation_anchors = sData.valuation_anchors;
+                if (sData.forecast_valuation) STOCK_DATA[ticker].forecast_valuation = sData.forecast_valuation;
                 // Cache full stocks JSON for retail PDF (buildRetailHTML expects stocks-format hypotheses dict)
                 STOCK_DATA[ticker]._stocksData = sData;
               }
@@ -11129,6 +11275,109 @@
         return '<div class="verdict-section">' +
           '<div class="verdict-inner"' + borderStyle + '>' +
           '<div class="verdict-text">' + v.text + '</div>' +
+          '</div>' +
+          '</div>';
+      }
+
+      function renderValuationRange(data) {
+        // Read valuation_range from stock data (written by calc-valuation-range.js)
+        var vr = data.valuation_range;
+        if (!vr || !vr.low || !vr.high || !vr.current_price) return '';
+
+        var low      = vr.low;
+        var fairLow  = vr.fair_low;
+        var fairHigh = vr.fair_high;
+        var high     = vr.high;
+        var cur      = vr.current_price;
+        var zone     = vr.zone || 'AMBER';
+        var zoneLabel = vr.zone_label || 'Within fair value range';
+
+        // Compute segment widths as % of full range
+        var totalRange = high - low;
+        if (totalRange <= 0) return '';
+        var greenPct = Math.max(0, ((fairLow - low) / totalRange) * 100);
+        var amberPct = Math.max(0, ((fairHigh - fairLow) / totalRange) * 100);
+        var redPct   = Math.max(0, ((high - fairHigh) / totalRange) * 100);
+        // Clamp to sum to 100
+        var total = greenPct + amberPct + redPct;
+        if (total > 0) { greenPct = greenPct/total*100; amberPct = amberPct/total*100; redPct = redPct/total*100; }
+
+        // Current price marker position
+        var markerPct = Math.max(1, Math.min(99, ((cur - low) / totalRange) * 100));
+
+        // Zone CSS class
+        var zoneCls = zone.toLowerCase().replace('_', '-');
+
+        // Zone label display
+        var zoneShort = zone === 'DEEP_GREEN' ? 'DEEP GREEN'
+          : zone === 'DEEP_RED' ? 'DEEP RED'
+          : zone;
+
+        // Upside/downside meta
+        var toFairHigh = vr.upside_to_fair_high != null ? (vr.upside_to_fair_high > 0 ? '+' : '') + vr.upside_to_fair_high.toFixed(1) + '% to fair high' : '';
+        var toBull     = vr.upside_to_bull     != null ? (vr.upside_to_bull > 0 ? '+' : '') + vr.upside_to_bull.toFixed(1) + '% to bull case' : '';
+        var toBear     = vr.downside_to_bear   != null ? vr.downside_to_bear.toFixed(1) + '% to bear case' : '';
+
+        // Forecast agent data
+        var fc = data.forecast_valuation;
+        var probLine = fc && fc.base_case ? 'Base probability: ' + fc.base_case.probability + '%' : '';
+        var catalystLine = fc && fc.key_catalyst ? fc.key_catalyst : '';
+        var widthLabel = fc && fc.range_width_interpretation ? 'Range: ' + fc.range_width_interpretation : '';
+
+        // Primary multiple info
+        var anchors = data.valuation_anchors;
+        var multipleLabel = '';
+        if (anchors && vr.diagnostics && vr.diagnostics.relative_benchmark) {
+          var rb = vr.diagnostics.relative_benchmark;
+          var mult = anchors.primary_multiple.replace('_', ' ').toUpperCase();
+          var premDisc = rb.premium_discount_pct;
+          var premStr = premDisc > 0 ? '+' + premDisc.toFixed(1) + '% premium to sector' : premDisc.toFixed(1) + '% discount to sector';
+          multipleLabel = mult + ': ' + rb.current_multiple.toFixed(1) + 'x vs sector ' + rb.blended_median.toFixed(1) + 'x (' + premStr + ')';
+        }
+
+        // Staleness check (>5 days)
+        var staleWarning = '';
+        if (vr.generated_at) {
+          var ageDays = (Date.now() - new Date(vr.generated_at).getTime()) / 86400000;
+          if (ageDays > 5) {
+            staleWarning = '<div class="vr-stale-warning">Range may be stale — last computed ' + Math.floor(ageDays) + ' days ago</div>';
+          }
+        }
+
+        var fmt = function(n) { return 'A$' + n.toFixed(2); };
+
+        return '<div class="vr-section">' +
+          '<div class="vr-inner">' +
+          '<div class="vr-header">' +
+          '<span class="vr-title">Valuation Range</span>' +
+          '<span class="vr-zone-badge zone-' + zoneCls + '">' + zoneShort + '</span>' +
+          '</div>' +
+          '<div class="vr-bar-wrap">' +
+          '<div class="vr-bar">' +
+          '<div class="vr-seg-green"  style="width:' + greenPct.toFixed(1) + '%"></div>' +
+          '<div class="vr-seg-amber"  style="width:' + amberPct.toFixed(1) + '%"></div>' +
+          '<div class="vr-seg-red"    style="width:' + redPct.toFixed(1)   + '%"></div>' +
+          '</div>' +
+          '<div class="vr-marker" style="left:' + markerPct.toFixed(1) + '%">' +
+          '<div class="vr-marker-pin"></div>' +
+          '<div class="vr-marker-label">' + fmt(cur) + '</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="vr-endpoints">' +
+          '<span class="vr-endpoint bear">Bear ' + fmt(low) + '</span>' +
+          '<span class="vr-endpoint">Fair ' + fmt(fairLow) + ' – ' + fmt(fairHigh) + '</span>' +
+          '<span class="vr-endpoint bull">Bull ' + fmt(high) + '</span>' +
+          '</div>' +
+          '<div class="vr-meta">' +
+          (toFairHigh ? '<span class="vr-meta-item">' + toFairHigh + '</span>' : '') +
+          (toBull     ? '<span class="vr-meta-item">' + toBull     + '</span>' : '') +
+          (toBear     ? '<span class="vr-meta-item">' + toBear     + '</span>' : '') +
+          (probLine   ? '<span class="vr-meta-item">' + probLine   + '</span>' : '') +
+          (widthLabel ? '<span class="vr-meta-item">' + widthLabel + '</span>' : '') +
+          (multipleLabel ? '<span class="vr-meta-item">' + multipleLabel + '</span>' : '') +
+          (catalystLine  ? '<span class="vr-meta-item"><strong>Catalyst:</strong> ' + catalystLine + '</span>' : '') +
+          '</div>' +
+          staleWarning +
           '</div>' +
           '</div>';
       }
@@ -12959,6 +13208,7 @@
           renderMacroBar(data) +
           renderCompositeBar(data, _scoresHtml) +
           renderVerdict(data) +
+          renderValuationRange(data) +
           renderSectionNav(data) +
           '<div class="report-content">' +
           '<div class="report-main">' + mainContent + '</div>' +
@@ -13602,6 +13852,17 @@
           domHtml = '<span class="' + covDomCls + '" style="font-size:0.75rem">' + covDomName + '</span>';
         }
 
+        // Valuation zone column
+        var zoneHtml = '<span style="color:var(--text-muted);font-size:0.6rem">—</span>';
+        var vr = data.valuation_range;
+        if (vr && vr.zone) {
+          var vrZoneCls = vr.zone.toLowerCase().replace('_', '-');
+          var vrZoneShort = vr.zone === 'DEEP_GREEN' ? 'DEEP GRN'
+            : vr.zone === 'DEEP_RED' ? 'DEEP RED'
+            : vr.zone;
+          zoneHtml = '<span class="cov-zone-badge zone-' + vrZoneCls + '">' + vrZoneShort + '</span>';
+        }
+
         var dateTs = 0;
         if (data.date) {
           var dp = data.date.split(' ');
@@ -13615,6 +13876,7 @@
           '<td class="td-company">' + compHtml + '</td>' +
           '<td class="td-sentiment">' + sentHtml + '</td>' +
           '<td class="td-dominant">' + domHtml + '</td>' +
+          '<td class="td-zone">' + zoneHtml + '</td>' +
           '<td class="td-date">' + shortDate + '</td>' +
           '<td>' + renderFreshnessBadge(data.ticker) + renderCatalystTag(data.ticker) + '</td>' +
           '</tr>';
@@ -13629,6 +13891,7 @@
           '<td class="td-company"></td>' +
           '<td class="td-sentiment"></td>' +
           '<td class="td-dominant"></td>' +
+          '<td></td>' +
           '<td><span class="coming-soon">Coming Soon</span></td>' +
           '<td></td>' +
           '</tr>';
@@ -16276,6 +16539,37 @@
         if (researchH || consensusH) {
           html += '<div class="hs-section">Company</div>';
           html += researchH + consensusH;
+        }
+
+        // Valuation Range (compact sidebar widget)
+        var vr = stock.valuation_range;
+        if (vr && vr.low && vr.high && vr.current_price) {
+          var vrZoneCls = (vr.zone || 'AMBER').toLowerCase().replace('_', '-');
+          var vrZoneShort = vr.zone === 'DEEP_GREEN' ? 'DEEP GREEN'
+            : vr.zone === 'DEEP_RED' ? 'DEEP RED'
+            : (vr.zone || 'AMBER');
+          var vrTotalW = vr.high - vr.low;
+          var vrGreenW = vrTotalW > 0 ? Math.max(0, ((vr.fair_low - vr.low) / vrTotalW) * 100) : 33;
+          var vrAmberW = vrTotalW > 0 ? Math.max(0, ((vr.fair_high - vr.fair_low) / vrTotalW) * 100) : 34;
+          var vrRedW   = vrTotalW > 0 ? Math.max(0, ((vr.high - vr.fair_high) / vrTotalW) * 100) : 33;
+          html += '<div class="hs-section">Valuation Range</div>';
+          html += '<div class="hs-vr-compact">';
+          html += kvRow('Zone', '<span class="cov-zone-badge zone-' + vrZoneCls + '">' + vrZoneShort + '</span>', '');
+          html += kvRow('Bear',  'A$' + vr.low.toFixed(2), 'dir-down');
+          html += kvRow('Fair',  'A$' + vr.fair_low.toFixed(2) + ' – A$' + vr.fair_high.toFixed(2), '');
+          html += kvRow('Bull',  'A$' + vr.high.toFixed(2), 'dir-up');
+          html += '<div class="hs-vr-bar">';
+          html += '<div class="vr-seg-green" style="width:' + vrGreenW.toFixed(0) + '%"></div>';
+          html += '<div class="vr-seg-amber" style="width:' + vrAmberW.toFixed(0) + '%"></div>';
+          html += '<div class="vr-seg-red"   style="width:' + vrRedW.toFixed(0)   + '%"></div>';
+          html += '</div>';
+          if (vr.upside_to_bull != null) {
+            html += kvRow('To bull',  (vr.upside_to_bull > 0 ? '+' : '') + vr.upside_to_bull.toFixed(1) + '%', vr.upside_to_bull > 0 ? 'dir-up' : 'dir-down');
+          }
+          if (vr.downside_to_bear != null) {
+            html += kvRow('To bear', vr.downside_to_bear.toFixed(1) + '%', vr.downside_to_bear < 0 ? 'dir-down' : '');
+          }
+          html += '</div>';
         }
 
         sidebar.innerHTML = html;

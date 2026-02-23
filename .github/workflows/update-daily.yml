@@ -188,6 +188,19 @@ jobs:
             echo "::warning::Index signal sync failed — _index.json may be stale"
           fi
 
+      - name: Calculate valuation ranges
+        if: steps.market-check.outputs.skip != 'true'
+        run: |
+          set +e
+          node scripts/calc-valuation-range.js
+          VR_EXIT=$?
+          set -e
+          if [ $VR_EXIT -ne 0 ]; then
+            echo "::warning::Valuation range calculation exited with code $VR_EXIT (non-fatal)"
+          fi
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
       - name: Validate score consistency
         if: steps.market-check.outputs.skip != 'true'
         run: node scripts/validate-scores.js
