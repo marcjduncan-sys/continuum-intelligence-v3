@@ -42,6 +42,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Fetch macro factors and benchmark returns
+        run: node scripts/fetch-macro-factors.js || true
+
       - name: Fetch live prices
         run: node scripts/fetch-live-prices.js
 
@@ -58,6 +61,9 @@ jobs:
             ARGS="--ticker ${{ github.event.inputs.ticker }}"
           fi
           node scripts/update-research.js $ARGS
+
+      - name: Recalculate relative performance (fixed benchmark lookback)
+        run: node scripts/calc-relative-performance.js || true
 
       - name: Log hypothesis history
         run: node scripts/log-hypothesis-history.js

@@ -60,6 +60,26 @@ const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 const HISTORY_RANGE    = '1mo';
 const HISTORY_INTERVAL = '1d';
 
+// 1-year lookback for benchmark return calculations (3m/6m/12m).
+const BENCHMARK_RANGE = '1y';
+
+// Tickers fetched with BENCHMARK_RANGE to produce benchmark_returns.
+// These values are IDENTICAL for every stock on any given day.
+const BENCHMARK_TICKERS = {
+  asx200:               '^AXJO',
+  asx_small_ords:       '^AXSO',
+  asx_materials:        '^AXMJ',
+  asx_financials:       '^AXFJ',
+  asx_healthcare:       '^AXHJ',
+  asx_consumer_staples: '^AXSJ',
+  asx_consumer_disc:    '^AXDJ',
+  asx_areit:            '^AXPJ',
+  asx_energy:           '^AXEJ',
+  asx_industrials:      '^AXIJ',
+  asx_technology:       '^AXTJ',
+  asx_gold:             '^AXGD',
+};
+
 // Tickers to fetch automatically from Yahoo Finance.
 // Key = field name used in the output schema.
 const YAHOO_TICKERS = {
@@ -169,10 +189,10 @@ function fetchJSON(url, session) {
 
 // ── Fetch one ticker — returns array of daily closes ─────────────────────────
 
-async function fetchDailyCloses(ticker, session) {
+async function fetchDailyCloses(ticker, session, range = HISTORY_RANGE) {
   const crumbParam = session ? `&crumb=${encodeURIComponent(session.crumb)}` : '';
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}` +
-              `?range=${HISTORY_RANGE}&interval=${HISTORY_INTERVAL}&includePrePost=false${crumbParam}`;
+              `?range=${range}&interval=${HISTORY_INTERVAL}&includePrePost=false${crumbParam}`;
 
   const json = await fetchJSON(url, session);
   const result = json.chart && json.chart.result && json.chart.result[0];
@@ -208,6 +228,71 @@ function computeReturns(closes) {
     change_5d: n >= 6  ? pct(closes[n - 6])  : null,
     change_20d: n >= 21 ? pct(closes[n - 21]) : null
   };
+}
+
+// ── Compute long-period benchmark returns (3m/6m/12m) ────────────────────────
+//
+// Requires at least 1 year of daily closes. Returns decimal fractions (5dp).
+// Uses trading-day counts: 12m=252, 6m=126, 3m=63.
+
+function computeBenchmarkReturns(closes) {
+  const n = closes.length;
+  if (n < 2) return { m12: null, m6: null, m3: null };
+
+  const last = closes[n - 1];
+  const pct = (from) => {
+    if (from == null || from === 0) return null;
+    return Math.round(((last - from) / from) * 100000) / 100000; // 5dp
+  };
+
+  // 12m: 252 trading days back; if history is shorter, use oldest available
+  const base12m = n >= 253 ? closes[n - 253] : closes[0];
+  return {
+    m12: pct(base12m),
+    m6:  n >= 127 ? pct(closes[n - 127]) : null,
+    m3:  n >= 64  ? pct(closes[n - 64])  : null,
+  };
+}
+
+// ── Fetch benchmark returns for all BENCHMARK_TICKERS ────────────────────────
+//
+// Falls back to prior values on failure. Only stamps calculated_date if the
+// primary ASX200 benchmark succeeds (guarantees the date is meaningful).
+
+async function fetchAllBenchmarks(session, prior) {
+  const today  = new Date().toISOString().split('T')[0];
+  // Seed with prior values so stale fallback works on partial failures
+  const result = Object.assign({}, prior && prior.benchmark_returns ? prior.benchmark_returns : {});
+
+  let asx200Ok = false;
+  let fetchCount = 0;
+
+  for (const [key, ticker] of Object.entries(BENCHMARK_TICKERS)) {
+    if (fetchCount > 0) await new Promise(r => setTimeout(r, 300));
+    fetchCount++;
+
+    try {
+      const closes = await fetchDailyCloses(ticker, session, BENCHMARK_RANGE);
+      const ret    = computeBenchmarkReturns(closes);
+
+      if (key === 'asx200') {
+        result.asx200_12m = ret.m12;
+        result.asx200_6m  = ret.m6;
+        result.asx200_3m  = ret.m3;
+        if (ret.m12 != null) asx200Ok = true;
+      } else {
+        result[key + '_12m'] = ret.m12;
+      }
+
+      const pctStr = ret.m12 != null ? (ret.m12 * 100).toFixed(2) + '%' : 'n/a';
+      console.log(`  [BENCH] ${ticker.padEnd(12)} 12m=${pctStr}`);
+    } catch (e) {
+      console.log(`  [BENCH-FAIL] ${ticker}: ${e.message} — keeping prior`);
+    }
+  }
+
+  if (asx200Ok) result.calculated_date = today;
+  return result;
 }
 
 // ── Stale day counter ─────────────────────────────────────────────────────────
@@ -289,7 +374,10 @@ function buildSkeleton(prior) {
       consumer_confidence:       prior?.macro?.consumer_confidence        ?? null,
       au_building_approvals_yoy: prior?.macro?.au_building_approvals_yoy ?? null,
       system_credit_growth_yoy:  prior?.macro?.system_credit_growth_yoy  ?? null
-    }
+    },
+    // Benchmark returns — refreshed daily, shared across all stocks.
+    // Carried forward from prior until fresh fetch succeeds.
+    benchmark_returns: prior?.benchmark_returns ?? null
   };
 
   return out;
@@ -471,6 +559,17 @@ async function main() {
       console.log(`  [FAIL] ${ticker.padEnd(12)} ${e.message} — using prior value`);
       placeFallback(out, key, prior);
     }
+  }
+
+  // ── Benchmark returns (12m/6m/3m for ASX200 + sector indices) ─────────────
+
+  console.log('\n  Fetching benchmark returns (1y range)...');
+  out.benchmark_returns = await fetchAllBenchmarks(session, prior);
+  const br = out.benchmark_returns;
+  if (br && br.asx200_12m != null) {
+    console.log(`  [BENCH-OK] ASX200 12m=${(br.asx200_12m * 100).toFixed(2)}%  calculated_date=${br.calculated_date}`);
+  } else {
+    console.log('  [BENCH-WARN] ASX200 benchmark not available — using prior if present');
   }
 
   // ── Derive gold_aud ────────────────────────────────────────────────────────
