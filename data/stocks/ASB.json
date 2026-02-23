@@ -5,7 +5,7 @@
   "market_cap": "2.5B",
   "risk_skew": "UPSIDE",
   "hypotheses": {
-    "T1": {
+    "D1": {
       "label": "US Defence Contract Pipeline Secures Multi-Year Revenue",
       "description": "A$13.1B order book converts at contracted margins; TAGOS-23 and follow-on programmes extend the US revenue runway",
       "plain_english": "This is the bull case — Austal's near-monopoly in US aluminium naval shipbuilding gives it captive multi-year revenue. The order book covers 15+ years at current delivery rates.",
@@ -17,7 +17,7 @@
       "weighted_inconsistency": 2,
       "last_updated": "2026-02-20T00:00:00.000Z"
     },
-    "T2": {
+    "D2": {
       "label": "AUKUS / Australian Defence Uplift Creates Domestic Pipeline",
       "description": "AUKUS and Australian Defence Strategic Review commitments drive domestic surface fleet work to Austal Henderson",
       "plain_english": "Australia's A$368B AUKUS commitment and defence budget expansion create a long-dated option for Henderson shipyard work. Not a current earnings driver but a structural tailwind.",
@@ -29,7 +29,7 @@
       "weighted_inconsistency": 3,
       "last_updated": "2026-02-20T00:00:00.000Z"
     },
-    "T3": {
+    "D3": {
       "label": "US Revenue Gap Creates Earnings Cliff",
       "description": "LCS programme wind-down and EPF completion create underutilisation at US facilities before new programmes (TAGOS-23) ramp",
       "plain_english": "The bear case on revenue timing — if new programmes are delayed or awarded elsewhere, Austal's US yards face a gap between current work rolling off and new work starting.",
@@ -41,7 +41,7 @@
       "weighted_inconsistency": 3,
       "last_updated": "2026-02-20T00:00:00.000Z"
     },
-    "T4": {
+    "D4": {
       "label": "Fixed-Price Contracts Recur with Cost Overruns + Governance",
       "description": "T-ATS accounting error is not isolated; further control failures or cost overruns in US operations destroy earnings quality and management credibility",
       "plain_english": "The governance bear case — the US$17.1M T-ATS double-counting may signal systemic internal control issues. If a second error emerges, the market will severely punish the stock.",
@@ -54,7 +54,7 @@
       "last_updated": "2026-02-20T00:00:00.000Z"
     }
   },
-  "dominant": "T1",
+  "dominant": "D1",
   "confidence": "MODERATE",
   "alert_state": "NORMAL",
   "current_price": 6.3,
@@ -111,11 +111,11 @@
     "idio_detail": {
       "signal": 32,
       "detail": "dominance_sqrt",
-      "T1": "T1",
-      "T1_score": 45,
-      "T1_sentiment": "BULLISH",
-      "T2": "T3",
-      "T2_score": 35,
+      "D1": "D1",
+      "D1_score": 45,
+      "D1_sentiment": "BULLISH",
+      "D2": "D3",
+      "D2_score": 35,
       "lead": 10,
       "raw_signal": 32
     }

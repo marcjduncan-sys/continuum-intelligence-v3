@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Continuum Intelligence — Independent Cross-Domain Equity Research</title>
   <meta name="description"
-    content="Cross-domain equity research built by former institutional practitioners. Evidence-driven analysis using the Analysis of Competing Hypotheses framework.">
+    content="Cross-domain equity research built by former institutional practitioners. Evidence-driven analysis using the Stock Drivers framework.">
   <meta property="og:title" content="Continuum Intelligence — Independent Cross-Domain Equity Research">
   <meta property="og:description"
     content="Evidence-driven equity analysis across 10 domains. Built by former UBS and Goldman Sachs executives.">
@@ -421,19 +421,19 @@
       background: #FFFFFF;
     }
 
-    [data-theme="light"] .tc-banner.t1 {
+    [data-theme="light"] .tc-banner.d1 {
       background: rgba(47, 133, 90, 0.08);
     }
 
-    [data-theme="light"] .tc-banner.t2 {
+    [data-theme="light"] .tc-banner.d2 {
       background: rgba(183, 121, 31, 0.08);
     }
 
-    [data-theme="light"] .tc-banner.t3 {
+    [data-theme="light"] .tc-banner.d3 {
       background: rgba(197, 48, 48, 0.08);
     }
 
-    [data-theme="light"] .tc-banner.t4 {
+    [data-theme="light"] .tc-banner.d4 {
       background: rgba(43, 108, 176, 0.08);
     }
 
@@ -2687,6 +2687,23 @@
       color: var(--text-muted);
     }
 
+    .tls-company-detail {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .verdict-scores-inline {
+      display: flex;
+      gap: var(--space-sm);
+      flex-shrink: 0;
+    }
+
+    .verdict-scores-inline .vs-item { min-width: 50px; }
+    .verdict-scores-inline .vs-score { font-size: 0.95rem; }
+
     /* --- Report Page: Section Nav --- */
     .section-nav {
       background: var(--bg-page);
@@ -3463,7 +3480,7 @@
       border-left: 4px solid var(--signal-amber);
     }
 
-    /* T1 prominence — dominant hypothesis visually highlighted */
+    /* D1 prominence — dominant driver visually highlighted */
     .hyp-card.dominant {
       border-width: 2px;
       border-left-width: 5px;
@@ -3471,24 +3488,10 @@
       position: relative;
     }
 
-    .hyp-card.dominant::after {
-      content: 'DOMINANT';
-      position: absolute;
-      top: var(--space-sm);
-      right: var(--space-sm);
-      font-size: 0.55rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      padding: 2px 8px;
-      border-radius: 3px;
-      background: rgba(0, 0, 0, 0.04);
-      color: var(--text-muted);
-    }
-
     .hc-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       margin-bottom: var(--space-md);
     }
 
@@ -3507,6 +3510,19 @@
       padding: 3px 10px;
       border-radius: 3px;
       white-space: nowrap;
+    }
+
+    .hc-dominant-badge {
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 3px;
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .hc-status.priced {
@@ -4334,22 +4350,22 @@
       border: 2px solid;
     }
 
-    .tc-banner.t1 {
+    .tc-banner.d1 {
       background: rgba(61, 170, 109, 0.1);
       border-color: var(--signal-green);
     }
 
-    .tc-banner.t2 {
+    .tc-banner.d2 {
       background: rgba(212, 160, 60, 0.1);
       border-color: var(--signal-amber);
     }
 
-    .tc-banner.t3 {
+    .tc-banner.d3 {
       background: rgba(212, 85, 85, 0.1);
       border-color: var(--signal-red);
     }
 
-    .tc-banner.t4 {
+    .tc-banner.d4 {
       background: rgba(74, 142, 204, 0.1);
       border-color: var(--signal-blue);
     }
@@ -4368,19 +4384,19 @@
       margin-bottom: var(--space-sm);
     }
 
-    .tc-banner.t1 .tc-banner-label {
+    .tc-banner.d1 .tc-banner-label {
       color: var(--signal-green);
     }
 
-    .tc-banner.t2 .tc-banner-label {
+    .tc-banner.d2 .tc-banner-label {
       color: var(--signal-amber);
     }
 
-    .tc-banner.t3 .tc-banner-label {
+    .tc-banner.d3 .tc-banner-label {
       color: var(--signal-red);
     }
 
-    .tc-banner.t4 .tc-banner-label {
+    .tc-banner.d4 .tc-banner-label {
       color: var(--signal-blue);
     }
 
@@ -4395,19 +4411,19 @@
       margin-bottom: var(--space-sm);
     }
 
-    .tc-banner.t1 .tc-banner-hypothesis {
+    .tc-banner.d1 .tc-banner-hypothesis {
       color: var(--signal-green);
     }
 
-    .tc-banner.t2 .tc-banner-hypothesis {
+    .tc-banner.d2 .tc-banner-hypothesis {
       color: var(--signal-amber);
     }
 
-    .tc-banner.t3 .tc-banner-hypothesis {
+    .tc-banner.d3 .tc-banner-hypothesis {
       color: var(--signal-red);
     }
 
-    .tc-banner.t4 .tc-banner-hypothesis {
+    .tc-banner.d4 .tc-banner-hypothesis {
       color: var(--signal-blue);
     }
 
@@ -4468,25 +4484,25 @@
       flex-shrink: 0;
     }
 
-    .tc-indicator.t1 {
+    .tc-indicator.d1 {
       background: rgba(61, 170, 109, 0.2);
       color: var(--signal-green);
       border: 2px solid var(--signal-green);
     }
 
-    .tc-indicator.t2 {
+    .tc-indicator.d2 {
       background: rgba(212, 160, 60, 0.2);
       color: var(--signal-amber);
       border: 2px solid var(--signal-amber);
     }
 
-    .tc-indicator.t3 {
+    .tc-indicator.d3 {
       background: rgba(212, 85, 85, 0.2);
       color: var(--signal-red);
       border: 2px solid var(--signal-red);
     }
 
-    .tc-indicator.t4 {
+    .tc-indicator.d4 {
       background: rgba(74, 142, 204, 0.2);
       color: var(--signal-blue);
       border: 2px solid var(--signal-blue);
@@ -5169,19 +5185,19 @@
       position: relative;
     }
 
-    .port-dna-segment.t1 {
+    .port-dna-segment.d1 {
       background: var(--signal-green);
     }
 
-    .port-dna-segment.t2 {
+    .port-dna-segment.d2 {
       background: var(--signal-amber);
     }
 
-    .port-dna-segment.t3 {
+    .port-dna-segment.d3 {
       background: var(--signal-red);
     }
 
-    .port-dna-segment.t4 {
+    .port-dna-segment.d4 {
       background: var(--signal-blue);
     }
 
@@ -5214,19 +5230,19 @@
       border-radius: 3px;
     }
 
-    .port-dna-dot.t1 {
+    .port-dna-dot.d1 {
       background: var(--signal-green);
     }
 
-    .port-dna-dot.t2 {
+    .port-dna-dot.d2 {
       background: var(--signal-amber);
     }
 
-    .port-dna-dot.t3 {
+    .port-dna-dot.d3 {
       background: var(--signal-red);
     }
 
-    .port-dna-dot.t4 {
+    .port-dna-dot.d4 {
       background: var(--signal-blue);
     }
 
@@ -7367,7 +7383,7 @@
       border-bottom: 1px solid var(--border);
       padding: 4px 0;
       font-family: var(--font-data);
-      font-size: 0.6rem;
+      font-size: 0.7rem;
       white-space: nowrap;
       position: relative;
     }
@@ -9048,8 +9064,7 @@
         <div class="hero">
           <div class="hero-tagline">Independent Cross-Domain Equity Research</div>
           <h1 class="hero-title">We map evidence, not opinions.</h1>
-          <p class="hero-subtitle">Systematic analysis across ten evidence domains using the Analysis of Competing
-            Hypotheses framework. Every claim sourced. Every hypothesis tested.</p>
+          <p class="hero-subtitle">Systematic analysis across ten evidence domains using the Stock Drivers framework. Every claim sourced. Every driver tested.</p>
           <p class="hero-cred">Built by former UBS and Goldman Sachs executives.</p>
         </div>
 
@@ -9193,7 +9208,7 @@
           </div>
           <div class="footer-bottom">
             <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses
-              publicly available information and the Analysis of Competing Hypotheses (ACH) methodology. No buy, sell,
+              publicly available information and the Stock Drivers methodology. No buy, sell,
               or hold recommendations are made. Readers should consult their own financial advisors.</div>
             <div class="footer-meta">&copy; <span class="year-auto"></span> Continuum Intelligence</div>
           </div>
@@ -9342,23 +9357,23 @@
               <div class="port-dna-subtitle">Where your capital is positioned across Continuum's hypotheses</div>
             </div>
             <div class="port-dna-bar" id="portDnaBar">
-              <div class="port-dna-segment t1" id="dnaT1" style="width:0%"><span class="port-dna-label">T1 <span
-                    id="pctT1">0%</span></span></div>
-              <div class="port-dna-segment t2" id="dnaT2" style="width:0%"><span class="port-dna-label">T2 <span
-                    id="pctT2">0%</span></span></div>
-              <div class="port-dna-segment t3" id="dnaT3" style="width:0%"><span class="port-dna-label">T3 <span
-                    id="pctT3">0%</span></span></div>
-              <div class="port-dna-segment t4" id="dnaT4" style="width:0%"><span class="port-dna-label">T4 <span
-                    id="pctT4">0%</span></span></div>
+              <div class="port-dna-segment d1" id="dnaD1" style="width:0%"><span class="port-dna-label">D1 <span
+                    id="pctD1">0%</span></span></div>
+              <div class="port-dna-segment d2" id="dnaD2" style="width:0%"><span class="port-dna-label">D2 <span
+                    id="pctD2">0%</span></span></div>
+              <div class="port-dna-segment d3" id="dnaD3" style="width:0%"><span class="port-dna-label">D3 <span
+                    id="pctD3">0%</span></span></div>
+              <div class="port-dna-segment d4" id="dnaD4" style="width:0%"><span class="port-dna-label">D4 <span
+                    id="pctD4">0%</span></span></div>
             </div>
             <div class="port-dna-legend">
-              <div class="port-dna-item"><span class="port-dna-dot t1"></span>T1: Growth/Recovery <span
-                  id="valT1">$0</span></div>
-              <div class="port-dna-item"><span class="port-dna-dot t2"></span>T2: Managed/Base Case <span
-                  id="valT2">$0</span></div>
-              <div class="port-dna-item"><span class="port-dna-dot t3"></span>T3: Risk/Downside <span
-                  id="valT3">$0</span></div>
-              <div class="port-dna-item"><span class="port-dna-dot t4"></span>T4: Disruption <span id="valT4">$0</span>
+              <div class="port-dna-item"><span class="port-dna-dot d1"></span>D1: Growth/Recovery <span
+                  id="valD1">$0</span></div>
+              <div class="port-dna-item"><span class="port-dna-dot d2"></span>D2: Managed/Base Case <span
+                  id="valD2">$0</span></div>
+              <div class="port-dna-item"><span class="port-dna-dot d3"></span>D3: Risk/Downside <span
+                  id="valD3">$0</span></div>
+              <div class="port-dna-item"><span class="port-dna-dot d4"></span>D4: Disruption <span id="valD4">$0</span>
               </div>
             </div>
           </div>
@@ -9452,7 +9467,7 @@
         <div class="footer-inner">
           <div class="footer-bottom">
             <div class="footer-disclaimer">This portal does not constitute personal financial advice. Position alignment
-              analysis uses publicly available information and the Analysis of Competing Hypotheses (ACH) methodology.
+              analysis uses publicly available information and the Stock Drivers methodology.
               No buy, sell, or hold recommendations are made.</div>
             <div class="footer-meta">&copy; <span class="year-auto"></span> Continuum Intelligence</div>
           </div>
@@ -9476,9 +9491,9 @@
           tag each piece with its epistemic quality, and then ask: which competing hypotheses does this evidence support
           or contradict?</p>
 
-        <h2 class="about-subtitle">Analysis of Competing Hypotheses</h2>
+        <h2 class="about-subtitle">Stock Drivers</h2>
 
-        <p class="about-text">Our methodology is built on the <strong>Analysis of Competing Hypotheses (ACH)</strong>
+        <p class="about-text">Our methodology is built on the <strong>Stock Drivers</strong>
           framework, originally developed by Richards Heuer at the CIA for intelligence analysis. ACH forces the analyst
           to consider multiple explanations simultaneously, rather than anchoring on a single narrative.</p>
 
@@ -9521,7 +9536,7 @@
             constitutes personal financial advice under Australian law or any other jurisdiction. All factual claims are
             sourced from ASX filings, ACCC publications, ABS statistics, RBA data, company investor presentations,
             broker consensus data, and publicly available information. Hypothesis survival scores reflect editorial
-            assessment based on the Analysis of Competing Hypotheses methodology. Readers should consult their own
+            assessment based on the Stock Drivers methodology. Readers should consult their own
             licensed financial advisors before making any investment decisions. Past performance is not indicative of
             future results. Continuum Intelligence, its principals, and contributors may hold positions in securities
             discussed. All content is provided "as is" without warranty of any kind.</p>
@@ -10950,7 +10965,7 @@
         return score > 5 ? 'UPSIDE' : score < -5 ? 'DOWNSIDE' : 'BALANCED';
       }
 
-      function renderCompositeBar(data) {
+      function renderCompositeBar(data, scoresHtml) {
         var tls = data.three_layer_signal || null;
 
         // If no computed signals yet — show pending state
@@ -11076,7 +11091,9 @@
           '<span class="tls-row-value ' + compCls + '">' + (cCont > 0 ? '+' : '') + cCont + _sentArrow(cCont) + '</span>' +
           '<div class="tls-bar-track"><div class="tls-bar-fill ' + compCls + '" style="width:' + compBarW + '%"></div></div>' +
           '</div>' +
-          t1Html +
+          '<div class="tls-company-detail">' + t1Html +
+          '<div class="verdict-scores verdict-scores-inline">' + (scoresHtml || '') + '</div>' +
+          '</div>' +
           '</div>' +
 
           '</div>' +
@@ -11085,16 +11102,13 @@
 
       // renderSkewBar removed — ERRATA_003: thesis skew eliminated from platform
 
-      function renderVerdict(data) {
+      function buildScoresHtml(data) {
         var v = data.verdict;
-        var borderStyle = v.borderColor ? ' style="border-color: ' + v.borderColor + '"' : '';
         var norm = normaliseScores(v.scores);
-
         // BUGFIX_002: sort verdict score chips by score descending (dominant narrative first)
         var displayIdxs = [];
         for (var di = 0; di < v.scores.length; di++) displayIdxs.push(di);
         displayIdxs.sort(function (a, b) { return norm[b] - norm[a]; });
-
         var scoresHtml = '';
         for (var di = 0; di < displayIdxs.length; di++) {
           var i = displayIdxs[di];
@@ -11107,11 +11121,15 @@
             '<div class="vs-direction"' + dirStyle + '>' + s.dirArrow + ' ' + s.dirText + '</div>' +
             '</div>';
         }
+        return scoresHtml;
+      }
 
+      function renderVerdict(data) {
+        var v = data.verdict;
+        var borderStyle = v.borderColor ? ' style="border-color: ' + v.borderColor + '"' : '';
         return '<div class="verdict-section">' +
           '<div class="verdict-inner"' + borderStyle + '>' +
           '<div class="verdict-text">' + v.text + '</div>' +
-          '<div class="verdict-scores">' + scoresHtml + '</div>' +
           '</div>' +
           '</div>';
       }
@@ -11120,7 +11138,7 @@
         var t = data.ticker.toLowerCase();
         var sections = [
           ['identity', '01 Identity'],
-          ['hypotheses', '02 Hypotheses'],
+          ['hypotheses', '02 Stock Drivers'],
           ['narrative', '03 Narrative'],
           ['evidence', '04 Evidence'],
           ['discriminates', '05 Discriminators'],
@@ -11268,8 +11286,9 @@
           var sentimentTagHtml = '<span class="hc-sentiment-tag ' + sentClass + '">' + sentLabel + '</span>';
 
           var dominantCls = (i === domIdx) ? ' dominant' : '';  // Bug 1 fix: was (i === 0)
+          var dominantBadge = (i === domIdx) ? '<span class="hc-dominant-badge">DOMINANT</span>' : '';
           cardsHtml += '<div class="hyp-card ' + h.dirClass + dominantCls + '">' +
-            '<div class="hc-header"><div class="hc-title">' + h.title + sentimentTagHtml + '</div><div class="hc-status ' + h.statusClass + '">' + h.statusText + '</div></div>' +
+            '<div class="hc-header"><div class="hc-title">' + h.title + sentimentTagHtml + '</div>' + dominantBadge + '<div class="hc-status ' + h.statusClass + '">' + h.statusText + '</div></div>' +
             '<div class="hc-score-row"><div class="hc-score-number">' + normScore + '</div><div class="hc-score-bar"><div class="hc-score-fill" style="width:' + normWidth + '"></div></div><div class="hc-score-meta">' + h.scoreMeta + '</div></div>' +
             '<p class="hc-desc">' + h.description + '</p>' +
             requiresHtml +
@@ -11280,7 +11299,7 @@
 
         return '<div class="report-section" id="' + t + '-hypotheses">' +
           '<div class="rs-number">Section 02</div>' +
-          '<div class="rs-title">Competing Hypotheses</div>' +
+          '<div class="rs-title">Stock Drivers</div>' +
           domNarrHtml +
           cardsHtml +
           '</div>';
@@ -11388,10 +11407,10 @@
           tbHtml += '<tr>' +
             '<td>' + row.domain + '</td>' +
             '<td style="color:var(--text-muted)">' + row.epistemic + '</td>' +
-            cellFn(row.t1) +
-            cellFn(row.t2) +
-            cellFn(row.t3) +
-            cellFn(row.t4) +
+            cellFn(row.d1) +
+            cellFn(row.d2) +
+            cellFn(row.d3) +
+            cellFn(row.d4) +
             '</tr>';
         }
 
@@ -11400,10 +11419,10 @@
         tbHtml += '<tr style="font-weight:700">' +
           '<td>Domain Count</td>' +
           '<td></td>' +
-          '<td style="font-family:var(--font-data)">' + sum.t1 + '</td>' +
-          '<td style="font-family:var(--font-data)' + (sum.t2Color ? ';color:' + sum.t2Color : '') + '">' + sum.t2 + '</td>' +
-          '<td style="font-family:var(--font-data)' + (sum.t3Color ? ';color:' + sum.t3Color : '') + '">' + sum.t3 + '</td>' +
-          '<td style="font-family:var(--font-data)">' + sum.t4 + '</td>' +
+          '<td style="font-family:var(--font-data)">' + sum.d1 + '</td>' +
+          '<td style="font-family:var(--font-data)' + (sum.d2Color ? ';color:' + sum.d2Color : '') + '">' + sum.d2 + '</td>' +
+          '<td style="font-family:var(--font-data)' + (sum.d3Color ? ';color:' + sum.d3Color : '') + '">' + sum.d3 + '</td>' +
+          '<td style="font-family:var(--font-data)">' + sum.d4 + '</td>' +
           '</tr>';
 
         return '<div class="rs-subtitle">Evidence Alignment Summary</div>' +
@@ -11594,7 +11613,7 @@
         var ma50Arr = useLive && liveTA ? liveTA.ma50Arr : computeMA(closes, 50);
         var ma200Arr = useLive && liveTA ? liveTA.ma200Arr : computeMA(closes, 200);
 
-        var chartTitle = useLive ? (n > 500 ? '3' : n > 250 ? '2' : '1') + '-Year Daily Price &amp; Moving Averages' : '12-Month Daily Price &amp; Moving Averages';
+        var chartTitle = (n > 500 ? '3' : n > 250 ? '2' : '1') + '-Year Daily Price &amp; Moving Averages';
         var liveLabel = useLive ? '<span class="ta-chart-live-badge">LIVE</span>' : '<span class="ta-chart-static-badge">STATIC</span>';
 
         // Chart dimensions
@@ -12068,10 +12087,10 @@
               }
               for (var r = 0; r < as.rows.length; r++) {
                 var row = as.rows[r];
-                var orig = { t1: row.t1, t2: row.t2, t3: row.t3, t4: row.t4 };
+                var orig = { d1: row.d1, d2: row.d2, d3: row.d3, d4: row.d4 };
                 for (var n = 1; n <= 4; n++) {
                   var fromOld = inverseTierMap[String(n)] || String(n);
-                  row['t' + n] = orig['t' + fromOld];
+                  row['d' + n] = orig['d' + fromOld];
                 }
               }
               // Reorder summary values
@@ -12079,13 +12098,13 @@
                 var sum = as.summary;
                 var origSum = {};
                 for (var n = 1; n <= 4; n++) {
-                  origSum['t' + n] = sum['t' + n];
-                  origSum['t' + n + 'Color'] = sum['t' + n + 'Color'];
+                  origSum['d' + n] = sum['d' + n];
+                  origSum['d' + n + 'Color'] = sum['d' + n + 'Color'];
                 }
                 for (var n = 1; n <= 4; n++) {
                   var fromOld = inverseTierMap[String(n)] || String(n);
-                  sum['t' + n] = origSum['t' + fromOld];
-                  sum['t' + n + 'Color'] = origSum['t' + fromOld + 'Color'];
+                  sum['d' + n] = origSum['d' + fromOld];
+                  sum['d' + n + 'Color'] = origSum['d' + fromOld + 'Color'];
                 }
               }
             }
@@ -12936,9 +12955,10 @@
           '</div>' +
           '</div>';
 
+        var _scoresHtml = buildScoresHtml(data);
         return renderReportHero(data) +
           renderMacroBar(data) +
-          renderCompositeBar(data) +
+          renderCompositeBar(data, _scoresHtml) +
           renderVerdict(data) +
           renderSectionNav(data) +
           '<div class="report-content">' +
@@ -15799,11 +15819,11 @@
             hypothesisValues.unknown += (p.marketValue || 0);
             return;
           }
-          const tier = data.primary === 'uphill' ? 't2' : data.primary;
+          const tier = data.primary === 'uphill' ? 'd2' : data.primary;
           hypothesisValues[tier] += (p.marketValue || 0);
         });
 
-        const tiers = ['t1', 't2', 't3', 't4'];
+        const tiers = ['d1', 'd2', 'd3', 'd4'];
         tiers.forEach(tier => {
           const pct = totalValue > 0 ? (hypothesisValues[tier] / totalValue) * 100 : 0;
           const segment = document.getElementById('dna' + tier.toUpperCase());
@@ -15848,7 +15868,7 @@
         const missingTiers = tiers.filter(tier => hypothesisValues[tier] === 0);
 
         if (missingTiers.length > 0) {
-          const tierNames = { t1: 'T1 (Growth/Recovery)', t2: 'T2 (Base Case)', t3: 'T3 (Downside)', t4: 'T4 (Disruption)' };
+          const tierNames = { d1: 'D1 (Growth/Recovery)', d2: 'D2 (Base Case)', d3: 'D3 (Downside)', d4: 'D4 (Disruption)' };
           hedgeEl.innerHTML = 'You have <strong>zero exposure</strong> to: ' + missingTiers.map(t => tierNames[t]).join(', ') + '. Consider whether this creates blind spots if these scenarios play out.';
         } else {
           hedgeEl.innerHTML = '<span class="success-highlight">Comprehensive coverage.</span> Your portfolio spans all four hypothesis types.';
@@ -15894,7 +15914,7 @@
 
           // Adjust for hypothesis strength — reads live STOCK_DATA, falls back to TC_DATA
           if (tc) {
-            const probs = [tcGetProb(p.ticker, 't1'), tcGetProb(p.ticker, 't2'), tcGetProb(p.ticker, 't3'), tcGetProb(p.ticker, 't4')];
+            const probs = [tcGetProb(p.ticker, 'd1'), tcGetProb(p.ticker, 'd2'), tcGetProb(p.ticker, 'd3'), tcGetProb(p.ticker, 'd4')];
             const maxProb = Math.max(...probs);
             // High conviction in dominant thesis = slight boost
             if (maxProb > 40) multiplier *= 1.05;
@@ -15991,8 +16011,8 @@
           alerts.push({
             type: 'critical',
             icon: '🔴',
-            title: 'XRO: T3 Probability Increased',
-            text: 'AI disruption thesis strengthened following Claude 4 announcement. T3 (Execution Failure) raised from 35% → 42%.',
+            title: 'XRO: D3 Probability Increased',
+            text: 'AI disruption thesis strengthened following Claude 4 announcement. D3 (Execution Failure) raised from 35% → 42%.',
             ticker: 'XRO',
             time: '2 hours ago',
             impact: 'Affects 15% of portfolio'
@@ -16004,7 +16024,7 @@
             type: 'warning',
             icon: '🟡',
             title: 'WOW: Earnings Preview',
-            text: 'Q1 FY26 results due Feb 25. Consensus expects 11.8% EBIT growth vs management guidance of "mid-to-high single digits". Watch for T1/T2 inflection.',
+            text: 'Q1 FY26 results due Feb 25. Consensus expects 11.8% EBIT growth vs management guidance of "mid-to-high single digits". Watch for D1/D2 inflection.',
             ticker: 'WOW',
             time: '1 day ago',
             impact: 'Affects 12% of portfolio'
@@ -16016,7 +16036,7 @@
             type: 'info',
             icon: '🔵',
             title: 'CSL: Plasma Collection Update',
-            text: 'Weekly collection data shows continued normalization. T1 (Recovery) probability stable at 45%. No change to thesis.',
+            text: 'Weekly collection data shows continued normalization. D1 (Recovery) probability stable at 45%. No change to thesis.',
             ticker: 'CSL',
             time: '3 days ago',
             impact: 'Affects 20% of portfolio'
@@ -16028,7 +16048,7 @@
             type: 'critical',
             icon: '🔴',
             title: 'WTC: Governance Concerns Escalate',
-            text: 'Additional board member resignation. T3 (Governance Risk) elevated from 30% → 35%. Review position sizing.',
+            text: 'Additional board member resignation. D3 (Governance Risk) elevated from 30% → 35%. Review position sizing.',
             ticker: 'WTC',
             time: '4 hours ago',
             impact: 'Affects 8% of portfolio'
@@ -16106,8 +16126,8 @@
         var page = document.getElementById('page-report-' + ticker);
         if (!page) return;
 
-        // Extract T1-T4 data from rendered verdict-scores DOM
-        var verdictScores = page.querySelector('.verdict-scores');
+        // Extract D1-D4 data from rendered verdict-scores DOM
+        var verdictScores = page.querySelector('.verdict-scores-inline') || page.querySelector('.verdict-scores');
         if (!verdictScores) return;
 
         var vsItems = verdictScores.querySelectorAll('.vs-item');
@@ -16225,8 +16245,8 @@
         html += '<div class="hs-stock-name">' + (stock.company || '') + '</div>';
         html += '</div>';
 
-        // Hypothesis tracker (T1-T4 + skew)
-        html += '<div class="hs-title">Hypothesis Tracker</div>';
+        // Driver tracker (D1-D4 + skew)
+        html += '<div class="hs-title">Driver Tracker</div>';
         hypotheses.forEach(function (h) {
           html += '<div class="hs-item">' +
             '<div class="hs-dot ' + h.dirClass + '"></div>' +
@@ -16268,211 +16288,211 @@
 
       const TC_DATA = {
         WOW: {
-          name: 'Woolworths Group', primary: 't2',
-          t1: { name: 'Managed Turnaround', prob: 36, desc: 'New leadership executes turnaround; margins stabilize' },
-          t2: { name: 'Structural Margin Erosion', prob: 25, desc: 'Price investment and regulatory pressure permanently compress margins' },
-          t3: { name: 'Regulatory Squeeze', prob: 21, desc: 'ACCC/FGCC action intensifies, constraining pricing power' },
-          t4: { name: 'Competitive Disruption', prob: 18, desc: 'Aldi and independents take meaningful share' },
+          name: 'Woolworths Group', primary: 'd2',
+          d1: { name: 'Managed Turnaround', prob: 36, desc: 'New leadership executes turnaround; margins stabilize' },
+          d2: { name: 'Structural Margin Erosion', prob: 25, desc: 'Price investment and regulatory pressure permanently compress margins' },
+          d3: { name: 'Regulatory Squeeze', prob: 21, desc: 'ACCC/FGCC action intensifies, constraining pricing power' },
+          d4: { name: 'Competitive Disruption', prob: 18, desc: 'Aldi and independents take meaningful share' },
           supporting: ['ACCC margin findings', 'FGCC compliance costs', 'Aldi expansion data'],
           contradicting: ['Q1 FY26 trading update', 'NPS improvement', 'Cost-out progress'],
-          analysis: "Your thesis <strong>supports T2 and T3</strong> — the downside scenarios. You believe margin pressure is structural, not cyclical, and regulatory headwinds are underappreciated. This puts you <strong>against consensus</strong> which prices a Bardwell turnaround (T1)."
+          analysis: "Your thesis <strong>supports D2 and D3</strong> — the downside scenarios. You believe margin pressure is structural, not cyclical, and regulatory headwinds are underappreciated. This puts you <strong>against consensus</strong> which prices a Bardwell turnaround (D1)."
         },
         CSL: {
-          name: 'CSL Limited', primary: 't1',
-          t1: { name: 'Plasma Recovery & Growth', prob: 45, desc: 'Collections normalize; Behring margins expand; Vifor synergies realized' },
-          t2: { name: 'Collection Shortfall', prob: 25, desc: 'US plasma collections fail to recover to target levels' },
-          t3: { name: 'Behring Margin Compression', prob: 18, desc: 'Pricing pressure and input costs squeeze Behring profitability' },
-          t4: { name: 'Competitive Threat', prob: 12, desc: 'Biosimilar competition emerges faster than expected' },
+          name: 'CSL Limited', primary: 'd1',
+          d1: { name: 'Plasma Recovery & Growth', prob: 45, desc: 'Collections normalize; Behring margins expand; Vifor synergies realized' },
+          d2: { name: 'Collection Shortfall', prob: 25, desc: 'US plasma collections fail to recover to target levels' },
+          d3: { name: 'Behring Margin Compression', prob: 18, desc: 'Pricing pressure and input costs squeeze Behring profitability' },
+          d4: { name: 'Competitive Threat', prob: 12, desc: 'Biosimilar competition emerges faster than expected' },
           supporting: ['Plasma collection trends', 'Behring margin guidance', 'Vifor integration synergies'],
           contradicting: ['Persistent collection challenges', 'Competitive dynamics', 'Pricing pressure signs'],
-          analysis: "Your thesis <strong>strongly supports T1</strong> — the base case recovery. You believe plasma collections are normalizing and Behring margins will expand. You're <strong>aligned with consensus</strong>. Watch T2 risks."
+          analysis: "Your thesis <strong>strongly supports D1</strong> — the base case recovery. You believe plasma collections are normalizing and Behring margins will expand. You're <strong>aligned with consensus</strong>. Watch D2 risks."
         },
         XRO: {
-          name: 'Xero Limited', primary: 't1',
-          t1: { name: 'AI-Led Growth Recovery', prob: 28, desc: 'AI investments drive subscriber growth; churn reduces' },
-          t2: { name: 'Structural Margin Pressure', prob: 22, desc: 'Competition forces sustained price investment' },
-          t3: { name: 'Execution Failure', prob: 35, desc: 'Management fails to deliver on AI promises; growth stalls' },
-          t4: { name: 'Competitive Disruption', prob: 15, desc: 'QuickBooks or new entrant disrupts with superior AI' },
+          name: 'Xero Limited', primary: 'd1',
+          d1: { name: 'AI-Led Growth Recovery', prob: 28, desc: 'AI investments drive subscriber growth; churn reduces' },
+          d2: { name: 'Structural Margin Pressure', prob: 22, desc: 'Competition forces sustained price investment' },
+          d3: { name: 'Execution Failure', prob: 35, desc: 'Management fails to deliver on AI promises; growth stalls' },
+          d4: { name: 'Competitive Disruption', prob: 15, desc: 'QuickBooks or new entrant disrupts with superior AI' },
           supporting: ['AI partnership announcement', 'Subscriber growth momentum', 'US market opportunity'],
           contradicting: ['History of missed guidance', 'QuickBooks AI advancement', 'Microsoft SMB push'],
-          analysis: "Your thesis <strong>supports T1</strong> — the turnaround narrative. However, you <strong>contradict T3 and T4</strong>, representing 50% of probability. High reward if right; significant risk if execution fails."
+          analysis: "Your thesis <strong>supports D1</strong> — the turnaround narrative. However, you <strong>contradict D3 and D4</strong>, representing 50% of probability. High reward if right; significant risk if execution fails."
         },
         WTC: {
           name: 'WiseTech Global', primary: 'uphill',
-          t1: { name: 'Organic Growth & Margins Intact', prob: 30, desc: 'Growth accelerates organically; margins expand' },
-          t2: { name: 'Growth Deceleration', prob: 25, desc: 'Customer acquisition slows; revenue growth moderates' },
-          t3: { name: 'Governance/Execution Risk', prob: 30, desc: 'Founder departure or governance issues impair execution' },
-          t4: { name: 'Competitive Disruption', prob: 15, desc: 'New logistics platform gains traction' },
+          d1: { name: 'Organic Growth & Margins Intact', prob: 30, desc: 'Growth accelerates organically; margins expand' },
+          d2: { name: 'Growth Deceleration', prob: 25, desc: 'Customer acquisition slows; revenue growth moderates' },
+          d3: { name: 'Governance/Execution Risk', prob: 30, desc: 'Founder departure or governance issues impair execution' },
+          d4: { name: 'Competitive Disruption', prob: 15, desc: 'New logistics platform gains traction' },
           supporting: ['CargoWise platform strength', 'Founder vision alignment', 'Global trade recovery'],
           contradicting: ['Governance concerns persist', 'Insider selling patterns', 'Competitive pricing pressure'],
-          analysis: "Your thesis is <strong>⚠️ PUSHING UPHILL</strong>. You don't align clearly with T1, yet contradict T2, T3, T4 (70% combined). Requires growth recovery AND governance concerns proving overblown."
+          analysis: "Your thesis is <strong>⚠️ PUSHING UPHILL</strong>. You don't align clearly with D1, yet contradict D2, D3, D4 (70% combined). Requires growth recovery AND governance concerns proving overblown."
         },
         WDS: {
-          name: 'Woodside Energy', primary: 't2',
-          t1: { name: 'Energy Transition Delayed', prob: 30, desc: 'Fossil demand persists longer; LNG prices remain elevated' },
-          t2: { name: 'Managed Decline', prob: 35, desc: 'Orderly transition; stable cash flows; disciplined capex' },
-          t3: { name: 'Stranded Asset Risk', prob: 20, desc: 'Accelerated transition strands LNG assets' },
-          t4: { name: 'Execution Failure', prob: 15, desc: 'Scarborough delays; cost overruns; production misses' },
+          name: 'Woodside Energy', primary: 'd2',
+          d1: { name: 'Energy Transition Delayed', prob: 30, desc: 'Fossil demand persists longer; LNG prices remain elevated' },
+          d2: { name: 'Managed Decline', prob: 35, desc: 'Orderly transition; stable cash flows; disciplined capex' },
+          d3: { name: 'Stranded Asset Risk', prob: 20, desc: 'Accelerated transition strands LNG assets' },
+          d4: { name: 'Execution Failure', prob: 15, desc: 'Scarborough delays; cost overruns; production misses' },
           supporting: ['LNG demand resilience', 'Asian contract pricing', 'Scarborough progress'],
           contradicting: ['Energy transition acceleration', 'EU LNG diversification', 'Cost inflation'],
-          analysis: "Your thesis <strong>supports T2</strong> — the managed decline scenario. You expect orderly cash flow generation through transition. Watch T1 (upside) and T3 (downside) scenarios."
+          analysis: "Your thesis <strong>supports D2</strong> — the managed decline scenario. You expect orderly cash flow generation through transition. Watch D1 (upside) and D3 (downside) scenarios."
         },
         MQG: {
-          name: 'Macquarie Group', primary: 't1',
-          t1: { name: 'Green Energy Leadership', prob: 40, desc: 'Green investment bank thesis succeeds; asset realizations strong' },
-          t2: { name: 'Commodities Normalization', prob: 25, desc: 'Commodity earnings normalize; offset by green growth' },
-          t3: { name: 'Asset Realization Shortfall', prob: 20, desc: 'Green asset sales disappoint; valuation gap persists' },
-          t4: { name: 'Competitive Pressure', prob: 15, desc: 'Traditional banks compete effectively on green finance' },
+          name: 'Macquarie Group', primary: 'd1',
+          d1: { name: 'Green Energy Leadership', prob: 40, desc: 'Green investment bank thesis succeeds; asset realizations strong' },
+          d2: { name: 'Commodities Normalization', prob: 25, desc: 'Commodity earnings normalize; offset by green growth' },
+          d3: { name: 'Asset Realization Shortfall', prob: 20, desc: 'Green asset sales disappoint; valuation gap persists' },
+          d4: { name: 'Competitive Pressure', prob: 15, desc: 'Traditional banks compete effectively on green finance' },
           supporting: ['Green asset pipeline', 'Commodity earnings resilience', 'Asset realization track record'],
           contradicting: ['Green asset valuation compression', 'Traditional bank competition', 'Rate headwinds'],
-          analysis: "Your thesis <strong>strongly supports T1</strong> — the green energy bank narrative. You believe Macquarie can pivot successfully. Watch T3 risk on asset realizations."
+          analysis: "Your thesis <strong>strongly supports D1</strong> — the green energy bank narrative. You believe Macquarie can pivot successfully. Watch D3 risk on asset realizations."
         },
         DRO: {
-          name: 'Droneshield', primary: 't3',
-          t1: { name: 'Mass Adoption', prob: 15, desc: 'Government contracts scale rapidly; commercial adoption accelerates' },
-          t2: { name: 'Defense Budget Dependence', prob: 25, desc: 'Revenue tied to lumpy defense procurement' },
-          t3: { name: 'Competitive Threat', prob: 40, desc: 'Larger defense primes enter; pricing pressure emerges' },
-          t4: { name: 'Technology Obsolescence', prob: 20, desc: 'New counter-drone tech renders products obsolete' },
+          name: 'Droneshield', primary: 'd3',
+          d1: { name: 'Mass Adoption', prob: 15, desc: 'Government contracts scale rapidly; commercial adoption accelerates' },
+          d2: { name: 'Defense Budget Dependence', prob: 25, desc: 'Revenue tied to lumpy defense procurement' },
+          d3: { name: 'Competitive Threat', prob: 40, desc: 'Larger defense primes enter; pricing pressure emerges' },
+          d4: { name: 'Technology Obsolescence', prob: 20, desc: 'New counter-drone tech renders products obsolete' },
           supporting: ['Defense contract wins', 'Counter-drone threat urgency', 'International expansion'],
           contradicting: ['Defense budget volatility', 'Large prime competition', 'Technology cycle risk'],
-          analysis: "Your thesis <strong>supports T2</strong> but acknowledges T3 risks. Droneshield operates in a niche vulnerable to larger competitors. High conviction required given T3/T4 probability (60%)."
+          analysis: "Your thesis <strong>supports D2</strong> but acknowledges D3 risks. Droneshield operates in a niche vulnerable to larger competitors. High conviction required given D3/D4 probability (60%)."
         },
         PME: {
-          name: 'Pro Medicus', primary: 't1',
-          t1: { name: 'Continued Dominance', prob: 50, desc: 'Visage AI maintains technical lead; contract renewals at higher rates' },
-          t2: { name: 'Growth Normalization', prob: 25, desc: 'Growth moderates from exceptional to strong levels' },
-          t3: { name: 'Competitive Entry', prob: 15, desc: 'Big Tech or med-tech enters radiology AI effectively' },
-          t4: { name: 'Valuation Compression', prob: 10, desc: 'Multiple derates despite continued execution' },
+          name: 'Pro Medicus', primary: 'd1',
+          d1: { name: 'Continued Dominance', prob: 50, desc: 'Visage AI maintains technical lead; contract renewals at higher rates' },
+          d2: { name: 'Growth Normalization', prob: 25, desc: 'Growth moderates from exceptional to strong levels' },
+          d3: { name: 'Competitive Entry', prob: 15, desc: 'Big Tech or med-tech enters radiology AI effectively' },
+          d4: { name: 'Valuation Compression', prob: 10, desc: 'Multiple derates despite continued execution' },
           supporting: ['Visage AI technical lead', 'Contract renewal pricing', 'Market expansion'],
           contradicting: ['Big Tech AI capabilities', 'Healthcare IT budgets', 'Multiple sustainability'],
-          analysis: "Your thesis <strong>strongly supports T1</strong> — the continued dominance scenario. High conviction in technical moat. Watch T3 (competition) as main risk."
+          analysis: "Your thesis <strong>strongly supports D1</strong> — the continued dominance scenario. High conviction in technical moat. Watch D3 (competition) as main risk."
         },
         GYG: {
-          name: 'Guzman y Gomez', primary: 't2',
-          t1: { name: 'Successful Scale-Up', prob: 25, desc: 'Store rollout succeeds; unit economics improve at scale' },
-          t2: { name: 'Growth vs Profitability Tension', prob: 35, desc: 'Expansion costs weigh; path to profit unclear' },
-          t3: { name: 'Competitive Response', prob: 25, desc: 'Incumbents respond effectively; differentiation erodes' },
-          t4: { name: 'Execution Failure', prob: 15, desc: 'Store openings miss targets; franchisee issues emerge' },
+          name: 'Guzman y Gomez', primary: 'd2',
+          d1: { name: 'Successful Scale-Up', prob: 25, desc: 'Store rollout succeeds; unit economics improve at scale' },
+          d2: { name: 'Growth vs Profitability Tension', prob: 35, desc: 'Expansion costs weigh; path to profit unclear' },
+          d3: { name: 'Competitive Response', prob: 25, desc: 'Incumbents respond effectively; differentiation erodes' },
+          d4: { name: 'Execution Failure', prob: 15, desc: 'Store openings miss targets; franchisee issues emerge' },
           supporting: ['Store rollout momentum', 'Brand differentiation', 'Australian market opportunity'],
           contradicting: ['Unit economics uncertainty', 'Competitive intensity', 'Franchisee model risks'],
-          analysis: "Your thesis <strong>aligns with T2</strong> — the growth vs profitability tension. You believe expansion will strain economics. This is the base case for recent IPOs in competitive markets."
+          analysis: "Your thesis <strong>aligns with D2</strong> — the growth vs profitability tension. You believe expansion will strain economics. This is the base case for recent IPOs in competitive markets."
         },
         GMG: {
-          name: 'Goodman Group', primary: 't1',
-          t1: { name: 'Logistics Megatrend', prob: 45, desc: 'E-commerce growth sustains; development pipeline delivers' },
-          t2: { name: 'Cyclical Slowdown', prob: 25, desc: 'Development slows; valuations moderate' },
-          t3: { name: 'Oversupply Risk', prob: 18, desc: 'Competitive development creates oversupply' },
-          t4: { name: 'Interest Rate Sensitivity', prob: 12, desc: 'Higher rates impair valuations and development returns' },
+          name: 'Goodman Group', primary: 'd1',
+          d1: { name: 'Logistics Megatrend', prob: 45, desc: 'E-commerce growth sustains; development pipeline delivers' },
+          d2: { name: 'Cyclical Slowdown', prob: 25, desc: 'Development slows; valuations moderate' },
+          d3: { name: 'Oversupply Risk', prob: 18, desc: 'Competitive development creates oversupply' },
+          d4: { name: 'Interest Rate Sensitivity', prob: 12, desc: 'Higher rates impair valuations and development returns' },
           supporting: ['E-commerce penetration growth', 'Development pipeline', 'Premium asset quality'],
           contradicting: ['Interest rate environment', 'Development cycle maturity', 'Competitive supply'],
-          analysis: "Your thesis <strong>supports T1</strong> — the logistics megatrend. You believe e-commerce tailwinds persist. Watch T4 (rates) and T3 (oversupply) as cyclical risks."
+          analysis: "Your thesis <strong>supports D1</strong> — the logistics megatrend. You believe e-commerce tailwinds persist. Watch D4 (rates) and D3 (oversupply) as cyclical risks."
         },
         SIG: {
-          name: 'Sigma Healthcare', primary: 't1',
-          t1: { name: 'Chemist Warehouse Synergies', prob: 40, desc: 'Merger delivers cost synergies; market position strengthens' },
-          t2: { name: 'Integration Challenges', prob: 30, desc: 'Merger execution proves difficult; synergies delayed' },
-          t3: { name: 'Regulatory Block', prob: 15, desc: 'ACCC blocks or conditions merger heavily' },
-          t4: { name: 'Competitive Response', prob: 15, desc: 'EBOS and independents respond effectively' },
+          name: 'Sigma Healthcare', primary: 'd1',
+          d1: { name: 'Chemist Warehouse Synergies', prob: 40, desc: 'Merger delivers cost synergies; market position strengthens' },
+          d2: { name: 'Integration Challenges', prob: 30, desc: 'Merger execution proves difficult; synergies delayed' },
+          d3: { name: 'Regulatory Block', prob: 15, desc: 'ACCC blocks or conditions merger heavily' },
+          d4: { name: 'Competitive Response', prob: 15, desc: 'EBOS and independents respond effectively' },
           supporting: ['Synergy targets', 'Market share opportunity', 'Scale advantages'],
           contradicting: ['Integration complexity', 'Regulatory uncertainty', 'Competitive dynamics'],
-          analysis: "Your thesis <strong>supports T1</strong> — the merger synergy story. You believe Sigma+Chemist Warehouse creates value. Key risk is T2 (integration execution)."
+          analysis: "Your thesis <strong>supports D1</strong> — the merger synergy story. You believe Sigma+Chemist Warehouse creates value. Key risk is D2 (integration execution)."
         },
         FMG: {
-          name: 'Fortescue', primary: 't2',
-          t1: { name: 'Green Hydrogen Success', prob: 20, desc: 'Fortescue Future Industries becomes viable business' },
-          t2: { name: 'Iron Ore Cash Machine', prob: 45, desc: 'Core iron ore generates cash; green projects scaled back' },
-          t3: { name: 'Iron Ore Price Collapse', prob: 25, desc: 'Chinese demand weakness crushes iron ore prices' },
-          t4: { name: 'Green Capital Destruction', prob: 10, desc: 'Hydrogen investments destroy value with no returns' },
+          name: 'Fortescue', primary: 'd2',
+          d1: { name: 'Green Hydrogen Success', prob: 20, desc: 'Fortescue Future Industries becomes viable business' },
+          d2: { name: 'Iron Ore Cash Machine', prob: 45, desc: 'Core iron ore generates cash; green projects scaled back' },
+          d3: { name: 'Iron Ore Price Collapse', prob: 25, desc: 'Chinese demand weakness crushes iron ore prices' },
+          d4: { name: 'Green Capital Destruction', prob: 10, desc: 'Hydrogen investments destroy value with no returns' },
           supporting: ['Iron ore cost position', 'Chinese demand resilience', 'Green hydrogen optionality'],
           contradicting: ['Iron ore price volatility', 'Chinese property weakness', 'Hydrogen economics'],
-          analysis: "Your thesis <strong>aligns with T2</strong> — the cash machine scenario. You view green hydrogen as optionality, not core value. Watch T3 (China risk) as main downside."
+          analysis: "Your thesis <strong>aligns with D2</strong> — the cash machine scenario. You view green hydrogen as optionality, not core value. Watch D3 (China risk) as main downside."
         },
         BHP: {
-          name: 'BHP Group', primary: 't2',
-          t1: { name: 'Commodity Upcycle', prob: 20, desc: 'Iron ore and copper prices surge on China stimulus and supply constraints' },
-          t2: { name: 'Steady Cash Generation', prob: 45, desc: 'Pilbara and copper assets deliver reliable cash flows; capital returns sustained' },
-          t3: { name: 'China Demand Slowdown', prob: 25, desc: 'Property sector contraction reduces steel demand; iron ore prices fall structurally' },
-          t4: { name: 'Green Steel Disruption', prob: 10, desc: 'Green steel and alternative materials reduce long-term iron ore demand' },
+          name: 'BHP Group', primary: 'd2',
+          d1: { name: 'Commodity Upcycle', prob: 20, desc: 'Iron ore and copper prices surge on China stimulus and supply constraints' },
+          d2: { name: 'Steady Cash Generation', prob: 45, desc: 'Pilbara and copper assets deliver reliable cash flows; capital returns sustained' },
+          d3: { name: 'China Demand Slowdown', prob: 25, desc: 'Property sector contraction reduces steel demand; iron ore prices fall structurally' },
+          d4: { name: 'Green Steel Disruption', prob: 10, desc: 'Green steel and alternative materials reduce long-term iron ore demand' },
           supporting: ['Pilbara cost position', 'Copper growth optionality', 'Capital returns track record'],
           contradicting: ['Chinese property sector weakness', 'Iron ore price volatility', 'Green steel transition risk'],
           analysis: "Placeholder"
         },
         CBA: {
-          name: 'Commonwealth Bank', primary: 't1',
-          t1: { name: 'Digital Franchise Premium', prob: 40, desc: 'Digital-first strategy and market dominance justify sustained premium to peers' },
-          t2: { name: 'NIM Compression', prob: 30, desc: 'RBA rate-cutting cycle compresses net interest margins, reducing earnings' },
-          t3: { name: 'Competitive Disruption', prob: 20, desc: 'Neo-banks and non-bank lenders take meaningful share in key segments' },
-          t4: { name: 'Credit Cycle Normalisation', prob: 10, desc: 'Housing stress emerges; credit losses rise from cyclical lows' },
+          name: 'Commonwealth Bank', primary: 'd1',
+          d1: { name: 'Digital Franchise Premium', prob: 40, desc: 'Digital-first strategy and market dominance justify sustained premium to peers' },
+          d2: { name: 'NIM Compression', prob: 30, desc: 'RBA rate-cutting cycle compresses net interest margins, reducing earnings' },
+          d3: { name: 'Competitive Disruption', prob: 20, desc: 'Neo-banks and non-bank lenders take meaningful share in key segments' },
+          d4: { name: 'Credit Cycle Normalisation', prob: 10, desc: 'Housing stress emerges; credit losses rise from cyclical lows' },
           supporting: ['Digital market share leadership', 'Cost efficiency advantage', 'Brand and distribution moat'],
           contradicting: ['Premium valuation vs peers', 'RBA cutting cycle exposure', 'Mortgage competition intensity'],
           analysis: "Placeholder"
         },
         DXS: {
-          name: 'Dexus', primary: 't2',
-          t1: { name: 'Office Market Recovery', prob: 25, desc: 'CBD net absorption turns positive; occupancy, rents and asset values recover' },
-          t2: { name: 'Diversified Real Assets', prob: 45, desc: 'Strategic pivot from office toward industrial and alternatives delivers stable distributions' },
-          t3: { name: 'Structural Office Decline', prob: 20, desc: 'Hybrid work permanently compresses CBD office demand; asset values fall further' },
-          t4: { name: 'Higher-for-Longer Rates', prob: 10, desc: 'Elevated rates compress REIT valuations and erode distributable earnings' },
+          name: 'Dexus', primary: 'd2',
+          d1: { name: 'Office Market Recovery', prob: 25, desc: 'CBD net absorption turns positive; occupancy, rents and asset values recover' },
+          d2: { name: 'Diversified Real Assets', prob: 45, desc: 'Strategic pivot from office toward industrial and alternatives delivers stable distributions' },
+          d3: { name: 'Structural Office Decline', prob: 20, desc: 'Hybrid work permanently compresses CBD office demand; asset values fall further' },
+          d4: { name: 'Higher-for-Longer Rates', prob: 10, desc: 'Elevated rates compress REIT valuations and erode distributable earnings' },
           supporting: ['Managed funds growth', 'Industrial development returns', 'Premium CBD asset quality'],
           contradicting: ['Office vacancy rates', 'Hybrid work permanence', 'Interest rate sensitivity'],
           analysis: "Placeholder"
         },
         HRZ: {
-          name: 'Horizon Minerals', primary: 't2',
-          t1: { name: 'Discovery Catalyst', prob: 30, desc: 'Major gold resource upgrade or new discovery re-rates the stock' },
-          t2: { name: 'Managed Explorer', prob: 40, desc: 'Steady exploration and development within WA Goldfields; project on track' },
-          t3: { name: 'Exploration Failure', prob: 20, desc: 'Drill results disappoint; resource downgrades impair project economics' },
-          t4: { name: 'Gold Price Collapse', prob: 10, desc: 'Gold price falls or cost overruns render development economics unviable' },
+          name: 'Horizon Minerals', primary: 'd2',
+          d1: { name: 'Discovery Catalyst', prob: 30, desc: 'Major gold resource upgrade or new discovery re-rates the stock' },
+          d2: { name: 'Managed Explorer', prob: 40, desc: 'Steady exploration and development within WA Goldfields; project on track' },
+          d3: { name: 'Exploration Failure', prob: 20, desc: 'Drill results disappoint; resource downgrades impair project economics' },
+          d4: { name: 'Gold Price Collapse', prob: 10, desc: 'Gold price falls or cost overruns render development economics unviable' },
           supporting: ['WA Goldfields location', 'Gold price support', 'Exploration pipeline'],
           contradicting: ['Small cap execution risk', 'Exploration uncertainty', 'Funding requirements'],
           analysis: "Placeholder"
         },
         NAB: {
-          name: 'National Australia Bank', primary: 't2',
-          t1: { name: 'SME Lending Recovery', prob: 25, desc: 'Business banking growth and cost discipline deliver earnings above expectations' },
-          t2: { name: 'NIM Compression', prob: 40, desc: 'RBA cuts and mortgage competition compress net interest margins' },
-          t3: { name: 'Credit Cycle Deterioration', prob: 25, desc: 'SME bad debts rise; provisioning increases as business conditions weaken' },
-          t4: { name: 'Regulatory Capital Squeeze', prob: 10, desc: 'APRA increases capital requirements; reduces dividend capacity' },
+          name: 'National Australia Bank', primary: 'd2',
+          d1: { name: 'SME Lending Recovery', prob: 25, desc: 'Business banking growth and cost discipline deliver earnings above expectations' },
+          d2: { name: 'NIM Compression', prob: 40, desc: 'RBA cuts and mortgage competition compress net interest margins' },
+          d3: { name: 'Credit Cycle Deterioration', prob: 25, desc: 'SME bad debts rise; provisioning increases as business conditions weaken' },
+          d4: { name: 'Regulatory Capital Squeeze', prob: 10, desc: 'APRA increases capital requirements; reduces dividend capacity' },
           supporting: ['Business banking franchise', 'Cost reduction progress', 'Capital position strength'],
           contradicting: ['Mortgage market competition', 'SME credit exposure', 'Rate cut NIM headwinds'],
           analysis: "Placeholder"
         },
         OCL: {
-          name: 'Objective Corporation', primary: 't2',
-          t1: { name: 'International Expansion', prob: 30, desc: 'UK, NZ and new government contract wins accelerate growth beyond current expectations' },
-          t2: { name: 'Steady GovTech SaaS', prob: 45, desc: 'Mission-critical government software delivers stable recurring revenue with modest growth' },
-          t3: { name: 'Contract Loss Risk', prob: 15, desc: 'Major government contracts not renewed; open-source alternatives gain traction' },
-          t4: { name: 'Public Sector Austerity', prob: 10, desc: 'Government budget cuts reduce technology spending across jurisdictions' },
+          name: 'Objective Corporation', primary: 'd2',
+          d1: { name: 'International Expansion', prob: 30, desc: 'UK, NZ and new government contract wins accelerate growth beyond current expectations' },
+          d2: { name: 'Steady GovTech SaaS', prob: 45, desc: 'Mission-critical government software delivers stable recurring revenue with modest growth' },
+          d3: { name: 'Contract Loss Risk', prob: 15, desc: 'Major government contracts not renewed; open-source alternatives gain traction' },
+          d4: { name: 'Public Sector Austerity', prob: 10, desc: 'Government budget cuts reduce technology spending across jurisdictions' },
           supporting: ['Mission-critical government software', 'High switching costs', 'Recurring revenue base'],
           contradicting: ['Concentration in government clients', 'Budget cycle dependency', 'Valuation premium'],
           analysis: "Placeholder"
         },
         RFG: {
-          name: 'Retail Food Group', primary: 't2',
-          t1: { name: 'Franchise Recovery', prob: 30, desc: 'Franchisee profitability improves; store count grows and international royalties expand' },
-          t2: { name: 'Managed Turnaround', prob: 40, desc: 'Stable franchise operations and gradual debt reduction with growing international royalties' },
-          t3: { name: 'Franchisee Distress', prob: 20, desc: 'Franchisee failures accelerate; brand damage and litigation risk intensify' },
-          t4: { name: 'Competitive Displacement', prob: 10, desc: 'Major fast food chains intensify competition; consumer discretionary spending falls' },
+          name: 'Retail Food Group', primary: 'd2',
+          d1: { name: 'Franchise Recovery', prob: 30, desc: 'Franchisee profitability improves; store count grows and international royalties expand' },
+          d2: { name: 'Managed Turnaround', prob: 40, desc: 'Stable franchise operations and gradual debt reduction with growing international royalties' },
+          d3: { name: 'Franchisee Distress', prob: 20, desc: 'Franchisee failures accelerate; brand damage and litigation risk intensify' },
+          d4: { name: 'Competitive Displacement', prob: 10, desc: 'Major fast food chains intensify competition; consumer discretionary spending falls' },
           supporting: ['International royalty diversification', 'Debt reduction progress', 'Brand portfolio breadth'],
           contradicting: ['Franchisee financial health', 'Consumer discretionary exposure', 'Legacy litigation risk'],
           analysis: "Placeholder"
         },
         RIO: {
-          name: 'Rio Tinto', primary: 't1',
-          t1: { name: 'Iron Ore Cash Generation', prob: 40, desc: 'Pilbara system generates exceptional cash flows as world\'s lowest-cost major operation' },
-          t2: { name: 'Energy Transition Portfolio', prob: 30, desc: 'Copper (Oyu Tolgoi) and lithium (Arcadium) position for energy transition demand surge' },
-          t3: { name: 'China Demand Slowdown', prob: 20, desc: 'Property sector contraction reduces steel and iron ore demand structurally' },
-          t4: { name: 'Growth Capex Risk', prob: 10, desc: 'Simandou, Arcadium and Oyu Tolgoi carry over US$15B execution and integration risk' },
+          name: 'Rio Tinto', primary: 'd1',
+          d1: { name: 'Iron Ore Cash Generation', prob: 40, desc: 'Pilbara system generates exceptional cash flows as world\'s lowest-cost major operation' },
+          d2: { name: 'Energy Transition Portfolio', prob: 30, desc: 'Copper (Oyu Tolgoi) and lithium (Arcadium) position for energy transition demand surge' },
+          d3: { name: 'China Demand Slowdown', prob: 20, desc: 'Property sector contraction reduces steel and iron ore demand structurally' },
+          d4: { name: 'Growth Capex Risk', prob: 10, desc: 'Simandou, Arcadium and Oyu Tolgoi carry over US$15B execution and integration risk' },
           supporting: ['Pilbara cost position', 'Copper/lithium optionality', 'Capital returns track record'],
           contradicting: ['Chinese property sector', 'Simandou execution complexity', 'Arcadium integration risk'],
           analysis: "Placeholder"
         },
         WOR: {
-          name: 'Worley', primary: 't1',
-          t1: { name: 'Energy Transition Winner', prob: 40, desc: 'Sustainability revenue grows to 60%+ as Worley becomes preferred energy transition partner' },
-          t2: { name: 'Traditional Energy Cash Cow', prob: 30, desc: 'LNG and upstream sustain margins while sustainability backlog builds' },
-          t3: { name: 'Margin Pressure', prob: 20, desc: 'Fixed-price legacy contracts and lower sustainability margins compress EBITA below 8% target' },
-          t4: { name: 'Cyclical Downturn', prob: 10, desc: 'Global recession triggers simultaneous capex cuts across traditional and sustainability energy' },
+          name: 'Worley', primary: 'd1',
+          d1: { name: 'Energy Transition Winner', prob: 40, desc: 'Sustainability revenue grows to 60%+ as Worley becomes preferred energy transition partner' },
+          d2: { name: 'Traditional Energy Cash Cow', prob: 30, desc: 'LNG and upstream sustain margins while sustainability backlog builds' },
+          d3: { name: 'Margin Pressure', prob: 20, desc: 'Fixed-price legacy contracts and lower sustainability margins compress EBITA below 8% target' },
+          d4: { name: 'Cyclical Downturn', prob: 10, desc: 'Global recession triggers simultaneous capex cuts across traditional and sustainability energy' },
           supporting: ['Sustainability backlog growth', 'Global engineering scale', 'LNG margin support'],
           contradicting: ['Fixed-price contract exposure', 'EBITA target miss risk', 'Energy capex cyclicality'],
           analysis: "Placeholder"
@@ -16482,130 +16502,130 @@
       // Stock-specific keywords per hypothesis tier (higher weight than generic patterns)
       const TC_KEYWORDS = {
         WOW: {
-          t1: ['turnaround', 'bardwell', 'margin stabiliz', 'cost.out progress', 'recovery.*margin', 'new.*management'],
-          t2: ['accc', 'fgcc', 'price investment', 'structural.*margin', 'regulatory.*pressure', 'permanently compress'],
-          t3: ['regulatory.*squeeze', 'pricing.*power.*constrain', 'accc.*enforcement', 'fgcc.*penalty'],
-          t4: ['aldi', 'independent.*grocer', 'market.*share.*loss', 'discount.*grocer']
+          d1: ['turnaround', 'bardwell', 'margin stabiliz', 'cost.out progress', 'recovery.*margin', 'new.*management'],
+          d2: ['accc', 'fgcc', 'price investment', 'structural.*margin', 'regulatory.*pressure', 'permanently compress'],
+          d3: ['regulatory.*squeeze', 'pricing.*power.*constrain', 'accc.*enforcement', 'fgcc.*penalty'],
+          d4: ['aldi', 'independent.*grocer', 'market.*share.*loss', 'discount.*grocer']
         },
         CSL: {
-          t1: ['plasma.*collect', 'behring.*margin', 'vifor.*synerg', 'collection.*normaliz', 'plasma.*recover'],
-          t2: ['collection.*shortfall', 'plasma.*fail', 'below.*target.*collect', 'plasma.*challenge'],
-          t3: ['behring.*compress', 'pricing.*pressure.*behring', 'input.*cost.*margin'],
-          t4: ['biosimilar', 'generic.*biologic', 'competitive.*entry.*plasma']
+          d1: ['plasma.*collect', 'behring.*margin', 'vifor.*synerg', 'collection.*normaliz', 'plasma.*recover'],
+          d2: ['collection.*shortfall', 'plasma.*fail', 'below.*target.*collect', 'plasma.*challenge'],
+          d3: ['behring.*compress', 'pricing.*pressure.*behring', 'input.*cost.*margin'],
+          d4: ['biosimilar', 'generic.*biologic', 'competitive.*entry.*plasma']
         },
         XRO: {
-          t1: ['ai.*subscrib', 'subscrib.*growth', 'arpu.*increas', 'cloud.*adopt', 'growth.*recover', 'churn.*reduc'],
-          t2: ['sbc', 'share.based compensation', 'melio', 'cash flow.*lower', 'dilut', 'margin.*pressure', 'not cheap', 'equity.*value.*below', 'above.*intrinsic', '40.*lower', 'net income.*lower'],
-          t3: ['execution.*fail', 'miss.*guidance', 'ai.*promise.*undeliver', 'growth.*stall', 'unproven'],
-          t4: ['quickbooks', 'intuit', 'microsoft.*smb', 'superior.*ai.*platform', 'competi.*disrupt']
+          d1: ['ai.*subscrib', 'subscrib.*growth', 'arpu.*increas', 'cloud.*adopt', 'growth.*recover', 'churn.*reduc'],
+          d2: ['sbc', 'share.based compensation', 'melio', 'cash flow.*lower', 'dilut', 'margin.*pressure', 'not cheap', 'equity.*value.*below', 'above.*intrinsic', '40.*lower', 'net income.*lower'],
+          d3: ['execution.*fail', 'miss.*guidance', 'ai.*promise.*undeliver', 'growth.*stall', 'unproven'],
+          d4: ['quickbooks', 'intuit', 'microsoft.*smb', 'superior.*ai.*platform', 'competi.*disrupt']
         },
         WTC: {
-          t1: ['cargowise', 'organic.*growth', 'margin.*expand', 'platform.*strength', 'global.*trade.*recover'],
-          t2: ['growth.*slow', 'customer.*acqui.*slow', 'revenue.*moderate', 'decelerat'],
-          t3: ['governance', 'founder.*depart', 'insider.*sell', 'execution.*risk', 'management.*concern'],
-          t4: ['new.*logistics.*platform', 'pricing.*pressure.*cargo', 'compet.*logistic']
+          d1: ['cargowise', 'organic.*growth', 'margin.*expand', 'platform.*strength', 'global.*trade.*recover'],
+          d2: ['growth.*slow', 'customer.*acqui.*slow', 'revenue.*moderate', 'decelerat'],
+          d3: ['governance', 'founder.*depart', 'insider.*sell', 'execution.*risk', 'management.*concern'],
+          d4: ['new.*logistics.*platform', 'pricing.*pressure.*cargo', 'compet.*logistic']
         },
         WDS: {
-          t1: ['lng.*demand', 'energy.*transition.*delay', 'fossil.*persist', 'lng.*price.*elevated', 'asian.*contract'],
-          t2: ['managed.*decline', 'orderly.*transition', 'stable.*cash', 'disciplin.*capex'],
-          t3: ['stranded.*asset', 'accelerat.*transition', 'lng.*strand', 'transition.*faster'],
-          t4: ['scarborough.*delay', 'cost.*overrun', 'production.*miss']
+          d1: ['lng.*demand', 'energy.*transition.*delay', 'fossil.*persist', 'lng.*price.*elevated', 'asian.*contract'],
+          d2: ['managed.*decline', 'orderly.*transition', 'stable.*cash', 'disciplin.*capex'],
+          d3: ['stranded.*asset', 'accelerat.*transition', 'lng.*strand', 'transition.*faster'],
+          d4: ['scarborough.*delay', 'cost.*overrun', 'production.*miss']
         },
         MQG: {
-          t1: ['green.*asset', 'green.*energy.*bank', 'asset.*realiz', 'renewable.*pipeline', 'green.*investment'],
-          t2: ['commodity.*normaliz', 'commodity.*earn.*moderate', 'trading.*normaliz'],
-          t3: ['asset.*realiz.*disappoint', 'valuation.*gap', 'green.*asset.*disappoint'],
-          t4: ['traditional.*bank.*compet', 'bank.*green.*finance', 'compet.*green']
+          d1: ['green.*asset', 'green.*energy.*bank', 'asset.*realiz', 'renewable.*pipeline', 'green.*investment'],
+          d2: ['commodity.*normaliz', 'commodity.*earn.*moderate', 'trading.*normaliz'],
+          d3: ['asset.*realiz.*disappoint', 'valuation.*gap', 'green.*asset.*disappoint'],
+          d4: ['traditional.*bank.*compet', 'bank.*green.*finance', 'compet.*green']
         },
         DRO: {
-          t1: ['mass.*adopt', 'government.*contract.*scale', 'commercial.*adopt'],
-          t2: ['defense.*budget', 'lumpy.*procurement', 'budget.*depend'],
-          t3: ['defense.*prime', 'larger.*compet', 'pricing.*pressure.*defense'],
-          t4: ['technology.*obsolet', 'new.*counter.drone', 'superior.*tech']
+          d1: ['mass.*adopt', 'government.*contract.*scale', 'commercial.*adopt'],
+          d2: ['defense.*budget', 'lumpy.*procurement', 'budget.*depend'],
+          d3: ['defense.*prime', 'larger.*compet', 'pricing.*pressure.*defense'],
+          d4: ['technology.*obsolet', 'new.*counter.drone', 'superior.*tech']
         },
         PME: {
-          t1: ['visage', 'technical.*lead', 'contract.*renew', 'radiology.*ai.*lead', 'moat'],
-          t2: ['growth.*normaliz', 'growth.*slow', 'exceptional.*to.*strong'],
-          t3: ['big.*tech.*entry', 'microsoft.*health', 'google.*health', 'competitive.*entry.*radiology'],
-          t4: ['multiple.*derat', 'valuation.*compress', 'pe.*compress']
+          d1: ['visage', 'technical.*lead', 'contract.*renew', 'radiology.*ai.*lead', 'moat'],
+          d2: ['growth.*normaliz', 'growth.*slow', 'exceptional.*to.*strong'],
+          d3: ['big.*tech.*entry', 'microsoft.*health', 'google.*health', 'competitive.*entry.*radiology'],
+          d4: ['multiple.*derat', 'valuation.*compress', 'pe.*compress']
         },
         GYG: {
-          t1: ['store.*rollout.*success', 'unit.*econom.*improve', 'scale.*benefit'],
-          t2: ['expansion.*cost', 'path.*to.*profit', 'unprofitable', 'cash.*burn'],
-          t3: ['mcdonalds', 'hungry jacks', 'competitive.*response', 'incumbent.*respond'],
-          t4: ['store.*miss', 'franchisee.*issue', 'execution.*fail']
+          d1: ['store.*rollout.*success', 'unit.*econom.*improve', 'scale.*benefit'],
+          d2: ['expansion.*cost', 'path.*to.*profit', 'unprofitable', 'cash.*burn'],
+          d3: ['mcdonalds', 'hungry jacks', 'competitive.*response', 'incumbent.*respond'],
+          d4: ['store.*miss', 'franchisee.*issue', 'execution.*fail']
         },
         GMG: {
-          t1: ['e.commerce.*growth', 'logistics.*megatrend', 'development.*pipeline', 'data.*centre'],
-          t2: ['development.*slow', 'cyclical.*slow', 'valuation.*moderate'],
-          t3: ['oversupply', 'compet.*development', 'industrial.*oversupply'],
-          t4: ['interest.*rate', 'higher.*rate.*impair', 'cap.*rate.*expand']
+          d1: ['e.commerce.*growth', 'logistics.*megatrend', 'development.*pipeline', 'data.*centre'],
+          d2: ['development.*slow', 'cyclical.*slow', 'valuation.*moderate'],
+          d3: ['oversupply', 'compet.*development', 'industrial.*oversupply'],
+          d4: ['interest.*rate', 'higher.*rate.*impair', 'cap.*rate.*expand']
         },
         SIG: {
-          t1: ['chemist.*warehouse', 'synerg', 'merger.*deliver', 'market.*position.*strengthen'],
-          t2: ['integration.*challenge', 'synerg.*delay', 'integration.*difficult'],
-          t3: ['accc.*block', 'regulatory.*block', 'merger.*condition'],
-          t4: ['ebos', 'independent.*compet', 'competitive.*response.*pharmacy']
+          d1: ['chemist.*warehouse', 'synerg', 'merger.*deliver', 'market.*position.*strengthen'],
+          d2: ['integration.*challenge', 'synerg.*delay', 'integration.*difficult'],
+          d3: ['accc.*block', 'regulatory.*block', 'merger.*condition'],
+          d4: ['ebos', 'independent.*compet', 'competitive.*response.*pharmacy']
         },
         FMG: {
-          t1: ['green.*hydrogen.*success', 'ffi', 'fortescue.*future', 'hydrogen.*viable'],
-          t2: ['iron.*ore.*cash', 'cash.*machine', 'green.*scaled.*back', 'core.*iron.*ore'],
-          t3: ['iron.*ore.*price.*collapse', 'china.*demand.*weakness', 'iron.*ore.*oversupply'],
-          t4: ['hydrogen.*destroy.*value', 'green.*capital.*destroy', 'no.*return.*hydrogen']
+          d1: ['green.*hydrogen.*success', 'ffi', 'fortescue.*future', 'hydrogen.*viable'],
+          d2: ['iron.*ore.*cash', 'cash.*machine', 'green.*scaled.*back', 'core.*iron.*ore'],
+          d3: ['iron.*ore.*price.*collapse', 'china.*demand.*weakness', 'iron.*ore.*oversupply'],
+          d4: ['hydrogen.*destroy.*value', 'green.*capital.*destroy', 'no.*return.*hydrogen']
         },
         BHP: {
-          t1: ['china.*stimulus', 'iron.*ore.*recover', 'copper.*surge', 'supercycle', 'commodity.*recover', 'pilbara.*recover'],
-          t2: ['steady.*cash', 'reliable.*dividend', 'stable.*iron', 'capital.*return', 'consistent.*cash.*flow'],
-          t3: ['china.*property', 'steel.*demand.*fall', 'iron.*ore.*price.*fall', 'property.*sector.*drag'],
-          t4: ['green.*steel', 'alternative.*material', 'iron.*ore.*obsolete', 'decarboni.*steel']
+          d1: ['china.*stimulus', 'iron.*ore.*recover', 'copper.*surge', 'supercycle', 'commodity.*recover', 'pilbara.*recover'],
+          d2: ['steady.*cash', 'reliable.*dividend', 'stable.*iron', 'capital.*return', 'consistent.*cash.*flow'],
+          d3: ['china.*property', 'steel.*demand.*fall', 'iron.*ore.*price.*fall', 'property.*sector.*drag'],
+          d4: ['green.*steel', 'alternative.*material', 'iron.*ore.*obsolete', 'decarboni.*steel']
         },
         CBA: {
-          t1: ['digital.*franchise', 'digital.*leader', 'market.*position.*justify', 'premium.*justify', 'quality.*justify', 'dominant.*bank'],
-          t2: ['nim.*compress', 'net.*interest.*margin', 'rate.*cut.*squeeze', 'rba.*cut', 'margin.*compress'],
-          t3: ['neo.bank', 'non.bank.*lender', 'fintech.*threat', 'mortgage.*compet', 'digital.*challenger'],
-          t4: ['credit.*loss', 'housing.*stress', 'bad.*debt', 'mortgage.*default', 'credit.*cycle.*normal']
+          d1: ['digital.*franchise', 'digital.*leader', 'market.*position.*justify', 'premium.*justify', 'quality.*justify', 'dominant.*bank'],
+          d2: ['nim.*compress', 'net.*interest.*margin', 'rate.*cut.*squeeze', 'rba.*cut', 'margin.*compress'],
+          d3: ['neo.bank', 'non.bank.*lender', 'fintech.*threat', 'mortgage.*compet', 'digital.*challenger'],
+          d4: ['credit.*loss', 'housing.*stress', 'bad.*debt', 'mortgage.*default', 'credit.*cycle.*normal']
         },
         DXS: {
-          t1: ['office.*recover', 'cbd.*recover', 'occupancy.*recover', 'rent.*recover', 'net.*absorption', 'office.*demand.*return'],
-          t2: ['industrial.*pivot', 'diversif.*real.*asset', 'managed.*fund.*growth', 'pivot.*from.*office', 'alternatives.*portfolio'],
-          t3: ['hybrid.*work.*permanent', 'structural.*decline.*office', 'permanent.*hybrid', 'office.*obsolete', 'wfh.*permanent'],
-          t4: ['higher.*for.*longer', 'rate.*compress.*reit', 'cap.*rate.*expand', 'discount.*rate.*higher', 'reit.*valuat.*compress']
+          d1: ['office.*recover', 'cbd.*recover', 'occupancy.*recover', 'rent.*recover', 'net.*absorption', 'office.*demand.*return'],
+          d2: ['industrial.*pivot', 'diversif.*real.*asset', 'managed.*fund.*growth', 'pivot.*from.*office', 'alternatives.*portfolio'],
+          d3: ['hybrid.*work.*permanent', 'structural.*decline.*office', 'permanent.*hybrid', 'office.*obsolete', 'wfh.*permanent'],
+          d4: ['higher.*for.*longer', 'rate.*compress.*reit', 'cap.*rate.*expand', 'discount.*rate.*higher', 'reit.*valuat.*compress']
         },
         HRZ: {
-          t1: ['discovery', 'resource.*upgrade', 'drill.*result.*positive', 'new.*find', 'resource.*re.rate', 'feasibility.*positive'],
-          t2: ['steady.*exploration', 'exploration.*on.*track', 'project.*develop', 'wa.*goldfields', 'managed.*explorer'],
-          t3: ['drill.*disappoint', 'resource.*downgrade', 'miss.*target', 'exploration.*fail', 'poor.*drill'],
-          t4: ['gold.*price.*fall', 'cost.*overrun', 'development.*unviable', 'gold.*collapse', 'project.*economics']
+          d1: ['discovery', 'resource.*upgrade', 'drill.*result.*positive', 'new.*find', 'resource.*re.rate', 'feasibility.*positive'],
+          d2: ['steady.*exploration', 'exploration.*on.*track', 'project.*develop', 'wa.*goldfields', 'managed.*explorer'],
+          d3: ['drill.*disappoint', 'resource.*downgrade', 'miss.*target', 'exploration.*fail', 'poor.*drill'],
+          d4: ['gold.*price.*fall', 'cost.*overrun', 'development.*unviable', 'gold.*collapse', 'project.*economics']
         },
         NAB: {
-          t1: ['sme.*recover', 'business.*bank.*grow', 'cost.*disciplin', 'earnings.*surprise', 'sme.*lending.*grow'],
-          t2: ['nim.*compress', 'margin.*compress', 'rate.*cut', 'mortgage.*compet', 'net.*interest.*margin'],
-          t3: ['bad.*debt', 'sme.*credit', 'rising.*provision', 'credit.*deteriorat', 'business.*failure.*rate'],
-          t4: ['apra.*capital', 'regulatory.*capital', 'capital.*requirement.*increase', 'dividend.*reduce.*capital']
+          d1: ['sme.*recover', 'business.*bank.*grow', 'cost.*disciplin', 'earnings.*surprise', 'sme.*lending.*grow'],
+          d2: ['nim.*compress', 'margin.*compress', 'rate.*cut', 'mortgage.*compet', 'net.*interest.*margin'],
+          d3: ['bad.*debt', 'sme.*credit', 'rising.*provision', 'credit.*deteriorat', 'business.*failure.*rate'],
+          d4: ['apra.*capital', 'regulatory.*capital', 'capital.*requirement.*increase', 'dividend.*reduce.*capital']
         },
         OCL: {
-          t1: ['international.*expand', 'uk.*contract', 'new.*government.*win', 'overseas.*grow', 'international.*contract'],
-          t2: ['recurring.*government', 'stable.*government', 'govtech', 'mission.*critical', 'switching.*cost', 'government.*saas'],
-          t3: ['contract.*not.*renew', 'contract.*loss', 'open.*source.*alternative', 'non.renewal', 'contract.*expire'],
-          t4: ['government.*budget.*cut', 'austerity', 'public.*sector.*cut', 'it.*spend.*reduc', 'government.*freeze']
+          d1: ['international.*expand', 'uk.*contract', 'new.*government.*win', 'overseas.*grow', 'international.*contract'],
+          d2: ['recurring.*government', 'stable.*government', 'govtech', 'mission.*critical', 'switching.*cost', 'government.*saas'],
+          d3: ['contract.*not.*renew', 'contract.*loss', 'open.*source.*alternative', 'non.renewal', 'contract.*expire'],
+          d4: ['government.*budget.*cut', 'austerity', 'public.*sector.*cut', 'it.*spend.*reduc', 'government.*freeze']
         },
         RFG: {
-          t1: ['franchisee.*profit', 'store.*count.*grow', 'international.*royalt', 'brand.*recover', 'new.*store.*open'],
-          t2: ['managed.*turnaround', 'debt.*reduc', 'stable.*franchise', 'royalt.*grow', 'orderly.*reduc'],
-          t3: ['franchisee.*fail', 'franchisee.*distress', 'litigation', 'brand.*damage', 'class.*action'],
-          t4: ['mcdonalds.*compet', 'fast.*food.*compet', 'consumer.*discretionary.*fall', 'competitive.*displacement']
+          d1: ['franchisee.*profit', 'store.*count.*grow', 'international.*royalt', 'brand.*recover', 'new.*store.*open'],
+          d2: ['managed.*turnaround', 'debt.*reduc', 'stable.*franchise', 'royalt.*grow', 'orderly.*reduc'],
+          d3: ['franchisee.*fail', 'franchisee.*distress', 'litigation', 'brand.*damage', 'class.*action'],
+          d4: ['mcdonalds.*compet', 'fast.*food.*compet', 'consumer.*discretionary.*fall', 'competitive.*displacement']
         },
         RIO: {
-          t1: ['pilbara', 'iron.*ore.*cash', 'cash.*generat', 'exceptional.*cash', 'lowest.*cost.*iron', 'pilbara.*system'],
-          t2: ['oyu.*tolgoi', 'copper.*optionality', 'arcadium', 'lithium.*position', 'energy.*transition.*copper', 'copper.*growth'],
-          t3: ['china.*property', 'steel.*demand.*fall', 'iron.*ore.*demand.*fall', 'china.*slowdown.*steel'],
-          t4: ['simandou', 'capex.*risk.*growth', 'arcadium.*integrat', 'execution.*risk.*simandou']
+          d1: ['pilbara', 'iron.*ore.*cash', 'cash.*generat', 'exceptional.*cash', 'lowest.*cost.*iron', 'pilbara.*system'],
+          d2: ['oyu.*tolgoi', 'copper.*optionality', 'arcadium', 'lithium.*position', 'energy.*transition.*copper', 'copper.*growth'],
+          d3: ['china.*property', 'steel.*demand.*fall', 'iron.*ore.*demand.*fall', 'china.*slowdown.*steel'],
+          d4: ['simandou', 'capex.*risk.*growth', 'arcadium.*integrat', 'execution.*risk.*simandou']
         },
         WOR: {
-          t1: ['sustainability.*revenue', 'energy.*transition.*partner', 'transition.*backlog', '60.*percent.*sustain', 'preferred.*partner'],
-          t2: ['lng.*margin', 'traditional.*energy.*sustain', 'upstream.*sustain', 'oil.*gas.*cash', 'traditional.*cash'],
-          t3: ['fixed.*price.*contract', 'ebita.*miss', 'margin.*compress.*worley', 'below.*8.*percent.*ebita'],
-          t4: ['capex.*correction', 'energy.*recession', 'downturn.*capex', 'cyclical.*downturn.*energy']
+          d1: ['sustainability.*revenue', 'energy.*transition.*partner', 'transition.*backlog', '60.*percent.*sustain', 'preferred.*partner'],
+          d2: ['lng.*margin', 'traditional.*energy.*sustain', 'upstream.*sustain', 'oil.*gas.*cash', 'traditional.*cash'],
+          d3: ['fixed.*price.*contract', 'ebita.*miss', 'margin.*compress.*worley', 'below.*8.*percent.*ebita'],
+          d4: ['capex.*correction', 'energy.*recession', 'downturn.*capex', 'cyclical.*downturn.*energy']
         }
       };
 
@@ -16623,13 +16643,13 @@
       }
 
       // Returns live pipeline probability (%) for a ticker/tier, falling back to TC_DATA.
-      // tier must be lowercase: 't1', 't2', 't3', 't4'
+      // tier must be lowercase: 'd1', 'd2', 'd3', 'd4'
       // Normalises survival_score across all four tiers so probabilities sum to 100%.
       function tcGetProb(ticker, tier) {
         try {
           var sd = typeof STOCK_DATA !== 'undefined' && STOCK_DATA && STOCK_DATA[ticker];
           if (sd && sd.hypotheses) {
-            var tKeys = ['T1', 'T2', 'T3', 'T4'];
+            var tKeys = ['D1', 'D2', 'D3', 'D4'];
             var sum = 0;
             tKeys.forEach(function (t) {
               var h = sd.hypotheses[t];
@@ -16679,15 +16699,15 @@
         let primaryTier = data.primary;
 
         if (thesis.length > 50) {
-          const scores = { t1: 0, t2: 0, t3: 0, t4: 0 };
+          const scores = { d1: 0, d2: 0, d3: 0, d4: 0 };
 
-          // Stock-specific keywords (weight 3) — T1 bullish only when not negated
+          // Stock-specific keywords (weight 3) — D1 bullish only when not negated
           const stockKeys = TC_KEYWORDS[tcSelectedTicker];
           if (stockKeys) {
-            ['t1', 't2', 't3', 't4'].forEach(tier => {
+            ['d1', 'd2', 'd3', 'd4'].forEach(tier => {
               (stockKeys[tier] || []).forEach(pat => {
-                if (tier === 't1') {
-                  if (matchNotNegated(pat)) scores.t1 += 3;
+                if (tier === 'd1') {
+                  if (matchNotNegated(pat)) scores.d1 += 3;
                 } else {
                   if (matchAny(pat)) scores[tier] += 3;
                 }
@@ -16695,28 +16715,28 @@
             });
           }
 
-          // Generic bearish / valuation signals → T2
-          if (matchAny('not cheap|overvalued|expensive|premium.*valuation|stretched|above.*intrinsic|equity.*value.*below|dilut')) scores.t2 += 2;
-          if (matchAny('share.based compensation|\\bsbc\\b|free cash flow.*weak|cash flow.*low')) scores.t2 += 2;
-          if (matchAny('moderate|normalize|base case|steady|fair value|\\bhold\\b|neutral')) scores.t2 += 1;
+          // Generic bearish / valuation signals → D2
+          if (matchAny('not cheap|overvalued|expensive|premium.*valuation|stretched|above.*intrinsic|equity.*value.*below|dilut')) scores.d2 += 2;
+          if (matchAny('share.based compensation|\\bsbc\\b|free cash flow.*weak|cash flow.*low')) scores.d2 += 2;
+          if (matchAny('moderate|normalize|base case|steady|fair value|\\bhold\\b|neutral')) scores.d2 += 1;
 
-          // Generic risk / execution signals → T3
-          if (matchAny('execution risk|miss.*guidance|\\bunproven\\b|structural risk|headwind|bear case|cautious|skeptical')) scores.t3 += 2;
-          if (matchAny('\\bshort\\b|\\bsell\\b|underperform|\\bavoid\\b')) scores.t3 += 2;
-          if (matchAny('\\brisk\\b|\\bproblem\\b|\\bconcern\\b|challenge|\\bworry\\b|\\bfail\\b')) scores.t3 += 1;
+          // Generic risk / execution signals → D3
+          if (matchAny('execution risk|miss.*guidance|\\bunproven\\b|structural risk|headwind|bear case|cautious|skeptical')) scores.d3 += 2;
+          if (matchAny('\\bshort\\b|\\bsell\\b|underperform|\\bavoid\\b')) scores.d3 += 2;
+          if (matchAny('\\brisk\\b|\\bproblem\\b|\\bconcern\\b|challenge|\\bworry\\b|\\bfail\\b')) scores.d3 += 1;
 
-          // Generic competitive signals → T4
-          if (matchAny('disrupt|competi.*threat|\\bobsolete\\b|\\breplace\\b|superior.*compet|incumbent.*respond')) scores.t4 += 2;
+          // Generic competitive signals → D4
+          if (matchAny('disrupt|competi.*threat|\\bobsolete\\b|\\breplace\\b|superior.*compet|incumbent.*respond')) scores.d4 += 2;
 
           // Generic bullish signals — only when NOT negated
-          if (matchNotNegated('\\bgrowth\\b|recovery|expansion|synergy|dominance|leadership')) scores.t1 += 2;
-          if (matchNotNegated('\\bbullish\\b|outperform')) scores.t1 += 1;
+          if (matchNotNegated('\\bgrowth\\b|recovery|expansion|synergy|dominance|leadership')) scores.d1 += 2;
+          if (matchNotNegated('\\bbullish\\b|outperform')) scores.d1 += 1;
 
           // Conditional buy framing ("what would make us buy") is NOT a bullish signal — penalise
           if (/what.*would.*make.*us.*buy|would.*consider.*buy|reasons.*to.*buy.*if|before.*we.*buy/i.test(thesisRaw)) {
-            scores.t1 = Math.max(0, scores.t1 - 3);
+            scores.d1 = Math.max(0, scores.d1 - 3);
           } else if (matchNotNegated('\\bbuy\\b')) {
-            scores.t1 += 1;
+            scores.d1 += 1;
           }
 
           const maxScore = Math.max(...Object.values(scores));
@@ -16743,7 +16763,7 @@
         }
 
         const rowsContainer = document.getElementById('tc-map-rows');
-        rowsContainer.innerHTML = ['t1', 't2', 't3', 't4'].map(tier => {
+        rowsContainer.innerHTML = ['d1', 'd2', 'd3', 'd4'].map(tier => {
           const tData = data[tier];
           const isMatch = tier === primaryTier;
           const stance = isMatch ? 'supports' : 'contradicts';
@@ -16764,9 +16784,9 @@
         let analysisText;
         if (primaryTier === continuumBase) {
           analysisText = `Your thesis aligns with Continuum's base case (<strong>${primaryTier.toUpperCase()}: ${tierData.name}</strong>), which carries a ${tcGetProb(tcSelectedTicker, primaryTier)}% probability weighting. The evidence pattern in your thesis is consistent with Continuum's dominant hypothesis.`;
-        } else if (primaryTier === 't1' && continuumBase !== 't1') {
+        } else if (primaryTier === 'd1' && continuumBase !== 'd1') {
           analysisText = `Your thesis is <strong>more bullish</strong> than Continuum's base case. Continuum assigns ${tcGetProb(tcSelectedTicker, continuumBase)}% to <strong>${continuumBase.toUpperCase()}: ${data[continuumBase].name}</strong>. You would need the ${data[continuumBase].name.toLowerCase()} risks to resolve favourably to justify your position.`;
-        } else if ((primaryTier === 't3' || primaryTier === 't4') && (continuumBase === 't1' || continuumBase === 't2')) {
+        } else if ((primaryTier === 'd3' || primaryTier === 'd4') && (continuumBase === 'd1' || continuumBase === 'd2')) {
           analysisText = `Your thesis is <strong>more bearish</strong> than Continuum's base case. Continuum assigns ${tcGetProb(tcSelectedTicker, continuumBase)}% to <strong>${continuumBase.toUpperCase()}: ${data[continuumBase].name}</strong>. Your view implies a dislocation — the market may be underpricing the downside risks your thesis identifies.`;
         } else {
           analysisText = `Your thesis diverges from Continuum's base case (<strong>${continuumBase.toUpperCase()}: ${data[continuumBase].name}</strong>, ${tcGetProb(tcSelectedTicker, continuumBase)}% probability). Your view aligns more closely with <strong>${primaryTier.toUpperCase()}: ${tierData.name}</strong> (${tcGetProb(tcSelectedTicker, primaryTier)}% probability). Consider what evidence would need to change for Continuum's assessment to shift.`;
@@ -18069,7 +18089,7 @@
      * Sections extracted (matching live page order):
      *   1. Verdict banner
      *   2. Section 01: Identity & Snapshot
-     *   3. Section 02: Competing Hypotheses (with NFI weight overlays)
+     *   3. Section 02: Stock Drivers (with NFI weight overlays)
      *   4. Section 03: Dominant Narrative (with NFI market-responsive update)
      *   5. Section 04: Primary Evidence Domains (10 domains + matrix)
      *   6. Section 05: What Discriminates
@@ -18195,7 +18215,7 @@
       var verdictHtml = '';
       if (verdictEl) {
         var verdictTextEl = verdictEl.querySelector('.verdict-text');
-        var verdictScoresEl = verdictEl.querySelector('.verdict-scores');
+        var verdictScoresEl = reportPage.querySelector('.verdict-scores-inline') || (verdictEl ? verdictEl.querySelector('.verdict-scores') : null);
         var vText = verdictTextEl ? txt(verdictTextEl) : txt(verdictEl);
         var vScores = '';
         if (verdictScoresEl) {
@@ -18320,7 +18340,7 @@
             listsHtml +
             '</div>';
         }
-        hypHtml = sectionTitle('02', 'Competing Hypotheses') + cardsHtml;
+        hypHtml = sectionTitle('02', 'Stock Drivers') + cardsHtml;
       }
       // ═══════════════════════════════════════════════════════════════════
       // EXTRACT: SECTION 03 - DOMINANT NARRATIVE (including NFI overlay)
@@ -18552,7 +18572,7 @@
       var disclaimerText = footerEl ? txt(footerEl) : 'This report does not constitute personal financial advice.';
       var disclaimerHtml = '<div class="pdf-disclaimer">' +
         '<div class="pdf-disc-title">Methodology & Disclaimer</div>' +
-        '<p>This report employs the Analysis of Competing Hypotheses (ACH) framework, a structured analytical ' +
+        '<p>This report employs the Stock Drivers framework, a structured analytical ' +
         'technique originally developed for intelligence analysis. Rather than seeking evidence to confirm a ' +
         'preferred thesis, ACH systematically evaluates all available evidence against multiple competing ' +
         'explanations, weighting by diagnosticity rather than volume.</p>' +
@@ -18740,7 +18760,7 @@
         identityHtml +
         /* Section 02: Hypotheses — soft break, flows naturally after cover/identity */
         pageBreak() +
-        pageHeader('Competing Hypotheses') +
+        pageHeader('Stock Drivers') +
         hypHtml +
         /* Section 03: Narrative — soft break, flows naturally */
         pageBreak() +
@@ -18775,8 +18795,8 @@
       // User saves as PDF from print dialog, then uploads to LinkedIn as a Document Post.
 
       var genDate = new Date().toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
-      var TIERS = ['T1', 'T2', 'T3', 'T4'];
-      var TIER_COLORS = { T1: '#00C853', T2: '#2979FF', T3: '#FF9100', T4: '#D50000' };
+      var TIERS = ['D1', 'D2', 'D3', 'D4'];
+      var TIER_COLORS = { D1: '#00C853', D2: '#2979FF', D3: '#FF9100', D4: '#D50000' };
 
       // Normalise raw survival_scores to percentages that sum to 100
       var rawScores = TIERS.map(function (t) {
@@ -18791,7 +18811,7 @@
         pcts[maxI] += (100 - rSum);
       }
 
-      var domTier = stock.dominant || 'T1';
+      var domTier = stock.dominant || 'D1';
       var domHyp = (stock.hypotheses && stock.hypotheses[domTier]) || {};
       var domPct = pcts[TIERS.indexOf(domTier)];
       var domColor = TIER_COLORS[domTier] || '#2979FF';
@@ -18971,7 +18991,7 @@
         '<div class="slide-body" style="display:flex;flex-direction:column;justify-content:space-between;">' +
         '<div style="font-size:7pt;color:#334155;line-height:1.6;">' +
         '<p style="margin-bottom:4mm;"><strong>This is not personal financial advice.</strong> Produced by Continuum Intelligence for informational purposes only. Not a recommendation to buy, sell, or hold any investment. Consult a licensed financial adviser before making any investment decision.</p>' +
-        '<p style="margin-bottom:4mm;"><strong>Methodology:</strong> Analysis of Competing Hypotheses (ACH) framework. Percentages represent evidence weight, not predicted probability of outcome. Reassess regularly as markets change.</p>' +
+        '<p style="margin-bottom:4mm;"><strong>Methodology:</strong> Stock Drivers framework. Percentages represent evidence weight, not predicted probability of outcome. Reassess regularly as markets change.</p>' +
         '<p>Data from public filings, ASX announcements, and market data. Generated ' + pdfEsc(genDate) + '. &copy; ' + new Date().getFullYear() + ' Continuum Intelligence. All rights reserved.</p>' +
         '</div>' +
         '<div style="background:#F0F4FA;border:1px solid #E2E8F0;padding:8px 14px;display:inline-block;">' +

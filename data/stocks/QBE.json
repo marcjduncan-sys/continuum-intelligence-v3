@@ -5,7 +5,7 @@
   "market_cap": "30.2B",
   "risk_skew": "UPSIDE",
   "hypotheses": {
-    "T1": {
+    "D1": {
       "label": "Hard Market Sustains COR &lt;94%",
       "description": "Commercial insurance pricing remains above loss cost trends; QBE sustains COR below 94% and re-rates as a consistently profitable insurer",
       "plain_english": "This is the bull case — QBE's FY25 underwriting beat is structural, not cyclical. Hard market pricing holds and investment income continues at elevated levels.",
@@ -17,7 +17,7 @@
       "weighted_inconsistency": 2,
       "last_updated": "2026-02-20T00:00:00.000Z"
     },
-    "T2": {
+    "D2": {
       "label": "Investment Portfolio Outperforms",
       "description": "US$28.9B portfolio generates 4.9%+ returns; structurally elevated rates provide durable investment income tailwind",
       "plain_english": "Higher-for-longer US rates are a structural benefit to QBE's bond portfolio. Investment income cushions underwriting volatility.",
@@ -29,7 +29,7 @@
       "weighted_inconsistency": 3,
       "last_updated": "2026-02-20T00:00:00.000Z"
     },
-    "T3": {
+    "D3": {
       "label": "Catastrophe Season Overwhelms Rate Gains",
       "description": "Above-budget natural catastrophe losses drive COR above 97%, eliminating underwriting profit and eroding investment income buffer",
       "plain_english": "This is the key tail risk — a severe North Atlantic hurricane season or multiple secondary perils above budget forces QBE to report a poor year despite the hard market.",
@@ -41,7 +41,7 @@
       "weighted_inconsistency": 3,
       "last_updated": "2026-02-20T00:00:00.000Z"
     },
-    "T4": {
+    "D4": {
       "label": "Premium Cycle Reversal / North America Deteriorates",
       "description": "Global insurance market softens faster than expected; new capital erodes pricing discipline; North America COR returns above 100%",
       "plain_english": "This is the structural bear case — insurance cycles always revert, and QBE's North America has a history of being the problem segment.",
@@ -54,7 +54,7 @@
       "last_updated": "2026-02-20T00:00:00.000Z"
     }
   },
-  "dominant": "T1",
+  "dominant": "D1",
   "confidence": "MODERATE",
   "alert_state": "NORMAL",
   "current_price": 21.48,
@@ -111,11 +111,11 @@
     "idio_detail": {
       "signal": 28,
       "detail": "dominance_sqrt",
-      "T1": "T1",
-      "T1_score": 40,
-      "T1_sentiment": "BULLISH",
-      "T2": "T3",
-      "T2_score": 30,
+      "D1": "D1",
+      "D1_score": 40,
+      "D1_sentiment": "BULLISH",
+      "D2": "D3",
+      "D2_score": 30,
       "lead": 10,
       "raw_signal": 28
     }

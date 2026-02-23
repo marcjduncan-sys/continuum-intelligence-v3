@@ -560,7 +560,7 @@ def build_cover(stock, macro, report_date):
     story.append(Paragraph('KEY TAKEAWAYS', S['section_header']))
     hyps = sorted_hypotheses(stock)
     dominant_hyp = hyps[0][1] if hyps else {}
-    dominant_key_val = hyps[0][0] if hyps else 'T1'
+    dominant_key_val = hyps[0][0] if hyps else 'D1'
     dom_prob_str = fmt_pct(dominant_hyp.get('survival_score'))
 
     big_picture  = stock.get('big_picture', '')
@@ -773,7 +773,7 @@ def build_hypotheses_page(stock):
     hyps = sorted_hypotheses(stock)
     dominant_field = stock.get('dominant', '')
 
-    story.append(Paragraph('COMPETING HYPOTHESES', S['section_header']))
+    story.append(Paragraph('STOCK DRIVERS', S['section_header']))
 
     if hyps:
         dom_key, dom_hyp = hyps[0]

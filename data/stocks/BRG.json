@@ -5,7 +5,7 @@
   "market_cap": "4.7B",
   "risk_skew": "UPSIDE",
   "hypotheses": {
-    "T1": {
+    "D1": {
       "label": "North American Premiumisation Drives Revenue Re-Acceleration",
       "description": "Revenue growth sustains 8-10%+ pa; pricing and supply chain diversification restore gross margins to 37%+; operating leverage drives EBIT expansion",
       "plain_english": "This is the bull case — Breville's premium brand keeps growing despite tariff headwinds, and margins recover as pricing actions and supply chain diversification take hold.",
@@ -17,7 +17,7 @@
       "weighted_inconsistency": 2,
       "last_updated": "2026-02-20T00:00:00.000Z"
     },
-    "T2": {
+    "D2": {
       "label": "European Sage Brand Accelerates Revenue Mix Shift",
       "description": "Sage brand grows 15%+ pa in Continental Europe; European segment becomes a material contributor to group revenue and earnings",
       "plain_english": "The European optionality thesis — Sage is where Breville was in North America 10 years ago. As European espresso culture and premium appliance spending grows, Sage captures disproportionate share.",
@@ -29,7 +29,7 @@
       "weighted_inconsistency": 3,
       "last_updated": "2026-02-20T00:00:00.000Z"
     },
-    "T3": {
+    "D3": {
       "label": "Consumer Discretionary Slowdown Pressures Premium Demand",
       "description": "US and European consumers reduce premium discretionary spending; revenue growth decelerates below 5%; tariff-compressed margins amplify operating deleverage",
       "plain_english": "The macro bear case — if tariff-driven inflation erodes consumer purchasing power and confidence falls, premium kitchen appliances are discretionary and deferrable.",
@@ -41,7 +41,7 @@
       "weighted_inconsistency": 3,
       "last_updated": "2026-02-20T00:00:00.000Z"
     },
-    "T4": {
+    "D4": {
       "label": "US Tariff + Competitive Intensity Erodes Margin Structurally",
       "description": "US tariffs on China and Vietnam manufactured goods persist or escalate; gross margins structurally erode toward 33-34%; premium multiple collapses",
       "plain_english": "The structural bear case — if tariff costs cannot be recovered through pricing and supply chain diversification fails to offset the cost impact, Breville's margin profile deteriorates permanently.",
@@ -54,7 +54,7 @@
       "last_updated": "2026-02-20T00:00:00.000Z"
     }
   },
-  "dominant": "T1",
+  "dominant": "D1",
   "confidence": "LOW",
   "alert_state": "NORMAL",
   "current_price": 32.6,
@@ -111,11 +111,11 @@
     "idio_detail": {
       "signal": 28,
       "detail": "dominance_sqrt",
-      "T1": "T1",
-      "T1_score": 40,
-      "T1_sentiment": "BULLISH",
-      "T2": "T3",
-      "T2_score": 35,
+      "D1": "D1",
+      "D1_score": 40,
+      "D1_sentiment": "BULLISH",
+      "D2": "D3",
+      "D2_score": 35,
       "lead": 5,
       "raw_signal": 28
     }

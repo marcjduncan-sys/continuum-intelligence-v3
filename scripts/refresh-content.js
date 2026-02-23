@@ -265,10 +265,10 @@ Respond with ONLY a JSON array — no markdown, no explanation. One object per a
     "summary": "1-2 sentence factual summary of what was announced",
     "diagnosticity": "one of: VERY_HIGH | HIGH | MEDIUM | LOW | VERY_LOW",
     "hypothesis_impact": {
-      "T1": "one of: CONSISTENT | INCONSISTENT | NEUTRAL",
-      "T2": "one of: CONSISTENT | INCONSISTENT | NEUTRAL",
-      "T3": "one of: CONSISTENT | INCONSISTENT | NEUTRAL",
-      "T4": "one of: CONSISTENT | INCONSISTENT | NEUTRAL"
+      "D1": "one of: CONSISTENT | INCONSISTENT | NEUTRAL",
+      "D2": "one of: CONSISTENT | INCONSISTENT | NEUTRAL",
+      "D3": "one of: CONSISTENT | INCONSISTENT | NEUTRAL",
+      "D4": "one of: CONSISTENT | INCONSISTENT | NEUTRAL"
     },
     "decay": {
       "full_weight_days": "integer — see decay guidelines above",
@@ -350,13 +350,13 @@ Respond with ONLY a JSON object — no markdown, no commentary:
 {
   "big_picture": "3 sentences as specified above",
   "hypotheses": {
-    "T1": {
+    "D1": {
       "plain_english": "3-4 sentences: variant perception, quantified thesis, supporting evidence, key assumption",
       "what_to_watch": "2-3 sentences: specific metric + date + threshold + consequence. Then secondary catalyst."
     },
-    "T2": { "plain_english": "...", "what_to_watch": "..." },
-    "T3": { "plain_english": "...", "what_to_watch": "..." },
-    "T4": { "plain_english": "...", "what_to_watch": "..." }
+    "D2": { "plain_english": "...", "what_to_watch": "..." },
+    "D3": { "plain_english": "...", "what_to_watch": "..." },
+    "D4": { "plain_english": "...", "what_to_watch": "..." }
   }
 }`;
 }
@@ -404,7 +404,7 @@ BIG_PICTURE STANDARD:
 - Second sentence: what the market is pricing vs what the evidence suggests
 - Third sentence: the key unresolved question that determines which hypothesis dominates`,
 
-  hypothesis_review: `You are a senior equity research analyst conducting a structural review of the hypothesis framework for an ASX-listed company. Your role is to identify when the existing T1-T4 framework no longer captures the most important competing explanations for the stock's trajectory. You are conservative: only recommend changes when the evidence pattern clearly demands it. You think in terms of what a rational Bayesian analyst would do.`,
+  hypothesis_review: `You are a senior equity research analyst conducting a structural review of the hypothesis framework for an ASX-listed company. Your role is to identify when the existing D1-D4 framework no longer captures the most important competing explanations for the stock's trajectory. You are conservative: only recommend changes when the evidence pattern clearly demands it. You think in terms of what a rational Bayesian analyst would do.`,
 };
 
 // ---------------------------------------------------------------------------
@@ -457,7 +457,7 @@ function validateEvidenceItem(item, ticker) {
     }
   }
   const impact = item.hypothesis_impact || {};
-  for (const tier of ['T1', 'T2', 'T3', 'T4']) {
+  for (const tier of ['D1', 'D2', 'D3', 'D4']) {
     if (!VALID_HYPOTHESIS_IMPACT.has(impact[tier])) {
       warn(`[${ticker}] invalid hypothesis_impact.${tier}: ${impact[tier]}`);
       return false;
@@ -684,7 +684,7 @@ ${flipHistory || 'None'}
 BIG PICTURE: ${stock.big_picture || 'none'}
 
 REVIEW TASK:
-Assess whether the current T1-T4 hypothesis framework adequately captures the key drivers of this stock's value. Consider:
+Assess whether the current D1-D4 hypothesis framework adequately captures the key drivers of this stock's value. Consider:
 1. Is any hypothesis now irrelevant or structurally dead?
 2. Has a new material thesis emerged that the framework doesn't capture?
 3. Are hypotheses too similar (poor discrimination) or too broad?
@@ -697,7 +697,7 @@ Respond with ONLY a JSON object — no markdown, no explanation:
   "reasoning": "1-2 sentences explaining why revision is or isn't needed",
   "proposed_changes": [
     {
-      "tier": "T1/T2/T3/T4",
+      "tier": "D1/D2/D3/D4",
       "action": "REPLACE | REFINE | KEEP",
       "new_label": "new label if REPLACE/REFINE, null if KEEP",
       "new_description": "new description if REPLACE/REFINE, null if KEEP",
