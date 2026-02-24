@@ -167,7 +167,7 @@
 [data-theme="light"] .hero { background: linear-gradient(135deg, #E8F5F3 0%, #EBF4FF 50%, #F5F6F8 100%); }
 [data-theme="light"] .report-hero { background: linear-gradient(135deg, #E8F5F3 0%, #EBF4FF 100%); }
 [data-theme="light"] .snap-hero { background: linear-gradient(135deg, #E8F5F3 0%, #EBF4FF 100%); }
-[data-theme="light"] .risk-skew-bar { background: #F0F1F4; }
+[data-theme="light"] .risk-skew-bar { background: var(--bg-surface); }
 /* Navigation & sections */
 [data-theme="light"] .section-nav { background: #FFFFFF; border-bottom: 1px solid #E2E8F0; }
 [data-theme="light"] .section-nav a { color: var(--text-muted); }
@@ -853,6 +853,10 @@ a:hover { color: var(--accent-sage); }
 .rh-metric-value.positive { color: var(--signal-green); }
 
 /* --- Report Page: Spec Sections (1.2–1.5) --- */
+.rh-spec-section {
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+}
 .rh-spec-block {
     padding: var(--space-md) 0;
     border-top: 1px solid var(--border);
@@ -5232,12 +5236,16 @@ function renderReportHero(data) {
           '<div class="rh-metrics">' + metricsHtml + '</div>' +
         '</div>' +
       '</div>' +
-      embeddedThesisHtml +
-      positionInRangeHtml +
-      skewIndicatorHtml +
-      nextDecisionHtml +
     '</div>' +
-  '</div>';
+  '</div>' +
+  (embeddedThesisHtml || positionInRangeHtml || skewIndicatorHtml || nextDecisionHtml
+    ? '<div class="rh-spec-section"><div class="report-hero-inner">' +
+        embeddedThesisHtml +
+        positionInRangeHtml +
+        skewIndicatorHtml +
+        nextDecisionHtml +
+      '</div></div>'
+    : '');
 }
 
 function renderSkewBar(data) {
