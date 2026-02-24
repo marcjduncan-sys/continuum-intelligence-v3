@@ -141,5 +141,55 @@
     169,
     170.22
   ],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": -30,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 35,
+      "bear": 65,
+      "direction": "downside",
+      "hypotheses": [
+        {
+          "title": "Digital Franchise Premium &mdash; Quality Justifies the Multiple",
+          "direction": "upside",
+          "weight": 35
+        },
+        {
+          "title": "NIM Compression &mdash; Rate Cuts Squeeze the Franchise",
+          "direction": "downside",
+          "weight": 28
+        },
+        {
+          "title": "Competitive Disruption &mdash; Neo-Banks and Non-Bank Lenders",
+          "direction": "downside",
+          "weight": 21
+        },
+        {
+          "title": "Credit Cycle Normalisation &mdash; Housing Risk Re-emerges",
+          "direction": "downside",
+          "weight": 16
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.716Z"
+    },
+    "overall_sentiment": -30,
+    "sentiment_label": "DOWNSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.270Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "DOWNSIDE",
+  "valuation_range": {
+    "low": 146.3,
+    "mid": 162.56,
+    "high": 178.82,
+    "shift_pct": -0.045,
+    "signal_used": -30,
+    "method": "sentiment_shift_v3",
+    "computed_at": "2026-02-24T06:42:12.315Z"
+  }
 }

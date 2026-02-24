@@ -74,7 +74,7 @@
       "from": "T1",
       "to": "T2",
       "trigger": "Q1 sales growth below expectations; competitive intensity rising",
-      "price_at_flip": 29.80,
+      "price_at_flip": 29.8,
       "from_survival": 0.35,
       "to_survival": 0.71
     }
@@ -164,11 +164,78 @@
   "price_signals": [],
   "editorial_override": null,
   "price_history": [
-    29.80, 29.95, 30.10, 30.25, 30.40,
-    30.55, 30.80, 31.00, 31.15, 31.30,
-    31.50, 31.65, 31.80, 32.00, 32.10,
-    32.20, 32.30, 32.35, 32.40, 32.45,
-    32.50, 32.45
+    29.8,
+    29.95,
+    30.1,
+    30.25,
+    30.4,
+    30.55,
+    30.8,
+    31,
+    31.15,
+    31.3,
+    31.5,
+    31.65,
+    31.8,
+    32,
+    32.1,
+    32.2,
+    32.3,
+    32.35,
+    32.4,
+    32.45,
+    32.5,
+    32.45
   ],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": -28,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 36,
+      "bear": 64,
+      "direction": "downside",
+      "hypotheses": [
+        {
+          "title": "T1: Managed Turnaround",
+          "direction": "upside",
+          "weight": 36
+        },
+        {
+          "title": "T2: Structural Margin Erosion",
+          "direction": "downside",
+          "weight": 25
+        },
+        {
+          "title": "T3: Regulatory Squeeze",
+          "direction": "downside",
+          "weight": 21
+        },
+        {
+          "title": "T4: Competitive Disruption",
+          "direction": "downside",
+          "weight": 18
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.669Z"
+    },
+    "overall_sentiment": -28,
+    "sentiment_label": "DOWNSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.246Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "DOWNSIDE",
+  "valuation_range": {
+    "low": 27.98,
+    "mid": 31.09,
+    "high": 34.2,
+    "shift_pct": -0.042,
+    "signal_used": -28,
+    "method": "sentiment_shift_v3",
+    "computed_at": "2026-02-24T06:42:12.289Z"
+  }
 }

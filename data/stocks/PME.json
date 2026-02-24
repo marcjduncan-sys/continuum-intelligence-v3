@@ -64,5 +64,46 @@
   "price_signals": [],
   "editorial_override": null,
   "price_history": [],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": 34,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 67,
+      "bear": 33,
+      "direction": "upside",
+      "hypotheses": [
+        {
+          "title": "T1: US Expansion Accelerates",
+          "direction": "upside",
+          "weight": 37
+        },
+        {
+          "title": "T2: Valuation Mean-Reversion",
+          "direction": "downside",
+          "weight": 21
+        },
+        {
+          "title": "T3: Competitive Disruption",
+          "direction": "downside",
+          "weight": 12
+        },
+        {
+          "title": "T4: AI Amplifies the Moat",
+          "direction": "upside",
+          "weight": 30
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.683Z"
+    },
+    "overall_sentiment": 34,
+    "sentiment_label": "UPSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.253Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "UPSIDE"
 }

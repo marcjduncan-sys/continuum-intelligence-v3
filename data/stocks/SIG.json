@@ -64,5 +64,46 @@
   "price_signals": [],
   "editorial_override": null,
   "price_history": [],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": -4,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 48,
+      "bear": 52,
+      "direction": "balanced",
+      "hypotheses": [
+        {
+          "title": "T1: Integration Success &amp; Re-Rating",
+          "direction": "upside",
+          "weight": 26
+        },
+        {
+          "title": "T2: Escrow Overhang Triggers De-Rating",
+          "direction": "downside",
+          "weight": 33
+        },
+        {
+          "title": "T3: Regulatory &amp; Structural Disruption",
+          "direction": "downside",
+          "weight": 19
+        },
+        {
+          "title": "T4: Dominant Platform Winner",
+          "direction": "upside",
+          "weight": 22
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.699Z"
+    },
+    "overall_sentiment": -4,
+    "sentiment_label": "BALANCED",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.258Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "BALANCED"
 }

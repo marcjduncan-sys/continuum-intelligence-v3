@@ -139,5 +139,55 @@
     118,
     118.45
   ],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": 2,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 51,
+      "bear": 49,
+      "direction": "balanced",
+      "hypotheses": [
+        {
+          "title": "Iron Ore Cash Generation &mdash; Pilbara Delivers",
+          "direction": "upside",
+          "weight": 32
+        },
+        {
+          "title": "Energy Transition Portfolio &mdash; Copper and Lithium Optionality",
+          "direction": "upside",
+          "weight": 19
+        },
+        {
+          "title": "China Demand Slowdown &mdash; Property Sector Drag",
+          "direction": "downside",
+          "weight": 26
+        },
+        {
+          "title": "Growth Capex Risk &mdash; Simandou and Arcadium Execution",
+          "direction": "downside",
+          "weight": 23
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.718Z"
+    },
+    "overall_sentiment": 2,
+    "sentiment_label": "BALANCED",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.272Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "BALANCED",
+  "valuation_range": {
+    "low": 106.92,
+    "mid": 118.81,
+    "high": 130.69,
+    "shift_pct": 0.003,
+    "signal_used": 2,
+    "method": "sentiment_shift_v3",
+    "computed_at": "2026-02-24T06:42:12.316Z"
+  }
 }

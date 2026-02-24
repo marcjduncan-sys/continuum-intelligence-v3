@@ -64,5 +64,46 @@
   "price_signals": [],
   "editorial_override": null,
   "price_history": [],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": -12,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 44,
+      "bear": 56,
+      "direction": "downside",
+      "hypotheses": [
+        {
+          "title": "T1: Cost Leader Resilience",
+          "direction": "upside",
+          "weight": 29
+        },
+        {
+          "title": "T2: Iron Ore Structural Decline",
+          "direction": "downside",
+          "weight": 30
+        },
+        {
+          "title": "T3: Green Energy Pivot Succeeds",
+          "direction": "upside",
+          "weight": 15
+        },
+        {
+          "title": "T4: Forrest Governance &amp; Capital Misallocation",
+          "direction": "downside",
+          "weight": 26
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.702Z"
+    },
+    "overall_sentiment": -12,
+    "sentiment_label": "DOWNSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.259Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "DOWNSIDE"
 }

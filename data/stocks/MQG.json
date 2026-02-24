@@ -64,5 +64,46 @@
   "price_signals": [],
   "editorial_override": null,
   "price_history": [],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": 11,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 32,
+      "bear": 21,
+      "direction": "upside",
+      "hypotheses": [
+        {
+          "title": "T1: Infrastructure &amp; Renewables Supercycle",
+          "direction": "upside",
+          "weight": 32
+        },
+        {
+          "title": "T2: Steady Diversified Earner",
+          "direction": "neutral",
+          "weight": 29
+        },
+        {
+          "title": "T3: Regulatory Reckoning",
+          "direction": "downside",
+          "weight": 21
+        },
+        {
+          "title": "T4: Strategic Pivot &amp; Business Mix Shift",
+          "direction": "neutral",
+          "weight": 18
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.691Z"
+    },
+    "overall_sentiment": 11,
+    "sentiment_label": "UPSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.256Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "UPSIDE"
 }

@@ -64,5 +64,46 @@
   "price_signals": [],
   "editorial_override": null,
   "price_history": [],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": -26,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 37,
+      "bear": 63,
+      "direction": "downside",
+      "hypotheses": [
+        {
+          "title": "T1: Domestic Growth Re-Accelerates",
+          "direction": "upside",
+          "weight": 20
+        },
+        {
+          "title": "T2: US Expansion Succeeds",
+          "direction": "upside",
+          "weight": 17
+        },
+        {
+          "title": "T3: Growth Maturation / Valuation Correction",
+          "direction": "downside",
+          "weight": 36
+        },
+        {
+          "title": "T4: US Losses Force Strategic Retreat",
+          "direction": "downside",
+          "weight": 27
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.686Z"
+    },
+    "overall_sentiment": -26,
+    "sentiment_label": "DOWNSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.254Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "DOWNSIDE"
 }

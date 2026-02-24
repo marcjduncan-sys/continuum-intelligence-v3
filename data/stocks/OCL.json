@@ -125,5 +125,55 @@
     13.46,
     13.46
   ],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": 12,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 56,
+      "bear": 44,
+      "direction": "upside",
+      "hypotheses": [
+        {
+          "title": "T1: SaaS Transition Acceleration",
+          "direction": "upside",
+          "weight": 25
+        },
+        {
+          "title": "T2: Government Digital Mandate",
+          "direction": "upside",
+          "weight": 31
+        },
+        {
+          "title": "T3: Growth Deceleration",
+          "direction": "downside",
+          "weight": 28
+        },
+        {
+          "title": "T4: Microsoft Displacement",
+          "direction": "downside",
+          "weight": 16
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.711Z"
+    },
+    "overall_sentiment": 12,
+    "sentiment_label": "UPSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.268Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "UPSIDE",
+  "valuation_range": {
+    "low": 12.33,
+    "mid": 13.7,
+    "high": 15.07,
+    "shift_pct": 0.018,
+    "signal_used": 12,
+    "method": "sentiment_shift_v3",
+    "computed_at": "2026-02-24T06:42:12.308Z"
+  }
 }

@@ -39,6 +39,58 @@ function getHypothesisColor(hId) {
   return colors[hId] || { hex: '#666666', rgb: '102, 102, 102' };
 }
 
+// ─── Compute risk skew from hypothesis data ─────────────────────────────────
+// Uses the same formula as computeSkewScore in normalise.js / index.html:
+//   Net = sum(upside normalised weights) - sum(downside normalised weights)
+//   Neutral hypotheses contribute zero.
+// Falls back to stored risk_skew if hypothesis data is unavailable.
+
+function computeRiskSkewForPdf(stock) {
+  // Try computing live from hypothesis data
+  var hyps = null;
+  if (stock.report && Array.isArray(stock.report.hypotheses) && stock.report.hypotheses.length > 0) {
+    hyps = stock.report.hypotheses;
+  } else if (Array.isArray(stock.hypotheses) && stock.hypotheses.length > 0 && stock.hypotheses[0].direction) {
+    hyps = stock.hypotheses;
+  }
+
+  if (!hyps) {
+    // Fallback to stored value
+    return stock.risk_skew || 'BALANCED';
+  }
+
+  // Use shared module if available, otherwise inline computation
+  if (typeof computeSkewScore === 'function') {
+    var result = computeSkewScore({ hypotheses: hyps });
+    return result.score > 5 ? 'UPSIDE' : result.score < -5 ? 'DOWNSIDE' : 'BALANCED';
+  }
+  if (typeof ContinuumNormalise !== 'undefined' && ContinuumNormalise.computeSkewScore) {
+    var result = ContinuumNormalise.computeSkewScore({ hypotheses: hyps });
+    return result.score > 5 ? 'UPSIDE' : result.score < -5 ? 'DOWNSIDE' : 'BALANCED';
+  }
+
+  // Inline fallback: normalise and compute net
+  var FLOOR = 5, CEILING = 80;
+  var raw = [];
+  for (var i = 0; i < hyps.length; i++) {
+    raw.push(Math.max(FLOOR, Math.min(CEILING, parseInt(hyps[i].score) || 0)));
+  }
+  var sum = 0;
+  for (var i = 0; i < raw.length; i++) sum += raw[i];
+  if (sum === 0) return 'BALANCED';
+  var norm = [];
+  for (var i = 0; i < raw.length; i++) norm.push(Math.round((raw[i] / sum) * 100));
+
+  var bull = 0, bear = 0;
+  for (var i = 0; i < hyps.length; i++) {
+    var dir = hyps[i].direction || 'downside';
+    if (dir === 'upside') bull += norm[i];
+    else if (dir === 'downside') bear += norm[i];
+  }
+  var score = bull - bear;
+  return score > 5 ? 'UPSIDE' : score < -5 ? 'DOWNSIDE' : 'BALANCED';
+}
+
 // ─── Build Institutional Report HTML ────────────────────────────────────────
 
 function buildInstitutionalReportHTML(stock) {
@@ -52,7 +104,7 @@ function buildInstitutionalReportHTML(stock) {
     day: 'numeric'
   });
 
-  var risk_skew = stock.risk_skew || 'NEUTRAL';
+  var risk_skew = computeRiskSkewForPdf(stock);
   var risk_color = risk_skew === 'DOWNSIDE' ? '#D50000' :
                    risk_skew === 'UPSIDE' ? '#00C853' : '#FF9100';
 
@@ -336,7 +388,7 @@ function buildRetailReportHTML(stock) {
     day: 'numeric'
   });
 
-  var risk_skew = stock.risk_skew || 'NEUTRAL';
+  var risk_skew = computeRiskSkewForPdf(stock);
   var risk_color = risk_skew === 'DOWNSIDE' ? '#D50000' :
                    risk_skew === 'UPSIDE' ? '#00C853' : '#FF9100';
 

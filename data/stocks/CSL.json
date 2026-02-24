@@ -25,7 +25,7 @@
       "risk_plain": "If growth slips below high single digits, the premium valuation may not be sustainable.",
       "survival_score": 0.75,
       "status": "HIGH",
-      "weighted_inconsistency": 1.0,
+      "weighted_inconsistency": 1,
       "last_updated": "2026-02-14T09:30:00+11:00"
     },
     "T3": {
@@ -57,14 +57,14 @@
   "confidence": "HIGH",
   "alert_state": "NORMAL",
   "alert_started": null,
-  "current_price": 285.50,
+  "current_price": 285.5,
   "big_picture": "CSL is a global biotech leader specialising in plasma-derived therapies and vaccines. It is one of only three companies worldwide that can collect and process blood plasma at scale, giving it an extremely strong competitive position.",
   "last_flip": {
     "date": "2025-08-20",
     "from": "T1",
     "to": "T2",
     "trigger": "FY25 result in-line but guidance conservative; plasma margin recovery on track but gradual",
-    "price_at_flip": 278.00,
+    "price_at_flip": 278,
     "from_survival": 0.36,
     "to_survival": 0.72
   },
@@ -74,8 +74,8 @@
       "from": "T2",
       "to": "T1",
       "trigger": "H1 FY25 earnings beat; Vifor synergies ahead of schedule; upgraded FY25 guidance",
-      "price_at_flip": 305.00,
-      "from_survival": 0.40,
+      "price_at_flip": 305,
+      "from_survival": 0.4,
       "to_survival": 0.78
     }
   ],
@@ -164,11 +164,78 @@
   "price_signals": [],
   "editorial_override": null,
   "price_history": [
-    280.00, 281.50, 282.00, 283.00, 283.50,
-    284.00, 283.80, 284.20, 284.50, 284.80,
-    285.00, 285.20, 284.90, 285.10, 285.30,
-    285.40, 285.50, 285.60, 285.40, 285.50,
-    285.60, 285.50
+    280,
+    281.5,
+    282,
+    283,
+    283.5,
+    284,
+    283.8,
+    284.2,
+    284.5,
+    284.8,
+    285,
+    285.2,
+    284.9,
+    285.1,
+    285.3,
+    285.4,
+    285.5,
+    285.6,
+    285.4,
+    285.5,
+    285.6,
+    285.5
   ],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": -28,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 26,
+      "bear": 54,
+      "direction": "downside",
+      "hypotheses": [
+        {
+          "title": "T1: Structural Compounder Resumes",
+          "direction": "upside",
+          "weight": 26
+        },
+        {
+          "title": "T2: Execution Risk in Transformation",
+          "direction": "downside",
+          "weight": 31
+        },
+        {
+          "title": "T3: Structural Headwinds Emerging",
+          "direction": "downside",
+          "weight": 23
+        },
+        {
+          "title": "T4: M&amp;A or Corporate Event",
+          "direction": "neutral",
+          "weight": 20
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.688Z"
+    },
+    "overall_sentiment": -28,
+    "sentiment_label": "DOWNSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.255Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "DOWNSIDE",
+  "valuation_range": {
+    "low": 246.16,
+    "mid": 273.51,
+    "high": 300.86,
+    "shift_pct": -0.042,
+    "signal_used": -28,
+    "method": "sentiment_shift_v3",
+    "computed_at": "2026-02-24T06:42:12.298Z"
+  }
 }

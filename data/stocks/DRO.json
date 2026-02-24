@@ -64,5 +64,46 @@
   "price_signals": [],
   "editorial_override": null,
   "price_history": [],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": 36,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 55,
+      "bear": 19,
+      "direction": "upside",
+      "hypotheses": [
+        {
+          "title": "T1: Defence Supercycle Winner",
+          "direction": "upside",
+          "weight": 29
+        },
+        {
+          "title": "T2: Lumpy Revenue, Not Scaling",
+          "direction": "neutral",
+          "weight": 26
+        },
+        {
+          "title": "T3: Competitive Displacement by Primes",
+          "direction": "downside",
+          "weight": 19
+        },
+        {
+          "title": "T4: US Market Penetration Succeeds",
+          "direction": "upside",
+          "weight": 26
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.681Z"
+    },
+    "overall_sentiment": 36,
+    "sentiment_label": "UPSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.252Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "UPSIDE"
 }

@@ -64,5 +64,46 @@
   "price_signals": [],
   "editorial_override": null,
   "price_history": [],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": 4,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 52,
+      "bear": 48,
+      "direction": "balanced",
+      "hypotheses": [
+        {
+          "title": "T1: Platform Expansion Delivers",
+          "direction": "upside",
+          "weight": 28
+        },
+        {
+          "title": "T2: Melio Integration Succeeds",
+          "direction": "upside",
+          "weight": 24
+        },
+        {
+          "title": "T3: AI Disruption Re-Prices SaaS",
+          "direction": "downside",
+          "weight": 38
+        },
+        {
+          "title": "T4: Competitive Displacement",
+          "direction": "downside",
+          "weight": 10
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.674Z"
+    },
+    "overall_sentiment": 4,
+    "sentiment_label": "BALANCED",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.249Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "BALANCED"
 }

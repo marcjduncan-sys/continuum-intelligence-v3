@@ -125,5 +125,55 @@
     1.24,
     1.24
   ],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": 24,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 62,
+      "bear": 38,
+      "direction": "upside",
+      "hypotheses": [
+        {
+          "title": "T1: Gold Price Leverage",
+          "direction": "upside",
+          "weight": 34
+        },
+        {
+          "title": "T2: Production Transition",
+          "direction": "upside",
+          "weight": 28
+        },
+        {
+          "title": "T3: Funding & Dilution Risk",
+          "direction": "downside",
+          "weight": 25
+        },
+        {
+          "title": "T4: Gold Price Reversal",
+          "direction": "downside",
+          "weight": 13
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.709Z"
+    },
+    "overall_sentiment": 24,
+    "sentiment_label": "UPSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.267Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "UPSIDE",
+  "valuation_range": {
+    "low": 1.16,
+    "mid": 1.28,
+    "high": 1.41,
+    "shift_pct": 0.036,
+    "signal_used": 24,
+    "method": "sentiment_shift_v3",
+    "computed_at": "2026-02-24T06:42:12.307Z"
+  }
 }

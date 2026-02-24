@@ -319,5 +319,55 @@
     46.01,
     45.51
   ],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": -34,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 33,
+      "bear": 67,
+      "direction": "downside",
+      "hypotheses": [
+        {
+          "title": "T1: Business Banking Moat",
+          "direction": "upside",
+          "weight": 33
+        },
+        {
+          "title": "T2: NIM Compression",
+          "direction": "downside",
+          "weight": 27
+        },
+        {
+          "title": "T3: Valuation De-rating",
+          "direction": "downside",
+          "weight": 23
+        },
+        {
+          "title": "T4: Credit Cycle Turn",
+          "direction": "downside",
+          "weight": 17
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.706Z"
+    },
+    "overall_sentiment": -34,
+    "sentiment_label": "DOWNSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.262Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "DOWNSIDE",
+  "valuation_range": {
+    "low": 38.88,
+    "mid": 43.2,
+    "high": 47.52,
+    "shift_pct": -0.051,
+    "signal_used": -34,
+    "method": "sentiment_shift_v3",
+    "computed_at": "2026-02-24T06:42:12.304Z"
+  }
 }

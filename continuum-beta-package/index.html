@@ -3074,26 +3074,98 @@ STOCK_DATA.WOW = {
 // ============================================================
 
 // Normalise raw ACH survival scores to sum to 100%
+// Normalise raw ACH survival scores to sum to 100%
+// v3 framework: enforce floor(5) and ceiling(80) per NARRATIVE_FRAMEWORK_V3.md
+// "No hypothesis can show <5% or >80%. After clamping, re-normalise to sum to 100."
 function normaliseScores(items) {
-  var sum = 0;
+  var FLOOR = 5;
+  var CEILING = 80;
   var raw = [];
   for (var i = 0; i < items.length; i++) {
     var val = parseInt(items[i].score) || 0;
     raw.push(val);
-    sum += val;
   }
-  if (sum === 0) return raw;
-  var result = [];
-  var allocated = 0;
+  if (raw.length === 0) return raw;
+
+  // Step 1: Clamp each score to floor/ceiling
+  var clamped = [];
   for (var i = 0; i < raw.length; i++) {
-    if (i === raw.length - 1) {
-      result.push(100 - allocated);
+    clamped.push(Math.max(FLOOR, Math.min(CEILING, raw[i])));
+  }
+
+  // Step 2: Sum clamped values and proportionally scale to 100
+  var sum = 0;
+  for (var i = 0; i < clamped.length; i++) sum += clamped[i];
+  if (sum === 0) {
+    var eq = Math.round(100 / clamped.length);
+    var eqResult = [];
+    for (var i = 0; i < clamped.length; i++) eqResult.push(eq);
+    return eqResult;
+  }
+
+  var result = [];
+  for (var i = 0; i < clamped.length; i++) {
+    result.push(Math.round((clamped[i] / sum) * 100));
+  }
+
+  // Step 3: Iterative post-normalisation clamp
+  for (var iter = 0; iter < 20; iter++) {
+    var overflow = 0;
+    var underflow = 0;
+    var freeIndices = [];
+    for (var i = 0; i < result.length; i++) {
+      if (result[i] > CEILING) { overflow += result[i] - CEILING; result[i] = CEILING; }
+      else if (result[i] < FLOOR) { underflow += FLOOR - result[i]; result[i] = FLOOR; }
+      else { freeIndices.push(i); }
+    }
+    if (overflow === 0 && underflow === 0) break;
+    var net = overflow - underflow;
+    if (net === 0) break;
+    if (freeIndices.length === 0) break;
+    if (net > 0) {
+      freeIndices.sort(function(a,b) { return result[a] - result[b]; });
+      var remaining = net;
+      for (var fi = 0; fi < freeIndices.length && remaining > 0; fi++) {
+        var idx = freeIndices[fi];
+        var room = CEILING - result[idx];
+        var give = Math.min(remaining, room);
+        result[idx] += give;
+        remaining -= give;
+      }
     } else {
-      var n = Math.round(raw[i] / sum * 100);
-      result.push(n);
-      allocated += n;
+      freeIndices.sort(function(a,b) { return result[b] - result[a]; });
+      var remaining = -net;
+      for (var fi = 0; fi < freeIndices.length && remaining > 0; fi++) {
+        var idx = freeIndices[fi];
+        var room = result[idx] - FLOOR;
+        var take = Math.min(remaining, room);
+        result[idx] -= take;
+        remaining -= take;
+      }
     }
   }
+
+  // Step 4: Fix rounding residual
+  var roundedSum = 0;
+  for (var i = 0; i < result.length; i++) roundedSum += result[i];
+  if (roundedSum !== 100) {
+    var diff = 100 - roundedSum;
+    var bestIdx = -1;
+    for (var i = 0; i < result.length; i++) {
+      var candidate = result[i] + diff;
+      if (candidate >= FLOOR && candidate <= CEILING) {
+        if (bestIdx === -1 || result[i] > result[bestIdx]) bestIdx = i;
+      }
+    }
+    if (bestIdx === -1) {
+      bestIdx = 0;
+      for (var i = 1; i < result.length; i++) {
+        if (result[i] > result[bestIdx]) bestIdx = i;
+      }
+    }
+    result[bestIdx] += diff;
+  }
+
   return result;
 }
 

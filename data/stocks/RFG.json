@@ -125,5 +125,55 @@
     1,
     1
   ],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": -6,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 47,
+      "bear": 53,
+      "direction": "downside",
+      "hypotheses": [
+        {
+          "title": "T1: Franchise Recovery",
+          "direction": "upside",
+          "weight": 20
+        },
+        {
+          "title": "T2: Debt Reduction Re-rating",
+          "direction": "upside",
+          "weight": 27
+        },
+        {
+          "title": "T3: Consumer Spending Risk",
+          "direction": "downside",
+          "weight": 30
+        },
+        {
+          "title": "T4: Brand Terminal Decline",
+          "direction": "downside",
+          "weight": 23
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.714Z"
+    },
+    "overall_sentiment": -6,
+    "sentiment_label": "DOWNSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.269Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "DOWNSIDE",
+  "valuation_range": {
+    "low": 0.89,
+    "mid": 0.99,
+    "high": 1.09,
+    "shift_pct": -0.009,
+    "signal_used": -6,
+    "method": "sentiment_shift_v3",
+    "computed_at": "2026-02-24T06:42:12.310Z"
+  }
 }

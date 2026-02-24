@@ -139,5 +139,55 @@
     12.8,
     12.85
   ],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": 12,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 56,
+      "bear": 44,
+      "direction": "upside",
+      "hypotheses": [
+        {
+          "title": "Energy Transition Winner &mdash; Sustainability Revenue Grows to 60%+",
+          "direction": "upside",
+          "weight": 26
+        },
+        {
+          "title": "Traditional Energy Cash Cow &mdash; LNG and Upstream Sustain",
+          "direction": "upside",
+          "weight": 30
+        },
+        {
+          "title": "Margin Pressure &mdash; Integration Drag and Fixed-Price Exposure",
+          "direction": "downside",
+          "weight": 28
+        },
+        {
+          "title": "Cyclical Downturn &mdash; Energy Capex Correction",
+          "direction": "downside",
+          "weight": 16
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.719Z"
+    },
+    "overall_sentiment": 12,
+    "sentiment_label": "UPSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.275Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "UPSIDE",
+  "valuation_range": {
+    "low": 11.77,
+    "mid": 13.08,
+    "high": 14.39,
+    "shift_pct": 0.018,
+    "signal_used": 12,
+    "method": "sentiment_shift_v3",
+    "computed_at": "2026-02-24T06:42:12.318Z"
+  }
 }

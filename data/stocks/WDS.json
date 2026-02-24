@@ -64,5 +64,46 @@
   "price_signals": [],
   "editorial_override": null,
   "price_history": [],
-  "weighting": null
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": -42,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 29,
+      "bear": 71,
+      "direction": "downside",
+      "hypotheses": [
+        {
+          "title": "T1: LNG Growth Champion",
+          "direction": "upside",
+          "weight": 29
+        },
+        {
+          "title": "T2: Execution Risk Materialises",
+          "direction": "downside",
+          "weight": 25
+        },
+        {
+          "title": "T3: Energy Transition Stranded Asset Risk",
+          "direction": "downside",
+          "weight": 21
+        },
+        {
+          "title": "T4: Value Trap with Yield Support",
+          "direction": "downside",
+          "weight": 25
+        }
+      ],
+      "computed_at": "2026-02-24T06:41:50.697Z"
+    },
+    "overall_sentiment": -42,
+    "sentiment_label": "DOWNSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T06:41:59.258Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "DOWNSIDE"
 }
