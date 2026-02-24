@@ -889,25 +889,30 @@ a:hover { color: var(--accent-sage); }
 .pir-bar-wrap {
     position: relative;
     margin-top: var(--space-md);
-    height: 72px;
+    padding: 28px 0 52px;
 }
 .pir-bar {
     position: relative;
-    height: 2px;
-    background: var(--border);
-    margin: 40px 16px 0;
+    height: 8px;
+    background: linear-gradient(to right, var(--signal-red), var(--signal-amber), var(--signal-green));
+    border-radius: 4px;
+    margin: 0 16px;
 }
 .pir-world {
     position: absolute;
     transform: translateX(-50%);
     text-align: center;
-    top: -32px;
+    top: 10px;
 }
 .pir-world-tick {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
     width: 1px;
-    height: 8px;
-    background: var(--text-muted);
-    margin: 0 auto 4px;
+    height: 10px;
+    background: rgba(138,154,184,0.4);
+    margin: 0;
 }
 .pir-world-price {
     font-family: var(--font-data);
@@ -925,11 +930,14 @@ a:hover { color: var(--accent-sage); }
 .pir-current {
     position: absolute;
     transform: translateX(-50%);
-    top: -10px;
+    top: -28px;
     text-align: center;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
 }
 .pir-current-dot {
-    font-size: 1.1rem;
+    font-size: 0.7rem;
     color: var(--accent-teal);
     line-height: 1;
 }
@@ -939,7 +947,7 @@ a:hover { color: var(--accent-sage); }
     font-weight: 700;
     color: var(--accent-teal);
     white-space: nowrap;
-    margin-top: 4px;
+    margin-bottom: 2px;
 }
 .pir-note {
     font-size: 0.6rem;
@@ -947,6 +955,49 @@ a:hover { color: var(--accent-sage); }
     font-style: italic;
     margin-top: var(--space-sm);
 }
+
+/* 1.4 Valuation Range */
+.vr-block { padding-bottom: var(--space-lg); }
+.vr-title-row { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-md); }
+.vr-badge {
+    font-size: 0.55rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 3px;
+}
+.vr-badge.amber { background: rgba(212,160,60,0.15); color: var(--signal-amber); }
+.vr-badge.neutral { background: rgba(0,0,0,0.08); color: var(--text-muted); }
+.vr-badge.positive { background: rgba(61,170,109,0.15); color: var(--signal-green); }
+.vr-bar-wrap { position: relative; padding: 20px 0 44px; }
+.vr-bar {
+    position: relative; height: 6px; border-radius: 3px; margin: 0 16px;
+    background: linear-gradient(to right, var(--signal-red) 0%, var(--signal-amber) 40%, var(--signal-green) 100%);
+}
+.vr-marker {
+    position: absolute; transform: translateX(-50%); top: 8px;
+    text-align: center; font-size: 0.6rem; color: var(--text-muted);
+    white-space: nowrap;
+}
+.vr-marker-price { font-family: var(--font-data); font-size: 0.68rem; font-weight: 600; color: var(--text-secondary); }
+.vr-marker-label { font-size: 0.55rem; color: var(--text-muted); margin-top: 2px; }
+.vr-marker::before {
+    content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+    width: 1px; height: 8px; background: rgba(138,154,184,0.4);
+}
+.vr-current {
+    position: absolute; transform: translateX(-50%); bottom: calc(100% + 4px);
+    text-align: center; white-space: nowrap;
+    font-family: var(--font-data); font-size: 0.68rem; font-weight: 700; color: var(--accent-teal);
+}
+.vr-current::after {
+    content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    width: 1px; height: 8px; background: var(--accent-teal);
+}
+.vr-stats {
+    display: flex; gap: var(--space-md); flex-wrap: wrap;
+    font-size: 0.65rem; color: var(--text-muted); margin-top: var(--space-xs);
+}
+.vr-stats span { white-space: nowrap; }
+.vr-stats .pos { color: var(--signal-green); }
+.vr-stats .neg { color: var(--signal-red); }
 
 /* 1.4 Skew Indicator */
 .rh-skew-indicator { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
@@ -1053,6 +1104,68 @@ a:hover { color: var(--accent-sage); }
     font-size: 0.5rem; font-weight: 600;
     color: var(--text-muted);
 }
+
+/* --- Report Page: Signal Bars --- */
+.signal-bars-section {
+    background: var(--bg-surface-alt);
+    border-bottom: 1px solid var(--border);
+}
+[data-theme="light"] .signal-bars-section { background: var(--bg-surface-alt); }
+.sb-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+    min-height: 36px;
+}
+.sb-row:last-child { border-bottom: none; }
+.sb-indicator {
+    width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; margin-top: 3px;
+}
+.sb-indicator.critical, .sb-indicator.downside { background: var(--signal-red); }
+.sb-indicator.positive, .sb-indicator.upside { background: var(--signal-green); }
+.sb-indicator.neutral { background: var(--text-muted); }
+.sb-indicator.amber { background: var(--signal-amber); }
+.sb-row-label {
+    font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); width: 148px; flex-shrink: 0; padding-top: 2px;
+}
+.sb-badge {
+    font-size: 0.6rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 3px; flex-shrink: 0; white-space: nowrap;
+}
+.sb-badge.critical { background: rgba(212,85,85,0.15); color: var(--signal-red); }
+.sb-badge.downside { background: rgba(212,85,85,0.15); color: var(--signal-red); }
+.sb-badge.upside { background: rgba(61,170,109,0.15); color: var(--signal-green); }
+.sb-badge.positive { background: rgba(61,170,109,0.15); color: var(--signal-green); }
+.sb-badge.neutral { background: rgba(0,0,0,0.08); color: var(--text-muted); }
+.sb-badge.amber { background: rgba(212,160,60,0.15); color: var(--signal-amber); }
+[data-theme="light"] .sb-badge.neutral { background: rgba(0,0,0,0.06); }
+.sb-items {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex: 1; padding-top: 2px;
+}
+.sb-item { font-size: 0.78rem; color: var(--text-secondary); font-family: var(--font-data); }
+.sb-item.pos { color: var(--signal-green); }
+.sb-item.neg { color: var(--signal-red); }
+.sb-sep { color: var(--border); font-size: 0.78rem; }
+.sb-company-body { flex: 1; }
+.sb-score-line { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: 4px; }
+.sb-score { font-family: var(--font-data); font-size: 1rem; font-weight: 800; }
+.sb-score.neg { color: var(--signal-red); }
+.sb-score.pos { color: var(--signal-green); }
+.sb-score.neutral { color: var(--signal-amber); }
+.sb-score-track {
+    width: 64px; height: 5px; border-radius: 3px; overflow: hidden; display: flex;
+    background: var(--bg-elevated);
+}
+.sb-desc { font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 6px; line-height: 1.4; }
+.sb-hyp-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.sb-hyp-chip {
+    font-size: 0.58rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+    border: 1px solid var(--border); border-radius: 3px; padding: 2px 7px; color: var(--text-muted);
+    white-space: nowrap;
+}
+.sb-hyp-chip.downside { border-color: rgba(212,85,85,0.4); color: var(--signal-red); }
+.sb-hyp-chip.upside { border-color: rgba(61,170,109,0.4); color: var(--signal-green); }
+.sb-hyp-chip .chip-pct { font-weight: 800; margin-left: 3px; }
 
 /* --- Report Page: Section Nav --- */
 .section-nav {
@@ -4934,7 +5047,25 @@ function loadFullResearchData(ticker, callback) {
           SNAPSHOT_DATA[ticker] = buildSnapshotFromStock(ticker);
         }
         console.log('[StockDataLoader] Loaded full research data for ' + ticker);
-        if (callback) callback(STOCK_DATA[ticker]);
+        // Also merge signal fields from data/stocks/TICKER.json
+        var sigUrl = 'data/stocks/' + ticker + '.json';
+        var sigXhr = new XMLHttpRequest();
+        sigXhr.open('GET', sigUrl, true);
+        sigXhr.onload = function() {
+          if (sigXhr.status === 200) {
+            try {
+              var sd = JSON.parse(sigXhr.responseText);
+              if (sd.three_layer_signal) STOCK_DATA[ticker].three_layer_signal = sd.three_layer_signal;
+              if (sd.valuation_range)    STOCK_DATA[ticker].valuation_range    = sd.valuation_range;
+              if (sd.price_signals && sd.price_signals.length)
+                STOCK_DATA[ticker].price_signals = sd.price_signals;
+            } catch(e) {}
+          }
+          if (callback) callback(STOCK_DATA[ticker]);
+        };
+        sigXhr.onerror = function() { if (callback) callback(STOCK_DATA[ticker]); };
+        sigXhr.send();
+        return; // callback is called from sigXhr handlers above
       } catch (err) {
         console.error('[StockDataLoader] Error parsing research data for ' + ticker + ':', err);
         if (callback) callback(null);
@@ -5196,7 +5327,73 @@ function renderReportHero(data) {
       '</div>';
   }
 
-  // ── Spec Section 1.4 — Skew Indicator ─────────────────────────────────────
+  // ── Spec Section 1.4 — Valuation Range ────────────────────────────────────
+  var valuationRangeHtml = '';
+  if (data.hero && data.hero.position_in_range && data.hero.position_in_range.worlds &&
+      data.hero.position_in_range.worlds.length >= 4) {
+    var vrWorlds = data.hero.position_in_range.worlds;
+    var vrCurrent = data._livePrice || data.price || data.hero.position_in_range.current_price;
+    vrCurrent = parseFloat(vrCurrent);
+    var vrBear    = vrWorlds[1].price;
+    var vrFairLow = (vrWorlds[1].price + vrWorlds[2].price) / 2;
+    var vrFairHigh= (vrWorlds[2].price + vrWorlds[3].price) / 2;
+    var vrBull    = vrWorlds[3].price;
+    var vrMin     = vrWorlds[0].price;
+    var vrRange   = vrBull - vrMin || 1;
+
+    var vrBadgeCls   = vrCurrent < vrBear ? 'amber' : vrCurrent > vrFairHigh ? 'positive' : 'neutral';
+    var vrBadgeLabel = vrCurrent < vrBear ? 'AMBER'  : vrCurrent > vrFairHigh ? 'POSITIVE' : 'NEUTRAL';
+
+    var vrBearPct    = ((vrBear     - vrMin) / vrRange * 100).toFixed(1);
+    var vrFairLowPct = ((vrFairLow  - vrMin) / vrRange * 100).toFixed(1);
+    var vrFairHighPct= ((vrFairHigh - vrMin) / vrRange * 100).toFixed(1);
+    var vrCurrPct    = Math.min(100, Math.max(0, ((vrCurrent - vrMin) / vrRange * 100))).toFixed(1);
+
+    var vrToFairH = ((vrFairHigh / vrCurrent - 1) * 100).toFixed(1);
+    var vrToBull  = ((vrBull     / vrCurrent - 1) * 100).toFixed(1);
+    var vrToBear  = ((vrBear     / vrCurrent - 1) * 100).toFixed(1);
+
+    // Extract FWD P/E from heroMetrics if available
+    var vrPE = '';
+    if (data.heroMetrics) {
+      for (var mi = 0; mi < data.heroMetrics.length; mi++) {
+        if (data.heroMetrics[mi].label === 'FWD P/E') { vrPE = data.heroMetrics[mi].value; break; }
+      }
+    }
+
+    valuationRangeHtml =
+      '<div class="rh-spec-block vr-block">' +
+        '<div class="vr-title-row">' +
+          '<span class="rh-spec-label">VALUATION RANGE</span>' +
+          '<span class="vr-badge ' + vrBadgeCls + '">' + vrBadgeLabel + '</span>' +
+        '</div>' +
+        '<div class="vr-bar-wrap">' +
+          '<div class="vr-bar">' +
+            '<div class="vr-current" style="left:' + vrCurrPct + '%">A$' + vrCurrent.toFixed(2) + '</div>' +
+            '<div class="vr-marker" style="left:' + vrBearPct + '%">' +
+              '<div class="vr-marker-price">A$' + vrBear.toFixed(2) + '</div>' +
+              '<div class="vr-marker-label">Bear</div>' +
+            '</div>' +
+            '<div class="vr-marker" style="left:' + vrFairLowPct + '%;color:var(--accent-teal)">' +
+              '<div class="vr-marker-price" style="color:var(--accent-teal)">A$' + vrFairLow.toFixed(2) + ' &ndash; A$' + vrFairHigh.toFixed(2) + '</div>' +
+              '<div class="vr-marker-label">Fair</div>' +
+            '</div>' +
+            '<div class="vr-marker" style="left:100%">' +
+              '<div class="vr-marker-price">A$' + vrBull.toFixed(2) + '</div>' +
+              '<div class="vr-marker-label">Bull</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="vr-stats">' +
+          '<span class="pos">+' + vrToFairH + '% to fair high</span>' +
+          '<span class="pos">+' + vrToBull + '% to bull case</span>' +
+          '<span>' + vrToBear + '% to bear case</span>' +
+          (vrPE ? '<span>PE FORWARD: ' + vrPE + '</span>' : '') +
+        '</div>' +
+      '</div>';
+  }
+
+  // ── Spec Section 1.5 — Skew Indicator ─────────────────────────────────────
   var skewIndicatorHtml = '';
   if (data.hero && data.hero.skew) {
     var skewCls = data.hero.skew === 'DOWNSIDE' ? 'rh-skew-down' : data.hero.skew === 'UPSIDE' ? 'rh-skew-up' : 'rh-skew-balanced';
@@ -5239,10 +5436,11 @@ function renderReportHero(data) {
       '</div>' +
     '</div>' +
   '</div>' +
-  (embeddedThesisHtml || positionInRangeHtml || skewIndicatorHtml || nextDecisionHtml
+  (embeddedThesisHtml || positionInRangeHtml || valuationRangeHtml || skewIndicatorHtml || nextDecisionHtml
     ? '<div class="rh-spec-section"><div class="report-hero-inner">' +
         embeddedThesisHtml +
         positionInRangeHtml +
+        valuationRangeHtml +
         skewIndicatorHtml +
         nextDecisionHtml +
       '</div></div>'
@@ -6704,6 +6902,154 @@ function destroyNarrativeTimelineChart(ticker) {
   }
 }
 
+function renderSignalBars(data) {
+  var tls = data.three_layer_signal;
+  var ta  = data.technicalAnalysis;
+  var rows = '';
+
+  // ── Row 1: Technical Indicators ────────────────────────────────────────────
+  if (ta) {
+    var regime     = ta.regime || '';
+    var isCritical = /break|bear|crash/i.test(regime);
+    var isPositive = /up|bull|accum|recov/i.test(regime);
+    var regimeCls  = isCritical ? 'critical' : isPositive ? 'positive' : 'neutral';
+    var badgeLabel = isCritical ? 'Critical' : isPositive ? 'Positive' : (regime || 'Neutral');
+
+    var currentP = parseFloat(data._livePrice || data.price || 0);
+    var ph = data.priceHistory;
+    var dailyChange = '', dailyCls = '';
+    if (ph && ph.length >= 2) {
+      var chg = (ph[ph.length-1] - ph[ph.length-2]) / ph[ph.length-2] * 100;
+      dailyCls    = chg >= 0 ? 'pos' : 'neg';
+      dailyChange = (chg >= 0 ? '+' : '') + chg.toFixed(1) + '% today';
+    }
+    var fromPeak = '', fromPeakCls = '';
+    if (ta.trend && ta.trend.drawdown != null) {
+      fromPeak    = ta.trend.drawdown.toFixed(1) + '% from peak';
+      fromPeakCls = ta.trend.drawdown < 0 ? 'neg' : 'pos';
+    }
+    rows +=
+      '<div class="sb-row">' +
+        '<span class="sb-indicator ' + regimeCls + '"></span>' +
+        '<span class="sb-row-label">Technical Indicators</span>' +
+        '<span class="sb-badge ' + regimeCls + '">' + badgeLabel + '</span>' +
+        '<div class="sb-items">' +
+          (currentP ? '<span class="sb-item">A$' + currentP.toFixed(2) + '</span><span class="sb-sep">|</span>' : '') +
+          (dailyChange ? '<span class="sb-item ' + dailyCls + '">' + dailyChange + '</span>' : '') +
+          (fromPeak    ? '<span class="sb-sep">|</span><span class="sb-item ' + fromPeakCls + '">' + fromPeak + '</span>' : '') +
+        '</div>' +
+      '</div>';
+  }
+
+  // ── Row 2: Macro Environment ────────────────────────────────────────────────
+  if (tls) {
+    var macSig   = tls.macro_signal  || 0;
+    var macCls   = macSig >  10 ? 'positive' : macSig < -10 ? 'downside' : 'neutral';
+    var macLabel = macSig >  10 ? 'SUPPORTIVE' : macSig < -10 ? 'HEADWIND' : 'NEUTRAL';
+    rows +=
+      '<div class="sb-row">' +
+        '<span class="sb-indicator ' + macCls + '"></span>' +
+        '<span class="sb-row-label">Macro Environment</span>' +
+        '<span class="sb-badge ' + macCls + '">' + macLabel + '</span>' +
+        '<div class="sb-items">' +
+          '<span class="sb-item">Signal ' + (macSig > 0 ? '+' : '') + macSig + '</span>' +
+          (tls.external_weight ? '<span class="sb-sep">|</span><span class="sb-item">Weight ' + tls.external_weight + '%</span>' : '') +
+        '</div>' +
+      '</div>';
+  }
+
+  // ── Row 3: Sector Narrative ─────────────────────────────────────────────────
+  if (tls) {
+    var secSig   = tls.sector_signal || 0;
+    var secCls   = secSig >  10 ? 'positive' : secSig < -10 ? 'downside' : 'neutral';
+    var secLabel = secSig >  10 ? 'POSITIVE'  : secSig < -10 ? 'NEGATIVE'  : 'NEUTRAL';
+    var secName  = (data.sector || '') + (data.sectorSub ? ' / ' + data.sectorSub : '');
+    var secWeight = tls.external_weight || 0;
+    rows +=
+      '<div class="sb-row">' +
+        '<span class="sb-indicator ' + secCls + '"></span>' +
+        '<span class="sb-row-label">Sector Narrative</span>' +
+        '<span class="sb-badge ' + secCls + '">' + secLabel + '</span>' +
+        '<div class="sb-items">' +
+          (secName ? '<span class="sb-item">' + secName + '</span><span class="sb-sep">|</span>' : '') +
+          '<span class="sb-item">Signal ' + (secSig > 0 ? '+' : '') + secSig + '</span>' +
+          '<span class="sb-sep">|</span>' +
+          '<span class="sb-item">Weight ' + secWeight + '%</span>' +
+          '<span class="sb-sep">|</span>' +
+          '<span class="sb-item">Contribs 0</span>' +
+        '</div>' +
+      '</div>';
+  }
+
+  // ── Row 4: Company Research ─────────────────────────────────────────────────
+  var skew     = computeSkewScore(data);
+  var compCls  = skew.score < -5 ? 'downside' : skew.score > 5 ? 'upside' : 'neutral';
+  var compBadge= skew.score < -5 ? 'DOWNSIDE'  : skew.score > 5 ? 'UPSIDE'  : 'NEUTRAL';
+  var scoreLbl = (skew.score > 0 ? '+' : '') + skew.score;
+  var hyps     = (tls && tls.company_detail && tls.company_detail.hypotheses)
+                   ? tls.company_detail.hypotheses
+                   : (skew.hypotheses || []);
+
+  var bearCt = 0, bullCt = 0;
+  for (var hi = 0; hi < hyps.length; hi++) {
+    if      (hyps[hi].direction === 'downside') bearCt++;
+    else if (hyps[hi].direction === 'upside')   bullCt++;
+  }
+
+  var dominant = null, domMax = -1;
+  for (var di = 0; di < hyps.length; di++) {
+    var dh = hyps[di], dw = dh.weight || 0;
+    if ((skew.score < 0 && dh.direction === 'downside' && dw > domMax) ||
+        (skew.score >= 0 && dh.direction === 'upside'  && dw > domMax)) {
+      domMax = dw; dominant = dh;
+    }
+  }
+
+  var sorted = hyps.slice().sort(function(a,b){ return (b.weight||0)-(a.weight||0); });
+  var chipsHtml = '';
+  for (var ci = 0; ci < sorted.length; ci++) {
+    var sh = sorted[ci];
+    var chipCls  = sh.direction === 'downside' ? 'downside' : sh.direction === 'upside' ? 'upside' : '';
+    var nMatch   = sh.title ? sh.title.match(/^([NT]\d+)/i) : null;
+    var nCode    = nMatch ? nMatch[1].toUpperCase() : '';
+    var descParts= (sh.title || '').replace(/^[NT]\d+[:\s]*/i,'').split(' ');
+    var keyWord  = (descParts[0] || '').toLowerCase() === 'structural' && descParts[1]
+                   ? descParts[1] : (descParts[0] || '');
+    chipsHtml +=
+      '<span class="sb-hyp-chip ' + chipCls + '">' +
+        nCode + (keyWord ? ' ' + keyWord.toUpperCase() : '') +
+        '<span class="chip-pct">' + (sh.weight || 0) + '%</span>' +
+      '</span>';
+  }
+
+  rows +=
+    '<div class="sb-row">' +
+      '<span class="sb-indicator ' + compCls + '"></span>' +
+      '<span class="sb-row-label">Company Research</span>' +
+      '<span class="sb-badge ' + compCls + '">' + compBadge + '</span>' +
+      '<div class="sb-company-body">' +
+        '<div class="sb-score-line">' +
+          '<span class="sb-score ' + compCls + '">' + scoreLbl + ' &#9660;</span>' +
+          '<div class="sb-score-track">' +
+            '<div class="skew-bar-bull" style="width:' + skew.bull + '%"></div>' +
+            '<div class="skew-bar-bear" style="width:' + skew.bear + '%"></div>' +
+          '</div>' +
+        '</div>' +
+        (hyps.length
+          ? '<div class="sb-desc">' +
+              bearCt + ' bear / ' + bullCt + ' bull' +
+              (dominant ? ' &bull; Dominant: ' + dominant.title + ' (' + dominant.direction.toUpperCase() + ')' : '') +
+            '</div>'
+          : '') +
+        (chipsHtml ? '<div class="sb-hyp-chips">' + chipsHtml + '</div>' : '') +
+      '</div>' +
+    '</div>';
+
+  return '<div class="signal-bars-section">' +
+    '<div class="report-hero-inner">' + rows + '</div>' +
+  '</div>';
+}
+
 function renderReportPage(data) {
   prepareHypotheses(data);
   var t = data.ticker.toLowerCase();
@@ -6735,6 +7081,7 @@ function renderReportPage(data) {
     '</div>';
 
   return renderReportHero(data) +
+    renderSignalBars(data) +
     renderSkewBar(data) +
     renderVerdict(data) +
     renderSectionNav(data) +
