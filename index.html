@@ -17,7 +17,7 @@
         script-src 'self' 'unsafe-inline' https://cdn.sheetjs.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
         style-src 'self' 'unsafe-inline';
         font-src 'self';
-        connect-src 'self' https://continuum-intelligence-production.up.railway.app https://query1.finance.yahoo.com https://query2.finance.yahoo.com;
+        connect-src 'self' https://continuum-intelligence-v3-production.up.railway.app https://query1.finance.yahoo.com https://query2.finance.yahoo.com;
         img-src 'self' data:;
         frame-ancestors 'none';
     ">
@@ -1335,6 +1335,7 @@
       overflow: hidden;
       display: -webkit-box;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
     }
 
@@ -2701,8 +2702,13 @@
       flex-shrink: 0;
     }
 
-    .verdict-scores-inline .vs-item { min-width: 50px; }
-    .verdict-scores-inline .vs-score { font-size: 0.95rem; }
+    .verdict-scores-inline .vs-item {
+      min-width: 50px;
+    }
+
+    .verdict-scores-inline .vs-score {
+      font-size: 0.95rem;
+    }
 
     /* --- Valuation Range Bar --- */
     .vr-section {
@@ -2710,17 +2716,20 @@
       border-bottom: 1px solid var(--border);
       padding: var(--space-lg) 0;
     }
+
     .vr-inner {
       max-width: var(--max-width);
       margin: 0 auto;
       padding: 0 var(--space-xl);
     }
+
     .vr-header {
       display: flex;
       align-items: center;
       gap: var(--space-sm);
       margin-bottom: var(--space-md);
     }
+
     .vr-title {
       font-size: 0.55rem;
       font-weight: 700;
@@ -2728,6 +2737,7 @@
       text-transform: uppercase;
       color: var(--text-muted);
     }
+
     .vr-zone-badge {
       font-size: 0.55rem;
       font-weight: 700;
@@ -2736,46 +2746,65 @@
       padding: 2px 8px;
       border-radius: 3px;
     }
-    .vr-zone-badge.zone-green, .vr-zone-badge.zone-deep-green {
+
+    .vr-zone-badge.zone-green,
+    .vr-zone-badge.zone-deep-green {
       background: rgba(61, 170, 109, 0.12);
       color: var(--signal-green);
       border: 1px solid rgba(61, 170, 109, 0.3);
     }
+
     .vr-zone-badge.zone-amber {
       background: rgba(212, 160, 60, 0.12);
       color: var(--signal-amber);
       border: 1px solid rgba(212, 160, 60, 0.3);
     }
-    .vr-zone-badge.zone-red, .vr-zone-badge.zone-deep-red {
+
+    .vr-zone-badge.zone-red,
+    .vr-zone-badge.zone-deep-red {
       background: rgba(212, 85, 85, 0.12);
       color: var(--signal-red);
       border: 1px solid rgba(212, 85, 85, 0.3);
     }
+
     .vr-bar-wrap {
       position: relative;
       margin-bottom: var(--space-md);
     }
+
     .vr-bar {
       display: flex;
       height: 12px;
       border-radius: 6px;
       overflow: hidden;
     }
-    .vr-seg-green  { background: rgba(61,  170, 109, 0.35); }
-    .vr-seg-amber  { background: rgba(212, 160,  60, 0.45); }
-    .vr-seg-red    { background: rgba(212,  85,  85, 0.35); }
+
+    .vr-seg-green {
+      background: rgba(61, 170, 109, 0.35);
+    }
+
+    .vr-seg-amber {
+      background: rgba(212, 160, 60, 0.45);
+    }
+
+    .vr-seg-red {
+      background: rgba(212, 85, 85, 0.35);
+    }
+
     .vr-marker {
       position: absolute;
       top: -4px;
       transform: translateX(-50%);
       pointer-events: none;
     }
+
     .vr-marker-pin {
       width: 2px;
       height: 20px;
       background: var(--text-primary);
       margin: 0 auto;
     }
+
     .vr-marker-label {
       font-family: var(--font-data);
       font-size: 0.62rem;
@@ -2785,18 +2814,27 @@
       text-align: center;
       margin-top: 2px;
     }
+
     .vr-endpoints {
       display: flex;
       justify-content: space-between;
       margin-top: var(--space-sm);
     }
+
     .vr-endpoint {
       font-size: 0.6rem;
       color: var(--text-muted);
       font-family: var(--font-data);
     }
-    .vr-endpoint.bear { color: var(--signal-red); }
-    .vr-endpoint.bull { color: var(--signal-green); }
+
+    .vr-endpoint.bear {
+      color: var(--signal-red);
+    }
+
+    .vr-endpoint.bull {
+      color: var(--signal-green);
+    }
+
     .vr-meta {
       display: flex;
       flex-wrap: wrap;
@@ -2805,14 +2843,23 @@
       color: var(--text-secondary);
       margin-top: var(--space-sm);
     }
-    .vr-meta-item strong { color: var(--text-primary); }
+
+    .vr-meta-item strong {
+      color: var(--text-primary);
+    }
+
     .vr-stale-warning {
       font-size: 0.6rem;
       color: var(--signal-amber);
       margin-top: var(--space-xs, 4px);
     }
+
     /* Coverage table Zone column */
-    .td-zone { text-align: center; white-space: nowrap; }
+    .td-zone {
+      text-align: center;
+      white-space: nowrap;
+    }
+
     .cov-zone-badge {
       font-size: 0.55rem;
       font-weight: 700;
@@ -2820,20 +2867,29 @@
       padding: 2px 7px;
       border-radius: 3px;
     }
-    .cov-zone-badge.zone-green, .cov-zone-badge.zone-deep-green {
+
+    .cov-zone-badge.zone-green,
+    .cov-zone-badge.zone-deep-green {
       background: rgba(61, 170, 109, 0.15);
       color: var(--signal-green);
     }
+
     .cov-zone-badge.zone-amber {
       background: rgba(212, 160, 60, 0.15);
       color: var(--signal-amber);
     }
-    .cov-zone-badge.zone-red, .cov-zone-badge.zone-deep-red {
+
+    .cov-zone-badge.zone-red,
+    .cov-zone-badge.zone-deep-red {
       background: rgba(212, 85, 85, 0.15);
       color: var(--signal-red);
     }
+
     /* Sidebar valuation section */
-    .hs-vr-compact { margin-top: var(--space-sm); }
+    .hs-vr-compact {
+      margin-top: var(--space-sm);
+    }
+
     .hs-vr-bar {
       display: flex;
       height: 6px;
@@ -2841,9 +2897,18 @@
       overflow: hidden;
       margin: 4px 0;
     }
-    .hs-vr-bar .vr-seg-green  { background: rgba(61,  170, 109, 0.5); }
-    .hs-vr-bar .vr-seg-amber  { background: rgba(212, 160,  60, 0.6); }
-    .hs-vr-bar .vr-seg-red    { background: rgba(212,  85,  85, 0.5); }
+
+    .hs-vr-bar .vr-seg-green {
+      background: rgba(61, 170, 109, 0.5);
+    }
+
+    .hs-vr-bar .vr-seg-amber {
+      background: rgba(212, 160, 60, 0.6);
+    }
+
+    .hs-vr-bar .vr-seg-red {
+      background: rgba(212, 85, 85, 0.5);
+    }
 
     /* --- Report Page: Section Nav --- */
     .section-nav {
@@ -9206,7 +9271,8 @@
         <div class="hero">
           <div class="hero-tagline">Independent Cross-Domain Equity Research</div>
           <h1 class="hero-title">We map evidence, not opinions.</h1>
-          <p class="hero-subtitle">Systematic analysis across ten evidence domains using the Stock Drivers framework. Every claim sourced. Every driver tested.</p>
+          <p class="hero-subtitle">Systematic analysis across ten evidence domains using the Stock Drivers framework.
+            Every claim sourced. Every driver tested.</p>
           <p class="hero-cred">Built by former UBS and Goldman Sachs executives.</p>
         </div>
 
@@ -9863,151 +9929,151 @@
       // === FRESHNESS_DATA — Auto-generated by research-monitor.js ===
       // Last updated: 2026-02-17T08:07:09.860Z
       const FRESHNESS_DATA = {
-  "ASB": {
-    "pricePctChange": -4.9,
-    "urgency": 10,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "BHP": {
-    "pricePctChange": 0.3,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "BRG": {
-    "pricePctChange": -1.7,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "CBA": {
-    "pricePctChange": -0.9,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "CSL": {
-    "pricePctChange": -2,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "DRO": {
-    "pricePctChange": -4.1,
-    "urgency": 10,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "DXS": {
-    "pricePctChange": 0.9,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "FMG": {
-    "pricePctChange": -0.2,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "GMG": {
-    "pricePctChange": 0,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "GYG": {
-    "pricePctChange": 2.2,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "HRZ": {
-    "pricePctChange": -1.7,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "MQG": {
-    "pricePctChange": -1.9,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "NAB": {
-    "pricePctChange": -1.3,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "OCL": {
-    "pricePctChange": -1.5,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "PME": {
-    "pricePctChange": -4.2,
-    "urgency": 10,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "QBE": {
-    "pricePctChange": 0.5,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "RFG": {
-    "pricePctChange": 2.8,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "RIO": {
-    "pricePctChange": 0.9,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "SIG": {
-    "pricePctChange": 0.7,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "WDS": {
-    "pricePctChange": -0.3,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "WOR": {
-    "pricePctChange": -1,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "WOW": {
-    "pricePctChange": 0.4,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "WTC": {
-    "pricePctChange": -3.1,
-    "urgency": 10,
-    "status": "OK",
-    "badge": "ok"
-  },
-  "XRO": {
-    "pricePctChange": -0.7,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
-  }
-};
+        "ASB": {
+          "pricePctChange": -4.9,
+          "urgency": 10,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "BHP": {
+          "pricePctChange": 0.3,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "BRG": {
+          "pricePctChange": -1.7,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "CBA": {
+          "pricePctChange": -0.9,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "CSL": {
+          "pricePctChange": -2,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "DRO": {
+          "pricePctChange": -4.1,
+          "urgency": 10,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "DXS": {
+          "pricePctChange": 0.9,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "FMG": {
+          "pricePctChange": -0.2,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "GMG": {
+          "pricePctChange": 0,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "GYG": {
+          "pricePctChange": 2.2,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "HRZ": {
+          "pricePctChange": -1.7,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "MQG": {
+          "pricePctChange": -1.9,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "NAB": {
+          "pricePctChange": -1.3,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "OCL": {
+          "pricePctChange": -1.5,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "PME": {
+          "pricePctChange": -4.2,
+          "urgency": 10,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "QBE": {
+          "pricePctChange": 0.5,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "RFG": {
+          "pricePctChange": 2.8,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "RIO": {
+          "pricePctChange": 0.9,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "SIG": {
+          "pricePctChange": 0.7,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "WDS": {
+          "pricePctChange": -0.3,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "WOR": {
+          "pricePctChange": -1,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "WOW": {
+          "pricePctChange": 0.4,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "WTC": {
+          "pricePctChange": -3.1,
+          "urgency": 10,
+          "status": "OK",
+          "badge": "ok"
+        },
+        "XRO": {
+          "pricePctChange": -0.7,
+          "urgency": 0,
+          "status": "OK",
+          "badge": "ok"
+        }
+      };
       // === END FRESHNESS_DATA ===
 
       // ============================================================
@@ -11365,16 +11431,20 @@
         } else {
           // BALANCED: full range driven by composite of all three signals
           var composite = 0.40 * skewSignal + 0.35 * priceSignal + 0.25 * rangeSignal;
-          if (composite > 0.30)       { zone = 'DEEP_GREEN'; zoneLabel = priceDesc + '; balanced skew, strong value signal'; }
-          else if (composite > 0.10)  { zone = 'GREEN';      zoneLabel = priceDesc + '; balanced skew, tilting positive'; }
-          else if (composite < -0.30) { zone = 'DEEP_RED';   zoneLabel = priceDesc + '; balanced skew, strong caution signal'; }
-          else if (composite < -0.10) { zone = 'RED';        zoneLabel = priceDesc + '; balanced skew, tilting negative'; }
-          else                        { zone = 'AMBER';      zoneLabel = priceDesc + '; balanced evidence'; }
+          if (composite > 0.30) { zone = 'DEEP_GREEN'; zoneLabel = priceDesc + '; balanced skew, strong value signal'; }
+          else if (composite > 0.10) { zone = 'GREEN'; zoneLabel = priceDesc + '; balanced skew, tilting positive'; }
+          else if (composite < -0.30) { zone = 'DEEP_RED'; zoneLabel = priceDesc + '; balanced skew, strong caution signal'; }
+          else if (composite < -0.10) { zone = 'RED'; zoneLabel = priceDesc + '; balanced skew, tilting negative'; }
+          else { zone = 'AMBER'; zoneLabel = priceDesc + '; balanced evidence'; }
         }
 
-        return { zone: zone, zoneLabel: zoneLabel,
-                 debug: { rawSkew: rawSkew, skewLabel: skewLabel, skewSignal: skewSignal,
-                          priceSignal: priceSignal, rangeSignal: rangeSignal, intensityScore: intensityScore } };
+        return {
+          zone: zone, zoneLabel: zoneLabel,
+          debug: {
+            rawSkew: rawSkew, skewLabel: skewLabel, skewSignal: skewSignal,
+            priceSignal: priceSignal, rangeSignal: rangeSignal, intensityScore: intensityScore
+          }
+        };
       }
 
       function renderValuationRange(data) {
@@ -11382,15 +11452,15 @@
         var vr = data.valuation_range;
         if (!vr || !vr.low || !vr.high || !vr.current_price) return '';
 
-        var low      = vr.low;
-        var fairLow  = vr.fair_low;
+        var low = vr.low;
+        var fairLow = vr.fair_low;
         var fairHigh = vr.fair_high;
-        var high     = vr.high;
-        var cur      = data._livePrice || data.price || vr.current_price;
+        var high = vr.high;
+        var cur = data._livePrice || data.price || vr.current_price;
 
         // Compute zone dynamically — uses same skew as composite bar + 52wk position
         var zoneResult = _computeZone(data, vr);
-        var zone      = zoneResult.zone;
+        var zone = zoneResult.zone;
         var zoneLabel = zoneResult.zoneLabel;
 
         // Compute segment widths as % of full range
@@ -11398,10 +11468,10 @@
         if (totalRange <= 0) return '';
         var greenPct = Math.max(0, ((fairLow - low) / totalRange) * 100);
         var amberPct = Math.max(0, ((fairHigh - fairLow) / totalRange) * 100);
-        var redPct   = Math.max(0, ((high - fairHigh) / totalRange) * 100);
+        var redPct = Math.max(0, ((high - fairHigh) / totalRange) * 100);
         // Clamp to sum to 100
         var total = greenPct + amberPct + redPct;
-        if (total > 0) { greenPct = greenPct/total*100; amberPct = amberPct/total*100; redPct = redPct/total*100; }
+        if (total > 0) { greenPct = greenPct / total * 100; amberPct = amberPct / total * 100; redPct = redPct / total * 100; }
 
         // Current price marker position
         var markerPct = Math.max(1, Math.min(99, ((cur - low) / totalRange) * 100));
@@ -11412,12 +11482,12 @@
         // Zone label display
         var zoneShort = zone === 'DEEP_GREEN' ? 'DEEP GREEN'
           : zone === 'DEEP_RED' ? 'DEEP RED'
-          : zone;
+            : zone;
 
         // Upside/downside meta
         var toFairHigh = vr.upside_to_fair_high != null ? (vr.upside_to_fair_high > 0 ? '+' : '') + vr.upside_to_fair_high.toFixed(1) + '% to fair high' : '';
-        var toBull     = vr.upside_to_bull     != null ? (vr.upside_to_bull > 0 ? '+' : '') + vr.upside_to_bull.toFixed(1) + '% to bull case' : '';
-        var toBear     = vr.downside_to_bear   != null ? vr.downside_to_bear.toFixed(1) + '% to bear case' : '';
+        var toBull = vr.upside_to_bull != null ? (vr.upside_to_bull > 0 ? '+' : '') + vr.upside_to_bull.toFixed(1) + '% to bull case' : '';
+        var toBear = vr.downside_to_bear != null ? vr.downside_to_bear.toFixed(1) + '% to bear case' : '';
 
         // Forecast agent data
         var fc = data.forecast_valuation;
@@ -11445,7 +11515,7 @@
           }
         }
 
-        var fmt = function(n) { return 'A$' + n.toFixed(2); };
+        var fmt = function (n) { return 'A$' + n.toFixed(2); };
 
         return '<div class="vr-section">' +
           '<div class="vr-inner">' +
@@ -11457,7 +11527,7 @@
           '<div class="vr-bar">' +
           '<div class="vr-seg-green"  style="width:' + greenPct.toFixed(1) + '%"></div>' +
           '<div class="vr-seg-amber"  style="width:' + amberPct.toFixed(1) + '%"></div>' +
-          '<div class="vr-seg-red"    style="width:' + redPct.toFixed(1)   + '%"></div>' +
+          '<div class="vr-seg-red"    style="width:' + redPct.toFixed(1) + '%"></div>' +
           '</div>' +
           '<div class="vr-marker" style="left:' + markerPct.toFixed(1) + '%">' +
           '<div class="vr-marker-pin"></div>' +
@@ -11471,12 +11541,12 @@
           '</div>' +
           '<div class="vr-meta">' +
           (toFairHigh ? '<span class="vr-meta-item">' + toFairHigh + '</span>' : '') +
-          (toBull     ? '<span class="vr-meta-item">' + toBull     + '</span>' : '') +
-          (toBear     ? '<span class="vr-meta-item">' + toBear     + '</span>' : '') +
-          (probLine   ? '<span class="vr-meta-item">' + probLine   + '</span>' : '') +
+          (toBull ? '<span class="vr-meta-item">' + toBull + '</span>' : '') +
+          (toBear ? '<span class="vr-meta-item">' + toBear + '</span>' : '') +
+          (probLine ? '<span class="vr-meta-item">' + probLine + '</span>' : '') +
           (widthLabel ? '<span class="vr-meta-item">' + widthLabel + '</span>' : '') +
           (multipleLabel ? '<span class="vr-meta-item">' + multipleLabel + '</span>' : '') +
-          (catalystLine  ? '<span class="vr-meta-item"><strong>Catalyst:</strong> ' + catalystLine + '</span>' : '') +
+          (catalystLine ? '<span class="vr-meta-item"><strong>Catalyst:</strong> ' + catalystLine + '</span>' : '') +
           '</div>' +
           staleWarning +
           '</div>' +
@@ -13983,7 +14053,7 @@
           var vrZoneCls = covZone.zone.toLowerCase().replace('_', '-');
           var vrZoneShort = covZone.zone === 'DEEP_GREEN' ? 'DEEP GRN'
             : covZone.zone === 'DEEP_RED' ? 'DEEP RED'
-            : covZone.zone;
+              : covZone.zone;
           zoneHtml = '<span class="cov-zone-badge zone-' + vrZoneCls + '">' + vrZoneShort + '</span>';
         }
 
@@ -16672,24 +16742,24 @@
           var vrZoneCls = sideZone.zone.toLowerCase().replace('_', '-');
           var vrZoneShort = sideZone.zone === 'DEEP_GREEN' ? 'DEEP GREEN'
             : sideZone.zone === 'DEEP_RED' ? 'DEEP RED'
-            : sideZone.zone;
+              : sideZone.zone;
           var vrTotalW = vr.high - vr.low;
           var vrGreenW = vrTotalW > 0 ? Math.max(0, ((vr.fair_low - vr.low) / vrTotalW) * 100) : 33;
           var vrAmberW = vrTotalW > 0 ? Math.max(0, ((vr.fair_high - vr.fair_low) / vrTotalW) * 100) : 34;
-          var vrRedW   = vrTotalW > 0 ? Math.max(0, ((vr.high - vr.fair_high) / vrTotalW) * 100) : 33;
+          var vrRedW = vrTotalW > 0 ? Math.max(0, ((vr.high - vr.fair_high) / vrTotalW) * 100) : 33;
           html += '<div class="hs-section">Valuation Range</div>';
           html += '<div class="hs-vr-compact">';
           html += kvRow('Zone', '<span class="cov-zone-badge zone-' + vrZoneCls + '">' + vrZoneShort + '</span>', '');
-          html += kvRow('Bear',  'A$' + vr.low.toFixed(2), 'dir-down');
-          html += kvRow('Fair',  'A$' + vr.fair_low.toFixed(2) + ' – A$' + vr.fair_high.toFixed(2), '');
-          html += kvRow('Bull',  'A$' + vr.high.toFixed(2), 'dir-up');
+          html += kvRow('Bear', 'A$' + vr.low.toFixed(2), 'dir-down');
+          html += kvRow('Fair', 'A$' + vr.fair_low.toFixed(2) + ' – A$' + vr.fair_high.toFixed(2), '');
+          html += kvRow('Bull', 'A$' + vr.high.toFixed(2), 'dir-up');
           html += '<div class="hs-vr-bar">';
           html += '<div class="vr-seg-green" style="width:' + vrGreenW.toFixed(0) + '%"></div>';
           html += '<div class="vr-seg-amber" style="width:' + vrAmberW.toFixed(0) + '%"></div>';
-          html += '<div class="vr-seg-red"   style="width:' + vrRedW.toFixed(0)   + '%"></div>';
+          html += '<div class="vr-seg-red"   style="width:' + vrRedW.toFixed(0) + '%"></div>';
           html += '</div>';
           if (vr.upside_to_bull != null) {
-            html += kvRow('To bull',  (vr.upside_to_bull > 0 ? '+' : '') + vr.upside_to_bull.toFixed(1) + '%', vr.upside_to_bull > 0 ? 'dir-up' : 'dir-down');
+            html += kvRow('To bull', (vr.upside_to_bull > 0 ? '+' : '') + vr.upside_to_bull.toFixed(1) + '%', vr.upside_to_bull > 0 ? 'dir-up' : 'dir-down');
           }
           if (vr.downside_to_bear != null) {
             html += kvRow('To bear', vr.downside_to_bear.toFixed(1) + '%', vr.downside_to_bear < 0 ? 'dir-down' : '');
@@ -17681,7 +17751,7 @@
 
       // --- Configuration ---
       // API base: auto-detect localhost for dev, Railway API for GitHub Pages, same origin for Railway
-      var PRODUCTION_API = 'https://continuum-intelligence-production.up.railway.app';
+      var PRODUCTION_API = 'https://continuum-intelligence-v3-production.up.railway.app';
       var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       var isFile = window.location.protocol === 'file:';
       var isGitHubPages = window.location.hostname.indexOf('github.io') !== -1;
@@ -18211,7 +18281,7 @@
   <!-- Inline Research Chat (within report pages) -->
   <script>
     (function () {
-      var PRODUCTION_API = 'https://continuum-intelligence-production.up.railway.app';
+      var PRODUCTION_API = 'https://continuum-intelligence-v3-production.up.railway.app';
       var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       var isGitHubPages = window.location.hostname.indexOf('github.io') !== -1;
       var apiOrigin = window.CHAT_API_URL

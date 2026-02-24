@@ -1,0 +1,142 @@
+{
+  "updated": "2026-02-23T10:00:00+11:00",
+  "updated_by": "manual_correction",
+  "notes": "CRITICAL FIX: RBA hiked +25bps to 3.85% on 3 Feb 2026. Previous data showed 4.10% cutting gradually - WRONG. This correction affects macro signal, sector signals for banks/property, and all downstream calculations.",
+
+  "rba": {
+    "cash_rate": 3.85,
+    "cash_rate_formatted": "3.85%",
+    "direction": "hiking",
+    "last_decision_date": "2026-02-03",
+    "last_action": "+25bps hike",
+    "previous_rate": 3.60,
+    "trajectory_label": "hiking (inflation concerns)",
+    "next_meeting": "2026-03-17",
+    "forward_guidance": "Board will be attentive to data. Inflation picked up materially in H2 2025. Capacity pressures stronger than previously assessed. Further hikes possible if inflation persists.",
+    "market_pricing_next_hike_may": "77%",
+    "macro_score_component": -8,
+    "rate_history_2025_2026": [
+      {"date": "2025-02-18", "rate": 4.10, "action": "cut_25bps", "from": 4.35},
+      {"date": "2025-05-20", "rate": 3.85, "action": "cut_25bps", "from": 4.10},
+      {"date": "2025-08-05", "rate": 3.60, "action": "cut_25bps", "from": 3.85},
+      {"date": "2025-09-16", "rate": 3.60, "action": "hold", "from": 3.60},
+      {"date": "2025-11-04", "rate": 3.60, "action": "hold", "from": 3.60},
+      {"date": "2025-12-09", "rate": 3.60, "action": "hold", "from": 3.60},
+      {"date": "2026-02-03", "rate": 3.85, "action": "hike_25bps", "from": 3.60}
+    ]
+  },
+
+  "asx200": {
+    "level": 9026,
+    "level_date": "2026-02-23",
+    "change_1d_pct": -0.61,
+    "change_1w_pct": 1.84,
+    "change_1m_pct": 0.88,
+    "change_3m_pct": null,
+    "change_12m_pct": 6.86,
+    "week_close_prior": 9081,
+    "year_high": 9115,
+    "year_low": 7169,
+    "notes": "Fell 0.61% on 23 Feb. Reporting season strong but tariff uncertainty weighing. Tech -4.55%, Healthcare -2.41%, REITs -2.22% on the day. Materials +1.53% (gold strength)."
+  },
+
+  "aud_usd": {
+    "rate": 0.7098,
+    "rate_date": "2026-02-23",
+    "change_1m_pct": 4.80,
+    "change_3m_pct": null,
+    "change_12m_pct": 11.46,
+    "year_high": 0.7125,
+    "year_low": 0.6425,
+    "notes": "Near 3-year highs. RBA hike expectations supporting AUD. Second-best performing G10 currency in 2026."
+  },
+
+  "vix": {
+    "level": 19.09,
+    "level_date": "2026-02-21",
+    "change_1d_pct": -5.64,
+    "notes": "Elevated but not stressed. US tariff uncertainty keeping floor under vol."
+  },
+
+  "china_pmi": {
+    "value": 50.5,
+    "period": "January 2026",
+    "source": "NBS",
+    "notes": "Marginally expansionary. Needs refresh when February data available."
+  },
+
+  "us_tariffs": {
+    "status": "Global tariff raised to 15% from 10%",
+    "date": "2026-02-22",
+    "notes": "Supreme Court struck down IEEPA-based Liberation Day tariffs. Trump immediately reimposed via alternative legal mechanisms, escalating to 15%. Australia weighing response. Significant uncertainty for trade-exposed sectors.",
+    "impact_assessment": "NEGATIVE for exporters, UNCERTAIN for domestic-focused"
+  },
+
+  "gold": {
+    "price_usd_oz": 5081,
+    "price_date": "2026-02-21",
+    "change_1d_pct": 1.7,
+    "notes": "Driven by soft US economic data and safe-haven demand amid tariff uncertainty"
+  },
+
+  "macro_signal_calculation": {
+    "asx200_momentum": {
+      "value": 0.88,
+      "band": "+3-8% = +8",
+      "score": 8
+    },
+    "vix": {
+      "value": 19.09,
+      "band": "18-25 = 0",
+      "score": 0
+    },
+    "aud_direction": {
+      "value": 4.80,
+      "band": "-5 to +5% = 0",
+      "score": 0
+    },
+    "rba_policy": {
+      "direction": "hiking",
+      "band": "hiking = -8",
+      "score": -8
+    },
+    "china_pmi": {
+      "value": 50.5,
+      "band": "50-52 = +4",
+      "score": 4
+    },
+    "macro_signal_total": 4,
+    "macro_signal_label": "NEUTRAL",
+    "previous_macro_signal": 16,
+    "change_reason": "RBA direction corrected from 'cutting gradually (+4)' to 'hiking (-8)'. Net swing: -12 points."
+  },
+
+  "benchmark_returns": {
+    "asx200_12m": 0.0686,
+    "asx200_12m_formatted": "+6.86%",
+    "asx_small_ords_12m": null,
+    "asx_materials_12m": null,
+    "calculated_date": "2026-02-23",
+    "notes": "SINGLE SOURCE OF TRUTH for all stock relative performance tables. Every stock page reads this value. Do not calculate per-stock."
+  },
+
+  "sector_impact_notes": {
+    "financials": "RBA hike is POSITIVE for bank NIMs in near term but NEGATIVE for credit growth and asset quality. Net effect depends on whether hiking cycle extends. CBA and NAB sector signals should reflect rate hiking environment.",
+    "property_reits": "RBA hike is NEGATIVE for REITs - higher discount rates compress valuations, higher mortgage rates slow housing turnover. GMG sector signal should reflect tightening conditions.",
+    "consumer_discretionary": "RBA hike is NEGATIVE for consumer spending power. Higher mortgage repayments (~$95/month per $600K loan) reduce discretionary income.",
+    "consumer_staples": "Relatively defensive but cost-of-living pressure supports private label switching thesis for WOW.",
+    "resources": "RBA hike less directly relevant. AUD strength (partly RBA-driven) is NEGATIVE for AUD-denominated commodity revenue.",
+    "tech": "Higher rates compress growth stock multiples. ASX tech down 40% over past 6 months already reflects this."
+  },
+
+  "display_values": {
+    "market_context_bar": {
+      "macro_badge": "NEUTRAL",
+      "macro_badge_colour": "amber",
+      "asx200_text": "ASX200 9,026 -0.61% today | +1.84% 1wk",
+      "aud_text": "AUD/USD 0.7098 +4.80% 1mo",
+      "vix_text": "VIX 19.09",
+      "rba_text": "RBA 3.85% (hiking)"
+    }
+  }
+}

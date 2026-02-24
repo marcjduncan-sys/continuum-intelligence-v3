@@ -188,8 +188,28 @@ export default async function ResearchPage({ params }: Params) {
               <h2 className="section-title">Technical Structure</h2>
             </div>
             <div className="section-content">
-              <p className="ta-text">{stock.technicalAnalysis?.regime} - {stock.technicalAnalysis?.trend?.direction}</p>
-              {/* Note: In a real implementation, we would add the Chart component here */}
+              <p className="ta-text" style={{ marginBottom: '1rem' }}>
+                <strong>Regime:</strong> {stock.technicalAnalysis?.regime} &bull; <strong>Trend:</strong> {stock.technicalAnalysis?.trend?.direction} ({stock.technicalAnalysis?.trend?.duration})
+              </p>
+
+              {/* 12-Month Price Chart */}
+              {stock.priceHistory && stock.priceHistory.length > 0 && (
+                <div className="rp-chart-container" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '8px', padding: '20px', height: '230px', marginTop: '1rem' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '12px' }}>12-Month Trailing Price</div>
+                  <svg width="100%" height="150" viewBox="0 0 1000 150" preserveAspectRatio="none">
+                    <path
+                      d={`M ${stock.priceHistory.map((p, i) => `${(i / (stock.priceHistory.length - 1)) * 1000},${150 - ((p! - Math.min(...stock.priceHistory!)) / (Math.max(...stock.priceHistory!) - Math.min(...stock.priceHistory!) || 1)) * 130 - 10}`).join(' L ')}`}
+                      fill="none"
+                      stroke="var(--accent-gold)"
+                      strokeWidth="2"
+                    />
+                  </svg>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--text-muted)', marginTop: '8px' }}>
+                    <span>12 Months Ago</span>
+                    <span>Current</span>
+                  </div>
+                </div>
+              )}
             </div>
           </section>
         </div>
