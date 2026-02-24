@@ -1301,10 +1301,10 @@ function pnSendChat() {
         });
     }
 
-    var PRODUCTION_API = 'https://continuum-intelligence-production.up.railway.app';
+    var PRODUCTION_API = 'https://imaginative-vision-production-16cb.up.railway.app';
     var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     var apiOrigin = window.CHAT_API_URL ||
-        (isLocal ? 'http://localhost:8000' : PRODUCTION_API);
+        (isLovar PRODUCTION_API = 'https://imaginative-vision-production-16cb.up.railway.app';cal ? 'http://localhost:8000' : PRODUCTION_API);
 
     fetch(apiOrigin + '/api/research-chat', {
         method: 'POST',
