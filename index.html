@@ -6347,7 +6347,7 @@ function prepareHypotheses(data) {
 
   // Tag each hypothesis with its original tier number before sorting
   for (var i = 0; i < hyps.length; i++) {
-    hyps[i]._origTierNum = hyps[i].tier.replace('n', '');
+    hyps[i]._origTierNum = hyps[i].tier.replace(/^n/, '');
   }
 
   // Sort by fewest contradictions (disconfirmation-based ranking), then raw score as tiebreaker
@@ -8949,6 +8949,7 @@ function route() {
                             container.innerHTML = renderReportPage(data);
                             renderedPages.add(ticker);
                             setupScrollSpy('page-' + hash);
+                            populateSidebar(ticker);
                             if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
                             if (typeof window.applyNarrativeAnalysis === 'function') window.applyNarrativeAnalysis(ticker);
                             initNarrativeTimelineChart(ticker);
