@@ -160,14 +160,15 @@
 [data-theme="light"] .featured-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
 [data-theme="light"] .evidence-card { background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
 [data-theme="light"] .hyp-card { background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-[data-theme="light"] .verdict-section { background: #FFFFFF; }
+[data-theme="light"] .verdict-section { background: var(--bg-surface-alt); }
 [data-theme="light"] .verdict-inner { box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
 [data-theme="light"] .callout { background: #F7F8FA; }
 /* Heroes & banners */
 [data-theme="light"] .hero { background: linear-gradient(135deg, #E8F5F3 0%, #EBF4FF 50%, #F5F6F8 100%); }
 [data-theme="light"] .report-hero { background: linear-gradient(135deg, #E8F5F3 0%, #EBF4FF 100%); }
 [data-theme="light"] .snap-hero { background: linear-gradient(135deg, #E8F5F3 0%, #EBF4FF 100%); }
-[data-theme="light"] .risk-skew-bar { background: var(--bg-surface); }
+[data-theme="light"] .risk-skew-bar { background: var(--bg-surface-alt); }
+[data-theme="light"] .rh-spec-section { background: var(--bg-surface-alt); }
 /* Navigation & sections */
 [data-theme="light"] .section-nav { background: #FFFFFF; border-bottom: 1px solid #E2E8F0; }
 [data-theme="light"] .section-nav a { color: var(--text-muted); }
@@ -854,7 +855,7 @@ a:hover { color: var(--accent-sage); }
 
 /* --- Report Page: Spec Sections (1.2–1.5) --- */
 .rh-spec-section {
-    background: var(--bg-surface);
+    background: var(--bg-surface-alt);
     border-bottom: 1px solid var(--border);
 }
 .rh-spec-block {
