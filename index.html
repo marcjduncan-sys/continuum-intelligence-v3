@@ -852,6 +852,122 @@ a:hover { color: var(--accent-sage); }
 .rh-metric-value.negative { color: var(--signal-red); }
 .rh-metric-value.positive { color: var(--signal-green); }
 
+/* --- Report Page: Spec Sections (1.2–1.5) --- */
+.rh-spec-block {
+    padding: var(--space-md) 0;
+    border-top: 1px solid var(--border);
+}
+.rh-spec-label {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: var(--space-xs);
+    display: inline;
+}
+.rh-spec-text {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-top: var(--space-xs);
+}
+
+/* 1.2 Embedded Thesis */
+.rh-embedded-thesis .rh-spec-text {
+    font-family: var(--font-serif);
+    color: var(--text-primary);
+}
+
+/* 1.3 Position in Range */
+.rh-position-range { padding-bottom: var(--space-lg); }
+.pir-bar-wrap {
+    position: relative;
+    margin-top: var(--space-md);
+    height: 72px;
+}
+.pir-bar {
+    position: relative;
+    height: 2px;
+    background: var(--border);
+    margin: 40px 16px 0;
+}
+.pir-world {
+    position: absolute;
+    transform: translateX(-50%);
+    text-align: center;
+    top: -32px;
+}
+.pir-world-tick {
+    width: 1px;
+    height: 8px;
+    background: var(--text-muted);
+    margin: 0 auto 4px;
+}
+.pir-world-price {
+    font-family: var(--font-data);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+.pir-world-label {
+    font-size: 0.58rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    margin-top: 2px;
+}
+.pir-current {
+    position: absolute;
+    transform: translateX(-50%);
+    top: -10px;
+    text-align: center;
+}
+.pir-current-dot {
+    font-size: 1.1rem;
+    color: var(--accent-teal);
+    line-height: 1;
+}
+.pir-current-label {
+    font-family: var(--font-data);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+    white-space: nowrap;
+    margin-top: 4px;
+}
+.pir-note {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: var(--space-sm);
+}
+
+/* 1.4 Skew Indicator */
+.rh-skew-indicator { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
+.rh-skew-indicator .rh-spec-text { flex-basis: 100%; margin-top: 4px; }
+.rh-skew-value {
+    font-family: var(--font-data);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 3px;
+}
+.rh-skew-down { color: var(--signal-red); background: rgba(239,68,68,0.08); }
+.rh-skew-up   { color: var(--signal-green); background: rgba(34,184,167,0.08); }
+.rh-skew-balanced { color: var(--signal-amber); background: rgba(245,158,11,0.08); }
+
+/* 1.5 Next Decision Point */
+.ndp-event {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: var(--space-xs);
+    margin-bottom: 2px;
+}
+.ndp-date { color: var(--text-muted); font-weight: 400; }
+
 /* --- Report Page: Sparkline --- */
 .rh-sparkline {
     margin-bottom: var(--space-xs);
@@ -5276,6 +5392,82 @@ function renderReportHero(data) {
 
   var sparklineHtml = data.priceHistory ? renderSparkline(data.priceHistory) : '';
 
+  // ── Spec Section 1.2 — What the Price Embeds ──────────────────────────────
+  var embeddedThesisHtml = '';
+  if (data.hero && data.hero.embedded_thesis) {
+    embeddedThesisHtml =
+      '<div class="rh-spec-block rh-embedded-thesis">' +
+        '<div class="rh-spec-label">WHAT THE PRICE EMBEDS</div>' +
+        '<p class="rh-spec-text">' + data.hero.embedded_thesis + '</p>' +
+      '</div>';
+  }
+
+  // ── Spec Section 1.3 — Position in Range ──────────────────────────────────
+  var positionInRangeHtml = '';
+  if (data.hero && data.hero.position_in_range) {
+    var pir = data.hero.position_in_range;
+    var worlds = pir.worlds;
+    var current = pir.current_price;
+    // Find min/max for bar positioning
+    var prices = worlds.map(function(w) { return w.price; });
+    prices.push(current);
+    var minP = Math.min.apply(null, prices);
+    var maxP = Math.max.apply(null, prices);
+    var rangeP = maxP - minP || 1;
+
+    var worldMarkersHtml = '';
+    for (var i = 0; i < worlds.length; i++) {
+      var w = worlds[i];
+      var pct = ((w.price - minP) / rangeP * 100).toFixed(1);
+      worldMarkersHtml +=
+        '<div class="pir-world" style="left:' + pct + '%">' +
+          '<div class="pir-world-tick"></div>' +
+          '<div class="pir-world-price">A$' + w.price.toFixed(0) + '</div>' +
+          '<div class="pir-world-label">' + w.label + '</div>' +
+        '</div>';
+    }
+    var currentPct = ((current - minP) / rangeP * 100).toFixed(1);
+
+    positionInRangeHtml =
+      '<div class="rh-spec-block rh-position-range">' +
+        '<div class="rh-spec-label">POSITION IN RANGE</div>' +
+        '<div class="pir-bar-wrap">' +
+          '<div class="pir-bar">' +
+            worldMarkersHtml +
+            '<div class="pir-current" style="left:' + currentPct + '%">' +
+              '<div class="pir-current-dot">&#9679;</div>' +
+              '<div class="pir-current-label">A$' + current.toFixed(2) + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        (pir.note ? '<div class="pir-note">' + pir.note + '</div>' : '') +
+      '</div>';
+  }
+
+  // ── Spec Section 1.4 — Skew Indicator ─────────────────────────────────────
+  var skewIndicatorHtml = '';
+  if (data.hero && data.hero.skew) {
+    var skewCls = data.hero.skew === 'DOWNSIDE' ? 'rh-skew-down' : data.hero.skew === 'UPSIDE' ? 'rh-skew-up' : 'rh-skew-balanced';
+    skewIndicatorHtml =
+      '<div class="rh-spec-block rh-skew-indicator">' +
+        '<span class="rh-spec-label">SKEW: </span>' +
+        '<span class="rh-skew-value ' + skewCls + '">' + data.hero.skew + '</span>' +
+        (data.hero.skew_description ? '<p class="rh-spec-text">' + data.hero.skew_description + '</p>' : '') +
+      '</div>';
+  }
+
+  // ── Spec Section 1.5 — Next Decision Point ────────────────────────────────
+  var nextDecisionHtml = '';
+  if (data.hero && data.hero.next_decision_point) {
+    var ndp = data.hero.next_decision_point;
+    nextDecisionHtml =
+      '<div class="rh-spec-block rh-next-decision">' +
+        '<div class="rh-spec-label">NEXT DECISION POINT</div>' +
+        '<div class="ndp-event">' + ndp.event + ' &middot; <span class="ndp-date">' + ndp.date + '</span></div>' +
+        '<p class="rh-spec-text">' + ndp.metric + '. ' + ndp.thresholds + '</p>' +
+      '</div>';
+  }
+
   return '<div class="report-hero">' +
     '<div class="report-hero-inner">' +
       '<a class="report-back" href="#home" onclick="navigate(\'home\')">&larr; Back to Coverage</a>' +
@@ -5293,6 +5485,10 @@ function renderReportHero(data) {
           '<div class="rh-metrics">' + metricsHtml + '</div>' +
         '</div>' +
       '</div>' +
+      embeddedThesisHtml +
+      positionInRangeHtml +
+      skewIndicatorHtml +
+      nextDecisionHtml +
     '</div>' +
   '</div>';
 }
