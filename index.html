@@ -269,7 +269,10 @@
     }
 
     [data-theme="light"] .verdict-section {
-      background: #FFFFFF;
+      background: var(--bg-header);
+    }
+    [data-theme="light"] .verdict-section .verdict-inner {
+      background: var(--bg-surface);
     }
 
     [data-theme="light"] .verdict-inner {
@@ -294,7 +297,10 @@
     }
 
     [data-theme="light"] .risk-skew-bar {
-      background: #F0F1F4;
+      background: var(--bg-header);
+    }
+    [data-theme="light"] .risk-skew-bar .rsb-inner {
+      background: var(--bg-surface);
     }
 
     /* Navigation & sections */
@@ -1787,9 +1793,14 @@
 
     /* --- Report Page: Risk Skew Bar --- */
     .risk-skew-bar {
-      background: var(--bg-surface);
+      background: var(--bg-header);
       padding: var(--space-md) 0;
       border-bottom: 1px solid var(--border);
+    }
+    .risk-skew-bar .rsb-inner {
+      background: var(--bg-surface);
+      border-radius: 8px;
+      padding: var(--space-md);
     }
 
     .rsb-inner {
@@ -1817,9 +1828,14 @@
 
     /* ── Phase 5: Macro Context Bar ── */
     .macro-bar {
-      background: var(--bg-surface);
+      background: var(--bg-header);
       border-bottom: 1px solid var(--border);
       padding: 10px 0;
+    }
+    .macro-bar .macro-bar-inner {
+      background: var(--bg-surface);
+      border-radius: 8px;
+      padding: 10px var(--space-lg);
     }
 
     .macro-bar-inner {
@@ -1900,9 +1916,14 @@
 
     /* ── Phase 5: Sector Narrative Panel ── */
     .sector-panel {
-      background: var(--bg-surface-alt);
+      background: var(--bg-header);
       border-bottom: 1px solid var(--border);
       padding: var(--space-md) 0;
+    }
+    .sector-panel .sector-panel-inner {
+      background: var(--bg-surface);
+      border-radius: 8px;
+      padding: var(--space-md) var(--space-lg);
     }
 
     .sector-panel-inner {
@@ -2071,9 +2092,14 @@
 
     /* ── Phase 5: Composite Sentiment Bar ── */
     .composite-bar {
-      background: var(--bg-surface);
+      background: var(--bg-header);
       border-bottom: 2px solid var(--border);
       padding: var(--space-md) 0;
+    }
+    .composite-bar .composite-bar-inner {
+      background: var(--bg-surface);
+      border-radius: 8px;
+      padding: var(--space-md) var(--space-lg);
     }
 
     .composite-bar-inner {
@@ -2630,9 +2656,14 @@
 
     /* --- Report Page: Verdict --- */
     .verdict-section {
-      background: var(--bg-surface);
+      background: var(--bg-header);
       border-bottom: 3px solid var(--accent-sage);
       padding: var(--space-lg) 0;
+    }
+    .verdict-section .verdict-inner {
+      background: var(--bg-surface);
+      border-radius: 8px;
+      padding: var(--space-md) var(--space-lg);
     }
 
     .verdict-inner {
@@ -2712,9 +2743,14 @@
 
     /* --- Valuation Range Bar --- */
     .vr-section {
-      background: var(--bg-surface);
+      background: var(--bg-header);
       border-bottom: 1px solid var(--border);
       padding: var(--space-lg) 0;
+    }
+    .vr-section .vr-inner {
+      background: var(--bg-surface);
+      border-radius: 8px;
+      padding: var(--space-lg);
     }
 
     .vr-inner {
@@ -3044,10 +3080,23 @@
       .verdict-inner,
       .section-nav-inner,
       .macro-bar-inner,
+      .sector-panel-inner,
       .composite-bar-inner,
       .vr-inner {
         max-width: 1340px;
         padding-right: calc(var(--space-lg) + 220px + var(--space-xl));
+      }
+
+      /* White card backgrounds with light green outer margins */
+      .risk-skew-bar .rsb-inner,
+      .verdict-section .verdict-inner,
+      .section-nav .section-nav-inner,
+      .macro-bar .macro-bar-inner,
+      .sector-panel .sector-panel-inner,
+      .composite-bar .composite-bar-inner,
+      .vr-section .vr-inner {
+        background: var(--bg-surface);
+        border-radius: 8px;
       }
     }
 
