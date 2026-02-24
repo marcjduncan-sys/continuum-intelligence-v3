@@ -295,7 +295,7 @@ function processStock(ticker, stockData, livePrice) {
   const hyps = stockData.hypotheses;
   if (!hyps) return null;
 
-  const tiers = Object.keys(hyps); // T1, T2, T3, T4
+  const tiers = Object.keys(hyps); // N1, N2, N3, N4
   if (tiers.length === 0) return null;
 
   const priceHistory = stockData.price_history || [];

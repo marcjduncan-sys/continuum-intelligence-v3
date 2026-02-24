@@ -278,7 +278,7 @@ function createMarketNarrativeSection(analysis) {
 
   // Build weight divergence table
   var weightRows = '';
-  var tiers = ['T1', 'T2', 'T3', 'T4'];
+  var tiers = ['N1', 'N2', 'N3', 'N4'];
   for (var i = 0; i < tiers.length; i++) {
     var t = tiers[i];
     var w = weights[t];
@@ -358,8 +358,8 @@ function addWeightBreakdownToCards(reportPage, analysis) {
 
     var titleText = titleEl.textContent;
     var tier = null;
-    var match = titleText.match(/T(\d)/);
-    if (match) tier = 'T' + match[1];
+    var match = titleText.match(/N(\d)/);
+    if (match) tier = 'N' + match[1];
     if (!tier || !weights[tier]) return;
 
     var w = weights[tier];

@@ -19,7 +19,7 @@ const SURVIVAL_THRESHOLDS = {
   VERY_LOW: 0.0
 };
 
-const HYPOTHESIS_IDS = ['T1', 'T2', 'T3', 'T4'];
+const HYPOTHESIS_IDS = ['N1', 'N2', 'N3', 'N4'];
 
 /**
  * Calculate the time-decay factor for an evidence item.

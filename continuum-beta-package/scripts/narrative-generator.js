@@ -39,13 +39,13 @@ const NARRATIVE_TEMPLATES = {
     guidanceCut: (ticker, price, metrics) => ({
       headline: `${ticker} guidance reduced`,
       verdictAddendum: `Management has reduced FY26 guidance, indicating a more challenging operating environment than previously anticipated.`,
-      evidenceUpdate: `Corporate Communications (Updated): Management reduced FY26 guidance, citing ${metrics.reason || 'challenging market conditions'}. This supports the structural margin erosion thesis (T2).`,
+      evidenceUpdate: `Corporate Communications (Updated): Management reduced FY26 guidance, citing ${metrics.reason || 'challenging market conditions'}. This supports the structural margin erosion thesis (N2).`,
       scoreAdjustment: -8
     }),
     guidanceRaise: (ticker, price, metrics) => ({
       headline: `${ticker} guidance increased`,
       verdictAddendum: `Management raised FY26 guidance, suggesting the turnaround narrative is gaining traction.`,
-      evidenceUpdate: `Corporate Communications (Updated): Management raised FY26 guidance, citing ${metrics.reason || 'improved trading conditions'}. This supports the turnaround thesis (T1).`,
+      evidenceUpdate: `Corporate Communications (Updated): Management raised FY26 guidance, citing ${metrics.reason || 'improved trading conditions'}. This supports the turnaround thesis (N1).`,
       scoreAdjustment: 8
     })
   },
@@ -54,9 +54,9 @@ const NARRATIVE_TEMPLATES = {
     ceoChange: (ticker, price, details) => ({
       headline: `${ticker} announces CEO transition`,
       verdictAddendum: `Leadership transition introduces execution risk. New CEO inherits the current strategic challenges.`,
-      evidenceUpdate: `Leadership & Governance (Updated): CEO transition announced. New CEO ${details.newCEO} takes over from ${details.oldCEO}. Turnaround thesis (T1) now rests on unproven leadership.`,
+      evidenceUpdate: `Leadership & Governance (Updated): CEO transition announced. New CEO ${details.newCEO} takes over from ${details.oldCEO}. Turnaround thesis (N1) now rests on unproven leadership.`,
       scoreAdjustment: -5,
-      hypothesisImpact: { t1: -10, t2: 5 }
+      hypothesisImpact: { n1: -10, n2: 5 }
     }),
     cfoChange: (ticker, price, details) => ({
       headline: `${ticker} announces CFO change`,
@@ -76,7 +76,7 @@ const NARRATIVE_TEMPLATES = {
     acquisition: (ticker, price, details) => ({
       headline: `${ticker} announces acquisition`,
       verdictAddendum: `Acquisition of ${details.target} for $${details.value}M introduces integration execution risk and capital allocation questions.`,
-      evidenceUpdate: `Corporate Communications (Updated): Acquisition announced - ${details.target} for $${details.value}M. Strategic rationale: ${details.rationale}. Integration risk added to T4 considerations.`,
+      evidenceUpdate: `Corporate Communications (Updated): Acquisition announced - ${details.target} for $${details.value}M. Strategic rationale: ${details.rationale}. Integration risk added to N4 considerations.`,
       scoreAdjustment: details.value > 500 ? -5 : -2
     }),
     divestment: (ticker, price, details) => ({
@@ -88,7 +88,7 @@ const NARRATIVE_TEMPLATES = {
     capitalRaising: (ticker, price, details) => ({
       headline: `${ticker} announces capital raising`,
       verdictAddendum: `Capital raising of $${details.amount}M dilutes existing shareholders and signals balance sheet pressure.`,
-      evidenceUpdate: `Corporate Communications (Updated): Capital raising announced - $${details.amount}M via ${details.method}. Dilution impact: ${details.dilution}%. Balance sheet pressure supports T2 thesis.`,
+      evidenceUpdate: `Corporate Communications (Updated): Capital raising announced - $${details.amount}M via ${details.method}. Dilution impact: ${details.dilution}%. Balance sheet pressure supports N2 thesis.`,
       scoreAdjustment: -5
     })
   },
@@ -97,9 +97,9 @@ const NARRATIVE_TEMPLATES = {
     investigation: (ticker, price, details) => ({
       headline: `${ticker} faces regulatory scrutiny`,
       verdictAddendum: `Regulatory investigation escalates compliance risk and potential for material penalties.`,
-      evidenceUpdate: `Regulatory Filings (Updated): ${details.regulator} investigation announced. Focus: ${details.focus}. Penalty risk elevated. T3 (Regulatory Squeeze) strengthened.`,
+      evidenceUpdate: `Regulatory Filings (Updated): ${details.regulator} investigation announced. Focus: ${details.focus}. Penalty risk elevated. N3 (Regulatory Squeeze) strengthened.`,
       scoreAdjustment: -7,
-      hypothesisImpact: { t3: 15 }
+      hypothesisImpact: { n3: 15 }
     }),
     fine: (ticker, price, details) => ({
       headline: `${ticker} receives regulatory penalty`,

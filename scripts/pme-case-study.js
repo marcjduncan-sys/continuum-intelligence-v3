@@ -21,26 +21,26 @@ const PME_CASE_STUDY = {
     },
     hypotheses: [
       {
-        tier: 't1',
-        title: 'T1: US Expansion Accelerates',
+        tier: 'n1',
+        title: 'N1: US Expansion Accelerates',
         score: '60%',
         description: 'Pro Medicus continues winning major US health system contracts...'
       },
       {
-        tier: 't2',
-        title: 'T2: Valuation Mean-Reversion',
+        tier: 'n2',
+        title: 'N2: Valuation Mean-Reversion',
         score: '35%',
         description: 'The 163x P/E contracts to a more conventional 50-80x...'
       },
       {
-        tier: 't3',
-        title: 'T3: Competitive Disruption',
+        tier: 'n3',
+        title: 'N3: Competitive Disruption',
         score: '20%',
         description: 'A competitor develops a platform that matches Visage 7...'
       },
       {
-        tier: 't4',
-        title: 'T4: AI Amplifies the Moat',
+        tier: 'n4',
+        title: 'N4: AI Amplifies the Moat',
         score: '50%',
         description: 'Pro Medicus becomes the platform on which AI radiology tools run...'
       }
@@ -134,10 +134,10 @@ function runPMECaseStudy() {
   console.log('─────┼──────────┼────────┼─────────┼────────┼───────────');
   
   const tierNames = {
-    'T1': 'US Expansion    ',
-    'T2': 'Valuation Mean  ',
-    'T3': 'Competitive     ',
-    'T4': 'AI Moat         '
+    'N1': 'US Expansion    ',
+    'N2': 'Valuation Mean  ',
+    'N3': 'Competitive     ',
+    'N4': 'AI Moat         '
   };
 
   Object.entries(analysis.weights).forEach(([tier, w]) => {
@@ -197,9 +197,9 @@ Secondary concern: Valuation Mean-Reversion. AI Amplifies Moat is being
 contradicted by price action.
 
 Research vs. Market Divergence:
-• T2: Research 35% → Market 55% (20pt gap)
-• T3: Research 20% → Market 60% (40pt gap) ⚠️ MAJOR
-• T4: Research 50% → Market 15% (35pt gap) ⚠️ MAJOR
+• N2: Research 35% → Market 55% (20pt gap)
+• N3: Research 20% → Market 60% (40pt gap) ⚠️ MAJOR
+• N4: Research 50% → Market 15% (35pt gap) ⚠️ MAJOR
 
 Implication: Either (a) the market is overreacting to near-term noise 
 and creating entry opportunity, or (b) the research thesis is missing 

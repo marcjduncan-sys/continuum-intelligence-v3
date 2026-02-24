@@ -1,7 +1,7 @@
 /**
  * DYNAMIC NARRATIVE ENGINE — Narrative Weighting Architecture
  *
- * Determines the Top Narrative (T1) via price-correlation analysis,
+ * Determines the Top Narrative (N1) via price-correlation analysis,
  * detects narrative inflection points, and quantifies dislocation
  * between consensus positioning and price-implied valuation.
  *
@@ -60,10 +60,10 @@ function dailyReturns(prices) {
  * Generate a synthetic hypothesis-implied return series.
  *
  * Each hypothesis implies a direction:
- * - T1 (Growth): positive returns expected
- * - T2 (Base):   flat/slightly positive returns expected
- * - T3 (Risk):   negative returns expected
- * - T4 (Disruption): strongly negative returns expected
+ * - N1 (Growth): positive returns expected
+ * - N2 (Base):   flat/slightly positive returns expected
+ * - N3 (Risk):   negative returns expected
+ * - N4 (Disruption): strongly negative returns expected
  *
  * The implied series is built from the hypothesis's survival score trajectory
  * and its directional bias, producing a series that correlates with price
@@ -76,7 +76,7 @@ function dailyReturns(prices) {
  */
 function hypothesisImpliedReturns(hId, score, returns) {
   // Directional bias for each hypothesis tier
-  var directionMap = { T1: 1.0, T2: 0.3, T3: -0.7, T4: -1.0 };
+  var directionMap = { N1: 1.0, N2: 0.3, N3: -0.7, N4: -1.0 };
   var direction = directionMap[hId] || 0;
 
   // The implied series is: for each actual return, the hypothesis "predicts"
@@ -103,7 +103,7 @@ function hypothesisImpliedReturns(hId, score, returns) {
  */
 function calculatePriceCorrelations(stock, priceHistory) {
   var returns = dailyReturns(priceHistory);
-  var ids = HYPOTHESIS_IDS || ['T1', 'T2', 'T3', 'T4'];
+  var ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
   var result = {};
 
   for (var h = 0; h < ids.length; h++) {
@@ -156,7 +156,7 @@ function calculatePriceCorrelations(stock, priceHistory) {
 }
 
 /**
- * Determine the Top Narrative (T1) — the hypothesis with the largest
+ * Determine the Top Narrative (N1) — the hypothesis with the largest
  * recent price correlation.
  *
  * @param {Object} correlationData  Output from calculatePriceCorrelations
@@ -202,7 +202,7 @@ function determineTopNarrative(correlationData, previousTopNarrative) {
  * @returns {Object} Dislocation metrics
  */
 function quantifyDislocation(stock, correlationData) {
-  var ids = HYPOTHESIS_IDS || ['T1', 'T2', 'T3', 'T4'];
+  var ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
 
   // Normalise survival scores to sum to 1 (evidence-implied weights)
   var totalSurvival = 0;
@@ -250,7 +250,7 @@ function quantifyDislocation(stock, correlationData) {
   // Direction: positive = price is more optimistic than evidence,
   //            negative = price is more pessimistic than evidence
   if (maxDislocationHypothesis) {
-    if (maxDislocationHypothesis === 'T1' || maxDislocationHypothesis === 'T2') {
+    if (maxDislocationHypothesis === 'N1' || maxDislocationHypothesis === 'N2') {
       dislocationDirection = maxDislocationBps > 0 ? 'positive' : 'negative';
     } else {
       dislocationDirection = maxDislocationBps > 0 ? 'negative' : 'positive';
@@ -274,7 +274,7 @@ function quantifyDislocation(stock, correlationData) {
  *
  * @param {Object}   stock              Stock evidence data object
  * @param {number[]} priceHistory       Recent closing prices (oldest first)
- * @param {string}   previousTopNarrative Previous T1 hypothesis ID (for inflection detection)
+ * @param {string}   previousTopNarrative Previous N1 hypothesis ID (for inflection detection)
  * @returns {Object} Full weighting analysis result, also stored on stock.weighting
  */
 function computeNarrativeWeighting(stock, priceHistory, previousTopNarrative) {
@@ -282,7 +282,7 @@ function computeNarrativeWeighting(stock, priceHistory, previousTopNarrative) {
   var topNarrative = determineTopNarrative(correlations, previousTopNarrative);
   var dislocation = quantifyDislocation(stock, correlations);
 
-  var ids = HYPOTHESIS_IDS || ['T1', 'T2', 'T3', 'T4'];
+  var ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
 
   // Compute normalised narrative weights (evidence_weight + signal_weight blended)
   var totalSurvival = 0;

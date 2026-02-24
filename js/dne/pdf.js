@@ -31,10 +31,10 @@ function escapeHtmlForPdf(text) {
 
 function getHypothesisColor(hId) {
   var colors = {
-    'T1': { hex: '#00C853', rgb: '0, 200, 83' },
-    'T2': { hex: '#2979FF', rgb: '41, 121, 255' },
-    'T3': { hex: '#FF9100', rgb: '255, 145, 0' },
-    'T4': { hex: '#D50000', rgb: '213, 0, 0' }
+    'N1': { hex: '#00C853', rgb: '0, 200, 83' },
+    'N2': { hex: '#2979FF', rgb: '41, 121, 255' },
+    'N3': { hex: '#FF9100', rgb: '255, 145, 0' },
+    'N4': { hex: '#D50000', rgb: '213, 0, 0' }
   };
   return colors[hId] || { hex: '#666666', rgb: '102, 102, 102' };
 }
@@ -209,7 +209,7 @@ function buildInstitutionalReportHTML(stock) {
     '</h2>';
 
   // List all four hypotheses
-  var hyp_ids = ['T1', 'T2', 'T3', 'T4'];
+  var hyp_ids = ['N1', 'N2', 'N3', 'N4'];
   for (var i = 0; i < hyp_ids.length; i++) {
     var hId = hyp_ids[i];
     var h = stock.hypotheses[hId];
@@ -270,10 +270,10 @@ function buildInstitutionalReportHTML(stock) {
     html += '<td style="padding: 6px; font-weight: 700; border: 1px solid #ddd;">Date</td>';
     html += '<td style="padding: 6px; font-weight: 700; border: 1px solid #ddd;">Source</td>';
     html += '<td style="padding: 6px; font-weight: 700; border: 1px solid #ddd;">Summary</td>';
-    html += '<td style="padding: 6px; font-weight: 700; border: 1px solid #ddd;">T1</td>';
-    html += '<td style="padding: 6px; font-weight: 700; border: 1px solid #ddd;">T2</td>';
-    html += '<td style="padding: 6px; font-weight: 700; border: 1px solid #ddd;">T3</td>';
-    html += '<td style="padding: 6px; font-weight: 700; border: 1px solid #ddd;">T4</td>';
+    html += '<td style="padding: 6px; font-weight: 700; border: 1px solid #ddd;">N1</td>';
+    html += '<td style="padding: 6px; font-weight: 700; border: 1px solid #ddd;">N2</td>';
+    html += '<td style="padding: 6px; font-weight: 700; border: 1px solid #ddd;">N3</td>';
+    html += '<td style="padding: 6px; font-weight: 700; border: 1px solid #ddd;">N4</td>';
     html += '</tr>';
 
     for (var j = 0; j < Math.min(stock.evidence_items.length, 8); j++) {
@@ -286,7 +286,7 @@ function buildInstitutionalReportHTML(stock) {
       html += '<td style="padding: 6px; border: 1px solid #ddd; font-size: 9px;">' + escapeHtmlForPdf(ev.summary || '') + '</td>';
       
       for (var k = 0; k < 4; k++) {
-        var hId_k = 'T' + (k + 1);
+        var hId_k = 'N' + (k + 1);
         var impact = ev.hypothesis_impact && ev.hypothesis_impact[hId_k];
         var impact_color = impact === 'CONSISTENT' ? '#00C853' : impact === 'INCONSISTENT' ? '#D50000' : '#999';
         var impact_text = impact ? impact.charAt(0).toUpperCase() : '−';
@@ -460,7 +460,7 @@ function buildRetailReportHTML(stock) {
     'What the Market is Pricing In' +
     '</div>';
 
-  var hyp_ids = ['T1', 'T2', 'T3', 'T4'];
+  var hyp_ids = ['N1', 'N2', 'N3', 'N4'];
   for (var i = 0; i < hyp_ids.length; i++) {
     var hId = hyp_ids[i];
     var h = stock.hypotheses[hId];

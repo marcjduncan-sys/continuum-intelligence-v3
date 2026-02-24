@@ -124,47 +124,47 @@ function generateDynamicHypotheses(ticker, weights, inference) {
   // Generate revised hypothesis descriptions based on market-implied weights
   const hypotheses = {};
   
-  // T1: Growth/Expansion
-  const t1Spread = weights.T1.shortTerm - weights.T1.longTerm;
-  if (t1Spread < -20) {
-    hypotheses.T1 = `Market is pricing in growth deceleration concerns (${Math.abs(t1Spread)}pts below research). Contract win momentum may be slowing.`;
-  } else if (t1Spread > 20) {
-    hypotheses.T1 = `Market is more optimistic on expansion (${t1Spread}pts above research). Pipeline strength exceeding expectations.`;
+  // N1: Growth/Expansion
+  const n1Spread = weights.N1.shortTerm - weights.N1.longTerm;
+  if (n1Spread < -20) {
+    hypotheses.N1 = `Market is pricing in growth deceleration concerns (${Math.abs(n1Spread)}pts below research). Contract win momentum may be slowing.`;
+  } else if (n1Spread > 20) {
+    hypotheses.N1 = `Market is more optimistic on expansion (${n1Spread}pts above research). Pipeline strength exceeding expectations.`;
   } else {
-    hypotheses.T1 = `Views aligned on US expansion trajectory.`;
+    hypotheses.N1 = `Views aligned on US expansion trajectory.`;
   }
-  
-  // T2: Valuation
-  const t2Spread = weights.T2.shortTerm - weights.T2.longTerm;
-  if (t2Spread > 30) {
-    hypotheses.T2 = `⚠️ Market is pricing in severe multiple compression (${t2Spread}pts above research). High-multiple vulnerability evident.`;
-  } else if (t2Spread < -20) {
-    hypotheses.T2 = `Market sees valuation support (${Math.abs(t2Spread)}pts below research). Multiple may be stabilizing.`;
+
+  // N2: Valuation
+  const n2Spread = weights.N2.shortTerm - weights.N2.longTerm;
+  if (n2Spread > 30) {
+    hypotheses.N2 = `⚠️ Market is pricing in severe multiple compression (${n2Spread}pts above research). High-multiple vulnerability evident.`;
+  } else if (n2Spread < -20) {
+    hypotheses.N2 = `Market sees valuation support (${Math.abs(n2Spread)}pts below research). Multiple may be stabilizing.`;
   } else {
-    hypotheses.T2 = `Limited disagreement on valuation metrics.`;
+    hypotheses.N2 = `Limited disagreement on valuation metrics.`;
   }
-  
-  // T3: Competition (KEY FOR PME!)
-  const t3Spread = weights.T3.shortTerm - weights.T3.longTerm;
-  if (t3Spread > 30) {
-    hypotheses.T3 = `🔴 CRITICAL: Market is pricing in significant competitive threat (${t3Spread}pts above research). Disruption fears dominating price action.`;
-  } else if (t3Spread < -20) {
-    hypotheses.T3 = `Market sees limited competitive threat (${Math.abs(t3Spread)}pts below research). Moat remains intact.`;
+
+  // N3: Competition (KEY FOR PME!)
+  const n3Spread = weights.N3.shortTerm - weights.N3.longTerm;
+  if (n3Spread > 30) {
+    hypotheses.N3 = `🔴 CRITICAL: Market is pricing in significant competitive threat (${n3Spread}pts above research). Disruption fears dominating price action.`;
+  } else if (n3Spread < -20) {
+    hypotheses.N3 = `Market sees limited competitive threat (${Math.abs(n3Spread)}pts below research). Moat remains intact.`;
   } else {
-    hypotheses.T3 = `Competitive dynamics views aligned.`;
+    hypotheses.N3 = `Competitive dynamics views aligned.`;
   }
-  
-  // T4: AI/Moat (KEY FOR PME!)
-  const t4Spread = weights.T4.shortTerm - weights.T4.longTerm;
-  if (weights.T4.shortTerm < 25 && weights.T4.longTerm > 40) {
+
+  // N4: AI/Moat (KEY FOR PME!)
+  const n4Spread = weights.N4.shortTerm - weights.N4.longTerm;
+  if (weights.N4.shortTerm < 25 && weights.N4.longTerm > 40) {
     // Market is rejecting the AI moat thesis
-    hypotheses.T4 = `🔴 CONTRADICTED: Market has reversed view on AI as moat amplifier (${weights.T4.longTerm}% → ${weights.T4.shortTerm}%). AI now seen as competitive threat, not advantage.`;
-  } else if (t4Spread > 20) {
-    hypotheses.T4 = `Market is more bullish on AI amplification (${t4Spread}pts above research). Platform effects accelerating.`;
-  } else if (t4Spread < -20) {
-    hypotheses.T4 = `Market questioning AI moat thesis (${Math.abs(t4Spread)}pts below research). Technology commoditization concerns.`;
+    hypotheses.N4 = `🔴 CONTRADICTED: Market has reversed view on AI as moat amplifier (${weights.N4.longTerm}% → ${weights.N4.shortTerm}%). AI now seen as competitive threat, not advantage.`;
+  } else if (n4Spread > 20) {
+    hypotheses.N4 = `Market is more bullish on AI amplification (${n4Spread}pts above research). Platform effects accelerating.`;
+  } else if (n4Spread < -20) {
+    hypotheses.N4 = `Market questioning AI moat thesis (${Math.abs(n4Spread)}pts below research). Technology commoditization concerns.`;
   } else {
-    hypotheses.T4 = `Views aligned on technology trajectory.`;
+    hypotheses.N4 = `Views aligned on technology trajectory.`;
   }
   
   return hypotheses;
@@ -224,7 +224,7 @@ function generateExecutiveSummary(commentary, weights, inference, dislocation) {
 }
 
 function generatePriceImplication(commentary, weights, dislocation) {
-  const t2 = weights.T2;
+  const t2 = weights.N2;
   const fromPeak = dislocation.metrics.drawdownFromPeak;
   
   return `Current price embeds ${t2.shortTerm > 50 ? 'significant multiple compression' : t2.shortTerm < t2.longTerm - 20 ? 'multiple expansion recovery' : 'stable valuation assumptions'}. ` +

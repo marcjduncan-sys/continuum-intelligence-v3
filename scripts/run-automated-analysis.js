@@ -107,9 +107,9 @@ for (const [ticker, config] of Object.entries(STOCK_CONFIG)) {
   else summary.normal++;
 
   // Step 2: Stock-specific narrative inference
-  // Pass T4 base weight so engine knows if T4 is a bullish thesis
+  // Pass N4 base weight so engine knows if N4 is a bullish thesis
   var characteristics = Object.assign({}, config.characteristics, {
-    t4BaseWeight: config.baseWeights.T4
+    n4BaseWeight: config.baseWeights.N4
   });
   const inference = NarrativeInferenceEngine.inferNarrative(
     ticker,
@@ -159,7 +159,7 @@ for (const [ticker, config] of Object.entries(STOCK_CONFIG)) {
 
   console.log(`${ticker}: ${dislocation.severity} (${change > 0 ? '+' : ''}${change.toFixed(2)}%, drawdown: ${drawdownPct.toFixed(1)}%)`);
   console.log(`  Primary: ${inference.primaryHypothesis} (${primaryName}) | Contradicted: ${contradictedName}`);
-  console.log(`  Weights: T1=${dynamicWeights.T1.blended}% T2=${dynamicWeights.T2.blended}% T3=${dynamicWeights.T3.blended}% T4=${dynamicWeights.T4.blended}%`);
+  console.log(`  Weights: N1=${dynamicWeights.N1.blended}% N2=${dynamicWeights.N2.blended}% N3=${dynamicWeights.N3.blended}% N4=${dynamicWeights.N4.blended}%`);
 }
 
 /**

@@ -29,10 +29,10 @@ const PNE_CONFIG = {
   
   // Hypothesis sensitivity to price moves
   HYPOTHESIS_SENSITIVITY: {
-    T1: { up: 0.8, down: 1.2 },  // Growth — sensitive to downside
-    T2: { up: 0.6, down: 0.9 },  // Valuation — less sensitive
-    T3: { up: 1.0, down: 1.5 },  // Competition — very sensitive to downside
-    T4: { up: 1.2, down: 1.8 }   // Moat — extremely sensitive to downside
+    N1: { up: 0.8, down: 1.2 },  // Growth — sensitive to downside
+    N2: { up: 0.6, down: 0.9 },  // Valuation — less sensitive
+    N3: { up: 1.0, down: 1.5 },  // Competition — very sensitive to downside
+    N4: { up: 1.2, down: 1.8 }   // Moat — extremely sensitive to downside
   }
 };
 
@@ -153,18 +153,18 @@ const NarrativeInferenceEngine = {
    */
   INFERENCE_MATRIX: {
     GAP_DOWN: {
-      highVolume: { primary: 'T3', secondary: 'T2', confidence: 0.80 },
-      lowVolume: { primary: 'T2', secondary: null, confidence: 0.60 }
+      highVolume: { primary: 'N3', secondary: 'N2', confidence: 0.80 },
+      lowVolume: { primary: 'N2', secondary: null, confidence: 0.60 }
     },
     DISTRIBUTION: {
-      newLows: { primary: 'T4', secondary: 'T3', confidence: 0.70 },
-      holdingSupport: { primary: 'T2', secondary: null, confidence: 0.65 }
+      newLows: { primary: 'N4', secondary: 'N3', confidence: 0.70 },
+      holdingSupport: { primary: 'N2', secondary: null, confidence: 0.65 }
     },
     CAPITULATION: {
-      any: { primary: 'T3', secondary: 'T4', confidence: 0.75, note: 'multi-hypothesis reset' }
+      any: { primary: 'N3', secondary: 'N4', confidence: 0.75, note: 'multi-hypothesis reset' }
     },
     STEADY_DECLINE: {
-      any: { primary: 'T2', secondary: 'T3', confidence: 0.60 }
+      any: { primary: 'N2', secondary: 'N3', confidence: 0.60 }
     }
   },
 
@@ -184,7 +184,7 @@ const NarrativeInferenceEngine = {
     const base = this.getBaseInference(pattern, metrics.volumeRatio);
 
     // Scoring system: accumulate evidence for each hypothesis
-    const scores = { T1: 0, T2: 0, T3: 0, T4: 0 };
+    const scores = { N1: 0, N2: 0, N3: 0, N4: 0 };
     let contradicted = null;
 
     // Base pattern scores
@@ -193,35 +193,35 @@ const NarrativeInferenceEngine = {
 
     // High-multiple stock with meaningful drawdown → valuation narrative
     if (highMultiple && metrics.drawdownFromPeak > 20) {
-      scores.T2 += 2.5;
+      scores.N2 += 2.5;
       // Extreme drawdown makes valuation even more dominant
-      if (metrics.drawdownFromPeak > 40) scores.T2 += 1.5;
+      if (metrics.drawdownFromPeak > 40) scores.N2 += 1.5;
     }
 
     // AI-exposed stock declining → competitive disruption fears, AI moat questioned
-    // Only contradict T4 if it's a bullish thesis (base weight >= 40 suggests a bull thesis)
-    var t4IsBullish = (stockCharacteristics.t4BaseWeight || 0) >= 40;
+    // Only contradict N4 if it's a bullish thesis (base weight >= 40 suggests a bull thesis)
+    var n4IsBullish = (stockCharacteristics.n4BaseWeight || 0) >= 40;
     if (hasAIExposure && metrics.todayReturn < -5) {
-      scores.T3 += 3;  // AI as competitive threat becomes dominant
-      if (t4IsBullish) contradicted = 'T4';  // Only contradict bullish AI-moat thesis
+      scores.N3 += 3;  // AI as competitive threat becomes dominant
+      if (n4IsBullish) contradicted = 'N4';  // Only contradict bullish AI-moat thesis
       // Extreme AI selloff amplifies this
       if (metrics.todayReturn < -15 || metrics.drawdownFromPeak > 50) {
-        scores.T3 += 2;
+        scores.N3 += 2;
       }
     } else if (hasAIExposure && metrics.drawdownFromPeak > 30) {
       // Even without a huge single-day drop, sustained drawdown in AI stock
-      scores.T3 += 2;
-      if (t4IsBullish) contradicted = 'T4';
+      scores.N3 += 2;
+      if (n4IsBullish) contradicted = 'N4';
     }
 
     // Growth stock in sustained decline → growth fears
     if (growthStock && metrics.consecutiveDownDays > 5) {
-      scores.T1 += 2;
+      scores.N1 += 2;
     }
 
     // Extreme drawdown from peak → valuation narrative is always relevant
     if (metrics.drawdownFromPeak > 50) {
-      scores.T2 += 1;
+      scores.N2 += 1;
     }
 
     // Sort by score to find primary and secondary
@@ -276,18 +276,18 @@ const NarrativeInferenceEngine = {
     const newsText = newsContext.map(n => n.title + ' ' + n.summary).join(' ').toLowerCase();
     
     if (newsText.includes('earnings') || newsText.includes('guidance') || newsText.includes('revenue')) {
-      inference.primary = 'T1';  // Growth/margin related
+      inference.primary = 'N1';  // Growth/margin related
     }
     if (newsText.includes('competitor') || newsText.includes('competition') || newsText.includes('market share')) {
-      inference.primary = 'T3';
+      inference.primary = 'N3';
     }
     if (newsText.includes('valuation') || newsText.includes('multiple') || newsText.includes('expensive')) {
-      inference.primary = 'T2';
+      inference.primary = 'N2';
     }
     if (newsText.includes('ai') || newsText.includes('artificial intelligence') || newsText.includes('technology')) {
       if (newsText.includes('threat') || newsText.includes('competition') || newsText.includes('disruption')) {
-        inference.primary = 'T3';
-        inference.contradicted = 'T4';
+        inference.primary = 'N3';
+        inference.contradicted = 'N4';
       }
     }
 

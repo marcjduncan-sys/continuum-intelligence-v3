@@ -4,7 +4,7 @@
   "sector": "Real Estate",
   "market_cap": "6.9B",
   "hypotheses": {
-    "T1": {
+    "N1": {
       "label": "Growth/Recovery",
       "description": "Australian office market recovery drives occupancy, rents, and asset revaluations higher",
       "plain_english": "The worst of the Australian office downturn is over. CBD net absorption is turning positive, vacancy rates are stabilising, and Dexus's premium office portfolio in Sydney and Melbourne is well-positioned to capture the recovery. If cap rates compress and rents grow, NTA per unit will recover and close the gap with the current share price.",
@@ -16,7 +16,7 @@
       "weighted_inconsistency": 3,
       "last_updated": "2026-02-16T09:00:00+11:00"
     },
-    "T2": {
+    "N2": {
       "label": "Managed/Base Case",
       "description": "Steady-state REIT: stable distributions, gradual portfolio repositioning toward industrial and alternatives",
       "plain_english": "Dexus continues its strategic pivot from pure office toward a diversified real assets platform. Industrial development delivers strong returns, funds management fees grow steadily, and distributions remain well-covered. The stock trades at a discount to NTA but reflects the market's fair assessment of the office headwinds.",
@@ -28,7 +28,7 @@
       "weighted_inconsistency": 1.5,
       "last_updated": "2026-02-16T09:00:00+11:00"
     },
-    "T3": {
+    "N3": {
       "label": "Risk/Downside",
       "description": "Structural office decline: hybrid work permanently reduces CBD office demand; asset values fall further",
       "plain_english": "The shift to hybrid work is permanent and accelerating. Companies continue to reduce their office footprint, sublease space floods the market, and CBD vacancy rates stay elevated. Dexus's office-heavy portfolio suffers ongoing valuation writedowns, and the NTA discount to share price persists or widens.",
@@ -40,7 +40,7 @@
       "weighted_inconsistency": 4,
       "last_updated": "2026-02-16T09:00:00+11:00"
     },
-    "T4": {
+    "N4": {
       "label": "Disruption",
       "description": "Higher-for-longer interest rates compress REIT valuations; rising cost of debt erodes earnings",
       "plain_english": "If interest rates stay higher for longer than the market expects, REIT valuations face a double hit: higher discount rates compress asset values, and higher debt costs eat into distributable earnings. Dexus, with significant debt facilities, is exposed to refinancing risk at higher rates.",
@@ -53,7 +53,7 @@
       "last_updated": "2026-02-16T09:00:00+11:00"
     }
   },
-  "dominant": "T2",
+  "dominant": "N2",
   "confidence": "MODERATE",
   "alert_state": "NORMAL",
   "alert_started": null,
@@ -61,8 +61,8 @@
   "big_picture": "Dexus is Australia's largest listed office REIT and a leading integrated real asset manager with $50.1 billion in assets under management. The company owns, manages, and develops premium office, industrial, and alternative assets primarily in Australian CBDs.",
   "last_flip": {
     "date": "2025-08-20",
-    "from": "T3",
-    "to": "T2",
+    "from": "N3",
+    "to": "N2",
     "trigger": "FY25 results delivered on AFFO guidance; office occupancy stabilising; positive net absorption in Sydney CBD",
     "price_at_flip": 6.85,
     "from_survival": 0.3,
@@ -71,8 +71,8 @@
   "narrative_history": [
     {
       "date": "2025-02-15",
-      "from": "T2",
-      "to": "T3",
+      "from": "N2",
+      "to": "N3",
       "trigger": "H1 FY25 office valuations declined; CBD vacancy remained elevated; hybrid work impact deepening",
       "price_at_flip": 7.2,
       "from_survival": 0.4,
@@ -89,10 +89,10 @@
       "summary": "FY25 AFFO 45.0 cents per security; delivered on guidance; distribution 37.0 cents",
       "diagnosticity": "HIGH",
       "hypothesis_impact": {
-        "T1": "NEUTRAL",
-        "T2": "CONSISTENT",
-        "T3": "INCONSISTENT",
-        "T4": "NEUTRAL"
+        "N1": "NEUTRAL",
+        "N2": "CONSISTENT",
+        "N3": "INCONSISTENT",
+        "N4": "NEUTRAL"
       },
       "decay": {
         "full_weight_days": 90,
@@ -109,10 +109,10 @@
       "summary": "Positive net absorption across all four major Australian CBDs; Sydney CBD vacancy declining from peak",
       "diagnosticity": "HIGH",
       "hypothesis_impact": {
-        "T1": "CONSISTENT",
-        "T2": "CONSISTENT",
-        "T3": "INCONSISTENT",
-        "T4": "NEUTRAL"
+        "N1": "CONSISTENT",
+        "N2": "CONSISTENT",
+        "N3": "INCONSISTENT",
+        "N4": "NEUTRAL"
       },
       "decay": {
         "full_weight_days": 60,
@@ -129,10 +129,10 @@
       "summary": "190,400 sqm industrial construction across 10 projects; 6 fully leased pre-completion",
       "diagnosticity": "MEDIUM",
       "hypothesis_impact": {
-        "T1": "NEUTRAL",
-        "T2": "CONSISTENT",
-        "T3": "NEUTRAL",
-        "T4": "NEUTRAL"
+        "N1": "NEUTRAL",
+        "N2": "CONSISTENT",
+        "N3": "NEUTRAL",
+        "N4": "NEUTRAL"
       },
       "decay": {
         "full_weight_days": 60,
@@ -149,10 +149,10 @@
       "summary": "Funds management platform grown to $50.1B AUM; fee income diversifying earnings away from direct property",
       "diagnosticity": "MEDIUM",
       "hypothesis_impact": {
-        "T1": "NEUTRAL",
-        "T2": "CONSISTENT",
-        "T3": "NEUTRAL",
-        "T4": "NEUTRAL"
+        "N1": "NEUTRAL",
+        "N2": "CONSISTENT",
+        "N3": "NEUTRAL",
+        "N4": "NEUTRAL"
       },
       "decay": {
         "full_weight_days": 90,
@@ -208,32 +208,32 @@
       "direction": "downside",
       "hypotheses": [
         {
-          "title": "T1: Office Market Recovery",
+          "title": "N1: Office Market Recovery",
           "direction": "upside",
           "weight": 26
         },
         {
-          "title": "T2: Steady-State REIT",
+          "title": "N2: Steady-State REIT",
           "direction": "neutral",
           "weight": 33
         },
         {
-          "title": "T3: Structural Office Decline",
+          "title": "N3: Structural Office Decline",
           "direction": "downside",
           "weight": 22
         },
         {
-          "title": "T4: Interest Rate &amp; Refinancing Risk",
+          "title": "N4: Interest Rate &amp; Refinancing Risk",
           "direction": "downside",
           "weight": 19
         }
       ],
-      "computed_at": "2026-02-24T06:41:50.704Z"
+      "computed_at": "2026-02-24T07:54:21.320Z"
     },
     "overall_sentiment": -15,
     "sentiment_label": "DOWNSIDE",
     "method": "company_only",
-    "composite_computed_at": "2026-02-24T06:41:59.261Z",
+    "composite_computed_at": "2026-02-24T07:54:38.669Z",
     "macro_signal": 0,
     "sector_signal": 0,
     "tech_signal": 0,
@@ -247,6 +247,6 @@
     "shift_pct": -0.0225,
     "signal_used": -15,
     "method": "sentiment_shift_v3",
-    "computed_at": "2026-02-24T06:42:12.302Z"
+    "computed_at": "2026-02-24T07:54:39.551Z"
   }
 }

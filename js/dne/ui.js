@@ -19,7 +19,7 @@ function updateNarrativeUI(stock) {
   if (!bar) return;
 
   var total = 0;
-  var ids = HYPOTHESIS_IDS || ['T1', 'T2', 'T3', 'T4'];
+  var ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
 
   for (var i = 0; i < ids.length; i++) {
     total += stock.hypotheses[ids[i]].survival_score;
@@ -65,7 +65,7 @@ function updateAlertBanner(stock) {
 
     var bestAltId = null;
     var bestAltScore = -1;
-    var ids = HYPOTHESIS_IDS || ['T1', 'T2', 'T3', 'T4'];
+    var ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
 
     for (var i = 0; i < ids.length; i++) {
       if (ids[i] !== stock.dominant &&
@@ -233,7 +233,7 @@ function renderCompetingHypotheses(stock) {
   var container = document.getElementById('hypotheses-panel');
   if (!container) return;
 
-  var ids = HYPOTHESIS_IDS || ['T1', 'T2', 'T3', 'T4'];
+  var ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
   var w = stock.weighting;
   var hasWeighting = w && w.hypothesis_weights;
 
@@ -321,7 +321,7 @@ function renderCompetingHypotheses(stock) {
     if (isInflection) {
       html += '<div class="inflection-tag visible">' +
         '<span class="inflection-dot"></span>' +
-        'Narrative inflection: T1 changed from ' +
+        'Narrative inflection: N1 changed from ' +
         escapeHtml(w.top_narrative.previous_top) + ' to ' + escapeHtml(hId) +
         '</div>';
     }

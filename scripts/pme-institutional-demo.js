@@ -33,10 +33,10 @@ const PME_INSTITUTIONAL_DEMO = {
         hasAIExposure: true
       },
       hypotheses: [
-        { tier: 't1', title: 'T1: US Expansion Accelerates', score: '60%' },
-        { tier: 't2', title: 'T2: Valuation Mean-Reversion', score: '35%' },
-        { tier: 't3', title: 'T3: Competitive Disruption', score: '20%' },
-        { tier: 't4', title: 'T4: AI Amplifies the Moat', score: '50%' }
+        { tier: 'n1', title: 'N1: US Expansion Accelerates', score: '60%' },
+        { tier: 'n2', title: 'N2: Valuation Mean-Reversion', score: '35%' },
+        { tier: 'n3', title: 'N3: Competitive Disruption', score: '20%' },
+        { tier: 'n4', title: 'N4: AI Amplifies the Moat', score: '50%' }
       ]
     };
 
@@ -53,10 +53,10 @@ const PME_INSTITUTIONAL_DEMO = {
 
     // Simulated weights after dislocation
     const weights = {
-      T1: { longTerm: 60, shortTerm: 45, blended: 54, confidence: 'MEDIUM', adjustment: -15 },
-      T2: { longTerm: 35, shortTerm: 75, blended: 51, confidence: 'HIGH', adjustment: +40 },
-      T3: { longTerm: 20, shortTerm: 65, blended: 38, confidence: 'HIGH', adjustment: +45 },
-      T4: { longTerm: 50, shortTerm: 20, blended: 38, confidence: 'LOW', adjustment: -30 }
+      N1: { longTerm: 60, shortTerm: 45, blended: 54, confidence: 'MEDIUM', adjustment: -15 },
+      N2: { longTerm: 35, shortTerm: 75, blended: 51, confidence: 'HIGH', adjustment: +40 },
+      N3: { longTerm: 20, shortTerm: 65, blended: 38, confidence: 'HIGH', adjustment: +45 },
+      N4: { longTerm: 50, shortTerm: 20, blended: 38, confidence: 'LOW', adjustment: -30 }
     };
 
     const dislocation = {
@@ -73,9 +73,9 @@ const PME_INSTITUTIONAL_DEMO = {
     };
 
     const inference = {
-      primaryHypothesis: 'T2',
-      secondaryHypothesis: 'T3',
-      contradictedHypothesis: 'T4',
+      primaryHypothesis: 'N2',
+      secondaryHypothesis: 'N3',
+      contradictedHypothesis: 'N4',
       confidence: 0.80,
       reasoning: 'Severe drawdown with high volume indicates valuation and competitive concerns'
     };
@@ -124,7 +124,7 @@ const PME_INSTITUTIONAL_DEMO = {
     console.log('  • Static — same text regardless of price action');
     console.log('  • Generic — could apply to any high-multiple stock');
     console.log('  • No price integration — does not reference -8% move');
-    console.log('  • No hypothesis weighting — ignores T3/T4 divergence');
+    console.log('  • No hypothesis weighting — ignores N3/N4 divergence');
     console.log('  • No action guidance — what should the analyst do?\n');
 
     console.log('INSTITUTIONAL FRAMEWORK (Current):');
@@ -140,7 +140,7 @@ const PME_INSTITUTIONAL_DEMO = {
     console.log('  • Dynamic — text generated from real price data');
     console.log('  • Specific — references actual metrics (8.36%, volume, support)');
     console.log('  • Integrated — every sentence connects price to narrative');
-    console.log('  • Hypothesis-mapped — explicit T1-T4 weight analysis');
+    console.log('  • Hypothesis-mapped — explicit N1-N4 weight analysis');
     console.log('  • Action-oriented — specific next steps for analyst');
     console.log('  • Professional tone — Goldman Sachs/UBS research quality');
   },

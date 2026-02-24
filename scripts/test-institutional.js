@@ -35,10 +35,10 @@ const priceData = {
 };
 
 const weights = {
-  T1: { longTerm: 60, shortTerm: 45, blended: 54, confidence: 'MEDIUM' },
-  T2: { longTerm: 35, shortTerm: 75, blended: 51, confidence: 'HIGH' },
-  T3: { longTerm: 20, shortTerm: 65, blended: 38, confidence: 'HIGH' },
-  T4: { longTerm: 50, shortTerm: 20, blended: 38, confidence: 'LOW' }
+  N1: { longTerm: 60, shortTerm: 45, blended: 54, confidence: 'MEDIUM' },
+  N2: { longTerm: 35, shortTerm: 75, blended: 51, confidence: 'HIGH' },
+  N3: { longTerm: 20, shortTerm: 65, blended: 38, confidence: 'HIGH' },
+  N4: { longTerm: 50, shortTerm: 20, blended: 38, confidence: 'LOW' }
 };
 
 const dislocation = {
@@ -55,9 +55,9 @@ const dislocation = {
 };
 
 const inference = {
-  primaryHypothesis: 'T2',
-  secondaryHypothesis: 'T3',
-  contradictedHypothesis: 'T4',
+  primaryHypothesis: 'N2',
+  secondaryHypothesis: 'N3',
+  contradictedHypothesis: 'N4',
   confidence: 0.80,
   reasoning: 'Severe drawdown with high volume indicates valuation and competitive concerns'
 };

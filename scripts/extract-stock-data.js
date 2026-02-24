@@ -222,7 +222,7 @@ function mergeWithExisting(ticker, extracted, freshness, reference) {
 
     // ── Metadata ──
     last_extracted: new Date().toISOString(),
-    last_updated: existing?.hypotheses?.T1?.last_updated || freshness[ticker]?.reviewDate || new Date().toISOString(),
+    last_updated: existing?.hypotheses?.N1?.last_updated || freshness[ticker]?.reviewDate || new Date().toISOString(),
   };
 
   return unified;
@@ -231,8 +231,8 @@ function mergeWithExisting(ticker, extracted, freshness, reference) {
 // ── Build hypotheses from both sources ───────────────────────────────
 function buildHypotheses(ticker, extracted, existing) {
   // If existing JSON has rich research hypotheses (with plain_english), use those
-  if (existing?.hypotheses?.T1?.plain_english &&
-      existing.hypotheses.T1.plain_english !== 'Placeholder — requires analyst research to populate.') {
+  if (existing?.hypotheses?.N1?.plain_english &&
+      existing.hypotheses.N1.plain_english !== 'Placeholder — requires analyst research to populate.') {
     return existing.hypotheses;
   }
 
@@ -240,10 +240,10 @@ function buildHypotheses(ticker, extracted, existing) {
   const hyps = {};
   if (extracted.hypotheses && Array.isArray(extracted.hypotheses)) {
     extracted.hypotheses.forEach((h, i) => {
-      const key = `T${i + 1}`;
+      const key = `N${i + 1}`;
       const scoreNum = parseInt(h.score) || 0;
       hyps[key] = {
-        label: h.title?.replace(/^T\d:\s*/, '') || h.direction || `Hypothesis ${i + 1}`,
+        label: h.title?.replace(/^N\d:\s*/, '') || h.direction || `Hypothesis ${i + 1}`,
         description: h.description || '',
         plain_english: h.description || 'Extracted from presentation — requires analyst enrichment.',
         what_to_watch: h.requires ? h.requires[0] : null,
@@ -266,17 +266,17 @@ function determineDominant(extracted, existing) {
   // Use verdict scores from presentation data
   if (extracted.verdict?.scores) {
     let maxScore = 0;
-    let dominant = 'T1';
+    let dominant = 'N1';
     extracted.verdict.scores.forEach((s, i) => {
       const score = parseInt(s.score) || 0;
       if (score > maxScore) {
         maxScore = score;
-        dominant = `T${i + 1}`;
+        dominant = `N${i + 1}`;
       }
     });
     return dominant;
   }
-  return 'T1';
+  return 'N1';
 }
 
 // ── Determine confidence ─────────────────────────────────────────────

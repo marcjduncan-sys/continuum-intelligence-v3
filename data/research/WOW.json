@@ -301,7 +301,7 @@
     "borderColor": null,
     "scores": [
       {
-        "label": "T1 Turnaround",
+        "label": "N1 Turnaround",
         "score": "50%",
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&rarr;",
@@ -309,7 +309,7 @@
         "dirColor": null
       },
       {
-        "label": "T2 Erosion",
+        "label": "N2 Erosion",
         "score": "35%",
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&uarr;",
@@ -317,7 +317,7 @@
         "dirColor": "var(--signal-red)"
       },
       {
-        "label": "T3 Regulatory",
+        "label": "N3 Regulatory",
         "score": "30%",
         "scoreColor": "var(--signal-red)",
         "dirArrow": "&uarr;",
@@ -325,7 +325,7 @@
         "dirColor": "var(--signal-red)"
       },
       {
-        "label": "T4 Disruption",
+        "label": "N4 Disruption",
         "score": "25%",
         "scoreColor": "var(--text-muted)",
         "dirArrow": "&rarr;",
@@ -497,9 +497,9 @@
   },
   "hypotheses": [
     {
-      "tier": "t1",
+      "tier": "n1",
       "direction": "upside",
-      "title": "T1: Managed Turnaround",
+      "title": "N1: Managed Turnaround",
       "statusClass": "priced",
       "statusText": "Priced",
       "score": "50%",
@@ -528,9 +528,9 @@
       ]
     },
     {
-      "tier": "t2",
+      "tier": "n2",
       "direction": "downside",
-      "title": "T2: Structural Margin Erosion",
+      "title": "N2: Structural Margin Erosion",
       "statusClass": "accumulating",
       "statusText": "Evidence Building",
       "score": "35%",
@@ -553,9 +553,9 @@
       ]
     },
     {
-      "tier": "t3",
+      "tier": "n3",
       "direction": "downside",
-      "title": "T3: Regulatory Squeeze",
+      "title": "N3: Regulatory Squeeze",
       "statusClass": "active",
       "statusText": "Active &mdash; Multiple Vectors",
       "score": "30%",
@@ -576,9 +576,9 @@
       ]
     },
     {
-      "tier": "t4",
+      "tier": "n4",
       "direction": "downside",
-      "title": "T4: Competitive Disruption",
+      "title": "N4: Competitive Disruption",
       "statusClass": "minimal",
       "statusText": "Slow Burn",
       "score": "25%",
@@ -622,11 +622,11 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1",
+            "text": "Supports N1",
             "class": "supports"
           },
           {
-            "text": "Neutral T2-T4",
+            "text": "Neutral N2-N4",
             "class": "neutral"
           }
         ],
@@ -642,15 +642,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Strongly Supports T3",
+            "text": "Strongly Supports N3",
             "class": "strong"
           },
           {
-            "text": "Supports T2",
+            "text": "Supports N2",
             "class": "supports"
           },
           {
-            "text": "Contradicts T1",
+            "text": "Contradicts N1",
             "class": "contradicts"
           }
         ],
@@ -666,11 +666,11 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (rating)",
+            "text": "Supports N1 (rating)",
             "class": "supports"
           },
           {
-            "text": "Weakly Supports T2 (target below price)",
+            "text": "Weakly Supports N2 (target below price)",
             "class": "supports"
           }
         ],
@@ -686,11 +686,11 @@
         "table": null,
         "tags": [
           {
-            "text": "Strongly Supports T4",
+            "text": "Strongly Supports N4",
             "class": "strong"
           },
           {
-            "text": "Supports T2",
+            "text": "Supports N2",
             "class": "supports"
           }
         ],
@@ -706,15 +706,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Weakly Supports T1",
+            "text": "Weakly Supports N1",
             "class": "supports"
           },
           {
-            "text": "Supports T2",
+            "text": "Supports N2",
             "class": "supports"
           },
           {
-            "text": "Supports T3",
+            "text": "Supports N3",
             "class": "supports"
           }
         ],
@@ -730,11 +730,11 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (e-com, NPS)",
+            "text": "Supports N1 (e-com, NPS)",
             "class": "supports"
           },
           {
-            "text": "Supports T4 (automation friction)",
+            "text": "Supports N4 (automation friction)",
             "class": "supports"
           }
         ],
@@ -750,15 +750,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T2",
+            "text": "Supports N2",
             "class": "supports"
           },
           {
-            "text": "Supports T4",
+            "text": "Supports N4",
             "class": "supports"
           },
           {
-            "text": "Neutral on T3",
+            "text": "Neutral on N3",
             "class": "neutral"
           }
         ],
@@ -774,15 +774,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Contradicts T1",
+            "text": "Contradicts N1",
             "class": "contradicts"
           },
           {
-            "text": "Supports T2",
+            "text": "Supports N2",
             "class": "supports"
           },
           {
-            "text": "Strongly Supports T3",
+            "text": "Strongly Supports N3",
             "class": "strong"
           }
         ],
@@ -829,15 +829,15 @@
         },
         "tags": [
           {
-            "text": "Neutral on T1 (unproven)",
+            "text": "Neutral on N1 (unproven)",
             "class": "neutral"
           },
           {
-            "text": "Supports T2 (continuity risk)",
+            "text": "Supports N2 (continuity risk)",
             "class": "supports"
           },
           {
-            "text": "Neutral on T3",
+            "text": "Neutral on N3",
             "class": "neutral"
           }
         ],
@@ -892,15 +892,15 @@
         },
         "tags": [
           {
-            "text": "Neutral on T1",
+            "text": "Neutral on N1",
             "class": "neutral"
           },
           {
-            "text": "Supports T2 (active sellers)",
+            "text": "Supports N2 (active sellers)",
             "class": "supports"
           },
           {
-            "text": "Neutral on T3",
+            "text": "Neutral on N3",
             "class": "neutral"
           }
         ],
@@ -911,28 +911,28 @@
       "headers": [
         "Domain",
         "Epistemic Status",
-        "T1 Turnaround",
-        "T2 Erosion",
-        "T3 Regulatory",
-        "T4 Disruption"
+        "N1 Turnaround",
+        "N2 Erosion",
+        "N3 Regulatory",
+        "N4 Disruption"
       ],
       "rows": [
         {
           "domain": "Corporate Comms",
           "epistemic": "Motivated",
-          "t1": {
+          "n1": {
             "class": "et-up",
             "text": "&#9650;"
           },
-          "t2": {
+          "n2": {
             "class": "et-neutral",
             "text": "&mdash;"
           },
-          "t3": {
+          "n3": {
             "class": "et-neutral",
             "text": "&mdash;"
           },
-          "t4": {
+          "n4": {
             "class": "et-neutral",
             "text": "&mdash;"
           }
@@ -940,19 +940,19 @@
         {
           "domain": "Regulatory",
           "epistemic": "Under Oath",
-          "t1": {
+          "n1": {
             "class": "et-down",
             "text": "&#9660;"
           },
-          "t2": {
+          "n2": {
             "class": "et-up",
             "text": "&#9650;"
           },
-          "t3": {
+          "n3": {
             "class": "et-strong",
             "text": "&#9650;&#9650;"
           },
-          "t4": {
+          "n4": {
             "class": "et-neutral",
             "text": "&mdash;"
           }
@@ -960,20 +960,20 @@
         {
           "domain": "Broker Research",
           "epistemic": "Consensus",
-          "t1": {
+          "n1": {
             "class": "et-up",
             "text": "&#9650;"
           },
-          "t2": {
+          "n2": {
             "class": "et-up",
             "text": "&#9650;",
             "style": "opacity:0.5"
           },
-          "t3": {
+          "n3": {
             "class": "et-neutral",
             "text": "&mdash;"
           },
-          "t4": {
+          "n4": {
             "class": "et-neutral",
             "text": "&mdash;"
           }
@@ -981,19 +981,19 @@
         {
           "domain": "Competitor Data",
           "epistemic": "Independent",
-          "t1": {
+          "n1": {
             "class": "et-neutral",
             "text": "&mdash;"
           },
-          "t2": {
+          "n2": {
             "class": "et-up",
             "text": "&#9650;"
           },
-          "t3": {
+          "n3": {
             "class": "et-neutral",
             "text": "&mdash;"
           },
-          "t4": {
+          "n4": {
             "class": "et-strong",
             "text": "&#9650;&#9650;"
           }
@@ -1001,20 +1001,20 @@
         {
           "domain": "Economic Data",
           "epistemic": "Objective",
-          "t1": {
+          "n1": {
             "class": "et-up",
             "text": "&#9650;",
             "style": "opacity:0.5"
           },
-          "t2": {
+          "n2": {
             "class": "et-up",
             "text": "&#9650;"
           },
-          "t3": {
+          "n3": {
             "class": "et-up",
             "text": "&#9650;"
           },
-          "t4": {
+          "n4": {
             "class": "et-neutral",
             "text": "&mdash;"
           }
@@ -1022,19 +1022,19 @@
         {
           "domain": "Alternative Data",
           "epistemic": "Behavioural",
-          "t1": {
+          "n1": {
             "class": "et-up",
             "text": "&#9650;"
           },
-          "t2": {
+          "n2": {
             "class": "et-neutral",
             "text": "&mdash;"
           },
-          "t3": {
+          "n3": {
             "class": "et-neutral",
             "text": "&mdash;"
           },
-          "t4": {
+          "n4": {
             "class": "et-up",
             "text": "&#9650;"
           }
@@ -1042,19 +1042,19 @@
         {
           "domain": "Academic Research",
           "epistemic": "Peer-reviewed",
-          "t1": {
+          "n1": {
             "class": "et-neutral",
             "text": "&mdash;"
           },
-          "t2": {
+          "n2": {
             "class": "et-up",
             "text": "&#9650;"
           },
-          "t3": {
+          "n3": {
             "class": "et-neutral",
             "text": "&mdash;"
           },
-          "t4": {
+          "n4": {
             "class": "et-up",
             "text": "&#9650;"
           }
@@ -1062,19 +1062,19 @@
         {
           "domain": "Media &amp; Social",
           "epistemic": "Noise",
-          "t1": {
+          "n1": {
             "class": "et-down",
             "text": "&#9660;"
           },
-          "t2": {
+          "n2": {
             "class": "et-up",
             "text": "&#9650;"
           },
-          "t3": {
+          "n3": {
             "class": "et-strong",
             "text": "&#9650;&#9650;"
           },
-          "t4": {
+          "n4": {
             "class": "et-neutral",
             "text": "&mdash;"
           }
@@ -1082,19 +1082,19 @@
         {
           "domain": "Leadership &amp; Governance",
           "epistemic": "Independent",
-          "t1": {
+          "n1": {
             "class": "et-neutral",
             "text": "&mdash;"
           },
-          "t2": {
+          "n2": {
             "class": "et-up",
             "text": "&#9650;"
           },
-          "t3": {
+          "n3": {
             "class": "et-neutral",
             "text": "&mdash;"
           },
-          "t4": {
+          "n4": {
             "class": "et-neutral",
             "text": "&mdash;"
           }
@@ -1102,31 +1102,31 @@
         {
           "domain": "Ownership &amp; Capital Flows",
           "epistemic": "Registry",
-          "t1": {
+          "n1": {
             "class": "et-neutral",
             "text": "&mdash;"
           },
-          "t2": {
+          "n2": {
             "class": "et-up",
             "text": "&#9650;"
           },
-          "t3": {
+          "n3": {
             "class": "et-neutral",
             "text": "&mdash;"
           },
-          "t4": {
+          "n4": {
             "class": "et-neutral",
             "text": "&mdash;"
           }
         }
       ],
       "summary": {
-        "t1": "3-4 (mixed)",
-        "t2": "7",
+        "n1": "3-4 (mixed)",
+        "n2": "7",
         "t2Color": "var(--signal-amber)",
-        "t3": "3 (2 strong)",
+        "n3": "3 (2 strong)",
         "t3Color": "var(--signal-red)",
-        "t4": "3"
+        "n4": "3"
       }
     }
   },
@@ -1137,7 +1137,7 @@
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
         "evidence": "<strong>1H FY26 Australian Food EBIT growth (25 Feb 2026).</strong> Consensus expects ~11.8%. Management guided \"mid-to-high single digits.\"",
-        "discriminatesBetween": "T1 (turnaround on track) vs T2 (margin erosion structural)",
+        "discriminatesBetween": "N1 (turnaround on track) vs N2 (margin erosion structural)",
         "currentReading": "Awaiting &mdash; 15 days",
         "readingClass": "td-amber"
       },
@@ -1145,7 +1145,7 @@
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
         "evidence": "<strong>ACCC v Woolworths court outcome.</strong> Coles settled for $10.25M. Woolworths is fighting.",
-        "discriminatesBetween": "T1 (manageable) vs T3 (punitive precedent)",
+        "discriminatesBetween": "N1 (manageable) vs N3 (punitive precedent)",
         "currentReading": "Pending &mdash; date TBC",
         "readingClass": "td-amber"
       },
@@ -1153,7 +1153,7 @@
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
         "evidence": "<strong>$400M cost-out delivery vs price investment consumption.</strong> If savings fund price cuts, margins don't recover.",
-        "discriminatesBetween": "T1 (margin recovery) vs T2 (savings consumed)",
+        "discriminatesBetween": "N1 (margin recovery) vs N2 (savings consumed)",
         "currentReading": "On track per mgmt &mdash; unverified",
         "readingClass": "td-amber"
       },
@@ -1161,7 +1161,7 @@
         "diagnosticity": "MEDIUM",
         "diagnosticityClass": "disc-med",
         "evidence": "<strong>Aldi online grocery launch.</strong> Currently offline. Binary risk to Woolworths' fastest-growing moat.",
-        "discriminatesBetween": "T1 (moat holds) vs T4 (moat breaks)",
+        "discriminatesBetween": "N1 (moat holds) vs N4 (moat breaks)",
         "currentReading": "No announced plans",
         "readingClass": "td-green"
       }
@@ -1178,12 +1178,12 @@
           {
             "if": "If AU Food EBIT growth &ge; 8%",
             "valence": "positive",
-            "then": "T1 (Turnaround) strengthens materially. Cost-out delivering margin recovery. Dividend path confirmed."
+            "then": "N1 (Turnaround) strengthens materially. Cost-out delivering margin recovery. Dividend path confirmed."
           },
           {
             "if": "If AU Food EBIT growth &lt; 5%",
             "valence": "negative",
-            "then": "T2 (Structural Erosion) strengthens. \"Transitional\" becomes \"structural.\" Share price vulnerable."
+            "then": "N2 (Structural Erosion) strengthens. \"Transitional\" becomes \"structural.\" Share price vulnerable."
           }
         ],
         "source": "Source: ASX announcement, company earnings presentation"
@@ -1195,12 +1195,12 @@
           {
             "if": "If settlement &lt; $50M, no structural orders",
             "valence": "positive",
-            "then": "T3 weakens. Manageable cost. FGCC enforcement proportionate."
+            "then": "N3 weakens. Manageable cost. FGCC enforcement proportionate."
           },
           {
             "if": "If penalties exceed $100M or structural orders imposed",
             "valence": "negative",
-            "then": "T3 crystallises. Aggressive enforcement precedent set."
+            "then": "N3 crystallises. Aggressive enforcement precedent set."
           }
         ],
         "source": "Source: Federal Court; ACCC media releases"
@@ -1217,7 +1217,7 @@
           {
             "if": "If supplier renegotiation compresses gross margins",
             "valence": "negative",
-            "then": "T3 strengthens. Gross margin impact visible in 2H FY26."
+            "then": "N3 strengthens. Gross margin impact visible in 2H FY26."
           }
         ],
         "source": "Source: FGCC legislation; ACCC enforcement portal"
@@ -1229,12 +1229,12 @@
           {
             "if": "If Aldi remains offline",
             "valence": "positive",
-            "then": "Woolworths' e-commerce moat intact. T4 remains slow-burn."
+            "then": "Woolworths' e-commerce moat intact. N4 remains slow-burn."
           },
           {
             "if": "If Aldi announces online grocery",
             "valence": "negative",
-            "then": "T4 accelerates from slow-burn to immediate. Valuation premium at risk."
+            "then": "N4 accelerates from slow-burn to immediate. Valuation premium at risk."
           }
         ],
         "source": "Source: Aldi AU corporate communications; international market signals"
@@ -1325,12 +1325,12 @@
       }
     ],
     "couldntAssess": [
-      "<strong>E-commerce unit economics:</strong> Woolworths does not disclose e-commerce profitability separately. We cannot assess whether 16%+ penetration is margin-accretive or dilutive. This is the single biggest gap for evaluating T1 vs T2.",
+      "<strong>E-commerce unit economics:</strong> Woolworths does not disclose e-commerce profitability separately. We cannot assess whether 16%+ penetration is margin-accretive or dilutive. This is the single biggest gap for evaluating N1 vs N2.",
       "<strong>$400M cost-out granularity:</strong> Management says \"on track\" but has not disclosed category-level savings or how much is being reinvested into pricing vs flowing to EBIT.",
       "<strong>Mandatory FGCC compliance cost:</strong> The code only took effect April 2025. No company has yet disclosed actual compliance cost burden. Fresh produce provisions don't commence until April 2026.",
       "<strong>Industrial relations trajectory:</strong> The 17-day strike was resolved with ~11% pay increases and concessions on AI monitoring. Whether this sets a precedent for future enterprise bargaining is unknown."
     ],
-    "analyticalLimitations": "Hypothesis survival scores (T1: 36%, T2: 25%, T3: 21%, T4: 18%) reflect editorial assessment based on publicly available evidence. These are qualitative judgments, not algorithmic outputs."
+    "analyticalLimitations": "Hypothesis survival scores (N1: 36%, N2: 25%, N3: 21%, N4: 18%) reflect editorial assessment based on publicly available evidence. These are qualitative judgments, not algorithmic outputs."
   },
   "technicalAnalysis": {
     "date": "10 February 2026",

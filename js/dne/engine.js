@@ -167,8 +167,8 @@ function checkNarrativeFlip(stock) {
  * Execute a narrative flip: update dominant hypothesis, log history.
  *
  * @param {Object} stock     Stock evidence data object (mutated in place)
- * @param {string} fromH     Hypothesis ID being replaced (e.g. 'T1')
- * @param {string} toH       Hypothesis ID becoming dominant (e.g. 'T3')
+ * @param {string} fromH     Hypothesis ID being replaced (e.g. 'N1')
+ * @param {string} toH       Hypothesis ID becoming dominant (e.g. 'N3')
  * @param {string} trigger   Human-readable trigger description
  */
 function executeFlip(stock, fromH, toH, trigger) {

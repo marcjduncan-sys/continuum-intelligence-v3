@@ -154,7 +154,7 @@ function buildSnapshot(ticker, date, researchData, stocksData, livePrices) {
     for (let i = 0; i < research.hypotheses.length; i++) {
       const rh = research.hypotheses[i];
       const id = rh.tier ? rh.tier.toUpperCase() : 'H' + (i + 1);
-      const name = (rh.title || '').replace(/^T\d:\s*/, '');
+      const name = (rh.title || '').replace(/^N\d:\s*/, '');
       const sentiment = mapDirection(rh.direction);
       hypotheses.push({
         id: id,
@@ -191,7 +191,7 @@ function buildSnapshot(ticker, date, researchData, stocksData, livePrices) {
     hypotheses[i].rank = i + 1;
   }
 
-  // Determine dominant narrative (T1 = rank 1)
+  // Determine dominant narrative (N1 = rank 1)
   const dominant = hypotheses.length > 0 ? hypotheses[0].id : null;
 
   // Compute thesis skew
@@ -226,7 +226,7 @@ function inferSentiment(key, hyp) {
   const label = (hyp.label || '').toLowerCase();
   if (label.includes('growth') || label.includes('recovery') || label.includes('upside')) return 'BULLISH';
   if (label.includes('risk') || label.includes('downside') || label.includes('disruption') || label.includes('compression')) return 'BEARISH';
-  if (key === 'T1' || key === 'T2') return 'BULLISH'; // T1/T2 in stocks data tend to be positive
+  if (key === 'N1' || key === 'N2') return 'BULLISH'; // N1/N2 in stocks data tend to be positive
   return 'BEARISH';
 }
 
@@ -253,7 +253,7 @@ function detectFlip(ticker, snapshot, historyData) {
   if (prior.dominant_narrative !== snapshot.dominant_narrative) {
     snapshot.narrative_flip = true;
 
-    // Find the old and new T1 details
+    // Find the old and new N1 details
     const oldT1 = prior.hypotheses.find(h => h.rank === 1);
     const newT1 = snapshot.hypotheses.find(h => h.rank === 1);
 
@@ -390,7 +390,7 @@ function main() {
     logged++;
     const arrow = snapshot.daily_change_pct > 0 ? '↑' : snapshot.daily_change_pct < 0 ? '↓' : '→';
     console.log('  [LOG]', ticker, ':', snapshot.price, arrow, snapshot.daily_change_pct + '%',
-      '| T1:', snapshot.dominant_narrative, '| Skew:', snapshot.thesis_skew, snapshot.thesis_skew_label);
+      '| N1:', snapshot.dominant_narrative, '| Skew:', snapshot.thesis_skew, snapshot.thesis_skew_label);
   }
 
   console.log('');

@@ -301,7 +301,7 @@
     "borderColor": "var(--signal-red)",
     "scores": [
       {
-        "label": "T1 Cost Leader",
+        "label": "N1 Cost Leader",
         "score": "40%",
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&rarr;",
@@ -309,7 +309,7 @@
         "dirColor": null
       },
       {
-        "label": "T2 Decline",
+        "label": "N2 Decline",
         "score": "40%",
         "scoreColor": "var(--signal-red)",
         "dirArrow": "&uarr;",
@@ -317,7 +317,7 @@
         "dirColor": "var(--signal-red)"
       },
       {
-        "label": "T3 Green Pivot",
+        "label": "N3 Green Pivot",
         "score": "20%",
         "scoreColor": "var(--text-muted)",
         "dirArrow": "&darr;",
@@ -325,7 +325,7 @@
         "dirColor": "var(--signal-green)"
       },
       {
-        "label": "T4 Governance",
+        "label": "N4 Governance",
         "score": "35%",
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&uarr;",
@@ -497,9 +497,9 @@
   },
   "hypotheses": [
     {
-      "tier": "t1",
+      "tier": "n1",
       "direction": "upside",
-      "title": "T1: Cost Leader Resilience",
+      "title": "N1: Cost Leader Resilience",
       "statusClass": "priced",
       "statusText": "Priced &mdash; Base Case",
       "score": "40%",
@@ -529,9 +529,9 @@
       ]
     },
     {
-      "tier": "t2",
+      "tier": "n2",
       "direction": "downside",
-      "title": "T2: Iron Ore Structural Decline",
+      "title": "N2: Iron Ore Structural Decline",
       "statusClass": "active",
       "statusText": "Active &mdash; Multiple Signals",
       "score": "40%",
@@ -561,9 +561,9 @@
       ]
     },
     {
-      "tier": "t3",
+      "tier": "n3",
       "direction": "upside",
-      "title": "T3: Green Energy Pivot Succeeds",
+      "title": "N3: Green Energy Pivot Succeeds",
       "statusClass": "minimal",
       "statusText": "Minimal Evidence &mdash; Capital Destroyed",
       "score": "20%",
@@ -587,9 +587,9 @@
       ]
     },
     {
-      "tier": "t4",
+      "tier": "n4",
       "direction": "downside",
-      "title": "T4: Forrest Governance &amp; Capital Misallocation",
+      "title": "N4: Forrest Governance &amp; Capital Misallocation",
       "statusClass": "active",
       "statusText": "Active &mdash; Evidence Accumulating",
       "score": "35%",
@@ -619,7 +619,7 @@
       "content": "<strong>Iron ore above US$100/t sustained:</strong> Current price requires iron ore to hold near current levels, which contradicts consensus forecasts of US$83-95/t. <strong>Cost leadership sufficient:</strong> Market assumes sub-US$19/wmt costs protect earnings even in a downturn. <strong>Energy pivot optionality:</strong> Some premium for green iron and copper exploration. <strong>Dividend sustained:</strong> 4.95% yield at 65% payout assumes NPAT does not decline further. <strong>China soft landing:</strong> Market pricing gradual steel decline, not a sharp correction."
     },
     "evidenceCheck": "The evidence is sharply divided by segment. <strong>Metals is strong:</strong> record shipments, lowest-quartile costs, strong balance sheet, and disciplined operations. <strong>Energy is a capital sink:</strong> US$700M EBITDA loss, US$150M in writedowns, no path to profitability within 5 years. The macro evidence is uniformly negative for iron ore: China peak steel, Simandou supply, EAF growth. The operational evidence is uniformly positive for the Metals division. These two forces are in direct tension, and the stock price suggests the market is weighting Metals resilience more heavily than structural decline.",
-    "narrativeStability": "<strong>Unstable, skewed negative.</strong> The narrative will be shaped by iron ore price trajectory and Simandou ramp-up timing. Each quarter of iron ore price decline weakens T1 and strengthens T2. The Energy division narrative has already shifted from \"bold green pivot\" to \"capital destruction\" following project cancellations. If iron ore breaks below US$90/t, the stock will likely re-rate toward consensus targets of ~A$19."
+    "narrativeStability": "<strong>Unstable, skewed negative.</strong> The narrative will be shaped by iron ore price trajectory and Simandou ramp-up timing. Each quarter of iron ore price decline weakens N1 and strengthens N2. The Energy division narrative has already shifted from \"bold green pivot\" to \"capital destruction\" following project cancellations. If iron ore breaks below US$90/t, the stock will likely re-rate toward consensus targets of ~A$19."
   },
   "evidence": {
     "intro": "Ten evidence domains assessed. Evidence is bifurcated: Metals division operational metrics are excellent, but structural macro headwinds and Energy division losses create a clear downside skew when combined with a stock price above consensus targets.",
@@ -634,15 +634,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (Metals strong)",
+            "text": "Supports N1 (Metals strong)",
             "class": "supports"
           },
           {
-            "text": "Contradicts T3 (Energy retreating)",
+            "text": "Contradicts N3 (Energy retreating)",
             "class": "contradicts"
           },
           {
-            "text": "Neutral on T2",
+            "text": "Neutral on N2",
             "class": "neutral"
           }
         ],
@@ -658,15 +658,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Strongly Supports T1 (Metals excellence)",
+            "text": "Strongly Supports N1 (Metals excellence)",
             "class": "strong"
           },
           {
-            "text": "Supports T2 (revenue declining on price)",
+            "text": "Supports N2 (revenue declining on price)",
             "class": "supports"
           },
           {
-            "text": "Strongly Supports T4 (Energy losses)",
+            "text": "Strongly Supports N4 (Energy losses)",
             "class": "strong"
           }
         ],
@@ -682,15 +682,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (cost position acknowledged)",
+            "text": "Supports N1 (cost position acknowledged)",
             "class": "supports"
           },
           {
-            "text": "Strongly Supports T2 (price decline forecasts)",
+            "text": "Strongly Supports N2 (price decline forecasts)",
             "class": "strong"
           },
           {
-            "text": "Contradicts T3 (no Energy value modelled)",
+            "text": "Contradicts N3 (no Energy value modelled)",
             "class": "contradicts"
           }
         ],
@@ -706,15 +706,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (cost position competitive)",
+            "text": "Supports N1 (cost position competitive)",
             "class": "supports"
           },
           {
-            "text": "Strongly Supports T2 (Simandou supply shock)",
+            "text": "Strongly Supports N2 (Simandou supply shock)",
             "class": "strong"
           },
           {
-            "text": "Contradicts T3 (competitors not pursuing green)",
+            "text": "Contradicts N3 (competitors not pursuing green)",
             "class": "contradicts"
           }
         ],
@@ -730,15 +730,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Contradicts T1 (price compression)",
+            "text": "Contradicts N1 (price compression)",
             "class": "contradicts"
           },
           {
-            "text": "Strongly Supports T2 (structural decline)",
+            "text": "Strongly Supports N2 (structural decline)",
             "class": "strong"
           },
           {
-            "text": "Neutral on T3, T4",
+            "text": "Neutral on N3, N4",
             "class": "neutral"
           }
         ],
@@ -754,15 +754,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (shipments confirmed)",
+            "text": "Supports N1 (shipments confirmed)",
             "class": "supports"
           },
           {
-            "text": "Supports T2 (China weakness confirmed)",
+            "text": "Supports N2 (China weakness confirmed)",
             "class": "supports"
           },
           {
-            "text": "Supports T4 (Energy workforce uncertainty)",
+            "text": "Supports N4 (Energy workforce uncertainty)",
             "class": "supports"
           }
         ],
@@ -778,15 +778,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (cost leader resilience)",
+            "text": "Supports N1 (cost leader resilience)",
             "class": "supports"
           },
           {
-            "text": "Strongly Supports T2 (peak steel literature)",
+            "text": "Strongly Supports N2 (peak steel literature)",
             "class": "strong"
           },
           {
-            "text": "Contradicts T3 (hydrogen cost gap)",
+            "text": "Contradicts N3 (hydrogen cost gap)",
             "class": "contradicts"
           }
         ],
@@ -802,15 +802,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T4 (Forrest personality risk)",
+            "text": "Supports N4 (Forrest personality risk)",
             "class": "supports"
           },
           {
-            "text": "Neutral on T1, T2",
+            "text": "Neutral on N1, N2",
             "class": "neutral"
           },
           {
-            "text": "Contradicts T3 (media scepticism)",
+            "text": "Contradicts N3 (media scepticism)",
             "class": "contradicts"
           }
         ],
@@ -857,15 +857,15 @@
         },
         "tags": [
           {
-            "text": "Supports T1 (operational management)",
+            "text": "Supports N1 (operational management)",
             "class": "supports"
           },
           {
-            "text": "Strongly Supports T4 (founder dominance)",
+            "text": "Strongly Supports N4 (founder dominance)",
             "class": "strong"
           },
           {
-            "text": "Contradicts T3 (Energy being scaled back)",
+            "text": "Contradicts N3 (Energy being scaled back)",
             "class": "contradicts"
           }
         ],
@@ -920,15 +920,15 @@
         },
         "tags": [
           {
-            "text": "Neutral on T1",
+            "text": "Neutral on N1",
             "class": "neutral"
           },
           {
-            "text": "Neutral on T2",
+            "text": "Neutral on N2",
             "class": "neutral"
           },
           {
-            "text": "Strongly Supports T4 (Forrest control)",
+            "text": "Strongly Supports N4 (Forrest control)",
             "class": "strong"
           }
         ],
@@ -943,8 +943,8 @@
       {
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
-        "evidence": "<strong>Iron ore price trajectory through 2026.</strong> Sustained above US$100/t supports T1; decline below US$90/t activates T2.",
-        "discriminatesBetween": "T1 (cost leader resilience) vs T2 (structural decline)",
+        "evidence": "<strong>Iron ore price trajectory through 2026.</strong> Sustained above US$100/t supports N1; decline below US$90/t activates N2.",
+        "discriminatesBetween": "N1 (cost leader resilience) vs N2 (structural decline)",
         "currentReading": "~US$100/t, declining trend",
         "readingClass": "td-amber"
       },
@@ -952,7 +952,7 @@
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
         "evidence": "<strong>Simandou ramp-up milestones.</strong> First commercial shipments and ramp-up pace toward 120 Mtpa.",
-        "discriminatesBetween": "T2 (supply shock real) vs T2 delayed (infrastructure delays)",
+        "discriminatesBetween": "N2 (supply shock real) vs N2 delayed (infrastructure delays)",
         "currentReading": "First shipments Jan 2026",
         "readingClass": "td-red"
       },
@@ -960,7 +960,7 @@
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
         "evidence": "<strong>Energy division capex allocation in FY26.</strong> Continued spend vs further cuts.",
-        "discriminatesBetween": "T4 (capital misallocation continues) vs T4 mitigated (Forrest showing discipline)",
+        "discriminatesBetween": "N4 (capital misallocation continues) vs N4 mitigated (Forrest showing discipline)",
         "currentReading": "Arizona and PEM50 cancelled",
         "readingClass": "td-amber"
       },
@@ -968,7 +968,7 @@
         "diagnosticity": "MEDIUM",
         "diagnosticityClass": "disc-med",
         "evidence": "<strong>China property starts trajectory.</strong> Stabilisation vs continued decline.",
-        "discriminatesBetween": "T1 (demand floor holds) vs T2 (demand accelerates downward)",
+        "discriminatesBetween": "N1 (demand floor holds) vs N2 (demand accelerates downward)",
         "currentReading": "Declining",
         "readingClass": "td-red"
       }
@@ -985,12 +985,12 @@
           {
             "if": "If iron ore sustains above US$100/t through 2026",
             "valence": "positive",
-            "then": "T1 (Cost Leader) strengthens. Margins hold. Dividend sustained. Stock may re-rate slightly."
+            "then": "N1 (Cost Leader) strengthens. Margins hold. Dividend sustained. Stock may re-rate slightly."
           },
           {
             "if": "If iron ore declines below US$85/t for &ge;3 months",
             "valence": "negative",
-            "then": "T2 (Structural Decline) confirmed. Earnings compress 30%+. Dividend at risk. Stock re-rates toward A$15-17."
+            "then": "N2 (Structural Decline) confirmed. Earnings compress 30%+. Dividend at risk. Stock re-rates toward A$15-17."
           }
         ],
         "source": "Source: Platts IODEX; SGX iron ore futures; major bank commodity forecasts"
@@ -1002,12 +1002,12 @@
           {
             "if": "If Simandou ramp-up is delayed beyond 2027 for infrastructure reasons",
             "valence": "positive",
-            "then": "T2 timeline extends. Supply overhang deferred. FMG has more time to deliver returns."
+            "then": "N2 timeline extends. Supply overhang deferred. FMG has more time to deliver returns."
           },
           {
             "if": "If Simandou achieves &ge;50 Mtpa by end-2027",
             "valence": "negative",
-            "then": "T2 accelerates. High-grade supply pressures FMG's grade discount. Market oversupply confirmed."
+            "then": "N2 accelerates. High-grade supply pressures FMG's grade discount. Market oversupply confirmed."
           }
         ],
         "source": "Source: Rio Tinto/Winning Consortium updates; Guinea government announcements; shipping data"
@@ -1019,12 +1019,12 @@
           {
             "if": "If Energy capex &lt;US$500M and focused on near-commercial projects",
             "valence": "positive",
-            "then": "T4 (Governance Risk) mitigated. Forrest showing capital discipline. Energy division right-sizing."
+            "then": "N4 (Governance Risk) mitigated. Forrest showing capital discipline. Energy division right-sizing."
           },
           {
             "if": "If new large-scale green hydrogen commitments announced without commercial pathway",
             "valence": "negative",
-            "then": "T4 strengthens. Capital misallocation continues. Minority shareholders subsidising Forrest's green ambitions."
+            "then": "N4 strengthens. Capital misallocation continues. Minority shareholders subsidising Forrest's green ambitions."
           }
         ],
         "source": "Source: FMG FY26 results; ASX capex guidance; Energy division disclosures"
@@ -1115,12 +1115,12 @@
       }
     ],
     "couldntAssess": [
-      "<strong>Simandou ramp-up reliability:</strong> Guinea's political stability, infrastructure readiness, and consortium execution are uncertain. A significant delay could materially change the T2 timeline.",
+      "<strong>Simandou ramp-up reliability:</strong> Guinea's political stability, infrastructure readiness, and consortium execution are uncertain. A significant delay could materially change the N2 timeline.",
       "<strong>FMG grade discount trajectory:</strong> As Simandou adds high-grade (65% Fe) supply, FMG's lower-grade ore (58-60% Fe) may face a widening quality discount. The magnitude of this effect is uncertain.",
       "<strong>Energy division forward commitments:</strong> The extent of remaining Energy division commitments, contractual obligations from cancelled projects, and Forrest's personal willingness to continue funding green initiatives is unclear.",
       "<strong>India demand offset:</strong> Whether India's steel demand growth can materially offset China's decline is an open question with wide uncertainty bands."
     ],
-    "analyticalLimitations": "Hypothesis survival scores (T1: 30%, T2: 30%, T3: 15%, T4: 26%) reflect editorial assessment. The equal weighting of T1 and T2 is deliberate: both are supported by strong evidence from different domains. T1 (Cost Leader) is supported by operational data; T2 (Structural Decline) is supported by macro data. The question is timeline: T1 may hold for 2-3 years while T2 plays out over 5-10 years. T3 (Green Pivot) is scored lowest because the evidence uniformly contradicts it following project cancellations and hydrogen cost gaps. T4 (Governance) is rising because each green writeoff provides additional evidence of capital misallocation."
+    "analyticalLimitations": "Hypothesis survival scores (N1: 30%, N2: 30%, N3: 15%, N4: 26%) reflect editorial assessment. The equal weighting of N1 and N2 is deliberate: both are supported by strong evidence from different domains. N1 (Cost Leader) is supported by operational data; N2 (Structural Decline) is supported by macro data. The question is timeline: N1 may hold for 2-3 years while N2 plays out over 5-10 years. N3 (Green Pivot) is scored lowest because the evidence uniformly contradicts it following project cancellations and hydrogen cost gaps. N4 (Governance) is rising because each green writeoff provides additional evidence of capital misallocation."
   },
   "technicalAnalysis": {
     "date": "11 February 2026",

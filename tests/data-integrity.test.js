@@ -46,10 +46,10 @@ describe('Ticker Configuration', () => {
       if (entry.status === 'active') {
         expect(entry).toHaveProperty('analysisConfig');
         expect(entry.analysisConfig).toHaveProperty('baseWeights');
-        expect(entry.analysisConfig.baseWeights).toHaveProperty('T1');
-        expect(entry.analysisConfig.baseWeights).toHaveProperty('T2');
-        expect(entry.analysisConfig.baseWeights).toHaveProperty('T3');
-        expect(entry.analysisConfig.baseWeights).toHaveProperty('T4');
+        expect(entry.analysisConfig.baseWeights).toHaveProperty('N1');
+        expect(entry.analysisConfig.baseWeights).toHaveProperty('N2');
+        expect(entry.analysisConfig.baseWeights).toHaveProperty('N3');
+        expect(entry.analysisConfig.baseWeights).toHaveProperty('N4');
       }
     });
   });
@@ -117,7 +117,7 @@ describe('Research Data Files', () => {
         expect(hyp).toHaveProperty('title');
         expect(hyp).toHaveProperty('score');
         expect(['upside', 'downside', 'neutral']).toContain(hyp.direction);
-        expect(['t1', 't2', 't3', 't4']).toContain(hyp.tier.toLowerCase());
+        expect(['n1', 'n2', 'n3', 'n4']).toContain(hyp.tier.toLowerCase());
       });
     });
   });

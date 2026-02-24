@@ -4,7 +4,7 @@
   "sector": "Healthcare",
   "market_cap": "138.5B",
   "hypotheses": {
-    "T1": {
+    "N1": {
       "label": "Growth/Recovery",
       "description": "Plasma collections normalise; Vifor acquisition delivers synergies; pipeline catalysts",
       "plain_english": "CSL's plasma collection business is recovering from COVID disruption, and its recent acquisition of Vifor Pharma is starting to deliver cost savings. If both trends continue, earnings growth could accelerate beyond current expectations.",
@@ -16,7 +16,7 @@
       "weighted_inconsistency": 2.5,
       "last_updated": "2026-02-14T09:30:00+11:00"
     },
-    "T2": {
+    "N2": {
       "label": "Managed/Base Case",
       "description": "Steady-state compounder: high single-digit earnings growth, premium valuation sustained",
       "plain_english": "CSL continues doing what it does best — growing earnings at 7-10% per year, driven by its dominant position in the global plasma market. The company deserves its premium valuation because of its deep competitive moat and long runway of growth.",
@@ -28,7 +28,7 @@
       "weighted_inconsistency": 1,
       "last_updated": "2026-02-14T09:30:00+11:00"
     },
-    "T3": {
+    "N3": {
       "label": "Risk/Downside",
       "description": "Vifor integration drags; plasma margin recovery slower than guided; FX headwinds",
       "plain_english": "Several things could go wrong at once: the Vifor acquisition might cost more to integrate than expected, plasma margins might not recover as fast as management promised, and the strong Australian dollar could eat into overseas earnings when converted back.",
@@ -40,7 +40,7 @@
       "weighted_inconsistency": 4.2,
       "last_updated": "2026-02-14T09:30:00+11:00"
     },
-    "T4": {
+    "N4": {
       "label": "Disruption",
       "description": "Gene therapy disrupts immunoglobulin demand; biosimilar erosion of key products",
       "plain_english": "This is the long-term existential risk: if gene therapy advances make immunoglobulin treatments unnecessary, or if biosimilar competitors undercut CSL's key products, the company's core business could face structural decline.",
@@ -53,7 +53,7 @@
       "last_updated": "2026-02-14T09:30:00+11:00"
     }
   },
-  "dominant": "T2",
+  "dominant": "N2",
   "confidence": "HIGH",
   "alert_state": "NORMAL",
   "alert_started": null,
@@ -61,8 +61,8 @@
   "big_picture": "CSL is a global biotech leader specialising in plasma-derived therapies and vaccines. It is one of only three companies worldwide that can collect and process blood plasma at scale, giving it an extremely strong competitive position.",
   "last_flip": {
     "date": "2025-08-20",
-    "from": "T1",
-    "to": "T2",
+    "from": "N1",
+    "to": "N2",
     "trigger": "FY25 result in-line but guidance conservative; plasma margin recovery on track but gradual",
     "price_at_flip": 278,
     "from_survival": 0.36,
@@ -71,8 +71,8 @@
   "narrative_history": [
     {
       "date": "2025-02-15",
-      "from": "T2",
-      "to": "T1",
+      "from": "N2",
+      "to": "N1",
       "trigger": "H1 FY25 earnings beat; Vifor synergies ahead of schedule; upgraded FY25 guidance",
       "price_at_flip": 305,
       "from_survival": 0.4,
@@ -89,10 +89,10 @@
       "summary": "FY25 NPATA $3.2B in-line; FY26 guidance 7-10% growth (conservative)",
       "diagnosticity": "HIGH",
       "hypothesis_impact": {
-        "T1": "NEUTRAL",
-        "T2": "CONSISTENT",
-        "T3": "INCONSISTENT",
-        "T4": "INCONSISTENT"
+        "N1": "NEUTRAL",
+        "N2": "CONSISTENT",
+        "N3": "INCONSISTENT",
+        "N4": "INCONSISTENT"
       },
       "decay": {
         "full_weight_days": 90,
@@ -109,10 +109,10 @@
       "summary": "Plasma collections +15% YoY; cost per litre declining but above pre-COVID levels",
       "diagnosticity": "MEDIUM",
       "hypothesis_impact": {
-        "T1": "CONSISTENT",
-        "T2": "CONSISTENT",
-        "T3": "INCONSISTENT",
-        "T4": "NEUTRAL"
+        "N1": "CONSISTENT",
+        "N2": "CONSISTENT",
+        "N3": "INCONSISTENT",
+        "N4": "NEUTRAL"
       },
       "decay": {
         "full_weight_days": 60,
@@ -129,10 +129,10 @@
       "summary": "Vifor synergies tracking to $200M target; iron portfolio growing 12% organically",
       "diagnosticity": "MEDIUM",
       "hypothesis_impact": {
-        "T1": "CONSISTENT",
-        "T2": "CONSISTENT",
-        "T3": "INCONSISTENT",
-        "T4": "NEUTRAL"
+        "N1": "CONSISTENT",
+        "N2": "CONSISTENT",
+        "N3": "INCONSISTENT",
+        "N4": "NEUTRAL"
       },
       "decay": {
         "full_weight_days": 60,
@@ -149,10 +149,10 @@
       "summary": "Garadacimab Phase III positive for hereditary angioedema prevention; regulatory submission planned",
       "diagnosticity": "HIGH",
       "hypothesis_impact": {
-        "T1": "CONSISTENT",
-        "T2": "NEUTRAL",
-        "T3": "INCONSISTENT",
-        "T4": "INCONSISTENT"
+        "N1": "CONSISTENT",
+        "N2": "NEUTRAL",
+        "N3": "INCONSISTENT",
+        "N4": "INCONSISTENT"
       },
       "decay": {
         "full_weight_days": 120,
@@ -197,32 +197,32 @@
       "direction": "downside",
       "hypotheses": [
         {
-          "title": "T1: Structural Compounder Resumes",
+          "title": "N1: Structural Compounder Resumes",
           "direction": "upside",
           "weight": 26
         },
         {
-          "title": "T2: Execution Risk in Transformation",
+          "title": "N2: Execution Risk in Transformation",
           "direction": "downside",
           "weight": 31
         },
         {
-          "title": "T3: Structural Headwinds Emerging",
+          "title": "N3: Structural Headwinds Emerging",
           "direction": "downside",
           "weight": 23
         },
         {
-          "title": "T4: M&amp;A or Corporate Event",
+          "title": "N4: M&amp;A or Corporate Event",
           "direction": "neutral",
           "weight": 20
         }
       ],
-      "computed_at": "2026-02-24T06:41:50.688Z"
+      "computed_at": "2026-02-24T07:54:21.306Z"
     },
     "overall_sentiment": -28,
     "sentiment_label": "DOWNSIDE",
     "method": "company_only",
-    "composite_computed_at": "2026-02-24T06:41:59.255Z",
+    "composite_computed_at": "2026-02-24T07:54:38.661Z",
     "macro_signal": 0,
     "sector_signal": 0,
     "tech_signal": 0,
@@ -236,6 +236,6 @@
     "shift_pct": -0.042,
     "signal_used": -28,
     "method": "sentiment_shift_v3",
-    "computed_at": "2026-02-24T06:42:12.298Z"
+    "computed_at": "2026-02-24T07:54:39.547Z"
   }
 }

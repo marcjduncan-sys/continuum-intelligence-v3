@@ -7,7 +7,7 @@
  * - 100% dynamically generated (no hardcoded text)
  * - Price-integrated (every statement connects to price action)
  * - Section-specific (tailored to each framework heading)
- * - Hypothesis-aligned (maps to T1-T4 framework)
+ * - Hypothesis-aligned (maps to N1-N4 framework)
  * - Evidence-based (cites specific metrics)
  */
 
@@ -42,7 +42,7 @@ const NARRATIVE_KNOWLEDGE = {
 
   // Hypothesis-specific narrative patterns
   hypothesis: {
-    T1: {
+    N1: {
       name: 'Growth/Expansion Thesis',
       bullish: ['contract acceleration', 'market share gains', 'execution momentum', 'pipeline strength'],
       bearish: ['growth deceleration', 'contract delays', 'execution concerns', 'pipeline depletion'],
@@ -52,7 +52,7 @@ const NARRATIVE_KNOWLEDGE = {
         contradicted: 'challenges growth trajectory assumptions'
       }
     },
-    T2: {
+    N2: {
       name: 'Valuation/Multiple Thesis',
       bullish: ['multiple expansion', 'valuation re-rating', 'premium justified', 'scarcity value'],
       bearish: ['multiple compression', 'valuation de-rating', 'premium unwinding', 'mean reversion'],
@@ -62,7 +62,7 @@ const NARRATIVE_KNOWLEDGE = {
         contradicted: 'suggests overshoot or undershoot'
       }
     },
-    T3: {
+    N3: {
       name: 'Competitive/Disruption Thesis',
       bullish: ['moat widening', 'barrier strengthening', 'competitive advantage', 'market position'],
       bearish: ['disruption risk', 'competitive pressure', 'threat emergence', 'moat erosion'],
@@ -72,7 +72,7 @@ const NARRATIVE_KNOWLEDGE = {
         contradicted: 'market overestimating threat velocity'
       }
     },
-    T4: {
+    N4: {
       name: 'Technology/Moat Amplification Thesis',
       bullish: ['technology leverage', 'platform effects', 'innovation premium', 'ecosystem expansion'],
       bearish: ['technology obsolescence', 'platform disruption', 'innovation commoditization', 'ecosystem threat'],
@@ -335,7 +335,7 @@ const TextGenerator = {
    * Generate Valuation section commentary
    */
   valuation(ticker, priceData, weights, dislocation) {
-    const t2 = weights.T2;
+    const t2 = weights.N2;
     const { currentPrice, peakPrice, priceAtReview } = priceData;
     const fromPeak = ((currentPrice - peakPrice) / peakPrice * 100).toFixed(1);
     const fromReview = ((currentPrice - priceAtReview) / priceAtReview * 100).toFixed(1);
@@ -345,7 +345,7 @@ const TextGenerator = {
     lines.push('');
     lines.push(`Current: A$${currentPrice} | From peak: ${fromPeak}% | From review: ${fromReview}%`);
     lines.push('');
-    lines.push(`**Valuation Thesis Weight (T2):** ${t2.blended}%`);
+    lines.push(`**Valuation Thesis Weight (N2):** ${t2.blended}%`);
     lines.push(`- Research view: ${t2.longTerm}% | Market-implied: ${t2.shortTerm}% | Spread: ${Math.abs(t2.shortTerm - t2.longTerm)}pts`);
     lines.push('');
     
@@ -502,25 +502,25 @@ const TextGenerator = {
 
   generateCatalystText(metric, tier) {
     const catalysts = {
-      T1: {
+      N1: {
         'win rate': 'Monitor contract announcements vs. historical run-rate',
         'contract value': 'Track total contract value growth quarter-over-quarter',
         'implementation timeline': 'Watch for delays in major rollout milestones',
         'market penetration': 'Assess market share progression in target segments'
       },
-      T2: {
+      N2: {
         'P/E ratio': 'Compare multiple expansion/contraction vs. sector peers',
         'EV/EBITDA': 'Monitor relative valuation vs. historical range',
         'price-to-sales': 'Track sales multiple compression metrics',
         'relative valuation': 'Assess discount/premium to comparable companies'
       },
-      T3: {
+      N3: {
         'market share': 'Watch for competitive wins/losses in key accounts',
         'retention rate': 'Monitor churn and customer switching behavior',
         'competitor R&D': 'Track competitor product launches and roadmaps',
         'switching costs': 'Assess customer migration economics'
       },
-      T4: {
+      N4: {
         'R&D intensity': 'Monitor R&D spend trajectory and patent filings',
         'patent pipeline': 'Track intellectual property development',
         'platform adoption': 'Watch ecosystem growth metrics',

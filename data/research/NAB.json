@@ -110,7 +110,7 @@
     "borderColor": null,
     "scores": [
       {
-        "label": "T1 Business Banking Moat",
+        "label": "N1 Business Banking Moat",
         "score": "50%",
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&rarr;",
@@ -118,7 +118,7 @@
         "dirColor": null
       },
       {
-        "label": "T2 NIM Compression",
+        "label": "N2 NIM Compression",
         "score": "40%",
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&uarr;",
@@ -126,7 +126,7 @@
         "dirColor": "var(--signal-red)"
       },
       {
-        "label": "T3 Valuation De-rating",
+        "label": "N3 Valuation De-rating",
         "score": "35%",
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&uarr;",
@@ -134,7 +134,7 @@
         "dirColor": "var(--signal-red)"
       },
       {
-        "label": "T4 Credit Cycle Turn",
+        "label": "N4 Credit Cycle Turn",
         "score": "25%",
         "scoreColor": "var(--text-muted)",
         "dirArrow": "&rarr;",
@@ -294,9 +294,9 @@
   },
   "hypotheses": [
     {
-      "tier": "t1",
+      "tier": "n1",
       "direction": "upside",
-      "title": "T1: Business Banking Moat",
+      "title": "N1: Business Banking Moat",
       "statusClass": "priced",
       "statusText": "Priced",
       "score": "50%",
@@ -325,9 +325,9 @@
       ]
     },
     {
-      "tier": "t2",
+      "tier": "n2",
       "direction": "downside",
-      "title": "T2: NIM Compression",
+      "title": "N2: NIM Compression",
       "statusClass": "accumulating",
       "statusText": "Evidence Building",
       "score": "40%",
@@ -350,9 +350,9 @@
       ]
     },
     {
-      "tier": "t3",
+      "tier": "n3",
       "direction": "downside",
-      "title": "T3: Valuation De-rating",
+      "title": "N3: Valuation De-rating",
       "statusClass": "accumulating",
       "statusText": "Evidence Building",
       "score": "35%",
@@ -375,9 +375,9 @@
       ]
     },
     {
-      "tier": "t4",
+      "tier": "n4",
       "direction": "downside",
-      "title": "T4: Credit Cycle Turn",
+      "title": "N4: Credit Cycle Turn",
       "statusClass": "watching",
       "statusText": "Watching",
       "score": "25%",
@@ -423,15 +423,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1",
+            "text": "Supports N1",
             "class": "supports"
           },
           {
-            "text": "Weakly Supports T2",
+            "text": "Weakly Supports N2",
             "class": "supports"
           },
           {
-            "text": "Neutral T3-T4",
+            "text": "Neutral N3-N4",
             "class": "neutral"
           }
         ],
@@ -447,11 +447,11 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (capital strength)",
+            "text": "Supports N1 (capital strength)",
             "class": "supports"
           },
           {
-            "text": "Weakly Supports T4 (impairments rising)",
+            "text": "Weakly Supports N4 (impairments rising)",
             "class": "supports"
           },
           {
@@ -471,11 +471,11 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (quality)",
+            "text": "Supports N1 (quality)",
             "class": "supports"
           },
           {
-            "text": "Strongly Supports T3 (above target)",
+            "text": "Strongly Supports N3 (above target)",
             "class": "strong"
           }
         ],
@@ -491,15 +491,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T3 (sector stretch)",
+            "text": "Supports N3 (sector stretch)",
             "class": "supports"
           },
           {
-            "text": "Neutral T1",
+            "text": "Neutral N1",
             "class": "neutral"
           },
           {
-            "text": "Weakly Supports T4 (competition)",
+            "text": "Weakly Supports N4 (competition)",
             "class": "supports"
           }
         ],
@@ -515,15 +515,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T2 (NIM pressure)",
+            "text": "Supports N2 (NIM pressure)",
             "class": "supports"
           },
           {
-            "text": "Weakly Supports T1 (housing/credit growth)",
+            "text": "Weakly Supports N1 (housing/credit growth)",
             "class": "supports"
           },
           {
-            "text": "Weakly Supports T4 (insolvencies)",
+            "text": "Weakly Supports N4 (insolvencies)",
             "class": "supports"
           }
         ],
@@ -539,15 +539,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (franchise stability)",
+            "text": "Supports N1 (franchise stability)",
             "class": "supports"
           },
           {
-            "text": "Neutral T2",
+            "text": "Neutral N2",
             "class": "neutral"
           },
           {
-            "text": "Neutral T4",
+            "text": "Neutral N4",
             "class": "neutral"
           }
         ],
@@ -559,19 +559,19 @@
         "epistemicClass": "ep-peerreviewed",
         "epistemicLabel": "Peer-Reviewed",
         "finding": "<strong>Banking competition research supports franchise durability thesis with caveats.</strong> Academic literature on Australian banking competition (Davis 2023, RBA Research Discussion Papers) confirms that Big Four switching costs remain high &mdash; SME banking relationships typically last 7-12 years with low voluntary churn. Research on NIM determinants (Borio et al. 2023, BIS Working Papers) finds that bank NIMs compress ~3-5bp per 25bp rate cut in the first year, accelerating if cuts are consecutive. Studies on neobank disruption (Frost 2024, IMF Working Paper) show that challenger banks gain market share fastest in retail deposits and personal lending but struggle to penetrate business banking due to relationship intensity and credit complexity.",
-        "tension": "Academic research on NIM compression supports the T2 thesis quantitatively. The franchise durability research is reassuring for T1 but is based on historical data that may not capture the pace of digital disruption fully.",
+        "tension": "Academic research on NIM compression supports the N2 thesis quantitatively. The franchise durability research is reassuring for N1 but is based on historical data that may not capture the pace of digital disruption fully.",
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (switching costs)",
+            "text": "Supports N1 (switching costs)",
             "class": "supports"
           },
           {
-            "text": "Supports T2 (NIM model)",
+            "text": "Supports N2 (NIM model)",
             "class": "supports"
           },
           {
-            "text": "Contradicts T4 (neobank limitations)",
+            "text": "Contradicts N4 (neobank limitations)",
             "class": "contradicts"
           }
         ],
@@ -587,15 +587,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T2 (NIM narrative)",
+            "text": "Supports N2 (NIM narrative)",
             "class": "supports"
           },
           {
-            "text": "Neutral T1",
+            "text": "Neutral N1",
             "class": "neutral"
           },
           {
-            "text": "Supports T3 (valuation concern)",
+            "text": "Supports N3 (valuation concern)",
             "class": "supports"
           }
         ],
@@ -611,15 +611,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (stable leadership)",
+            "text": "Supports N1 (stable leadership)",
             "class": "supports"
           },
           {
-            "text": "Neutral T2",
+            "text": "Neutral N2",
             "class": "neutral"
           },
           {
-            "text": "Neutral T3",
+            "text": "Neutral N3",
             "class": "neutral"
           }
         ],
@@ -635,15 +635,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (demand floor)",
+            "text": "Supports N1 (demand floor)",
             "class": "supports"
           },
           {
-            "text": "Supports T3 (passive-driven premium)",
+            "text": "Supports N3 (passive-driven premium)",
             "class": "supports"
           },
           {
-            "text": "Neutral T2",
+            "text": "Neutral N2",
             "class": "neutral"
           }
         ],
@@ -659,7 +659,7 @@
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
         "evidence": "<strong>1H FY2026 NIM (May 2026).</strong> If NIM holds above 1.65%, the compression thesis is manageable. If NIM falls below 1.60%, revenue headwind becomes material.",
-        "discriminatesBetween": "T1 (franchise resilience) vs T2 (NIM structural decline)",
+        "discriminatesBetween": "N1 (franchise resilience) vs N2 (NIM structural decline)",
         "currentReading": "Awaiting &mdash; ~May 2026",
         "readingClass": "td-amber"
       },
@@ -667,7 +667,7 @@
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
         "evidence": "<strong>Price vs consensus convergence.</strong> Stock at A$45.34, consensus ~A$40. If stock holds above A$44 after 1H results, market is upgrading the thesis. If it falls toward A$40, de-rating is underway.",
-        "discriminatesBetween": "T1 (premium justified) vs T3 (de-rating)",
+        "discriminatesBetween": "N1 (premium justified) vs N3 (de-rating)",
         "currentReading": "Stock at A$45.34 &mdash; 10-15% above consensus",
         "readingClass": "td-amber"
       },
@@ -675,7 +675,7 @@
         "diagnosticity": "MEDIUM",
         "diagnosticityClass": "disc-med",
         "evidence": "<strong>Business banking impairment charges.</strong> A material uptick in SME/commercial loan losses would undermine the franchise quality thesis and trigger de-rating.",
-        "discriminatesBetween": "T1 (quality franchise) vs T4 (credit cycle turn)",
+        "discriminatesBetween": "N1 (quality franchise) vs N4 (credit cycle turn)",
         "currentReading": "~A$900M &mdash; manageable",
         "readingClass": "td-green"
       }
@@ -692,12 +692,12 @@
           {
             "if": "If NIM above 1.65% and impairments below A$500M (half-year)",
             "valence": "positive",
-            "then": "T1 (Franchise Moat) holds. Premium valuation supported by earnings delivery under new CEO."
+            "then": "N1 (Franchise Moat) holds. Premium valuation supported by earnings delivery under new CEO."
           },
           {
             "if": "If NIM below 1.60% or impairments above A$600M",
             "valence": "negative",
-            "then": "T2/T4 strengthen. Earnings revision cycle begins. De-rating toward 16-17x P/E likely."
+            "then": "N2/N4 strengthen. Earnings revision cycle begins. De-rating toward 16-17x P/E likely."
           }
         ],
         "source": "Source: NAB ASX announcement, investor presentation"
@@ -709,12 +709,12 @@
           {
             "if": "If RBA cuts total 50bp or less by Dec 2026 (terminal ~3.60%+)",
             "valence": "positive",
-            "then": "NIM compression manageable. T2 weakens. Bank sector premium may hold."
+            "then": "NIM compression manageable. N2 weakens. Bank sector premium may hold."
           },
           {
             "if": "If RBA cuts 100bp+ (terminal below 3.35%)",
             "valence": "negative",
-            "then": "T2 strengthens materially. NIM compression accelerates. Sector de-rating probable."
+            "then": "N2 strengthens materially. NIM compression accelerates. Sector de-rating probable."
           }
         ],
         "source": "Source: RBA Board decisions; money market pricing"
@@ -726,12 +726,12 @@
           {
             "if": "If business loan 90+ day arrears stay below 1.5%",
             "valence": "positive",
-            "then": "T4 (Credit Cycle) remains background risk. Business banking earnings resilience confirmed."
+            "then": "N4 (Credit Cycle) remains background risk. Business banking earnings resilience confirmed."
           },
           {
             "if": "If business loan arrears exceed 2.0% or a major commercial property default occurs",
             "valence": "negative",
-            "then": "T4 crystallises. NAB's business banking concentration becomes a liability, not an asset. Outsized de-rating vs CBA/WBC."
+            "then": "N4 crystallises. NAB's business banking concentration becomes a liability, not an asset. Outsized de-rating vs CBA/WBC."
           }
         ],
         "source": "Source: APRA monthly banking statistics; NAB quarterly disclosures"

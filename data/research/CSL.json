@@ -298,10 +298,26 @@
     "skew_description": "Three of four research drivers carry confirmed bearish evidence direction. The dominant driver — D1: Execution Risk in Transformation at 31% weight — is confirmed by 1H results. The probability-weighted assessment across all drivers implies a price below current, with 2 bear drivers confirmed against 1 bull driver at 1H missed.",
     "position_in_range": {
       "worlds": [
-        { "label": "Structural Decline", "price": 100, "gap_pct": -0.34 },
-        { "label": "Execution Drag", "price": 192.80, "gap_pct": 0.27 },
-        { "label": "Managed Recovery", "price": 248.00, "gap_pct": 0.64 },
-        { "label": "Compounder Restores", "price": 303.84, "gap_pct": 1.00 }
+        {
+          "label": "Structural Decline",
+          "price": 100,
+          "gap_pct": -0.34
+        },
+        {
+          "label": "Execution Drag",
+          "price": 192.8,
+          "gap_pct": 0.27
+        },
+        {
+          "label": "Managed Recovery",
+          "price": 248,
+          "gap_pct": 0.64
+        },
+        {
+          "label": "Compounder Restores",
+          "price": 303.84,
+          "gap_pct": 1
+        }
       ],
       "current_price": 151.56,
       "note": "World prices are indicative — pending full W1–W4 valuation build"
@@ -322,7 +338,7 @@
     "borderColor": "var(--signal-green)",
     "scores": [
       {
-        "label": "T1 Compounder",
+        "label": "N1 Compounder",
         "score": "45%",
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&darr;",
@@ -330,7 +346,7 @@
         "dirColor": "var(--signal-amber)"
       },
       {
-        "label": "T2 Execution",
+        "label": "N2 Execution",
         "score": "55%",
         "scoreColor": "var(--signal-red)",
         "dirArrow": "&uarr;",
@@ -338,7 +354,7 @@
         "dirColor": "var(--signal-red)"
       },
       {
-        "label": "T3 Headwinds",
+        "label": "N3 Headwinds",
         "score": "40%",
         "scoreColor": "var(--signal-red)",
         "dirArrow": "&uarr;",
@@ -346,7 +362,7 @@
         "dirColor": "var(--signal-red)"
       },
       {
-        "label": "T4 Corporate",
+        "label": "N4 Corporate",
         "score": "35%",
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&uarr;",
@@ -518,9 +534,9 @@
   },
   "hypotheses": [
     {
-      "tier": "t1",
+      "tier": "n1",
       "direction": "upside",
-      "title": "T1: Structural Compounder Resumes",
+      "title": "N1: Structural Compounder Resumes",
       "statusClass": "priced",
       "statusText": "Tested &mdash; 1H Missed But Franchise Intact",
       "score": "45%",
@@ -552,9 +568,9 @@
       ]
     },
     {
-      "tier": "t2",
+      "tier": "n2",
       "direction": "downside",
-      "title": "T2: Execution Risk in Transformation",
+      "title": "N2: Execution Risk in Transformation",
       "statusClass": "active",
       "statusText": "Confirmed &mdash; 1H Results Validate",
       "score": "55%",
@@ -579,9 +595,9 @@
       ]
     },
     {
-      "tier": "t3",
+      "tier": "n3",
       "direction": "downside",
-      "title": "T3: Structural Headwinds Emerging",
+      "title": "N3: Structural Headwinds Emerging",
       "statusClass": "active",
       "statusText": "Confirmed &mdash; 1H Evidence Across Multiple Lines",
       "score": "40%",
@@ -605,9 +621,9 @@
       ]
     },
     {
-      "tier": "t4",
+      "tier": "n4",
       "direction": "neutral",
-      "title": "T4: M&amp;A or Corporate Event",
+      "title": "N4: M&amp;A or Corporate Event",
       "statusClass": "accumulating",
       "statusText": "Materialised &mdash; CEO Departure is the Corporate Event",
       "score": "35%",
@@ -652,15 +668,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (guidance reaffirmed)",
+            "text": "Supports N1 (guidance reaffirmed)",
             "class": "supports"
           },
           {
-            "text": "Strongly Supports T2 (CEO exit + impairments)",
+            "text": "Strongly Supports N2 (CEO exit + impairments)",
             "class": "strong"
           },
           {
-            "text": "Supports T4 (portfolio clean-up)",
+            "text": "Supports N4 (portfolio clean-up)",
             "class": "supports"
           }
         ],
@@ -676,15 +692,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Mixed on T1 (underlying okay, headline weak)",
+            "text": "Mixed on N1 (underlying okay, headline weak)",
             "class": "supports"
           },
           {
-            "text": "Strongly Supports T2 (impairments + NPAT drop)",
+            "text": "Strongly Supports N2 (impairments + NPAT drop)",
             "class": "strong"
           },
           {
-            "text": "Supports T3 (albumin, KCENTRA, Seqirus all weak)",
+            "text": "Supports N3 (albumin, KCENTRA, Seqirus all weak)",
             "class": "supports"
           }
         ],
@@ -700,11 +716,11 @@
         "table": null,
         "tags": [
           {
-            "text": "Strongly Supports T1",
+            "text": "Strongly Supports N1",
             "class": "strong"
           },
           {
-            "text": "Contradicts T2",
+            "text": "Contradicts N2",
             "class": "contradicts"
           }
         ],
@@ -720,11 +736,11 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (share gains)",
+            "text": "Supports N1 (share gains)",
             "class": "supports"
           },
           {
-            "text": "Supports T3 (China risk)",
+            "text": "Supports N3 (China risk)",
             "class": "supports"
           }
         ],
@@ -740,15 +756,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (IG demand)",
+            "text": "Supports N1 (IG demand)",
             "class": "supports"
           },
           {
-            "text": "Supports T3 (flu decline)",
+            "text": "Supports N3 (flu decline)",
             "class": "supports"
           },
           {
-            "text": "Neutral T4",
+            "text": "Neutral N4",
             "class": "neutral"
           }
         ],
@@ -760,19 +776,19 @@
         "epistemicClass": "ep-behavioural",
         "epistemicLabel": "Behavioural",
         "finding": "<strong>Workforce reduction:</strong> Headcount fell from 32,698 to 29,904 (down 8.5%), representing approximately 3,000 job cuts. This is the largest workforce reduction in CSL's history and was not prominently disclosed in corporate communications. <strong>Plasma collection centre activity:</strong> US collection volumes appear stable based on donor traffic data, supporting the Behring revenue thesis. <strong>Gene therapy signals:</strong> HEMGENIX pricing at US$3.5M per treatment generating mixed uptake data; some treatment centres reporting slower-than-expected adoption due to payer pushback on gene therapy pricing.",
-        "tension": "The 3,000-job cut is significant and underreported. While framed as efficiency improvement, the scale suggests deeper cost pressures than management has publicly acknowledged. This is the strongest data point supporting T2 (execution risk in transformation).",
+        "tension": "The 3,000-job cut is significant and underreported. While framed as efficiency improvement, the scale suggests deeper cost pressures than management has publicly acknowledged. This is the strongest data point supporting N2 (execution risk in transformation).",
         "table": null,
         "tags": [
           {
-            "text": "Supports T1 (collection stable)",
+            "text": "Supports N1 (collection stable)",
             "class": "supports"
           },
           {
-            "text": "Strongly Supports T2 (job cuts)",
+            "text": "Strongly Supports N2 (job cuts)",
             "class": "strong"
           },
           {
-            "text": "Supports T3 (gene therapy slow)",
+            "text": "Supports N3 (gene therapy slow)",
             "class": "supports"
           }
         ],
@@ -788,15 +804,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Strongly Supports T1",
+            "text": "Strongly Supports N1",
             "class": "strong"
           },
           {
-            "text": "Neutral T2 (CEO succession)",
+            "text": "Neutral N2 (CEO succession)",
             "class": "neutral"
           },
           {
-            "text": "Contradicts T3 (gene therapy coexistence)",
+            "text": "Contradicts N3 (gene therapy coexistence)",
             "class": "contradicts"
           }
         ],
@@ -812,15 +828,15 @@
         "table": null,
         "tags": [
           {
-            "text": "Strongly Supports T2",
+            "text": "Strongly Supports N2",
             "class": "strong"
           },
           {
-            "text": "Neutral on T1",
+            "text": "Neutral on N1",
             "class": "neutral"
           },
           {
-            "text": "Neutral on T3",
+            "text": "Neutral on N3",
             "class": "neutral"
           }
         ],
@@ -867,15 +883,15 @@
         },
         "tags": [
           {
-            "text": "Neutral on T1 (board quality)",
+            "text": "Neutral on N1 (board quality)",
             "class": "neutral"
           },
           {
-            "text": "Strongly Supports T2 (transition risk)",
+            "text": "Strongly Supports N2 (transition risk)",
             "class": "strong"
           },
           {
-            "text": "Supports T4 (Perreault influence)",
+            "text": "Supports N4 (Perreault influence)",
             "class": "supports"
           }
         ],
@@ -930,15 +946,15 @@
         },
         "tags": [
           {
-            "text": "Supports T1 (sovereign accumulating)",
+            "text": "Supports N1 (sovereign accumulating)",
             "class": "supports"
           },
           {
-            "text": "Neutral on T2",
+            "text": "Neutral on N2",
             "class": "neutral"
           },
           {
-            "text": "Supports T4 (buyback support)",
+            "text": "Supports N4 (buyback support)",
             "class": "supports"
           }
         ],
@@ -954,15 +970,15 @@
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
         "evidence": "<strong>1H FY26 Results (12 Feb 2026) &mdash; RESOLVED.</strong> Behring IG -6%, NPATA -7%, $1.1B impairments, CEO departed. Result was mixed: franchise intact but execution messy.",
-        "discriminatesBetween": "T1 (franchise intact) vs T2 (transformation disrupting operations)",
-        "currentReading": "T2 confirmed; T1 weakened but not invalidated",
+        "discriminatesBetween": "N1 (franchise intact) vs N2 (transformation disrupting operations)",
+        "currentReading": "N2 confirmed; N1 weakened but not invalidated",
         "readingClass": "td-red"
       },
       {
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
         "evidence": "<strong>Permanent CEO appointment timeline and identity.</strong> Internal promotion signals continuity; external hire signals strategic reset.",
-        "discriminatesBetween": "T1 (smooth transition) vs T2 (prolonged uncertainty)",
+        "discriminatesBetween": "N1 (smooth transition) vs N2 (prolonged uncertainty)",
         "currentReading": "Search underway &mdash; no timeline; interim CEO presenting",
         "readingClass": "td-amber"
       },
@@ -970,15 +986,15 @@
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
         "evidence": "<strong>2H FY26 NPATA acceleration.</strong> Guidance implies US$1.55-1.65B in 2H (vs US$1.9B in 1H). Must deliver to validate reaffirmed guidance.",
-        "discriminatesBetween": "T1 (guidance credible, 2H seasonal strength) vs T2 (guidance cut risk, cost pressures)",
+        "discriminatesBetween": "N1 (guidance credible, 2H seasonal strength) vs N2 (guidance cut risk, cost pressures)",
         "currentReading": "Awaiting &mdash; August 2026",
         "readingClass": "td-amber"
       },
       {
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
-        "evidence": "<strong>Albumin trend in 2H.</strong> 1H albumin -27% was the largest single product decline. If structural (China substitution), T3 strengthens materially.",
-        "discriminatesBetween": "T1 (one-off destocking) vs T3 (permanent China import substitution)",
+        "evidence": "<strong>Albumin trend in 2H.</strong> 1H albumin -27% was the largest single product decline. If structural (China substitution), N3 strengthens materially.",
+        "discriminatesBetween": "N1 (one-off destocking) vs N3 (permanent China import substitution)",
         "currentReading": "Confirmed declining in 1H; 2H trend critical",
         "readingClass": "td-red"
       }
@@ -986,7 +1002,7 @@
     "nonDiscriminating": "<strong>\"Share price down 40%\"</strong> (price decline is the question, not the answer) &bull; <strong>\"P/E of 13.4x looks cheap\"</strong> (cheap can get cheaper if 2H misses) &bull; <strong>\"US$1.1B impairments\"</strong> (backward-looking; does not impair core franchise) &bull; <strong>\"Consensus Buy\"</strong> (uniformity may reflect slow re-rating rather than conviction)"
   },
   "tripwires": {
-    "intro": "Four revision conditions. The first tripwire has been triggered &mdash; 1H results came in mixed, confirming T2 but not invalidating T1. The remaining three are now more diagnostic than ever.",
+    "intro": "Four revision conditions. The first tripwire has been triggered &mdash; 1H results came in mixed, confirming N2 but not invalidating N1. The remaining three are now more diagnostic than ever.",
     "cards": [
       {
         "date": "12 FEBRUARY 2026",
@@ -995,12 +1011,12 @@
           {
             "if": "NPATA US$1.9B (-7%); Behring IG -6%; Albumin -27%; KCENTRA -20%",
             "valence": "negative",
-            "then": "<strong>Outcome:</strong> T2 confirmed (execution challenges real). T1 weakened but not invalidated (margins expanding, guidance reaffirmed). T3 gained evidence (albumin, KCENTRA structural declines)."
+            "then": "<strong>Outcome:</strong> N2 confirmed (execution challenges real). N1 weakened but not invalidated (margins expanding, guidance reaffirmed). N3 gained evidence (albumin, KCENTRA structural declines)."
           },
           {
             "if": "US$1.1B impairments; CEO departed day before; stock crashed 17% to A$151",
             "valence": "negative",
-            "then": "<strong>Outcome:</strong> T4 activated (corporate event materialised). Market priced worst case; partial recovery to A$163 suggests floor forming."
+            "then": "<strong>Outcome:</strong> N4 activated (corporate event materialised). Market priced worst case; partial recovery to A$163 suggests floor forming."
           }
         ],
         "source": "Source: CSL 1H FY26 Results, 12 Feb 2026; ASX announcement"
@@ -1012,12 +1028,12 @@
           {
             "if": "If appointment made within 6 months with clear strategic mandate",
             "valence": "positive",
-            "then": "T2 weakens. Transition was orderly, not dysfunctional. Market re-rates."
+            "then": "N2 weakens. Transition was orderly, not dysfunctional. Market re-rates."
           },
           {
             "if": "If search extends beyond 6 months or interim CEO role becomes permanent",
             "valence": "negative",
-            "then": "T2 strengthens. Prolonged uncertainty; Seqirus/Vifor strategic direction unresolved."
+            "then": "N2 strengthens. Prolonged uncertainty; Seqirus/Vifor strategic direction unresolved."
           }
         ],
         "source": "Source: ASX announcement; board disclosures"
@@ -1029,12 +1045,12 @@
           {
             "if": "If FY26 NPATA hits US$3.45-3.55B guidance and albumin stabilises",
             "valence": "positive",
-            "then": "T1 strengthens decisively. 2H delivered. 1H was the trough. Market re-rates."
+            "then": "N1 strengthens decisively. 2H delivered. 1H was the trough. Market re-rates."
           },
           {
             "if": "If NPATA misses guidance or further impairments emerge",
             "valence": "negative",
-            "then": "T2 deepens. Guidance was not credible. Multiple compression continues toward A$140."
+            "then": "N2 deepens. Guidance was not credible. Multiple compression continues toward A$140."
           }
         ],
         "source": "Source: CSL FY26 Annual Report; segmental disclosures"
@@ -1046,12 +1062,12 @@
           {
             "if": "If new CEO revives Seqirus demerger or announces Vifor/Seqirus sale",
             "valence": "positive",
-            "then": "T4 crystallises. Sum-of-parts value unlocking; clean portfolio story."
+            "then": "N4 crystallises. Sum-of-parts value unlocking; clean portfolio story."
           },
           {
             "if": "If Seqirus remains integrated with no strategic clarity under new CEO",
             "valence": "negative",
-            "then": "T2 persists. Conglomerate discount continues; capital allocation questions unresolved."
+            "then": "N2 persists. Conglomerate discount continues; capital allocation questions unresolved."
           }
         ],
         "source": "Source: ASX announcements; new CEO strategic presentation"
@@ -1147,7 +1163,7 @@
       "<strong>Gene therapy payer dynamics:</strong> HEMGENIX at US$3.5M per treatment faces payer pushback that is difficult to quantify. Uptake trajectories depend on reimbursement negotiations that are not publicly disclosed.",
       "<strong>China regulatory trajectory:</strong> The pace of Chinese import substitution in albumin depends on NMPA regulatory decisions that are opaque to external analysts."
     ],
-    "analyticalLimitations": "Hypothesis survival scores (T1: 45%, T2: 55%, T3: 40%, T4: 35%) reflect editorial assessment updated post-1H FY26 results. T2 (Execution Risk) is now the dominant hypothesis after 1H confirmed broad-based weakness, $1.1B impairments, and CEO departure. T1 (Structural Compounder) remains viable but weakened &mdash; the franchise indicators are defensible but headline numbers were poor. T3 gained evidence from albumin -27%, KCENTRA -20%, and Seqirus -2%. T4 elevated by the CEO departure and portfolio clean-up. These scores will be revised materially based on 2H FY26 results and permanent CEO appointment."
+    "analyticalLimitations": "Hypothesis survival scores (N1: 45%, N2: 55%, N3: 40%, N4: 35%) reflect editorial assessment updated post-1H FY26 results. N2 (Execution Risk) is now the dominant hypothesis after 1H confirmed broad-based weakness, $1.1B impairments, and CEO departure. N1 (Structural Compounder) remains viable but weakened &mdash; the franchise indicators are defensible but headline numbers were poor. N3 gained evidence from albumin -27%, KCENTRA -20%, and Seqirus -2%. N4 elevated by the CEO departure and portfolio clean-up. These scores will be revised materially based on 2H FY26 results and permanent CEO appointment."
   },
   "technicalAnalysis": {
     "date": "11 February 2026",

@@ -26,7 +26,7 @@ const SCHEMA_VERSION = 1;
 
 /**
  * Build a direction map from presentation.hypotheses.
- * Returns { T1: "upside", T2: "downside", ... }
+ * Returns { N1: "upside", N2: "downside", ... }
  */
 function getDirectionMap(stock) {
   const map = {};

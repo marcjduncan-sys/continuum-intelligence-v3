@@ -170,13 +170,13 @@ function updateRegistry(ticker, company, sector, sectorSub, marketData) {
       peakPrice: marketData.yearHigh,
       low52Week: marketData.yearLow,
       high52Week: marketData.yearHigh,
-      baseWeights: { T1: 50, T2: 35, T3: 30, T4: 35 },
+      baseWeights: { N1: 50, N2: 35, N3: 30, N4: 35 },
       characteristics: { highMultiple: false, growthStock: false, hasAIExposure: false },
       hypothesisNames: {
-        T1: 'Growth/Recovery',
-        T2: 'Base Case/Compression',
-        T3: 'Risk/Downside',
-        T4: 'Disruption/Catalyst'
+        N1: 'Growth/Recovery',
+        N2: 'Base Case/Compression',
+        N3: 'Risk/Downside',
+        N4: 'Disruption/Catalyst'
       }
     }
   };
@@ -205,7 +205,7 @@ function createStockJSON(ticker, company, sector, marketData) {
       ? (marketData.sharesOutstanding * marketData.currentPrice / 1e9).toFixed(1) + 'B'
       : null,
     hypotheses: {
-      T1: {
+      N1: {
         label: 'Growth/Recovery',
         description: `${company} executes on growth strategy; earnings accelerate`,
         plain_english: `This is the bull case — ${company} delivers on its key initiatives and the market rewards it.`,
@@ -217,7 +217,7 @@ function createStockJSON(ticker, company, sector, marketData) {
         weighted_inconsistency: 3.0,
         last_updated: new Date().toISOString()
       },
-      T2: {
+      N2: {
         label: 'Base Case/Managed',
         description: `${company} delivers steady-state results; valuation holds`,
         plain_english: 'The company continues on its current trajectory — neither surprising positively nor negatively.',
@@ -229,7 +229,7 @@ function createStockJSON(ticker, company, sector, marketData) {
         weighted_inconsistency: 2.0,
         last_updated: new Date().toISOString()
       },
-      T3: {
+      N3: {
         label: 'Risk/Downside',
         description: `${company} faces headwinds; earnings or multiples compress`,
         plain_english: 'This is the bear case — something goes wrong and the stock de-rates.',
@@ -241,7 +241,7 @@ function createStockJSON(ticker, company, sector, marketData) {
         weighted_inconsistency: 4.0,
         last_updated: new Date().toISOString()
       },
-      T4: {
+      N4: {
         label: 'Disruption/Catalyst',
         description: `A structural shift changes the investment case for ${company}`,
         plain_english: 'An external force — technology, regulation, or competition — fundamentally alters the business.',
@@ -254,7 +254,7 @@ function createStockJSON(ticker, company, sector, marketData) {
         last_updated: new Date().toISOString()
       }
     },
-    dominant: 'T2',
+    dominant: 'N2',
     confidence: 'LOW',
     alert_state: 'NORMAL',
     current_price: marketData.currentPrice,
@@ -385,10 +385,10 @@ STOCK_DATA.${short} = {
     text: '${esc(company)} has been added to coverage. Trading at <span class="key-stat">${marketData.currency}${price}</span>. Full narrative analysis with competing hypotheses is pending.',
     borderColor: null,
     scores: [
-      { label: 'T1 Growth/Recovery', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
-      { label: 'T2 Base Case', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
-      { label: 'T3 Risk/Downside', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
-      { label: 'T4 Disruption/Catalyst', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null }
+      { label: 'N1 Growth/Recovery', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'N2 Base Case', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'N3 Risk/Downside', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null },
+      { label: 'N4 Disruption/Catalyst', score: '?', scoreColor: 'var(--text-muted)', dirArrow: '&rarr;', dirText: 'Pending', dirColor: null }
     ]
   },
 
@@ -414,8 +414,8 @@ STOCK_DATA.${short} = {
   // Hypotheses (placeholder — requires analyst research)
   hypotheses: [
     {
-      tier: 't1', direction: 'upside',
-      title: 'T1: Growth/Recovery',
+      tier: 'n1', direction: 'upside',
+      title: 'N1: Growth/Recovery',
       statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
       score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
       description: 'Placeholder hypothesis. Requires analyst research to populate.',
@@ -424,8 +424,8 @@ STOCK_DATA.${short} = {
       contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
     },
     {
-      tier: 't2', direction: 'neutral',
-      title: 'T2: Base Case',
+      tier: 'n2', direction: 'neutral',
+      title: 'N2: Base Case',
       statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
       score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
       description: 'Placeholder hypothesis. Requires analyst research to populate.',
@@ -434,8 +434,8 @@ STOCK_DATA.${short} = {
       contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
     },
     {
-      tier: 't3', direction: 'downside',
-      title: 'T3: Risk/Downside',
+      tier: 'n3', direction: 'downside',
+      title: 'N3: Risk/Downside',
       statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
       score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
       description: 'Placeholder hypothesis. Requires analyst research to populate.',
@@ -444,8 +444,8 @@ STOCK_DATA.${short} = {
       contradictingLabel: 'Contradicting Evidence', contradicting: ['Pending analysis']
     },
     {
-      tier: 't4', direction: 'downside',
-      title: 'T4: Disruption/Catalyst',
+      tier: 'n4', direction: 'downside',
+      title: 'N4: Disruption/Catalyst',
       statusClass: 'watching', statusText: 'Watching &mdash; Pending Analysis',
       score: '?', scoreWidth: '0%', scoreMeta: 'Pending',
       description: 'Placeholder hypothesis. Requires analyst research to populate.',
