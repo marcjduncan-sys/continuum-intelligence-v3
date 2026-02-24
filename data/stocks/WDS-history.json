@@ -2988,7 +2988,84 @@
       "flip_detail": null,
       "events": [],
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-02-24",
+      "price": 25.83,
+      "daily_change_pct": -0.04,
+      "volume_ratio": 1,
+      "price_classification": "NOISE",
+      "hypotheses": [
+        {
+          "id": "N1",
+          "name": "LNG Growth Champion",
+          "sentiment": "BULLISH",
+          "survival_score": 29,
+          "rank": 1,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N2",
+          "name": "Execution Risk Materialises",
+          "sentiment": "BEARISH",
+          "survival_score": 25,
+          "rank": 2,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N4",
+          "name": "Value Trap with Yield Support",
+          "sentiment": "BEARISH",
+          "survival_score": 25,
+          "rank": 3,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N3",
+          "name": "Energy Transition Stranded Asset Risk",
+          "sentiment": "BEARISH",
+          "survival_score": 21,
+          "rank": 4,
+          "inconsistency_count": 0
+        }
+      ],
+      "thesis_skew": -42,
+      "thesis_skew_label": "DOWNSIDE",
+      "dominant_narrative": "N1",
+      "narrative_flip": true,
+      "flip_detail": {
+        "from": {
+          "id": "T1",
+          "name": "LNG Growth Champion",
+          "score_at_flip": 29
+        },
+        "to": {
+          "id": "N1",
+          "name": "LNG Growth Champion",
+          "score_at_flip": 29
+        },
+        "trigger": "Score recalculation"
+      },
+      "events": [],
+      "overcorrection_active": false
     }
   ],
-  "flips": []
+  "flips": [
+    {
+      "date": "2026-02-24",
+      "from": {
+        "id": "T1",
+        "name": "LNG Growth Champion",
+        "score_at_flip": 29
+      },
+      "to": {
+        "id": "N1",
+        "name": "LNG Growth Champion",
+        "score_at_flip": 29
+      },
+      "trigger": "Score recalculation",
+      "price_on_day": 25.83,
+      "price_change_pct": -0.04
+    }
+  ]
 }

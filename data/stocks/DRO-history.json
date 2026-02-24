@@ -3192,6 +3192,66 @@
       "flip_detail": null,
       "events": [],
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-02-24",
+      "price": 3.25,
+      "daily_change_pct": 2.85,
+      "volume_ratio": 1,
+      "price_classification": "NOTABLE",
+      "hypotheses": [
+        {
+          "id": "N1",
+          "name": "Defence Supercycle Winner",
+          "sentiment": "BULLISH",
+          "survival_score": 29,
+          "rank": 1,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N2",
+          "name": "Lumpy Revenue, Not Scaling",
+          "sentiment": "NEUTRAL",
+          "survival_score": 26,
+          "rank": 2,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N4",
+          "name": "US Market Penetration Succeeds",
+          "sentiment": "BULLISH",
+          "survival_score": 26,
+          "rank": 3,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N3",
+          "name": "Competitive Displacement by Primes",
+          "sentiment": "BEARISH",
+          "survival_score": 19,
+          "rank": 4,
+          "inconsistency_count": 0
+        }
+      ],
+      "thesis_skew": 36,
+      "thesis_skew_label": "UPSIDE",
+      "dominant_narrative": "N1",
+      "narrative_flip": true,
+      "flip_detail": {
+        "from": {
+          "id": "T1",
+          "name": "Defence Supercycle Winner",
+          "score_at_flip": 29
+        },
+        "to": {
+          "id": "N1",
+          "name": "Defence Supercycle Winner",
+          "score_at_flip": 29
+        },
+        "trigger": "Score recalculation"
+      },
+      "events": [],
+      "overcorrection_active": false
     }
   ],
   "flips": [
@@ -3466,6 +3526,22 @@
       "trigger": "Reconstructed from price-as-evidence (4.29% move)",
       "price_on_day": 3.16,
       "price_change_pct": 4.29
+    },
+    {
+      "date": "2026-02-24",
+      "from": {
+        "id": "T1",
+        "name": "Defence Supercycle Winner",
+        "score_at_flip": 29
+      },
+      "to": {
+        "id": "N1",
+        "name": "Defence Supercycle Winner",
+        "score_at_flip": 29
+      },
+      "trigger": "Score recalculation",
+      "price_on_day": 3.25,
+      "price_change_pct": 2.85
     }
   ]
 }

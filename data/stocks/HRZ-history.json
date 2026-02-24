@@ -2987,6 +2987,66 @@
       "flip_detail": null,
       "events": [],
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-02-24",
+      "price": 1.24,
+      "daily_change_pct": 0,
+      "volume_ratio": 1,
+      "price_classification": "NOISE",
+      "hypotheses": [
+        {
+          "id": "N1",
+          "name": "Gold Price Leverage",
+          "sentiment": "BULLISH",
+          "survival_score": 34,
+          "rank": 1,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N2",
+          "name": "Production Transition",
+          "sentiment": "BULLISH",
+          "survival_score": 28,
+          "rank": 2,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N3",
+          "name": "Funding & Dilution Risk",
+          "sentiment": "BEARISH",
+          "survival_score": 25,
+          "rank": 3,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N4",
+          "name": "Gold Price Reversal",
+          "sentiment": "BEARISH",
+          "survival_score": 13,
+          "rank": 4,
+          "inconsistency_count": 0
+        }
+      ],
+      "thesis_skew": 24,
+      "thesis_skew_label": "UPSIDE",
+      "dominant_narrative": "N1",
+      "narrative_flip": true,
+      "flip_detail": {
+        "from": {
+          "id": "T1",
+          "name": "Gold Price Leverage",
+          "score_at_flip": 34
+        },
+        "to": {
+          "id": "N1",
+          "name": "Gold Price Leverage",
+          "score_at_flip": 34
+        },
+        "trigger": "Score recalculation"
+      },
+      "events": [],
+      "overcorrection_active": false
     }
   ],
   "flips": [
@@ -3053,6 +3113,22 @@
       "trigger": "Reconstructed from price-as-evidence (-1.67% move)",
       "price_on_day": 1.175,
       "price_change_pct": -1.67
+    },
+    {
+      "date": "2026-02-24",
+      "from": {
+        "id": "T1",
+        "name": "Gold Price Leverage",
+        "score_at_flip": 34
+      },
+      "to": {
+        "id": "N1",
+        "name": "Gold Price Leverage",
+        "score_at_flip": 34
+      },
+      "trigger": "Score recalculation",
+      "price_on_day": 1.24,
+      "price_change_pct": 0
     }
   ]
 }

@@ -3324,6 +3324,66 @@
       "flip_detail": null,
       "events": [],
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-02-24",
+      "price": 13.91,
+      "daily_change_pct": 3.34,
+      "volume_ratio": 1,
+      "price_classification": "NOTABLE",
+      "hypotheses": [
+        {
+          "id": "N2",
+          "name": "Government Digital Mandate",
+          "sentiment": "BULLISH",
+          "survival_score": 31,
+          "rank": 1,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N3",
+          "name": "Growth Deceleration",
+          "sentiment": "BEARISH",
+          "survival_score": 28,
+          "rank": 2,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N1",
+          "name": "SaaS Transition Acceleration",
+          "sentiment": "BULLISH",
+          "survival_score": 25,
+          "rank": 3,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N4",
+          "name": "Microsoft Displacement",
+          "sentiment": "BEARISH",
+          "survival_score": 16,
+          "rank": 4,
+          "inconsistency_count": 0
+        }
+      ],
+      "thesis_skew": 12,
+      "thesis_skew_label": "UPSIDE",
+      "dominant_narrative": "N2",
+      "narrative_flip": true,
+      "flip_detail": {
+        "from": {
+          "id": "T2",
+          "name": "Government Digital Mandate",
+          "score_at_flip": 31
+        },
+        "to": {
+          "id": "N2",
+          "name": "Government Digital Mandate",
+          "score_at_flip": 31
+        },
+        "trigger": "Score recalculation"
+      },
+      "events": [],
+      "overcorrection_active": false
     }
   ],
   "flips": [
@@ -3774,6 +3834,22 @@
       "trigger": "Reconstructed from price-as-evidence (0% move)",
       "price_on_day": 13.46,
       "price_change_pct": 0
+    },
+    {
+      "date": "2026-02-24",
+      "from": {
+        "id": "T2",
+        "name": "Government Digital Mandate",
+        "score_at_flip": 31
+      },
+      "to": {
+        "id": "N2",
+        "name": "Government Digital Mandate",
+        "score_at_flip": 31
+      },
+      "trigger": "Score recalculation",
+      "price_on_day": 13.91,
+      "price_change_pct": 3.34
     }
   ]
 }

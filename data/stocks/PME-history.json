@@ -3084,6 +3084,66 @@
       "flip_detail": null,
       "events": [],
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-02-24",
+      "price": 125.96,
+      "daily_change_pct": 7.69,
+      "volume_ratio": 1,
+      "price_classification": "SIGNIFICANT",
+      "hypotheses": [
+        {
+          "id": "N1",
+          "name": "US Expansion Accelerates",
+          "sentiment": "BULLISH",
+          "survival_score": 37,
+          "rank": 1,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N4",
+          "name": "AI Amplifies the Moat",
+          "sentiment": "BULLISH",
+          "survival_score": 30,
+          "rank": 2,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N2",
+          "name": "Valuation Mean-Reversion",
+          "sentiment": "BEARISH",
+          "survival_score": 21,
+          "rank": 3,
+          "inconsistency_count": 0
+        },
+        {
+          "id": "N3",
+          "name": "Competitive Disruption",
+          "sentiment": "BEARISH",
+          "survival_score": 12,
+          "rank": 4,
+          "inconsistency_count": 0
+        }
+      ],
+      "thesis_skew": 34,
+      "thesis_skew_label": "UPSIDE",
+      "dominant_narrative": "N1",
+      "narrative_flip": true,
+      "flip_detail": {
+        "from": {
+          "id": "T1",
+          "name": "US Expansion Accelerates",
+          "score_at_flip": 37
+        },
+        "to": {
+          "id": "N1",
+          "name": "US Expansion Accelerates",
+          "score_at_flip": 37
+        },
+        "trigger": "Significant price move of 7.69%"
+      },
+      "events": [],
+      "overcorrection_active": false
     }
   ],
   "flips": [
@@ -3214,6 +3274,22 @@
       "trigger": "Reconstructed from price-as-evidence (-1.06% move)",
       "price_on_day": 116.97,
       "price_change_pct": -1.06
+    },
+    {
+      "date": "2026-02-24",
+      "from": {
+        "id": "T1",
+        "name": "US Expansion Accelerates",
+        "score_at_flip": 37
+      },
+      "to": {
+        "id": "N1",
+        "name": "US Expansion Accelerates",
+        "score_at_flip": 37
+      },
+      "trigger": "Significant price move of 7.69%",
+      "price_on_day": 125.96,
+      "price_change_pct": 7.69
     }
   ]
 }
