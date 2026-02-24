@@ -57,7 +57,7 @@
   "confidence": "HIGH",
   "alert_state": "NORMAL",
   "alert_started": null,
-  "current_price": 285.5,
+  "current_price": 145,
   "big_picture": "CSL is a global biotech leader specialising in plasma-derived therapies and vaccines. It is one of only three companies worldwide that can collect and process blood plasma at scale, giving it an extremely strong competitive position.",
   "last_flip": {
     "date": "2025-08-20",
@@ -237,5 +237,166 @@
     "signal_used": -28,
     "method": "sentiment_shift_v3",
     "computed_at": "2026-02-24T07:54:39.547Z"
+  },
+  "priceHistory": [
+    145
+  ],
+  "freshness": {
+    "pricePctChange": -49.2,
+    "urgency": 40,
+    "status": "HIGH",
+    "badge": "high"
+  },
+  "last_price_update": "2026-02-24T09:12:32.734Z",
+  "technicalAnalysis": {
+    "date": "11 February 2026",
+    "period": "1 Year",
+    "source": "Continuum Technical Intelligence",
+    "regime": "Breakdown",
+    "clarity": "Clear",
+    "price": {
+      "current": 145,
+      "currency": "A$"
+    },
+    "movingAverages": {
+      "ma50": {
+        "value": 176.5,
+        "date": "12 Feb 2026"
+      },
+      "ma200": {
+        "value": 210,
+        "date": "12 Feb 2026"
+      },
+      "crossover": {
+        "type": "Death Cross",
+        "date": "w/c 22 September 2025",
+        "description": "50-day MA crossed below 200-day MA following sharp selloff; gap widening"
+      },
+      "priceVsMa50": -7.4,
+      "priceVsMa200": -22.2
+    },
+    "trend": {
+      "direction": "Down",
+      "duration": "7 months",
+      "structure": "Consolidation base broken by 1H FY26 results crash; new 8-year low at A$151",
+      "peak": {
+        "price": 272,
+        "date": "w/c 28 July 2025"
+      },
+      "trough": {
+        "price": 151.08,
+        "date": "12 February 2026"
+      },
+      "drawdown": -44.4
+    },
+    "keyLevels": {
+      "support": {
+        "price": 151,
+        "method": "Intraday 1H results crash low (12 Feb 2026); 8-year low"
+      },
+      "resistance": {
+        "price": 175,
+        "method": "Prior support turned resistance; former consolidation base"
+      },
+      "fiftyTwoWeekHigh": {
+        "price": 272,
+        "date": "w/c 28 July 2025"
+      },
+      "fiftyTwoWeekLow": {
+        "price": 151.08,
+        "date": "12 February 2026"
+      }
+    },
+    "volume": {
+      "latestVs20DayAvg": 5.8,
+      "latestDate": "12 February 2026",
+      "priorSpikes": [
+        {
+          "period": "w/c 1 September 2025",
+          "ratio": 3.4,
+          "context": "Sharp selloff from A$271 to A$225"
+        },
+        {
+          "period": "w/c 27 October 2025",
+          "ratio": 2.2,
+          "context": "Break below A$200; institutional rebalancing"
+        },
+        {
+          "period": "w/c 10 November 2025",
+          "ratio": 2.8,
+          "context": "Crash to A$170; capitulation selling"
+        },
+        {
+          "period": "12 February 2026",
+          "ratio": 5.8,
+          "context": "1H FY26 results + CEO departure; crashed 17% intraday to A$151"
+        }
+      ]
+    },
+    "volatility": {
+      "latestDailyRange": {
+        "high": 180.5,
+        "low": 151.08,
+        "date": "12 February 2026"
+      },
+      "latestRangePercent": 19.5,
+      "avgDailyRangePercent30": 2.1,
+      "avgDailyRangePercent90": 1.9
+    },
+    "meanReversion": {
+      "vsMa50": -7.4,
+      "vsMa200": -22.2,
+      "rangePosition": 10,
+      "rangeHigh": 272,
+      "rangeLow": 151.08
+    },
+    "inflectionPoints": [
+      {
+        "date": "w/c 28 July 2025",
+        "price": 272,
+        "event": "12-month high"
+      },
+      {
+        "date": "w/c 1 September 2025",
+        "price": 225.5,
+        "event": "Sharp selloff; drops 17% in one week"
+      },
+      {
+        "date": "w/c 22 September 2025",
+        "price": 205.81,
+        "event": "Death cross forms; 50-day MA below 200-day MA"
+      },
+      {
+        "date": "w/c 10 November 2025",
+        "price": 170.77,
+        "event": "Breaks below A$180; near capitulation"
+      },
+      {
+        "date": "w/c 12 January 2026",
+        "price": 168.29,
+        "event": "Prior 12-month low; base attempted"
+      },
+      {
+        "date": "12 February 2026",
+        "price": 151.08,
+        "event": "1H results + CEO exit; crashed 17% intraday to 8-year low; recovered to A$163"
+      }
+    ],
+    "relativePerformance": {
+      "vsIndex": {
+        "name": "S&amp;P/ASX 200",
+        "period": "12 months",
+        "stockReturn": -39.9,
+        "indexReturn": -2.3,
+        "relativeReturn": -37.6
+      },
+      "vsSector": {
+        "name": "S&amp;P/ASX Healthcare",
+        "period": "12 months",
+        "stockReturn": -39.9,
+        "sectorReturn": -12.4,
+        "relativeReturn": -27.5
+      }
+    }
   }
 }

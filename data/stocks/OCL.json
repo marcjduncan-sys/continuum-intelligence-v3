@@ -56,7 +56,7 @@
   "dominant": "N2",
   "confidence": "LOW",
   "alert_state": "NORMAL",
-  "current_price": 13.46,
+  "current_price": 12.92,
   "big_picture": "Objective Corporation Limited (ASX: OCL) — coverage initiated. Full analysis pending.",
   "last_flip": null,
   "narrative_history": [],
@@ -175,5 +175,151 @@
     "signal_used": 12,
     "method": "sentiment_shift_v3",
     "computed_at": "2026-02-24T07:54:39.556Z"
+  },
+  "priceHistory": [
+    12.92
+  ],
+  "freshness": {
+    "pricePctChange": -4,
+    "urgency": 10,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_price_update": "2026-02-24T09:12:33.000Z",
+  "technicalAnalysis": {
+    "date": "16 February 2026",
+    "period": "1 Year",
+    "source": "Continuum Technical Intelligence",
+    "regime": "Breakdown",
+    "clarity": "Clear",
+    "price": {
+      "current": 12.92,
+      "currency": "A$"
+    },
+    "movingAverages": {
+      "ma50": {
+        "value": 15.2,
+        "date": "16 Feb 2026"
+      },
+      "ma200": {
+        "value": 17.8,
+        "date": "16 Feb 2026"
+      },
+      "crossover": {
+        "type": "Death Cross",
+        "date": "w/c 14 October 2025",
+        "description": "50-day MA crossed below 200-day MA, confirming the downtrend. Price has remained below both moving averages since."
+      },
+      "priceVsMa50": -11.4,
+      "priceVsMa200": -24.4
+    },
+    "trend": {
+      "direction": "Down",
+      "duration": "8 months",
+      "structure": "Persistent downtrend from A$22.90 high with no sustained rally attempts. Each bounce has been sold into. The decline accelerated through the A$15.00 support in January 2026.",
+      "peak": {
+        "price": 22.9,
+        "date": "w/c 7 July 2025"
+      },
+      "trough": {
+        "price": 13.19,
+        "date": "14 February 2026"
+      },
+      "drawdown": -42.4
+    },
+    "keyLevels": {
+      "support": {
+        "price": 13.19,
+        "method": "52-week low — current intraday support; A$13.00 is the round number psychological level"
+      },
+      "resistance": {
+        "price": 15,
+        "method": "Prior support turned resistance — broken in January 2026 acceleration"
+      },
+      "fiftyTwoWeekHigh": {
+        "price": 22.9,
+        "date": "w/c 7 July 2025"
+      },
+      "fiftyTwoWeekLow": {
+        "price": 13.19,
+        "date": "14 February 2026"
+      }
+    },
+    "volume": {
+      "latestVs20DayAvg": 1.2,
+      "latestDate": "16 February 2026",
+      "priorSpikes": [
+        {
+          "period": "w/c 20 January 2026",
+          "ratio": 2.8,
+          "context": "Break below A$15.00 support on elevated volume"
+        },
+        {
+          "period": "w/c 25 August 2025",
+          "ratio": 2.1,
+          "context": "FY25 results release — initial selling pressure"
+        }
+      ]
+    },
+    "volatility": {
+      "latestDailyRange": {
+        "high": 13.6,
+        "low": 13.3,
+        "date": "16 February 2026"
+      },
+      "latestRangePercent": 2.2,
+      "avgDailyRangePercent30": 2.5,
+      "avgDailyRangePercent90": 2.1
+    },
+    "meanReversion": {
+      "vsMa50": -11.4,
+      "vsMa200": -24.4,
+      "rangePosition": 3,
+      "rangeHigh": 22.9,
+      "rangeLow": 13.19
+    },
+    "inflectionPoints": [
+      {
+        "date": "w/c 7 July 2025",
+        "price": 22.9,
+        "event": "52-week high"
+      },
+      {
+        "date": "w/c 25 August 2025",
+        "price": 19.5,
+        "event": "FY25 results — gap down on guidance miss"
+      },
+      {
+        "date": "w/c 14 October 2025",
+        "price": 17,
+        "event": "Death Cross — technical sell signal"
+      },
+      {
+        "date": "w/c 20 January 2026",
+        "price": 14.8,
+        "event": "Break below A$15.00 support"
+      },
+      {
+        "date": "14 February 2026",
+        "price": 13.19,
+        "event": "52-week low — no base forming yet"
+      }
+    ],
+    "relativePerformance": {
+      "vsIndex": {
+        "name": "S&P/ASX 200",
+        "period": "12 months",
+        "stockReturn": -41.2,
+        "indexReturn": 4.2,
+        "relativeReturn": -45.4
+      },
+      "vsSector": {
+        "name": "S&P/ASX Technology",
+        "period": "12 months",
+        "stockReturn": -41.2,
+        "sectorReturn": -8.5,
+        "relativeReturn": -32.7
+      }
+    }
   }
 }

@@ -56,7 +56,7 @@
   "dominant": "N1",
   "confidence": "LOW",
   "alert_state": "NORMAL",
-  "current_price": 12.85,
+  "current_price": 12.95,
   "big_picture": "Worley Limited (ASX: WOR) — coverage initiated. Full analysis pending.",
   "last_flip": null,
   "narrative_history": [],
@@ -189,5 +189,141 @@
     "signal_used": 12,
     "method": "sentiment_shift_v3",
     "computed_at": "2026-02-24T07:54:39.560Z"
+  },
+  "priceHistory": [
+    12.95
+  ],
+  "freshness": {
+    "pricePctChange": 0.8,
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_price_update": "2026-02-24T09:12:33.065Z",
+  "technicalAnalysis": {
+    "date": "14 February 2026",
+    "period": "12 months",
+    "source": "ASX / Yahoo Finance",
+    "regime": "Downtrend — Bottoming Attempt",
+    "clarity": "Low clarity, searching for base",
+    "price": {
+      "current": 12.95,
+      "currency": "A$"
+    },
+    "movingAverages": {
+      "ma50": {
+        "value": 12.4,
+        "date": "14 Feb 2026"
+      },
+      "ma200": {
+        "value": 13.8,
+        "date": "14 Feb 2026"
+      },
+      "crossover": {
+        "type": "Death Cross",
+        "date": "Jul 2025",
+        "description": "50-day MA crossed below 200-day MA in July 2025, confirming downtrend. Price recently reclaimed 50-day MA, potential early bottoming signal."
+      },
+      "priceVsMa50": 3.6,
+      "priceVsMa200": -6.9
+    },
+    "trend": {
+      "direction": "Downtrend (moderating)",
+      "duration": "10 months",
+      "structure": "Sharp downtrend from $17.50 peak (Apr 2025) to $10.00 low (Dec 2025), followed by base-building between $11.50-$13.50. Lower highs sequence may be breaking with recent strength above $12.80. Early bottoming signals present.",
+      "peak": {
+        "price": 17.5,
+        "date": "Apr 2025"
+      },
+      "trough": {
+        "price": 10,
+        "date": "Dec 2025"
+      },
+      "drawdown": -26.6
+    },
+    "keyLevels": {
+      "support": {
+        "price": 11.5,
+        "method": "Double bottom formation + volume support cluster"
+      },
+      "resistance": {
+        "price": 14,
+        "method": "200-day MA + prior support turned resistance"
+      },
+      "fiftyTwoWeekHigh": {
+        "price": 17.5,
+        "date": "Apr 2025"
+      },
+      "fiftyTwoWeekLow": {
+        "price": 10,
+        "date": "Dec 2025"
+      }
+    },
+    "volume": {
+      "latestVs20DayAvg": 0.15,
+      "latestDate": "14 Feb 2026",
+      "priorSpikes": [
+        {
+          "period": "Aug 2024",
+          "ratio": 3.5,
+          "context": "FY24 results — margin miss triggered 12% sell-off on heavy volume"
+        },
+        {
+          "period": "Dec 2025",
+          "ratio": 2.8,
+          "context": "Insider buying disclosed — CEO/CFO purchases sparked 15% rally from $10.00 low"
+        }
+      ]
+    },
+    "volatility": {
+      "latestDailyRange": {
+        "high": 13.1,
+        "low": 12.6,
+        "date": "14 Feb 2026"
+      },
+      "latestRangePercent": 3.88,
+      "avgDailyRangePercent30": 3.2,
+      "avgDailyRangePercent90": 3.5
+    },
+    "meanReversion": {
+      "vsMa50": 3.6,
+      "vsMa200": -6.9,
+      "rangePosition": 38,
+      "rangeHigh": 17.5,
+      "rangeLow": 10
+    },
+    "inflectionPoints": [
+      {
+        "date": "Aug 2024",
+        "price": 16,
+        "event": "FY24 results — margin miss, stock fell 12%"
+      },
+      {
+        "date": "Nov 2024",
+        "price": 12,
+        "event": "Capital Markets Day — mixed reception, range-bound"
+      },
+      {
+        "date": "Dec 2025",
+        "price": 10,
+        "event": "Capitulation low — insider buying sparked recovery rally"
+      }
+    ],
+    "relativePerformance": {
+      "vsIndex": {
+        "name": "S&P/ASX 200",
+        "period": "12 months",
+        "stockReturn": -26.6,
+        "indexReturn": 8.5,
+        "relativeReturn": -35.1
+      },
+      "vsSector": {
+        "name": "S&P/ASX Energy",
+        "period": "12 months",
+        "stockReturn": -26.6,
+        "sectorReturn": -8.2,
+        "relativeReturn": -18.4
+      }
+    }
   }
 }

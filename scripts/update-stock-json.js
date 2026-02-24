@@ -77,9 +77,22 @@ function main() {
 
     const newPrice = priceData.price;
     const oldPrice = stock.current_price;
+    const FORCE = args.includes('--force');
     const priceChanged = Math.abs(newPrice - (oldPrice || 0)) > 0.001;
 
-    if (!priceChanged) {
+    // Technical Analysis Sync check
+    const researchPath = path.join(__dirname, '..', 'data', 'research', `${ticker}.json`);
+    let needsTASync = false;
+    if (fs.existsSync(researchPath)) {
+      try {
+        const research = JSON.parse(fs.readFileSync(researchPath, 'utf8'));
+        if (research.technicalAnalysis && !stock.technicalAnalysis) {
+          needsTASync = true;
+        }
+      } catch (err) { }
+    }
+
+    if (!priceChanged && !FORCE && !needsTASync) {
       console.log(`  ─ ${ticker}: A$${newPrice} (unchanged)`);
       skipped++;
       continue;
@@ -144,19 +157,34 @@ function main() {
 
     stock.freshness.urgency = Math.min(urgency, 100);
     stock.freshness.status = urgency >= 50 ? 'CRITICAL' :
-                              urgency >= 35 ? 'HIGH' :
-                              urgency >= 20 ? 'MODERATE' : 'OK';
+      urgency >= 35 ? 'HIGH' :
+        urgency >= 20 ? 'MODERATE' : 'OK';
     stock.freshness.badge = stock.freshness.status.toLowerCase();
 
     // ── Update timestamp ─────────────────────────────────────────
     stock.last_price_update = now.toISOString();
+
+    // ── Sync technicalAnalysis from research (Expert Source) ──────
+    if (fs.existsSync(researchPath)) {
+      try {
+        const research = JSON.parse(fs.readFileSync(researchPath, 'utf8'));
+        if (research.technicalAnalysis) {
+          stock.technicalAnalysis = research.technicalAnalysis;
+          // Ensure technicalAnalysis object has the most recent price if available
+          if (stock.technicalAnalysis.price) {
+            stock.technicalAnalysis.price.current = newPrice;
+          }
+        }
+      } catch (err) { }
+    }
 
     // ── Log ──────────────────────────────────────────────────────
     const changeStr = priceData.changePercent !== undefined
       ? ` (${priceData.changePercent >= 0 ? '+' : ''}${priceData.changePercent.toFixed(2)}%)`
       : '';
     const freshStr = stock.freshness.status !== 'OK' ? ` [${stock.freshness.status}]` : '';
-    console.log(`  ✓ ${ticker}: A$${oldPrice} → A$${newPrice}${changeStr}${freshStr}`);
+    const taStr = (fs.existsSync(researchPath) && JSON.parse(fs.readFileSync(researchPath, 'utf8')).technicalAnalysis) ? ' [TA-Synced]' : '';
+    console.log(`  ✓ ${ticker}: A$${oldPrice || 0} → A$${newPrice}${changeStr}${freshStr}${taStr}`);
 
     // ── Write ────────────────────────────────────────────────────
     if (!DRY_RUN) {

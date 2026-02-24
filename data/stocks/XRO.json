@@ -56,7 +56,7 @@
   "dominant": "N2",
   "confidence": "LOW",
   "alert_state": "NORMAL",
-  "current_price": null,
+  "current_price": 71.84,
   "big_picture": "Xero Limited (ASX: XRO) — coverage initiated. Full analysis pending.",
   "last_flip": null,
   "narrative_history": [],
@@ -105,5 +105,171 @@
     "tech_signal": 0,
     "external_weight": 0
   },
-  "risk_skew": "BALANCED"
+  "risk_skew": "BALANCED",
+  "priceHistory": [
+    71.84
+  ],
+  "freshness": {
+    "pricePctChange": 0,
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_price_update": "2026-02-24T09:12:33.100Z",
+  "technicalAnalysis": {
+    "date": "12 February 2026",
+    "period": "1 Year",
+    "source": "Continuum Technical Intelligence",
+    "regime": "Trending",
+    "clarity": "Clear",
+    "price": {
+      "current": 71.84,
+      "currency": "A$"
+    },
+    "movingAverages": {
+      "ma50": {
+        "value": 105.28,
+        "date": "12 Feb 2026"
+      },
+      "ma200": {
+        "value": 136.58,
+        "date": "12 Feb 2026"
+      },
+      "crossover": {
+        "type": "Death Cross",
+        "date": "w/c 6 October 2025",
+        "description": "50-day MA crossed below 200-day MA"
+      },
+      "priceVsMa50": -26.1,
+      "priceVsMa200": -43.1
+    },
+    "trend": {
+      "direction": "Down",
+      "duration": "8 months",
+      "structure": "Lower highs, lower lows",
+      "peak": {
+        "price": 194.21,
+        "date": "w/c 16 June 2025"
+      },
+      "trough": {
+        "price": 77.76,
+        "date": "12 February 2026"
+      },
+      "drawdown": -60
+    },
+    "keyLevels": {
+      "support": {
+        "price": 77,
+        "method": "Prior intraday low cluster (Feb 2026 sessions)"
+      },
+      "resistance": {
+        "price": 90,
+        "method": "Prior support turned resistance (Jan 2026 breakdown level)"
+      },
+      "fiftyTwoWeekHigh": {
+        "price": 194.21,
+        "date": "w/c 16 June 2025"
+      },
+      "fiftyTwoWeekLow": {
+        "price": 77.71,
+        "date": "12 February 2026"
+      }
+    },
+    "volume": {
+      "latestVs20DayAvg": 4.8,
+      "latestDate": "12 February 2026",
+      "priorSpikes": [
+        {
+          "period": "w/c 23 June 2025",
+          "ratio": 2.8,
+          "context": "Initial break below A$160"
+        },
+        {
+          "period": "w/c 6 October 2025",
+          "ratio": 2.1,
+          "context": "Death cross week"
+        },
+        {
+          "period": "w/c 15 December 2025",
+          "ratio": 2.4,
+          "context": "Break below A$120"
+        },
+        {
+          "period": "w/c 3 February 2026",
+          "ratio": 3.5,
+          "context": "AI panic sell-off; ASX IT Index -9.4%; break below A$100"
+        },
+        {
+          "period": "12 February 2026",
+          "ratio": 4.8,
+          "context": "Anthropic Claude catalyst; new 52-week low A$77.71; capitulation volume"
+        }
+      ]
+    },
+    "volatility": {
+      "latestDailyRange": {
+        "high": 84.76,
+        "low": 77.71,
+        "date": "12 February 2026"
+      },
+      "latestRangePercent": 9.1,
+      "avgDailyRangePercent30": 3.2,
+      "avgDailyRangePercent90": 2.1
+    },
+    "meanReversion": {
+      "vsMa50": -26.1,
+      "vsMa200": -43.1,
+      "rangePosition": 1,
+      "rangeHigh": 194.21,
+      "rangeLow": 77.71
+    },
+    "inflectionPoints": [
+      {
+        "date": "w/c 16 June 2025",
+        "price": 194.21,
+        "event": "12-month high"
+      },
+      {
+        "date": "w/c 23 June 2025",
+        "price": 184,
+        "event": "Break below A$190; volume 2.8x 20-day avg"
+      },
+      {
+        "date": "w/c 6 October 2025",
+        "price": 140,
+        "event": "Death cross formed; 50-day MA crosses below 200-day MA"
+      },
+      {
+        "date": "w/c 15 December 2025",
+        "price": 120,
+        "event": "Break below A$120; volume 2.4x 20-day avg"
+      },
+      {
+        "date": "w/c 3 February 2026",
+        "price": 96.1,
+        "event": "AI panic: ASX IT Index -9.4%; Anthropic Claude cited as catalyst; break below A$100"
+      },
+      {
+        "date": "12 February 2026",
+        "price": 77.71,
+        "event": "New 52-week low; volume 4.8x avg; -60% from high; capitulation characteristics"
+      }
+    ],
+    "relativePerformance": {
+      "vsIndex": {
+        "name": "S&amp;P/ASX 200",
+        "period": "12 months",
+        "stockReturn": -60,
+        "indexReturn": -2.3,
+        "relativeReturn": -57.7
+      },
+      "vsSector": {
+        "name": "S&amp;P/ASX IT Index",
+        "period": "12 months",
+        "stockReturn": -60,
+        "sectorReturn": -18.5,
+        "relativeReturn": -41.5
+      }
+    }
+  }
 }

@@ -56,7 +56,7 @@
   "dominant": "N2",
   "confidence": "LOW",
   "alert_state": "NORMAL",
-  "current_price": 1,
+  "current_price": 1.095,
   "big_picture": "Retail Food Group Limited (ASX: RFG) — coverage initiated. Full analysis pending.",
   "last_flip": null,
   "narrative_history": [],
@@ -175,5 +175,151 @@
     "signal_used": -6,
     "method": "sentiment_shift_v3",
     "computed_at": "2026-02-24T07:54:39.557Z"
+  },
+  "priceHistory": [
+    1.095
+  ],
+  "freshness": {
+    "pricePctChange": 9.5,
+    "urgency": 20,
+    "status": "MODERATE",
+    "badge": "moderate"
+  },
+  "last_price_update": "2026-02-24T09:12:33.018Z",
+  "technicalAnalysis": {
+    "date": "16 February 2026",
+    "period": "1 Year",
+    "source": "Continuum Technical Intelligence",
+    "regime": "Breakdown",
+    "clarity": "Clear",
+    "price": {
+      "current": 1.095,
+      "currency": "A$"
+    },
+    "movingAverages": {
+      "ma50": {
+        "value": 1.22,
+        "date": "16 Feb 2026"
+      },
+      "ma200": {
+        "value": 1.55,
+        "date": "16 Feb 2026"
+      },
+      "crossover": {
+        "type": "Death Cross",
+        "date": "w/c 18 November 2025",
+        "description": "50-day MA crossed below 200-day MA. Price has remained below both averages and the gap is widening, indicating accelerating downward momentum."
+      },
+      "priceVsMa50": -18,
+      "priceVsMa200": -35.5
+    },
+    "trend": {
+      "direction": "Down",
+      "duration": "9 months",
+      "structure": "Steady decline from A$2.38 high with no meaningful rally. The downtrend has been persistent and orderly — no capitulation spike, just gradual selling. At A$1.07 (52-week low and psychological floor), the question is whether a base will form.",
+      "peak": {
+        "price": 2.38,
+        "date": "w/c 19 May 2025"
+      },
+      "trough": {
+        "price": 1,
+        "date": "16 February 2026"
+      },
+      "drawdown": -58
+    },
+    "keyLevels": {
+      "support": {
+        "price": 1,
+        "method": "Psychological round number and 52-week low — first test of this level"
+      },
+      "resistance": {
+        "price": 1.2,
+        "method": "Prior breakdown level and 50-day MA convergence zone"
+      },
+      "fiftyTwoWeekHigh": {
+        "price": 2.38,
+        "date": "w/c 19 May 2025"
+      },
+      "fiftyTwoWeekLow": {
+        "price": 1,
+        "date": "16 February 2026"
+      }
+    },
+    "volume": {
+      "latestVs20DayAvg": 0.9,
+      "latestDate": "16 February 2026",
+      "priorSpikes": [
+        {
+          "period": "w/c 16 September 2025",
+          "ratio": 2.4,
+          "context": "FY25 results release — selling on disappointing guidance"
+        },
+        {
+          "period": "w/c 27 January 2026",
+          "ratio": 1.8,
+          "context": "Break below A$1.10 — accelerated selling"
+        }
+      ]
+    },
+    "volatility": {
+      "latestDailyRange": {
+        "high": 1.02,
+        "low": 0.99,
+        "date": "16 February 2026"
+      },
+      "latestRangePercent": 3,
+      "avgDailyRangePercent30": 3.5,
+      "avgDailyRangePercent90": 3.2
+    },
+    "meanReversion": {
+      "vsMa50": -18,
+      "vsMa200": -35.5,
+      "rangePosition": 0,
+      "rangeHigh": 2.38,
+      "rangeLow": 1
+    },
+    "inflectionPoints": [
+      {
+        "date": "w/c 19 May 2025",
+        "price": 2.38,
+        "event": "52-week high"
+      },
+      {
+        "date": "w/c 16 September 2025",
+        "price": 1.63,
+        "event": "FY25 results — gap down"
+      },
+      {
+        "date": "w/c 18 November 2025",
+        "price": 1.46,
+        "event": "Death Cross — technical sell signal"
+      },
+      {
+        "date": "w/c 27 January 2026",
+        "price": 1.11,
+        "event": "Break below A$1.10 support"
+      },
+      {
+        "date": "16 February 2026",
+        "price": 1,
+        "event": "52-week low — testing A$1.07 psychological floor"
+      }
+    ],
+    "relativePerformance": {
+      "vsIndex": {
+        "name": "S&P/ASX 200",
+        "period": "12 months",
+        "stockReturn": -58,
+        "indexReturn": 4.2,
+        "relativeReturn": -62.2
+      },
+      "vsSector": {
+        "name": "S&P/ASX Consumer Discretionary",
+        "period": "12 months",
+        "stockReturn": -58,
+        "sectorReturn": -5.8,
+        "relativeReturn": -52.2
+      }
+    }
   }
 }

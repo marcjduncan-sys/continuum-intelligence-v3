@@ -56,7 +56,7 @@
   "dominant": "N1",
   "confidence": "LOW",
   "alert_state": "NORMAL",
-  "current_price": 170.22,
+  "current_price": 178.5,
   "big_picture": "Commonwealth Bank of Australia (ASX: CBA) — coverage initiated. Full analysis pending.",
   "last_flip": null,
   "narrative_history": [],
@@ -191,5 +191,141 @@
     "signal_used": -30,
     "method": "sentiment_shift_v3",
     "computed_at": "2026-02-24T07:54:39.558Z"
+  },
+  "priceHistory": [
+    178.5
+  ],
+  "freshness": {
+    "pricePctChange": 4.9,
+    "urgency": 10,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_price_update": "2026-02-24T09:12:32.722Z",
+  "technicalAnalysis": {
+    "date": "14 February 2026",
+    "period": "12 months",
+    "source": "ASX / Yahoo Finance",
+    "regime": "Overbought — Extended Rally",
+    "clarity": "Clear trend, stretched extension",
+    "price": {
+      "current": 178.5,
+      "currency": "A$"
+    },
+    "movingAverages": {
+      "ma50": {
+        "value": 163.5,
+        "date": "14 Feb 2026"
+      },
+      "ma200": {
+        "value": 142.3,
+        "date": "14 Feb 2026"
+      },
+      "crossover": {
+        "type": "Golden Cross",
+        "date": "Aug 2024",
+        "description": "50-day MA crossed above 200-day MA in August 2024, confirming structural uptrend. Spread between MAs has widened to $21.20, indicating strong momentum."
+      },
+      "priceVsMa50": 4.1,
+      "priceVsMa200": 19.6
+    },
+    "trend": {
+      "direction": "Uptrend",
+      "duration": "18 months",
+      "structure": "Strong sustained uptrend with higher highs and higher lows since August 2024. Rally has been remarkably smooth with minimal pullbacks, driven by passive inflows and retail buying.",
+      "peak": {
+        "price": 172,
+        "date": "Feb 2026"
+      },
+      "trough": {
+        "price": 98.5,
+        "date": "Aug 2024"
+      },
+      "drawdown": 0
+    },
+    "keyLevels": {
+      "support": {
+        "price": 160,
+        "method": "Prior resistance turned support + 50-day MA convergence"
+      },
+      "resistance": {
+        "price": 175,
+        "method": "Psychological round number + channel projection"
+      },
+      "fiftyTwoWeekHigh": {
+        "price": 172,
+        "date": "Feb 2026"
+      },
+      "fiftyTwoWeekLow": {
+        "price": 105.5,
+        "date": "Mar 2025"
+      }
+    },
+    "volume": {
+      "latestVs20DayAvg": -0.12,
+      "latestDate": "14 Feb 2026",
+      "priorSpikes": [
+        {
+          "period": "Feb 2025",
+          "ratio": 2.8,
+          "context": "1H FY25 results day — 2.8x average volume"
+        },
+        {
+          "period": "Aug 2025",
+          "ratio": 2.1,
+          "context": "FY25 results + final dividend ex-date"
+        }
+      ]
+    },
+    "volatility": {
+      "latestDailyRange": {
+        "high": 171.5,
+        "low": 169,
+        "date": "14 Feb 2026"
+      },
+      "latestRangePercent": 1.47,
+      "avgDailyRangePercent30": 1.25,
+      "avgDailyRangePercent90": 1.35
+    },
+    "meanReversion": {
+      "vsMa50": 4.1,
+      "vsMa200": 19.6,
+      "rangePosition": 97,
+      "rangeHigh": 172,
+      "rangeLow": 105.5
+    },
+    "inflectionPoints": [
+      {
+        "date": "Feb 2025",
+        "price": 135,
+        "event": "1H FY25 results — beat expectations, stock rallied 8%"
+      },
+      {
+        "date": "Aug 2025",
+        "price": 155,
+        "event": "FY25 results — NIM held better than feared, $4B buyback announced"
+      },
+      {
+        "date": "Nov 2025",
+        "price": 160,
+        "event": "S&P/ASX 200 rebalance — CBA weight increased, passive inflows accelerated"
+      }
+    ],
+    "relativePerformance": {
+      "vsIndex": {
+        "name": "S&P/ASX 200",
+        "period": "12 months",
+        "stockReturn": 26.1,
+        "indexReturn": 8.5,
+        "relativeReturn": 17.6
+      },
+      "vsSector": {
+        "name": "S&P/ASX Financials",
+        "period": "12 months",
+        "stockReturn": 26.1,
+        "sectorReturn": 12.3,
+        "relativeReturn": 13.8
+      }
+    }
   }
 }

@@ -57,7 +57,7 @@
   "confidence": "HIGH",
   "alert_state": "NORMAL",
   "alert_started": null,
-  "current_price": 32.45,
+  "current_price": 31.54,
   "big_picture": "Woolworths is Australia's largest supermarket chain, with around 37% market share. The company is currently in a recovery phase after a period of competitive pressure, with improving margins and a growing digital business.",
   "last_flip": {
     "date": "2026-01-15",
@@ -237,5 +237,156 @@
     "signal_used": -28,
     "method": "sentiment_shift_v3",
     "computed_at": "2026-02-24T07:54:39.542Z"
+  },
+  "priceHistory": [
+    31.54
+  ],
+  "freshness": {
+    "pricePctChange": -2.8,
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_price_update": "2026-02-24T09:12:33.079Z",
+  "technicalAnalysis": {
+    "date": "10 February 2026",
+    "period": "1 Year",
+    "source": "Continuum Technical Intelligence",
+    "regime": "Range-bound",
+    "clarity": "Mixed",
+    "price": {
+      "current": 31.54,
+      "currency": "A$"
+    },
+    "movingAverages": {
+      "ma50": {
+        "value": 29.94,
+        "date": "10 Feb 2026"
+      },
+      "ma200": {
+        "value": 29.9,
+        "date": "10 Feb 2026"
+      },
+      "crossover": {
+        "type": "Golden Cross",
+        "date": "w/c 20 January 2026",
+        "description": "50-day MA crossed above 200-day MA"
+      },
+      "priceVsMa50": 4.9,
+      "priceVsMa200": 5
+    },
+    "trend": {
+      "direction": "Recovering",
+      "duration": "4 months",
+      "structure": "Higher lows from October 2025 trough; approaching prior range resistance",
+      "peak": {
+        "price": 33.61,
+        "date": "w/c 8 September 2025"
+      },
+      "trough": {
+        "price": 25.91,
+        "date": "w/c 20 October 2025"
+      },
+      "drawdown": -22.9
+    },
+    "keyLevels": {
+      "support": {
+        "price": 29.3,
+        "method": "Prior consolidation zone (Dec 2025 – Jan 2026)"
+      },
+      "resistance": {
+        "price": 32,
+        "method": "Round number and prior range ceiling (Jun–Aug 2025)"
+      },
+      "fiftyTwoWeekHigh": {
+        "price": 33.61,
+        "date": "w/c 8 September 2025"
+      },
+      "fiftyTwoWeekLow": {
+        "price": 25.91,
+        "date": "w/c 20 October 2025"
+      }
+    },
+    "volume": {
+      "latestVs20DayAvg": 1.1,
+      "latestDate": "10 February 2026",
+      "priorSpikes": [
+        {
+          "period": "w/c 15 September 2025",
+          "ratio": 2.8,
+          "context": "Sharp selloff from A$33.42 to A$28.51; likely earnings reaction"
+        },
+        {
+          "period": "w/c 20 October 2025",
+          "ratio": 1.9,
+          "context": "Capitulation low at A$25.91"
+        }
+      ]
+    },
+    "volatility": {
+      "latestDailyRange": {
+        "high": 31.69,
+        "low": 31.41,
+        "date": "10 February 2026"
+      },
+      "latestRangePercent": 0.9,
+      "avgDailyRangePercent30": 0.6,
+      "avgDailyRangePercent90": 0.8
+    },
+    "meanReversion": {
+      "vsMa50": 4.9,
+      "vsMa200": 5,
+      "rangePosition": 71,
+      "rangeHigh": 33.61,
+      "rangeLow": 25.91
+    },
+    "inflectionPoints": [
+      {
+        "date": "w/c 8 September 2025",
+        "price": 33.61,
+        "event": "12-month high"
+      },
+      {
+        "date": "w/c 15 September 2025",
+        "price": 28.51,
+        "event": "Sharp selloff; price drops 15% in one week"
+      },
+      {
+        "date": "w/c 20 October 2025",
+        "price": 25.91,
+        "event": "12-month low; capitulation"
+      },
+      {
+        "date": "w/c 15 December 2025",
+        "price": 29.32,
+        "event": "Recovery rally clears A$29 resistance"
+      },
+      {
+        "date": "w/c 20 January 2026",
+        "price": 30.08,
+        "event": "Golden cross forms; 50-day MA crosses above 200-day MA"
+      },
+      {
+        "date": "10 February 2026",
+        "price": 31.41,
+        "event": "Approaching A$32 resistance; momentum intact"
+      }
+    ],
+    "relativePerformance": {
+      "vsIndex": {
+        "name": "S&amp;P/ASX 200",
+        "period": "12 months",
+        "stockReturn": 5.4,
+        "indexReturn": -2.3,
+        "relativeReturn": 7.7
+      },
+      "vsSector": {
+        "name": "S&amp;P/ASX Consumer Staples",
+        "period": "12 months",
+        "stockReturn": 5.4,
+        "sectorReturn": 1.2,
+        "relativeReturn": 4.2
+      }
+    }
   }
 }

@@ -57,7 +57,7 @@
   "confidence": "MODERATE",
   "alert_state": "NORMAL",
   "alert_started": null,
-  "current_price": 6.17,
+  "current_price": 6.57,
   "big_picture": "Dexus is Australia's largest listed office REIT and a leading integrated real asset manager with $50.1 billion in assets under management. The company owns, manages, and develops premium office, industrial, and alternative assets primarily in Australian CBDs.",
   "last_flip": {
     "date": "2025-08-20",
@@ -248,5 +248,146 @@
     "signal_used": -15,
     "method": "sentiment_shift_v3",
     "computed_at": "2026-02-24T07:54:39.551Z"
+  },
+  "priceHistory": [
+    6.57
+  ],
+  "freshness": {
+    "pricePctChange": 6.5,
+    "urgency": 20,
+    "status": "MODERATE",
+    "badge": "moderate"
+  },
+  "last_price_update": "2026-02-24T09:12:32.864Z",
+  "technicalAnalysis": {
+    "date": "16 February 2026",
+    "period": "1 Year",
+    "source": "Continuum Technical Intelligence",
+    "regime": "Downtrending",
+    "clarity": "Clear",
+    "price": {
+      "current": 6.57,
+      "currency": "A$"
+    },
+    "movingAverages": {
+      "ma50": {
+        "value": 6.45,
+        "date": "16 Feb 2026"
+      },
+      "ma200": {
+        "value": 7.05,
+        "date": "16 Feb 2026"
+      },
+      "crossover": {
+        "type": "Death Cross",
+        "date": "w/c 15 September 2025",
+        "description": "50-day MA crossed below 200-day MA during sustained downtrend"
+      },
+      "priceVsMa50": -4.3,
+      "priceVsMa200": -12.5
+    },
+    "trend": {
+      "direction": "Down",
+      "duration": "12 months",
+      "structure": "Lower highs and lower lows from 52-week high; sustained downtrend",
+      "peak": {
+        "price": 7.89,
+        "date": "w/c 24 February 2025"
+      },
+      "trough": {
+        "price": 6.17,
+        "date": "16 February 2026"
+      },
+      "drawdown": -21.8
+    },
+    "keyLevels": {
+      "support": {
+        "price": 6,
+        "method": "Round number and psychological support"
+      },
+      "resistance": {
+        "price": 6.5,
+        "method": "50-day MA resistance and recent consolidation ceiling"
+      },
+      "fiftyTwoWeekHigh": {
+        "price": 7.89,
+        "date": "w/c 24 February 2025"
+      },
+      "fiftyTwoWeekLow": {
+        "price": 6.17,
+        "date": "16 February 2026"
+      }
+    },
+    "volume": {
+      "latestVs20DayAvg": 1,
+      "latestDate": "16 February 2026",
+      "priorSpikes": [
+        {
+          "period": "w/c 25 August 2025",
+          "ratio": 2,
+          "context": "FY25 results release"
+        },
+        {
+          "period": "w/c 10 November 2025",
+          "ratio": 1.5,
+          "context": "Investor update; industrial development"
+        }
+      ]
+    },
+    "volatility": {
+      "latestDailyRange": {
+        "high": 6.22,
+        "low": 6.15,
+        "date": "16 February 2026"
+      },
+      "latestRangePercent": 1.1,
+      "avgDailyRangePercent30": 1.2,
+      "avgDailyRangePercent90": 1.3
+    },
+    "meanReversion": {
+      "vsMa50": -4.3,
+      "vsMa200": -12.5,
+      "rangePosition": 0,
+      "rangeHigh": 7.89,
+      "rangeLow": 6.17
+    },
+    "inflectionPoints": [
+      {
+        "date": "w/c 24 February 2025",
+        "price": 7.89,
+        "event": "52-week high"
+      },
+      {
+        "date": "w/c 25 August 2025",
+        "price": 6.85,
+        "event": "FY25 results; modest recovery"
+      },
+      {
+        "date": "w/c 15 September 2025",
+        "price": 6.7,
+        "event": "Death cross forms; downtrend confirmed"
+      },
+      {
+        "date": "16 February 2026",
+        "price": 6.17,
+        "event": "52-week low; pre-H1 results"
+      }
+    ],
+    "relativePerformance": {
+      "vsIndex": {
+        "name": "S&amp;P/ASX 200",
+        "period": "12 months",
+        "stockReturn": -21.8,
+        "indexReturn": -2.3,
+        "relativeReturn": -19.5
+      },
+      "vsSector": {
+        "name": "S&amp;P/ASX A-REIT",
+        "period": "12 months",
+        "stockReturn": -21.8,
+        "sectorReturn": -8.5,
+        "relativeReturn": -13.3
+      }
+    }
   }
 }

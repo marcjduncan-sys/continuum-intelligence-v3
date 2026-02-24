@@ -56,7 +56,7 @@
   "dominant": "N2",
   "confidence": "LOW",
   "alert_state": "NORMAL",
-  "current_price": 1.24,
+  "current_price": 1.105,
   "big_picture": "Horizon Minerals Limited (ASX: HRZ) — coverage initiated. Full analysis pending.",
   "last_flip": null,
   "narrative_history": [],
@@ -175,5 +175,151 @@
     "signal_used": 24,
     "method": "sentiment_shift_v3",
     "computed_at": "2026-02-24T07:54:39.554Z"
+  },
+  "priceHistory": [
+    1.105
+  ],
+  "freshness": {
+    "pricePctChange": -10.9,
+    "urgency": 30,
+    "status": "MODERATE",
+    "badge": "moderate"
+  },
+  "last_price_update": "2026-02-24T09:12:32.914Z",
+  "technicalAnalysis": {
+    "date": "16 February 2026",
+    "period": "1 Year",
+    "source": "Continuum Technical Intelligence",
+    "regime": "Consolidation",
+    "clarity": "Moderate",
+    "price": {
+      "current": 1.105,
+      "currency": "A$"
+    },
+    "movingAverages": {
+      "ma50": {
+        "value": 1.28,
+        "date": "16 Feb 2026"
+      },
+      "ma200": {
+        "value": 1.05,
+        "date": "16 Feb 2026"
+      },
+      "crossover": {
+        "type": "Golden Cross",
+        "date": "w/c 6 January 2026",
+        "description": "50-day MA crossed above 200-day MA, confirming the uptrend from the A$0.64 low. However, the recent pullback from A$1.51 has brought the price back below the 50-day MA."
+      },
+      "priceVsMa50": -3.1,
+      "priceVsMa200": 18.1
+    },
+    "trend": {
+      "direction": "Up (with pullback)",
+      "duration": "6 months",
+      "structure": "Strong rally from A$0.64 to A$1.51 followed by consolidation in A$1.15-1.35 range. Higher lows being established but momentum has stalled near A$1.50 resistance.",
+      "peak": {
+        "price": 1.51,
+        "date": "w/c 13 January 2026"
+      },
+      "trough": {
+        "price": 0.64,
+        "date": "w/c 5 August 2025"
+      },
+      "drawdown": -17.9
+    },
+    "keyLevels": {
+      "support": {
+        "price": 1.15,
+        "method": "Prior consolidation low and 20-day MA support zone"
+      },
+      "resistance": {
+        "price": 1.51,
+        "method": "52-week high — previous rejection level with volume"
+      },
+      "fiftyTwoWeekHigh": {
+        "price": 1.51,
+        "date": "w/c 13 January 2026"
+      },
+      "fiftyTwoWeekLow": {
+        "price": 0.64,
+        "date": "w/c 5 August 2025"
+      }
+    },
+    "volume": {
+      "latestVs20DayAvg": 0.8,
+      "latestDate": "16 February 2026",
+      "priorSpikes": [
+        {
+          "period": "w/c 13 January 2026",
+          "ratio": 3.2,
+          "context": "Rally to 52-week high on gold sector momentum"
+        },
+        {
+          "period": "w/c 4 November 2025",
+          "ratio": 2.5,
+          "context": "Breakout above A$1.00 resistance on resource upgrade announcement"
+        }
+      ]
+    },
+    "volatility": {
+      "latestDailyRange": {
+        "high": 1.26,
+        "low": 1.22,
+        "date": "16 February 2026"
+      },
+      "latestRangePercent": 3.2,
+      "avgDailyRangePercent30": 4.1,
+      "avgDailyRangePercent90": 4.8
+    },
+    "meanReversion": {
+      "vsMa50": -3.1,
+      "vsMa200": 18.1,
+      "rangePosition": 69,
+      "rangeHigh": 1.51,
+      "rangeLow": 0.64
+    },
+    "inflectionPoints": [
+      {
+        "date": "w/c 5 August 2025",
+        "price": 0.64,
+        "event": "52-week low — capitulation base"
+      },
+      {
+        "date": "w/c 4 November 2025",
+        "price": 1,
+        "event": "Breakout above A$1.00 psychological resistance"
+      },
+      {
+        "date": "w/c 6 January 2026",
+        "price": 1.28,
+        "event": "Golden Cross — 50-day crosses above 200-day MA"
+      },
+      {
+        "date": "w/c 13 January 2026",
+        "price": 1.51,
+        "event": "52-week high — gold sector momentum peak"
+      },
+      {
+        "date": "w/c 3 February 2026",
+        "price": 1.17,
+        "event": "Pullback support test — higher low established"
+      }
+    ],
+    "relativePerformance": {
+      "vsIndex": {
+        "name": "S&P/ASX 200",
+        "period": "12 months",
+        "stockReturn": 93.8,
+        "indexReturn": 4.2,
+        "relativeReturn": 89.6
+      },
+      "vsSector": {
+        "name": "S&P/ASX Gold Index",
+        "period": "12 months",
+        "stockReturn": 93.8,
+        "sectorReturn": 28.5,
+        "relativeReturn": 65.3
+      }
+    }
   }
 }
