@@ -1373,6 +1373,175 @@ a:hover { color: var(--accent-sage); }
     margin-bottom: 4px;
 }
 
+/* ── Sidebar: Price row ── */
+.hs-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-top: 2px;
+}
+.hs-price {
+    font-family: var(--font-data);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.hs-change-badge {
+    font-family: var(--font-data);
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 3px;
+}
+.hs-change-badge.pos { background: rgba(72,187,120,0.12); color: var(--signal-green); }
+.hs-change-badge.neg { background: rgba(245,101,101,0.12); color: var(--signal-red); }
+
+/* ── Sidebar: Section headings ── */
+.hs-section-head {
+    font-size: 0.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-top: var(--space-md);
+    margin-bottom: var(--space-xs);
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--border);
+}
+.hs-subhead {
+    font-size: 0.48rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-top: var(--space-sm);
+    margin-bottom: 4px;
+}
+
+/* ── Sidebar: Overall Skew row ── */
+.hs-overall-skew {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(30,48,80,0.4);
+}
+.hs-skew-dir {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.hs-skew-dir.upside   { color: var(--signal-green); }
+.hs-skew-dir.downside { color: var(--signal-red); }
+.hs-skew-dir.balanced { color: var(--signal-amber); }
+.hs-skew-score {
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+.hs-skew-score.upside   { color: var(--signal-green); }
+.hs-skew-score.downside { color: var(--signal-red); }
+.hs-skew-score.balanced { color: var(--signal-amber); }
+
+/* ── Sidebar: Environment rows (Macro/Sector) ── */
+.hs-env-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(30,48,80,0.4);
+}
+.hs-env-row:last-child { border-bottom: none; }
+.hs-env-label {
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+    flex: 1;
+}
+.hs-env-score {
+    font-family: var(--font-data);
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 28px;
+    text-align: right;
+}
+
+/* ── Sidebar: Company metric rows (P/E, Rev Growth) ── */
+.hs-company-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(30,48,80,0.4);
+}
+.hs-company-row:last-child { border-bottom: none; }
+.hs-company-label {
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+    flex: 1;
+}
+.hs-company-value {
+    font-family: var(--font-data);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ── Sidebar: Valuation Range ── */
+.hs-val-section {
+    margin-top: var(--space-sm);
+}
+.hs-val-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+.hs-val-zone {
+    font-size: 0.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 1px 6px;
+    border-radius: 3px;
+}
+.hs-val-zone.amber   { background: rgba(201,169,110,0.15); color: var(--signal-amber); }
+.hs-val-zone.green   { background: rgba(72,187,120,0.12);  color: var(--signal-green); }
+.hs-val-zone.red     { background: rgba(245,101,101,0.12); color: var(--signal-red); }
+.hs-val-levels {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-data);
+    font-size: 0.58rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+.hs-val-levels span { text-align: center; }
+.hs-val-bar {
+    width: 100%;
+    height: 5px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--signal-red), var(--signal-amber) 40%, var(--signal-green));
+    position: relative;
+    margin-bottom: 6px;
+}
+.hs-val-marker {
+    position: absolute;
+    top: -3px;
+    width: 3px;
+    height: 11px;
+    background: var(--text-primary);
+    border-radius: 1px;
+    transform: translateX(-50%);
+}
+.hs-val-distances {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-data);
+    font-size: 0.55rem;
+}
+.hs-val-distances .pos { color: var(--signal-green); }
+.hs-val-distances .neg { color: var(--signal-red); }
+
 /* --- Evidence Domain Cards --- */
 .evidence-card {
     background: var(--bg-card);
@@ -10125,65 +10294,202 @@ function clearPortfolio() {
 
 /* --- Hypothesis Sidebar Population --- */
 function populateSidebar(ticker) {
-    const sidebarId = ticker.toLowerCase() + '-sidebar';
-    const sidebar = document.getElementById(sidebarId);
+    var sidebarId = ticker.toLowerCase() + '-sidebar';
+    var sidebar = document.getElementById(sidebarId);
     if (!sidebar) return;
 
     // Don't re-populate if already filled
     if (sidebar.children.length > 0) return;
 
-    const page = document.getElementById('page-report-' + ticker);
+    var page = document.getElementById('page-report-' + ticker);
     if (!page) return;
 
-    // Extract N1-N4 data from verdict-scores
-    const verdictScores = page.querySelector('.verdict-scores');
-    if (!verdictScores) return;
+    var stock = STOCK_DATA[ticker];
+    if (!stock) return;
 
-    const vsItems = verdictScores.querySelectorAll('.vs-item');
-    const hypotheses = [];
-    vsItems.forEach((item, i) => {
-        const label = item.querySelector('.vs-label');
-        const score = item.querySelector('.vs-score');
-        const dirClass = item.getAttribute('data-dir') || 'dir-neutral';
-        hypotheses.push({
-            dirClass: dirClass,
-            label: label ? label.textContent.trim() : '',
-            score: score ? score.textContent.trim() : ''
+    // ── Extract N1-N4 from verdict-scores DOM ──
+    var verdictScores = page.querySelector('.verdict-scores');
+    var hypotheses = [];
+    if (verdictScores) {
+        var vsItems = verdictScores.querySelectorAll('.vs-item');
+        vsItems.forEach(function(item) {
+            var label = item.querySelector('.vs-label');
+            var score = item.querySelector('.vs-score');
+            var dirClass = item.getAttribute('data-dir') || 'dir-neutral';
+            hypotheses.push({
+                dirClass: dirClass,
+                label: label ? label.textContent.trim() : '',
+                score: score ? score.textContent.trim() : ''
+            });
         });
-    });
-
-    // Extract skew badge
-    const skewBar = page.querySelector('.risk-skew-bar .skew-badge');
-    let skewClass = '';
-    let skewHTML = '';
-    if (skewBar) {
-        if (skewBar.classList.contains('upside')) skewClass = 'upside';
-        else if (skewBar.classList.contains('downside')) skewClass = 'downside';
-        else if (skewBar.classList.contains('balanced')) skewClass = 'balanced';
-        skewHTML = skewBar.outerHTML;
     }
 
-    // Build sidebar HTML
-    const stock = STOCK_DATA[ticker];
-    let html = '';
-    if (stock) {
-        html += '<div class="hs-stock-id">' +
-            '<div class="hs-stock-ticker">' + stock.tickerFull + '</div>' +
-            '<div class="hs-stock-name">' + stock.company + '</div>' +
-        '</div>';
+    // ── Compute skew from data ──
+    var skew = computeSkewScore(stock);
+    var skewDir = skew.direction || 'balanced';
+    var skewLabel = skewDir.toUpperCase();
+    var skewScoreNum = skew.score || 0;
+    var skewScoreStr = (skewScoreNum > 0 ? '+' : '') + skewScoreNum;
+
+    // ── Three-layer signal data ──
+    var tls = stock.three_layer_signal || {};
+    var macSig = tls.macro_signal || 0;
+    var secSig = tls.sector_signal || 0;
+    var macCls = macSig > 10 ? 'dir-up' : macSig < -10 ? 'dir-down' : 'dir-neutral';
+    var secCls = secSig > 10 ? 'dir-up' : secSig < -10 ? 'dir-down' : 'dir-neutral';
+
+    // ── P/E and Revenue Growth from REFERENCE_DATA / heroMetrics ──
+    var ref = (typeof REFERENCE_DATA !== 'undefined') ? REFERENCE_DATA[ticker] : null;
+    var peValue = '—';
+    var revGrowthValue = '—';
+
+    // Try heroMetrics first (live-hydrated values)
+    if (stock.heroMetrics) {
+        for (var mi = 0; mi < stock.heroMetrics.length; mi++) {
+            var mLabel = (stock.heroMetrics[mi].label || '').toLowerCase();
+            if (mLabel === 'fwd p/e' || mLabel === 'p/e') {
+                peValue = stock.heroMetrics[mi].value;
+            }
+            if (mLabel === 'rev growth' || mLabel === 'revenue growth') {
+                revGrowthValue = stock.heroMetrics[mi].value;
+            }
+        }
     }
-    html += '<div class="hs-title">Hypothesis Tracker</div>';
-    hypotheses.forEach(h => {
+    // Fallback to REFERENCE_DATA
+    if (ref) {
+        if (peValue === '—' && ref.epsForward) {
+            var currentP = parseFloat(stock._livePrice || stock.price || stock.current_price || 0);
+            if (currentP > 0) peValue = (currentP / ref.epsForward).toFixed(1) + 'x';
+        }
+        if (revGrowthValue === '—' && ref.revenueGrowth != null) {
+            revGrowthValue = (ref.revenueGrowth > 0 ? '+' : '') + ref.revenueGrowth + '%';
+        }
+    }
+
+    // ── Price and change ──
+    var livePrice = parseFloat(stock._livePrice || stock.price || stock.current_price || 0);
+    var ph = stock.priceHistory;
+    var changePct = null;
+    if (ph && ph.length >= 2) {
+        changePct = ((ph[ph.length - 1] - ph[ph.length - 2]) / ph[ph.length - 2] * 100);
+    } else if (stock.freshness && stock.freshness.pricePctChange != null) {
+        changePct = stock.freshness.pricePctChange;
+    }
+
+    // ── Valuation Range ──
+    var vr = null;
+    var vrBear = 0, vrFair = 0, vrBull = 0, vrZone = '', vrZoneCls = '';
+    var vrToBull = '', vrToBear = '';
+    // Prefer hero.position_in_range.worlds (full data)
+    if (stock.hero && stock.hero.position_in_range && stock.hero.position_in_range.worlds &&
+        stock.hero.position_in_range.worlds.length >= 4) {
+        var w = stock.hero.position_in_range.worlds;
+        vrBear = w[1].price;
+        vrFair = (w[1].price + w[2].price) / 2;
+        vrBull = w[3].price;
+        vr = { low: vrBear, mid: vrFair, high: vrBull };
+    } else if (stock.valuation_range) {
+        vr = stock.valuation_range;
+        vrBear = vr.low;
+        vrFair = vr.mid;
+        vrBull = vr.high;
+    }
+
+    if (vr && livePrice > 0) {
+        if (livePrice < vrBear)      { vrZone = 'RED';   vrZoneCls = 'red'; }
+        else if (livePrice > vrFair) { vrZone = 'GREEN'; vrZoneCls = 'green'; }
+        else                         { vrZone = 'AMBER'; vrZoneCls = 'amber'; }
+
+        vrToBull = ((vrBull / livePrice - 1) * 100).toFixed(1);
+        vrToBear = ((vrBear / livePrice - 1) * 100).toFixed(1);
+    }
+
+    // ── Build HTML ──
+    var html = '';
+
+    // 1. Stock ID
+    html += '<div class="hs-stock-id">' +
+        '<div class="hs-stock-ticker">' + (stock.tickerFull || stock.ticker || ticker) + '</div>' +
+        '<div class="hs-price-row">';
+    if (livePrice > 0) {
+        html += '<span class="hs-price">A$' + livePrice.toFixed(2) + '</span>';
+    }
+    if (changePct !== null) {
+        var chgCls = changePct >= 0 ? 'pos' : 'neg';
+        html += '<span class="hs-change-badge ' + chgCls + '">' +
+            (changePct >= 0 ? '+' : '') + changePct.toFixed(1) + '%</span>';
+    }
+    html += '</div>' +
+        '<div class="hs-stock-name">' + (stock.company || '') + '</div>' +
+    '</div>';
+
+    // 2. DRIVER TRACKER heading + hypothesis items
+    html += '<div class="hs-section-head">Driver Tracker</div>';
+    hypotheses.forEach(function(h) {
         html += '<div class="hs-item">' +
             '<div class="hs-dot ' + h.dirClass + '"></div>' +
             '<div class="hs-label">' + h.label + '</div>' +
             '<div class="hs-score ' + h.dirClass + '">' + h.score + '</div>' +
         '</div>';
     });
-    html += '<div class="hs-skew">' +
-        '<div class="hs-skew-label">Risk Skew</div>' +
-        skewHTML +
+
+    // 3. RISK SKEW subheading
+    html += '<div class="hs-subhead">Risk Skew</div>';
+
+    // 4. OVERALL SKEW
+    html += '<div class="hs-overall-skew">' +
+        '<span class="hs-skew-dir ' + skewDir + '">' + skewLabel + '</span>' +
+        '<span class="hs-skew-score ' + skewDir + '">' + skewScoreStr + '</span>' +
     '</div>';
+
+    // 5. EXT. ENVIRONMENT
+    html += '<div class="hs-subhead">Ext. Environment</div>' +
+        '<div class="hs-env-row">' +
+            '<div class="hs-dot ' + macCls + '"></div>' +
+            '<span class="hs-env-label">Macro</span>' +
+            '<span class="hs-env-score">' + (macSig > 0 ? '+' : '') + macSig + '</span>' +
+        '</div>' +
+        '<div class="hs-env-row">' +
+            '<div class="hs-dot ' + secCls + '"></div>' +
+            '<span class="hs-env-label">Sector</span>' +
+            '<span class="hs-env-score">' + (secSig > 0 ? '+' : '') + secSig + '</span>' +
+        '</div>';
+
+    // 6. COMPANY
+    html += '<div class="hs-subhead">Company</div>' +
+        '<div class="hs-company-row">' +
+            '<span class="hs-company-label">P/E</span>' +
+            '<span class="hs-company-value">' + peValue + '</span>' +
+        '</div>' +
+        '<div class="hs-company-row">' +
+            '<span class="hs-company-label">Rev Growth</span>' +
+            '<span class="hs-company-value">' + revGrowthValue + '</span>' +
+        '</div>';
+
+    // 7. VALUATION RANGE
+    if (vr && livePrice > 0) {
+        var vrRange = vrBull - vrBear || 1;
+        var vrCurrPct = Math.min(100, Math.max(0, ((livePrice - vrBear) / vrRange * 100))).toFixed(1);
+
+        html += '<div class="hs-section-head">Valuation Range</div>' +
+            '<div class="hs-val-section">' +
+                '<div class="hs-val-header">' +
+                    '<span class="hs-val-zone ' + vrZoneCls + '">' + vrZone + '</span>' +
+                '</div>' +
+                '<div class="hs-val-levels">' +
+                    '<span>Bear<br>A$' + vrBear.toFixed(2) + '</span>' +
+                    '<span>Fair<br>A$' + vrFair.toFixed(2) + '</span>' +
+                    '<span>Bull<br>A$' + vrBull.toFixed(2) + '</span>' +
+                '</div>' +
+                '<div class="hs-val-bar">' +
+                    '<div class="hs-val-marker" style="left:' + vrCurrPct + '%"></div>' +
+                '</div>' +
+                '<div class="hs-val-distances">' +
+                    '<span class="neg">' + vrToBear + '% to bear</span>' +
+                    '<span class="pos">+' + vrToBull + '% to bull</span>' +
+                '</div>' +
+            '</div>';
+    }
 
     sidebar.innerHTML = html;
 }
