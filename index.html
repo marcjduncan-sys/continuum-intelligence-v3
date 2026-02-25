@@ -5874,7 +5874,7 @@ function renderReportHero(data) {
   if (data.hero && data.hero.position_in_range) {
     var pir = data.hero.position_in_range;
     var worlds = pir.worlds;
-    var current = pir.current_price;
+    var current = parseFloat(data._livePrice || data.price || pir.current_price);
     // Find min/max for bar positioning
     var prices = worlds.map(function(w) { return w.price; });
     prices.push(current);
