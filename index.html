@@ -778,6 +778,28 @@ a:hover { color: var(--accent-sage); }
     display: inline-block;
 }
 .report-back:hover { color: var(--text-primary); }
+/* Report page: prev/next stock navigation bar */
+.rh-stock-nav-bar {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+}
+.rh-stock-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 10px var(--space-lg);
+}
+.rh-stock-nav a {
+    font-family: var(--font-data);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent-teal);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+.rh-stock-nav a:hover { color: var(--text-primary); }
 .rh-main {
     display: flex;
     justify-content: space-between;
@@ -5825,7 +5847,20 @@ function renderReportHero(data) {
       '</div>';
   }
 
-  return '<div class="report-hero">' +
+  // Prev/next stock navigation
+  var _navTickers = (typeof FEATURED_ORDER !== 'undefined') ? FEATURED_ORDER : Object.keys(STOCK_DATA);
+  var _navIdx = _navTickers.indexOf(data.ticker);
+  var _prevTicker = _navTickers[(_navIdx - 1 + _navTickers.length) % _navTickers.length];
+  var _nextTicker = _navTickers[(_navIdx + 1) % _navTickers.length];
+  var stockNavHtml = '<div class="rh-stock-nav-bar">' +
+    '<div class="rh-stock-nav">' +
+      '<a href="#report-' + _prevTicker + '" onclick="navigate(\'report-' + _prevTicker + '\');return false;">&lsaquo; ' + _prevTicker + '</a>' +
+      '<a href="#report-' + _nextTicker + '" onclick="navigate(\'report-' + _nextTicker + '\');return false;">' + _nextTicker + ' &rsaquo;</a>' +
+    '</div>' +
+  '</div>';
+
+  return stockNavHtml +
+  '<div class="report-hero">' +
     '<div class="report-hero-inner">' +
       '<a class="report-back" href="#home" onclick="navigate(\'home\')">&larr; Back to Coverage</a>' +
       '<div class="rh-main">' +
