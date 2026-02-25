@@ -3244,6 +3244,54 @@ a:hover { color: var(--accent-sage); }
 }
 
 /* ============================================================
+   PAGE-SCOPED OVERRIDES
+   Use these selectors when you need to style a shared class
+   (.hero, .site-footer, .section-header, .skew-badge, etc.)
+   differently on ONE page without affecting others.
+
+   RULE: When editing shared classes, always scope with the
+   page ID. Never edit the base shared class directly unless
+   you intend to change ALL pages.
+
+   Example:
+     #page-home .hero-title { font-size: 2.8rem; }  <-- SAFE
+     .hero-title { font-size: 2.8rem; }              <-- DANGEROUS
+   ============================================================ */
+
+/* --- Home Page Scoped Overrides --- */
+/* Uncomment and customise any of these to change ONLY the home page */
+/* #page-home .hero { } */
+/* #page-home .hero-title { } */
+/* #page-home .hero-subtitle { } */
+/* #page-home .hero-tagline { } */
+/* #page-home .hero-cred { } */
+/* #page-home .site-footer { } */
+/* #page-home .footer-top { } */
+/* #page-home .footer-bottom { } */
+/* #page-home .section-header { } */
+/* #page-home .section-title { } */
+/* #page-home .skew-badge { } */
+/* #page-home .skew-bar-track { } */
+/* #page-home .skew-bar-bull { } */
+/* #page-home .skew-bar-bear { } */
+/* #page-home .skew-score { } */
+
+/* --- Snapshots Page Scoped Overrides --- */
+/* #page-snapshots .hero { } */
+/* #page-snapshots .hero-title { } */
+/* #page-snapshots .hero-subtitle { } */
+/* #page-snapshots .site-footer { } */
+
+/* --- Portfolio Page Scoped Overrides --- */
+/* #page-portfolio .hero { } */
+/* #page-portfolio .hero-title { } */
+/* #page-portfolio .hero-subtitle { } */
+
+/* --- About Page Scoped Overrides --- */
+/* #page-about .hero-tagline { } */
+/* #page-about .site-footer { } */
+
+/* ============================================================
    SNAPSHOT â€” Design System (adapted for site integration)
    ============================================================ */
 
