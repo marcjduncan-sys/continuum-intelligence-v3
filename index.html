@@ -1321,6 +1321,76 @@ a:hover { color: var(--accent-sage); }
     margin: 0 auto;
     padding: var(--space-xl) var(--space-lg);
 }
+/* --- Refresh controls --- */
+.refresh-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: var(--space-sm);
+}
+.btn-refresh {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-data);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    background: rgba(74, 158, 126, 0.10);
+    border: 1px solid rgba(74, 158, 126, 0.25);
+    border-radius: 4px;
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-refresh:hover { background: rgba(74, 158, 126, 0.20); color: var(--text-primary); }
+.btn-refresh:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.btn-refresh .refresh-icon {
+    display: inline-block;
+    transition: transform 0.3s;
+}
+.btn-refresh.refreshing .refresh-icon {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.refresh-timestamp {
+    font-family: var(--font-data);
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+}
+.refresh-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+.progress-bar {
+    width: 120px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent-teal);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+.progress-label {
+    font-family: var(--font-data);
+    font-size: 0.6rem;
+    color: var(--accent-sage);
+    letter-spacing: 0.02em;
+}
+
 .report-section {
     margin-bottom: var(--space-2xl);
     scroll-margin-top: calc(var(--nav-height) + 50px);
@@ -5954,6 +6024,18 @@ function renderReportHero(data) {
           '<div class="rh-company">' + data.tickerFull + ' &bull; ' + data.exchange + ' &bull; ' + data.sector + '</div>' +
           '<div class="rh-sector-tag">' + data.heroDescription + '</div>' +
           (data.heroCompanyDescription ? '<div class="rh-company-desc">' + data.heroCompanyDescription + '</div>' : '') +
+          '<div class="refresh-controls">' +
+            '<button class="btn-refresh" id="refresh-btn-' + data.ticker + '" onclick="triggerRefresh(\'' + data.ticker + '\')">' +
+              '<span class="refresh-icon">&#8635;</span> Update' +
+            '</button>' +
+            '<span class="refresh-timestamp" id="refresh-ts-' + data.ticker + '">' +
+              (data.date ? 'Last updated: ' + data.date : '') +
+            '</span>' +
+            '<div class="refresh-progress" id="refresh-progress-' + data.ticker + '" style="display:none">' +
+              '<div class="progress-bar"><div class="progress-fill" id="refresh-fill-' + data.ticker + '"></div></div>' +
+              '<span class="progress-label" id="refresh-label-' + data.ticker + '">Searching for new data...</span>' +
+            '</div>' +
+          '</div>' +
         '</div>' +
         '<div class="rh-right">' +
           sparklineHtml +
@@ -10883,6 +10965,134 @@ function tcAnalyze() {
     
     document.getElementById('tc-results').classList.add('active');
     document.getElementById('tc-results').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ============================================================
+// REFRESH / UPDATE BUTTON LOGIC
+// ============================================================
+
+var REFRESH_API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:8000'
+    : '';  // Same origin in production
+
+var _refreshPollers = {};
+
+async function triggerRefresh(ticker) {
+    ticker = ticker.toUpperCase();
+    var btn = document.getElementById('refresh-btn-' + ticker);
+    var progress = document.getElementById('refresh-progress-' + ticker);
+    var fill = document.getElementById('refresh-fill-' + ticker);
+    var label = document.getElementById('refresh-label-' + ticker);
+    var ts = document.getElementById('refresh-ts-' + ticker);
+
+    if (!btn) return;
+
+    // Disable button, show progress
+    btn.disabled = true;
+    btn.classList.add('refreshing');
+    if (progress) progress.style.display = 'flex';
+    if (fill) fill.style.width = '5%';
+    if (label) label.textContent = 'Starting refresh...';
+
+    try {
+        // POST to trigger refresh
+        var resp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (resp.status === 409) {
+            if (label) label.textContent = 'Refresh already in progress...';
+            // Still poll for status
+        } else if (!resp.ok) {
+            var errData = await resp.json().catch(function() { return {}; });
+            throw new Error(errData.detail || 'Refresh failed (' + resp.status + ')');
+        }
+
+        // Start polling for status
+        _pollRefreshStatus(ticker);
+
+    } catch (err) {
+        console.error('Refresh error:', err);
+        if (label) label.textContent = 'Error: ' + err.message;
+        setTimeout(function() {
+            _resetRefreshUI(ticker);
+        }, 4000);
+    }
+}
+
+function _pollRefreshStatus(ticker) {
+    // Clear any existing poller
+    if (_refreshPollers[ticker]) clearInterval(_refreshPollers[ticker]);
+
+    _refreshPollers[ticker] = setInterval(async function() {
+        try {
+            var resp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker + '/status');
+            if (!resp.ok) return;
+
+            var data = await resp.json();
+            var fill = document.getElementById('refresh-fill-' + ticker);
+            var label = document.getElementById('refresh-label-' + ticker);
+
+            if (fill) fill.style.width = data.progress_pct + '%';
+            if (label) label.textContent = data.stage_label;
+
+            if (data.status === 'completed') {
+                clearInterval(_refreshPollers[ticker]);
+                delete _refreshPollers[ticker];
+
+                // Fetch updated data
+                try {
+                    var resultResp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker + '/result');
+                    if (resultResp.ok) {
+                        var updatedData = await resultResp.json();
+                        // Merge into global stock data and re-render
+                        if (typeof STOCK_DATA !== 'undefined') {
+                            STOCK_DATA[ticker] = updatedData;
+                        }
+                        // Re-render the report page
+                        var container = document.getElementById('page-report-' + ticker.toLowerCase());
+                        if (container && typeof renderReportPage === 'function') {
+                            container.innerHTML = renderReportPage(updatedData);
+                            // Re-initialise any chart/interactive elements
+                            if (typeof initChartForTicker === 'function') initChartForTicker(ticker);
+                            if (typeof initInlineChat === 'function') initInlineChat();
+                        }
+                    }
+                } catch (e) {
+                    console.error('Failed to fetch refresh result:', e);
+                }
+
+                // Show completion briefly then reset
+                if (fill) fill.style.width = '100%';
+                if (label) label.textContent = 'Complete!';
+                setTimeout(function() { _resetRefreshUI(ticker); }, 2000);
+            }
+
+            if (data.status === 'failed') {
+                clearInterval(_refreshPollers[ticker]);
+                delete _refreshPollers[ticker];
+                if (label) label.textContent = 'Failed: ' + (data.error || 'Unknown error');
+                setTimeout(function() { _resetRefreshUI(ticker); }, 5000);
+            }
+
+        } catch (e) {
+            console.error('Status poll error:', e);
+        }
+    }, 2000);  // Poll every 2 seconds
+}
+
+function _resetRefreshUI(ticker) {
+    var btn = document.getElementById('refresh-btn-' + ticker);
+    var progress = document.getElementById('refresh-progress-' + ticker);
+    var fill = document.getElementById('refresh-fill-' + ticker);
+
+    if (btn) {
+        btn.disabled = false;
+        btn.classList.remove('refreshing');
+    }
+    if (progress) progress.style.display = 'none';
+    if (fill) fill.style.width = '0%';
 }
 </script>
 

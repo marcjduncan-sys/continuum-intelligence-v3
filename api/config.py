@@ -17,3 +17,7 @@ INDEX_HTML_PATH = os.path.realpath(os.getenv(
 ))
 MAX_PASSAGES = 12
 MAX_CONVERSATION_TURNS = 20
+
+# Gemini (Google) — specialist analysis
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")

@@ -5,6 +5,8 @@ FastAPI backend that provides LLM-powered research chat grounded in
 structured equity research data.
 """
 
+import asyncio
+import json
 import logging
 import os
 import time
@@ -12,13 +14,14 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 import anthropic
-from fastapi import FastAPI, HTTPException
+from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field
 
 import config
 from ingest import ingest, get_tickers, get_passage_count
+from refresh import RefreshJob, refresh_jobs, get_job, is_running, run_refresh
 from retriever import retrieve
 
 logging.basicConfig(level=logging.INFO)
@@ -39,6 +42,12 @@ async def lifespan(app: FastAPI):
         logger.warning("ANTHROPIC_API_KEY does not look like a valid Anthropic key")
     else:
         logger.info("ANTHROPIC_API_KEY is configured (starts with sk-ant-...)")
+
+    # Validate Gemini API key
+    if not config.GEMINI_API_KEY:
+        logger.warning("GEMINI_API_KEY is NOT set — refresh will fall back to Claude only")
+    else:
+        logger.info("GEMINI_API_KEY is configured")
 
     logger.info("Ingesting research data from index.html...")
     t0 = time.time()
@@ -301,6 +310,105 @@ async def list_tickers():
         "tickers": get_tickers(),
         "counts": get_passage_count(),
     }
+
+
+# ---------------------------------------------------------------------------
+# Refresh endpoints
+# ---------------------------------------------------------------------------
+
+def _run_refresh_background(ticker: str):
+    """Run refresh in a new event loop (for BackgroundTasks)."""
+    loop = asyncio.new_event_loop()
+    try:
+        loop.run_until_complete(run_refresh(ticker))
+    finally:
+        loop.close()
+
+
+@app.post("/api/refresh/{ticker}")
+async def trigger_refresh(ticker: str, background_tasks: BackgroundTasks):
+    """
+    Trigger a data refresh for a single stock.
+
+    Returns 409 if a refresh is already running for this ticker.
+    """
+    ticker = ticker.upper()
+
+    # Validate ticker exists in research data
+    data_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
+    if not (data_dir / f"{ticker}.json").exists():
+        raise HTTPException(
+            status_code=404,
+            detail=f"No research data found for '{ticker}'",
+        )
+
+    # Check for existing running job
+    if is_running(ticker):
+        raise HTTPException(
+            status_code=409,
+            detail=f"Refresh already in progress for {ticker}",
+        )
+
+    # Create job and launch in background
+    background_tasks.add_task(_run_refresh_background, ticker)
+
+    # Pre-create the job entry so status polling works immediately
+    if not get_job(ticker) or get_job(ticker).status in ("completed", "failed"):
+        refresh_jobs[ticker] = RefreshJob(ticker=ticker)
+
+    return {
+        "status": "started",
+        "ticker": ticker,
+        "message": f"Refresh started for {ticker}",
+    }
+
+
+@app.get("/api/refresh/{ticker}/status")
+async def refresh_status(ticker: str):
+    """Poll the progress of a refresh job."""
+    ticker = ticker.upper()
+    job = get_job(ticker)
+    if job is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No refresh job found for {ticker}",
+        )
+    return job.to_dict()
+
+
+@app.get("/api/refresh/{ticker}/result")
+async def refresh_result(ticker: str):
+    """Fetch updated research JSON after a refresh completes."""
+    ticker = ticker.upper()
+    job = get_job(ticker)
+
+    if job is None:
+        raise HTTPException(status_code=404, detail=f"No refresh job for {ticker}")
+
+    if job.status == "failed":
+        raise HTTPException(
+            status_code=500,
+            detail=f"Refresh failed: {job.error}",
+        )
+
+    if job.status != "completed":
+        raise HTTPException(
+            status_code=202,
+            detail=f"Refresh still in progress: {job.stage_label}",
+        )
+
+    # Return the updated research data
+    if job.result:
+        return job.result
+
+    # Fallback: read from disk
+    data_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
+    path = data_dir / f"{ticker}.json"
+    if path.exists():
+        with open(path) as f:
+            return json.load(f)
+
+    raise HTTPException(status_code=404, detail="Research data not found")
 
 
 # ---------------------------------------------------------------------------
