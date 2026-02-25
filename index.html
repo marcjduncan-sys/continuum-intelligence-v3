@@ -1153,7 +1153,7 @@ a:hover { color: var(--accent-sage); }
 .sb-score.pos { color: var(--signal-green); }
 .sb-score.neutral { color: var(--signal-amber); }
 .sb-score-track {
-    width: 64px; height: 5px; border-radius: 3px; overflow: hidden; display: flex;
+    width: 80px; height: 10px; border-radius: 5px; overflow: hidden; display: flex;
     background: var(--bg-elevated);
 }
 .sb-desc { font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 6px; line-height: 1.4; }
@@ -1166,6 +1166,24 @@ a:hover { color: var(--accent-sage); }
 .sb-hyp-chip.downside { border-color: rgba(212,85,85,0.4); color: var(--signal-red); }
 .sb-hyp-chip.upside { border-color: rgba(61,170,109,0.4); color: var(--signal-green); }
 .sb-hyp-chip .chip-pct { font-weight: 800; margin-left: 3px; }
+
+/* Report-scoped lighter bar colours */
+.signal-bars-section .skew-bar-bull,
+.risk-skew-bar .skew-bar-bull {
+    background: #5BC88A;
+}
+.signal-bars-section .skew-bar-bear,
+.risk-skew-bar .skew-bar-bear {
+    background: #E87A7A;
+}
+[data-theme="light"] .signal-bars-section .skew-bar-bull,
+[data-theme="light"] .risk-skew-bar .skew-bar-bull {
+    background: #6DD49A;
+}
+[data-theme="light"] .signal-bars-section .skew-bar-bear,
+[data-theme="light"] .risk-skew-bar .skew-bar-bear {
+    background: #E88A8A;
+}
 
 /* --- Report Page: Section Nav --- */
 .section-nav {
@@ -5848,7 +5866,7 @@ function renderSkewBar(data) {
     '<div class="rsb-inner">' +
       '<span class="rsb-label">Thesis Skew</span>' +
       '<span class="skew-badge ' + dir + '">' + arrow + '</span>' +
-      '<div class="skew-bar-track" style="width:80px;height:8px;margin:0 4px">' +
+      '<div class="skew-bar-track" style="width:80px;height:10px;margin:0 4px">' +
         '<div class="skew-bar-bull" style="width:' + skew.bull + '%"></div>' +
         '<div class="skew-bar-bear" style="width:' + skew.bear + '%"></div>' +
       '</div>' +
