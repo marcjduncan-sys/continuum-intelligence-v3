@@ -10485,27 +10485,21 @@ function populateSidebar(ticker) {
     // Don't re-populate if already filled
     if (sidebar.children.length > 0) return;
 
-    var page = document.getElementById('page-report-' + ticker);
-    if (!page) return;
-
     var stock = STOCK_DATA[ticker];
     if (!stock) return;
 
-    // ── Extract N1-N4 from verdict-scores DOM ──
-    var verdictScores = page.querySelector('.verdict-scores');
+    // ── Extract N1-N4 directly from STOCK_DATA (not DOM) ──
     var hypotheses = [];
-    if (verdictScores) {
-        var vsItems = verdictScores.querySelectorAll('.vs-item');
-        vsItems.forEach(function(item) {
-            var label = item.querySelector('.vs-label');
-            var score = item.querySelector('.vs-score');
-            var dirClass = item.getAttribute('data-dir') || 'dir-neutral';
+    if (stock.hypotheses && stock.hypotheses.length > 0) {
+        var norm = normaliseScores(stock.hypotheses);
+        for (var i = 0; i < stock.hypotheses.length; i++) {
+            var h = stock.hypotheses[i];
             hypotheses.push({
-                dirClass: dirClass,
-                label: label ? label.textContent.trim() : '',
-                score: score ? score.textContent.trim() : ''
+                dirClass: h.dirClass || 'dir-neutral',
+                label: (h.title || '').replace(/^N\d+:\s*/, ''),
+                score: norm[i] + '%'
             });
-        });
+        }
     }
 
     // ── Compute skew from data ──
