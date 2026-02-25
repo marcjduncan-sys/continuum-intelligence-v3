@@ -21,7 +21,7 @@
 const fs = require('fs');
 const path = require('path');
 const { findLatestPrices } = require('./find-latest-prices');
-const { processStock, scoreToStatus: engineScoreToStatus } = require('./price-evidence-engine');
+const { processStock } = require('./price-evidence-engine');
 
 const STOCKS_DIR = path.join(__dirname, '..', 'data', 'stocks');
 const INDEX_PATH = path.join(__dirname, '..', 'index.html');
@@ -62,9 +62,7 @@ function determineDominant(scores, currentDominant) {
  * Determine status label from survival score
  */
 function scoreToStatus(score) {
-  return engineScoreToStatus ? engineScoreToStatus(score) : (
-    score >= 0.6 ? 'HIGH' : score >= 0.4 ? 'MODERATE' : score >= 0.2 ? 'LOW' : 'VERY_LOW'
-  );
+  return score >= 0.6 ? 'HIGH' : score >= 0.4 ? 'MODERATE' : score >= 0.2 ? 'LOW' : 'VERY_LOW';
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -194,13 +192,13 @@ function updateVerdictScoresInHtml(html, ticker, newScores) {
     // Match patterns like: score: '50%'  or  scoreWidth: '50%'
     // Only update within the verdict.scores array entries (index-based)
     const scorePattern = new RegExp(
-      `(\\{[^}]*tier:\\s*'t${idx + 1}'[^}]*score:\\s*')\\d+(%')`,
+      `(\\{[^}]*tier:\\s*'n${idx + 1}'[^}]*score:\\s*')\\d+(%')`,
     );
     block = block.replace(scorePattern, `$1${pct}$2`);
 
     // Also update scoreWidth
     const widthPattern = new RegExp(
-      `(\\{[^}]*tier:\\s*'t${idx + 1}'[^}]*scoreWidth:\\s*')\\d+(%')`,
+      `(\\{[^}]*tier:\\s*'n${idx + 1}'[^}]*scoreWidth:\\s*')\\d+(%')`,
     );
     block = block.replace(widthPattern, `$1${pct}$2`);
   });
@@ -279,13 +277,13 @@ function main() {
 
     if (taConfig) {
       // V2 engine: price-aware, volume-confirmed, technically informed
-      const enginePriceData = priceData || {
-        price: currentPrice,
-        previousClose: stock.current_price,
-        changePercent: 0
-      };
-      engineResult = processStock(stock, enginePriceData);
-      newScores = engineResult.scores;
+      engineResult = processStock(ticker, stock, currentPrice);
+      if (engineResult && engineResult.updates) {
+        newScores = {};
+        for (const [key, upd] of Object.entries(engineResult.updates)) {
+          newScores[key] = upd.survival_score;
+        }
+      }
     }
 
     let scoreChanged = false;

@@ -584,4 +584,7 @@ function dailyStr(result) {
     result.cumulative.twentyDay.toFixed(1) + '%';
 }
 
-main();
+// Only run main when executed directly (not when require'd)
+if (require.main === module) main();
+
+module.exports = { processStock };
