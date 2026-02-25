@@ -1479,5 +1479,42 @@
     "hypothesesCount": "4 Active"
   },
   "_overcorrection": null,
-  "_alertState": "NORMAL"
+  "_alertState": "NORMAL",
+  "hero": {
+    "embedded_thesis": "At A$31.96, the price embeds a turnaround at a premium multiple. The 25x forward P/E implies Woolworths restores food EBIT margins toward historical levels, ACCC litigation resolves without structural remedies, and Big W stabilises. The market is pricing a recovery narrative that FY25 results did not support: NPAT fell 19%, Big W posted losses, and regulatory pressure intensified. The 1H FY26 results are the first genuine test of whether a trough has been reached or a new normal is being established.",
+    "skew": "DOWNSIDE",
+    "skew_description": "Three of four hypotheses carry downside direction. N2 (Structural Margin Erosion) at 35% and N3 (Regulatory Squeeze) at 30% are both rising in evidence weight following FY25. N4 (Competitive Disruption) at 25% is steady. N1 (Managed Turnaround) at 50% is awaiting confirmation from the 25 February 1H FY26 results.",
+    "position_in_range": {
+      "current_price": 31.96,
+      "worlds": [
+        {
+          "label": "Structural Decline",
+          "price": 19,
+          "gap_pct": 0
+        },
+        {
+          "label": "Margin Erosion Persists",
+          "price": 27,
+          "gap_pct": 0.44
+        },
+        {
+          "label": "Soft Recovery",
+          "price": 35,
+          "gap_pct": 0.76
+        },
+        {
+          "label": "Turnaround Delivers",
+          "price": 40,
+          "gap_pct": 1
+        }
+      ],
+      "note": "World prices are indicative — pending full W1–W4 valuation build"
+    },
+    "next_decision_point": {
+      "event": "1H FY26 Results",
+      "date": "25 February 2026",
+      "metric": "Food EBIT margin; Australian Food comparable sales growth; Big W EBIT; ACCC update",
+      "thresholds": "Food EBIT margin above 5.0% with positive comparable sales confirms N1 managed turnaround is credible. Margin below 4.5% or Big W losses widening confirms N2 structural erosion. Any ACCC finding requiring pricing remedies activates N3 regulatory squeeze scenario and removes the recovery premium from the multiple."
+    }
+  }
 }

@@ -981,5 +981,42 @@
     "hypothesesCount": "4 Active"
   },
   "_overcorrection": null,
-  "_alertState": "NORMAL"
+  "_alertState": "NORMAL",
+  "hero": {
+    "embedded_thesis": "At A$45.34, the price embeds a soft-landing scenario where business credit demand holds, NIM compression from RBA rate cuts is modest, and the housing market avoids a credit event. The current ~16x forward P/E implies NAB's business banking franchise commands a quality premium without approaching CBA's franchise multiple. This valuation leaves little margin for NIM falling below 1.70% or any deterioration in SME credit quality.",
+    "skew": "DOWNSIDE",
+    "skew_description": "Three of four hypotheses carry downside direction. N2 (NIM Compression) at 40% is rising as rate cuts begin. N3 (Valuation De-rating) at 35% is rising as the stock trades above consensus targets. N4 (Credit Cycle Turn) at 25% is watching. Only N1 (Business Banking Moat) at 50% supports the current multiple, and this hypothesis is already priced in.",
+    "position_in_range": {
+      "current_price": 45.34,
+      "worlds": [
+        {
+          "label": "Credit Cycle Turns",
+          "price": 32,
+          "gap_pct": 0
+        },
+        {
+          "label": "NIM Compression",
+          "price": 40,
+          "gap_pct": 0.3
+        },
+        {
+          "label": "Soft Landing",
+          "price": 50,
+          "gap_pct": 0.68
+        },
+        {
+          "label": "Business Banking Outperforms",
+          "price": 54,
+          "gap_pct": 1
+        }
+      ],
+      "note": "World prices are indicative — pending full W1–W4 valuation build"
+    },
+    "next_decision_point": {
+      "event": "1H FY2026 Results",
+      "date": "May 2026",
+      "metric": "Net interest margin; business lending volume growth; loan impairment charges",
+      "thresholds": "NIM holding above 1.75% through two RBA cuts validates N1 business banking resilience. NIM falling below 1.70% confirms N2 and supports de-rating toward A$40. Business credit growth above 6% year-on-year differentiates NAB from retail-heavy peers and sustains the franchise premium."
+    }
+  }
 }

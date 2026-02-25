@@ -978,5 +978,42 @@
     "hypothesesCount": "4 Active"
   },
   "_overcorrection": null,
-  "_alertState": "NORMAL"
+  "_alertState": "NORMAL",
+  "hero": {
+    "embedded_thesis": "At A$6.31, the price embeds structural uncertainty about office demand recovery, trading at a significant discount to NTA. The market appears to price hybrid work as a permanent structural headwind rather than a cyclical adjustment, discounting Dexus's exposure to premium CBD assets where occupancy has proven more resilient than secondary markets. The discount implies either further NTA write-downs or a prolonged period of below-cost-of-capital returns.",
+    "skew": "NEUTRAL",
+    "skew_description": "Hypotheses are mixed. N2 (Steady-State REIT) leads at 45% neutral weight, providing a base case floor. N1 (Office Recovery) at 35% and N3 (Structural Decline) at 30% partially offset. The RBA rate trajectory is the dominant exogenous variable: rate cuts improve distribution sustainability and reduce refinancing risk.",
+    "position_in_range": {
+      "current_price": 6.31,
+      "worlds": [
+        {
+          "label": "Structural Decline",
+          "price": 4,
+          "gap_pct": 0
+        },
+        {
+          "label": "Hybrid Headwinds",
+          "price": 5.5,
+          "gap_pct": 0.29
+        },
+        {
+          "label": "Steady Recovery",
+          "price": 7.5,
+          "gap_pct": 0.64
+        },
+        {
+          "label": "Office Normalises",
+          "price": 9,
+          "gap_pct": 1
+        }
+      ],
+      "note": "World prices are indicative — pending full W1–W4 valuation build"
+    },
+    "next_decision_point": {
+      "event": "H1 FY26 Results",
+      "date": "18 February 2026",
+      "metric": "Occupancy rate; NTA per unit; distribution guidance; refinancing update",
+      "thresholds": "Occupancy above 92% with NTA stable supports N1 recovery thesis. Distribution cut or NTA write-down above 5% activates N3 structural decline. Refinancing at rates below 5.5% removes N4 interest rate risk from the range."
+    }
+  }
 }

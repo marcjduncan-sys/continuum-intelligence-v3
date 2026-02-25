@@ -839,5 +839,42 @@
     "reviewDate": "2026-03-04",
     "message": "Single-day move of -10.9% exceeds 10% threshold — possible overcorrection"
   },
-  "_alertState": "OVERCORRECTION"
+  "_alertState": "OVERCORRECTION",
+  "hero": {
+    "embedded_thesis": "At A$1.24, the price embeds an elevated gold price environment and a credible path to production through toll treatment at an established mill. The valuation implies Boorara mining approvals are granted within a reasonable timeframe, the capital-light development model avoids a dilutive equity raise, and gold holds above US$2,500/oz. The stock offers leveraged exposure to gold without the production risk premium of a greenfield development.",
+    "skew": "UPSIDE",
+    "skew_description": "Two of four hypotheses carry upside direction. N1 (Gold Price Sensitivity) at 55% is the dominant driver, building as gold sustains near record levels. N2 (Production Transition) at 45% is also building with the toll treatment pathway advancing. Downside risks N3 (Funding) at 40% and N4 (Gold Reversal) at 20% are material but lower probability given current gold market conditions.",
+    "position_in_range": {
+      "current_price": 1.24,
+      "worlds": [
+        {
+          "label": "Gold Reversal",
+          "price": 0.5,
+          "gap_pct": 0
+        },
+        {
+          "label": "Funding Dilution",
+          "price": 0.85,
+          "gap_pct": 0.2
+        },
+        {
+          "label": "Production Transition",
+          "price": 1.7,
+          "gap_pct": 0.71
+        },
+        {
+          "label": "Gold Supercycle",
+          "price": 2.2,
+          "gap_pct": 1
+        }
+      ],
+      "note": "World prices are indicative — pending full W1–W4 valuation build"
+    },
+    "next_decision_point": {
+      "event": "Boorara Mining Approvals",
+      "date": "Q2 2026",
+      "metric": "Mining approval status; toll treatment agreement; capital raise size if required",
+      "thresholds": "Boorara mining approval with toll treatment agreement confirms N2 production transition. Any capital raise below 20% dilution at above A$1.00 per share preserves N3 funding risk at manageable levels. Gold sustaining above US$2,800/oz strengthens N1 leverage thesis materially."
+    }
+  }
 }

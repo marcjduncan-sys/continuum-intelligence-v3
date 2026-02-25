@@ -838,5 +838,42 @@
     }
   },
   "_overcorrection": null,
-  "_alertState": "NORMAL"
+  "_alertState": "NORMAL",
+  "hero": {
+    "embedded_thesis": "At A$1.07, the price embeds modest recovery expectations after the debt restructuring, reflecting a franchise network that remains operational but carries persistent reputational and structural damage. The valuation implies stabilisation of the outlet count, gradual debt reduction from free cash flow, and consumer spending resilience in the quick service restaurant segment. The price does not embed any recovery to pre-scandal growth rates.",
+    "skew": "DOWNSIDE",
+    "skew_description": "Two downside hypotheses are rising. N3 (Consumer Spending Risk) at 45% is the dominant near-term risk as discretionary spending faces pressure. N4 (Brand Terminal Decline) at 35% is rising as the franchise network continues to contract. N2 (Debt Reduction Re-rating) at 40% is already priced in. N1 (Franchise Recovery) at 30% is weakening with no evidence of network expansion.",
+    "position_in_range": {
+      "current_price": 1.07,
+      "worlds": [
+        {
+          "label": "Brand Terminal Decline",
+          "price": 0.4,
+          "gap_pct": 0
+        },
+        {
+          "label": "Consumer Squeeze",
+          "price": 0.75,
+          "gap_pct": 0.25
+        },
+        {
+          "label": "Debt Reduction Re-rates",
+          "price": 1.4,
+          "gap_pct": 0.71
+        },
+        {
+          "label": "Franchise Recovery",
+          "price": 1.8,
+          "gap_pct": 1
+        }
+      ],
+      "note": "World prices are indicative — pending full W1–W4 valuation build"
+    },
+    "next_decision_point": {
+      "event": "H1 FY2026 Results",
+      "date": "1H 2026",
+      "metric": "Network outlet count; same-store sales; net debt; free cash flow",
+      "thresholds": "Outlet count stabilising above 2,400 with positive SSS confirms the franchise floor. Net debt below A$60M demonstrates the debt reduction thesis is converting to value. Outlet count declining below 2,200 or SSS below negative 5% activates N4 terminal decline scenario."
+    }
+  }
 }

@@ -959,5 +959,42 @@
     "hypothesesCount": "4 Active"
   },
   "_overcorrection": null,
-  "_alertState": "NORMAL"
+  "_alertState": "NORMAL",
+  "hero": {
+    "embedded_thesis": "At A$170.22, the price embeds permanent franchise superiority at ~24x forward P/E, a 40% premium to major bank peers. This multiple implies CBA sustains NIMs above 2.00% through the rate cut cycle, digital investment continues to widen the competitive moat, and credit losses remain near cyclical lows indefinitely. The price assigns near-zero probability to NIM compression below 1.90% or any acceleration in non-bank market share erosion.",
+    "skew": "DOWNSIDE",
+    "skew_description": "Three of four hypotheses carry downside direction. N2 (NIM Compression) at 60% weight is building as the RBA rate cut cycle begins. N3 (Competitive Disruption) and N4 (Credit Cycle) contribute additional downside probability. Only N1 (Franchise Premium) at 75% provides upside, but this hypothesis is already priced into the current multiple.",
+    "position_in_range": {
+      "current_price": 170.22,
+      "worlds": [
+        {
+          "label": "Credit Cycle Turns",
+          "price": 120,
+          "gap_pct": 0
+        },
+        {
+          "label": "NIM Compression",
+          "price": 145,
+          "gap_pct": 0.31
+        },
+        {
+          "label": "Soft Landing",
+          "price": 180,
+          "gap_pct": 0.75
+        },
+        {
+          "label": "Franchise Premium Sustained",
+          "price": 200,
+          "gap_pct": 1
+        }
+      ],
+      "note": "World prices are indicative — pending full W1–W4 valuation build"
+    },
+    "next_decision_point": {
+      "event": "NIM Below 1.90% or Loan Impairment Above 15bp",
+      "date": "Monitoring — FY26 Results August 2026",
+      "metric": "Net interest margin trajectory; loan impairment charges as % of loans",
+      "thresholds": "NIM sustaining above 2.00% through two rate cuts supports N1 franchise thesis. NIM falling below 1.90% confirms N2 and triggers valuation de-rating toward A$145. Impairment above 15bp activates N4 credit cycle scenario."
+    }
+  }
 }

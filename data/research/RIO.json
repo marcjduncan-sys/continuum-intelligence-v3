@@ -973,5 +973,42 @@
     "reviewDate": "2026-03-04",
     "message": "Single-day move of +35.0% exceeds 10% threshold — possible overcorrection"
   },
-  "_alertState": "OVERCORRECTION"
+  "_alertState": "OVERCORRECTION",
+  "hero": {
+    "embedded_thesis": "At A$118.45, the price embeds a cautious scenario on China steel demand and elevated execution risk on the Simandou and Arcadium growth projects. The ~10x forward earnings multiple reflects market scepticism that Rio's energy transition portfolio delivers returns commensurate with capital deployed. The 5.4% dividend yield implies the market values capital return over growth, pricing the Pilbara cash machine as the dominant earnings driver for the foreseeable future.",
+    "skew": "BALANCED",
+    "skew_description": "Hypotheses are balanced. N1 (Iron Ore Cash Generation) at 70% provides a substantial earnings floor. N2 (Energy Transition Portfolio) at 40% is progressing. Offsetting these, N3 (China Demand Slowdown) at 55% is elevated and N4 (Growth Capex Risk) at 50% is building. The net skew is balanced pending resolution of the China demand trajectory and Simandou execution.",
+    "position_in_range": {
+      "current_price": 118.45,
+      "worlds": [
+        {
+          "label": "Simandou and China Shock",
+          "price": 75,
+          "gap_pct": 0
+        },
+        {
+          "label": "China Slowdown",
+          "price": 100,
+          "gap_pct": 0.58
+        },
+        {
+          "label": "Steady Iron Ore",
+          "price": 135,
+          "gap_pct": 0.86
+        },
+        {
+          "label": "Energy Transition Wins",
+          "price": 155,
+          "gap_pct": 1
+        }
+      ],
+      "note": "World prices are indicative — pending full W1–W4 valuation build"
+    },
+    "next_decision_point": {
+      "event": "Iron Ore Price and Simandou Production Update",
+      "date": "Monitoring throughout 2026",
+      "metric": "Iron ore spot price; Simandou ramp schedule; Arcadium lithium integration update",
+      "thresholds": "Iron ore sustaining above US$100/t through H1 2026 validates N1 Pilbara resilience. Simandou producing above 30 Mtpa by year-end 2026 confirms supply risk is real. Any Arcadium impairment or capex revision above 20% activates N4 growth capex risk scenario."
+    }
+  }
 }
