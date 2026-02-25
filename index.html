@@ -421,6 +421,83 @@ a:hover { color: var(--accent-sage); }
     color: var(--accent-teal);
 }
 
+/* --- Home Page Stock Search --- */
+#page-home .home-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+#page-home .home-search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+#page-home .home-search-icon {
+    position: absolute;
+    left: 8px;
+    width: 13px; height: 13px;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+#page-home .home-search-input {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 5px 10px 5px 28px;
+    font-size: 0.72rem;
+    color: var(--text-primary);
+    width: 180px;
+    outline: none;
+    transition: border-color 0.15s, width 0.2s;
+}
+#page-home .home-search-input::placeholder { color: var(--text-muted); }
+#page-home .home-search-input:focus {
+    border-color: var(--accent-teal);
+    width: 220px;
+}
+#page-home .home-search-results {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    min-width: 240px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    z-index: 200;
+    display: none;
+    overflow: hidden;
+}
+#page-home .home-search-result {
+    padding: 9px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+}
+#page-home .home-search-result:last-child { border-bottom: none; }
+#page-home .home-search-result:hover { background: var(--bg-hover, rgba(0,200,117,0.06)); }
+#page-home .home-search-result-ticker {
+    font-family: var(--font-data);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+    min-width: 56px;
+}
+#page-home .home-search-result-name {
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#page-home .home-search-empty {
+    padding: 10px 14px;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+}
+
 /* --- Featured Report Cards --- */
 .featured-grid {
     display: grid;
@@ -4668,6 +4745,13 @@ a:hover { color: var(--accent-sage); }
         <!-- Featured Reports -->
         <div class="section-header">
             <div class="section-title">Latest Research</div>
+            <div class="home-search">
+                <div class="home-search-wrap">
+                    <svg class="home-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" class="home-search-input" id="home-stock-search" placeholder="Search stocks…" autocomplete="off" spellcheck="false">
+                </div>
+                <div class="home-search-results" id="home-search-results"></div>
+            </div>
         </div>
 
         <div class="featured-grid" id="featured-grid"></div>
@@ -9734,6 +9818,50 @@ document.addEventListener('click', (e) => {
 });
 
 // Initialize home page content and portfolio
+function initHomeSearch() {
+    var input = document.getElementById('home-stock-search');
+    var results = document.getElementById('home-search-results');
+    if (!input || !results) return;
+
+    input.addEventListener('input', function() {
+        var q = this.value.trim().toLowerCase();
+        if (!q) { results.style.display = 'none'; results.innerHTML = ''; return; }
+        var matches = [];
+        for (var ticker in STOCK_DATA) {
+            var s = STOCK_DATA[ticker];
+            if (ticker.toLowerCase().includes(q) ||
+                (s.company && s.company.toLowerCase().includes(q)) ||
+                (s.tickerFull && s.tickerFull.toLowerCase().includes(q))) {
+                matches.push(s);
+            }
+        }
+        if (matches.length === 0) {
+            results.innerHTML = '<div class="home-search-empty">No stocks found</div>';
+            results.style.display = 'block';
+            return;
+        }
+        var html = '';
+        matches.slice(0, 8).forEach(function(s) {
+            html += '<div class="home-search-result" onclick="navigate(\'report-' + s.ticker + '\');document.getElementById(\'home-stock-search\').value=\'\';document.getElementById(\'home-search-results\').style.display=\'none\'">' +
+                '<span class="home-search-result-ticker">' + (s.tickerFull || s.ticker) + '</span>' +
+                '<span class="home-search-result-name">' + (s.company || '') + '</span>' +
+            '</div>';
+        });
+        results.innerHTML = html;
+        results.style.display = 'block';
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!input.contains(e.target) && !results.contains(e.target)) {
+            results.style.display = 'none';
+        }
+    });
+
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') { this.value = ''; results.style.display = 'none'; }
+    });
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     // Populate featured cards
     const featuredGrid = document.getElementById('featured-grid');
@@ -9786,6 +9914,9 @@ window.addEventListener('DOMContentLoaded', () => {
             tcGrid.appendChild(card);
         });
     }
+
+    // Home stock search
+    initHomeSearch();
 
     // Portfolio initialization
     setupUploadZone();
