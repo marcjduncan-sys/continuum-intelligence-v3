@@ -1196,7 +1196,7 @@
         "name": "S&amp;P/ASX IT Index",
         "period": "12 months",
         "stockReturn": -60.3,
-        "sectorReturn": -21.0,
+        "sectorReturn": -21,
         "relativeReturn": -39.3
       }
     }
@@ -1205,5 +1205,16 @@
     "disclaimer": "This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information. This report does not contain buy, sell, or hold recommendations, price targets, or valuation models.",
     "domainCount": "10 of 10",
     "hypothesesCount": "4 Active"
-  }
+  },
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-02-25",
+    "triggerPrice": 42.99,
+    "direction": "down",
+    "movePct": -37.06,
+    "reviewDate": "2026-03-04",
+    "message": "Single-day move of -37.1% exceeds 10% threshold — possible overcorrection"
+  },
+  "_alertState": "OVERCORRECTION"
 }

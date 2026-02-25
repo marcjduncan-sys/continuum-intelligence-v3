@@ -11,10 +11,10 @@
       "what_to_watch": "H1 FY26 plasma collection volumes and Vifor integration milestones. If plasma cost per litre returns to pre-COVID levels, this narrative strengthens significantly.",
       "upside": "Pipeline catalysts (CSL112, garadacimab) could drive re-rating if clinical data exceeds expectations.",
       "risk_plain": "If plasma collection costs stay elevated or Vifor integration hits unexpected problems, the growth story weakens.",
-      "survival_score": 0.58,
+      "survival_score": 0.27,
       "status": "MODERATE",
       "weighted_inconsistency": 2.5,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "last_updated": "2026-02-25T08:09:34.717Z"
     },
     "N2": {
       "label": "Managed/Base Case",
@@ -23,10 +23,10 @@
       "what_to_watch": "FY26 earnings guidance at H1 result. If guidance stays at 7-10% NPATA growth, the base case holds firm.",
       "upside": "Consistent execution could attract more long-only institutional capital, supporting valuation multiples.",
       "risk_plain": "If growth slips below high single digits, the premium valuation may not be sustainable.",
-      "survival_score": 0.75,
+      "survival_score": 0.37,
       "status": "HIGH",
       "weighted_inconsistency": 1,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "last_updated": "2026-02-25T08:09:34.717Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Vifor integration costs in H1 FY26 and AUD/USD exchange rate trajectory. If integration costs rise or AUD strengthens above 0.70, downside risk increases.",
       "upside": null,
       "risk_plain": "Currency headwinds alone could knock 3-5% off reported earnings, and if combined with slower Vifor synergies, the stock could de-rate.",
-      "survival_score": 0.33,
+      "survival_score": 0.24,
       "status": "LOW",
       "weighted_inconsistency": 4.2,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "last_updated": "2026-02-25T08:09:34.717Z"
     },
     "N4": {
       "label": "Disruption",
@@ -50,12 +50,12 @@
       "survival_score": 0.12,
       "status": "VERY_LOW",
       "weighted_inconsistency": 7.1,
-      "last_updated": "2026-02-14T09:30:00+11:00"
+      "last_updated": "2026-02-25T08:09:34.717Z"
     }
   },
   "dominant": "N2",
   "confidence": "HIGH",
-  "alert_state": "NORMAL",
+  "alert_state": "OVERCORRECTION",
   "alert_started": null,
   "current_price": 145,
   "big_picture": "CSL is a global biotech leader specialising in plasma-derived therapies and vaccines. It is one of only three companies worldwide that can collect and process blood plasma at scale, giving it an extremely strong competitive position.",
@@ -159,6 +159,13 @@
         "half_life_days": 180
       },
       "active": true
+    },
+    {
+      "date": "2026-02-25",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "Single-day move of -49.2% exceeds 10% threshold — possible overcorrection",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -171,6 +178,16 @@
       "cumulative_20d": 1.42,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-02-25",
+      "classification": "MATERIAL",
+      "daily_change_pct": -49.23,
+      "volume_multiplier": 1,
+      "cumulative_5d": 0,
+      "cumulative_20d": 1.42,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
@@ -409,5 +426,15 @@
         "relativeReturn": -27.5
       }
     }
+  },
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-02-25",
+    "triggerPrice": 145,
+    "direction": "down",
+    "movePct": -49.23,
+    "reviewDate": "2026-03-04",
+    "message": "Single-day move of -49.2% exceeds 10% threshold — possible overcorrection"
   }
 }
