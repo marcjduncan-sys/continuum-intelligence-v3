@@ -415,13 +415,16 @@ async def refresh_result(ticker: str):
 # Serve frontend
 # ---------------------------------------------------------------------------
 
-@app.get("/data/{filename}")
-async def serve_data(filename: str):
-    """Serve data files (live-prices.json, announcements.json)."""
+@app.get("/data/{file_path:path}")
+async def serve_data(file_path: str):
+    """Serve data files including nested paths (e.g. data/research/WOW.json)."""
     data_dir = Path(config.INDEX_HTML_PATH).parent / "data"
-    file_path = data_dir / filename
-    if file_path.exists() and file_path.suffix == ".json":
-        return FileResponse(file_path, media_type="application/json")
+    full_path = (data_dir / file_path).resolve()
+    # Security: ensure resolved path is still within data_dir
+    if not str(full_path).startswith(str(data_dir.resolve())):
+        raise HTTPException(status_code=403, detail="Access denied")
+    if full_path.exists() and full_path.suffix == ".json":
+        return FileResponse(full_path, media_type="application/json")
     raise HTTPException(status_code=404, detail="File not found")
 
 
