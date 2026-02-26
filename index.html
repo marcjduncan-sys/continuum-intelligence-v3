@@ -4064,24 +4064,29 @@ a:hover { color: var(--accent-sage); }
     bottom: 24px;
     right: 24px;
     z-index: 200;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
+    height: 44px;
+    padding: 0 20px 0 16px;
+    border-radius: 999px;
     background: var(--accent-teal);
     color: #fff;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.35);
     transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    font-family: var(--font-ui, system-ui, -apple-system, sans-serif);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
 }
 .chat-fab:hover {
-    transform: scale(1.08);
+    transform: scale(1.04);
     box-shadow: 0 6px 28px rgba(0,0,0,0.45);
 }
-.chat-fab svg { width: 24px; height: 24px; }
+.chat-fab svg { width: 18px; height: 18px; flex-shrink: 0; }
 .chat-fab.hidden { display: none; }
 
 /* --- Chat Panel --- */
@@ -12128,8 +12133,9 @@ async function _fetchAndMergeBatchResults() {
 <!-- FAB Button -->
 <button class="chat-fab" id="chatFab" title="Ask the research analyst" aria-label="Open research chat" aria-expanded="false" aria-controls="chatPanel">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
     </svg>
+    Analyst
 </button>
 
 <!-- Chat Panel -->
