@@ -9184,6 +9184,7 @@ const ContinuumDynamics = (function() {
     }
 
     // Deep hydrate complex objects
+    if (stock.hero) hydrateTextFields(stock.hero, ref, computed);
     if (stock.skew) hydrateTextFields(stock.skew, ref, computed);
     if (stock.verdict) hydrateTextFields(stock.verdict, ref, computed);
     if (stock.narrative) hydrateTextFields(stock.narrative, ref, computed);
