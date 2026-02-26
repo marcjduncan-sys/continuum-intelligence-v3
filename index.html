@@ -7955,25 +7955,34 @@ function destroyNarrativeTimelineChart(ticker) {
 }
 
 function renderSignalBars(data) {
-  var tls = data.three_layer_signal;
+  var tls = data.three_layer_signal || {};
   var ta  = data.technicalAnalysis;
   var rows = '';
 
-  // "€"€ Row 1: Technical Indicators "€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€
+  // ── Row 1: Technical Indicators ───────────────────────────────────────────
   if (ta) {
     var regime     = ta.regime || '';
     var isCritical = /break|bear|crash/i.test(regime);
     var isPositive = /up|bull|accum|recov/i.test(regime);
     var regimeCls  = isCritical ? 'critical' : isPositive ? 'positive' : 'neutral';
-    var badgeLabel = isCritical ? 'Critical' : isPositive ? 'Positive' : (regime || 'Neutral');
+    var badgeLabel = isCritical ? 'Critical' : isPositive ? 'Positive' : (regime.split(/[\s—–-]/)[0] || 'Neutral');
 
     var currentP = parseFloat(data._livePrice || data.price || 0);
     var ph = data.priceHistory;
     var dailyChange = '', dailyCls = '';
-    if (ph && ph.length >= 2) {
-      var chg = (ph[ph.length-1] - ph[ph.length-2]) / ph[ph.length-2] * 100;
+    // Prefer live change % from server data; fall back to priceHistory diff
+    if (data._liveChangePct != null && !isNaN(data._liveChangePct)) {
+      var chg = parseFloat(data._liveChangePct);
       dailyCls    = chg >= 0 ? 'pos' : 'neg';
       dailyChange = (chg >= 0 ? '+' : '') + chg.toFixed(1) + '% today';
+    } else if (ph && ph.length >= 2) {
+      var last2 = parseFloat(ph[ph.length - 1]);
+      var prev2 = parseFloat(ph[ph.length - 2]);
+      if (!isNaN(last2) && !isNaN(prev2) && prev2 !== 0) {
+        var chg = (last2 - prev2) / prev2 * 100;
+        dailyCls    = chg >= 0 ? 'pos' : 'neg';
+        dailyChange = (chg >= 0 ? '+' : '') + chg.toFixed(1) + '% today';
+      }
     }
     var fromPeak = '', fromPeakCls = '';
     if (ta.trend && ta.trend.drawdown != null) {
