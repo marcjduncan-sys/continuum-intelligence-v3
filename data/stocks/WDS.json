@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.32,
-      "status": "LOW",
+      "survival_score": 0.49,
+      "status": "MODERATE",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-02-26T01:30:48.610Z"
+      "last_updated": "2026-02-26T22:00:24.438Z"
     },
     "N2": {
       "label": "Commodity Price Risk",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.39,
+      "survival_score": 0.34,
       "status": "LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-02-26T01:30:48.610Z"
+      "last_updated": "2026-02-26T22:00:24.438Z"
     },
     "N3": {
       "label": "Energy Transition Risk",
@@ -35,10 +35,10 @@
       "what_to_watch": "Cost pressures, competitive threats, or macro headwinds.",
       "upside": null,
       "risk_plain": "Material downside if multiple risks crystallise simultaneously.",
-      "survival_score": 0.19,
+      "survival_score": 0.11,
       "status": "VERY_LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-02-26T01:30:48.610Z"
+      "last_updated": "2026-02-26T22:00:24.438Z"
     },
     "N4": {
       "label": "Scarborough Delivery",
@@ -47,18 +47,26 @@
       "what_to_watch": "Industry disruption signals and regulatory changes.",
       "upside": null,
       "risk_plain": "If disruption materialises, prior assumptions become invalid.",
-      "survival_score": 0.1,
+      "survival_score": 0.06,
       "status": "VERY_LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-02-26T01:30:48.610Z"
+      "last_updated": "2026-02-26T22:00:24.438Z"
     }
   },
-  "dominant": "N2",
-  "confidence": "LOW",
+  "dominant": "N1",
+  "confidence": "MODERATE",
   "alert_state": "NORMAL",
   "current_price": 27.94,
   "big_picture": "Woodside Energy Group (ASX: WDS) — coverage initiated. Full analysis pending.",
-  "last_flip": null,
+  "last_flip": {
+    "date": "2026-02-26",
+    "from": "N2",
+    "to": "N1",
+    "trigger": "Automated: survival score shift (Commodity Price Risk → LNG Volume Growth)",
+    "price_at_flip": 27.94,
+    "from_survival": 0.34,
+    "to_survival": 0.49
+  },
   "narrative_history": [],
   "evidence_items": [],
   "price_signals": [
@@ -342,10 +350,10 @@
     }
   },
   "price_evidence": {
-    "last_run": "2026-02-26T05:36:48.027Z",
-    "classification": "NOISE"
+    "last_run": "2026-02-26T22:00:24.438Z",
+    "classification": "SIGNIFICANT"
   },
-  "last_research_update": "2026-02-26T05:36:48.027Z",
+  "last_research_update": "2026-02-26T22:00:24.438Z",
   "price": 27.94,
   "date": "26 February 2026"
 }
