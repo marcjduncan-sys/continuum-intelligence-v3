@@ -5033,7 +5033,7 @@ a:hover { color: var(--accent-sage); }
             <div class="port-insights-grid">
                 <div class="port-insight-card">
                     <div class="port-insight-header">
-                        <span class="port-insight-icon">âš ️</span>
+                        <span class="port-insight-icon">⚠️</span>
                         <span class="port-insight-title">Concentration Alert</span>
                     </div>
                     <div class="port-insight-content" id="portConcentrationAlert">
@@ -5042,7 +5042,7 @@ a:hover { color: var(--accent-sage); }
                 </div>
                 <div class="port-insight-card">
                     <div class="port-insight-header">
-                        <span class="port-insight-icon">ðŸŽ¯</span>
+                        <span class="port-insight-icon">&#x1F3AF;</span>
                         <span class="port-insight-title">Contrarian Opportunities</span>
                     </div>
                     <div class="port-insight-content" id="portContrarianOpp">
@@ -5051,7 +5051,7 @@ a:hover { color: var(--accent-sage); }
                 </div>
                 <div class="port-insight-card">
                     <div class="port-insight-header">
-                        <span class="port-insight-icon">ðŸ›¡️</span>
+                        <span class="port-insight-icon">&#x1F6E1;&#xFE0F;</span>
                         <span class="port-insight-title">Hedge Gaps</span>
                     </div>
                     <div class="port-insight-content" id="portHedgeGaps">
@@ -5060,7 +5060,7 @@ a:hover { color: var(--accent-sage); }
                 </div>
                 <div class="port-insight-card">
                     <div class="port-insight-header">
-                        <span class="port-insight-icon">ðŸ"Š</span>
+                        <span class="port-insight-icon">&#x1F4CA;</span>
                         <span class="port-insight-title">Alignment Score</span>
                     </div>
                     <div class="port-insight-content" id="portAlignmentScore">
@@ -5082,7 +5082,7 @@ a:hover { color: var(--accent-sage); }
             </div>
 
             <div class="change-alerts-empty" id="changeAlertsEmpty">
-                <div class="change-empty-icon">ðŸ""</div>
+                <div class="change-empty-icon">&#x1F514;</div>
                 <div class="change-empty-title">No active alerts</div>
                 <div class="change-empty-text">Recent hypothesis changes will appear here when your portfolio is loaded</div>
             </div>
@@ -10700,7 +10700,7 @@ function renderChangeAlerts(positions) {
     if (tickers.includes('XRO')) {
         alerts.push({
             type: 'critical',
-            icon: 'ðŸ"´',
+            icon: '🔴',
             title: 'XRO: N3 Probability Increased',
             text: 'AI disruption thesis strengthened following Claude 4 announcement. N3 (Execution Failure) raised from 35% -> 42%.',
             ticker: 'XRO',
@@ -10712,7 +10712,7 @@ function renderChangeAlerts(positions) {
     if (tickers.includes('WOW')) {
         alerts.push({
             type: 'warning',
-            icon: 'ðŸŸ¡',
+            icon: '🟡',
             title: 'WOW: Earnings Preview',
             text: 'Q1 FY26 results due Feb 25. Consensus expects 11.8% EBIT growth vs management guidance of "mid-to-high single digits". Watch for N1/N2 inflection.',
             ticker: 'WOW',
@@ -10724,7 +10724,7 @@ function renderChangeAlerts(positions) {
     if (tickers.includes('CSL')) {
         alerts.push({
             type: 'info',
-            icon: 'ðŸ"µ',
+            icon: '🔵',
             title: 'CSL: Plasma Collection Update',
             text: 'Weekly collection data shows continued normalization. N1 (Recovery) probability stable at 45%. No change to thesis.',
             ticker: 'CSL',
@@ -10736,7 +10736,7 @@ function renderChangeAlerts(positions) {
     if (tickers.includes('WTC')) {
         alerts.push({
             type: 'critical',
-            icon: 'ðŸ"´',
+            icon: '🔴',
             title: 'WTC: Governance Concerns Escalate',
             text: 'Additional board member resignation. N3 (Governance Risk) elevated from 30% -> 35%. Review position sizing.',
             ticker: 'WTC',
@@ -10748,7 +10748,7 @@ function renderChangeAlerts(positions) {
     if (alerts.length < 2) {
         alerts.push({
             type: 'info',
-            icon: 'ðŸ"Š',
+            icon: '📊',
             title: 'Market: ASX 200 Volatility Elevated',
             text: 'VIX-equivalent at 18-month high. Consider position sizing across all hypotheses.',
             ticker: 'MARKET',
@@ -10767,7 +10767,7 @@ function renderChangeAlerts(positions) {
                     <div class="change-alert-meta">
                         <span class="change-alert-ticker">${a.ticker}</span>
                         <span>⏱ ${a.time}</span>
-                        <span>ðŸ'¼ ${a.impact}</span>
+                        <span>💼 ${a.impact}</span>
                     </div>
                 </div>
             </div>
@@ -11043,7 +11043,7 @@ const TC_DATA = {
         n4: { name: 'Competitive Disruption', prob: 15, desc: 'New logistics platform gains traction' },
         supporting: ['CargoWise platform strength', 'Founder vision alignment', 'Global trade recovery'],
         contradicting: ['Governance concerns persist', 'Insider selling patterns', 'Competitive pricing pressure'],
-        analysis: "Your thesis is <strong>âš ️ PUSHING UPHILL</strong>. You don't align clearly with N1, yet contradict N2, N3, N4 (70% combined). Requires growth recovery AND governance concerns proving overblown."
+        analysis: "Your thesis is <strong>⚠️ PUSHING UPHILL</strong>. You don't align clearly with N1, yet contradict N2, N3, N4 (70% combined). Requires growth recovery AND governance concerns proving overblown."
     },
     WDS: {
         name: 'Woodside Energy', primary: 'n2',
@@ -11176,7 +11176,7 @@ function tcAnalyze() {
     const tierData = data[primaryTier];
     if (primaryTier === 'uphill') {
         document.getElementById('tc-banner-label').textContent = 'Your thesis position:';
-        document.getElementById('tc-banner-hypothesis').textContent = 'âš ️ PUSHING UPHILL';
+        document.getElementById('tc-banner-hypothesis').textContent = '⚠️ PUSHING UPHILL';
         document.getElementById('tc-banner-desc').textContent = "Your view doesn't clearly align with any single hypothesis. You're making a contrarian bet.";
     } else {
         document.getElementById('tc-banner-label').textContent = 'Your thesis aligns most closely with:';
