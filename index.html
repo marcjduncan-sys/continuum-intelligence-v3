@@ -11383,7 +11383,9 @@ function tcAnalyze() {
 
 var REFRESH_API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:8000'
-    : '';  // Same origin in production
+    : window.location.hostname.includes('github.io')
+        ? 'https://imaginative-vision-production-16cb.up.railway.app'
+        : '';  // Same origin on Railway
 
 var _refreshPollers = {};
 
