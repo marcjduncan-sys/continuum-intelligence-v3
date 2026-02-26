@@ -267,52 +267,12 @@ function createMarketNarrativeSection(analysis) {
   if (severity === 'NORMAL') return null;
 
   var shift = analysis.narrativeShift;
-  var weights = analysis.weights;
-  var hNames = analysis.hypothesisNames || {};
   if (!shift || !shift.hasShift) return null;
 
   var headerClass = severity === 'CRITICAL' ? ' nfi-mn-header-critical' :
                     severity === 'HIGH' ? ' nfi-mn-header-high' : '';
   var badgeClass = severity === 'CRITICAL' ? 'nfi-mn-badge-critical' :
                    severity === 'HIGH' ? 'nfi-mn-badge-high' : 'nfi-mn-badge-moderate';
-
-  // Build weight divergence table
-  var weightRows = '';
-  var tiers = ['N1', 'N2', 'N3', 'N4'];
-  for (var i = 0; i < tiers.length; i++) {
-    var t = tiers[i];
-    var w = weights[t];
-    if (!w) continue;
-    var name = hNames[t] || t;
-    var gap = Math.abs(w.longTerm - w.shortTerm);
-    var gapClass = gap > 40 ? 'nfi-hw-gap-high' : gap > 20 ? 'nfi-hw-gap-medium' : '';
-    var isContradicted = analysis.inference.contradictedHypothesis === t;
-
-    weightRows +=
-      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:0.78rem;">' +
-        '<div style="width:150px;color:var(--text-secondary,#d1d5db);font-weight:600;">' + t + ': ' + name +
-          (isContradicted ? ' <span class="nfi-contradicted-badge">CONTRADICTED</span>' : '') +
-        '</div>' +
-        '<div style="flex:1;">' +
-          '<div class="nfi-hw-row">' +
-            '<span class="nfi-hw-label">Research</span>' +
-            '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-lt" style="width:' + w.longTerm + '%"></div></div>' +
-            '<span class="nfi-hw-value">' + w.longTerm + '%</span>' +
-          '</div>' +
-          '<div class="nfi-hw-row">' +
-            '<span class="nfi-hw-label">Market</span>' +
-            '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-st" style="width:' + w.shortTerm + '%"></div></div>' +
-            '<span class="nfi-hw-value">' + w.shortTerm + '%</span>' +
-          '</div>' +
-          '<div class="nfi-hw-row">' +
-            '<span class="nfi-hw-label">Blended</span>' +
-            '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-blend" style="width:' + w.blended + '%"></div></div>' +
-            '<span class="nfi-hw-value">' + w.blended + '%</span>' +
-          '</div>' +
-          '<div class="nfi-hw-gap ' + gapClass + '">' + gap + 'pt divergence | Confidence: ' + w.confidence + '</div>' +
-        '</div>' +
-      '</div>';
-  }
 
   var section = document.createElement('div');
   section.className = 'nfi-market-narrative';
@@ -334,10 +294,6 @@ function createMarketNarrativeSection(analysis) {
         '<div class="nfi-mn-label">Institutional Commentary</div>' +
         '<div class="nfi-mn-text">' + shift.commentary + '</div>' +
       '</div>' : '') +
-      '<div class="nfi-mn-section">' +
-        '<div class="nfi-mn-label">Hypothesis Weight Breakdown: Research vs Market vs Blended</div>' +
-        weightRows +
-      '</div>' +
     '</div>';
 
   return section;
@@ -358,8 +314,8 @@ function addWeightBreakdownToCards(reportPage, analysis) {
 
     var titleText = titleEl.textContent;
     var tier = null;
-    var match = titleText.match(/N(\d)/);
-    if (match) tier = 'N' + match[1];
+    var match = titleText.match(/T(\d)/);
+    if (match) tier = 'T' + match[1];
     if (!tier || !weights[tier]) return;
 
     var w = weights[tier];
@@ -372,9 +328,40 @@ function addWeightBreakdownToCards(reportPage, analysis) {
       titleEl.insertAdjacentHTML('beforeend', ' <span class="nfi-contradicted-badge">CONTRADICTED</span>');
     }
 
-    // Remove any existing weight breakdown (cleanup from previous renders)
+    // Remove any existing weight breakdown
     var existing = card.querySelector('.nfi-hyp-weights');
     if (existing) existing.remove();
+
+    var breakdown = document.createElement('div');
+    breakdown.className = 'nfi-hyp-weights';
+    breakdown.innerHTML =
+      '<div class="nfi-hw-row">' +
+        '<span class="nfi-hw-label">Research</span>' +
+        '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-lt" style="width:' + w.longTerm + '%"></div></div>' +
+        '<span class="nfi-hw-value">' + w.longTerm + '%</span>' +
+      '</div>' +
+      '<div class="nfi-hw-row">' +
+        '<span class="nfi-hw-label">Market</span>' +
+        '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-st" style="width:' + w.shortTerm + '%"></div></div>' +
+        '<span class="nfi-hw-value">' + w.shortTerm + '%</span>' +
+      '</div>' +
+      '<div class="nfi-hw-row">' +
+        '<span class="nfi-hw-label">Blended</span>' +
+        '<div class="nfi-hw-bar-container"><div class="nfi-hw-bar nfi-hw-bar-blend" style="width:' + w.blended + '%"></div></div>' +
+        '<span class="nfi-hw-value">' + w.blended + '%</span>' +
+      '</div>' +
+      '<div class="nfi-hw-gap ' + gapClass + '">' +
+        gap + 'pt divergence | Confidence: ' + w.confidence +
+        (isContradicted ? ' | PRICE ACTION CONTRADICTS THIS THESIS' : '') +
+      '</div>';
+
+    // Insert after score row
+    var scoreRow = card.querySelector('.hc-score-row');
+    if (scoreRow) {
+      scoreRow.parentNode.insertBefore(breakdown, scoreRow.nextSibling);
+    } else {
+      card.appendChild(breakdown);
+    }
   });
 }
 
