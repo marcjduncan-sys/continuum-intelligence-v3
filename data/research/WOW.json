@@ -1478,8 +1478,17 @@
     "domainCount": "10 of 10",
     "hypothesesCount": "4 Active"
   },
-  "_overcorrection": null,
-  "_alertState": "NORMAL",
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-02-26",
+    "triggerPrice": 36.35,
+    "direction": "up",
+    "movePct": 11.85,
+    "reviewDate": "2026-03-05",
+    "message": "Single-day move of +11.8% exceeds 10% threshold — possible overcorrection"
+  },
+  "_alertState": "OVERCORRECTION",
   "hero": {
     "embedded_thesis": "At A$31.96, the price embeds a turnaround at a premium multiple. The 25x forward P/E implies Woolworths restores food EBIT margins toward historical levels, ACCC litigation resolves without structural remedies, and Big W stabilises. The market is pricing a recovery narrative that FY25 results did not support: NPAT fell 19%, Big W posted losses, and regulatory pressure intensified. The 1H FY26 results are the first genuine test of whether a trough has been reached or a new normal is being established.",
     "skew": "DOWNSIDE",

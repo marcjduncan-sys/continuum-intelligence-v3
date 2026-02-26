@@ -971,8 +971,17 @@
     "domainCount": "10 of 10",
     "hypothesesCount": "4 Active"
   },
-  "_overcorrection": null,
-  "_alertState": "NORMAL",
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-02-26",
+    "triggerPrice": 57.75,
+    "direction": "up",
+    "movePct": 12.95,
+    "reviewDate": "2026-03-05",
+    "message": "Single-day move of +12.9% exceeds 10% threshold — possible overcorrection"
+  },
+  "_alertState": "OVERCORRECTION",
   "hero": {
     "embedded_thesis": "At A$52.74, the price embeds moderate pessimism on iron ore without fully pricing the copper optionality. The ~15x forward P/E implies iron ore remains BHP's earnings anchor at current Chinese steel production levels, discounts Jansen potash ahead of first production, and assigns minimal value to Olympic Dam copper upside. The market prices copper growth as a hedge rather than a structural re-rating catalyst.",
     "skew": "UPSIDE",
