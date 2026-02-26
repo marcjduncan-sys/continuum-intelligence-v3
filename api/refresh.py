@@ -189,8 +189,12 @@ HYPOTHESIS_UPDATE_SYSTEM = """\
 You are a senior equity research analyst at Continuum Intelligence. You assess competing \
 hypotheses for ASX-listed companies using structured evidence.
 
-Given the current hypothesis weights, updated evidence cards, and new market data, \
-re-assess each hypothesis. Return a JSON object:
+Given the current hypothesis weights, updated evidence cards, new market data, and the \
+existing narrative sections, perform a FULL research update. You must rewrite all narrative \
+content to reflect current reality — do not leave stale references to past events as if \
+they are future events.
+
+Return a JSON object with ALL of the following fields:
 
 {
   "hypotheses": [
@@ -199,16 +203,43 @@ re-assess each hypothesis. Return a JSON object:
       "title": "N1: [title]",
       "updated_score": "XX%",
       "direction": "up|down|steady",
-      "rationale": "Brief rationale for the score change"
+      "rationale": "Brief rationale for the score change",
+      "updated_description": "Updated 2-3 sentence description of this hypothesis scenario"
     }
   ],
-  "narrative_update": "2-3 sentence update to the dominant narrative based on new evidence",
-  "verdict_update": "Updated verdict text (2-3 sentences on what the market is pricing vs reality)",
+  "embedded_thesis": "Rewritten 3-5 sentence paragraph describing what the current price embeds. \
+Reference the CURRENT price (provided), not old prices. Describe what assumptions the market is \
+making at this level. Use plain text, no HTML.",
+  "skew_description": "Rewritten 2-3 sentence summary of hypothesis weightings and directional skew.",
+  "narrative_rewrite": "Full rewrite of the dominant narrative (4-8 sentences). Use HTML formatting: \
+<strong> for emphasis, <span class='key-stat'> for key numbers. Must reflect ALL recent events \
+including any results, announcements, or catalysts from the gathered data. Do NOT reference past \
+events as future events.",
+  "price_implication": "Rewritten HTML content describing what the current price assumes. Use \
+bullet format with <br> separators. Reference the current price.",
+  "evidence_check": "Rewritten HTML paragraph assessing how much evidence supports vs contradicts \
+the dominant narrative.",
+  "narrative_stability": "Rewritten HTML paragraph evaluating narrative robustness and what could \
+change it.",
+  "verdict_update": "Updated verdict text (3-5 sentences on what the market is pricing vs reality \
+at the current price). Must reference current price and recent events.",
+  "next_decision_point": {
+    "event": "The next material upcoming catalyst (NOT a past event)",
+    "date": "Expected date (YYYY-MM-DD or descriptive)",
+    "metric": "What to watch for",
+    "thresholds": "Specific levels or outcomes that would shift the thesis"
+  },
   "key_catalyst": "The single most important upcoming catalyst"
 }
 
-Be rigorous. Scores should reflect genuine probability weighting. \
-If nothing material has changed, keep scores steady and say so."""
+CRITICAL RULES:
+- Today's date is provided in the prompt. Any event with a date before today has ALREADY HAPPENED.
+- Rewrite ALL narrative sections to reflect current reality.
+- Reference the CURRENT price, not old prices.
+- If results or announcements have been released, discuss what they SHOWED, not what they might show.
+- Scores should reflect genuine probability weighting.
+- If nothing material has changed, keep scores steady and say so, but still ensure narratives \
+reference current prices and dates correctly."""
 
 
 # ---------------------------------------------------------------------------
@@ -356,7 +387,7 @@ async def _run_hypothesis_synthesis(
     evidence_update: dict,
     gathered: dict,
 ) -> dict:
-    """Run Claude hypothesis re-weighting."""
+    """Run Claude hypothesis re-weighting and full narrative rewrite."""
     # Format current hypotheses
     hypotheses_summary = []
     for h in research.get("hypotheses", []):
@@ -374,7 +405,16 @@ async def _run_hypothesis_synthesis(
 
     price_data = gathered.get("price_data", {})
 
-    user_prompt = f"""## Stock: {ticker} ({research.get('company', '')})
+    # Extract existing narrative sections for context
+    hero = research.get("hero", {})
+    narrative = research.get("narrative", {})
+    skew = research.get("skew", {})
+
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    user_prompt = f"""## TODAY'S DATE: {today}
+
+## Stock: {ticker} ({research.get('company', '')})
 ## Current Price: A${price_data.get('price', 'N/A')} ({price_data.get('change_pct', 0):+.1f}%)
 ## 52-Week Range: A${price_data.get('low_52w', 'N/A')} - A${price_data.get('high_52w', 'N/A')}
 
@@ -383,6 +423,27 @@ async def _run_hypothesis_synthesis(
 
 ## Current Verdict:
 {research.get('verdict', {}).get('text', 'N/A')[:500]}
+
+## Current Embedded Thesis (hero.embedded_thesis):
+{hero.get('embedded_thesis', 'N/A')[:500]}
+
+## Current Skew Description:
+{hero.get('skew_description', 'N/A')[:300]}
+
+## Current Narrative (theNarrative):
+{narrative.get('theNarrative', 'N/A')[:800]}
+
+## Current Price Implication:
+{narrative.get('priceImplication', {}).get('content', 'N/A')[:500] if isinstance(narrative.get('priceImplication'), dict) else 'N/A'}
+
+## Current Evidence Check:
+{narrative.get('evidenceCheck', 'N/A')[:400]}
+
+## Current Narrative Stability:
+{narrative.get('narrativeStability', 'N/A')[:400]}
+
+## Current Next Decision Point:
+{json.dumps(hero.get('next_decision_point', {}), indent=2)}
 
 ## Evidence Update Summary:
 {evidence_changes}
@@ -393,7 +454,13 @@ async def _run_hypothesis_synthesis(
 ## Recent ASX Announcements:
 {json.dumps(gathered.get('announcements', [])[:5], indent=2)}
 
-Please re-assess each hypothesis weight and provide updated narrative and verdict as JSON."""
+## Recent News:
+{json.dumps(gathered.get('news', [])[:5], indent=2)}
+
+IMPORTANT: Any event with a date BEFORE {today} has ALREADY HAPPENED. Rewrite all narrative \
+sections to reflect this. Do not describe past events as upcoming.
+
+Please provide the FULL updated JSON with all narrative rewrites."""
 
     try:
         if not config.ANTHROPIC_API_KEY:
@@ -409,7 +476,7 @@ Please re-assess each hypothesis weight and provide updated narrative and verdic
         client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
         response = client.messages.create(
             model=config.ANTHROPIC_MODEL,
-            max_tokens=2048,
+            max_tokens=4096,
             system=HYPOTHESIS_UPDATE_SYSTEM + "\n\nRespond with valid JSON only.",
             messages=[{"role": "user", "content": user_prompt}],
         )
@@ -493,6 +560,8 @@ def _merge_updates(
                 if hu.get("updated_score"):
                     h["score"] = hu["updated_score"]
                     h["scoreWidth"] = hu["updated_score"]
+                if hu.get("updated_description"):
+                    h["description"] = hu["updated_description"]
                 # Update direction in verdict scores
                 direction = hu.get("direction", "steady")
                 dir_map = {
@@ -509,15 +578,56 @@ def _merge_updates(
                             vs["dirText"] = text
                 break
 
-    # -- Narrative update --
-    if hypothesis_update.get("narrative_update"):
-        if "narrative" in updated and isinstance(updated["narrative"], dict):
-            # Prepend the update to the existing narrative
-            existing_narrative = updated["narrative"].get("theNarrative", "")
-            update_text = hypothesis_update["narrative_update"]
+    # -- Hero section rewrites --
+    if "hero" in updated:
+        if hypothesis_update.get("embedded_thesis"):
+            updated["hero"]["embedded_thesis"] = hypothesis_update["embedded_thesis"]
+        if hypothesis_update.get("skew_description"):
+            updated["hero"]["skew_description"] = hypothesis_update["skew_description"]
+        # Update next decision point (must be a FUTURE event)
+        ndp = hypothesis_update.get("next_decision_point")
+        if ndp and isinstance(ndp, dict) and ndp.get("event"):
+            updated["hero"]["next_decision_point"] = {
+                "event": ndp["event"],
+                "date": ndp.get("date", "TBC"),
+                "metric": ndp.get("metric", ""),
+                "thresholds": ndp.get("thresholds", ""),
+            }
+
+    # -- Full narrative rewrite --
+    if "narrative" in updated and isinstance(updated["narrative"], dict):
+        if hypothesis_update.get("narrative_rewrite"):
             updated["narrative"]["theNarrative"] = (
-                f"<strong>[Updated {now}]</strong> {update_text}<br><br>"
+                f"<strong>[Updated {now}]</strong> "
+                f"{hypothesis_update['narrative_rewrite']}"
+            )
+        elif hypothesis_update.get("narrative_update"):
+            # Fallback: prepend short update if full rewrite not provided
+            existing_narrative = updated["narrative"].get("theNarrative", "")
+            updated["narrative"]["theNarrative"] = (
+                f"<strong>[Updated {now}]</strong> "
+                f"{hypothesis_update['narrative_update']}<br><br>"
                 f"{existing_narrative}"
+            )
+
+        if hypothesis_update.get("price_implication"):
+            if isinstance(updated["narrative"].get("priceImplication"), dict):
+                updated["narrative"]["priceImplication"]["content"] = (
+                    hypothesis_update["price_implication"]
+                )
+                # Update the label to reference current price
+                price_str = price_data.get("price")
+                if price_str:
+                    updated["narrative"]["priceImplication"]["label"] = (
+                        f"Embedded Assumptions at A${float(price_str):.2f}"
+                    )
+
+        if hypothesis_update.get("evidence_check"):
+            updated["narrative"]["evidenceCheck"] = hypothesis_update["evidence_check"]
+
+        if hypothesis_update.get("narrative_stability"):
+            updated["narrative"]["narrativeStability"] = (
+                hypothesis_update["narrative_stability"]
             )
 
     # -- Verdict update --
