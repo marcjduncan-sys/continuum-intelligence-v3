@@ -269,7 +269,7 @@ When patching STOCK_DATA with refreshed research data, preserve `_livePrice`, `p
 ## 8. File Coupling (Read Before Editing)
 
 ### 8.1 Never Modify Without Full Impact Analysis
-- `computeSkewScore()` -- 5+ callers across home, reports, snapshots, portfolio
+- `computeSkewScore()` -- **DO NOT call directly from renderers.** Use `data._skew` instead (cached during hydration). All 19 consumer sites use `data._skew || computeSkewScore(data)` as fallback. The canonical value is set once in `ContinuumDynamics.hydrate()` after `adjustHypothesisScores()` mutates hypothesis scores. Calling `computeSkewScore()` at different lifecycle points returns different results — the cache prevents this inconsistency.
 - `prepareHypotheses()` -- remaps N1-N4 labels across evidence, discriminators, tripwires, gaps, verdict, alignment table
 - `normaliseScores()` -- floor 5, ceiling 80, scale to 100%. Used by DNE engine, frontend skew, and must be replicated by backend scripts
 - `route()` -- master router, controls all page activation
