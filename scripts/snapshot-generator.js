@@ -155,7 +155,7 @@
     var config = getSeverityConfig(severity);
 
     // Price display — prefer live price
-    var displayPrice = livePrice || stock.price;
+    var displayPrice = parseFloat(livePrice || stock.price) || 0;
     var priceStr = stock.currency + displayPrice.toFixed(2);
 
     // NFI badge HTML

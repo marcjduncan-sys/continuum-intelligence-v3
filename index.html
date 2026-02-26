@@ -5876,7 +5876,7 @@ function renderReportHero(data) {
     var worlds = pir.worlds;
     var current = parseFloat(data._livePrice || data.price || pir.current_price);
     // Find min/max for bar positioning
-    var prices = worlds.map(function(w) { return w.price; });
+    var prices = worlds.map(function(w) { w.price = parseFloat(w.price) || 0; return w.price; });
     prices.push(current);
     var minP = Math.min.apply(null, prices);
     var maxP = Math.max.apply(null, prices);
@@ -5918,11 +5918,11 @@ function renderReportHero(data) {
     var vrWorlds = data.hero.position_in_range.worlds;
     var vrCurrent = data._livePrice || data.price || data.hero.position_in_range.current_price;
     vrCurrent = parseFloat(vrCurrent);
-    var vrBear    = vrWorlds[1].price;
-    var vrFairLow = (vrWorlds[1].price + vrWorlds[2].price) / 2;
-    var vrFairHigh= (vrWorlds[2].price + vrWorlds[3].price) / 2;
-    var vrBull    = vrWorlds[3].price;
-    var vrMin     = vrWorlds[0].price;
+    var vrBear    = parseFloat(vrWorlds[1].price) || 0;
+    var vrFairLow = (parseFloat(vrWorlds[1].price) + parseFloat(vrWorlds[2].price)) / 2;
+    var vrFairHigh= (parseFloat(vrWorlds[2].price) + parseFloat(vrWorlds[3].price)) / 2;
+    var vrBull    = parseFloat(vrWorlds[3].price) || 0;
+    var vrMin     = parseFloat(vrWorlds[0].price) || 0;
     var vrRange   = vrBull - vrMin || 1;
 
     var vrBadgeCls   = vrCurrent < vrBear ? 'amber' : vrCurrent > vrFairHigh ? 'positive' : 'neutral';
@@ -6536,9 +6536,9 @@ function renderTAChart(data) {
   function xPos(idx) { return padL + (idx / (n - 1)) * cW; }
   function yPos(val) { return padT + (1 - (val - pMin) / pRange) * cH; }
 
-  var supportPrice = ta ? ta.keyLevels.support.price : null;
-  var resistPrice = ta ? ta.keyLevels.resistance.price : null;
-  var curPrice = useLive && live.currentPrice ? live.currentPrice : data.price;
+  var supportPrice = ta ? parseFloat(ta.keyLevels.support.price) || null : null;
+  var resistPrice = ta ? parseFloat(ta.keyLevels.resistance.price) || null : null;
+  var curPrice = parseFloat(useLive && live.currentPrice ? live.currentPrice : data.price) || 0;
   var cur = data.currency;
 
   // Build SVG
@@ -6963,9 +6963,9 @@ function renderHypSidebar(data) {
   if (data.hero && data.hero.position_in_range && data.hero.position_in_range.worlds &&
       data.hero.position_in_range.worlds.length >= 4) {
     var w = data.hero.position_in_range.worlds;
-    vrBear = w[1].price;
-    vrFair = (w[1].price + w[2].price) / 2;
-    vrBull = w[3].price;
+    vrBear = parseFloat(w[1].price) || 0;
+    vrFair = (parseFloat(w[1].price) + parseFloat(w[2].price)) / 2;
+    vrBull = parseFloat(w[3].price) || 0;
     vr = { low: vrBear, mid: vrFair, high: vrBull };
   } else if (data.valuation_range) {
     vr = data.valuation_range;
@@ -8620,7 +8620,7 @@ const ContinuumDynamics = (function() {
     var ref = REFERENCE_DATA[ticker];
     if (!stock || !ref) return null;
 
-    var price = stock._livePrice || stock.price;
+    var price = parseFloat(stock._livePrice || stock.price) || 0;
     var currency = stock.currency || 'A$';
 
     // 52-week high/low from priceHistory
@@ -8777,8 +8777,8 @@ const ContinuumDynamics = (function() {
 
     // Replace price: "A$77.87" -> new price
     if (anchors.price && computed.price !== anchors.price) {
-      var oldPrice = anchors.price.toFixed(2);
-      var newPrice = computed.price.toFixed(2);
+      var oldPrice = parseFloat(anchors.price).toFixed(2);
+      var newPrice = parseFloat(computed.price).toFixed(2);
       text = text.split(currency + oldPrice).join(currency + newPrice);
     }
 
@@ -8996,7 +8996,7 @@ const ContinuumDynamics = (function() {
 })();
 
 // Run initial hydration immediately after all STOCK_DATA is defined
-ContinuumDynamics.hydrateAll();
+try { ContinuumDynamics.hydrateAll(); } catch(e) { console.error('[ContinuumDynamics] hydrateAll failed:', e); }
 
 
 // ============================================================
@@ -10813,9 +10813,9 @@ function populateSidebar(ticker) {
     if (stock.hero && stock.hero.position_in_range && stock.hero.position_in_range.worlds &&
         stock.hero.position_in_range.worlds.length >= 4) {
         var w = stock.hero.position_in_range.worlds;
-        vrBear = w[1].price;
-        vrFair = (w[1].price + w[2].price) / 2;
-        vrBull = w[3].price;
+        vrBear = parseFloat(w[1].price) || 0;
+        vrFair = (parseFloat(w[1].price) + parseFloat(w[2].price)) / 2;
+        vrBull = parseFloat(w[3].price) || 0;
         vr = { low: vrBear, mid: vrFair, high: vrBull };
     } else if (stock.valuation_range) {
         vr = stock.valuation_range;
