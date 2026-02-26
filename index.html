@@ -11809,6 +11809,7 @@ function _resetRefreshUI(ticker) {
 // ============================================================
 var _batchPoller = null;
 var _batchStartTime = null;
+var _batchCachedTickers = {};
 
 async function triggerRefreshAll() {
     var btn = document.getElementById('btn-refresh-all');
@@ -11834,6 +11835,7 @@ async function triggerRefreshAll() {
 
         var data = await resp.json();
         _batchStartTime = Date.now();
+        _batchCachedTickers = {};
 
         // Build the ticker grid
         _buildBatchGrid(data.tickers);
@@ -11881,6 +11883,17 @@ function _startBatchPolling() {
 async function _pollBatchStatus() {
     try {
         var resp = await fetch(REFRESH_API_BASE + '/api/refresh-all/status');
+        if (resp.status === 404) {
+            // Server restarted — batch state lost
+            clearInterval(_batchPoller);
+            _batchPoller = null;
+            var stats = document.getElementById('batch-stats');
+            var cachedCount = Object.keys(_batchCachedTickers).filter(function(k) { return _batchCachedTickers[k]; }).length;
+            if (stats) stats.textContent = 'Server restarted. ' + cachedCount + ' tickers cached. Close and retry remaining.';
+            var btn = document.getElementById('btn-refresh-all');
+            if (btn) { btn.disabled = false; btn.textContent = '\u21BB Refresh All Research'; }
+            return;
+        }
         if (!resp.ok) return;
 
         var data = await resp.json();
@@ -11906,11 +11919,17 @@ async function _pollBatchStatus() {
             if (elapsedEl) elapsedEl.textContent = mins + 'm ' + (secs < 10 ? '0' : '') + secs + 's';
         }
 
-        // Update per-ticker cards
+        // Update per-ticker cards + incremental caching
         var tickerStatuses = data.per_ticker_status || [];
         for (var i = 0; i < tickerStatuses.length; i++) {
             var ts = tickerStatuses[i];
             _updateBatchCard(ts);
+
+            // Incrementally fetch + cache each ticker as it completes
+            if (ts.status === 'completed' && !_batchCachedTickers[ts.ticker]) {
+                _batchCachedTickers[ts.ticker] = true;
+                _fetchAndCacheSingleTicker(ts.ticker);
+            }
         }
 
         // Check if done
@@ -11922,8 +11941,9 @@ async function _pollBatchStatus() {
             var btn = document.getElementById('btn-refresh-all');
             if (btn) { btn.disabled = false; btn.textContent = '\u21BB Refresh All Research'; }
 
-            // Fetch all results and merge
-            _fetchAndMergeBatchResults();
+            // Final re-render (individual caches already done incrementally)
+            if (typeof renderCoverageTable === 'function') renderCoverageTable();
+            if (typeof renderFeaturedGrid === 'function') renderFeaturedGrid();
         }
 
     } catch (e) {
@@ -11958,6 +11978,56 @@ function _updateBatchCard(ts) {
     if (iconEl) {
         iconEl.textContent = icon;
         if (ts.error) iconEl.title = ts.error;
+    }
+}
+
+async function _fetchAndCacheSingleTicker(ticker) {
+    try {
+        var resp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker + '/result');
+        if (!resp.ok) return;
+
+        var updatedData = await resp.json();
+        var currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00A3','EUR':'\u20AC'};
+
+        // Normalise currency
+        if (updatedData.currency && currencyMap[updatedData.currency]) {
+            updatedData.currency = currencyMap[updatedData.currency];
+        }
+
+        // Merge into STOCK_DATA, preserving live prices
+        if (typeof STOCK_DATA !== 'undefined') {
+            var livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
+            var livePriceHistory = STOCK_DATA[ticker] ? STOCK_DATA[ticker].priceHistory : undefined;
+            STOCK_DATA[ticker] = updatedData;
+            if (livePrice !== undefined) {
+                STOCK_DATA[ticker]._livePrice = livePrice;
+                STOCK_DATA[ticker].price = livePrice;
+            }
+            if (livePriceHistory) STOCK_DATA[ticker].priceHistory = livePriceHistory;
+        }
+
+        // Cache in localStorage
+        try {
+            localStorage.setItem('ci_research_' + ticker, JSON.stringify(updatedData));
+        } catch (lsErr) { /* ignore */ }
+
+        console.log('[BatchRefresh] Cached ' + ticker + ' incrementally');
+
+        // Re-render current page if viewing this ticker
+        var hash = window.location.hash || '';
+        var reportMatch = hash.match(/^#report-(\w+)/);
+        if (reportMatch && reportMatch[1].toUpperCase() === ticker) {
+            if (typeof destroyNarrativeTimelineChart === 'function') destroyNarrativeTimelineChart(ticker);
+            var container = document.getElementById('page-report-' + ticker);
+            if (container && typeof renderReportPage === 'function') {
+                container.innerHTML = renderReportPage(STOCK_DATA[ticker]);
+                if (typeof initChartForTicker === 'function') initChartForTicker(ticker);
+                if (typeof initInlineChat === 'function') initInlineChat();
+            }
+        }
+    } catch (e) {
+        console.error('[BatchRefresh] Failed to cache ' + ticker + ':', e);
+        _batchCachedTickers[ticker] = false; // Allow retry on next poll
     }
 }
 

@@ -166,6 +166,7 @@ class BatchRefreshJob:
 
 batch_jobs: dict[str, BatchRefreshJob] = {}
 _batch_semaphore: asyncio.Semaphore | None = None
+_gather_semaphore: asyncio.Semaphore | None = None
 
 
 def _get_batch_semaphore() -> asyncio.Semaphore:
@@ -173,6 +174,14 @@ def _get_batch_semaphore() -> asyncio.Semaphore:
     if _batch_semaphore is None:
         _batch_semaphore = asyncio.Semaphore(3)
     return _batch_semaphore
+
+
+def _get_gather_semaphore() -> asyncio.Semaphore:
+    """Limit concurrent data-gathering to avoid OOM on Railway."""
+    global _gather_semaphore
+    if _gather_semaphore is None:
+        _gather_semaphore = asyncio.Semaphore(5)
+    return _gather_semaphore
 
 
 def get_batch_job(batch_id: str) -> BatchRefreshJob | None:
@@ -198,6 +207,7 @@ async def _run_single_in_batch(
     """Run a single-ticker refresh within a batch, using semaphore for stages 2-3."""
     ticker = ticker.upper()
     semaphore = _get_batch_semaphore()
+    gather_sem = _get_gather_semaphore()
 
     # Create per-ticker job entry (so individual /status endpoint also works)
     job = RefreshJob(ticker=ticker)
@@ -211,13 +221,14 @@ async def _run_single_in_batch(
         research = _load_research(ticker)
         company_name = research.get("company", ticker)
 
-        # ---- Stage 1: Data Gathering (no semaphore) ----
-        job.status = "gathering_data"
-        job.stage_index = 1
-        batch_job.per_ticker_status[ticker] = job.to_dict()
-        logger.info(f"[BATCH][{ticker}] Stage 1: Gathering data...")
+        # ---- Stage 1: Data Gathering (gather semaphore limits concurrency) ----
+        async with gather_sem:
+            job.status = "gathering_data"
+            job.stage_index = 1
+            batch_job.per_ticker_status[ticker] = job.to_dict()
+            logger.info(f"[BATCH][{ticker}] Stage 1: Gathering data...")
 
-        gathered = await gather_all_data(ticker, company_name)
+            gathered = await gather_all_data(ticker, company_name)
 
         # ---- Stages 2-3: Acquire semaphore for LLM-heavy work ----
         async with semaphore:
