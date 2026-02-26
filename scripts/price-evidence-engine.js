@@ -488,8 +488,13 @@ function main() {
       stockData.price_signals = stockData.price_signals.slice(-60);
     }
 
-    // Update current price
+    // Update current price and maintain price_history
     stockData.current_price = result.current_price;
+    if (!stockData.price_history) stockData.price_history = [];
+    stockData.price_history.push(result.current_price);
+    if (stockData.price_history.length > 60) {
+      stockData.price_history = stockData.price_history.slice(-60);
+    }
 
     // Handle overcorrection state
     if (result.overcorrection.triggered) {
