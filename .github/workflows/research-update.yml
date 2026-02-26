@@ -25,6 +25,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Fetch latest prices
         run: node scripts/fetch-live-prices.js
 

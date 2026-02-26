@@ -53,6 +53,10 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install dependencies
+        if: steps.market-check.outputs.skip != 'true'
+        run: npm ci
+
       - name: Fetch live prices
         if: steps.market-check.outputs.skip != 'true'
         id: fetch

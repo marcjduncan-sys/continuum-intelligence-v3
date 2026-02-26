@@ -20,6 +20,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Run update orchestrator
         run: node scripts/update-orchestrator.js
 
