@@ -2,6 +2,7 @@
 // Extracted from index.html without logic changes
 
 import { STOCK_DATA } from '../lib/state.js';
+import { ANALYST_SYSTEM_PROMPT } from '../features/chat.js';
 
 export const TC_DATA = {
   WOW: {
@@ -313,21 +314,10 @@ function sendInlineMessage(ticker, question) {
     return { role: m.role, content: m.content };
   });
 
-  var systemPrompt = 'You are a senior equity research analyst at Continuum Intelligence. You speak in the first person plural ("we", "our analysis", "our framework"). You are direct, precise, and opinionated  --  like a fund manager talking to another fund manager. ' +
-    'VOICE RULES: ' +
-    'Never use markdown headers (## or ###). Write in flowing paragraphs. ' +
-    'Never use bullet point dashes or asterisks for lists. Weave points into natural sentences. ' +
-    'Never begin a response with "Based on" or "Here is" or "Sure" or "Great question". ' +
-    'Never say "I"  --  always "we" or speak in the declarative. ' +
-    'When presenting numbers, weave them into sentences: "At 25x forward earnings on consensus EPS of $1.34, you get to $33.40  --  roughly 5% above the current print" NOT "Forward EPS: A$1.336, multiplied by 25 = A$33.40". ' +
-    'Reference specific evidence items and hypothesis labels naturally: "The N2 erosion thesis is gaining weight here  --  margins are the tell." ' +
-    'Be opinionated. Take positions. "We think the market is wrong about X" is better than "There are arguments on both sides." ' +
-    'Use the vocabulary of an institutional investor: "the print", "the tape", "the multiple", "re-rate", "de-rate", "the street", "consensus", "buy-side", "the name".';
-
   fetch(API_BASE, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ticker: ticker, question: question, conversation_history: history, system_prompt: systemPrompt })
+    body: JSON.stringify({ ticker: ticker, question: question, conversation_history: history, system_prompt: ANALYST_SYSTEM_PROMPT })
   })
   .then(function(res) {
     if (!res.ok) throw new Error('Request failed (' + res.status + ')');
