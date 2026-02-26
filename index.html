@@ -5834,6 +5834,41 @@ function loadFullResearchData(ticker, callback) {
     if (callback) callback(STOCK_DATA[ticker]);
     return;
   }
+
+  // Check localStorage for cached refresh data (persists across page reloads)
+  try {
+    var cached = localStorage.getItem('ci_research_' + ticker);
+    if (cached) {
+      var cachedData = JSON.parse(cached);
+      // Use cached data if it has a _lastRefreshed timestamp (written by refresh pipeline)
+      if (cachedData._lastRefreshed) {
+        var livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
+        var livePriceHistory = STOCK_DATA[ticker] ? STOCK_DATA[ticker].priceHistory : undefined;
+        STOCK_DATA[ticker] = cachedData;
+        STOCK_DATA[ticker]._indexOnly = false;
+        STOCK_DATA[ticker]._fromCache = true;
+        if (livePrice !== undefined) {
+          STOCK_DATA[ticker]._livePrice = livePrice;
+          STOCK_DATA[ticker].price = livePrice;
+        }
+        if (livePriceHistory) {
+          STOCK_DATA[ticker].priceHistory = livePriceHistory;
+        }
+        if (typeof ContinuumDynamics !== 'undefined' && ContinuumDynamics.hydrate) {
+          ContinuumDynamics.hydrate(ticker);
+        }
+        if (typeof buildSnapshotFromStock === 'function') {
+          SNAPSHOT_DATA[ticker] = buildSnapshotFromStock(ticker);
+        }
+        console.log('[StockDataLoader] Loaded CACHED research for ' + ticker + ' (refreshed ' + cachedData._lastRefreshed + ')');
+        if (callback) callback(STOCK_DATA[ticker]);
+        return;
+      }
+    }
+  } catch (cacheErr) {
+    console.warn('[StockDataLoader] Cache read failed:', cacheErr);
+  }
+
   var url = 'data/research/' + ticker + '.json';
   var xhr = new XMLHttpRequest();
   xhr.open('GET', url, true);
@@ -11469,6 +11504,13 @@ function _pollRefreshStatus(ticker) {
                             var livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
                             STOCK_DATA[ticker] = updatedData;
                             if (livePrice !== undefined) STOCK_DATA[ticker]._livePrice = livePrice;
+                        }
+                        // Cache in localStorage so refresh survives page reload
+                        try {
+                            localStorage.setItem('ci_research_' + ticker.toUpperCase(), JSON.stringify(updatedData));
+                            console.log('[RefreshCache] Cached refresh result for ' + ticker);
+                        } catch (lsErr) {
+                            console.warn('[RefreshCache] localStorage write failed:', lsErr);
                         }
                         // Destroy Chart.js instances before DOM replacement
                         if (typeof destroyNarrativeTimelineChart === 'function') {

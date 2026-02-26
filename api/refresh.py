@@ -238,6 +238,7 @@ CRITICAL RULES:
 - Reference the CURRENT price, not old prices.
 - If results or announcements have been released, discuss what they SHOWED, not what they might show.
 - Scores should reflect genuine probability weighting.
+- The four hypothesis scores MUST sum to exactly 100%. Express each as an integer percentage (e.g. "25%", not "24.7%").
 - If nothing material has changed, keep scores steady and say so, but still ensure narratives \
 reference current prices and dates correctly."""
 
@@ -477,6 +478,7 @@ Please provide the FULL updated JSON with all narrative rewrites."""
         response = client.messages.create(
             model=config.ANTHROPIC_MODEL,
             max_tokens=4096,
+            temperature=0,
             system=HYPOTHESIS_UPDATE_SYSTEM + "\n\nRespond with valid JSON only.",
             messages=[{"role": "user", "content": user_prompt}],
         )
