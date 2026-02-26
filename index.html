@@ -8584,23 +8584,27 @@ const ContinuumDynamics = (function() {
   // --- Formatting Helpers ---
   function fmtB(val) {
     // Format billions: 12.05 â†’ "12.1B", 0.95 â†’ "950M", 79.3 â†’ "79B"
-    if (val >= 100) return Math.round(val) + 'B';
-    if (val >= 10)  return val.toFixed(1).replace(/\.0$/, '') + 'B';
-    if (val >= 1)   return val.toFixed(1).replace(/\.0$/, '') + 'B';
-    return Math.round(val * 1000) + 'M';
+    val = parseFloat(val) || 0;
+    if (val >= 100) return Math.round(val) + ‘B’;
+    if (val >= 10)  return val.toFixed(1).replace(/\.0$/, ‘’) + ‘B’;
+    if (val >= 1)   return val.toFixed(1).replace(/\.0$/, ‘’) + ‘B’;
+    return Math.round(val * 1000) + ‘M’;
   }
 
   function fmtPrice(val, currency) {
+    val = parseFloat(val) || 0;
     if (val >= 100) return (currency || 'A$') + val.toFixed(2);
     if (val >= 10)  return (currency || 'A$') + val.toFixed(2);
     return (currency || 'A$') + val.toFixed(2);
   }
 
   function fmtPct(val) {
+    val = parseFloat(val) || 0;
     return Math.round(Math.abs(val)) + '%';
   }
 
   function fmtPE(val) {
+    val = parseFloat(val);
     if (!val || !isFinite(val) || val <= 0) return null;
     if (val >= 100) return '~' + Math.round(val) + 'x';
     return val.toFixed(1).replace(/\.0$/, '') + 'x';

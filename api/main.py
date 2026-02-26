@@ -415,17 +415,52 @@ async def refresh_result(ticker: str):
 # Serve frontend
 # ---------------------------------------------------------------------------
 
+STATIC_ROOT = Path(config.INDEX_HTML_PATH).parent
+
+MIME_TYPES = {
+    ".json": "application/json",
+    ".js": "application/javascript",
+    ".css": "text/css",
+    ".svg": "image/svg+xml",
+    ".png": "image/png",
+    ".ico": "image/x-icon",
+}
+
+# Directories that contain static assets (relative to STATIC_ROOT)
+STATIC_DIRS = {"data", "scripts", "js"}
+
+
 @app.get("/data/{file_path:path}")
 async def serve_data(file_path: str):
     """Serve data files including nested paths (e.g. data/research/WOW.json)."""
-    data_dir = Path(config.INDEX_HTML_PATH).parent / "data"
-    full_path = (data_dir / file_path).resolve()
-    # Security: ensure resolved path is still within data_dir
-    if not str(full_path).startswith(str(data_dir.resolve())):
+    return _serve_static("data", file_path)
+
+
+@app.get("/scripts/{file_path:path}")
+async def serve_scripts(file_path: str):
+    """Serve script files."""
+    return _serve_static("scripts", file_path)
+
+
+@app.get("/js/{file_path:path}")
+async def serve_js(file_path: str):
+    """Serve JS files."""
+    return _serve_static("js", file_path)
+
+
+def _serve_static(directory: str, file_path: str):
+    """Serve a static file from a whitelisted directory with security checks."""
+    if directory not in STATIC_DIRS:
         raise HTTPException(status_code=403, detail="Access denied")
-    if full_path.exists() and full_path.suffix == ".json":
-        return FileResponse(full_path, media_type="application/json")
-    raise HTTPException(status_code=404, detail="File not found")
+    base_dir = (STATIC_ROOT / directory).resolve()
+    full_path = (base_dir / file_path).resolve()
+    # Security: ensure resolved path stays within the target directory
+    if not str(full_path).startswith(str(base_dir)):
+        raise HTTPException(status_code=403, detail="Access denied")
+    if not full_path.exists() or not full_path.is_file():
+        raise HTTPException(status_code=404, detail="File not found")
+    mime = MIME_TYPES.get(full_path.suffix, "application/octet-stream")
+    return FileResponse(full_path, media_type=mime)
 
 
 @app.get("/{full_path:path}")

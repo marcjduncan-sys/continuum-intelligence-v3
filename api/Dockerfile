@@ -10,6 +10,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY api/ ./api/
 COPY index.html ./index.html
 COPY data/ ./data/
+COPY scripts/ ./scripts/
+COPY js/ ./js/
 
 WORKDIR /app/api
 
