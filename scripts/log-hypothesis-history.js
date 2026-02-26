@@ -202,6 +202,14 @@ function main() {
     let history;
     try {
       history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
+      // Normalise legacy key: older files use "history" instead of "entries"
+      if (!history.entries && Array.isArray(history.history)) {
+        history.entries = history.history;
+        delete history.history;
+      }
+      if (!Array.isArray(history.entries)) {
+        history.entries = [];
+      }
     } catch {
       history = { ticker, schema_version: SCHEMA_VERSION, entries: [] };
     }
