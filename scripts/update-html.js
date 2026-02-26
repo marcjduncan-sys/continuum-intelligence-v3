@@ -1,26 +1,43 @@
 /**
- * Continuum Intelligence - HTML Updater
- * Applies price data and narrative updates to index.html
- * Generates updated HTML with fresh data
+ * Continuum Intelligence - Data Updater
+ * Applies price data and narrative updates to per-ticker JSON files.
+ *
+ * Target files:
+ *   data/research/{TICKER}.json  - per-ticker research data
+ *   data/stocks/{TICKER}.json    - per-ticker stock data (price, priceHistory)
+ *   data/freshness.json          - freshness metadata for all tickers
+ *   data/reference.json          - reference / identity data for all tickers
+ *   data/last-update-report.json - run report (unchanged)
  */
 
 const fs = require('fs');
 const path = require('path');
 const { findLatestPrices } = require('./find-latest-prices');
 
-// Load data files
-function loadData() {
-  const dataDir = path.join(__dirname, '..', 'data');
+const DATA_DIR = path.join(__dirname, '..', 'data');
 
-  // Prices: use find-latest-prices to pick freshest available source
+// ---------------------------------------------------------------------------
+// Helper: read JSON, apply updater, write back
+// ---------------------------------------------------------------------------
+function updateJsonFile(filePath, updater) {
+  let data = {};
+  try { data = JSON.parse(fs.readFileSync(filePath, 'utf8')); } catch (e) { /* start fresh */ }
+  updater(data);
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+}
+
+// ---------------------------------------------------------------------------
+// Load input data (prices + pending updates + events)
+// ---------------------------------------------------------------------------
+function loadData() {
   const priceResult = findLatestPrices('newest');
   if (!priceResult) {
     throw new Error('No price data found. Run event-scraper or fetch-live-prices first.');
   }
   console.log(`Using prices from ${priceResult.source} (${priceResult.file}), updated ${priceResult.updated}`);
 
-  const updatesPath = path.join(dataDir, 'pending-updates.json');
-  const eventsPath = path.join(dataDir, 'events-log.json');
+  const updatesPath = path.join(DATA_DIR, 'pending-updates.json');
+  const eventsPath  = path.join(DATA_DIR, 'events-log.json');
 
   return {
     prices: priceResult.prices,
@@ -33,269 +50,287 @@ function loadData() {
   };
 }
 
-// Format currency
+// ---------------------------------------------------------------------------
+// Format helpers (business logic preserved)
+// ---------------------------------------------------------------------------
 function formatCurrency(value, currency = 'A$') {
   if (!value) return '--';
   return `${currency}${value.toFixed(2)}`;
 }
 
-// Format market cap
 function formatMarketCap(value) {
   if (!value) return '--';
   if (value >= 1e12) return `A$${(value / 1e12).toFixed(1)}T`;
-  if (value >= 1e9) return `A$${(value / 1e9).toFixed(1)}B`;
-  if (value >= 1e6) return `A$${(value / 1e6).toFixed(1)}M`;
+  if (value >= 1e9)  return `A$${(value / 1e9).toFixed(1)}B`;
+  if (value >= 1e6)  return `A$${(value / 1e6).toFixed(1)}M`;
   return `A$${value.toFixed(0)}`;
 }
 
-// Update price in HTML
-function updatePrice(html, ticker, priceData) {
-  let modified = html;
-  
-  // Update price in STOCK_DATA object
-  const priceRegex = new RegExp(`(${ticker}:[\\s\\S]*?price:\\s*)([0-9.]+)`, 'i');
-  if (priceRegex.test(modified)) {
-    modified = modified.replace(priceRegex, `$1${priceData.price.toFixed(2)}`);
-  }
-  
-  // Update date
-  const dateStr = new Date().toLocaleDateString('en-AU', { 
-    day: 'numeric', 
-    month: 'long', 
-    year: 'numeric' 
+// ---------------------------------------------------------------------------
+// Update price fields in research JSON and stocks JSON
+// ---------------------------------------------------------------------------
+function updatePrice(ticker, priceData) {
+  const dateStr = new Date().toLocaleDateString('en-AU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
   });
-  const dateRegex = new RegExp(`(${ticker}:[\\s\\S]*?date:\\s*['"])([^'"]+)`);
-  if (dateRegex.test(modified)) {
-    modified = modified.replace(dateRegex, `$1${dateStr}`);
+
+  // Update research/{TICKER}.json — price + date
+  const researchPath = path.join(DATA_DIR, 'research', `${ticker}.json`);
+  updateJsonFile(researchPath, (research) => {
+    research.price = parseFloat(priceData.price.toFixed(2));
+    research.date  = dateStr;
+    research.current_price = parseFloat(priceData.price.toFixed(2));
+    research.last_price_update = new Date().toISOString();
+  });
+
+  // Update stocks/{TICKER}.json — price + date
+  const stocksPath = path.join(DATA_DIR, 'stocks', `${ticker}.json`);
+  if (fs.existsSync(stocksPath)) {
+    updateJsonFile(stocksPath, (stock) => {
+      stock.price = parseFloat(priceData.price.toFixed(2));
+      stock.date  = dateStr;
+    });
   }
-  
-  // Update price history array (append latest, keep last 252 trading days)
-  // This is a simplified version - real implementation would be more careful
-  
-  return modified;
 }
 
-// Update hero metrics based on price data
-function updateHeroMetrics(html, ticker, priceData) {
-  let modified = html;
-  
-  // Update hero price display
-  const heroPriceRegex = new RegExp(`(${ticker}[\\s\\S]*?price:\\s*)([0-9.]+)`, 'i');
-  if (heroPriceRegex.test(modified)) {
-    modified = modified.replace(heroPriceRegex, `$1${priceData.price.toFixed(2)}`);
-  }
-  
-  // Update market cap if available
-  if (priceData.marketCap) {
-    const mktCapFormatted = formatMarketCap(priceData.marketCap);
-    const mktCapRegex = new RegExp(`(${ticker}[\\s\\S]*?Mkt Cap['"]*\\s*value:\\s*['"])([^'"]+)`);
-    if (mktCapRegex.test(modified)) {
-      modified = modified.replace(mktCapRegex, `$1${mktCapFormatted}`);
+// ---------------------------------------------------------------------------
+// Update hero metrics (market cap, drawdown) in research JSON
+// ---------------------------------------------------------------------------
+function updateHeroMetrics(ticker, priceData) {
+  const researchPath = path.join(DATA_DIR, 'research', `${ticker}.json`);
+  if (!fs.existsSync(researchPath)) return;
+
+  updateJsonFile(researchPath, (research) => {
+    research.current_price = parseFloat(priceData.price.toFixed(2));
+
+    if (priceData.marketCap) {
+      research.market_cap = formatMarketCap(priceData.marketCap);
     }
-  }
-  
-  // Update drawdown calculation
-  if (priceData.drawdown !== undefined) {
-    const drawdownRegex = new RegExp(`(${ticker}[\\s\\S]*?drawdown['"]*\\s*value:\\s*)([0-9.]+)`);
-    if (drawdownRegex.test(modified)) {
-      modified = modified.replace(drawdownRegex, `$1${priceData.drawdown.toFixed(1)}`);
+
+    if (priceData.drawdown !== undefined) {
+      if (!research.technicalAnalysis) research.technicalAnalysis = {};
+      if (!research.technicalAnalysis.trend) research.technicalAnalysis.trend = {};
+      research.technicalAnalysis.trend.drawdown = parseFloat(priceData.drawdown.toFixed(1));
     }
-  }
-  
-  return modified;
+  });
 }
 
-// Update freshness data
-function updateFreshness(html, ticker, freshnessData) {
-  let modified = html;
-  
-  // Find and update FRESHNESS_DATA entry for this ticker
-  const freshnessStart = modified.indexOf('const FRESHNESS_DATA = {');
-  if (freshnessStart === -1) return modified;
-  
-  const tickerPattern = new RegExp(`"${ticker}":\\s*\\{[^}]+\\}`, 's');
-  const match = modified.match(tickerPattern);
-  
-  if (match) {
-    const oldEntry = match[0];
-    const newEntry = `"${ticker}": {
-    "reviewDate": "${freshnessData.reviewDate}",
-    "daysSinceReview": ${freshnessData.daysSinceReview},
-    "priceAtReview": ${freshnessData.priceAtReview.toFixed(2)},
-    "pricePctChange": ${freshnessData.pricePctChange.toFixed(1)},
-    "nearestCatalyst": ${freshnessData.nearestCatalyst ? `"${freshnessData.nearestCatalyst}"` : 'null'},
-    "nearestCatalystDate": ${freshnessData.nearestCatalystDate ? `"${freshnessData.nearestCatalystDate}"` : 'null'},
-    "nearestCatalystDays": ${freshnessData.nearestCatalystDays || 'null'},
-    "urgency": ${freshnessData.urgency},
-    "status": "${freshnessData.status}",
-    "badge": "${freshnessData.badge}"${freshnessData.eventsDetected ? `,
-    "eventsDetected": ${freshnessData.eventsDetected}` : ''}
-  }`;
-    
-    modified = modified.replace(oldEntry, newEntry);
+// ---------------------------------------------------------------------------
+// Update freshness metadata in data/freshness.json
+// ---------------------------------------------------------------------------
+function updateFreshness(ticker, freshnessData) {
+  const freshnessPath = path.join(DATA_DIR, 'freshness.json');
+
+  updateJsonFile(freshnessPath, (freshness) => {
+    const entry = {};
+    if (freshnessData.reviewDate !== undefined)        entry.reviewDate        = freshnessData.reviewDate;
+    if (freshnessData.daysSinceReview !== undefined)    entry.daysSinceReview   = freshnessData.daysSinceReview;
+    if (freshnessData.priceAtReview !== undefined)      entry.priceAtReview     = parseFloat(freshnessData.priceAtReview.toFixed(2));
+    if (freshnessData.pricePctChange !== undefined)     entry.pricePctChange    = parseFloat(freshnessData.pricePctChange.toFixed(1));
+    entry.nearestCatalyst     = freshnessData.nearestCatalyst     || null;
+    entry.nearestCatalystDate = freshnessData.nearestCatalystDate || null;
+    entry.nearestCatalystDays = freshnessData.nearestCatalystDays || null;
+    if (freshnessData.urgency !== undefined)            entry.urgency           = freshnessData.urgency;
+    if (freshnessData.status)                           entry.status            = freshnessData.status;
+    if (freshnessData.badge)                            entry.badge             = freshnessData.badge;
+    if (freshnessData.eventsDetected)                   entry.eventsDetected    = freshnessData.eventsDetected;
+
+    freshness[ticker] = Object.assign(freshness[ticker] || {}, entry);
+  });
+
+  // Also mirror freshness into the research JSON for co-location
+  const researchPath = path.join(DATA_DIR, 'research', `${ticker}.json`);
+  if (fs.existsSync(researchPath)) {
+    updateJsonFile(researchPath, (research) => {
+      if (!research.freshness) research.freshness = {};
+      Object.assign(research.freshness, {
+        pricePctChange: freshnessData.pricePctChange !== undefined
+          ? parseFloat(freshnessData.pricePctChange.toFixed(1))
+          : research.freshness.pricePctChange,
+        urgency: freshnessData.urgency !== undefined ? freshnessData.urgency : research.freshness.urgency,
+        status:  freshnessData.status  || research.freshness.status,
+        badge:   freshnessData.badge   || research.freshness.badge
+      });
+    });
   }
-  
-  return modified;
 }
 
-// Update narrative text based on events
-function updateNarrative(html, ticker, updates) {
-  let modified = html;
-  
-  for (const update of updates) {
-    // Update verdict text if provided
-    if (update.verdictAddendum) {
-      // Find the verdict section for this ticker
-      const tickerStart = modified.indexOf(`ticker: '${ticker}'`);
-      if (tickerStart === -1) continue;
-      
-      const tickerEnd = modified.indexOf('};\n\n// ===', tickerStart + 1000);
-      const tickerSection = modified.slice(tickerStart, tickerEnd);
-      
-      // Find verdict text and append addendum
-      const verdictMatch = tickerSection.match(/(verdict:\s*\{[\s\S]*?text:['"])([^'"]+)/);
-      if (verdictMatch && !tickerSection.includes(update.verdictAddendum)) {
-        const newVerdict = verdictMatch[1] + verdictMatch[2] + ' ' + update.verdictAddendum;
-        modified = modified.replace(verdictMatch[0], newVerdict);
+// ---------------------------------------------------------------------------
+// Update narrative text (verdict addendum, evidence, hypothesis scores)
+// ---------------------------------------------------------------------------
+function updateNarrative(ticker, updates) {
+  const researchPath = path.join(DATA_DIR, 'research', `${ticker}.json`);
+  if (!fs.existsSync(researchPath)) return;
+
+  updateJsonFile(researchPath, (research) => {
+    for (const update of updates) {
+      // Append verdict addendum
+      if (update.verdictAddendum) {
+        if (!research.big_picture) research.big_picture = '';
+        if (!research.big_picture.includes(update.verdictAddendum)) {
+          research.big_picture = (research.big_picture + ' ' + update.verdictAddendum).trim();
+        }
+      }
+
+      // Update evidence items
+      if (update.evidenceUpdate) {
+        if (!research.evidence_items) research.evidence_items = [];
+        research.evidence_items.push(update.evidenceUpdate);
+      }
+
+      // Adjust hypothesis scores
+      if (update.scoreAdjustment && research.hypotheses) {
+        for (const [hypoKey, adjustment] of Object.entries(update.scoreAdjustment)) {
+          if (research.hypotheses[hypoKey]) {
+            if (typeof adjustment === 'number') {
+              research.hypotheses[hypoKey].survival_score = adjustment;
+            } else if (adjustment.delta) {
+              research.hypotheses[hypoKey].survival_score =
+                Math.max(0, Math.min(1,
+                  (research.hypotheses[hypoKey].survival_score || 0) + adjustment.delta
+                ));
+            }
+            research.hypotheses[hypoKey].last_updated = new Date().toISOString();
+          }
+        }
       }
     }
-    
-    // Update evidence cards if provided
-    if (update.evidenceUpdate) {
-      // This would add or update evidence domain cards
-      // Simplified implementation
-    }
-    
-    // Update hypothesis scores if provided
-    if (update.scoreAdjustment) {
-      // This would adjust hypothesis survival scores
-      // Simplified implementation
-    }
-  }
-  
-  return modified;
+
+    research.last_research_update = new Date().toISOString();
+  });
 }
 
-// Update featured card metrics
-function updateFeaturedCard(html, ticker, priceData) {
-  let modified = html;
-  
-  // Update featured card price
-  const featuredPriceRegex = new RegExp(
-    `(featuredPriceColor:[^}]+)(price:[^,]+)`,
-    'i'
-  );
-  // This is a simplified pattern - real implementation would be more specific
-  
-  return modified;
+// ---------------------------------------------------------------------------
+// Update featured card data in research JSON
+// ---------------------------------------------------------------------------
+function updateFeaturedCard(ticker, priceData) {
+  const researchPath = path.join(DATA_DIR, 'research', `${ticker}.json`);
+  if (!fs.existsSync(researchPath)) return;
+
+  updateJsonFile(researchPath, (research) => {
+    research.current_price = parseFloat(priceData.price.toFixed(2));
+    // Append latest price to priceHistory (short recent window) if it differs
+    if (Array.isArray(research.priceHistory)) {
+      const last = research.priceHistory[research.priceHistory.length - 1];
+      if (last !== research.current_price) {
+        research.priceHistory.push(research.current_price);
+      }
+    }
+  });
 }
 
-// Update identity table
-function updateIdentityTable(html, ticker, priceData) {
-  let modified = html;
-  
-  // Update share price in identity table
-  const priceRowPattern = new RegExp(
-    `(${ticker}[\\s\\S]*?Share Price['"]*\\s*,\\s*['"])([^'"]+)`,
-    'i'
-  );
-  if (priceRowPattern.test(modified)) {
-    modified = modified.replace(priceRowPattern, `$1${formatCurrency(priceData.price)}`);
+// ---------------------------------------------------------------------------
+// Update identity / reference table data
+// ---------------------------------------------------------------------------
+function updateIdentityTable(ticker, priceData) {
+  // Update research JSON with current share price
+  const researchPath = path.join(DATA_DIR, 'research', `${ticker}.json`);
+  if (fs.existsSync(researchPath)) {
+    updateJsonFile(researchPath, (research) => {
+      research.current_price = parseFloat(priceData.price.toFixed(2));
+
+      if (priceData.yearHigh && priceData.yearLow) {
+        if (!research.technicalAnalysis) research.technicalAnalysis = {};
+        if (!research.technicalAnalysis.keyLevels) research.technicalAnalysis.keyLevels = {};
+        if (!research.technicalAnalysis.keyLevels.fiftyTwoWeekHigh) research.technicalAnalysis.keyLevels.fiftyTwoWeekHigh = {};
+        if (!research.technicalAnalysis.keyLevels.fiftyTwoWeekLow) research.technicalAnalysis.keyLevels.fiftyTwoWeekLow = {};
+        research.technicalAnalysis.keyLevels.fiftyTwoWeekHigh.price = priceData.yearHigh;
+        research.technicalAnalysis.keyLevels.fiftyTwoWeekLow.price  = priceData.yearLow;
+      }
+
+      if (priceData.marketCap) {
+        research.market_cap = formatMarketCap(priceData.marketCap);
+      }
+    });
   }
-  
-  // Update 52-week range if we have the data
-  if (priceData.yearHigh && priceData.yearLow) {
-    const rangePattern = new RegExp(
-      `(${ticker}[\\s\\S]*?52-Week Range['"]*\\s*,\\s*['"])([^'"]+)`,
-      'i'
-    );
-    if (rangePattern.test(modified)) {
-      const newRange = `${formatCurrency(priceData.yearLow)} – ${formatCurrency(priceData.yearHigh)}`;
-      modified = modified.replace(rangePattern, `$1${newRange}`);
+
+  // Update reference.json with identity-table fields
+  const referencePath = path.join(DATA_DIR, 'reference.json');
+  updateJsonFile(referencePath, (ref) => {
+    if (!ref[ticker]) ref[ticker] = {};
+    const entry = ref[ticker];
+
+    if (!entry._anchors) entry._anchors = {};
+    entry._anchors.price = parseFloat(priceData.price.toFixed(2));
+
+    if (priceData.yearHigh && priceData.yearLow) {
+      entry._anchors.yearHigh = priceData.yearHigh;
+      entry._anchors.yearLow  = priceData.yearLow;
     }
-  }
-  
-  // Update market cap
-  if (priceData.marketCap) {
-    const mktCapPattern = new RegExp(
-      `(${ticker}[\\s\\S]*?Market Cap['"]*\\s*,\\s*['"])([^'"]+)`,
-      'i'
-    );
-    if (mktCapPattern.test(modified)) {
-      modified = modified.replace(mktCapPattern, `$1${formatMarketCap(priceData.marketCap)}`);
+
+    if (priceData.marketCap) {
+      entry._anchors.marketCapStr = formatMarketCap(priceData.marketCap).replace('A$', '');
     }
-  }
-  
-  return modified;
+
+    if (priceData.drawdown !== undefined) {
+      entry._anchors.drawdown = parseFloat(priceData.drawdown.toFixed(1));
+    }
+  });
 }
 
-// Main update function
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
 function main() {
-  console.log('=== Continuum HTML Updater ===\n');
-  
+  console.log('=== Continuum Data Updater ===\n');
+
   const data = loadData();
-  const htmlPath = path.join(__dirname, '..', 'index.html');
-  let html = fs.readFileSync(htmlPath, 'utf8');
-  
+
   console.log(`Loaded ${Object.keys(data.prices).length} price updates`);
   console.log(`Loaded updates for ${Object.keys(data.updates.updates || {}).length} tickers`);
-  
+
   let modifiedCount = 0;
-  
+
   // Apply price updates
   for (const [ticker, priceData] of Object.entries(data.prices)) {
-    const originalHtml = html;
-    
-    html = updatePrice(html, ticker, priceData);
-    html = updateHeroMetrics(html, ticker, priceData);
-    html = updateIdentityTable(html, ticker, priceData);
-    html = updateFeaturedCard(html, ticker, priceData);
-    
-    if (html !== originalHtml) {
+    const researchPath = path.join(DATA_DIR, 'research', `${ticker}.json`);
+    const beforeJson = fs.existsSync(researchPath)
+      ? fs.readFileSync(researchPath, 'utf8') : '{}';
+
+    updatePrice(ticker, priceData);
+    updateHeroMetrics(ticker, priceData);
+    updateIdentityTable(ticker, priceData);
+    updateFeaturedCard(ticker, priceData);
+
+    const afterJson = fs.existsSync(researchPath)
+      ? fs.readFileSync(researchPath, 'utf8') : '{}';
+
+    if (afterJson !== beforeJson) {
       modifiedCount++;
-      console.log(`✓ ${ticker}: Price $${priceData.price.toFixed(2)}`);
+      console.log(`  ${ticker}: Price $${priceData.price.toFixed(2)}`);
     }
   }
-  
+
   // Apply freshness updates
   for (const [ticker, freshnessData] of Object.entries(data.updates.freshnessUpdates || {})) {
-    const originalHtml = html;
-    html = updateFreshness(html, ticker, freshnessData);
-    
-    if (html !== originalHtml) {
-      console.log(`✓ ${ticker}: Freshness ${freshnessData.status}`);
-    }
+    updateFreshness(ticker, freshnessData);
+    console.log(`  ${ticker}: Freshness ${freshnessData.status}`);
   }
-  
+
   // Apply narrative updates
   for (const [ticker, updates] of Object.entries(data.updates.updates || {})) {
     if (updates.length > 0) {
-      const originalHtml = html;
-      html = updateNarrative(html, ticker, updates);
-      
-      if (html !== originalHtml) {
-        console.log(`✓ ${ticker}: ${updates.length} narrative updates`);
-      }
+      updateNarrative(ticker, updates);
+      console.log(`  ${ticker}: ${updates.length} narrative updates`);
     }
   }
-  
-  // Write updated HTML
-  fs.writeFileSync(htmlPath, html);
-  
+
   console.log(`\n=== Complete ===`);
   console.log(`Updated ${modifiedCount} tickers`);
-  console.log('index.html refreshed');
-  
-  // Generate report
+  console.log('JSON data files refreshed');
+
+  // Generate report (unchanged)
   const report = {
     timestamp: new Date().toISOString(),
     tickersUpdated: modifiedCount,
     pricesUpdated: Object.keys(data.prices).length,
     narrativesUpdated: Object.values(data.updates.updates || {}).filter(u => u.length > 0).length
   };
-  
+
   fs.writeFileSync(
-    path.join(__dirname, '..', 'data', 'last-update-report.json'),
+    path.join(DATA_DIR, 'last-update-report.json'),
     JSON.stringify(report, null, 2)
   );
 }

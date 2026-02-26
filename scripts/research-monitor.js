@@ -4,7 +4,7 @@
  *
  * Continuum Intelligence — Research Freshness & Catalyst Monitor
  *
- * Parses all stock data from index.html and generates a priority-ranked
+ * Parses all stock data from data/research/*.json and generates a priority-ranked
  * action queue based on three signals:
  *
  *   1. FRESHNESS  — Days since research was last updated
@@ -13,15 +13,30 @@
  *
  * Each stock receives an urgency score (0-100) and a recommended action.
  *
- * Usage: node scripts/research-monitor.js [--json] [--quiet]
- *   --json   Output machine-readable JSON instead of console table
- *   --quiet  Suppress banner and summary text (for piping)
+ * Freshness data is written to data/freshness.json.
+ *
+ * Usage: node scripts/research-monitor.js [--json] [--quiet] [--inject]
+ *   --json     Output machine-readable JSON instead of console table
+ *   --quiet    Suppress banner and summary text (for piping)
+ *   --inject   Write freshness data to data/freshness.json
  */
 
 const fs = require('fs');
 const path = require('path');
 
-const INDEX_PATH = path.join(__dirname, '..', 'index.html');
+const ROOT = path.join(__dirname, '..');
+const RESEARCH_DIR = path.join(ROOT, 'data', 'research');
+const FRESHNESS_PATH = path.join(ROOT, 'data', 'freshness.json');
+
+// --- JSON helpers ---
+
+function readJson(filePath) {
+  try { return JSON.parse(fs.readFileSync(filePath, 'utf8')); } catch (e) { return null; }
+}
+
+function writeJson(filePath, data) {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+}
 
 // --- Configuration ---
 
@@ -59,53 +74,46 @@ const WEIGHTS = {
 // --- Parsing ---
 
 /**
- * Extract all stock tickers and their metadata from index.html
+ * Extract all stock tickers and their metadata from data/research/*.json files
  */
-function parseStockData(html) {
+function parseStockData() {
   const stocks = [];
 
-  // Match STOCK_DATA blocks — both compact and multi-line
-  const blockRegex = /STOCK_DATA\.(\w+)\s*=\s*\{/g;
-  let match;
+  let files;
+  try {
+    files = fs.readdirSync(RESEARCH_DIR).filter(f => f.endsWith('.json') && !f.startsWith('_'));
+  } catch (e) {
+    console.error(`[ERROR] Could not read research directory: ${e.message}`);
+    return stocks;
+  }
 
-  while ((match = blockRegex.exec(html)) !== null) {
-    const ticker = match[1];
-    const blockStart = match.index;
+  for (const file of files) {
+    const filePath = path.join(RESEARCH_DIR, file);
+    const data = readJson(filePath);
+    if (!data) continue;
 
-    // Find the end of this block (next STOCK_DATA or SNAPSHOT_DATA)
-    const nextBlock = html.indexOf('STOCK_DATA.', blockStart + 1);
-    const snapshotBlock = html.indexOf('SNAPSHOT_DATA.', blockStart);
-    let blockEnd = html.length;
-    if (nextBlock > blockStart) blockEnd = Math.min(blockEnd, nextBlock);
-    if (snapshotBlock > blockStart) blockEnd = Math.min(blockEnd, snapshotBlock);
+    const ticker = data.ticker || file.replace('.json', '');
 
-    const block = html.substring(blockStart, blockEnd);
-
-    // Extract fields
     const stock = {
       ticker,
-      company: extractString(block, 'company'),
-      sector: extractString(block, 'sector'),
-      price: extractNumber(block, /\bprice:\s*([\d.]+)/),
-      date: extractString(block, 'date'),
-      priceAtReview: null,  // will be calculated
-      tripwires: extractTripwires(block),
-      priceHistory: extractPriceHistory(block)
+      company: data.company || null,
+      sector: data.sector || null,
+      price: data.price || null,
+      date: data.date || null,
+      priceAtReview: null,
+      tripwires: extractTripwires(data),
+      priceHistory: data.priceHistory || []
     };
 
     // Calculate price at time of review from priceHistory
-    // The last entry in priceHistory closest to the review date is the review price
     if (stock.date && stock.price) {
       stock.priceAtReview = stock.price; // default: use current price as fallback
 
-      // Try to get price from technicalAnalysis latestDailyRange
-      const reviewPriceMatch = block.match(/latestDailyRange:\s*\{[^}]*?(?:high|low):\s*([\d.]+)/);
-      if (reviewPriceMatch) {
-        // Use the midpoint of the daily range on review date as proxy
-        const highMatch = block.match(/latestDailyRange:\s*\{[^}]*?high:\s*([\d.]+)/);
-        const lowMatch = block.match(/latestDailyRange:\s*\{[^}]*?low:\s*([\d.]+)/);
-        if (highMatch && lowMatch) {
-          stock.priceAtReview = (parseFloat(highMatch[1]) + parseFloat(lowMatch[1])) / 2;
+      // Try to get price from technicalAnalysis latestDailyRange if present
+      if (data.technicalAnalysis && data.technicalAnalysis.latestDailyRange) {
+        const range = data.technicalAnalysis.latestDailyRange;
+        if (range.high != null && range.low != null) {
+          stock.priceAtReview = (range.high + range.low) / 2;
         }
       }
     }
@@ -118,48 +126,43 @@ function parseStockData(html) {
 
 function stripHtmlEntities(str) {
   return str
-    .replace(/&mdash;/g, '—')
-    .replace(/&ndash;/g, '–')
+    .replace(/&mdash;/g, '\u2014')
+    .replace(/&ndash;/g, '\u2013')
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
-    .replace(/&bull;/g, '•')
+    .replace(/&bull;/g, '\u2022')
     .replace(/&ge;/g, '>=')
     .replace(/&le;/g, '<=')
     .replace(/&rarr;/g, '->')
     .replace(/&#\d+;/g, '');
 }
 
-function extractString(block, field) {
-  // Match both 'value' and "value" formats
-  const regex = new RegExp(`\\b${field}:\\s*['"]([^'"]+)['"]`);
-  const match = block.match(regex);
-  return match ? match[1] : null;
-}
-
-function extractNumber(block, regex) {
-  const match = block.match(regex);
-  return match ? parseFloat(match[1]) : null;
-}
-
-function extractPriceHistory(block) {
-  const match = block.match(/priceHistory:\s*\[([^\]]+)\]/);
-  if (!match) return [];
-  return match[1].split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
-}
-
-function extractTripwires(block) {
+/**
+ * Extract tripwires from research JSON data.
+ * Tripwires may be in data.tripwires.cards[] (each with date and title/name fields).
+ */
+function extractTripwires(data) {
   const tripwires = [];
-  // Find the tripwires array
-  const tripStart = block.indexOf('tripwires:');
-  if (tripStart === -1) return tripwires;
 
-  // Extract individual tripwire entries
-  const tripSection = block.substring(tripStart, block.indexOf('],', tripStart) + 2);
-  const entryRegex = /\{\s*date:\s*'([^']+)',\s*name:\s*'([^']+)'/g;
-  let m;
-  while ((m = entryRegex.exec(tripSection)) !== null) {
-    tripwires.push({ date: m[1], name: stripHtmlEntities(m[2]) });
+  // Check tripwires.cards array format (used by research JSON)
+  if (data.tripwires && Array.isArray(data.tripwires.cards)) {
+    for (const card of data.tripwires.cards) {
+      if (card.date && card.title) {
+        tripwires.push({ date: card.date, name: stripHtmlEntities(card.title) });
+      } else if (card.date && card.name) {
+        tripwires.push({ date: card.date, name: stripHtmlEntities(card.name) });
+      }
+    }
+  }
+
+  // Check flat tripwires array format
+  if (Array.isArray(data.tripwires) && data.tripwires.length > 0 && typeof data.tripwires[0] === 'object') {
+    for (const tw of data.tripwires) {
+      if (tw.date && (tw.name || tw.title)) {
+        tripwires.push({ date: tw.date, name: stripHtmlEntities(tw.name || tw.title) });
+      }
+    }
   }
 
   return tripwires;
@@ -169,20 +172,20 @@ function extractTripwires(block) {
 
 /**
  * Parse various date formats used in the data:
- *   '10 February 2026'      → exact date
- *   '25 FEB 2026'            → exact date
- *   '12 FEBRUARY 2026'       → exact date
- *   '1H 2026'                → approximate (Jul 1 2026)
- *   '2H 2026'                → approximate (Dec 1 2026)
- *   'Q1 2026' - 'Q4 2026'   → approximate
- *   'APR 2026', 'APRIL 2026'→ first of month
- *   'MID-2026'               → Jul 1 2026
- *   'CY 2026'                → Jun 30 2026
- *   'FY26', 'FY27'           → Jun 30 of that year (Aus financial year)
- *   'ONGOING'                → null (no specific date)
- *   '1H FY26 RESULTS'        → Feb 2026
- *   '2026 AGM'               → Oct 2026 (typical AGM season)
- *   '2026-2027'              → mid-2026
+ *   '10 February 2026'      -> exact date
+ *   '25 FEB 2026'            -> exact date
+ *   '12 FEBRUARY 2026'       -> exact date
+ *   '1H 2026'                -> approximate (Jul 1 2026)
+ *   '2H 2026'                -> approximate (Dec 1 2026)
+ *   'Q1 2026' - 'Q4 2026'   -> approximate
+ *   'APR 2026', 'APRIL 2026'-> first of month
+ *   'MID-2026'               -> Jul 1 2026
+ *   'CY 2026'                -> Jun 30 2026
+ *   'FY26', 'FY27'           -> Jun 30 of that year (Aus financial year)
+ *   'ONGOING'                -> null (no specific date)
+ *   '1H FY26 RESULTS'        -> Feb 2026
+ *   '2026 AGM'               -> Oct 2026 (typical AGM season)
+ *   '2026-2027'              -> mid-2026
  */
 function parseDate(dateStr) {
   if (!dateStr) return null;
@@ -290,14 +293,13 @@ function scoreDislocation(pctChange) {
 function urgencyLabel(score) {
   if (score >= 75) return { status: 'CRITICAL', action: 'Immediate research review required', badge: 'critical' };
   if (score >= 50) return { status: 'HIGH', action: 'Research review recommended this week', badge: 'high' };
-  if (score >= 25) return { status: 'MODERATE', action: 'Monitor — review within 2 weeks', badge: 'moderate' };
+  if (score >= 25) return { status: 'MODERATE', action: 'Monitor -- review within 2 weeks', badge: 'moderate' };
   return { status: 'OK', action: 'Research is current', badge: 'ok' };
 }
 
 // --- Main Analysis ---
 
-function analyseStocks(html, now) {
-  const stocks = parseStockData(html);
+function analyseStocks(stocks, now) {
   const results = [];
 
   for (const stock of stocks) {
@@ -389,10 +391,10 @@ function printReport(results, now) {
   const dateStr = now.toISOString().split('T')[0];
 
   console.log('');
-  console.log('╔══════════════════════════════════════════════════════════════════╗');
-  console.log('║     CONTINUUM INTELLIGENCE — RESEARCH FRESHNESS MONITOR        ║');
-  console.log(`║     Report Date: ${dateStr}                                     ║`);
-  console.log('╚══════════════════════════════════════════════════════════════════╝');
+  console.log('='.repeat(66));
+  console.log('  CONTINUUM INTELLIGENCE -- RESEARCH FRESHNESS MONITOR');
+  console.log(`  Report Date: ${dateStr}`);
+  console.log('='.repeat(66));
   console.log('');
 
   // Summary counts
@@ -401,13 +403,13 @@ function printReport(results, now) {
   const moderate = results.filter(r => r.status === 'MODERATE').length;
   const ok = results.filter(r => r.status === 'OK').length;
 
-  console.log(`  Status:  🔴 ${critical} CRITICAL   🟠 ${high} HIGH   🟡 ${moderate} MODERATE   🟢 ${ok} OK`);
+  console.log(`  Status:  ${critical} CRITICAL   ${high} HIGH   ${moderate} MODERATE   ${ok} OK`);
   console.log('');
 
   // Priority queue
-  console.log('  ┌─────────┬──────────────────────────┬───────┬───────┬──────────┬────────────────────────────┐');
-  console.log('  │ TICKER  │ RESEARCH DATE            │ DAYS  │ PRICE │ URGENCY  │ NEAREST CATALYST           │');
-  console.log('  ├─────────┼──────────────────────────┼───────┼───────┼──────────┼────────────────────────────┤');
+  console.log('  +---------+--------------------------+-------+-------+----------+----------------------------+');
+  console.log('  | TICKER  | RESEARCH DATE            | DAYS  | PRICE | URGENCY  | NEAREST CATALYST           |');
+  console.log('  +---------+--------------------------+-------+-------+----------+----------------------------+');
 
   for (const r of results) {
     const ticker = r.ticker.padEnd(7);
@@ -415,23 +417,23 @@ function printReport(results, now) {
     const days = String(r.daysSinceReview).padStart(3) + 'd';
     const priceDelta = (r.pricePctChange >= 0 ? '+' : '') + r.pricePctChange.toFixed(1) + '%';
     const price = priceDelta.padStart(5);
-    const statusIcon = { CRITICAL: '🔴', HIGH: '🟠', MODERATE: '🟡', OK: '🟢' }[r.status];
-    const urgency = `${statusIcon} ${String(r.scores.urgency).padStart(2)}`;
+    const statusLabel = { CRITICAL: 'CRIT', HIGH: 'HIGH', MODERATE: 'MOD ', OK: ' OK ' }[r.status];
+    const urgency = `${statusLabel} ${String(r.scores.urgency).padStart(2)}`;
     const catalyst = r.nearestCatalyst
       ? `${r.nearestCatalyst} (${r.nearestCatalystDays <= 0 ? 'PASSED' : r.nearestCatalystDays + 'd'})`.substring(0, 26)
-      : '—';
+      : '--';
 
-    console.log(`  │ ${ticker} │ ${date} │ ${days} │ ${price} │ ${urgency}     │ ${catalyst.padEnd(26)} │`);
+    console.log(`  | ${ticker} | ${date} | ${days} | ${price} | ${urgency}     | ${catalyst.padEnd(26)} |`);
   }
 
-  console.log('  └─────────┴──────────────────────────┴───────┴───────┴──────────┴────────────────────────────┘');
+  console.log('  +---------+--------------------------+-------+-------+----------+----------------------------+');
   console.log('');
 
   // Action items
   const actionable = results.filter(r => r.status !== 'OK');
   if (actionable.length > 0) {
     console.log('  ACTION QUEUE (priority order):');
-    console.log('  ─────────────────────────────────');
+    console.log('  ' + '-'.repeat(35));
     for (let i = 0; i < actionable.length; i++) {
       const r = actionable[i];
       const reasons = [];
@@ -442,12 +444,12 @@ function printReport(results, now) {
       }
       if (r.scores.dislocation >= 30) reasons.push(`price moved ${r.pricePctChange > 0 ? '+' : ''}${r.pricePctChange}% since review`);
 
-      console.log(`  ${i + 1}. [${r.status}] ${r.ticker} — ${r.action}`);
+      console.log(`  ${i + 1}. [${r.status}] ${r.ticker} -- ${r.action}`);
       if (reasons.length) console.log(`     Reason: ${reasons.join('; ')}`);
     }
     console.log('');
   } else {
-    console.log('  ✓ All research is current. No action required.');
+    console.log('  All research is current. No action required.');
     console.log('');
   }
 }
@@ -466,13 +468,13 @@ function generateJSON(results, now) {
   };
 }
 
-// --- Freshness Metadata Injection ---
+// --- Freshness Data Output ---
 
 /**
- * Inject FRESHNESS_DATA object into index.html so the frontend
+ * Write freshness data to data/freshness.json so the frontend
  * can render freshness badges and catalyst alerts on stock cards.
  */
-function injectFreshnessData(html, results, now) {
+function writeFreshnessData(results, now) {
   const freshnessObj = {};
   for (const r of results) {
     freshnessObj[r.ticker] = {
@@ -489,30 +491,11 @@ function injectFreshnessData(html, results, now) {
     };
   }
 
-  const dataBlock = `\n// === FRESHNESS_DATA — Auto-generated by research-monitor.js ===\n` +
-    `// Last updated: ${now.toISOString()}\n` +
-    `const FRESHNESS_DATA = ${JSON.stringify(freshnessObj, null, 2)};\n` +
-    `// === END FRESHNESS_DATA ===\n`;
-
-  // Check if FRESHNESS_DATA already exists
-  const existingStart = html.indexOf('// === FRESHNESS_DATA');
-  const existingEnd = html.indexOf('// === END FRESHNESS_DATA ===');
-
-  if (existingStart !== -1 && existingEnd !== -1) {
-    // Replace existing block
-    const endOfLine = html.indexOf('\n', existingEnd);
-    html = html.substring(0, existingStart) + dataBlock.trim() + html.substring(endOfLine);
-  } else {
-    // Insert before the first STOCK_DATA declaration
-    const insertPoint = html.indexOf('STOCK_DATA.');
-    if (insertPoint !== -1) {
-      // Find the start of the line
-      const lineStart = html.lastIndexOf('\n', insertPoint);
-      html = html.substring(0, lineStart) + '\n' + dataBlock + html.substring(lineStart);
-    }
+  try {
+    writeJson(FRESHNESS_PATH, freshnessObj);
+  } catch (e) {
+    console.error(`  [ERROR] Failed to write freshness.json: ${e.message}`);
   }
-
-  return html;
 }
 
 // --- Entry Point ---
@@ -523,10 +506,10 @@ function main() {
   const quietMode = args.includes('--quiet');
   const injectMode = args.includes('--inject');
 
-  const html = fs.readFileSync(INDEX_PATH, 'utf8');
+  const stocks = parseStockData();
   const now = new Date();
 
-  const results = analyseStocks(html, now);
+  const results = analyseStocks(stocks, now);
 
   if (jsonMode) {
     console.log(JSON.stringify(generateJSON(results, now), null, 2));
@@ -534,19 +517,18 @@ function main() {
     printReport(results, now);
   }
 
-  // Inject freshness data into HTML for frontend rendering
+  // Write freshness data to JSON file
   if (injectMode) {
-    const updatedHtml = injectFreshnessData(html, results, now);
-    fs.writeFileSync(INDEX_PATH, updatedHtml, 'utf8');
+    writeFreshnessData(results, now);
     if (!quietMode) {
-      console.log('  [INJECTED] FRESHNESS_DATA written to index.html');
+      console.log('  [WRITTEN] Freshness data saved to data/freshness.json');
     }
   }
 
   // Exit with code 2 if any stock is CRITICAL (for CI alerting)
   const hasCritical = results.some(r => r.status === 'CRITICAL');
   if (hasCritical && !jsonMode) {
-    console.log('  ⚠  CRITICAL stocks detected — exit code 2');
+    console.log('  WARNING: CRITICAL stocks detected -- exit code 2');
   }
 
   // Always output summary line for GitHub Actions
@@ -562,7 +544,7 @@ function main() {
 }
 
 // Export for use by orchestrator
-module.exports = { analyseStocks, parseStockData, parseDate, injectFreshnessData, generateJSON };
+module.exports = { analyseStocks, parseStockData, parseDate, writeFreshnessData, generateJSON };
 
 // Run if called directly
 if (require.main === module) {

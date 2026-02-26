@@ -1,0 +1,421 @@
+{
+  "ticker": "DXS.AX",
+  "company": "Dexus",
+  "sector": "Real Estate",
+  "market_cap": "6.9B",
+  "hypotheses": {
+    "N1": {
+      "label": "Growth/Recovery",
+      "description": "Australian office market recovery drives occupancy, rents, and asset revaluations higher",
+      "plain_english": "The worst of the Australian office downturn is over. CBD net absorption is turning positive, vacancy rates are stabilising, and Dexus's premium office portfolio in Sydney and Melbourne is well-positioned to capture the recovery. If cap rates compress and rents grow, NTA per unit will recover and close the gap with the current share price.",
+      "what_to_watch": "H1 FY26 results (18 February 2026): office occupancy, like-for-like income growth, and cap rate movements. Positive net absorption across CBDs would confirm the recovery thesis.",
+      "upside": "If office cap rates compress 25-50bps and rents grow 3-5%, Dexus NTA could recover meaningfully, driving a share price re-rating.",
+      "risk_plain": "If return-to-office trends stall or reverse, and sublease supply increases, the office recovery could take much longer than expected.",
+      "survival_score": 0.39,
+      "status": "LOW",
+      "weighted_inconsistency": 3,
+      "last_updated": "2026-02-26T05:36:48.027Z"
+    },
+    "N2": {
+      "label": "Managed/Base Case",
+      "description": "Steady-state REIT: stable distributions, gradual portfolio repositioning toward industrial and alternatives",
+      "plain_english": "Dexus continues its strategic pivot from pure office toward a diversified real assets platform. Industrial development delivers strong returns, funds management fees grow steadily, and distributions remain well-covered. The stock trades at a discount to NTA but reflects the market's fair assessment of the office headwinds.",
+      "what_to_watch": "FY26 distribution guidance and AFFO per security. If AFFO holds above 45 cents and distributions are maintained, the base case holds.",
+      "upside": "Funds management platform growth to $50B+ AUM could drive fee income and re-rating as a fund manager, not just a REIT.",
+      "risk_plain": "If office valuations continue to decline, the NTA discount persists and distributions may come under pressure.",
+      "survival_score": 0.49,
+      "status": "MODERATE",
+      "weighted_inconsistency": 1.5,
+      "last_updated": "2026-02-26T05:36:48.027Z"
+    },
+    "N3": {
+      "label": "Risk/Downside",
+      "description": "Structural office decline: hybrid work permanently reduces CBD office demand; asset values fall further",
+      "plain_english": "The shift to hybrid work is permanent and accelerating. Companies continue to reduce their office footprint, sublease space floods the market, and CBD vacancy rates stay elevated. Dexus's office-heavy portfolio suffers ongoing valuation writedowns, and the NTA discount to share price persists or widens.",
+      "what_to_watch": "CBD vacancy rates (PCA data), tenant lease expiry profiles, and any major tenant downsizing announcements. Rising sublease availability is the clearest negative signal.",
+      "upside": null,
+      "risk_plain": "If office valuations decline another 10-15%, Dexus may need to cut distributions to preserve capital and manage gearing.",
+      "survival_score": 0.07,
+      "status": "VERY_LOW",
+      "weighted_inconsistency": 4,
+      "last_updated": "2026-02-26T05:36:48.027Z"
+    },
+    "N4": {
+      "label": "Disruption",
+      "description": "Higher-for-longer interest rates compress REIT valuations; rising cost of debt erodes earnings",
+      "plain_english": "If interest rates stay higher for longer than the market expects, REIT valuations face a double hit: higher discount rates compress asset values, and higher debt costs eat into distributable earnings. Dexus, with significant debt facilities, is exposed to refinancing risk at higher rates.",
+      "what_to_watch": "RBA cash rate trajectory and bond yields. If the 10-year government bond yield rises above 5%, REIT valuations face further pressure.",
+      "upside": null,
+      "risk_plain": "Each 50bps increase in borrowing costs reduces Dexus AFFO by approximately 2-3 cents per security.",
+      "survival_score": 0.05,
+      "status": "VERY_LOW",
+      "weighted_inconsistency": 5,
+      "last_updated": "2026-02-26T05:36:48.027Z"
+    }
+  },
+  "dominant": "N2",
+  "confidence": "MODERATE",
+  "alert_state": "NORMAL",
+  "alert_started": null,
+  "current_price": 6.68,
+  "big_picture": "Dexus is Australia's largest listed office REIT and a leading integrated real asset manager with $50.1 billion in assets under management. The company owns, manages, and develops premium office, industrial, and alternative assets primarily in Australian CBDs.",
+  "last_flip": {
+    "date": "2025-08-20",
+    "from": "N3",
+    "to": "N2",
+    "trigger": "FY25 results delivered on AFFO guidance; office occupancy stabilising; positive net absorption in Sydney CBD",
+    "price_at_flip": 6.85,
+    "from_survival": 0.3,
+    "to_survival": 0.65
+  },
+  "narrative_history": [
+    {
+      "date": "2025-02-15",
+      "from": "N2",
+      "to": "N3",
+      "trigger": "H1 FY25 office valuations declined; CBD vacancy remained elevated; hybrid work impact deepening",
+      "price_at_flip": 7.2,
+      "from_survival": 0.4,
+      "to_survival": 0.55
+    }
+  ],
+  "evidence_items": [
+    {
+      "id": "DXS_FY25_RESULT",
+      "type": "EARNINGS_REPORT",
+      "source": "ASX Filing",
+      "epistemic_tag": "Under Oath (statutory)",
+      "date": "2025-08-20T08:00:00+11:00",
+      "summary": "FY25 AFFO 45.0 cents per security; delivered on guidance; distribution 37.0 cents",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "N1": "NEUTRAL",
+        "N2": "CONSISTENT",
+        "N3": "INCONSISTENT",
+        "N4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 120
+      },
+      "active": true
+    },
+    {
+      "id": "DXS_OFFICE_RECOVERY",
+      "type": "MARKET_DATA",
+      "source": "PCA / JLL",
+      "epistemic_tag": "Independent (third-party)",
+      "date": "2025-12-15T10:00:00+11:00",
+      "summary": "Positive net absorption across all four major Australian CBDs; Sydney CBD vacancy declining from peak",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "N1": "CONSISTENT",
+        "N2": "CONSISTENT",
+        "N3": "INCONSISTENT",
+        "N4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 60,
+        "half_life_days": 90
+      },
+      "active": true
+    },
+    {
+      "id": "DXS_INDUSTRIAL_DEV",
+      "type": "OPERATIONAL_DATA",
+      "source": "Investor Update",
+      "epistemic_tag": "Motivated (corporate)",
+      "date": "2025-11-01T10:00:00+11:00",
+      "summary": "190,400 sqm industrial construction across 10 projects; 6 fully leased pre-completion",
+      "diagnosticity": "MEDIUM",
+      "hypothesis_impact": {
+        "N1": "NEUTRAL",
+        "N2": "CONSISTENT",
+        "N3": "NEUTRAL",
+        "N4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 60,
+        "half_life_days": 90
+      },
+      "active": true
+    },
+    {
+      "id": "DXS_FUNDS_MGMT",
+      "type": "OPERATIONAL_DATA",
+      "source": "ASX Filing",
+      "epistemic_tag": "Under Oath (statutory)",
+      "date": "2025-08-20T08:00:00+11:00",
+      "summary": "Funds management platform grown to $50.1B AUM; fee income diversifying earnings away from direct property",
+      "diagnosticity": "MEDIUM",
+      "hypothesis_impact": {
+        "N1": "NEUTRAL",
+        "N2": "CONSISTENT",
+        "N3": "NEUTRAL",
+        "N4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 120
+      },
+      "active": true
+    }
+  ],
+  "price_signals": [
+    {
+      "date": "2026-02-24",
+      "classification": "NOISE",
+      "daily_change_pct": -0.48,
+      "volume_multiplier": 1,
+      "cumulative_5d": -3.59,
+      "cumulative_20d": -13.1,
+      "results_day": false,
+      "overcorrection_active": false
+    },
+    {
+      "date": "2026-02-25",
+      "classification": "SIGNIFICANT",
+      "daily_change_pct": 5.97,
+      "volume_multiplier": 1,
+      "cumulative_5d": -3.59,
+      "cumulative_20d": -13.1,
+      "results_day": false,
+      "overcorrection_active": false
+    }
+  ],
+  "editorial_override": null,
+  "price_history": [
+    7.5,
+    7.45,
+    7.42,
+    7.38,
+    7.35,
+    7.3,
+    7.28,
+    7.25,
+    7.2,
+    7.18,
+    7.15,
+    7.12,
+    7.1,
+    7.08,
+    7.05,
+    7,
+    6.95,
+    6.9,
+    6.85,
+    6.8,
+    6.75,
+    6.7,
+    6.65,
+    6.6,
+    6.55,
+    6.5,
+    6.45,
+    6.4,
+    6.35,
+    6.3,
+    6.25,
+    6.2,
+    6.17
+  ],
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": -15,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 26,
+      "bear": 41,
+      "direction": "downside",
+      "hypotheses": [
+        {
+          "title": "N1: Office Market Recovery",
+          "direction": "upside",
+          "weight": 26
+        },
+        {
+          "title": "N2: Steady-State REIT",
+          "direction": "neutral",
+          "weight": 33
+        },
+        {
+          "title": "N3: Structural Office Decline",
+          "direction": "downside",
+          "weight": 22
+        },
+        {
+          "title": "N4: Interest Rate &amp; Refinancing Risk",
+          "direction": "downside",
+          "weight": 19
+        }
+      ],
+      "computed_at": "2026-02-24T07:54:21.320Z"
+    },
+    "overall_sentiment": -15,
+    "sentiment_label": "DOWNSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T07:54:38.669Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "DOWNSIDE",
+  "valuation_range": {
+    "low": 5.43,
+    "mid": 6.03,
+    "high": 6.63,
+    "shift_pct": -0.0225,
+    "signal_used": -15,
+    "method": "sentiment_shift_v3",
+    "computed_at": "2026-02-24T07:54:39.551Z"
+  },
+  "priceHistory": [
+    6.57,
+    6.61,
+    6.68
+  ],
+  "freshness": {
+    "pricePctChange": 1.1,
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_price_update": "2026-02-26T05:36:47.903Z",
+  "technicalAnalysis": {
+    "date": "16 February 2026",
+    "period": "1 Year",
+    "source": "Continuum Technical Intelligence",
+    "regime": "Downtrending",
+    "clarity": "Clear",
+    "price": {
+      "current": 6.68,
+      "currency": "A$"
+    },
+    "movingAverages": {
+      "ma50": {
+        "value": 6.45,
+        "date": "16 Feb 2026"
+      },
+      "ma200": {
+        "value": 7.05,
+        "date": "16 Feb 2026"
+      },
+      "crossover": {
+        "type": "Death Cross",
+        "date": "w/c 15 September 2025",
+        "description": "50-day MA crossed below 200-day MA during sustained downtrend"
+      },
+      "priceVsMa50": -4.3,
+      "priceVsMa200": -12.5
+    },
+    "trend": {
+      "direction": "Down",
+      "duration": "12 months",
+      "structure": "Lower highs and lower lows from 52-week high; sustained downtrend",
+      "peak": {
+        "price": 7.89,
+        "date": "w/c 24 February 2025"
+      },
+      "trough": {
+        "price": 6.17,
+        "date": "16 February 2026"
+      },
+      "drawdown": -21.8
+    },
+    "keyLevels": {
+      "support": {
+        "price": 6,
+        "method": "Round number and psychological support"
+      },
+      "resistance": {
+        "price": 6.5,
+        "method": "50-day MA resistance and recent consolidation ceiling"
+      },
+      "fiftyTwoWeekHigh": {
+        "price": 7.89,
+        "date": "w/c 24 February 2025"
+      },
+      "fiftyTwoWeekLow": {
+        "price": 6.17,
+        "date": "16 February 2026"
+      }
+    },
+    "volume": {
+      "latestVs20DayAvg": 1,
+      "latestDate": "16 February 2026",
+      "priorSpikes": [
+        {
+          "period": "w/c 25 August 2025",
+          "ratio": 2,
+          "context": "FY25 results release"
+        },
+        {
+          "period": "w/c 10 November 2025",
+          "ratio": 1.5,
+          "context": "Investor update; industrial development"
+        }
+      ]
+    },
+    "volatility": {
+      "latestDailyRange": {
+        "high": 6.22,
+        "low": 6.15,
+        "date": "16 February 2026"
+      },
+      "latestRangePercent": 1.1,
+      "avgDailyRangePercent30": 1.2,
+      "avgDailyRangePercent90": 1.3
+    },
+    "meanReversion": {
+      "vsMa50": -4.3,
+      "vsMa200": -12.5,
+      "rangePosition": 0,
+      "rangeHigh": 7.89,
+      "rangeLow": 6.17
+    },
+    "inflectionPoints": [
+      {
+        "date": "w/c 24 February 2025",
+        "price": 7.89,
+        "event": "52-week high"
+      },
+      {
+        "date": "w/c 25 August 2025",
+        "price": 6.85,
+        "event": "FY25 results; modest recovery"
+      },
+      {
+        "date": "w/c 15 September 2025",
+        "price": 6.7,
+        "event": "Death cross forms; downtrend confirmed"
+      },
+      {
+        "date": "16 February 2026",
+        "price": 6.17,
+        "event": "52-week low; pre-H1 results"
+      }
+    ],
+    "relativePerformance": {
+      "vsIndex": {
+        "name": "S&amp;P/ASX 200",
+        "period": "12 months",
+        "stockReturn": -21.8,
+        "indexReturn": 6.9,
+        "relativeReturn": -28.7
+      },
+      "vsSector": {
+        "name": "S&amp;P/ASX A-REIT",
+        "period": "12 months",
+        "stockReturn": -21.8,
+        "sectorReturn": 5,
+        "relativeReturn": -26.8
+      }
+    }
+  },
+  "price_evidence": {
+    "last_run": "2026-02-26T05:36:48.027Z",
+    "classification": "SIGNIFICANT"
+  },
+  "last_research_update": "2026-02-26T05:36:48.027Z"
+}

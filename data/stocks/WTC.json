@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 5.2,
-      "last_updated": "2026-02-26T08:07:22.714Z"
+      "last_updated": "2026-02-26T01:30:48.610Z"
     },
     "N2": {
       "label": "Managed/Base Case",
@@ -26,7 +26,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2.8,
-      "last_updated": "2026-02-26T08:07:22.714Z"
+      "last_updated": "2026-02-26T05:36:48.027Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Board investigation outcomes, any new media reports, and mid-market customer retention data. If churn exceeds 8% or new governance issues emerge, this narrative strengthens.",
       "upside": null,
       "risk_plain": "If the governance situation worsens or major customers defect, the stock could test new lows below $60.",
-      "survival_score": 0.45,
+      "survival_score": 0.52,
       "status": "MODERATE",
       "weighted_inconsistency": 1.1,
-      "last_updated": "2026-02-26T08:07:22.714Z"
+      "last_updated": "2026-02-26T05:36:48.027Z"
     },
     "N4": {
       "label": "Disruption",
@@ -47,14 +47,14 @@
       "what_to_watch": "Competitive product launches from FourKites, project44, or new AI-native logistics platforms. Also monitor key engineering talent retention.",
       "upside": null,
       "risk_plain": "While the CargoWise moat is deep, the company's reliance on one person for technical vision is a genuine structural vulnerability.",
-      "survival_score": 0.45,
-      "status": "MODERATE",
+      "survival_score": 0.38,
+      "status": "LOW",
       "weighted_inconsistency": 5.8,
-      "last_updated": "2026-02-26T08:07:22.714Z"
+      "last_updated": "2026-02-26T05:36:48.027Z"
     }
   },
   "dominant": "N3",
-  "confidence": "LOW",
+  "confidence": "MODERATE",
   "alert_state": "OVERCORRECTION",
   "alert_started": null,
   "current_price": 49,
@@ -175,13 +175,6 @@
       "severity": "AMBER",
       "message": "Single-day move of -37.1% exceeds 10% threshold — possible overcorrection",
       "auto_generated": true
-    },
-    {
-      "date": "2026-02-26",
-      "type": "OVERCORRECTION_TRIGGER",
-      "severity": "AMBER",
-      "message": "Single-day move of -28.3% exceeds 10% threshold — possible overcorrection",
-      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -241,16 +234,6 @@
       "date": "2026-02-25",
       "classification": "MATERIAL",
       "daily_change_pct": -37.06,
-      "volume_multiplier": 1,
-      "cumulative_5d": 0.44,
-      "cumulative_20d": -30.1,
-      "results_day": false,
-      "overcorrection_active": true
-    },
-    {
-      "date": "2026-02-26",
-      "classification": "MATERIAL",
-      "daily_change_pct": -28.26,
       "volume_multiplier": 1,
       "cumulative_5d": 0.44,
       "cumulative_20d": -30.1,
@@ -495,16 +478,18 @@
   "_overcorrection": {
     "active": true,
     "triggerType": "SINGLE_DAY",
-    "triggerDate": "2026-02-26",
-    "triggerPrice": 49,
+    "triggerDate": "2026-02-25",
+    "triggerPrice": 42.99,
     "direction": "down",
-    "movePct": -28.26,
-    "reviewDate": "2026-03-05",
-    "message": "Single-day move of -28.3% exceeds 10% threshold — possible overcorrection"
+    "movePct": -37.06,
+    "reviewDate": "2026-03-04",
+    "message": "Single-day move of -37.1% exceeds 10% threshold — possible overcorrection"
   },
   "price_evidence": {
-    "last_run": "2026-02-26T08:03:41.240Z",
+    "last_run": "2026-02-26T05:36:48.027Z",
     "classification": "MATERIAL"
   },
-  "last_research_update": "2026-02-26T08:03:41.240Z"
+  "last_research_update": "2026-02-26T05:36:48.027Z",
+  "price": 49,
+  "date": "26 February 2026"
 }

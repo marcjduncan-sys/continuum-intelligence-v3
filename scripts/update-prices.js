@@ -2,7 +2,12 @@
 /**
  * update-prices.js
  * Fetches latest daily close prices from Yahoo Finance for all tickers
- * in index.html and updates the price field + appends to priceHistory.
+ * and writes updated prices to per-ticker JSON files.
+ *
+ * Data targets:
+ *   - data/research/{TICKER}.json  → price, priceHistory, technicalAnalysis.price.current
+ *   - data/stocks/{TICKER}.json    → current_price, priceHistory
+ *   - data/latest-prices.json      → {TICKER}.price
  *
  * Yahoo Finance v8 API requires cookie + crumb authentication.
  * This script obtains a session before fetching prices.
@@ -15,7 +20,10 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const INDEX_PATH = path.join(__dirname, '..', 'index.html');
+const DATA_DIR = path.join(__dirname, '..', 'data');
+const RESEARCH_DIR = path.join(DATA_DIR, 'research');
+const STOCKS_DIR = path.join(DATA_DIR, 'stocks');
+const LATEST_PRICES_PATH = path.join(DATA_DIR, 'latest-prices.json');
 
 // All tickers to update (from central registry)
 const { getTickersAX } = require('./lib/registry');
@@ -148,111 +156,98 @@ async function fetchYahoo(ticker, session) {
   }
 }
 
-function updateStockData(html, ticker, priceData) {
-  if (!priceData) return html;
+// --- Helpers for safe JSON file I/O ---
+
+function readJSONFile(filePath) {
+  try {
+    const raw = fs.readFileSync(filePath, 'utf8');
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
+}
+
+function writeJSONFile(filePath, data) {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + '\n', 'utf8');
+}
+
+/**
+ * Append price to a priceHistory array, dedup last entry, trim to MAX_HISTORY.
+ * Returns the updated array (mutates nothing).
+ */
+function appendPriceHistory(history, price) {
+  if (!Array.isArray(history)) history = [];
+  const lastInHistory = history[history.length - 1];
+
+  // Only append if the new price is different from the last entry
+  if (lastInHistory == null || Math.abs(lastInHistory - price) > 0.005) {
+    history = history.concat(price);
+  }
+
+  // Trim to max length (keep most recent)
+  if (history.length > MAX_HISTORY) {
+    history = history.slice(history.length - MAX_HISTORY);
+  }
+
+  return history;
+}
+
+// --- Core update function: writes to JSON files ---
+
+function updateStockData(ticker, priceData) {
+  if (!priceData) return false;
 
   const short = priceData.shortTicker;
   const price = priceData.currentPrice;
 
-  // --- 1. Update the price field in STOCK_DATA ---
-  // Match: STOCK_DATA.XXX = { ... price: 123.45, ... }
-  // We need to find the price field within this stock's block
+  // --- 1. Update research file: data/research/{TICKER}.json ---
+  const researchPath = path.join(RESEARCH_DIR, `${short}.json`);
+  const research = readJSONFile(researchPath);
+  if (research) {
+    // Update top-level price
+    research.price = price;
 
-  // For compact (single-line) stocks like GMG
-  const compactRegex = new RegExp(
-    `(STOCK_DATA\\.${short}\\s*=\\s*\\{[^}]*?price:\\s*)([\\d.]+)(,)`,
-    'g'
-  );
+    // Update priceHistory (append + trim)
+    research.priceHistory = appendPriceHistory(research.priceHistory, price);
 
-  // For multi-line stocks
-  const multilineRegex = new RegExp(
-    `(STOCK_DATA\\.${short}\\s*=\\s*\\{[\\s\\S]*?^\\s*price:\\s*)([\\d.]+)(,)`,
-    'gm'
-  );
-
-  let updated = false;
-
-  // Try compact first (GMG)
-  if (compactRegex.test(html)) {
-    compactRegex.lastIndex = 0;
-    html = html.replace(compactRegex, `$1${price}$3`);
-    updated = true;
-  }
-
-  if (!updated) {
-    // Multi-line: find the STOCK_DATA block start, then the price within it
-    const blockStart = html.indexOf(`STOCK_DATA.${short}`);
-    if (blockStart === -1) return html;
-
-    // Find price: within the next 500 chars (it's near the top of each block)
-    const searchWindow = html.substring(blockStart, blockStart + 500);
-    const priceMatch = searchWindow.match(/(\bprice:\s*)([\d.]+)/);
-    if (priceMatch) {
-      const priceIdx = blockStart + searchWindow.indexOf(priceMatch[0]);
-      html = html.substring(0, priceIdx) +
-        priceMatch[0].replace(priceMatch[2], String(price)) +
-        html.substring(priceIdx + priceMatch[0].length);
-      updated = true;
-    }
-  }
-
-  if (!updated) {
-    console.error(`  [WARN] Could not find price field for ${short}`);
-    return html;
-  }
-
-  // --- 2. Update priceHistory (append latest close, trim to MAX_HISTORY) ---
-  const histRegex = new RegExp(
-    `(STOCK_DATA\\.${short}[\\s\\S]*?priceHistory:\\s*\\[)([^\\]]+)(\\])`,
-    'm'
-  );
-  const histMatch = html.match(histRegex);
-  if (histMatch) {
-    let prices = histMatch[2].split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
-    const lastInHistory = prices[prices.length - 1];
-
-    // Only append if the new price is different from the last entry
-    if (Math.abs(lastInHistory - price) > 0.005) {
-      prices.push(price);
+    // Update technicalAnalysis.price.current if it exists
+    if (research.technicalAnalysis &&
+        research.technicalAnalysis.price) {
+      research.technicalAnalysis.price.current = price;
     }
 
-    // Trim to max length (keep most recent)
-    if (prices.length > MAX_HISTORY) {
-      prices = prices.slice(prices.length - MAX_HISTORY);
+    writeJSONFile(researchPath, research);
+  } else {
+    console.error(`  [WARN] Research file not found: ${researchPath}`);
+  }
+
+  // --- 2. Update stocks file: data/stocks/{TICKER}.json ---
+  const stocksPath = path.join(STOCKS_DIR, `${short}.json`);
+  const stocks = readJSONFile(stocksPath);
+  if (stocks) {
+    stocks.current_price = price;
+
+    // Update priceHistory if it exists in the stocks file
+    if (Array.isArray(stocks.priceHistory)) {
+      stocks.priceHistory = appendPriceHistory(stocks.priceHistory, price);
     }
 
-    const newHistStr = prices.map(p => p.toFixed ? p : String(p)).join(', ');
-    html = html.replace(histRegex, `$1${newHistStr}$3`);
+    writeJSONFile(stocksPath, stocks);
+  } else {
+    console.error(`  [WARN] Stocks file not found: ${stocksPath}`);
   }
 
-  // --- 3. Update SNAPSHOT_DATA price if it exists ---
-  const snapRegex = new RegExp(
-    `(SNAPSHOT_DATA\\.${short}\\s*=\\s*\\{[\\s\\S]*?\\bprice:\\s*)([\\.\\d]+)`,
-    'm'
-  );
-  if (snapRegex.test(html)) {
-    html = html.replace(snapRegex, `$1${price}`);
+  // --- 3. Update latest-prices.json ---
+  const latestPrices = readJSONFile(LATEST_PRICES_PATH) || {};
+  if (!latestPrices[short]) {
+    latestPrices[short] = { ticker: short };
   }
-
-  // --- 4. Update technicalAnalysis.price.current if it exists ---
-  const taBlock = html.indexOf(`STOCK_DATA.${short}`);
-  if (taBlock !== -1) {
-    // Find technicalAnalysis within this block (search up to next STOCK_DATA)
-    const nextBlock = html.indexOf('STOCK_DATA.', taBlock + 1);
-    const blockEnd = nextBlock === -1 ? html.length : nextBlock;
-    const blockStr = html.substring(taBlock, blockEnd);
-
-    const taPriceMatch = blockStr.match(/(price:\s*\{\s*current:\s*)([\d.]+)/);
-    if (taPriceMatch) {
-      const idx = taBlock + blockStr.indexOf(taPriceMatch[0]);
-      html = html.substring(0, idx) +
-        taPriceMatch[0].replace(taPriceMatch[2], String(price)) +
-        html.substring(idx + taPriceMatch[0].length);
-    }
-  }
+  latestPrices[short].price = price;
+  latestPrices[short].timestamp = new Date().toISOString();
+  writeJSONFile(LATEST_PRICES_PATH, latestPrices);
 
   console.log(`  [OK] ${short}: ${price}`);
-  return html;
+  return true;
 }
 
 async function main() {
@@ -268,7 +263,6 @@ async function main() {
     console.log('  Attempting without authentication...');
   }
 
-  let html = fs.readFileSync(INDEX_PATH, 'utf8');
   let updatedCount = 0;
   let failedCount = 0;
 
@@ -277,8 +271,7 @@ async function main() {
     if (updatedCount > 0) await new Promise(r => setTimeout(r, 300));
 
     const data = await fetchYahoo(ticker, session);
-    if (data) {
-      html = updateStockData(html, ticker, data);
+    if (data && updateStockData(ticker, data)) {
       updatedCount++;
     } else {
       failedCount++;
@@ -286,10 +279,9 @@ async function main() {
   }
 
   if (updatedCount > 0) {
-    fs.writeFileSync(INDEX_PATH, html, 'utf8');
     console.log(`\nDone: ${updatedCount} updated, ${failedCount} failed.`);
   } else {
-    console.log('\nNo prices were fetched. File not modified.');
+    console.log('\nNo prices were fetched. No files modified.');
     process.exit(1);
   }
 }

@@ -13,7 +13,7 @@ Current implementation: 21-stock ASX equity research SPA. Vanilla HTML/JS/CSS fr
 
 - **Frontend:** GitHub Pages (marcjduncan-sys/continuum-intelligence-v3)
 - **Backend:** `https://imaginative-vision-production-16cb.up.railway.app`
-- **Frontend sets `REFRESH_API_BASE`** to Railway URL when running on GitHub Pages
+- **Frontend sets `REFRESH_API_BASE`** to Railway URL when running on GitHub Pages; uses empty string on localhost (Vite proxy)
 - **21 Tickers:** BHP, CBA, CSL, DRO, DXS, FMG, GMG, GYG, HRZ, MQG, NAB, OCL, PME, RFG, RIO, SIG, WDS, WOR, WOW, WTC, XRO
 
 ### Predecessor Context (V2)
@@ -61,12 +61,45 @@ Neutral hypotheses contribute zero. No sqrt amplification. No company weight mul
 
 ## 3. Architecture
 
-### Frontend (index.html, ~13,700 lines)
-- Monolithic SPA: all HTML, CSS, JS in one file plus external modules in `js/` and `css/`
-- Hash-based routing via `route()` function
-- `STOCK_DATA` object is the central in-memory data store, hydrated from `_index.json` then lazy-loaded per ticker
-- Live prices via `MarketFeed` IIFE polling Yahoo Finance
-- See `MODULE_MAP.md` for detailed line ranges and coupling matrix
+### Frontend (Vite + ES Modules)
+
+**Build:** `npm run dev` (Vite dev server) / `npm run build` (production → `dist/`)
+
+```
+index.html (~726 lines — HTML shell only, no inline CSS/JS)
+src/
+├── main.js                    Entry point — boots app, exposes window globals
+├── styles/                    11 CSS modules imported via styles/index.css
+│   ├── tokens.css             Design tokens (CSS custom properties)
+│   ├── base.css               Reset, typography, layout primitives
+│   ├── nav.css, home.css, report.css, portfolio.css, thesis.css
+│   ├── chat.css, batch.css, snapshot.css
+│   └── index.css              Imports all partials
+├── lib/
+│   ├── state.js               STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA (shared objects)
+│   ├── format.js              Number/date/currency formatting
+│   ├── router.js              Hash-based SPA router + renderedPages set
+│   └── dom.js                 escapeHtml, computeSkewScore, announcePageChange
+├── data/
+│   ├── loader.js              Fetch _index.json + on-demand per-ticker research JSON
+│   └── dynamics.js            ContinuumDynamics (hydration engine for computed fields)
+├── pages/
+│   ├── home.js                Featured grid, coverage table, search
+│   ├── report.js              Report page orchestrator — renderReport(data)
+│   ├── report-sections.js     ~1600 lines, all section renderers + Chart.js timeline
+│   ├── portfolio.js, snapshot.js, thesis.js, about.js
+├── features/
+│   ├── chat.js                Research chat (FAB + inline per-ticker)
+│   ├── pdf.js                 PDF report generation (institutional + retail)
+│   └── batch-refresh.js       Single + batch research refresh via API
+└── services/
+    ├── live-data.js            Yahoo Finance OHLCV + localStorage cache
+    └── market-feed.js          Live price polling, ticker strip, market status bar
+```
+
+- **CDN deps** loaded via `<script>` tags: Chart.js, marked.js, DOMPurify, SheetJS (lazy)
+- **5 classic (non-module) scripts:** 3 DNE engines, personalisation.js, snapshot-generator.js
+- **Build output:** ~194 KB JS (58 KB gzip) + 132 KB CSS (21 KB gzip)
 
 ### Backend (api/)
 - `main.py` -- FastAPI app, chat endpoints, refresh endpoints, static file serving
@@ -410,6 +443,7 @@ The platform serves institutional investors who will immediately dismiss content
 - When merging new data into existing research JSON, preserve fields not being updated
 - When patching STOCK_DATA in memory, preserve `_livePrice` and `priceHistory` (injected by MarketFeed, not part of research JSON)
 - Index file (`_index.json`) must stay in sync with individual ticker JSONs
+- History JSON files use `entries` key (NOT `history`)
 
 ### 11.4 Writing Standard
 Australian English (Macquarie/Oxford, Australian Government Style Manual). No em-dashes in any output. No LLM-characteristic phrasing ("It's worth noting", "Let's dive in", "Here's the thing"). The platform serves institutional investors; every piece of text must read as if written by a senior analyst.
@@ -478,7 +512,7 @@ Fields are stored (analytical judgment, computed at pipeline time) or computed l
 ## 14. Deployment
 
 ### Frontend
-Push to `main` branch. GitHub Pages auto-deploys.
+Push to `main` branch. GitHub Pages auto-deploys via Vite build (`npm run build` → `dist/`).
 
 ### Backend
 Push to `main`. Railway auto-deploys from `api/` directory via `railway.json` and `Procfile`.
@@ -494,7 +528,15 @@ Push to `main`. Railway auto-deploys from `api/` directory via `railway.json` an
 
 ## 15. Common Operations
 
-### Running Locally
+### Running Locally (Frontend)
+```bash
+npm run dev        # Vite dev server (localhost:5173+), proxies /api to Railway
+npm run build      # Production build → dist/
+npm run preview    # Serve dist/ locally
+```
+Note: No Python installed locally. All API calls go through Vite proxy to Railway production API.
+
+### Running Backend (if Python available)
 ```bash
 cd api && pip install -r requirements.txt
 # Set ANTHROPIC_API_KEY, GEMINI_API_KEY env vars

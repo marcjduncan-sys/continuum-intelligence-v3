@@ -5,13 +5,13 @@
  * Continuum Intelligence — Server-Side Content Hydration
  *
  * After prices are updated by update-prices.js, this script:
- *   1. Reads current prices from STOCK_DATA in index.html
- *   2. Reads REFERENCE_DATA anchors (what values are in the text)
+ *   1. Reads current prices from per-ticker data/research/{ticker}.json files
+ *   2. Reads REFERENCE_DATA anchors from data/reference.json
  *   3. Computes new derived metrics (market cap, P/E, drawdown, upside)
- *   4. Performs targeted text replacement in all STOCK_DATA string fields
- *   5. Updates REFERENCE_DATA._anchors to match the new values
+ *   4. Performs targeted text replacement in all string fields within the JSON
+ *   5. Updates _anchors in data/reference.json to match new values
  *
- * This ensures the HTML file itself stays current between deploys,
+ * This ensures the JSON data files stay current between deploys,
  * not just at client-side runtime.
  *
  * Usage: node scripts/hydrate-content.js [--dry-run]
@@ -20,7 +20,19 @@
 const fs = require('fs');
 const path = require('path');
 
-const INDEX_PATH = path.join(__dirname, '..', 'index.html');
+const ROOT = path.join(__dirname, '..');
+const RESEARCH_DIR = path.join(ROOT, 'data', 'research');
+const REFERENCE_PATH = path.join(ROOT, 'data', 'reference.json');
+
+// --- JSON helpers ---
+
+function readJson(filePath) {
+  try { return JSON.parse(fs.readFileSync(filePath, 'utf8')); } catch (e) { return null; }
+}
+
+function writeJson(filePath, data) {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+}
 
 // --- Formatting (must match client-side ContinuumDynamics) ---
 
@@ -35,83 +47,6 @@ function fmtPE(val) {
   if (!val || !isFinite(val) || val <= 0) return null;
   if (val >= 100) return '~' + Math.round(val) + 'x';
   return val.toFixed(1).replace(/\.0$/, '') + 'x';
-}
-
-// --- Parse current prices from STOCK_DATA ---
-
-function extractPrice(html, ticker) {
-  const blockStart = html.indexOf(`STOCK_DATA.${ticker}`);
-  if (blockStart === -1) return null;
-  const searchWindow = html.substring(blockStart, blockStart + 500);
-  const priceMatch = searchWindow.match(/\bprice:\s*([\d.]+)/);
-  return priceMatch ? parseFloat(priceMatch[1]) : null;
-}
-
-function extractPriceHistory(html, ticker) {
-  const regex = new RegExp(`STOCK_DATA\\.${ticker}[\\s\\S]*?priceHistory:\\s*\\[([^\\]]+)\\]`, 'm');
-  const match = html.match(regex);
-  if (!match) return [];
-  return match[1].split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
-}
-
-// --- Parse REFERENCE_DATA ---
-
-function extractReferenceData(html) {
-  const refStart = html.indexOf('const REFERENCE_DATA = {');
-  if (refStart === -1) { console.error('[ERROR] REFERENCE_DATA not found'); return null; }
-  const refEnd = html.indexOf('\n// === END REFERENCE_DATA ===', refStart);
-  if (refEnd === -1) { console.error('[ERROR] END REFERENCE_DATA marker not found'); return null; }
-
-  const refBlock = html.substring(refStart, refEnd + 1);
-
-  // Use a simplified parser: extract per-ticker data
-  const tickers = {};
-  const tickerRegex = /(\w+):\s*\{/g;
-  let match;
-
-  // Find all top-level ticker keys
-  const innerStart = refBlock.indexOf('{') + 1;
-  const inner = refBlock.substring(innerStart);
-
-  // Extract _anchors for each ticker
-  const anchorRegex = /(\w+):\s*\{[^]*?_anchors:\s*\{([^}]+)\}/g;
-  while ((match = anchorRegex.exec(refBlock)) !== null) {
-    const ticker = match[1];
-    const anchorStr = match[2];
-
-    const anchors = {};
-    // Parse key-value pairs from anchor string
-    const kvRegex = /(\w+):\s*(?:'([^']*)'|"([^"]*)"|(-?[\d.]+)|null)/g;
-    let kv;
-    while ((kv = kvRegex.exec(anchorStr)) !== null) {
-      const key = kv[1];
-      const val = kv[2] || kv[3] || (kv[4] !== undefined ? parseFloat(kv[4]) : null);
-      anchors[key] = val;
-    }
-
-    // Also extract other reference fields
-    const tickerBlock = refBlock.substring(
-      refBlock.indexOf(ticker + ':'),
-      refBlock.indexOf('_anchors:', refBlock.indexOf(ticker + ':'))
-    );
-
-    tickers[ticker] = {
-      sharesOutstanding: extractRefNumber(tickerBlock, 'sharesOutstanding'),
-      analystTarget: extractRefNumber(tickerBlock, 'analystTarget'),
-      epsTrailing: extractRefNumber(tickerBlock, 'epsTrailing'),
-      epsForward: extractRefNumber(tickerBlock, 'epsForward'),
-      divPerShare: extractRefNumber(tickerBlock, 'divPerShare'),
-      _anchors: anchors
-    };
-  }
-
-  return tickers;
-}
-
-function extractRefNumber(block, field) {
-  const regex = new RegExp(`${field}:\\s*(-?[\\d.]+)`);
-  const match = block.match(regex);
-  return match ? parseFloat(match[1]) : null;
 }
 
 // --- Compute derived metrics ---
@@ -135,46 +70,108 @@ function computeMetrics(price, priceHistory, ref) {
   };
 }
 
-// --- Text Replacement ---
+// --- Deep string replacement in JSON objects ---
 
-function replaceInRange(html, rangeStart, rangeEnd, oldStr, newStr) {
-  if (!oldStr || !newStr || oldStr === newStr) return html;
-  const section = html.substring(rangeStart, rangeEnd);
-  const updated = section.split(oldStr).join(newStr);
-  if (updated !== section) {
-    return html.substring(0, rangeStart) + updated + html.substring(rangeEnd);
+/**
+ * Recursively walk all string values in an object and replace oldStr with newStr.
+ * Returns true if any replacement was made.
+ */
+function replaceInAllStrings(obj, oldStr, newStr) {
+  if (!oldStr || !newStr || oldStr === newStr) return false;
+  let changed = false;
+
+  function walk(o, parentKey) {
+    if (typeof o === 'string') {
+      return o.split(oldStr).join(newStr);
+    }
+    if (Array.isArray(o)) {
+      for (let i = 0; i < o.length; i++) {
+        const result = walk(o[i], i);
+        if (typeof o[i] === 'string' && result !== o[i]) {
+          o[i] = result;
+          changed = true;
+        } else if (typeof o[i] === 'object' && o[i] !== null) {
+          walk(o[i], i);
+        }
+      }
+      return o;
+    }
+    if (typeof o === 'object' && o !== null) {
+      for (const key of Object.keys(o)) {
+        const val = o[key];
+        if (typeof val === 'string') {
+          const replaced = val.split(oldStr).join(newStr);
+          if (replaced !== val) {
+            o[key] = replaced;
+            changed = true;
+          }
+        } else if (typeof val === 'object' && val !== null) {
+          walk(val, key);
+        }
+      }
+      return o;
+    }
+    return o;
   }
-  return html;
+
+  walk(obj, null);
+  return changed;
 }
 
-function hydrateStockText(html, ticker, anchors, computed, currency) {
-  // Find the bounds of this stock's STOCK_DATA block
-  const blockStart = html.indexOf(`STOCK_DATA.${ticker}`);
-  if (blockStart === -1) return html;
+/**
+ * Regex replacement across all string values in an object.
+ */
+function regexReplaceInAllStrings(obj, regex, replacerFn) {
+  let changed = false;
 
-  // Find end: next STOCK_DATA or SNAPSHOT_DATA or REFERENCE_DATA
-  let blockEnd = html.length;
-  const nextStock = html.indexOf('STOCK_DATA.', blockStart + 20);
-  const snapshot = html.indexOf('SNAPSHOT_DATA', blockStart);
-  if (nextStock > blockStart) blockEnd = Math.min(blockEnd, nextStock);
-  if (snapshot > blockStart) blockEnd = Math.min(blockEnd, snapshot);
+  function walk(o) {
+    if (typeof o === 'string') {
+      const replaced = o.replace(regex, replacerFn);
+      return { val: replaced, changed: replaced !== o };
+    }
+    if (Array.isArray(o)) {
+      for (let i = 0; i < o.length; i++) {
+        if (typeof o[i] === 'string') {
+          const { val, changed: c } = walk(o[i]);
+          if (c) { o[i] = val; changed = true; }
+        } else if (typeof o[i] === 'object' && o[i] !== null) {
+          walk(o[i]);
+        }
+      }
+      return { val: o, changed };
+    }
+    if (typeof o === 'object' && o !== null) {
+      for (const key of Object.keys(o)) {
+        const val = o[key];
+        if (typeof val === 'string') {
+          const result = walk(val);
+          if (result.changed) { o[key] = result.val; changed = true; }
+        } else if (typeof val === 'object' && val !== null) {
+          walk(val);
+        }
+      }
+      return { val: o, changed };
+    }
+    return { val: o, changed: false };
+  }
 
-  const esc = currency.replace('$', '\\$');
+  walk(obj);
+  return changed;
+}
 
+// --- Hydrate a single stock's JSON data ---
+
+function hydrateStockData(stockData, anchors, computed, currency) {
   // Replace price
   if (anchors.price != null && computed.price !== anchors.price) {
     const oldPrice = Number(anchors.price).toFixed(2);
     const newPrice = computed.price.toFixed(2);
-    html = replaceInRange(html, blockStart, blockEnd, currency + oldPrice, currency + newPrice);
-    // Recalculate blockEnd after replacement (length may change)
-    blockEnd += (newPrice.length - oldPrice.length) *
-      html.substring(blockStart, blockEnd + 200).split(currency + newPrice).length;
+    replaceInAllStrings(stockData, currency + oldPrice, currency + newPrice);
   }
 
   // Replace market cap
   if (anchors.marketCapStr && computed.marketCapStr && computed.marketCapStr !== anchors.marketCapStr) {
-    html = replaceInRange(html, blockStart, html.indexOf('STOCK_DATA.', blockStart + 20) || html.length,
-      currency + anchors.marketCapStr, currency + computed.marketCapStr);
+    replaceInAllStrings(stockData, currency + anchors.marketCapStr, currency + computed.marketCapStr);
   }
 
   // Replace drawdown percentage in context
@@ -182,14 +179,10 @@ function hydrateStockText(html, ticker, anchors, computed, currency) {
     const oldDd = Math.round(Math.abs(anchors.drawdown));
     const newDd = Math.round(Math.abs(computed.drawdownFromHigh));
     if (oldDd !== newDd && oldDd > 0 && newDd > 0) {
-      // Target: "down XX%", "-XX%", "↓XX%", "&darr;XX%"
-      const section = html.substring(blockStart, blockEnd);
-      let updated = section;
-      updated = updated.replace(new RegExp('(down |&darr;|-|sell-off[^\\d]*)' + oldDd + '%', 'gi'),
-        function(match) { return match.replace(oldDd + '%', newDd + '%'); });
-      if (updated !== section) {
-        html = html.substring(0, blockStart) + updated + html.substring(blockEnd);
-      }
+      regexReplaceInAllStrings(stockData,
+        new RegExp('(down |&darr;|-|sell-off[^\\d]*)' + oldDd + '%', 'gi'),
+        function(match) { return match.replace(oldDd + '%', newDd + '%'); }
+      );
     }
   }
 
@@ -198,13 +191,10 @@ function hydrateStockText(html, ticker, anchors, computed, currency) {
     const oldUp = Math.round(Math.abs(anchors.upsideToTarget));
     const newUp = Math.round(Math.abs(computed.upsideToTarget));
     if (oldUp !== newUp && oldUp > 0 && newUp > 0) {
-      const section = html.substring(blockStart, blockEnd);
-      let updated = section;
-      updated = updated.replace(new RegExp('(\\+|upside[^\\d]*|representing |\\()' + oldUp + '%', 'gi'),
-        function(match) { return match.replace(oldUp + '%', newUp + '%'); });
-      if (updated !== section) {
-        html = html.substring(0, blockStart) + updated + html.substring(blockEnd);
-      }
+      regexReplaceInAllStrings(stockData,
+        new RegExp('(\\+|upside[^\\d]*|representing |\\()' + oldUp + '%', 'gi'),
+        function(match) { return match.replace(oldUp + '%', newUp + '%'); }
+      );
     }
   }
 
@@ -213,9 +203,7 @@ function hydrateStockText(html, ticker, anchors, computed, currency) {
     const oldPE = fmtPE(anchors.pe);
     const newPE = fmtPE(computed.trailingPE);
     if (oldPE && newPE && oldPE !== newPE) {
-      html = replaceInRange(html, blockStart,
-        html.indexOf('STOCK_DATA.', blockStart + 20) || html.length,
-        oldPE, newPE);
+      replaceInAllStrings(stockData, oldPE, newPE);
     }
   }
 
@@ -224,110 +212,52 @@ function hydrateStockText(html, ticker, anchors, computed, currency) {
     const oldFPE = fmtPE(anchors.fwdPE);
     const newFPE = fmtPE(computed.forwardPE);
     if (oldFPE && newFPE && oldFPE !== newFPE) {
-      html = replaceInRange(html, blockStart,
-        html.indexOf('STOCK_DATA.', blockStart + 20) || html.length,
-        oldFPE, newFPE);
+      replaceInAllStrings(stockData, oldFPE, newFPE);
     }
   }
 
-  return html;
+  return stockData;
 }
 
-// --- Update _anchors in REFERENCE_DATA to match new values ---
+// --- Update _anchors in reference data ---
 
-function updateAnchors(html, ticker, computed) {
-  // Find the _anchors block for this ticker in REFERENCE_DATA
-  const refStart = html.indexOf('const REFERENCE_DATA = {');
-  if (refStart === -1) return html;
-  const refEnd = html.indexOf('// === END REFERENCE_DATA ===', refStart);
-  if (refEnd === -1) return html;
+function updateAnchors(refEntry, computed) {
+  if (!refEntry || !refEntry._anchors) return;
 
-  // Find this ticker's _anchors block
-  const tickerAnchorPattern = new RegExp(
-    `(${ticker}:[\\s\\S]*?_anchors:\\s*\\{\\s*)` +
-    `price:\\s*[\\d.]+`,
-    'm'
-  );
-  const anchorMatch = html.substring(refStart, refEnd).match(tickerAnchorPattern);
-  if (!anchorMatch) return html;
-
-  // Build new anchor values
-  const anchorStart = refStart + html.substring(refStart, refEnd).indexOf('_anchors:', html.substring(refStart, refEnd).indexOf(ticker + ':'));
-  if (anchorStart < refStart) return html;
-
-  const anchorBlockStart = html.indexOf('{', anchorStart) + 1;
-  const anchorBlockEnd = html.indexOf('}', anchorBlockStart);
-  if (anchorBlockEnd === -1) return html;
-
-  const oldAnchorContent = html.substring(anchorBlockStart, anchorBlockEnd);
+  const anchors = refEntry._anchors;
 
   // Update price anchor
-  let newAnchorContent = oldAnchorContent.replace(
-    /price:\s*[\d.]+/,
-    `price: ${computed.price}`
-  );
+  anchors.price = computed.price;
 
   // Update marketCapStr anchor
   if (computed.marketCapStr) {
-    newAnchorContent = newAnchorContent.replace(
-      /marketCapStr:\s*'[^']*'/,
-      `marketCapStr: '${computed.marketCapStr}'`
-    );
+    anchors.marketCapStr = computed.marketCapStr;
   }
 
   // Update drawdown anchor
-  if (computed.drawdownFromHigh != null) {
-    if (newAnchorContent.includes('drawdown:')) {
-      newAnchorContent = newAnchorContent.replace(
-        /drawdown:\s*(?:null|-?[\d.]+)/,
-        `drawdown: ${Math.round(Math.abs(computed.drawdownFromHigh))}`
-      );
-    }
+  if (computed.drawdownFromHigh != null && anchors.drawdown !== undefined) {
+    anchors.drawdown = Math.round(Math.abs(computed.drawdownFromHigh));
   }
 
   // Update upside anchor
-  if (computed.upsideToTarget != null) {
-    if (newAnchorContent.includes('upsideToTarget:')) {
-      newAnchorContent = newAnchorContent.replace(
-        /upsideToTarget:\s*(?:null|-?[\d.]+)/,
-        `upsideToTarget: ${Math.round(Math.abs(computed.upsideToTarget))}`
-      );
-    }
+  if (computed.upsideToTarget != null && anchors.upsideToTarget !== undefined) {
+    anchors.upsideToTarget = Math.round(Math.abs(computed.upsideToTarget));
   }
 
   // Update PE anchor
   if (computed.trailingPE) {
-    newAnchorContent = newAnchorContent.replace(
-      /pe:\s*[\d.]+/,
-      `pe: ${Math.round(computed.trailingPE * 10) / 10}`
-    );
+    anchors.pe = Math.round(computed.trailingPE * 10) / 10;
   }
 
   // Update forward PE anchor
-  if (computed.forwardPE) {
-    if (newAnchorContent.includes('fwdPE:')) {
-      newAnchorContent = newAnchorContent.replace(
-        /fwdPE:\s*[\d.]+/,
-        `fwdPE: ${Math.round(computed.forwardPE * 10) / 10}`
-      );
-    }
+  if (computed.forwardPE && anchors.fwdPE !== undefined) {
+    anchors.fwdPE = Math.round(computed.forwardPE * 10) / 10;
   }
 
   // Update divYield anchor
-  if (computed.divYield != null) {
-    if (newAnchorContent.includes('divYield:')) {
-      newAnchorContent = newAnchorContent.replace(
-        /divYield:\s*[\d.]+/,
-        `divYield: ${Math.round(computed.divYield * 10) / 10}`
-      );
-    }
+  if (computed.divYield != null && anchors.divYield !== undefined) {
+    anchors.divYield = Math.round(computed.divYield * 10) / 10;
   }
-
-  if (newAnchorContent !== oldAnchorContent) {
-    html = html.substring(0, anchorBlockStart) + newAnchorContent + html.substring(anchorBlockEnd);
-  }
-
-  return html;
 }
 
 // --- Main ---
@@ -337,34 +267,44 @@ function main() {
   const dryRun = args.includes('--dry-run');
 
   console.log('');
-  console.log('╔══════════════════════════════════════════════════════════════╗');
-  console.log('║     CONTINUUM INTELLIGENCE — CONTENT HYDRATION ENGINE       ║');
-  console.log(`║     ${new Date().toISOString()}                       ║`);
-  console.log('╚══════════════════════════════════════════════════════════════╝');
+  console.log('='.repeat(62));
+  console.log('  CONTINUUM INTELLIGENCE -- CONTENT HYDRATION ENGINE');
+  console.log('  ' + new Date().toISOString());
+  console.log('='.repeat(62));
   console.log('');
 
-  let html = fs.readFileSync(INDEX_PATH, 'utf8');
-  const refData = extractReferenceData(html);
-
+  // Load reference data
+  const refData = readJson(REFERENCE_PATH);
   if (!refData) {
-    console.error('  [FATAL] Could not parse REFERENCE_DATA. Aborting.');
+    console.error('  [FATAL] Could not parse data/reference.json. Aborting.');
     process.exit(1);
   }
 
+  // Get list of tickers from reference data keys
+  const tickers = Object.keys(refData);
   let updatedCount = 0;
   let unchangedCount = 0;
+  let refChanged = false;
 
-  for (const ticker of Object.keys(refData)) {
+  for (const ticker of tickers) {
     const ref = refData[ticker];
-    if (!ref._anchors) { continue; }
+    if (!ref || !ref._anchors) { continue; }
 
-    const price = extractPrice(html, ticker);
-    if (!price) {
-      console.log(`  [SKIP] ${ticker}: could not extract price`);
+    // Load per-ticker research JSON
+    const researchPath = path.join(RESEARCH_DIR, `${ticker}.json`);
+    const stockData = readJson(researchPath);
+    if (!stockData) {
+      console.log(`  [SKIP] ${ticker}: could not read data/research/${ticker}.json`);
       continue;
     }
 
-    const priceHistory = extractPriceHistory(html, ticker);
+    const price = stockData.price;
+    if (!price) {
+      console.log(`  [SKIP] ${ticker}: no price field in research JSON`);
+      continue;
+    }
+
+    const priceHistory = stockData.priceHistory || [];
     const computed = computeMetrics(price, priceHistory, ref);
 
     const anchorPrice = ref._anchors.price;
@@ -374,19 +314,29 @@ function main() {
       continue;
     }
 
-    console.log(`  [UPD]  ${ticker}: ${anchorPrice} → ${price}` +
+    console.log(`  [UPD]  ${ticker}: ${anchorPrice} -> ${price}` +
       (computed.marketCapStr ? ` | MCap: ${computed.marketCapStr}` : '') +
       (computed.drawdownFromHigh != null ? ` | DD: ${Math.round(computed.drawdownFromHigh)}%` : '') +
       (computed.upsideToTarget != null ? ` | Upside: ${Math.round(computed.upsideToTarget)}%` : ''));
 
-    // Hydrate text content
-    const currency = ticker === 'XRO' ? 'A$' : // XRO reports in NZ$ but price is A$
-                     (html.match(new RegExp(`STOCK_DATA\\.${ticker}[\\s\\S]*?currency:\\s*'([^']+)'`)) || [,'A$'])[1];
+    // Determine currency from stock data
+    const currency = stockData.currency || 'A$';
 
-    html = hydrateStockText(html, ticker, ref._anchors, computed, currency);
+    // Hydrate text content within the JSON
+    hydrateStockData(stockData, ref._anchors, computed, currency);
 
-    // Update anchors to reflect new values
-    html = updateAnchors(html, ticker, computed);
+    // Write updated research JSON
+    if (!dryRun) {
+      try {
+        writeJson(researchPath, stockData);
+      } catch (e) {
+        console.error(`  [ERROR] Failed to write ${researchPath}: ${e.message}`);
+      }
+    }
+
+    // Update anchors in reference data
+    updateAnchors(ref, computed);
+    refChanged = true;
 
     updatedCount++;
   }
@@ -395,10 +345,15 @@ function main() {
   console.log(`  Summary: ${updatedCount} updated, ${unchangedCount} unchanged`);
 
   if (dryRun) {
-    console.log('  [DRY RUN] No file written.');
-  } else if (updatedCount > 0) {
-    fs.writeFileSync(INDEX_PATH, html, 'utf8');
-    console.log('  [WRITTEN] index.html updated with hydrated content.');
+    console.log('  [DRY RUN] No files written.');
+  } else if (refChanged) {
+    try {
+      writeJson(REFERENCE_PATH, refData);
+      console.log('  [WRITTEN] data/reference.json updated with new anchors.');
+    } catch (e) {
+      console.error(`  [ERROR] Failed to write reference.json: ${e.message}`);
+    }
+    console.log(`  [WRITTEN] ${updatedCount} research JSON file(s) updated.`);
   } else {
     console.log('  [NO-OP] No changes needed.');
   }

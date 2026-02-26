@@ -49,7 +49,7 @@ jobs:
       - name: Check for changes
         id: changes
         run: |
-          git add data/stocks/ data/live-prices.json index.html 2>/dev/null || true
+          git add data/stocks/ data/live-prices.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else

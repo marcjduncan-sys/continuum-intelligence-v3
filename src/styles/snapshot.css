@@ -1,0 +1,212 @@
+/* ============================================================
+   SNAPSHOT  --  Design System (adapted for site integration)
+   ============================================================ */
+
+/* --- Snapshot Grid (listing page) --- */
+.snapshot-grid,
+#snapshot-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 20px !important;
+    width: 100% !important;
+    padding: 20px 0 !important;
+}
+
+/* Snapshot container is a wrapper  --  grid is on .snap-grid child */
+#snapshot-container {
+    width: 100%;
+    padding: 20px 0;
+}
+
+@media (max-width: 1024px) {
+    .snapshot-grid,
+    #snapshot-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .snapshot-grid,
+    #snapshot-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.snapshot-card,
+[class*="snapshot-card"] {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
+    padding: var(--space-lg); cursor: pointer; transition: border-color 0.2s, transform 0.15s;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+.snapshot-card:hover { border-color: var(--accent-teal); transform: translateY(-2px); }
+.snapshot-card .sc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-sm); }
+.snapshot-card .sc-ticker { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; }
+.snapshot-card .sc-company { font-size: 0.78rem; color: var(--text-secondary); margin-bottom: var(--space-xs); }
+.snapshot-card .sc-sector { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-teal); background: rgba(26,158,143,0.15); padding: 3px 8px; border-radius: 3px; display: inline-block; margin-bottom: var(--space-sm); }
+.snapshot-card .sc-price { font-family: var(--font-data); font-size: 1.2rem; font-weight: 700; }
+.snapshot-card .sc-price-currency { font-size: 0.75rem; color: var(--text-muted); }
+.snapshot-card .sc-meta { display: flex; gap: var(--space-md); margin-top: var(--space-sm); flex-wrap: wrap; }
+.snapshot-card .sc-meta-item { font-size: 0.68rem; color: var(--text-muted); }
+.snapshot-card .sc-meta-value { font-family: var(--font-data); font-weight: 600; color: var(--text-secondary); }
+.snapshot-card .sc-skew { margin-top: var(--space-md); padding-top: var(--space-sm); border-top: 1px solid var(--border); display: flex; align-items: center; gap: var(--space-sm); }
+.snapshot-card .sc-skew-rationale { font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* --- Snapshot Report Page --- */
+.snap-page { max-width: 1240px; margin: 0 auto; padding: var(--space-md); }
+.snap-back { font-size: 0.78rem; color: var(--accent-teal); cursor: pointer; display: inline-block; margin-bottom: var(--space-md); }
+.snap-back:hover { color: var(--text-primary); }
+
+.snap-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+.snap-header-left { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.snap-ticker { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
+.snap-company-name { font-size: 0.85rem; color: var(--text-secondary); }
+.snap-sector-tag { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-teal); background: rgba(26,158,143,0.15); padding: 3px 8px; border-radius: 3px; }
+.snap-header-right { display: flex; align-items: center; gap: 20px; }
+.snap-logo-mark { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+.snap-logo-mark .brand-green { color: #3DAA6D; }
+.snap-report-date { font-family: var(--font-data); font-size: 0.65rem; color: var(--text-muted); }
+
+.snap-price-bar { display: flex; align-items: baseline; gap: 24px; padding: 8px 0 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; flex-wrap: wrap; }
+.snap-price-main { font-family: var(--font-data); font-size: 1.8rem; font-weight: 700; }
+.snap-price-currency { font-size: 0.8rem; color: var(--text-muted); font-weight: 400; }
+.snap-price-meta { display: flex; gap: 20px; flex-wrap: wrap; }
+.snap-pm-item { display: flex; flex-direction: column; gap: 1px; }
+.snap-pm-label { font-size: 0.55rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+.snap-pm-value { font-family: var(--font-data); font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); }
+.snap-pm-value.premium { color: var(--accent-gold); }
+.snap-pm-value.negative { color: var(--signal-red); }
+.snap-pm-value.positive { color: var(--signal-green); }
+
+.snap-risk-skew-bar { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); margin-bottom: 10px; flex-wrap: wrap; }
+.snap-risk-skew-label { font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+.snap-risk-skew-badge { font-family: var(--font-data); font-size: 0.85rem; font-weight: 800; letter-spacing: 0.04em; padding: 4px 14px; border-radius: 3px; }
+.snap-risk-skew-badge.downside { background: rgba(212,85,85,0.12); color: var(--signal-red); border: 1px solid rgba(212,85,85,0.3); }
+.snap-risk-skew-badge.upside { background: rgba(61,170,109,0.12); color: var(--signal-green); border: 1px solid rgba(61,170,109,0.3); }
+.snap-risk-skew-badge.balanced { background: rgba(212,160,60,0.12); color: var(--signal-amber); border: 1px solid rgba(212,160,60,0.3); }
+.snap-risk-skew-rationale { font-size: 0.65rem; color: var(--text-secondary); line-height: 1.4; flex: 1; min-width: 200px; }
+
+.snap-main-grid { display: grid; grid-template-columns: 280px 1fr 280px; gap: 10px; }
+.snap-col { display: flex; flex-direction: column; gap: 8px; }
+.snap-section-label { font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-teal); margin-bottom: 4px; }
+
+/* Narrative box */
+.snap-narrative-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 10px; }
+.snap-narrative-text { font-size: 0.75rem; line-height: 1.55; color: var(--text-secondary); }
+.snap-narrative-text strong { color: var(--text-primary); font-weight: 600; }
+.snap-narrative-verdict { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.7rem; font-weight: 600; color: var(--signal-amber); line-height: 1.5; }
+
+/* Hypothesis cards */
+.snap-hyp-stack { display: flex; flex-direction: column; gap: 4px; }
+.snap-hyp-card { background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--border); border-radius: 4px; padding: 8px 10px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.snap-hyp-card.snap-upside { border-left-color: var(--signal-green); }
+.snap-hyp-card.snap-downside { border-left-color: var(--signal-red); }
+.snap-hyp-card.snap-neutral { border-left-color: var(--signal-amber); }
+.snap-hyp-info { flex: 1; }
+.snap-hyp-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+.snap-hyp-desc { font-size: 0.6rem; color: var(--text-muted); line-height: 1.35; }
+.snap-hyp-score-container { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 42px; }
+.snap-hyp-score { font-family: var(--font-data); font-size: 1rem; font-weight: 700; }
+.snap-hyp-score.high { color: var(--signal-red); }
+.snap-hyp-score.medium { color: var(--signal-amber); }
+.snap-hyp-score.low { color: var(--text-muted); }
+.snap-hyp-score.priced { color: var(--signal-green); }
+.snap-hyp-direction { font-size: 0.55rem; font-weight: 600; }
+.snap-hyp-direction.up { color: var(--signal-red); }
+.snap-hyp-direction.down { color: var(--signal-green); }
+.snap-hyp-direction.flat { color: var(--text-muted); }
+.snap-hyp-status-tag { font-size: 0.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 1px 5px; border-radius: 2px; }
+.snap-tag-priced { background: rgba(61,170,109,0.15); color: var(--signal-green); }
+.snap-tag-accumulating { background: rgba(212,85,85,0.12); color: var(--signal-red); }
+.snap-tag-tail { background: rgba(212,160,60,0.12); color: var(--signal-amber); }
+.snap-tag-minimal { background: rgba(86,104,130,0.2); color: var(--text-muted); }
+
+/* Survival bar */
+.snap-survival-bar-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; }
+.snap-survival-bar-label { font-size: 0.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px; }
+.snap-survival-bar { display: flex; height: 20px; border-radius: 3px; overflow: hidden; gap: 2px; }
+.snap-sb-segment { display: flex; align-items: center; justify-content: center; font-family: var(--font-data); font-size: 0.55rem; font-weight: 700; color: var(--text-primary); }
+.snap-sb-upside { background: var(--signal-green); }
+.snap-sb-downside { background: var(--signal-red); }
+.snap-sb-neutral { background: var(--signal-amber); }
+.snap-survival-legend { display: flex; justify-content: space-between; margin-top: 4px; flex-wrap: wrap; gap: 2px; }
+.snap-sl-item { display: flex; align-items: center; gap: 4px; font-size: 0.48rem; color: var(--text-muted); }
+.snap-sl-dot { width: 6px; height: 6px; border-radius: 1px; }
+
+/* Evidence matrix */
+.snap-evidence-matrix { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.snap-ev-matrix-header { display: grid; grid-template-columns: 120px repeat(4, 1fr); background: var(--bg-surface); border-bottom: 1px solid var(--border); }
+.snap-ev-matrix-header .snap-ev-cell { font-size: 0.48rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); padding: 5px; text-align: center; }
+.snap-ev-matrix-header .snap-ev-cell:first-child { text-align: left; }
+.snap-ev-matrix-row { display: grid; grid-template-columns: 120px repeat(4, 1fr); border-bottom: 1px solid var(--border); }
+.snap-ev-matrix-row:last-child { border-bottom: none; }
+.snap-ev-cell { padding: 4px 5px; font-size: 0.6rem; display: flex; align-items: center; }
+.snap-ev-domain { font-weight: 600; color: var(--text-secondary); gap: 4px; }
+.snap-ev-epistemic { font-size: 0.42rem; font-weight: 500; color: var(--text-muted); font-style: italic; }
+.snap-ev-signal { justify-content: center; font-size: 0.8rem; }
+.snap-signal-strong-support { color: var(--signal-green); }
+.snap-signal-support { color: rgba(61,170,109,0.55); }
+.snap-signal-contradict { color: var(--signal-red); }
+.snap-signal-neutral { color: var(--text-muted); }
+
+/* Discriminating evidence */
+.snap-discrim-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 10px; flex: 1; }
+.snap-discrim-item { display: flex; gap: 8px; align-items: flex-start; padding: 4px 0; border-bottom: 1px solid var(--border); }
+.snap-discrim-item:last-child { border-bottom: none; }
+.snap-discrim-tag { font-family: var(--font-data); font-size: 0.5rem; font-weight: 700; padding: 2px 5px; border-radius: 2px; white-space: nowrap; margin-top: 1px; }
+.snap-discrim-tag.high { background: rgba(212,85,85,0.12); color: var(--signal-red); }
+.snap-discrim-tag.medium { background: rgba(212,160,60,0.12); color: var(--signal-amber); }
+.snap-discrim-text { font-size: 0.6rem; color: var(--text-secondary); line-height: 1.4; }
+.snap-discrim-text strong { color: var(--text-primary); font-weight: 600; }
+.snap-non-discrim { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
+.snap-non-discrim-label { font-size: 0.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 3px; }
+.snap-non-discrim-items { display: flex; flex-wrap: wrap; gap: 4px; }
+.snap-nd-chip { font-size: 0.5rem; color: var(--text-muted); background: var(--bg-surface); padding: 2px 6px; border-radius: 2px; text-decoration: line-through; text-decoration-color: rgba(86,104,130,0.4); }
+
+/* Tripwires */
+.snap-tripwire-list { display: flex; flex-direction: column; gap: 4px; }
+.snap-tripwire-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; }
+.snap-tw-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.snap-tw-date { font-family: var(--font-data); font-size: 0.6rem; font-weight: 600; color: var(--accent-gold); }
+.snap-tw-test-name { font-size: 0.53rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.snap-tw-conditions { display: flex; flex-direction: column; gap: 3px; }
+.snap-tw-if { font-size: 0.58rem; color: var(--text-secondary); line-height: 1.35; display: flex; gap: 4px; }
+.snap-tw-if-icon { font-family: var(--font-data); font-weight: 700; flex-shrink: 0; width: 10px; }
+.snap-tw-if-icon.up { color: var(--signal-green); }
+.snap-tw-if-icon.down { color: var(--signal-red); }
+
+/* Gaps & Coverage */
+.snap-gaps-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 10px; }
+.snap-gap-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--border); }
+.snap-gap-row:last-child { border-bottom: none; }
+.snap-gap-domain { font-size: 0.58rem; font-weight: 500; color: var(--text-secondary); }
+.snap-gap-status { font-size: 0.5rem; font-weight: 600; padding: 1px 5px; border-radius: 2px; }
+.snap-gap-full { background: rgba(61,170,109,0.12); color: var(--signal-green); }
+.snap-gap-partial { background: rgba(212,160,60,0.12); color: var(--signal-amber); }
+.snap-gap-limited { background: rgba(86,104,130,0.2); color: var(--text-muted); }
+
+/* Unanswered questions */
+.snap-questions-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 10px; }
+.snap-question-item { font-size: 0.58rem; color: var(--text-secondary); line-height: 1.4; padding: 3px 0 3px 10px; position: relative; }
+.snap-question-item::before { content: '?'; position: absolute; left: 0; font-family: var(--font-data); font-weight: 700; color: var(--accent-teal); font-size: 0.58rem; }
+
+/* Snapshot footer */
+.snap-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 6px; border-top: 1px solid var(--border); margin-top: 10px; flex-wrap: wrap; gap: 8px; }
+.snap-footer-left { font-size: 0.48rem; color: var(--text-muted); font-style: italic; max-width: 60%; line-height: 1.4; }
+.snap-footer-right { display: flex; gap: 16px; }
+.snap-footer-meta { font-family: var(--font-data); font-size: 0.48rem; color: var(--text-muted); }
+
+/* Link to full report */
+.snap-view-full { display: inline-block; margin-top: var(--space-sm); font-size: 0.65rem; font-weight: 600; color: var(--accent-teal); cursor: pointer; }
+.snap-view-full:hover { color: var(--text-primary); }
+
+/* Responsive adjustments */
+@media (max-width: 1280px) {
+    .snap-main-grid { grid-template-columns: 260px 1fr 260px; }
+}
+@media (max-width: 960px) {
+    .snap-main-grid { grid-template-columns: 1fr; }
+    .snap-page { padding: var(--space-sm); }
+    .snap-price-bar { gap: 12px; }
+}

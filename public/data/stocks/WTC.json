@@ -1,0 +1,493 @@
+{
+  "ticker": "WTC.AX",
+  "company": "WiseTech Global",
+  "sector": "Information Technology",
+  "market_cap": "22.8B",
+  "hypotheses": {
+    "N1": {
+      "label": "Growth/Recovery",
+      "description": "Governance concerns priced in; product moat intact; returns to premium growth trajectory",
+      "plain_english": "The worst of the governance crisis is behind WiseTech. The new CEO is stabilising the company, the CargoWise platform remains dominant in its niche, and once investor confidence returns, the stock could recover toward its pre-crisis valuation.",
+      "what_to_watch": "New CEO's first strategy update and H1 FY26 customer churn metrics. If churn returns to pre-crisis levels (<5%) and new contract wins resume, recovery becomes credible.",
+      "upside": "If governance concerns fully resolve and growth re-accelerates, the stock could re-rate back toward $100+, representing significant upside.",
+      "risk_plain": "The recovery narrative depends heavily on the new CEO successfully rebuilding trust with institutional investors and key customers.",
+      "survival_score": 0.05,
+      "status": "VERY_LOW",
+      "weighted_inconsistency": 5.2,
+      "last_updated": "2026-02-26T01:30:48.610Z"
+    },
+    "N2": {
+      "label": "Managed/Base Case",
+      "description": "Solid software compounder but de-rated to sector average on governance discount",
+      "plain_english": "WiseTech is still a good software business with strong recurring revenue, but investors are no longer willing to pay a premium valuation because of lingering governance concerns. The stock trades at fair value for a mid-growth software company.",
+      "what_to_watch": "FY26 ARR growth rate and valuation multiple vs ASX tech peers. If the governance discount narrows and growth holds at 15%+, this narrative holds.",
+      "upside": "Stable execution could gradually close the governance discount over 12-18 months.",
+      "risk_plain": "If growth slows further or new governance issues surface, even the base case valuation may be too generous.",
+      "survival_score": 0.05,
+      "status": "VERY_LOW",
+      "weighted_inconsistency": 2.8,
+      "last_updated": "2026-02-26T05:36:48.027Z"
+    },
+    "N3": {
+      "label": "Risk/Downside",
+      "description": "Governance crisis deepens; customer churn accelerates; key-person risk materialises",
+      "plain_english": "The governance crisis is not over. More revelations could emerge, key customers might leave because of reputational concerns, and the company's heavy dependence on its founder creates ongoing risk. The stock could fall further.",
+      "what_to_watch": "Board investigation outcomes, any new media reports, and mid-market customer retention data. If churn exceeds 8% or new governance issues emerge, this narrative strengthens.",
+      "upside": null,
+      "risk_plain": "If the governance situation worsens or major customers defect, the stock could test new lows below $60.",
+      "survival_score": 0.52,
+      "status": "MODERATE",
+      "weighted_inconsistency": 1.1,
+      "last_updated": "2026-02-26T05:36:48.027Z"
+    },
+    "N4": {
+      "label": "Disruption",
+      "description": "Competitor leapfrogs CargoWise platform; founder departure triggers strategic collapse",
+      "plain_english": "The worst-case scenario: a competitor builds a better logistics software platform, or the founder's departure leads to a loss of strategic direction and technical talent. The company's core competitive advantage erodes permanently.",
+      "what_to_watch": "Competitive product launches from FourKites, project44, or new AI-native logistics platforms. Also monitor key engineering talent retention.",
+      "upside": null,
+      "risk_plain": "While the CargoWise moat is deep, the company's reliance on one person for technical vision is a genuine structural vulnerability.",
+      "survival_score": 0.38,
+      "status": "LOW",
+      "weighted_inconsistency": 5.8,
+      "last_updated": "2026-02-26T05:36:48.027Z"
+    }
+  },
+  "dominant": "N3",
+  "confidence": "MODERATE",
+  "alert_state": "OVERCORRECTION",
+  "alert_started": null,
+  "current_price": 49,
+  "big_picture": "WiseTech Global is an Australian software company that makes CargoWise, the world's leading logistics management platform. The company experienced a severe governance crisis in late 2024 when allegations about the founder's conduct emerged, causing the stock to drop 35%.",
+  "last_flip": {
+    "date": "2024-10-18",
+    "from": "N1",
+    "to": "N3",
+    "trigger": "Governance crisis: founder conduct allegations; -35% in 3 sessions; board investigation announced",
+    "price_at_flip": 72.3,
+    "from_survival": 0.15,
+    "to_survival": 0.78
+  },
+  "narrative_history": [
+    {
+      "date": "2024-08-20",
+      "from": "N2",
+      "to": "N1",
+      "trigger": "FY24 results beat expectations; ARR growth +28%; CargoWise platform consolidation accelerating",
+      "price_at_flip": 108.5,
+      "from_survival": 0.42,
+      "to_survival": 0.8
+    },
+    {
+      "date": "2024-02-15",
+      "from": "N1",
+      "to": "N2",
+      "trigger": "H1 FY24 solid but organic growth slowing to mid-teens; acquisition integration mixed",
+      "price_at_flip": 88,
+      "from_survival": 0.38,
+      "to_survival": 0.73
+    }
+  ],
+  "evidence_items": [
+    {
+      "id": "WTC_GOVERNANCE_CRISIS",
+      "type": "GOVERNANCE_EVENT",
+      "source": "Media / ASX Filing",
+      "epistemic_tag": "Third-party investigation",
+      "date": "2024-10-15T08:00:00+11:00",
+      "summary": "Founder conduct allegations; board investigation; multiple executives departed",
+      "diagnosticity": "CRITICAL",
+      "hypothesis_impact": {
+        "N1": "INCONSISTENT",
+        "N2": "INCONSISTENT",
+        "N3": "CONSISTENT",
+        "N4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 180,
+        "half_life_days": 365
+      },
+      "active": true
+    },
+    {
+      "id": "WTC_H1_FY25_RESULT",
+      "type": "EARNINGS_REPORT",
+      "source": "ASX Filing",
+      "epistemic_tag": "Under Oath (statutory)",
+      "date": "2025-02-20T08:00:00+11:00",
+      "summary": "H1 FY25 revenue +20% but below elevated expectations; churn ticking up in mid-market",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "N1": "INCONSISTENT",
+        "N2": "NEUTRAL",
+        "N3": "CONSISTENT",
+        "N4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 120
+      },
+      "active": true
+    },
+    {
+      "id": "WTC_NEW_CEO_APPOINTED",
+      "type": "GOVERNANCE_EVENT",
+      "source": "ASX Filing",
+      "epistemic_tag": "Under Oath (statutory)",
+      "date": "2025-06-01T08:00:00+11:00",
+      "summary": "New CEO appointed; founder transitions to non-executive; governance reset underway",
+      "diagnosticity": "MEDIUM",
+      "hypothesis_impact": {
+        "N1": "CONSISTENT",
+        "N2": "CONSISTENT",
+        "N3": "INCONSISTENT",
+        "N4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 120,
+        "half_life_days": 180
+      },
+      "active": true
+    },
+    {
+      "id": "WTC_FY25_RESULT",
+      "type": "EARNINGS_REPORT",
+      "source": "ASX Filing",
+      "epistemic_tag": "Under Oath (statutory)",
+      "date": "2025-08-21T08:00:00+11:00",
+      "summary": "FY25 revenue $1.1B (+18%); EBITDA margin stable; FY26 guidance cautious",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "N1": "NEUTRAL",
+        "N2": "CONSISTENT",
+        "N3": "NEUTRAL",
+        "N4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 120
+      },
+      "active": true
+    },
+    {
+      "date": "2026-02-25",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "Single-day move of -37.1% exceeds 10% threshold — possible overcorrection",
+      "auto_generated": true
+    }
+  ],
+  "price_signals": [
+    {
+      "id": "INTRADAY_DROP_10_2024-10-15",
+      "rule_id": "INTRADAY_DROP_10",
+      "name": "Critical intraday decline",
+      "date": "2024-10-15T14:30:00+11:00",
+      "diagnosticity": "CRITICAL",
+      "hypothesis_impact": {
+        "N1": "INCONSISTENT",
+        "N2": "INCONSISTENT",
+        "N3": "CONSISTENT",
+        "N4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 15,
+        "half_life_days": 30
+      },
+      "active": true,
+      "can_trigger_immediate_flip": true,
+      "price_at_trigger": 78.2,
+      "return_at_trigger": -0.22
+    },
+    {
+      "id": "HIGH_VOLUME_DOWN_2024-10-15",
+      "rule_id": "HIGH_VOLUME_DOWN",
+      "name": "Institutional distribution",
+      "date": "2024-10-15T14:30:00+11:00",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "N1": "INCONSISTENT",
+        "N2": "NEUTRAL",
+        "N3": "CONSISTENT",
+        "N4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 10,
+        "half_life_days": 20
+      },
+      "active": true,
+      "can_trigger_immediate_flip": false,
+      "price_at_trigger": 78.2,
+      "return_at_trigger": -0.22
+    },
+    {
+      "date": "2026-02-24",
+      "classification": "NOISE",
+      "daily_change_pct": 0.29,
+      "volume_multiplier": 1,
+      "cumulative_5d": 0.44,
+      "cumulative_20d": -30.1,
+      "results_day": false,
+      "overcorrection_active": false
+    },
+    {
+      "date": "2026-02-25",
+      "classification": "MATERIAL",
+      "daily_change_pct": -37.06,
+      "volume_multiplier": 1,
+      "cumulative_5d": 0.44,
+      "cumulative_20d": -30.1,
+      "results_day": false,
+      "overcorrection_active": true
+    }
+  ],
+  "editorial_override": null,
+  "price_history": [
+    100.5,
+    98,
+    92,
+    85,
+    78.2,
+    74,
+    72.5,
+    71.8,
+    70.5,
+    69.8,
+    69,
+    68.5,
+    68.8,
+    69.2,
+    68.9,
+    68.5,
+    68.2,
+    68,
+    67.8,
+    68.1,
+    68.3,
+    68.5
+  ],
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": -6,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 47,
+      "bear": 53,
+      "direction": "downside",
+      "hypotheses": [
+        {
+          "title": "N1: Governance Resolved, Re-Rating Higher",
+          "direction": "upside",
+          "weight": 18
+        },
+        {
+          "title": "N2: Product Carries Despite Governance Crisis",
+          "direction": "upside",
+          "weight": 29
+        },
+        {
+          "title": "N3: Customer Confidence Eventually Erodes",
+          "direction": "downside",
+          "weight": 21
+        },
+        {
+          "title": "N4: Founder Entrenchment Destroys Value",
+          "direction": "downside",
+          "weight": 32
+        }
+      ],
+      "computed_at": "2026-02-24T07:54:21.298Z"
+    },
+    "overall_sentiment": -6,
+    "sentiment_label": "DOWNSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T07:54:38.654Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "DOWNSIDE",
+  "valuation_range": {
+    "low": 61.1,
+    "mid": 67.88,
+    "high": 74.67,
+    "shift_pct": -0.009,
+    "signal_used": -6,
+    "method": "sentiment_shift_v3",
+    "computed_at": "2026-02-24T07:54:39.545Z"
+  },
+  "priceHistory": [
+    42.99,
+    50.14,
+    49
+  ],
+  "freshness": {
+    "pricePctChange": -2.3,
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_price_update": "2026-02-26T05:36:47.925Z",
+  "technicalAnalysis": {
+    "date": "10 February 2026",
+    "period": "1 Year",
+    "source": "Continuum Technical Intelligence",
+    "regime": "Trending",
+    "clarity": "Clear",
+    "price": {
+      "current": 49,
+      "currency": "A$"
+    },
+    "movingAverages": {
+      "ma50": {
+        "value": 65.47,
+        "date": "10 Feb 2026"
+      },
+      "ma200": {
+        "value": 89.66,
+        "date": "10 Feb 2026"
+      },
+      "crossover": {
+        "type": "Death Cross",
+        "date": "w/c 14 July 2025",
+        "description": "50-day MA crossed below 200-day MA"
+      },
+      "priceVsMa50": -24.7,
+      "priceVsMa200": -45
+    },
+    "trend": {
+      "direction": "Down",
+      "duration": "10 months",
+      "structure": "Lower highs, lower lows; accelerating decline since December 2025",
+      "peak": {
+        "price": 124.07,
+        "date": "w/c 17 February 2025"
+      },
+      "trough": {
+        "price": 47.6,
+        "date": "w/c 3 February 2026"
+      },
+      "drawdown": -60.3
+    },
+    "keyLevels": {
+      "support": {
+        "price": 47,
+        "method": "Recent intraday low cluster (Feb 2026)"
+      },
+      "resistance": {
+        "price": 68,
+        "method": "Prior breakdown level (Jan 2026)"
+      },
+      "fiftyTwoWeekHigh": {
+        "price": 124.07,
+        "date": "w/c 17 February 2025"
+      },
+      "fiftyTwoWeekLow": {
+        "price": 47.6,
+        "date": "w/c 3 February 2026"
+      }
+    },
+    "volume": {
+      "latestVs20DayAvg": 2.4,
+      "latestDate": "10 February 2026",
+      "priorSpikes": [
+        {
+          "period": "w/c 24 February 2025",
+          "ratio": 3.1,
+          "context": "Governance shock; initial break below A$100"
+        },
+        {
+          "period": "w/c 14 July 2025",
+          "ratio": 2.3,
+          "context": "Death cross week; break below A$90"
+        },
+        {
+          "period": "w/c 22 December 2025",
+          "ratio": 2.6,
+          "context": "Break below A$70; capitulation selling"
+        }
+      ]
+    },
+    "volatility": {
+      "latestDailyRange": {
+        "high": 50.59,
+        "low": 47.6,
+        "date": "10 February 2026"
+      },
+      "latestRangePercent": 6.3,
+      "avgDailyRangePercent30": 3.2,
+      "avgDailyRangePercent90": 2.4
+    },
+    "meanReversion": {
+      "vsMa50": -24.7,
+      "vsMa200": -45,
+      "rangePosition": 2,
+      "rangeHigh": 124.07,
+      "rangeLow": 47.6
+    },
+    "inflectionPoints": [
+      {
+        "date": "w/c 17 February 2025",
+        "price": 124.07,
+        "event": "12-month high"
+      },
+      {
+        "date": "w/c 24 February 2025",
+        "price": 97.25,
+        "event": "Governance shock; price drops 21% in one week"
+      },
+      {
+        "date": "w/c 14 July 2025",
+        "price": 90,
+        "event": "Death cross forms; 50-day MA crosses below 200-day MA"
+      },
+      {
+        "date": "w/c 22 December 2025",
+        "price": 71.52,
+        "event": "Break below A$70; selling accelerates"
+      },
+      {
+        "date": "w/c 19 January 2026",
+        "price": 62.63,
+        "event": "Break below A$65; no buying support"
+      },
+      {
+        "date": "w/c 3 February 2026",
+        "price": 47.6,
+        "event": "New 12-month low; capitulation"
+      }
+    ],
+    "relativePerformance": {
+      "vsIndex": {
+        "name": "S&amp;P/ASX 200",
+        "period": "12 months",
+        "stockReturn": -60.3,
+        "indexReturn": 6.9,
+        "relativeReturn": -67.2
+      },
+      "vsSector": {
+        "name": "S&amp;P/ASX IT Index",
+        "period": "12 months",
+        "stockReturn": -60.3,
+        "sectorReturn": -21,
+        "relativeReturn": -39.3
+      }
+    }
+  },
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-02-25",
+    "triggerPrice": 42.99,
+    "direction": "down",
+    "movePct": -37.06,
+    "reviewDate": "2026-03-04",
+    "message": "Single-day move of -37.1% exceeds 10% threshold — possible overcorrection"
+  },
+  "price_evidence": {
+    "last_run": "2026-02-26T05:36:48.027Z",
+    "classification": "MATERIAL"
+  },
+  "last_research_update": "2026-02-26T05:36:48.027Z"
+}

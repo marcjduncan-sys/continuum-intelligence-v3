@@ -12,6 +12,7 @@ COPY index.html ./index.html
 COPY data/ ./data/
 COPY scripts/ ./scripts/
 COPY js/ ./js/
+COPY dist/ ./dist/
 
 WORKDIR /app/api
 

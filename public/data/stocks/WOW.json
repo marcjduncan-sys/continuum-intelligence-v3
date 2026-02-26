@@ -1,0 +1,420 @@
+{
+  "ticker": "WOW.AX",
+  "company": "Woolworths Group",
+  "sector": "Consumer Staples",
+  "market_cap": "41.2B",
+  "hypotheses": {
+    "N1": {
+      "label": "Growth/Recovery",
+      "description": "Market re-rates on margin recovery and digital transformation",
+      "plain_english": "The evidence suggests Woolworths is in recovery mode. Margins are improving, digital sales are growing, and management is executing well on its transformation strategy.",
+      "what_to_watch": "Q3 FY26 margins and online penetration rate. If Australian Food EBIT margin holds above 5.5% and e-commerce grows >20% YoY, this narrative strengthens.",
+      "upside": "If digital transformation accelerates and margins expand further, the market could re-rate the stock to a premium multiple, driving 15-20% upside.",
+      "risk_plain": "If competition from ALDI and Costco intensifies faster than expected, margin recovery could stall.",
+      "survival_score": 0.46,
+      "status": "MODERATE",
+      "weighted_inconsistency": 1.2,
+      "last_updated": "2026-02-26T05:36:48.027Z"
+    },
+    "N2": {
+      "label": "Managed/Base Case",
+      "description": "Defensive compounder delivering GDP+ growth with stable margins",
+      "plain_english": "Woolworths continues as a reliable, steady performer. Revenue grows roughly in line with the economy, margins stay stable, and the dividend keeps flowing. No fireworks, but no disasters either.",
+      "what_to_watch": "Revenue growth vs CPI inflation. If top-line growth consistently falls below inflation, the base case weakens.",
+      "upside": "Steady dividend growth and defensive positioning could attract capital in a risk-off market environment.",
+      "risk_plain": "If the economy slows significantly, even defensive names like Woolworths could see pressure on volumes.",
+      "survival_score": 0.44,
+      "status": "MODERATE",
+      "weighted_inconsistency": 2.1,
+      "last_updated": "2026-02-26T05:36:48.027Z"
+    },
+    "N3": {
+      "label": "Risk/Downside",
+      "description": "Structural margin compression from competition and cost inflation",
+      "plain_english": "The worry here is that competition from ALDI, Costco, and Amazon is eating into Woolworths' market share and squeezing its profit margins. If costs keep rising faster than prices, profits shrink.",
+      "what_to_watch": "ALDI market share data and quarterly cost inflation trends. If ALDI share exceeds 12% nationally, this narrative gains weight.",
+      "upside": null,
+      "risk_plain": "If ALDI continues to grow at current rates, Woolworths' margins will come under sustained pressure, potentially leading to earnings downgrades.",
+      "survival_score": 0.05,
+      "status": "VERY_LOW",
+      "weighted_inconsistency": 4.8,
+      "last_updated": "2026-02-26T05:36:48.027Z"
+    },
+    "N4": {
+      "label": "Disruption",
+      "description": "Business model disruption from ALDI/Costco/Amazon Fresh",
+      "plain_english": "This is the worst-case scenario: a new competitor like Amazon Fresh launches in Australia and fundamentally changes how people buy groceries, making Woolworths' store network a liability rather than an asset.",
+      "what_to_watch": "Amazon Fresh AU launch timeline and any announcements of new international grocery entrants to the Australian market.",
+      "upside": null,
+      "risk_plain": "If Amazon Fresh launches in Australian metro areas, it could trigger a structural re-rating of the entire sector.",
+      "survival_score": 0.05,
+      "status": "VERY_LOW",
+      "weighted_inconsistency": 6.3,
+      "last_updated": "2026-02-26T01:30:48.610Z"
+    }
+  },
+  "dominant": "N1",
+  "confidence": "LOW",
+  "alert_state": "NORMAL",
+  "alert_started": null,
+  "current_price": 36.35,
+  "big_picture": "Woolworths is Australia's largest supermarket chain, with around 37% market share. The company is currently in a recovery phase after a period of competitive pressure, with improving margins and a growing digital business.",
+  "last_flip": {
+    "date": "2026-01-15",
+    "from": "N2",
+    "to": "N1",
+    "trigger": "H1 FY26 earnings beat +6% vs consensus; margin guidance upgrade",
+    "price_at_flip": 32.45,
+    "from_survival": 0.38,
+    "to_survival": 0.74
+  },
+  "narrative_history": [
+    {
+      "date": "2025-11-20",
+      "from": "N1",
+      "to": "N2",
+      "trigger": "Q1 sales growth below expectations; competitive intensity rising",
+      "price_at_flip": 29.8,
+      "from_survival": 0.35,
+      "to_survival": 0.71
+    }
+  ],
+  "evidence_items": [
+    {
+      "id": "WOW_H1_FY26_EARNINGS",
+      "type": "EARNINGS_REPORT",
+      "source": "ASX Filing",
+      "epistemic_tag": "Under Oath (statutory)",
+      "date": "2026-01-15T08:00:00+11:00",
+      "summary": "H1 FY26 NPAT beat consensus by 6%; raised FY26 margin guidance",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "N1": "CONSISTENT",
+        "N2": "CONSISTENT",
+        "N3": "INCONSISTENT",
+        "N4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 90
+      },
+      "active": true
+    },
+    {
+      "id": "WOW_DIGITAL_GROWTH",
+      "type": "OPERATIONAL_DATA",
+      "source": "Company Presentation",
+      "epistemic_tag": "Motivated (corporate)",
+      "date": "2026-01-15T08:00:00+11:00",
+      "summary": "Online sales +22% YoY; Everyday Market GMV doubling",
+      "diagnosticity": "MEDIUM",
+      "hypothesis_impact": {
+        "N1": "CONSISTENT",
+        "N2": "NEUTRAL",
+        "N3": "NEUTRAL",
+        "N4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 60,
+        "half_life_days": 60
+      },
+      "active": true
+    },
+    {
+      "id": "WOW_ALDI_SHARE",
+      "type": "INDUSTRY_DATA",
+      "source": "Roy Morgan Research",
+      "epistemic_tag": "Independent (third-party)",
+      "date": "2025-12-01T08:00:00+11:00",
+      "summary": "ALDI national grocery share steady at 10.2%; growth rate moderating from prior years",
+      "diagnosticity": "MEDIUM",
+      "hypothesis_impact": {
+        "N1": "NEUTRAL",
+        "N2": "CONSISTENT",
+        "N3": "INCONSISTENT",
+        "N4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 120
+      },
+      "active": true
+    },
+    {
+      "id": "WOW_MARGIN_GUIDANCE",
+      "type": "MANAGEMENT_GUIDANCE",
+      "source": "Earnings Call Transcript",
+      "epistemic_tag": "Motivated (corporate)",
+      "date": "2026-01-15T10:00:00+11:00",
+      "summary": "Management guided FY26 Australian Food EBIT margin to 5.8-6.0%, up from 5.5% in FY25",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "N1": "CONSISTENT",
+        "N2": "CONSISTENT",
+        "N3": "INCONSISTENT",
+        "N4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 90
+      },
+      "active": true
+    }
+  ],
+  "price_signals": [
+    {
+      "date": "2026-02-24",
+      "classification": "NOISE",
+      "daily_change_pct": -0.15,
+      "volume_multiplier": 1,
+      "cumulative_5d": 0.46,
+      "cumulative_20d": 8.35,
+      "results_day": false,
+      "overcorrection_active": false
+    },
+    {
+      "date": "2026-02-25",
+      "classification": "NOTABLE",
+      "daily_change_pct": -2.95,
+      "volume_multiplier": 1,
+      "cumulative_5d": 0.46,
+      "cumulative_20d": 8.35,
+      "results_day": false,
+      "overcorrection_active": false
+    }
+  ],
+  "editorial_override": null,
+  "price_history": [
+    29.8,
+    29.95,
+    30.1,
+    30.25,
+    30.4,
+    30.55,
+    30.8,
+    31,
+    31.15,
+    31.3,
+    31.5,
+    31.65,
+    31.8,
+    32,
+    32.1,
+    32.2,
+    32.3,
+    32.35,
+    32.4,
+    32.45,
+    32.5,
+    32.45
+  ],
+  "weighting": null,
+  "three_layer_signal": {
+    "company_signal": -28,
+    "company_detail": {
+      "method": "net_hypothesis_weights",
+      "bull": 36,
+      "bear": 64,
+      "direction": "downside",
+      "hypotheses": [
+        {
+          "title": "N1: Managed Turnaround",
+          "direction": "upside",
+          "weight": 36
+        },
+        {
+          "title": "N2: Structural Margin Erosion",
+          "direction": "downside",
+          "weight": 25
+        },
+        {
+          "title": "N3: Regulatory Squeeze",
+          "direction": "downside",
+          "weight": 21
+        },
+        {
+          "title": "N4: Competitive Disruption",
+          "direction": "downside",
+          "weight": 18
+        }
+      ],
+      "computed_at": "2026-02-24T07:54:21.288Z"
+    },
+    "overall_sentiment": -28,
+    "sentiment_label": "DOWNSIDE",
+    "method": "company_only",
+    "composite_computed_at": "2026-02-24T07:54:38.650Z",
+    "macro_signal": 0,
+    "sector_signal": 0,
+    "tech_signal": 0,
+    "external_weight": 0
+  },
+  "risk_skew": "DOWNSIDE",
+  "valuation_range": {
+    "low": 27.98,
+    "mid": 31.09,
+    "high": 34.2,
+    "shift_pct": -0.042,
+    "signal_used": -28,
+    "method": "sentiment_shift_v3",
+    "computed_at": "2026-02-24T07:54:39.542Z"
+  },
+  "priceHistory": [
+    31.54,
+    35.83,
+    36.35
+  ],
+  "freshness": {
+    "pricePctChange": 1.5,
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_price_update": "2026-02-26T05:36:47.923Z",
+  "technicalAnalysis": {
+    "date": "10 February 2026",
+    "period": "1 Year",
+    "source": "Continuum Technical Intelligence",
+    "regime": "Range-bound",
+    "clarity": "Mixed",
+    "price": {
+      "current": 36.35,
+      "currency": "A$"
+    },
+    "movingAverages": {
+      "ma50": {
+        "value": 29.94,
+        "date": "10 Feb 2026"
+      },
+      "ma200": {
+        "value": 29.9,
+        "date": "10 Feb 2026"
+      },
+      "crossover": {
+        "type": "Golden Cross",
+        "date": "w/c 20 January 2026",
+        "description": "50-day MA crossed above 200-day MA"
+      },
+      "priceVsMa50": 4.9,
+      "priceVsMa200": 5
+    },
+    "trend": {
+      "direction": "Recovering",
+      "duration": "4 months",
+      "structure": "Higher lows from October 2025 trough; approaching prior range resistance",
+      "peak": {
+        "price": 33.61,
+        "date": "w/c 8 September 2025"
+      },
+      "trough": {
+        "price": 25.91,
+        "date": "w/c 20 October 2025"
+      },
+      "drawdown": -22.9
+    },
+    "keyLevels": {
+      "support": {
+        "price": 29.3,
+        "method": "Prior consolidation zone (Dec 2025 – Jan 2026)"
+      },
+      "resistance": {
+        "price": 32,
+        "method": "Round number and prior range ceiling (Jun–Aug 2025)"
+      },
+      "fiftyTwoWeekHigh": {
+        "price": 33.61,
+        "date": "w/c 8 September 2025"
+      },
+      "fiftyTwoWeekLow": {
+        "price": 25.91,
+        "date": "w/c 20 October 2025"
+      }
+    },
+    "volume": {
+      "latestVs20DayAvg": 1.1,
+      "latestDate": "10 February 2026",
+      "priorSpikes": [
+        {
+          "period": "w/c 15 September 2025",
+          "ratio": 2.8,
+          "context": "Sharp selloff from A$33.42 to A$28.51; likely earnings reaction"
+        },
+        {
+          "period": "w/c 20 October 2025",
+          "ratio": 1.9,
+          "context": "Capitulation low at A$25.91"
+        }
+      ]
+    },
+    "volatility": {
+      "latestDailyRange": {
+        "high": 31.69,
+        "low": 31.41,
+        "date": "10 February 2026"
+      },
+      "latestRangePercent": 0.9,
+      "avgDailyRangePercent30": 0.6,
+      "avgDailyRangePercent90": 0.8
+    },
+    "meanReversion": {
+      "vsMa50": 4.9,
+      "vsMa200": 5,
+      "rangePosition": 71,
+      "rangeHigh": 33.61,
+      "rangeLow": 25.91
+    },
+    "inflectionPoints": [
+      {
+        "date": "w/c 8 September 2025",
+        "price": 33.61,
+        "event": "12-month high"
+      },
+      {
+        "date": "w/c 15 September 2025",
+        "price": 28.51,
+        "event": "Sharp selloff; price drops 15% in one week"
+      },
+      {
+        "date": "w/c 20 October 2025",
+        "price": 25.91,
+        "event": "12-month low; capitulation"
+      },
+      {
+        "date": "w/c 15 December 2025",
+        "price": 29.32,
+        "event": "Recovery rally clears A$29 resistance"
+      },
+      {
+        "date": "w/c 20 January 2026",
+        "price": 30.08,
+        "event": "Golden cross forms; 50-day MA crosses above 200-day MA"
+      },
+      {
+        "date": "10 February 2026",
+        "price": 31.41,
+        "event": "Approaching A$32 resistance; momentum intact"
+      }
+    ],
+    "relativePerformance": {
+      "vsIndex": {
+        "name": "S&amp;P/ASX 200",
+        "period": "12 months",
+        "stockReturn": 5.4,
+        "indexReturn": 6.9,
+        "relativeReturn": -1.5
+      },
+      "vsSector": {
+        "name": "S&amp;P/ASX Consumer Staples",
+        "period": "12 months",
+        "stockReturn": 5.4,
+        "sectorReturn": -1.4,
+        "relativeReturn": 6.8
+      }
+    }
+  },
+  "price_evidence": {
+    "last_run": "2026-02-26T05:36:48.027Z",
+    "classification": "MATERIAL"
+  },
+  "last_research_update": "2026-02-26T05:36:48.027Z"
+}

@@ -130,15 +130,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add index.html \
-                  data/live-prices.json \
-                  data/latest-prices.json \
-                  data/narrative-analysis.json \
-                  data/announcements.json \
-                  data/events/ \
-                  data/stocks/*.json \
-                  data/stocks/*-history.json \
-                  data/research/*.json || true
+          git add data/ 2>/dev/null || true
 
           if git diff --cached --quiet; then
             echo "No changes to commit"

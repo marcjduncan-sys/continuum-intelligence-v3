@@ -8,7 +8,7 @@
  *   2. Detect narrative flips (dominant hypothesis changes)
  *   3. Update freshness timestamps and urgency scores
  *   4. Update the "Updated" date for each stock
- *   5. Write changes back to stock JSONs and inject into index.html
+ *   5. Write changes back to stock JSONs, data/research/*.json, and data/freshness.json
  *
  * No LLM calls. Pure rule-based computation.
  *
@@ -23,9 +23,10 @@ const path = require('path');
 const { findLatestPrices } = require('./find-latest-prices');
 const { processStock } = require('./price-evidence-engine');
 
-const STOCKS_DIR = path.join(__dirname, '..', 'data', 'stocks');
-const INDEX_PATH = path.join(__dirname, '..', 'index.html');
-const TA_CONFIG_PATH = path.join(__dirname, '..', 'data', 'config', 'ta-config.json');
+const dataDir = path.join(__dirname, '..', 'data');
+const STOCKS_DIR = path.join(dataDir, 'stocks');
+const RESEARCH_DIR = path.join(dataDir, 'research');
+const TA_CONFIG_PATH = path.join(dataDir, 'config', 'ta-config.json');
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 const TICKER_FILTER = args.includes('--ticker') ? args[args.indexOf('--ticker') + 1] : null;
@@ -125,95 +126,58 @@ function updateFreshness(stock, currentPrice) {
 }
 
 // ══════════════════════════════════════════════════════════════════════
-// INDEX.HTML INJECTION
+// JSON FILE WRITERS
 // ══════════════════════════════════════════════════════════════════════
 
 /**
- * Update the FRESHNESS_DATA block in index.html with current values
- * from all stock JSONs.
+ * Write freshness data to data/freshness.json.
  */
-function updateFreshnessInHtml(html, allFreshness) {
-  // Find and replace the FRESHNESS_DATA block
-  const startRegex = /const FRESHNESS_DATA\s*=\s*\{/;
-  const startMatch = html.match(startRegex);
-  if (!startMatch) {
-    console.log('  ⚠ Could not find FRESHNESS_DATA in index.html');
-    return html;
+function writeFreshnessJson(allFreshness) {
+  try {
+    fs.writeFileSync(path.join(dataDir, 'freshness.json'), JSON.stringify(allFreshness, null, 2));
+    console.log('  ✓ Updated data/freshness.json');
+  } catch (err) {
+    console.error(`  ✗ Failed to write data/freshness.json — ${err.message}`);
   }
-
-  const startIdx = startMatch.index;
-  let depth = 0;
-  let endIdx = -1;
-  for (let i = startIdx + startMatch[0].length - 1; i < html.length; i++) {
-    if (html[i] === '{') depth++;
-    else if (html[i] === '}') {
-      depth--;
-      if (depth === 0) { endIdx = i + 1; break; }
-    }
-  }
-  if (endIdx === -1) return html;
-
-  // Build replacement
-  const replacement = 'const FRESHNESS_DATA = ' + JSON.stringify(allFreshness, null, 2);
-  return html.substring(0, startIdx) + replacement + html.substring(endIdx);
 }
 
 /**
- * Update the verdict scores in a STOCK_DATA block in index.html.
- * Updates the score percentage values to match recalculated survival scores.
+ * Update the research JSON for a ticker (data/research/{ticker}.json).
+ * Applies verdict score updates (if newScores provided) and date update in a single read/write.
  */
-function updateVerdictScoresInHtml(html, ticker, newScores) {
-  // Find the STOCK_DATA.TICKER block
-  const blockRegex = new RegExp(`STOCK_DATA\\.${ticker}\\s*=\\s*\\{`);
-  const blockMatch = html.match(blockRegex);
-  if (!blockMatch) return html;
-
-  // Find the verdict.scores section within this block
-  // Look for "score: 'XX%'" patterns within the ticker block
-  const blockStart = blockMatch.index;
-
-  // Find end of this STOCK_DATA block
-  let depth = 0;
-  let blockEnd = blockStart;
-  for (let i = blockStart + blockMatch[0].length - 1; i < html.length; i++) {
-    if (html[i] === '{') depth++;
-    else if (html[i] === '}') {
-      depth--;
-      if (depth === 0) { blockEnd = i + 1; break; }
-    }
+function updateResearchJson(ticker, newDate, newScores) {
+  const researchPath = path.join(RESEARCH_DIR, `${ticker}.json`);
+  let research;
+  try {
+    research = JSON.parse(fs.readFileSync(researchPath, 'utf8'));
+  } catch (err) {
+    console.log(`  ⚠ Could not read research JSON for ${ticker} — ${err.message}`);
+    return;
   }
 
-  let block = html.substring(blockStart, blockEnd);
+  // Update verdict scores if provided
+  if (newScores && research.verdict && Array.isArray(research.verdict.scores)) {
+    const scoreKeys = Object.keys(newScores);
+    scoreKeys.forEach((key) => {
+      const pct = Math.round(newScores[key] * 100) + '%';
+      // Match by tier key (e.g. "N1") at the start of the label
+      const entry = research.verdict.scores.find(
+        s => s.label && s.label.toUpperCase().startsWith(key)
+      );
+      if (entry) {
+        entry.score = pct;
+      }
+    });
+  }
 
-  // Update scores in verdict section
-  const scoreKeys = Object.keys(newScores);
-  scoreKeys.forEach((key, idx) => {
-    const pct = Math.round(newScores[key] * 100);
-    // Match patterns like: score: '50%'  or  scoreWidth: '50%'
-    // Only update within the verdict.scores array entries (index-based)
-    const scorePattern = new RegExp(
-      `(\\{[^}]*tier:\\s*'n${idx + 1}'[^}]*score:\\s*')\\d+(%')`,
-    );
-    block = block.replace(scorePattern, `$1${pct}$2`);
+  // Update report date
+  research.date = newDate;
 
-    // Also update scoreWidth
-    const widthPattern = new RegExp(
-      `(\\{[^}]*tier:\\s*'n${idx + 1}'[^}]*scoreWidth:\\s*')\\d+(%')`,
-    );
-    block = block.replace(widthPattern, `$1${pct}$2`);
-  });
-
-  return html.substring(0, blockStart) + block + html.substring(blockEnd);
-}
-
-/**
- * Update the report date in a STOCK_DATA block.
- */
-function updateDateInHtml(html, ticker, newDate) {
-  const pattern = new RegExp(
-    `(STOCK_DATA\\.${ticker}\\s*=\\s*\\{[\\s\\S]*?date:\\s*')([^']+)(')`
-  );
-  return html.replace(pattern, `$1${newDate}$3`);
+  try {
+    fs.writeFileSync(researchPath, JSON.stringify(research, null, 2));
+  } catch (err) {
+    console.error(`  ✗ Failed to write research JSON for ${ticker} — ${err.message}`);
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -240,9 +204,6 @@ function main() {
 
   const jsonFiles = fs.readdirSync(STOCKS_DIR).filter(f => f.endsWith('.json'));
   console.log(`  Stock JSONs: ${jsonFiles.length}\n`);
-
-  // ── Load index.html ────────────────────────────────────────────
-  let html = fs.readFileSync(INDEX_PATH, 'utf8');
 
   const allFreshness = {};
   let updatedCount = 0;
@@ -373,11 +334,10 @@ function main() {
       fs.writeFileSync(filePath, JSON.stringify(stock, null, 2));
     }
 
-    // ── 7. Update index.html ──────────────────────────────────
-    if (newScores) {
-      html = updateVerdictScoresInHtml(html, ticker, newScores);
+    // ── 7. Update research JSON (scores + date) ───────────────
+    if (!DRY_RUN) {
+      updateResearchJson(ticker, dateStr, newScores);
     }
-    html = updateDateInHtml(html, ticker, dateStr);
 
     // Log
     const scoresStr = newScores
@@ -389,13 +349,9 @@ function main() {
     updatedCount++;
   }
 
-  // ── Update FRESHNESS_DATA in index.html ────────────────────────
-  html = updateFreshnessInHtml(html, allFreshness);
-
-  // ── Write index.html ───────────────────────────────────────────
+  // ── Write freshness.json ────────────────────────────────────────
   if (!DRY_RUN) {
-    fs.writeFileSync(INDEX_PATH, html);
-    console.log(`\n  ✓ Updated index.html with new dates and scores`);
+    writeFreshnessJson(allFreshness);
   }
 
   // ── Summary ────────────────────────────────────────────────────

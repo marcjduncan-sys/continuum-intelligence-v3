@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.05,
+      "survival_score": 0.06,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-02-26T08:07:22.723Z"
+      "last_updated": "2026-02-26T05:36:48.027Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.05,
+      "survival_score": 0.12,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-02-26T08:07:22.723Z"
+      "last_updated": "2026-02-26T05:36:48.027Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -38,7 +38,7 @@
       "survival_score": 0.46,
       "status": "MODERATE",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-02-26T08:07:22.723Z"
+      "last_updated": "2026-02-26T05:36:48.027Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -47,14 +47,14 @@
       "what_to_watch": "Industry disruption signals and regulatory changes.",
       "upside": null,
       "risk_plain": "If disruption materialises, prior assumptions become invalid.",
-      "survival_score": 0.44,
-      "status": "MODERATE",
+      "survival_score": 0.36,
+      "status": "LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-02-26T08:07:22.723Z"
+      "last_updated": "2026-02-26T05:36:48.027Z"
     }
   },
   "dominant": "N3",
-  "confidence": "LOW",
+  "confidence": "MODERATE",
   "alert_state": "OVERCORRECTION",
   "current_price": 1.09,
   "big_picture": "Horizon Minerals Limited (ASX: HRZ) — coverage initiated. Full analysis pending.",
@@ -75,13 +75,6 @@
       "severity": "AMBER",
       "message": "Single-day move of -10.9% exceeds 10% threshold — possible overcorrection",
       "auto_generated": true
-    },
-    {
-      "date": "2026-02-26",
-      "type": "OVERCORRECTION_TRIGGER",
-      "severity": "AMBER",
-      "message": "Single-day move of -12.1% exceeds 10% threshold — possible overcorrection",
-      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -99,16 +92,6 @@
       "date": "2026-02-25",
       "classification": "MATERIAL",
       "daily_change_pct": -10.89,
-      "volume_multiplier": 1,
-      "cumulative_5d": -6.06,
-      "cumulative_20d": -4.62,
-      "results_day": false,
-      "overcorrection_active": true
-    },
-    {
-      "date": "2026-02-26",
-      "classification": "MATERIAL",
-      "daily_change_pct": -12.1,
       "volume_multiplier": 1,
       "cumulative_5d": -6.06,
       "cumulative_20d": -4.62,
@@ -380,16 +363,18 @@
   "_overcorrection": {
     "active": true,
     "triggerType": "SINGLE_DAY",
-    "triggerDate": "2026-02-26",
-    "triggerPrice": 1.09,
+    "triggerDate": "2026-02-25",
+    "triggerPrice": 1.105,
     "direction": "down",
-    "movePct": -12.1,
-    "reviewDate": "2026-03-05",
-    "message": "Single-day move of -12.1% exceeds 10% threshold — possible overcorrection"
+    "movePct": -10.89,
+    "reviewDate": "2026-03-04",
+    "message": "Single-day move of -10.9% exceeds 10% threshold — possible overcorrection"
   },
   "price_evidence": {
-    "last_run": "2026-02-26T08:03:41.240Z",
+    "last_run": "2026-02-26T05:36:48.027Z",
     "classification": "MATERIAL"
   },
-  "last_research_update": "2026-02-26T08:03:41.240Z"
+  "last_research_update": "2026-02-26T05:36:48.027Z",
+  "price": 1.09,
+  "date": "26 February 2026"
 }

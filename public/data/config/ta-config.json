@@ -1,0 +1,78 @@
+{
+  "version": "2.0",
+  "feature_flags": {
+    "price_evidence_engine": true,
+    "volume_confirmation": true,
+    "technical_level_integration": true,
+    "overcorrection_detection": true,
+    "ta_agent_signals": false
+  },
+  "price_classification": {
+    "noise_threshold_pct": 2,
+    "notable_threshold_pct": 5,
+    "significant_threshold_pct": 10,
+    "notable_points": 2,
+    "significant_points": 5,
+    "material_points": 10
+  },
+  "cumulative_moves": {
+    "five_day_threshold_pct": 10,
+    "five_day_amplifier": 1.5,
+    "twenty_day_threshold_pct": 20,
+    "twenty_day_flag": "structural_shift",
+    "sixty_day_threshold_pct": 30,
+    "sixty_day_flag": "full_recalibration"
+  },
+  "earnings_event": {
+    "drop_threshold_pct": 5,
+    "rise_threshold_pct": 5,
+    "strong_boost": 8,
+    "strong_penalise": 5,
+    "moderate_threshold_pct": 2
+  },
+  "volume_multipliers": {
+    "very_high_threshold": 2.0,
+    "very_high_multiplier": 2.0,
+    "high_threshold": 1.5,
+    "high_multiplier": 1.5,
+    "normal_low": 0.8,
+    "normal_high": 1.5,
+    "normal_multiplier": 1.0,
+    "low_threshold": 0.5,
+    "low_multiplier": 0.7,
+    "very_low_multiplier": 0.3
+  },
+  "technical_levels": {
+    "support_break_boost_bearish": 4,
+    "support_break_penalise_bullish": 3,
+    "support_hold_boost_bullish": 3,
+    "support_hold_penalise_bearish": 2,
+    "resistance_break_boost_bullish": 4,
+    "resistance_break_penalise_bearish": 3,
+    "resistance_reject_boost_bearish": 3,
+    "resistance_reject_penalise_bullish": 2,
+    "ma50_cross_points": 3,
+    "ma50_cross_penalise": 2,
+    "death_golden_cross_points": 5,
+    "death_golden_cross_penalise": 4,
+    "oversold_overbought_threshold_pct": 10
+  },
+  "overcorrection": {
+    "single_day_threshold_pct": 10,
+    "five_day_cumulative_threshold_pct": 15,
+    "resolution_days": 5,
+    "confirmed_reversal_pct": 50,
+    "extend_reversal_pct": 25,
+    "fundamental_move_points": 3
+  },
+  "normalisation": {
+    "floor": 0.05,
+    "ceiling": 0.80,
+    "sum_target": 1.0
+  },
+  "ta_agent": {
+    "schema_version": "1.0",
+    "max_impact_per_signal": 5,
+    "signals_dir": "data/ta-signals"
+  }
+}

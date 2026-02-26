@@ -15,6 +15,11 @@ INDEX_HTML_PATH = os.path.realpath(os.getenv(
     "INDEX_HTML_PATH",
     os.path.join(os.path.dirname(__file__), "..", "index.html"),
 ))
+# Project root directory — used to locate data/ and other assets
+PROJECT_ROOT = os.path.realpath(os.getenv(
+    "PROJECT_ROOT",
+    os.path.join(os.path.dirname(__file__), ".."),
+))
 MAX_PASSAGES = 12
 MAX_CONVERSATION_TURNS = 20
 

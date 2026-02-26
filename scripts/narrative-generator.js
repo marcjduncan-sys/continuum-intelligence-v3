@@ -2,24 +2,40 @@
  * Continuum Intelligence - Narrative Generator
  * Auto-generates research narrative updates based on events
  * Uses template system for common events, with structured output
+ *
+ * Reads stock data from data/research/*.json files.
  */
 
 const fs = require('fs');
 const path = require('path');
 const { findLatestPrices } = require('./find-latest-prices');
 
-// Load existing data
+const ROOT = path.join(__dirname, '..');
+const RESEARCH_DIR = path.join(ROOT, 'data', 'research');
+
+// --- JSON helpers ---
+
+function readJson(filePath) {
+  try { return JSON.parse(fs.readFileSync(filePath, 'utf8')); } catch (e) { return null; }
+}
+
+// Load existing stock data from research JSON files
 function loadStockData() {
-  const dataPath = path.join(__dirname, '..', 'index.html');
-  const html = fs.readFileSync(dataPath, 'utf8');
-  
-  // Extract STOCK_DATA from HTML
-  const match = html.match(/const STOCK_DATA = \{([\s\S]*?)\};/);
-  if (!match) return {};
-  
-  // This is a simplified version - in practice, you'd parse the JS properly
-  // For now, we'll work with the events data
-  return {};
+  const stocks = {};
+
+  try {
+    const files = fs.readdirSync(RESEARCH_DIR).filter(f => f.endsWith('.json') && !f.startsWith('_'));
+    for (const file of files) {
+      const data = readJson(path.join(RESEARCH_DIR, file));
+      if (data && data.ticker) {
+        stocks[data.ticker] = data;
+      }
+    }
+  } catch (e) {
+    console.error(`[WARN] Could not read research directory: ${e.message}`);
+  }
+
+  return stocks;
 }
 
 // Template generators for different event types
@@ -50,7 +66,7 @@ const NARRATIVE_TEMPLATES = {
       scoreAdjustment: 8
     })
   },
-  
+
   MANAGEMENT: {
     ceoChange: (ticker, price, details) => ({
       headline: `${ticker} announces CEO transition`,
@@ -72,7 +88,7 @@ const NARRATIVE_TEMPLATES = {
       scoreAdjustment: -2
     })
   },
-  
+
   MA: {
     acquisition: (ticker, price, details) => ({
       headline: `${ticker} announces acquisition`,
@@ -93,7 +109,7 @@ const NARRATIVE_TEMPLATES = {
       scoreAdjustment: -5
     })
   },
-  
+
   REGULATORY: {
     investigation: (ticker, price, details) => ({
       headline: `${ticker} faces regulatory scrutiny`,
@@ -115,7 +131,7 @@ const NARRATIVE_TEMPLATES = {
       scoreAdjustment: 2
     })
   },
-  
+
   ANALYST: {
     upgrade: (ticker, price, details) => ({
       headline: `${ticker} upgraded by ${details.broker}`,
@@ -136,7 +152,7 @@ const NARRATIVE_TEMPLATES = {
       scoreAdjustment: -2
     })
   },
-  
+
   MACRO: {
     rateCut: (ticker, price, details) => ({
       headline: `RBA cuts rates`,
@@ -163,11 +179,11 @@ const NARRATIVE_TEMPLATES = {
 function generateNarrativeUpdate(event, priceData) {
   const template = NARRATIVE_TEMPLATES[event.type];
   if (!template) return null;
-  
+
   // Determine sub-type based on event details
   let subType = 'default';
   const title = event.title.toLowerCase();
-  
+
   if (event.type === 'EARNINGS') {
     if (title.includes('beat') || title.includes('exceed')) subType = 'beat';
     else if (title.includes('miss') || title.includes('below')) subType = 'miss';
@@ -198,10 +214,10 @@ function generateNarrativeUpdate(event, priceData) {
     else if (title.includes('rate') && title.includes('hike')) subType = 'rateHike';
     else subType = 'commodity';
   }
-  
+
   const generator = template[subType];
   if (!generator) return null;
-  
+
   // Extract metrics from event (in reality, you'd parse the announcement)
   const metrics = {
     eps: 'TBD',
@@ -216,54 +232,30 @@ function generateNarrativeUpdate(event, priceData) {
     regulator: 'ACCC',
     ...event.extractedMetrics
   };
-  
-  return generator(event.ticker, priceData?.price, metrics);
-}
 
-// Apply updates to HTML content
-function applyNarrativeUpdates(html, updates) {
-  let modified = html;
-  
-  for (const update of updates) {
-    // This is a simplified example - real implementation would need
-    // proper DOM manipulation or structured data files
-    
-    // Add to verdict section
-    if (update.verdictAddendum) {
-      // Find verdict section and append
-      const verdictRegex = /(verdict:\s*\{[^}]*text:['"])([^'"]*)/;
-      if (verdictRegex.test(modified)) {
-        modified = modified.replace(verdictRegex, `$1$2 ${update.verdictAddendum}`);
-      }
-    }
-  }
-  
-  return modified;
+  return generator(event.ticker, priceData?.price, metrics);
 }
 
 // Generate freshness update
 function generateFreshnessUpdate(ticker, priceData, events) {
   const now = new Date();
-  const lastReview = new Date(); // Would come from existing data
-  const daysSince = 0;
-  
+
   // Check for recent events that would trigger urgency
-  const recentHighImpact = events.filter(e => 
-    e.ticker === ticker && 
+  const recentHighImpact = events.filter(e =>
+    e.ticker === ticker &&
     e.severity === 'HIGH' &&
     new Date(e.timestamp) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
   );
-  
-  const urgency = recentHighImpact.length > 0 ? 35 : 
+
+  const urgency = recentHighImpact.length > 0 ? 35 :
                   events.filter(e => e.ticker === ticker).length > 0 ? 20 : 0;
-  
-  const status = urgency >= 35 ? 'CRITICAL' : 
-                 urgency >= 20 ? 'MODERATE' : 
-                 daysSince > 14 ? 'HIGH' : 'OK';
-  
+
+  const status = urgency >= 35 ? 'CRITICAL' :
+                 urgency >= 20 ? 'MODERATE' : 'OK';
+
   return {
     reviewDate: now.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' }),
-    daysSinceReview: daysSince,
+    daysSinceReview: 0,
     priceAtReview: priceData?.price || 0,
     pricePctChange: priceData?.changePercent || 0,
     nearestCatalyst: recentHighImpact[0]?.title || null,
@@ -279,9 +271,9 @@ function generateFreshnessUpdate(ticker, priceData, events) {
 // Main function
 async function main() {
   console.log('=== Continuum Narrative Generator ===\n');
-  
-  // Load data — use find-latest-prices to pick the freshest source
-  const dataDir = path.join(__dirname, '..', 'data');
+
+  // Load data -- use find-latest-prices to pick the freshest source
+  const dataDir = path.join(ROOT, 'data');
   const eventsPath = path.join(dataDir, 'events-log.json');
 
   const priceResult = findLatestPrices('newest');
@@ -293,44 +285,48 @@ async function main() {
   console.log(`Using prices from ${priceResult.source} (${priceResult.file}), updated ${priceResult.updated}`);
   const prices = priceResult.prices;
 
+  // Also load stock data from research JSON for context
+  const stockData = loadStockData();
+  console.log(`Loaded research data for ${Object.keys(stockData).length} tickers from data/research/`);
+
   const events = fs.existsSync(eventsPath)
     ? JSON.parse(fs.readFileSync(eventsPath, 'utf8'))
     : [];
 
   console.log(`Loaded ${Object.keys(prices).length} prices, ${events.length} events`);
-  
+
   // Generate updates for each ticker with events
   const tickersWithEvents = [...new Set(events.map(e => e.ticker))];
   const updates = {};
   const freshnessUpdates = {};
-  
+
   for (const ticker of tickersWithEvents) {
     const tickerEvents = events.filter(e => e.ticker === ticker && e.requiresNarrativeUpdate);
     const priceData = prices[ticker];
-    
+
     updates[ticker] = [];
-    
+
     for (const event of tickerEvents) {
       const update = generateNarrativeUpdate(event, priceData);
       if (update) {
         updates[ticker].push(update);
-        console.log(`✓ ${ticker}: ${update.headline}`);
+        console.log(`  ${ticker}: ${update.headline}`);
       }
     }
-    
+
     // Generate freshness update
     freshnessUpdates[ticker] = generateFreshnessUpdate(ticker, priceData, events);
   }
-  
+
   // Save updates
   fs.writeFileSync(
     path.join(dataDir, 'pending-updates.json'),
     JSON.stringify({ updates, freshnessUpdates, generatedAt: new Date().toISOString() }, null, 2)
   );
-  
+
   console.log(`\nGenerated updates for ${Object.keys(updates).length} tickers`);
   console.log('Updates saved to data/pending-updates.json');
-  
+
   // Summary for GitHub Actions
   const totalUpdates = Object.values(updates).flat().length;
   process.exit(totalUpdates > 0 ? 100 : 0);

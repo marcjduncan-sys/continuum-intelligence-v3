@@ -1,0 +1,170 @@
+{
+  "price_evidence_rules": [
+    {
+      "id": "INTRADAY_DROP_5",
+      "name": "Significant intraday decline",
+      "condition": "intraday_return <= -0.05",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "NEUTRAL",
+        "T3": "CONSISTENT",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 10
+      }
+    },
+    {
+      "id": "INTRADAY_DROP_10",
+      "name": "Critical intraday decline",
+      "condition": "intraday_return <= -0.10",
+      "diagnosticity": "CRITICAL",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 15,
+        "half_life_days": 30
+      },
+      "force_recalc": true,
+      "can_trigger_immediate_flip": true
+    },
+    {
+      "id": "CUMULATIVE_5DAY_DROP_8",
+      "name": "Sustained negative momentum",
+      "condition": "cumulative_5day_return <= -0.08",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 0,
+        "half_life_days": 0,
+        "note": "Full weight while trend persists; removed when 5-day return recovers above -3%"
+      }
+    },
+    {
+      "id": "HIGH_VOLUME_DOWN",
+      "name": "Institutional distribution",
+      "condition": "daily_volume >= 3 * avg_30day_volume AND daily_return < 0",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "NEUTRAL",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 10,
+        "half_life_days": 20
+      }
+    },
+    {
+      "id": "EARNINGS_MISS_5",
+      "name": "Earnings miss vs consensus",
+      "condition": "earnings_surprise <= -0.05",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "NEUTRAL",
+        "T3": "CONSISTENT",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 90,
+        "note": "Full weight until next reporting period"
+      }
+    },
+    {
+      "id": "EARNINGS_BEAT_5",
+      "name": "Earnings beat vs consensus",
+      "condition": "earnings_surprise >= 0.05",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "CONSISTENT",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 90,
+        "half_life_days": 90
+      }
+    },
+    {
+      "id": "NEW_52W_HIGH_VOLUME",
+      "name": "New 52-week high on above-average volume",
+      "condition": "price >= 52_week_high AND daily_volume >= 1.5 * avg_30day_volume",
+      "diagnosticity": "MEDIUM",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "NEUTRAL",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 10,
+        "half_life_days": 20
+      }
+    },
+    {
+      "id": "NEW_52W_LOW",
+      "name": "New 52-week low",
+      "condition": "price <= 52_week_low",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "INCONSISTENT",
+        "T2": "INCONSISTENT",
+        "T3": "CONSISTENT",
+        "T4": "CONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 10,
+        "half_life_days": 20
+      }
+    },
+    {
+      "id": "INTRADAY_RALLY_5",
+      "name": "Significant intraday rally",
+      "condition": "intraday_return >= 0.05",
+      "diagnosticity": "HIGH",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "NEUTRAL",
+        "T3": "INCONSISTENT",
+        "T4": "NEUTRAL"
+      },
+      "decay": {
+        "full_weight_days": 5,
+        "half_life_days": 10
+      }
+    },
+    {
+      "id": "INTRADAY_RALLY_10",
+      "name": "Critical intraday rally",
+      "condition": "intraday_return >= 0.10",
+      "diagnosticity": "CRITICAL",
+      "hypothesis_impact": {
+        "T1": "CONSISTENT",
+        "T2": "NEUTRAL",
+        "T3": "INCONSISTENT",
+        "T4": "INCONSISTENT"
+      },
+      "decay": {
+        "full_weight_days": 15,
+        "half_life_days": 30
+      },
+      "force_recalc": true,
+      "can_trigger_immediate_flip": true
+    }
+  ]
+}

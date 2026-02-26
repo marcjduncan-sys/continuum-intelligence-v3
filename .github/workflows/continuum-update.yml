@@ -51,7 +51,7 @@ jobs:
       - name: Run narrative analysis
         run: node scripts/run-automated-analysis.js
 
-      - name: Run research update (survival scores + index.html)
+      - name: Run research update (survival scores)
         run: |
           ARGS=""
           if [ -n "${{ github.event.inputs.ticker }}" ]; then
@@ -68,7 +68,7 @@ jobs:
       - name: Check for changes
         id: changes
         run: |
-          git add data/ index.html 2>/dev/null || true
+          git add data/ 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No changes detected."
