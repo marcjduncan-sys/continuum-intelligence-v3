@@ -479,7 +479,24 @@ at the current price). Must reference current price and recent events.",
     "metric": "What to watch for",
     "thresholds": "Specific levels or outcomes that would shift the thesis"
   },
-  "key_catalyst": "The single most important upcoming catalyst"
+  "key_catalyst": "The single most important upcoming catalyst",
+  "tripwire_updates": [
+    {
+      "index": 0,
+      "status": "resolved or still_pending or updated",
+      "resolution": "What actually happened (for resolved). Null if still pending.",
+      "new_date": "Updated date if event was postponed. Null if unchanged."
+    }
+  ],
+  "new_tripwire": {
+    "date": "FUTURE catalyst date (must be after today)",
+    "name": "Short catalyst name",
+    "conditions": [
+      {"if": "If [positive scenario]", "valence": "positive", "then": "Then [implication]"},
+      {"if": "If [negative scenario]", "valence": "negative", "then": "Then [implication]"}
+    ],
+    "source": "Source citation"
+  }
 }
 
 CRITICAL RULES:
@@ -487,10 +504,21 @@ CRITICAL RULES:
 - Rewrite ALL narrative sections to reflect current reality.
 - Reference the CURRENT price, not old prices.
 - If results or announcements have been released, discuss what they SHOWED, not what they might show.
+- If a material event has occurred but detailed results are NOT in the provided data, state that \
+the event has occurred. Describe ONLY what is factually known (e.g., from headlines, snippets, or \
+observable market reaction). NEVER use conditional or speculative language ("if results disappoint", \
+"should guidance miss") about events that have already happened.
+- When rewriting narrative_stability: if a key test or catalyst has already occurred, do NOT describe \
+the narrative as "resting on" that upcoming event. Describe what the event revealed or, if outcome \
+details are unavailable, state the event occurred and the narrative now rests on the next catalyst.
 - Scores should reflect genuine probability weighting.
 - The four hypothesis scores MUST sum to exactly 100%. Express each as an integer percentage (e.g. "25%", not "24.7%").
 - If nothing material has changed, keep scores steady and say so, but still ensure narratives \
-reference current prices and dates correctly."""
+reference current prices and dates correctly.
+- For tripwire_updates: any tripwire with a date BEFORE today MUST have status "resolved". \
+Describe what actually happened in the resolution field. If you lack specific outcome details, \
+say "Event occurred [date]; outcome details pending data update."
+- new_tripwire MUST reference a FUTURE event (date after today). Provide the next material catalyst."""
 
 
 # ---------------------------------------------------------------------------
@@ -661,6 +689,17 @@ async def _run_hypothesis_synthesis(
     narrative = research.get("narrative", {})
     skew = research.get("skew", {})
 
+    # Extract tripwires for temporal resolution
+    tripwires_summary = []
+    for i, tw in enumerate(research.get("tripwires", {}).get("cards", [])):
+        tripwires_summary.append({
+            "index": i,
+            "date": tw.get("date", ""),
+            "name": tw.get("name", ""),
+            "conditions_count": len(tw.get("conditions", [])),
+            "first_condition": tw.get("conditions", [{}])[0].get("if", "") if tw.get("conditions") else "",
+        })
+
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     user_prompt = f"""## TODAY'S DATE: {today}
@@ -708,10 +747,17 @@ async def _run_hypothesis_synthesis(
 ## Recent News:
 {json.dumps(gathered.get('news', [])[:5], indent=2)}
 
-IMPORTANT: Any event with a date BEFORE {today} has ALREADY HAPPENED. Rewrite all narrative \
-sections to reflect this. Do not describe past events as upcoming.
+## Recent Earnings/Results News:
+{json.dumps(gathered.get('earnings_news', [])[:5], indent=2)}
 
-Please provide the FULL updated JSON with all narrative rewrites."""
+## Current Tripwires (catalysts being watched):
+{json.dumps(tripwires_summary, indent=2)}
+
+IMPORTANT: Any event with a date BEFORE {today} has ALREADY HAPPENED. Rewrite all narrative \
+sections to reflect this. Do not describe past events as upcoming. For each tripwire with a date \
+before today, set status to "resolved" in tripwire_updates.
+
+Please provide the FULL updated JSON with all narrative rewrites and tripwire updates."""
 
     try:
         if not config.ANTHROPIC_API_KEY:
@@ -727,7 +773,7 @@ Please provide the FULL updated JSON with all narrative rewrites."""
         client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
         response = client.messages.create(
             model=config.ANTHROPIC_MODEL,
-            max_tokens=4096,
+            max_tokens=6144,
             temperature=0,
             system=HYPOTHESIS_UPDATE_SYSTEM + "\n\nRespond with valid JSON only.",
             messages=[{"role": "user", "content": user_prompt}],
@@ -886,6 +932,47 @@ def _merge_updates(
     if hypothesis_update.get("verdict_update"):
         if "verdict" in updated and isinstance(updated["verdict"], dict):
             updated["verdict"]["text"] = hypothesis_update["verdict_update"]
+
+    # -- Tripwire updates --
+    tripwire_updates = hypothesis_update.get("tripwire_updates", [])
+    if tripwire_updates and "tripwires" in updated:
+        cards = updated["tripwires"].get("cards", [])
+        for tu in tripwire_updates:
+            idx = tu.get("index")
+            if idx is None or not (0 <= idx < len(cards)):
+                continue
+            status = tu.get("status", "")
+            if status == "resolved" and tu.get("resolution"):
+                # Mark card as resolved with outcome
+                if "RESOLVED" not in cards[idx].get("name", ""):
+                    cards[idx]["name"] = cards[idx]["name"] + " \u2014 RESOLVED"
+                cards[idx]["conditions"].append({
+                    "if": "OUTCOME",
+                    "valence": "resolved",
+                    "then": tu["resolution"],
+                })
+            elif status == "updated" and tu.get("new_date"):
+                cards[idx]["date"] = tu["new_date"]
+
+    # -- New tripwire (replace oldest resolved card if at max 4) --
+    new_tw = hypothesis_update.get("new_tripwire")
+    if new_tw and isinstance(new_tw, dict) and new_tw.get("name"):
+        cards = updated.get("tripwires", {}).get("cards", [])
+        # Validate it has required fields
+        if new_tw.get("date") and new_tw.get("conditions"):
+            if len(cards) >= 4:
+                # Replace first resolved card
+                replaced = False
+                for i, c in enumerate(cards):
+                    if "\u2014 RESOLVED" in c.get("name", ""):
+                        cards[i] = new_tw
+                        replaced = True
+                        break
+                if not replaced:
+                    # All cards still pending — append anyway (will have 5)
+                    cards.append(new_tw)
+            else:
+                cards.append(new_tw)
 
     # -- Timestamp --
     updated["date"] = now

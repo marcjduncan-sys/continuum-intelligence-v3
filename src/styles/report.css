@@ -1222,6 +1222,14 @@
     padding: var(--space-md) var(--space-lg);
     margin-bottom: var(--space-md);
 }
+.tw-card.tw-resolved {
+    opacity: 0.6;
+    border-left: 3px solid var(--text-muted);
+}
+.tw-card.tw-resolved .tw-date::after {
+    content: ' \2713';
+    color: var(--signal-green);
+}
 .tw-header {
     display: flex;
     justify-content: space-between;
@@ -1254,6 +1262,7 @@
 }
 .tw-cond-if.positive { color: var(--signal-green); }
 .tw-cond-if.negative { color: var(--signal-red); }
+.tw-cond-if.resolved { color: var(--text-muted); font-style: italic; }
 .tw-cond-then {
     font-size: 0.72rem; color: var(--text-secondary);
     line-height: 1.4;

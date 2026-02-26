@@ -557,10 +557,12 @@ export function renderTripwires(data) {
       '</div>';
     }
 
-    cardsHtml += '<div class="tw-card">' +
+    var resolvedCls = card.name.indexOf('RESOLVED') >= 0 ? ' tw-resolved' : '';
+
+    cardsHtml += '<div class="tw-card' + resolvedCls + '">' +
       '<div class="tw-header"><div class="tw-date">' + card.date + '</div><div class="tw-name">' + card.name + '</div></div>' +
       '<div class="tw-conditions">' + conditionsHtml + '</div>' +
-      '<div class="tw-source">' + card.source + '</div>' +
+      '<div class="tw-source">' + (card.source || '') + '</div>' +
     '</div>';
   }
 

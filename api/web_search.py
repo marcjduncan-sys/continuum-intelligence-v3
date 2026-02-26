@@ -255,6 +255,50 @@ def _parse_ddg_html(html: str, max_results: int) -> list[dict[str, str]]:
 
 
 # ---------------------------------------------------------------------------
+# Targeted earnings/results search
+# ---------------------------------------------------------------------------
+
+async def fetch_earnings_news(
+    company_name: str,
+    ticker: str,
+    num_results: int = 5,
+) -> list[dict[str, str]]:
+    """
+    Search specifically for recent earnings, results, and guidance data.
+
+    Uses a more targeted query than general news to surface actual result
+    details (revenue, EBIT, NPAT, guidance) that help the synthesis stage
+    describe what happened rather than speculate.
+    """
+    year = datetime.now(timezone.utc).year
+    query = f"{company_name} {ticker} ASX earnings results revenue EBIT guidance {year}"
+    url = "https://html.duckduckgo.com/html/"
+
+    client = _get_http_client()
+    try:
+        resp = await client.post(
+            url,
+            data={"q": query, "df": "m"},  # df=m: past month
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        )
+
+        if resp.status_code != 200:
+            logger.warning(f"DuckDuckGo earnings search returned {resp.status_code}")
+            return []
+
+        html = resp.text
+        results = _parse_ddg_html(html, num_results)
+        return results
+
+    except Exception as e:
+        logger.error(f"Earnings search error for {ticker}: {e}")
+        return []
+
+
+# ---------------------------------------------------------------------------
 # Parallel data gathering
 # ---------------------------------------------------------------------------
 
@@ -267,14 +311,15 @@ async def gather_all_data(
 
     Returns
     -------
-    dict with keys: price_data, announcements, news.
+    dict with keys: price_data, announcements, news, earnings_news.
     """
     price_task = fetch_yahoo_price(ticker)
     announcements_task = fetch_asx_announcements(ticker)
     news_task = web_search_news(company_name, ticker)
+    earnings_task = fetch_earnings_news(company_name, ticker)
 
-    price_data, announcements, news = await asyncio.gather(
-        price_task, announcements_task, news_task,
+    price_data, announcements, news, earnings_news = await asyncio.gather(
+        price_task, announcements_task, news_task, earnings_task,
         return_exceptions=True,
     )
 
@@ -291,9 +336,14 @@ async def gather_all_data(
         logger.error(f"News fetch failed for {ticker}: {news}")
         news = []
 
+    if isinstance(earnings_news, Exception):
+        logger.error(f"Earnings news fetch failed for {ticker}: {earnings_news}")
+        earnings_news = []
+
     return {
         "price_data": price_data,
         "announcements": announcements,
         "news": news,
+        "earnings_news": earnings_news,
         "gathered_at": datetime.now(timezone.utc).isoformat(),
     }

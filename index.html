@@ -2095,6 +2095,14 @@ a:hover { color: var(--accent-sage); }
     padding: var(--space-md) var(--space-lg);
     margin-bottom: var(--space-md);
 }
+.tw-card.tw-resolved {
+    opacity: 0.6;
+    border-left: 3px solid var(--text-muted);
+}
+.tw-card.tw-resolved .tw-date::after {
+    content: ' \2713';
+    color: var(--signal-green);
+}
 .tw-header {
     display: flex;
     justify-content: space-between;
@@ -2127,6 +2135,7 @@ a:hover { color: var(--accent-sage); }
 }
 .tw-cond-if.positive { color: var(--signal-green); }
 .tw-cond-if.negative { color: var(--signal-red); }
+.tw-cond-if.resolved { color: var(--text-muted); font-style: italic; }
 .tw-cond-then {
     font-size: 0.72rem; color: var(--text-secondary);
     line-height: 1.4;
@@ -6457,10 +6466,12 @@ function renderTripwires(data) {
       '</div>';
     }
 
-    cardsHtml += '<div class="tw-card">' +
+    var resolvedCls = card.name.indexOf('RESOLVED') >= 0 ? ' tw-resolved' : '';
+
+    cardsHtml += '<div class="tw-card' + resolvedCls + '">' +
       '<div class="tw-header"><div class="tw-date">' + card.date + '</div><div class="tw-name">' + card.name + '</div></div>' +
       '<div class="tw-conditions">' + conditionsHtml + '</div>' +
-      '<div class="tw-source">' + card.source + '</div>' +
+      '<div class="tw-source">' + (card.source || '') + '</div>' +
     '</div>';
   }
 
