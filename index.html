@@ -6101,7 +6101,7 @@ function renderReportHero(data) {
 }
 
 function renderSkewBar(data) {
-  var skew = computeSkewScore(data);
+  var skew = data._skew || computeSkewScore(data);
   var dir = skew.direction;
   var arrow = dir === 'downside' ? '&#9660; DOWNSIDE' : dir === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
   var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
@@ -6956,7 +6956,7 @@ function renderHypSidebar(data) {
   }
 
   // ── Skew ──
-  var skew = computeSkewScore(data);
+  var skew = data._skew || computeSkewScore(data);
   var skewDir = skew.direction || 'balanced';
   var skewLabel = skewDir.toUpperCase();
   var skewScoreNum = skew.score || 0;
@@ -7817,7 +7817,7 @@ function renderSignalBars(data) {
   }
 
   // "€"€ Row 4: Company Research "€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€"€
-  var skew     = computeSkewScore(data);
+  var skew     = data._skew || computeSkewScore(data);
   var compCls  = skew.score < -5 ? 'downside' : skew.score > 5 ? 'upside' : 'neutral';
   var compBadge= skew.score < -5 ? 'DOWNSIDE'  : skew.score > 5 ? 'UPSIDE'  : 'NEUTRAL';
   var scoreLbl = (skew.score > 0 ? '+' : '') + skew.score;
@@ -8135,7 +8135,7 @@ function buildSnapshotFromStock(ticker) {
   }
 
   // 12. Skew badge  --  derived from computed score, not static data
-  var skewComputed = computeSkewScore(stock);
+  var skewComputed = stock._skew || computeSkewScore(stock);
   var skewBadge = skewComputed.direction === 'downside' ? '&#9660; DOWNSIDE' :
                   skewComputed.direction === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
 
@@ -8421,7 +8421,7 @@ function renderSnapshotPage(data) {
 // ============================================================
 
 function renderFeaturedCard(data) {
-  var skew = computeSkewScore(data);
+  var skew = data._skew || computeSkewScore(data);
   var dir = skew.direction;
   var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
   var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
@@ -8481,7 +8481,7 @@ function renderCatalystTag(ticker) {
 }
 
 function renderCoverageRow(data) {
-  var skew = computeSkewScore(data);
+  var skew = data._skew || computeSkewScore(data);
   var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
   var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
 
@@ -8609,7 +8609,7 @@ function buildCoverageData() {
     coverageData[t] = {
       company: d.company,
       price: d.price,
-      skew: computeSkewScore(d).direction,
+      skew: (d._skew || computeSkewScore(d)).direction,
       sector: d.sector
     };
   }
@@ -8991,6 +8991,9 @@ const ContinuumDynamics = (function() {
 
     // 2. Hypothesis scores
     adjustHypothesisScores(stock, computed, ref);
+
+    // 2b. Cache canonical skew score (single source of truth for all renderers)
+    stock._skew = computeSkewScore(stock);
 
     // 3. All text fields (narrative, descriptions, rationale, evidence)
     // Skip fields that shouldn't be text-replaced
@@ -10817,7 +10820,7 @@ function populateSidebar(ticker) {
     }
 
     // ── Compute skew from data ──
-    var skew = computeSkewScore(stock);
+    var skew = stock._skew || computeSkewScore(stock);
     var skewDir = skew.direction || 'balanced';
     var skewLabel = skewDir.toUpperCase();
     var skewScoreNum = skew.score || 0;

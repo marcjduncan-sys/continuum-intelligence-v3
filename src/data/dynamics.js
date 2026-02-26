@@ -9,6 +9,7 @@
 
 import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA } from '../lib/state.js';
 import { fmtB, fmtPrice, fmtPct, fmtPE, signPct } from '../lib/format.js';
+import { computeSkewScore } from '../lib/dom.js';
 
 // --- Core Computation ---
 
@@ -386,6 +387,9 @@ export function hydrate(ticker) {
 
   // 2. Hypothesis scores
   adjustHypothesisScores(stock, computed, ref);
+
+  // 2b. Cache canonical skew score (single source of truth for all renderers)
+  stock._skew = computeSkewScore(stock);
 
   // 3. All text fields (narrative, descriptions, rationale, evidence)
   // Skip fields that shouldn't be text-replaced

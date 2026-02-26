@@ -7,7 +7,7 @@ import { computeSkewScore } from '../lib/dom.js';
 var coverageSortDir = 0; // 0 = unsorted (default), 1 = desc (bearish first), -1 = asc (bullish first)
 
 export function renderFeaturedCard(data) {
-  var skew = computeSkewScore(data);
+  var skew = data._skew || computeSkewScore(data);
   var dir = skew.direction;
   var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
   var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
@@ -67,7 +67,7 @@ export function renderCatalystTag(ticker) {
 }
 
 export function renderCoverageRow(data) {
-  var skew = computeSkewScore(data);
+  var skew = data._skew || computeSkewScore(data);
   var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
   var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
 
@@ -192,7 +192,7 @@ export function buildCoverageData() {
     coverageData[t] = {
       company: d.company,
       price: d.price,
-      skew: computeSkewScore(d).direction,
+      skew: (d._skew || computeSkewScore(d)).direction,
       sector: d.sector
     };
   }

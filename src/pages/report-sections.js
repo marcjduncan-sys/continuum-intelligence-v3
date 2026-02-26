@@ -211,7 +211,7 @@ export function renderReportHero(data) {
 }
 
 export function renderSkewBar(data) {
-  var skew = computeSkewScore(data);
+  var skew = data._skew || computeSkewScore(data);
   var dir = skew.direction;
   var arrow = dir === 'downside' ? '&#9660; DOWNSIDE' : dir === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
   var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
@@ -1023,7 +1023,7 @@ export function renderHypSidebar(data) {
     }
   }
 
-  var skew = computeSkewScore(data);
+  var skew = data._skew || computeSkewScore(data);
   var skewDir = skew.direction || 'balanced';
   var skewLabel = skewDir.toUpperCase();
   var skewScoreNum = skew.score || 0;
@@ -1811,7 +1811,7 @@ export function renderSignalBars(data) {
   }
 
   // Row 4: Company Research
-  var skew     = computeSkewScore(data);
+  var skew     = data._skew || computeSkewScore(data);
   var compCls  = skew.score < -5 ? 'downside' : skew.score > 5 ? 'upside' : 'neutral';
   var compBadge= skew.score < -5 ? 'DOWNSIDE'  : skew.score > 5 ? 'UPSIDE'  : 'NEUTRAL';
   var scoreLbl = (skew.score > 0 ? '+' : '') + skew.score;

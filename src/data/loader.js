@@ -128,7 +128,7 @@ export function buildCoverageData() {
     coverageData[t] = {
       company: d.company,
       price: d.price,
-      skew: computeSkewScore(d).direction,
+      skew: (d._skew || computeSkewScore(d)).direction,
       sector: d.sector
     };
   }
@@ -340,7 +340,7 @@ export function buildSnapshotFromStock(ticker) {
   }
 
   // 12. Skew badge -- derived from computed score, not static data
-  var skewComputed = computeSkewScore(stock);
+  var skewComputed = stock._skew || computeSkewScore(stock);
   var skewBadge = skewComputed.direction === 'downside' ? '&#9660; DOWNSIDE' :
                   skewComputed.direction === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
 

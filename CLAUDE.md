@@ -334,7 +334,7 @@ These classes are used across multiple pages. Never edit the base definition:
 ## 9. AI Agent Operating Principles
 
 ### 9.1 Think Before Acting
-Before writing any code, answer three questions: (a) what exactly is the desired end state, (b) what is the minimal change to get there, (c) what could break. If you cannot answer (c), read more code first. The 13,700-line index.html has deep coupling chains that are not obvious from reading a single function.
+Before writing any code, answer three questions: (a) what exactly is the desired end state, (b) what is the minimal change to get there, (c) what could break. If you cannot answer (c), read more code first. The modular structure has coupling chains (see Section 8) that are not obvious from reading a single module.
 
 ### 9.2 Scope Discipline
 Do the thing you were asked to do. Do not "improve" adjacent code, refactor for style, or add features that were not requested. Every additional change is a risk surface. If you notice something worth fixing, note it in the response, don't fix it silently.
@@ -349,7 +349,7 @@ After making a change, verify it works. Do not declare success based on "the cod
 - Do not assume Railway has the same environment as local. It has ~512MB RAM, ephemeral disk, and restarts under load.
 
 ### 9.5 Edit Precision
-In a 13,700-line file, surgical edits are mandatory. When using Edit tool or equivalent:
+When using Edit tool or equivalent:
 - Include enough surrounding context to make the match unique
 - Never use find-and-replace patterns that could match in multiple locations
 - After editing, verify the edit landed where intended (read the file back at the target lines)
@@ -382,8 +382,8 @@ In OneDrive (parent `Continuum` folder):
 - `PRICE_NARRATIVE_INTEGRATION.md` -- DNE integration guide, UI components
 - `EVENT_SYSTEM.md` -- event classification, freshness monitoring, automation
 
-### 9.9 Respect the Monolith
-This codebase is intentionally a monolithic SPA with no build step, no transpilation, no framework. That is a design decision, not technical debt. Do not introduce build tooling, bundlers, or frameworks. Do not suggest migrating to React/Vue/Svelte. The tradeoff is accepted: complexity in one file, zero deployment friction.
+### 9.9 Respect the Architecture
+This codebase is a vanilla JS SPA with ES modules bundled by Vite. No framework (React/Vue/Svelte). Do not suggest migrating to a framework. The modular structure under `src/` was extracted from a 13,700-line monolith in Feb 2026 and each module has clear ownership boundaries. Do not merge modules back together or create cross-cutting abstractions that weren't requested.
 
 ---
 
@@ -424,8 +424,9 @@ The platform serves institutional investors who will immediately dismiss content
 ## 11. Code Quality Standards
 
 ### 11.1 JavaScript (Frontend)
-- No ES6+ syntax that breaks older browsers without transpilation (this is vanilla JS, no build step)
-- Use `var` not `let`/`const` for consistency with existing codebase (legacy decision, maintained for consistency)
+- Vite builds to `dist/` — ES2020+ syntax is fine in `src/` modules (Vite transpiles)
+- `src/` modules use `const`/`let` and ES module `import`/`export`
+- Classic scripts (`js/`, `scripts/`) still use `var` for consistency with their existing style
 - All DOM queries must null-check before use
 - All fetch calls must handle non-200 responses
 - Console.log with `[Module]` prefix for debuggability (e.g., `[BatchRefresh]`, `[MarketFeed]`)
@@ -512,17 +513,19 @@ Fields are stored (analytical judgment, computed at pipeline time) or computed l
 ## 14. Deployment
 
 ### Frontend
-Push to `main` branch. GitHub Pages auto-deploys via Vite build (`npm run build` → `dist/`).
+Push to `main` branch. GitHub Actions runs `npm ci → npx vitest run → npm run build` then deploys `dist/` to GitHub Pages. Unit tests gate deployment — if tests fail, the site does not deploy.
 
 ### Backend
 Push to `main`. Railway auto-deploys from `api/` directory via `railway.json` and `Procfile`.
 
 ### Pre-Push Checklist
-1. `git status` -- no unintended files staged
-2. `git diff` -- review what's actually changing
-3. `git pull --rebase origin main` -- sync with automated commits
-4. `git push origin main`
-5. After push: verify Railway deploy succeeds (check `/api/health` endpoint)
+1. `npm run test:unit` -- all Vitest tests pass
+2. `npm run build` -- production build succeeds
+3. `git status` -- no unintended files staged
+4. `git diff` -- review what's actually changing
+5. `git pull --rebase origin main` -- sync with automated commits
+6. `git push origin main`
+7. After push: verify GitHub Actions deploy succeeds, then Railway health (`/api/health`)
 
 ---
 
@@ -530,9 +533,13 @@ Push to `main`. Railway auto-deploys from `api/` directory via `railway.json` an
 
 ### Running Locally (Frontend)
 ```bash
-npm run dev        # Vite dev server (localhost:5173+), proxies /api to Railway
-npm run build      # Production build → dist/
-npm run preview    # Serve dist/ locally
+npm run dev              # Vite dev server (localhost:5173+), proxies /api to Railway
+npm run build            # Production build → dist/
+npm run preview          # Serve dist/ locally
+npm run test:unit        # Vitest (104 tests on src/ modules)
+npm run test:all         # Jest + Vitest (145 total)
+npm run typecheck        # tsc --noEmit (JSDoc type checking)
+npm run test:unit:watch  # Vitest watch mode (re-runs on save)
 ```
 Note: No Python installed locally. All API calls go through Vite proxy to Railway production API.
 
@@ -563,9 +570,25 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 ---
 
-## 16. Testing Mental Model
+## 16. Testing
 
-There is no test suite in V3. (V2 had Jest tests for data integrity and HTML structure.) Verification is manual. When making changes:
+### 16.1 Automated Tests
+Two test runners coexist (disjoint scopes, no conflict):
+
+| Runner | Command | Scope | Module system |
+|--------|---------|-------|---------------|
+| **Vitest** | `npm run test:unit` | `src/**/*.test.js` (104 tests) | ESM |
+| **Jest** | `npm test` | `tests/*.test.js` (41 tests) | CommonJS |
+
+- `npm run test:all` — runs both suites sequentially
+- `npm run test:unit:coverage` — Vitest with V8 coverage
+- `npm run typecheck` — tsc with checkJs (scoped to tested files in tsconfig.json)
+- CI: `npx vitest run` gates deployment in `.github/workflows/deploy.yml`
+
+Test files are co-located: `src/lib/format.test.js` next to `src/lib/format.js`.
+
+### 16.2 Manual Verification
+Automated tests cover pure logic. UI and integration still require manual checks:
 
 1. **API changes:** Hit the endpoint with curl or browser dev tools. Check the response shape and status code.
 2. **Frontend data changes:** Open browser console, inspect `STOCK_DATA[ticker]` and `localStorage.getItem('ci_research_TICKER')`.
@@ -578,12 +601,13 @@ There is no test suite in V3. (V2 had Jest tests for data integrity and HTML str
 
 ## 17. Known Issues
 
-- `personalisation.js` has a SyntaxError (`Unexpected identifier 'PRODUCTION_API'`) affecting the Personalisation tab
+- `personalisation.js` has a SyntaxError (`Unexpected identifier 'PRODUCTION_API'`) affecting the Personalisation tab (fixed in modularisation — `isLocal` ternary corrected)
 - Service worker returns 404 (non-critical)
 - Coverage table "UPDATED" column may show stale dates after refresh (pipeline may not update the `date` field, or table reads from static data rather than localStorage cache)
-- Dead code: `_fetchAndMergeBatchResults()` still exists in index.html but is no longer called
 - Backend skew scripts (`scripts/calc-idio-signal.js`, `scripts/calc-composite-sentiment.js`) still use old sqrt formula. Frontend is correct. Backend values in `data/stocks/*.json` are stale. See `DEVELOPER-BRIEF-Skew-Scoring-Simplification.md` for TODO list.
 - V2 event-scraper scripts (`event-scraper.js`, `narrative-generator.js`, `update-html.js`) exist in the parent repo but are not used by V3. V3's refresh pipeline replaces this automation.
+- DNE engines (`js/dne/`) still loaded as classic scripts — not yet converted to ES modules
+- `tsconfig.json` only covers 4 files in `include` — expand as JSDoc is added to more modules
 
 ---
 

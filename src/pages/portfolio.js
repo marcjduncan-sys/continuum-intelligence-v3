@@ -579,7 +579,7 @@ export function populateSidebar(ticker) {
   }
 
   // Compute skew from data
-  var skew = computeSkewScore(stock);
+  var skew = stock._skew || computeSkewScore(stock);
   var skewDir = skew.direction || 'balanced';
   var skewLabel = skewDir.toUpperCase();
   var skewScoreNum = skew.score || 0;
