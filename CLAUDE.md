@@ -264,6 +264,12 @@ When merging refreshed data into STOCK_DATA, currency must be normalised: `AUD` 
 ### 7.8 Live Data Preservation on Merge
 When patching STOCK_DATA with refreshed research data, preserve `_livePrice`, `priceHistory`, and `_liveChart`. These are injected by MarketFeed at runtime and are not part of the research JSON. Overwriting them blanks the price display.
 
+### 7.9 Vite Base Path for GitHub Pages
+`vite.config.js` must set `base: '/continuum-intelligence-v3/'` because GitHub Pages serves from a project subdirectory, not the domain root. Without this, all Vite-generated asset paths (`/assets/...` for CSS bundles, font preloads, `@font-face` url() paths) resolve to the wrong root and 404. The inline `<style>` block in index.html is unaffected (it's not processed by Vite), so most pages appear to work -- only features with CSS exclusively in the Vite bundle (e.g. personalisation page) visibly break. If the repo is ever renamed or moved to a custom domain, this `base` value must be updated.
+
+### 7.10 Vite Build vs Dev: Two Different Worlds
+The `src/` module tree (`main.js`, `src/styles/`, etc.) is only active during `npm run dev`. In production builds, Vite processes `index.html` as the entry: it bundles `<link rel="stylesheet">` tags into a CSS asset and transforms font preloads, but the app's JS runs from inline `<script>` blocks in index.html (the original monolith code). There is no `<script type="module" src="src/main.js">` in the HTML. This means: (a) CSS for production must be in `<link>` tags in index.html OR in the inline `<style>` block, not in `src/styles/` imports, and (b) changes to `src/` JS modules have no effect on the production build.
+
 ---
 
 ## 8. File Coupling (Read Before Editing)
