@@ -1,6 +1,30 @@
 {
   "ticker": "RFG",
-  "history": [
+  "flips": [
+    {
+      "date": "2026-02-24",
+      "from": {
+        "id": "T3",
+        "name": "Consumer Spending Risk",
+        "score_at_flip": 30
+      },
+      "to": {
+        "id": "N3",
+        "name": "Consumer Spending Risk",
+        "score_at_flip": 30
+      },
+      "trigger": "Significant price move of 7%",
+      "price_on_day": 1.07,
+      "price_change_pct": 7
+    }
+  ],
+  "freshness": {
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_research_update": "2026-02-26T01:30:48.610Z",
+  "entries": [
     {
       "date": "2025-11-27",
       "price": 1.63,
@@ -3096,24 +3120,30 @@
       "flip_detail": null,
       "events": [],
       "overcorrection_active": false
-    }
-  ],
-  "flips": [
+    },
     {
-      "date": "2026-02-24",
-      "from": {
-        "id": "T3",
-        "name": "Consumer Spending Risk",
-        "score_at_flip": 30
+      "date": "2026-02-26",
+      "price": 1.08,
+      "change_pct": -1.37,
+      "volume_ratio": null,
+      "scores": {
+        "N1": 0.27,
+        "N2": 0.34,
+        "N3": 0.24,
+        "N4": 0.15
       },
-      "to": {
-        "id": "N3",
-        "name": "Consumer Spending Risk",
-        "score_at_flip": 30
-      },
-      "trigger": "Significant price move of 7%",
-      "price_on_day": 1.07,
-      "price_change_pct": 7
+      "ranks": [
+        "N2",
+        "N1",
+        "N3",
+        "N4"
+      ],
+      "skew": 0,
+      "dominant": "N2",
+      "flip": false,
+      "flags": [],
+      "events": [],
+      "reconstructed": false
     }
   ]
 }

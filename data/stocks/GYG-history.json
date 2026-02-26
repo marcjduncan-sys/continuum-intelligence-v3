@@ -1,6 +1,30 @@
 {
   "ticker": "GYG",
-  "history": [
+  "flips": [
+    {
+      "date": "2026-02-24",
+      "from": {
+        "id": "T3",
+        "name": "Growth Maturation / Valuation Correction",
+        "score_at_flip": 36
+      },
+      "to": {
+        "id": "N3",
+        "name": "Growth Maturation / Valuation Correction",
+        "score_at_flip": 36
+      },
+      "trigger": "Score recalculation",
+      "price_on_day": 19.5,
+      "price_change_pct": 1.99
+    }
+  ],
+  "freshness": {
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_research_update": "2026-02-26T01:30:48.610Z",
+  "entries": [
     {
       "date": "2025-11-27",
       "price": 23.43,
@@ -3096,24 +3120,30 @@
       "flip_detail": null,
       "events": [],
       "overcorrection_active": false
-    }
-  ],
-  "flips": [
+    },
     {
-      "date": "2026-02-24",
-      "from": {
-        "id": "T3",
-        "name": "Growth Maturation / Valuation Correction",
-        "score_at_flip": 36
+      "date": "2026-02-26",
+      "price": 18.54,
+      "change_pct": 2.66,
+      "volume_ratio": null,
+      "scores": {
+        "N1": 0.32,
+        "N2": 0.39,
+        "N3": 0.19,
+        "N4": 0.1
       },
-      "to": {
-        "id": "N3",
-        "name": "Growth Maturation / Valuation Correction",
-        "score_at_flip": 36
-      },
-      "trigger": "Score recalculation",
-      "price_on_day": 19.5,
-      "price_change_pct": 1.99
+      "ranks": [
+        "N2",
+        "N1",
+        "N3",
+        "N4"
+      ],
+      "skew": 0,
+      "dominant": "N2",
+      "flip": false,
+      "flags": [],
+      "events": [],
+      "reconstructed": false
     }
   ]
 }

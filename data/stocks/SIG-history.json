@@ -1,6 +1,30 @@
 {
   "ticker": "SIG",
-  "history": [
+  "flips": [
+    {
+      "date": "2026-02-24",
+      "from": {
+        "id": "T2",
+        "name": "Escrow Overhang Triggers De-Rating",
+        "score_at_flip": 33
+      },
+      "to": {
+        "id": "N2",
+        "name": "Escrow Overhang Triggers De-Rating",
+        "score_at_flip": 33
+      },
+      "trigger": "Score recalculation",
+      "price_on_day": 3.02,
+      "price_change_pct": 0.33
+    }
+  ],
+  "freshness": {
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_research_update": "2026-02-26T01:30:48.610Z",
+  "entries": [
     {
       "date": "2025-11-27",
       "price": 2.93,
@@ -3096,24 +3120,30 @@
       "flip_detail": null,
       "events": [],
       "overcorrection_active": false
-    }
-  ],
-  "flips": [
+    },
     {
-      "date": "2026-02-24",
-      "from": {
-        "id": "T2",
-        "name": "Escrow Overhang Triggers De-Rating",
-        "score_at_flip": 33
+      "date": "2026-02-26",
+      "price": 3.2,
+      "change_pct": 6.67,
+      "volume_ratio": null,
+      "scores": {
+        "N1": 0.32,
+        "N2": 0.39,
+        "N3": 0.19,
+        "N4": 0.1
       },
-      "to": {
-        "id": "N2",
-        "name": "Escrow Overhang Triggers De-Rating",
-        "score_at_flip": 33
-      },
-      "trigger": "Score recalculation",
-      "price_on_day": 3.02,
-      "price_change_pct": 0.33
+      "ranks": [
+        "N2",
+        "N1",
+        "N3",
+        "N4"
+      ],
+      "skew": 0,
+      "dominant": "N2",
+      "flip": false,
+      "flags": [],
+      "events": [],
+      "reconstructed": false
     }
   ]
 }

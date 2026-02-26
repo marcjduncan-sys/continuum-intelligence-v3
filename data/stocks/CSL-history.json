@@ -1,6 +1,30 @@
 {
   "ticker": "CSL",
-  "history": [
+  "flips": [
+    {
+      "date": "2026-02-24",
+      "from": {
+        "id": "T2",
+        "name": "Execution Risk in Transformation",
+        "score_at_flip": 31
+      },
+      "to": {
+        "id": "N2",
+        "name": "Execution Risk in Transformation",
+        "score_at_flip": 31
+      },
+      "trigger": "Score recalculation",
+      "price_on_day": 151.56,
+      "price_change_pct": -0.4
+    }
+  ],
+  "freshness": {
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_research_update": "2026-02-26T01:30:48.610Z",
+  "entries": [
     {
       "date": "2025-11-27",
       "price": 180.08,
@@ -3096,24 +3120,30 @@
       "flip_detail": null,
       "events": [],
       "overcorrection_active": false
-    }
-  ],
-  "flips": [
+    },
     {
-      "date": "2026-02-24",
-      "from": {
-        "id": "T2",
-        "name": "Execution Risk in Transformation",
-        "score_at_flip": 31
+      "date": "2026-02-26",
+      "price": 145.62,
+      "change_pct": 0.43,
+      "volume_ratio": null,
+      "scores": {
+        "N1": 0.17,
+        "N2": 0.27,
+        "N3": 0.34,
+        "N4": 0.22
       },
-      "to": {
-        "id": "N2",
-        "name": "Execution Risk in Transformation",
-        "score_at_flip": 31
-      },
-      "trigger": "Score recalculation",
-      "price_on_day": 151.56,
-      "price_change_pct": -0.4
+      "ranks": [
+        "N3",
+        "N2",
+        "N4",
+        "N1"
+      ],
+      "skew": 0,
+      "dominant": "N3",
+      "flip": false,
+      "flags": [],
+      "events": [],
+      "reconstructed": false
     }
   ]
 }

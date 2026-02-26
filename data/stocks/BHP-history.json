@@ -1,6 +1,30 @@
 {
   "ticker": "BHP",
-  "history": [
+  "flips": [
+    {
+      "date": "2026-02-24",
+      "from": {
+        "id": "T1",
+        "name": "Copper Supercycle",
+        "score_at_flip": 34
+      },
+      "to": {
+        "id": "N1",
+        "name": "Copper Supercycle",
+        "score_at_flip": 34
+      },
+      "trigger": "Score recalculation",
+      "price_on_day": 52.74,
+      "price_change_pct": 4.73
+    }
+  ],
+  "freshness": {
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_research_update": "2026-02-26T01:30:48.610Z",
+  "entries": [
     {
       "date": "2025-11-27",
       "price": 40.95,
@@ -3096,24 +3120,30 @@
       "flip_detail": null,
       "events": [],
       "overcorrection_active": false
-    }
-  ],
-  "flips": [
+    },
     {
-      "date": "2026-02-24",
-      "from": {
-        "id": "T1",
-        "name": "Copper Supercycle",
-        "score_at_flip": 34
+      "date": "2026-02-26",
+      "price": 58.02,
+      "change_pct": 5.97,
+      "volume_ratio": null,
+      "scores": {
+        "N1": 0.41,
+        "N2": 0.48,
+        "N3": 0.06,
+        "N4": 0.05
       },
-      "to": {
-        "id": "N1",
-        "name": "Copper Supercycle",
-        "score_at_flip": 34
-      },
-      "trigger": "Score recalculation",
-      "price_on_day": 52.74,
-      "price_change_pct": 4.73
+      "ranks": [
+        "N2",
+        "N1",
+        "N3",
+        "N4"
+      ],
+      "skew": 0,
+      "dominant": "N2",
+      "flip": false,
+      "flags": [],
+      "events": [],
+      "reconstructed": false
     }
   ]
 }

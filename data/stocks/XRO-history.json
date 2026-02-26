@@ -1,6 +1,30 @@
 {
   "ticker": "XRO",
-  "history": [
+  "flips": [
+    {
+      "date": "2026-02-24",
+      "from": {
+        "id": "T3",
+        "name": "AI Disruption Re-Prices SaaS",
+        "score_at_flip": 38
+      },
+      "to": {
+        "id": "N3",
+        "name": "AI Disruption Re-Prices SaaS",
+        "score_at_flip": 38
+      },
+      "trigger": "Score recalculation",
+      "price_on_day": 78.5,
+      "price_change_pct": -0.71
+    }
+  ],
+  "freshness": {
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_research_update": "2026-02-26T01:30:48.610Z",
+  "entries": [
     {
       "date": "2025-11-27",
       "price": 118.25,
@@ -3096,24 +3120,30 @@
       "flip_detail": null,
       "events": [],
       "overcorrection_active": false
-    }
-  ],
-  "flips": [
+    },
     {
-      "date": "2026-02-24",
-      "from": {
-        "id": "T3",
-        "name": "AI Disruption Re-Prices SaaS",
-        "score_at_flip": 38
+      "date": "2026-02-26",
+      "price": 81.26,
+      "change_pct": 13.11,
+      "volume_ratio": null,
+      "scores": {
+        "N1": 0.32,
+        "N2": 0.39,
+        "N3": 0.19,
+        "N4": 0.1
       },
-      "to": {
-        "id": "N3",
-        "name": "AI Disruption Re-Prices SaaS",
-        "score_at_flip": 38
-      },
-      "trigger": "Score recalculation",
-      "price_on_day": 78.5,
-      "price_change_pct": -0.71
+      "ranks": [
+        "N2",
+        "N1",
+        "N3",
+        "N4"
+      ],
+      "skew": 0,
+      "dominant": "N2",
+      "flip": false,
+      "flags": [],
+      "events": [],
+      "reconstructed": false
     }
   ]
 }

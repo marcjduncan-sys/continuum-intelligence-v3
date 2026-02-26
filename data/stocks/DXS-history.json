@@ -1,6 +1,30 @@
 {
   "ticker": "DXS",
-  "history": [
+  "flips": [
+    {
+      "date": "2026-02-24",
+      "from": {
+        "id": "T2",
+        "name": "Steady-State REIT",
+        "score_at_flip": 33
+      },
+      "to": {
+        "id": "N2",
+        "name": "Steady-State REIT",
+        "score_at_flip": 33
+      },
+      "trigger": "Score recalculation",
+      "price_on_day": 6.31,
+      "price_change_pct": 0.16
+    }
+  ],
+  "freshness": {
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_research_update": "2026-02-26T01:30:48.610Z",
+  "entries": [
     {
       "date": "2025-11-27",
       "price": 7.21,
@@ -3096,24 +3120,30 @@
       "flip_detail": null,
       "events": [],
       "overcorrection_active": false
-    }
-  ],
-  "flips": [
+    },
     {
-      "date": "2026-02-24",
-      "from": {
-        "id": "T2",
-        "name": "Steady-State REIT",
-        "score_at_flip": 33
+      "date": "2026-02-26",
+      "price": 6.61,
+      "change_pct": 0.61,
+      "volume_ratio": null,
+      "scores": {
+        "N1": 0.36,
+        "N2": 0.46,
+        "N3": 0.12,
+        "N4": 0.06
       },
-      "to": {
-        "id": "N2",
-        "name": "Steady-State REIT",
-        "score_at_flip": 33
-      },
-      "trigger": "Score recalculation",
-      "price_on_day": 6.31,
-      "price_change_pct": 0.16
+      "ranks": [
+        "N2",
+        "N1",
+        "N3",
+        "N4"
+      ],
+      "skew": 0,
+      "dominant": "N2",
+      "flip": false,
+      "flags": [],
+      "events": [],
+      "reconstructed": false
     }
   ]
 }

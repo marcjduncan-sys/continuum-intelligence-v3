@@ -11,10 +11,10 @@
       "what_to_watch": "H1 FY26 plasma collection volumes and Vifor integration milestones. If plasma cost per litre returns to pre-COVID levels, this narrative strengthens significantly.",
       "upside": "Pipeline catalysts (CSL112, garadacimab) could drive re-rating if clinical data exceeds expectations.",
       "risk_plain": "If plasma collection costs stay elevated or Vifor integration hits unexpected problems, the growth story weakens.",
-      "survival_score": 0.27,
-      "status": "MODERATE",
+      "survival_score": 0.17,
+      "status": "VERY_LOW",
       "weighted_inconsistency": 2.5,
-      "last_updated": "2026-02-25T08:09:34.717Z"
+      "last_updated": "2026-02-26T01:30:48.610Z"
     },
     "N2": {
       "label": "Managed/Base Case",
@@ -23,10 +23,10 @@
       "what_to_watch": "FY26 earnings guidance at H1 result. If guidance stays at 7-10% NPATA growth, the base case holds firm.",
       "upside": "Consistent execution could attract more long-only institutional capital, supporting valuation multiples.",
       "risk_plain": "If growth slips below high single digits, the premium valuation may not be sustainable.",
-      "survival_score": 0.37,
-      "status": "HIGH",
+      "survival_score": 0.27,
+      "status": "LOW",
       "weighted_inconsistency": 1,
-      "last_updated": "2026-02-25T08:09:34.717Z"
+      "last_updated": "2026-02-26T01:30:48.610Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Vifor integration costs in H1 FY26 and AUD/USD exchange rate trajectory. If integration costs rise or AUD strengthens above 0.70, downside risk increases.",
       "upside": null,
       "risk_plain": "Currency headwinds alone could knock 3-5% off reported earnings, and if combined with slower Vifor synergies, the stock could de-rate.",
-      "survival_score": 0.24,
+      "survival_score": 0.34,
       "status": "LOW",
       "weighted_inconsistency": 4.2,
-      "last_updated": "2026-02-25T08:09:34.717Z"
+      "last_updated": "2026-02-26T01:30:48.610Z"
     },
     "N4": {
       "label": "Disruption",
@@ -47,26 +47,26 @@
       "what_to_watch": "Gene therapy clinical trial results targeting primary immunodeficiency conditions, and any biosimilar approvals for immunoglobulin products in major markets.",
       "upside": null,
       "risk_plain": "While this is a long-term risk, any breakthrough gene therapy result could trigger a sharp de-rating of the entire plasma sector.",
-      "survival_score": 0.12,
-      "status": "VERY_LOW",
+      "survival_score": 0.22,
+      "status": "LOW",
       "weighted_inconsistency": 7.1,
-      "last_updated": "2026-02-25T08:09:34.717Z"
+      "last_updated": "2026-02-26T01:30:48.610Z"
     }
   },
-  "dominant": "N2",
-  "confidence": "HIGH",
+  "dominant": "N3",
+  "confidence": "LOW",
   "alert_state": "OVERCORRECTION",
   "alert_started": null,
-  "current_price": 145,
+  "current_price": 145.62,
   "big_picture": "CSL is a global biotech leader specialising in plasma-derived therapies and vaccines. It is one of only three companies worldwide that can collect and process blood plasma at scale, giving it an extremely strong competitive position.",
   "last_flip": {
-    "date": "2025-08-20",
-    "from": "N1",
-    "to": "N2",
-    "trigger": "FY25 result in-line but guidance conservative; plasma margin recovery on track but gradual",
-    "price_at_flip": 278,
-    "from_survival": 0.36,
-    "to_survival": 0.72
+    "date": "2026-02-26",
+    "from": "N2",
+    "to": "N3",
+    "trigger": "Automated: survival score shift (Managed/Base Case → Risk/Downside)",
+    "price_at_flip": 145.62,
+    "from_survival": 0.27,
+    "to_survival": 0.34
   },
   "narrative_history": [
     {
@@ -77,6 +77,15 @@
       "price_at_flip": 305,
       "from_survival": 0.4,
       "to_survival": 0.78
+    },
+    {
+      "date": "2025-08-20",
+      "from": "N1",
+      "to": "N2",
+      "trigger": "FY25 result in-line but guidance conservative; plasma margin recovery on track but gradual",
+      "price_at_flip": 278,
+      "from_survival": 0.36,
+      "to_survival": 0.72
     }
   ],
   "evidence_items": [
@@ -267,15 +276,16 @@
     "computed_at": "2026-02-24T07:54:39.547Z"
   },
   "priceHistory": [
-    145
+    145,
+    145.62
   ],
   "freshness": {
-    "pricePctChange": -49.2,
-    "urgency": 40,
-    "status": "HIGH",
-    "badge": "high"
+    "pricePctChange": 0.4,
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
   },
-  "last_price_update": "2026-02-24T09:12:32.734Z",
+  "last_price_update": "2026-02-26T01:30:48.481Z",
   "technicalAnalysis": {
     "date": "11 February 2026",
     "period": "1 Year",
@@ -283,7 +293,7 @@
     "regime": "Breakdown",
     "clarity": "Clear",
     "price": {
-      "current": 145,
+      "current": 145.62,
       "currency": "A$"
     },
     "movingAverages": {
@@ -415,15 +425,15 @@
         "name": "S&amp;P/ASX 200",
         "period": "12 months",
         "stockReturn": -39.9,
-        "indexReturn": -2.3,
-        "relativeReturn": -37.6
+        "indexReturn": 6.9,
+        "relativeReturn": -46.8
       },
       "vsSector": {
         "name": "S&amp;P/ASX Healthcare",
         "period": "12 months",
         "stockReturn": -39.9,
-        "sectorReturn": -12.4,
-        "relativeReturn": -27.5
+        "sectorReturn": -24.9,
+        "relativeReturn": -15
       }
     }
   },
@@ -436,5 +446,10 @@
     "movePct": -49.23,
     "reviewDate": "2026-03-04",
     "message": "Single-day move of -49.2% exceeds 10% threshold — possible overcorrection"
-  }
+  },
+  "price_evidence": {
+    "last_run": "2026-02-26T01:30:48.610Z",
+    "classification": "MATERIAL"
+  },
+  "last_research_update": "2026-02-26T01:30:48.610Z"
 }

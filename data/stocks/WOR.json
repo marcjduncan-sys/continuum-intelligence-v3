@@ -11,10 +11,10 @@
       "what_to_watch": "Sustainability revenue mix, new contract wins in hydrogen/CCS/offshore wind, IRA and EU Green Deal funding.",
       "upside": "Material re-rating if sustainability revenue exceeds 60% and margins converge with traditional energy.",
       "risk_plain": "If project delays persist and sustainability margins remain structurally lower, growth thesis weakens.",
-      "survival_score": 0.5,
-      "status": "MODERATE",
+      "survival_score": 0.28,
+      "status": "LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-02-18T00:00:00.000Z"
+      "last_updated": "2026-02-26T01:30:48.610Z"
     },
     "N2": {
       "label": "Traditional Energy Cash Cow",
@@ -23,10 +23,10 @@
       "what_to_watch": "LNG investment cycle, Middle East upstream capex, oil price trajectory.",
       "upside": "If traditional energy spending sustains, segment provides stable cash flow and higher margins.",
       "risk_plain": "If oil prices collapse below US$60/bbl, traditional energy capex would be cut sharply.",
-      "survival_score": 0.6,
-      "status": "MODERATE",
+      "survival_score": 0.37,
+      "status": "LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-02-18T00:00:00.000Z"
+      "last_updated": "2026-02-26T01:30:48.610Z"
     },
     "N3": {
       "label": "Margin Pressure",
@@ -35,10 +35,10 @@
       "what_to_watch": "Quarterly EBITA margin, fixed-price contract run-off, sustainability vs traditional margin gap.",
       "upside": null,
       "risk_plain": "If margins cannot reach 8%+ by FY26, the market will question management execution credibility.",
-      "survival_score": 0.3,
+      "survival_score": 0.22,
       "status": "LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-02-18T00:00:00.000Z"
+      "last_updated": "2026-02-26T01:30:48.610Z"
     },
     "N4": {
       "label": "Cyclical Downturn",
@@ -47,18 +47,26 @@
       "what_to_watch": "Global recession indicators, oil price, government clean energy subsidy policies, backlog cancellations.",
       "upside": null,
       "risk_plain": "In past downturns revenue fell 20-30% and margins compressed to near-zero; elevated leverage amplifies risk.",
-      "survival_score": 0.15,
-      "status": "LOW",
+      "survival_score": 0.13,
+      "status": "VERY_LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-02-18T00:00:00.000Z"
+      "last_updated": "2026-02-26T01:30:48.610Z"
     }
   },
-  "dominant": "N1",
-  "confidence": "LOW",
+  "dominant": "N2",
+  "confidence": "MODERATE",
   "alert_state": "NORMAL",
-  "current_price": 12.95,
+  "current_price": 11.69,
   "big_picture": "Worley Limited (ASX: WOR) — coverage initiated. Full analysis pending.",
-  "last_flip": null,
+  "last_flip": {
+    "date": "2026-02-26",
+    "from": "N1",
+    "to": "N2",
+    "trigger": "Automated: survival score shift (Energy Transition Winner → Traditional Energy Cash Cow)",
+    "price_at_flip": 11.69,
+    "from_survival": 0.28,
+    "to_survival": 0.37
+  },
   "narrative_history": [],
   "evidence_items": [],
   "price_signals": [
@@ -212,15 +220,16 @@
     "computed_at": "2026-02-24T07:54:39.560Z"
   },
   "priceHistory": [
-    12.95
+    12.95,
+    11.69
   ],
   "freshness": {
-    "pricePctChange": 0.8,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
+    "pricePctChange": -9.7,
+    "urgency": 20,
+    "status": "MODERATE",
+    "badge": "moderate"
   },
-  "last_price_update": "2026-02-24T09:12:33.065Z",
+  "last_price_update": "2026-02-26T01:30:48.506Z",
   "technicalAnalysis": {
     "date": "14 February 2026",
     "period": "12 months",
@@ -228,7 +237,7 @@
     "regime": "Downtrend — Bottoming Attempt",
     "clarity": "Low clarity, searching for base",
     "price": {
-      "current": 12.95,
+      "current": 11.69,
       "currency": "A$"
     },
     "movingAverages": {
@@ -335,16 +344,21 @@
         "name": "S&P/ASX 200",
         "period": "12 months",
         "stockReturn": -26.6,
-        "indexReturn": 8.5,
-        "relativeReturn": -35.1
+        "indexReturn": 6.9,
+        "relativeReturn": -33.5
       },
       "vsSector": {
         "name": "S&P/ASX Energy",
         "period": "12 months",
         "stockReturn": -26.6,
-        "sectorReturn": -8.2,
-        "relativeReturn": -18.4
+        "sectorReturn": -2.3,
+        "relativeReturn": -24.3
       }
     }
-  }
+  },
+  "price_evidence": {
+    "last_run": "2026-02-26T01:30:48.610Z",
+    "classification": "SIGNIFICANT"
+  },
+  "last_research_update": "2026-02-26T01:30:48.610Z"
 }
