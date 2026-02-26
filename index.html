@@ -4827,8 +4827,11 @@ a:hover { color: var(--accent-sage); }
         <div class="featured-grid" id="featured-grid"></div>
 
         <!-- Coverage Universe -->
-        <div class="section-header">
+        <div class="section-header" style="display:flex;align-items:center;justify-content:space-between">
             <div class="section-title">Coverage Universe</div>
+            <button class="btn-refresh-all" id="btn-refresh-all" onclick="triggerRefreshAll()">
+                &#8635; Refresh All Research
+            </button>
         </div>
 
         <table class="coverage-table" id="coverage-table">
@@ -11559,6 +11562,465 @@ function _resetRefreshUI(ticker) {
     }
     if (progress) progress.style.display = 'none';
     if (fill) fill.style.width = '0%';
+}
+</script>
+
+<!-- ============================================================
+     BATCH REFRESH MODAL
+     ============================================================ -->
+<div id="batch-refresh-modal" class="batch-modal" style="display:none">
+  <div class="batch-modal-backdrop" onclick="closeBatchModal()"></div>
+  <div class="batch-modal-content">
+    <div class="batch-modal-header">
+      <h2 class="batch-modal-title">Refreshing All Research</h2>
+      <button class="batch-modal-close" onclick="closeBatchModal()">&times;</button>
+    </div>
+    <div class="batch-overall">
+      <div class="batch-progress-track">
+        <div class="batch-progress-fill" id="batch-overall-fill" style="width:0%"></div>
+      </div>
+      <div class="batch-stats" id="batch-stats">Queuing 21 stocks...</div>
+    </div>
+    <div class="batch-ticker-grid" id="batch-ticker-grid"></div>
+    <div class="batch-modal-footer">
+      <span class="batch-elapsed" id="batch-elapsed"></span>
+      <button class="batch-close-btn" id="batch-close-btn" onclick="closeBatchModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Refresh All button */
+.btn-refresh-all {
+  background: linear-gradient(135deg, #0a2f1f 0%, #145a3a 100%);
+  color: #00c875;
+  border: 1px solid rgba(0,200,117,0.3);
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-refresh-all:hover {
+  background: linear-gradient(135deg, #145a3a 0%, #1a7a4e 100%);
+  border-color: rgba(0,200,117,0.6);
+  box-shadow: 0 0 12px rgba(0,200,117,0.15);
+}
+.btn-refresh-all:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+[data-theme="light"] .btn-refresh-all {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  color: #1b5e20;
+  border-color: rgba(27,94,32,0.3);
+}
+
+/* Batch modal */
+.batch-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.batch-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+}
+.batch-modal-content {
+  position: relative;
+  background: #0d1b14;
+  border: 1px solid rgba(0,200,117,0.2);
+  border-radius: 12px;
+  width: 680px;
+  max-width: 95vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+[data-theme="light"] .batch-modal-content {
+  background: #fff;
+  border-color: #ddd;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+.batch-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.batch-modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #e0e0e0;
+  margin: 0;
+}
+[data-theme="light"] .batch-modal-title { color: #1a1a1a; }
+.batch-modal-close {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.batch-modal-close:hover { color: #fff; }
+
+/* Overall progress */
+.batch-overall { margin-bottom: 20px; }
+.batch-progress-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+[data-theme="light"] .batch-progress-track { background: #e0e0e0; }
+.batch-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00c875, #00e68a);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+.batch-stats {
+  font-size: 0.82rem;
+  color: #aaa;
+  text-align: center;
+}
+[data-theme="light"] .batch-stats { color: #666; }
+
+/* Ticker grid */
+.batch-ticker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+@media (max-width: 600px) {
+  .batch-ticker-grid { grid-template-columns: repeat(4, 1fr); }
+}
+.batch-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 10px 6px;
+  text-align: center;
+  transition: all 0.3s;
+}
+[data-theme="light"] .batch-card {
+  background: #f8f8f8;
+  border-color: #e0e0e0;
+}
+.batch-card.status-queued { opacity: 0.5; }
+.batch-card.status-running {
+  border-color: rgba(87,155,252,0.5);
+  background: rgba(87,155,252,0.08);
+}
+.batch-card.status-completed {
+  border-color: rgba(0,200,117,0.5);
+  background: rgba(0,200,117,0.08);
+}
+.batch-card.status-failed {
+  border-color: rgba(228,66,88,0.5);
+  background: rgba(228,66,88,0.08);
+}
+.batch-card-ticker {
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  margin-bottom: 4px;
+  color: #e0e0e0;
+}
+[data-theme="light"] .batch-card-ticker { color: #1a1a1a; }
+.batch-card-mini-bar {
+  width: 100%;
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+[data-theme="light"] .batch-card-mini-bar { background: #ddd; }
+.batch-card-mini-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s;
+  background: #579bfc;
+}
+.status-completed .batch-card-mini-fill { background: #00c875; width: 100% !important; }
+.status-failed .batch-card-mini-fill { background: #e44258; width: 100% !important; }
+.batch-card-icon {
+  font-size: 0.7rem;
+  color: #888;
+}
+.status-queued .batch-card-icon { color: #666; }
+.status-running .batch-card-icon { color: #579bfc; }
+.status-completed .batch-card-icon { color: #00c875; }
+.status-failed .batch-card-icon { color: #e44258; }
+
+/* Footer */
+.batch-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.batch-elapsed {
+  font-size: 0.78rem;
+  color: #888;
+  font-family: 'JetBrains Mono', monospace;
+}
+.batch-close-btn {
+  background: rgba(255,255,255,0.08);
+  color: #ccc;
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+.batch-close-btn:hover { background: rgba(255,255,255,0.15); }
+[data-theme="light"] .batch-close-btn {
+  background: #f0f0f0;
+  color: #333;
+  border-color: #ccc;
+}
+</style>
+
+<script>
+// ============================================================
+// BATCH REFRESH (Refresh All)
+// ============================================================
+var _batchPoller = null;
+var _batchStartTime = null;
+
+async function triggerRefreshAll() {
+    var btn = document.getElementById('btn-refresh-all');
+    if (btn) { btn.disabled = true; btn.textContent = 'Refreshing...'; }
+
+    try {
+        var resp = await fetch(REFRESH_API_BASE + '/api/refresh-all', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (resp.status === 409) {
+            // Already running — just open modal and start polling
+            _showBatchModal();
+            _startBatchPolling();
+            return;
+        }
+
+        if (!resp.ok) {
+            var err = await resp.json().catch(function() { return {}; });
+            throw new Error(err.detail || 'Batch refresh failed (' + resp.status + ')');
+        }
+
+        var data = await resp.json();
+        _batchStartTime = Date.now();
+
+        // Build the ticker grid
+        _buildBatchGrid(data.tickers);
+        _showBatchModal();
+        _startBatchPolling();
+
+    } catch (err) {
+        console.error('Batch refresh error:', err);
+        alert('Failed to start batch refresh: ' + err.message);
+        if (btn) { btn.disabled = false; btn.textContent = '\u21BB Refresh All Research'; }
+    }
+}
+
+function _buildBatchGrid(tickers) {
+    var grid = document.getElementById('batch-ticker-grid');
+    if (!grid) return;
+    var html = '';
+    for (var i = 0; i < tickers.length; i++) {
+        html += '<div class="batch-card status-queued" id="batch-card-' + tickers[i] + '">' +
+            '<div class="batch-card-ticker">' + tickers[i] + '</div>' +
+            '<div class="batch-card-mini-bar"><div class="batch-card-mini-fill" style="width:0%"></div></div>' +
+            '<div class="batch-card-icon">\u25CB</div>' +
+        '</div>';
+    }
+    grid.innerHTML = html;
+}
+
+function _showBatchModal() {
+    var modal = document.getElementById('batch-refresh-modal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeBatchModal() {
+    var modal = document.getElementById('batch-refresh-modal');
+    if (modal) modal.style.display = 'none';
+    // Don't stop polling — let it continue in background
+}
+
+function _startBatchPolling() {
+    if (_batchPoller) clearInterval(_batchPoller);
+    _batchPoller = setInterval(_pollBatchStatus, 3000);
+    _pollBatchStatus(); // immediate first poll
+}
+
+async function _pollBatchStatus() {
+    try {
+        var resp = await fetch(REFRESH_API_BASE + '/api/refresh-all/status');
+        if (!resp.ok) return;
+
+        var data = await resp.json();
+
+        // Update overall progress
+        var fill = document.getElementById('batch-overall-fill');
+        if (fill) fill.style.width = data.overall_progress_pct + '%';
+
+        var stats = document.getElementById('batch-stats');
+        if (stats) {
+            stats.textContent = data.total_completed + '/' + data.total + ' completed' +
+                (data.total_failed > 0 ? ', ' + data.total_failed + ' failed' : '') +
+                (data.total_in_progress > 0 ? ', ' + data.total_in_progress + ' in progress' : '') +
+                (data.total_queued > 0 ? ', ' + data.total_queued + ' queued' : '');
+        }
+
+        // Update elapsed time
+        if (_batchStartTime) {
+            var elapsed = Math.round((Date.now() - _batchStartTime) / 1000);
+            var mins = Math.floor(elapsed / 60);
+            var secs = elapsed % 60;
+            var elapsedEl = document.getElementById('batch-elapsed');
+            if (elapsedEl) elapsedEl.textContent = mins + 'm ' + (secs < 10 ? '0' : '') + secs + 's';
+        }
+
+        // Update per-ticker cards
+        var tickerStatuses = data.per_ticker_status || [];
+        for (var i = 0; i < tickerStatuses.length; i++) {
+            var ts = tickerStatuses[i];
+            _updateBatchCard(ts);
+        }
+
+        // Check if done
+        if (data.status === 'completed' || data.status === 'partially_failed' || data.status === 'failed') {
+            clearInterval(_batchPoller);
+            _batchPoller = null;
+
+            // Re-enable button
+            var btn = document.getElementById('btn-refresh-all');
+            if (btn) { btn.disabled = false; btn.textContent = '\u21BB Refresh All Research'; }
+
+            // Fetch all results and merge
+            _fetchAndMergeBatchResults();
+        }
+
+    } catch (e) {
+        console.error('Batch poll error:', e);
+    }
+}
+
+function _updateBatchCard(ts) {
+    var card = document.getElementById('batch-card-' + ts.ticker);
+    if (!card) return;
+
+    // Determine visual status class
+    var statusClass = 'status-queued';
+    var icon = '\u25CB'; // circle
+    if (ts.status === 'completed') {
+        statusClass = 'status-completed';
+        icon = '\u2713'; // checkmark
+    } else if (ts.status === 'failed') {
+        statusClass = 'status-failed';
+        icon = '\u2717'; // cross
+    } else if (ts.status !== 'queued') {
+        statusClass = 'status-running';
+        icon = '\u21BB'; // refresh
+    }
+
+    card.className = 'batch-card ' + statusClass;
+
+    var miniFill = card.querySelector('.batch-card-mini-fill');
+    if (miniFill) miniFill.style.width = ts.progress_pct + '%';
+
+    var iconEl = card.querySelector('.batch-card-icon');
+    if (iconEl) {
+        iconEl.textContent = icon;
+        if (ts.error) iconEl.title = ts.error;
+    }
+}
+
+async function _fetchAndMergeBatchResults() {
+    try {
+        var resp = await fetch(REFRESH_API_BASE + '/api/refresh-all/results');
+        if (!resp.ok) {
+            console.error('Failed to fetch batch results:', resp.status);
+            return;
+        }
+
+        var data = await resp.json();
+        var results = data.results || {};
+        var currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00A3','EUR':'\u20AC'};
+        var merged = 0;
+
+        for (var ticker in results) {
+            if (!results.hasOwnProperty(ticker)) continue;
+            var updatedData = results[ticker];
+
+            // Normalise currency
+            if (updatedData.currency && currencyMap[updatedData.currency]) {
+                updatedData.currency = currencyMap[updatedData.currency];
+            }
+
+            // Merge into STOCK_DATA, preserving live prices
+            if (typeof STOCK_DATA !== 'undefined') {
+                var livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
+                var livePriceHistory = STOCK_DATA[ticker] ? STOCK_DATA[ticker].priceHistory : undefined;
+                STOCK_DATA[ticker] = updatedData;
+                if (livePrice !== undefined) {
+                    STOCK_DATA[ticker]._livePrice = livePrice;
+                    STOCK_DATA[ticker].price = livePrice;
+                }
+                if (livePriceHistory) STOCK_DATA[ticker].priceHistory = livePriceHistory;
+            }
+
+            // Cache in localStorage
+            try {
+                localStorage.setItem('ci_research_' + ticker, JSON.stringify(updatedData));
+            } catch (lsErr) { /* ignore */ }
+
+            merged++;
+        }
+
+        console.log('[BatchRefresh] Merged ' + merged + ' tickers into STOCK_DATA');
+
+        // Re-render current page if it's a report page
+        var hash = window.location.hash || '';
+        var reportMatch = hash.match(/^#report-(\w+)/);
+        if (reportMatch) {
+            var currentTicker = reportMatch[1].toUpperCase();
+            if (STOCK_DATA[currentTicker]) {
+                if (typeof destroyNarrativeTimelineChart === 'function') {
+                    destroyNarrativeTimelineChart(currentTicker);
+                }
+                var container = document.getElementById('page-report-' + currentTicker);
+                if (container && typeof renderReportPage === 'function') {
+                    container.innerHTML = renderReportPage(STOCK_DATA[currentTicker]);
+                    if (typeof initChartForTicker === 'function') initChartForTicker(currentTicker);
+                    if (typeof initInlineChat === 'function') initInlineChat();
+                }
+            }
+        }
+
+        // Re-render coverage table and featured grid if on home page
+        if (typeof renderCoverageTable === 'function') renderCoverageTable();
+        if (typeof renderFeaturedGrid === 'function') renderFeaturedGrid();
+
+    } catch (e) {
+        console.error('Batch result merge error:', e);
+    }
 }
 </script>
 

@@ -21,7 +21,11 @@ from pydantic import BaseModel, Field
 
 import config
 from ingest import ingest, get_tickers, get_passage_count
-from refresh import RefreshJob, refresh_jobs, get_job, is_running, run_refresh
+from refresh import (
+    RefreshJob, refresh_jobs, get_job, is_running, run_refresh,
+    batch_jobs, get_batch_job, get_latest_batch_job, is_batch_running,
+    run_batch_refresh,
+)
 from retriever import retrieve
 
 logging.basicConfig(level=logging.INFO)
@@ -342,6 +346,13 @@ async def trigger_refresh(ticker: str, background_tasks: BackgroundTasks):
             detail=f"No research data found for '{ticker}'",
         )
 
+    # Check if ticker is part of an active batch refresh
+    if is_batch_running():
+        raise HTTPException(
+            status_code=409,
+            detail=f"{ticker} is part of an active batch refresh",
+        )
+
     # Check for existing running job
     if is_running(ticker):
         raise HTTPException(
@@ -409,6 +420,118 @@ async def refresh_result(ticker: str):
             return json.load(f)
 
     raise HTTPException(status_code=404, detail="Research data not found")
+
+
+# ---------------------------------------------------------------------------
+# Batch refresh endpoints
+# ---------------------------------------------------------------------------
+
+def _run_batch_background(batch_id: str, tickers: list[str]):
+    """Run batch refresh in a new event loop (for BackgroundTasks)."""
+    loop = asyncio.new_event_loop()
+    try:
+        loop.run_until_complete(run_batch_refresh(batch_id, tickers))
+    finally:
+        loop.close()
+
+
+@app.post("/api/refresh-all")
+async def trigger_refresh_all(background_tasks: BackgroundTasks):
+    """Trigger a batch refresh for all stocks with research data."""
+    if is_batch_running():
+        raise HTTPException(
+            status_code=409,
+            detail="A batch refresh is already in progress",
+        )
+
+    # Discover all tickers from research data files
+    data_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
+    tickers = sorted(
+        p.stem.upper()
+        for p in data_dir.glob("*.json")
+        if p.stem != "_index"
+    )
+
+    if not tickers:
+        raise HTTPException(status_code=404, detail="No research data found")
+
+    # Create batch ID and launch
+    batch_id = time.strftime("%Y%m%d-%H%M%S")
+    background_tasks.add_task(_run_batch_background, batch_id, tickers)
+
+    # Pre-create the batch job so status polling works immediately
+    from refresh import BatchRefreshJob
+    batch_jobs[batch_id] = BatchRefreshJob(
+        batch_id=batch_id,
+        tickers=tickers,
+        status="in_progress",
+        per_ticker_status={
+            t: {
+                "ticker": t,
+                "status": "queued",
+                "stage_index": 0,
+                "stage_label": "Queued",
+                "progress_pct": 0,
+                "started_at": None,
+                "completed_at": None,
+                "error": None,
+            }
+            for t in tickers
+        },
+    )
+
+    return {
+        "batch_id": batch_id,
+        "status": "started",
+        "tickers": tickers,
+        "count": len(tickers),
+        "message": f"Batch refresh started for {len(tickers)} tickers",
+    }
+
+
+@app.get("/api/refresh-all/status")
+async def batch_refresh_status():
+    """Poll the progress of the latest batch refresh."""
+    job = get_latest_batch_job()
+    if job is None:
+        raise HTTPException(status_code=404, detail="No batch refresh found")
+    return job.to_dict()
+
+
+@app.get("/api/refresh-all/results")
+async def batch_refresh_results():
+    """Fetch all completed research JSONs from the latest batch."""
+    job = get_latest_batch_job()
+    if job is None:
+        raise HTTPException(status_code=404, detail="No batch refresh found")
+
+    if job.status in ("queued", "in_progress"):
+        raise HTTPException(
+            status_code=202,
+            detail="Batch refresh still in progress",
+        )
+
+    # Collect results from individual refresh_jobs
+    results = {}
+    data_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
+    for ticker in job.tickers:
+        ticker_job = get_job(ticker)
+        if ticker_job and ticker_job.result:
+            results[ticker] = ticker_job.result
+        else:
+            # Fallback: read from disk
+            path = data_dir / f"{ticker}.json"
+            if path.exists():
+                with open(path) as f:
+                    results[ticker] = json.load(f)
+
+    return {
+        "batch_id": job.batch_id,
+        "status": job.status,
+        "total_completed": job.total_completed,
+        "total_failed": job.total_failed,
+        "results": results,
+    }
 
 
 # ---------------------------------------------------------------------------

@@ -99,6 +99,245 @@ def is_running(ticker: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# Batch refresh infrastructure
+# ---------------------------------------------------------------------------
+
+@dataclass
+class BatchRefreshJob:
+    batch_id: str
+    tickers: list = field(default_factory=list)
+    status: str = "queued"  # queued | in_progress | completed | partially_failed
+    started_at: float = field(default_factory=time.time)
+    completed_at: float | None = None
+    per_ticker_status: dict = field(default_factory=dict)
+    errors: dict = field(default_factory=dict)
+
+    @property
+    def total_completed(self) -> int:
+        return sum(
+            1 for s in self.per_ticker_status.values() if s.get("status") == "completed"
+        )
+
+    @property
+    def total_failed(self) -> int:
+        return sum(
+            1 for s in self.per_ticker_status.values() if s.get("status") == "failed"
+        )
+
+    @property
+    def total_in_progress(self) -> int:
+        return sum(
+            1
+            for s in self.per_ticker_status.values()
+            if s.get("status") not in ("completed", "failed", "queued")
+        )
+
+    @property
+    def progress_pct(self) -> int:
+        if not self.tickers:
+            return 0
+        done = self.total_completed + self.total_failed
+        return int(done / len(self.tickers) * 100)
+
+    def to_dict(self) -> dict:
+        return {
+            "batch_id": self.batch_id,
+            "status": self.status,
+            "overall_progress_pct": self.progress_pct,
+            "started_at": self.started_at,
+            "completed_at": self.completed_at,
+            "total": len(self.tickers),
+            "total_completed": self.total_completed,
+            "total_failed": self.total_failed,
+            "total_in_progress": self.total_in_progress,
+            "total_queued": len(self.tickers)
+            - self.total_completed
+            - self.total_failed
+            - self.total_in_progress,
+            "per_ticker_status": [
+                self.per_ticker_status.get(
+                    t,
+                    {"ticker": t, "status": "queued", "progress_pct": 0, "stage_label": "Queued", "error": None},
+                )
+                for t in self.tickers
+            ],
+        }
+
+
+batch_jobs: dict[str, BatchRefreshJob] = {}
+_batch_semaphore: asyncio.Semaphore | None = None
+
+
+def _get_batch_semaphore() -> asyncio.Semaphore:
+    global _batch_semaphore
+    if _batch_semaphore is None:
+        _batch_semaphore = asyncio.Semaphore(3)
+    return _batch_semaphore
+
+
+def get_batch_job(batch_id: str) -> BatchRefreshJob | None:
+    return batch_jobs.get(batch_id)
+
+
+def get_latest_batch_job() -> BatchRefreshJob | None:
+    if not batch_jobs:
+        return None
+    return max(batch_jobs.values(), key=lambda j: j.started_at)
+
+
+def is_batch_running() -> bool:
+    for job in batch_jobs.values():
+        if job.status in ("queued", "in_progress"):
+            return True
+    return False
+
+
+async def _run_single_in_batch(
+    ticker: str, batch_job: BatchRefreshJob
+) -> dict | None:
+    """Run a single-ticker refresh within a batch, using semaphore for stages 2-3."""
+    ticker = ticker.upper()
+    semaphore = _get_batch_semaphore()
+
+    # Create per-ticker job entry (so individual /status endpoint also works)
+    job = RefreshJob(ticker=ticker)
+    refresh_jobs[ticker] = job
+
+    # Update batch tracking
+    batch_job.per_ticker_status[ticker] = job.to_dict()
+
+    try:
+        # Load existing research
+        research = _load_research(ticker)
+        company_name = research.get("company", ticker)
+
+        # ---- Stage 1: Data Gathering (no semaphore) ----
+        job.status = "gathering_data"
+        job.stage_index = 1
+        batch_job.per_ticker_status[ticker] = job.to_dict()
+        logger.info(f"[BATCH][{ticker}] Stage 1: Gathering data...")
+
+        gathered = await gather_all_data(ticker, company_name)
+
+        # ---- Stages 2-3: Acquire semaphore for LLM-heavy work ----
+        async with semaphore:
+            # Stage 2: Specialist Analysis (Gemini)
+            job.status = "specialist_analysis"
+            job.stage_index = 2
+            batch_job.per_ticker_status[ticker] = job.to_dict()
+            logger.info(f"[BATCH][{ticker}] Stage 2: Specialist analysis...")
+
+            evidence_update = await _run_evidence_specialists(
+                ticker, research, gathered
+            )
+
+            # Stage 3: Hypothesis Synthesis (Claude)
+            job.status = "hypothesis_synthesis"
+            job.stage_index = 3
+            batch_job.per_ticker_status[ticker] = job.to_dict()
+            logger.info(f"[BATCH][{ticker}] Stage 3: Hypothesis synthesis...")
+
+            hypothesis_update = await _run_hypothesis_synthesis(
+                ticker, research, evidence_update, gathered
+            )
+
+        # ---- Stage 4: Write Results (no semaphore) ----
+        job.status = "writing_results"
+        job.stage_index = 4
+        batch_job.per_ticker_status[ticker] = job.to_dict()
+        logger.info(f"[BATCH][{ticker}] Stage 4: Writing results...")
+
+        updated_research = _merge_updates(
+            research, gathered, evidence_update, hypothesis_update
+        )
+
+        _save_research(ticker, updated_research)
+        _update_index(ticker, updated_research)
+
+        # Mark complete
+        job.status = "completed"
+        job.stage_index = 5
+        job.completed_at = time.time()
+        job.result = updated_research
+        batch_job.per_ticker_status[ticker] = job.to_dict()
+        logger.info(
+            f"[BATCH][{ticker}] Completed in {job.completed_at - job.started_at:.1f}s"
+        )
+
+        return updated_research
+
+    except Exception as e:
+        job.status = "failed"
+        job.error = str(e)
+        job.completed_at = time.time()
+        batch_job.per_ticker_status[ticker] = job.to_dict()
+        batch_job.errors[ticker] = str(e)
+        logger.error(f"[BATCH][{ticker}] Failed: {e}", exc_info=True)
+        return None
+
+
+async def run_batch_refresh(batch_id: str, tickers: list[str]) -> dict:
+    """Execute batch refresh for all tickers with controlled parallelism."""
+    batch_job = BatchRefreshJob(batch_id=batch_id, tickers=tickers, status="in_progress")
+    batch_jobs[batch_id] = batch_job
+
+    # Initialise per-ticker status
+    for t in tickers:
+        batch_job.per_ticker_status[t] = {
+            "ticker": t,
+            "status": "queued",
+            "stage_index": 0,
+            "stage_label": "Queued",
+            "progress_pct": 0,
+            "started_at": None,
+            "completed_at": None,
+            "error": None,
+        }
+
+    logger.info(f"[BATCH] Starting batch {batch_id} for {len(tickers)} tickers")
+
+    # Launch all tickers; semaphore controls concurrency at stages 2-3
+    results = await asyncio.gather(
+        *[_run_single_in_batch(t, batch_job) for t in tickers],
+        return_exceptions=True,
+    )
+
+    # Handle any unexpected exceptions from gather
+    for i, result in enumerate(results):
+        if isinstance(result, Exception):
+            t = tickers[i]
+            if t not in batch_job.errors:
+                batch_job.errors[t] = str(result)
+                batch_job.per_ticker_status[t] = {
+                    "ticker": t,
+                    "status": "failed",
+                    "stage_index": 0,
+                    "stage_label": "Failed",
+                    "progress_pct": 0,
+                    "started_at": None,
+                    "completed_at": time.time(),
+                    "error": str(result),
+                }
+
+    # Mark batch complete
+    batch_job.completed_at = time.time()
+    if batch_job.total_failed == 0:
+        batch_job.status = "completed"
+    elif batch_job.total_completed == 0:
+        batch_job.status = "failed"
+    else:
+        batch_job.status = "partially_failed"
+
+    elapsed = batch_job.completed_at - batch_job.started_at
+    logger.info(
+        f"[BATCH] {batch_id} finished in {elapsed:.0f}s — "
+        f"{batch_job.total_completed} completed, {batch_job.total_failed} failed"
+    )
+
+    return batch_job.to_dict()
+
+
+# ---------------------------------------------------------------------------
 # Research data paths
 # ---------------------------------------------------------------------------
 
