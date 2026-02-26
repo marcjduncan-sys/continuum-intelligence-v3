@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ES2020",
+    "moduleResolution": "bundler",
+    "checkJs": true,
+    "allowJs": true,
+    "noEmit": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "lib": ["ES2020", "DOM"],
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/lib/format.js",
+    "src/lib/dom.js",
+    "src/lib/state.js",
+    "src/data/dynamics.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests",
+    "scripts"
+  ]
+}

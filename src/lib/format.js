@@ -5,11 +5,11 @@
 
 /**
  * Format billions: 12.05 -> "12.1B", 0.95 -> "950M", 79.3 -> "79B"
- * @param {number} val
+ * @param {number|string} val
  * @returns {string}
  */
 export function fmtB(val) {
-  val = parseFloat(val) || 0;
+  val = parseFloat(/** @type {string} */(val)) || 0;
   if (val >= 100) return Math.round(val) + 'B';
   if (val >= 10)  return val.toFixed(1).replace(/\.0$/, '') + 'B';
   if (val >= 1)   return val.toFixed(1).replace(/\.0$/, '') + 'B';
@@ -18,12 +18,12 @@ export function fmtB(val) {
 
 /**
  * Format price to currency string: fmtPrice(31.41, 'A$') -> "A$31.41"
- * @param {number} val
+ * @param {number|string} val
  * @param {string} [currency='A$']
  * @returns {string}
  */
 export function fmtPrice(val, currency) {
-  val = parseFloat(val) || 0;
+  val = parseFloat(/** @type {string} */(val)) || 0;
   if (val >= 100) return (currency || 'A$') + val.toFixed(2);
   if (val >= 10)  return (currency || 'A$') + val.toFixed(2);
   return (currency || 'A$') + val.toFixed(2);
@@ -31,21 +31,21 @@ export function fmtPrice(val, currency) {
 
 /**
  * Format percentage (absolute value, rounded): fmtPct(-60) -> "60%"
- * @param {number} val
+ * @param {number|string} val
  * @returns {string}
  */
 export function fmtPct(val) {
-  val = parseFloat(val) || 0;
+  val = parseFloat(/** @type {string} */(val)) || 0;
   return Math.round(Math.abs(val)) + '%';
 }
 
 /**
  * Format P/E ratio: fmtPE(41.3) -> "41.3x", fmtPE(150) -> "~150x"
- * @param {number} val
+ * @param {number|string} val
  * @returns {string|null}
  */
 export function fmtPE(val) {
-  val = parseFloat(val);
+  val = parseFloat(/** @type {string} */(val));
   if (!val || !isFinite(val) || val <= 0) return null;
   if (val >= 100) return '~' + Math.round(val) + 'x';
   return val.toFixed(1).replace(/\.0$/, '') + 'x';

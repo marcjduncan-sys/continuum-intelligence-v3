@@ -13,9 +13,23 @@ import { fmtB, fmtPrice, fmtPct, fmtPE, signPct } from '../lib/format.js';
 // --- Core Computation ---
 
 /**
+ * @typedef {{ price: string, marketCap: string|null, trailingPE: string|null,
+ *   forwardPE: string|null, divYield: string|null, drawdown: string|null,
+ *   drawdownClean: string|null, upsideToTarget: string|null, high52: string|null,
+ *   low52: string|null, range52: string|null, analystTarget: string|null,
+ *   analystTargetWithUpside: string|null }} ComputedFmt
+ *
+ * @typedef {{ ticker: string, price: number, currency: string, marketCap: number|null,
+ *   marketCapStr: string|null, trailingPE: number|null, forwardPE: number|null,
+ *   divYield: number|null, high52: number|null, low52: number|null,
+ *   drawdownFromHigh: number|null, upsideToTarget: number|null,
+ *   rangePosition: number|null, fmt: ComputedFmt }} ComputedMetrics
+ */
+
+/**
  * Compute derived metrics from live price + reference data for a ticker.
  * @param {string} ticker
- * @returns {object|null} Computed metrics object or null if data missing
+ * @returns {ComputedMetrics|null} Computed metrics or null if data missing
  */
 export function compute(ticker) {
   var stock = STOCK_DATA[ticker];

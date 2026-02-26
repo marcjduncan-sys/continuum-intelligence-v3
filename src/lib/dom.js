@@ -28,18 +28,22 @@ export function announcePageChange(text) {
 }
 
 /**
+ * @typedef {{ score: string|number, [key: string]: any }} HypothesisInput
+ */
+
+/**
  * Normalise raw ACH survival scores to sum to 100%
  * v3 framework: enforce floor(5) and ceiling(80) per NARRATIVE_FRAMEWORK_V3.md
  * "No hypothesis can show <5% or >80%. After clamping, re-normalise to sum to 100."
- * @param {Array<{score: string|number}>} items
- * @returns {number[]}
+ * @param {HypothesisInput[]} items
+ * @returns {number[]} Normalised scores summing to 100, each in range [5, 80]
  */
 export function normaliseScores(items) {
   var FLOOR = 5;
   var CEILING = 80;
   var raw = [];
   for (var i = 0; i < items.length; i++) {
-    var val = parseInt(items[i].score) || 0;
+    var val = parseInt(String(items[i].score)) || 0;
     raw.push(val);
   }
   if (raw.length === 0) return raw;
@@ -137,13 +141,17 @@ export function normaliseScores(items) {
 }
 
 /**
+ * @typedef {{ title: string, direction: string, weight: number }} HypothesisBreakdown
+ * @typedef {{ bull: number, bear: number, score: number, direction: 'upside'|'downside'|'balanced', hypotheses: HypothesisBreakdown[] }} SkewResult
+ */
+
+/**
  * Compute skew score from hypothesis weights (v3 framework)
- * Returns { bull: 0-100, bear: 0-100, score: -100 to +100, direction: string, hypotheses: [{title, direction, weight}] }
  * Principle 5: Thesis Skew is derived mechanically from hypothesis scores and sentiment tags.
  * NEUTRAL hypotheses split 50/50 between bull and bear.
  * Direction thresholds: >+5 = upside, <-5 = downside, else balanced.
- * @param {object} data - Stock data object with hypotheses array
- * @returns {{bull: number, bear: number, score: number, direction: string, hypotheses: Array}}
+ * @param {{ hypotheses?: Array<{ score: string|number, direction: string, title?: string, tier?: string }> }} data
+ * @returns {SkewResult}
  */
 export function computeSkewScore(data) {
   if (!data || !data.hypotheses || data.hypotheses.length === 0) {
@@ -172,6 +180,7 @@ export function computeSkewScore(data) {
   bear = Math.round(bear);
   var score = bull - bear;
   // Derive direction mechanically from score -- never from static data
+  /** @type {'upside'|'downside'|'balanced'} */
   var direction = score > 5 ? 'upside' : score < -5 ? 'downside' : 'balanced';
   return { bull: bull, bear: bear, score: score, direction: direction, hypotheses: breakdown };
 }

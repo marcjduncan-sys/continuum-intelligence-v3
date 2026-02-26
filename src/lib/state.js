@@ -5,11 +5,17 @@
 // ============================================================
 
 // --- State containers ---
+/** @type {{ [ticker: string]: object }} */
 const STOCK_DATA = {};
+/** @type {{ [ticker: string]: object }} */
 const FRESHNESS_DATA = {};
+/** @type {{ [ticker: string]: object }} */
 const REFERENCE_DATA = {};
+/** @type {{ [ticker: string]: object }} */
 const SNAPSHOT_DATA = {};
+/** @type {{ [ticker: string]: object }} */
 const COVERAGE_DATA = {};
+/** @type {{ [ticker: string]: object }} */
 const TC_DATA = {};
 
 // --- Config constants ---
@@ -27,7 +33,7 @@ export const FEATURED_ORDER = new Proxy([], {
   get(target, prop, receiver) {
     const keys = Object.keys(STOCK_DATA);
     if (prop === 'length') return keys.length;
-    if (typeof prop === 'string' && !isNaN(prop)) return keys[Number(prop)];
+    if (typeof prop === 'string' && !isNaN(/** @type {any} */(prop))) return keys[Number(prop)];
     const val = keys[prop];
     if (typeof val === 'function') return val.bind(keys);
     return Reflect.get(keys, prop, receiver);
@@ -48,7 +54,7 @@ export const SNAPSHOT_ORDER = new Proxy([], {
   get(target, prop, receiver) {
     const keys = Object.keys(STOCK_DATA);
     if (prop === 'length') return keys.length;
-    if (typeof prop === 'string' && !isNaN(prop)) return keys[Number(prop)];
+    if (typeof prop === 'string' && !isNaN(/** @type {any} */(prop))) return keys[Number(prop)];
     const val = keys[prop];
     if (typeof val === 'function') return val.bind(keys);
     return Reflect.get(keys, prop, receiver);
