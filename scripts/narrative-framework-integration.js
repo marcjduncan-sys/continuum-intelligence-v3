@@ -25,9 +25,8 @@ const NFI_STYLES = `
   border-bottom: 1px solid var(--border, #1E3050);
 }
 .nfi-alert-inner {
-  max-width: var(--max-width, 1120px);
-  margin: 0 auto;
-  padding: 0 var(--space-lg, 24px);
+  /* max-width, margin, padding inherited from main CSS (.report-hero-inner rule)
+     to stay aligned with signal-bars and other hero sections */
 }
 .nfi-alert-row {
   display: flex;
