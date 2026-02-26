@@ -1,3 +1,14 @@
+# Stage 1: Build frontend with Vite
+FROM node:20-slim AS frontend
+WORKDIR /build
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY index.html vite.config.js ./
+COPY src/ ./src/
+COPY public/ ./public/
+RUN npm run build
+
+# Stage 2: Python API
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -8,11 +19,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY api/ ./api/
-COPY index.html ./index.html
 COPY data/ ./data/
-COPY scripts/ ./scripts/
-COPY js/ ./js/
-COPY dist/ ./dist/
+COPY --from=frontend /build/dist/ ./dist/
 
 WORKDIR /app/api
 

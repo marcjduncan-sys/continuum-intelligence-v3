@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-from config import INDEX_HTML_PATH
+from config import INDEX_HTML_PATH, PROJECT_ROOT
 
 
 logger = logging.getLogger(__name__)
@@ -94,12 +94,11 @@ def _clean_html(text: str) -> str:
 
 def _get_data_dir() -> Path:
     """
-    Resolve the data/research/ directory relative to index.html.
-    INDEX_HTML_PATH points at index.html in the repo root;
-    data/research/ is a sibling directory.
+    Resolve the data/research/ directory from PROJECT_ROOT.
+    Uses the live data/ directory (updated by CI/CD), not the Vite
+    dist/ copy which may be stale.
     """
-    index_dir = Path(INDEX_HTML_PATH).parent
-    return index_dir / "data" / "research"
+    return Path(PROJECT_ROOT) / "data" / "research"
 
 
 # ---------------------------------------------------------------------------

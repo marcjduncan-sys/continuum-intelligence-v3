@@ -551,7 +551,10 @@ async def batch_refresh_results():
 # Serve frontend
 # ---------------------------------------------------------------------------
 
-STATIC_ROOT = Path(config.INDEX_HTML_PATH).parent
+# Vite build output (assets, css, fonts, bundled JS/CSS)
+DIST_ROOT = Path(config.DIST_DIR).resolve()
+# Live data directory (updated by CI/CD, used for both serving and ingestion)
+DATA_ROOT = Path(config.PROJECT_ROOT).resolve() / "data"
 
 MIME_TYPES = {
     ".json": "application/json",
@@ -560,38 +563,24 @@ MIME_TYPES = {
     ".svg": "image/svg+xml",
     ".png": "image/png",
     ".ico": "image/x-icon",
+    ".woff2": "font/woff2",
+    ".woff": "font/woff",
+    ".ttf": "font/ttf",
+    ".html": "text/html",
 }
-
-# Directories that contain static assets (relative to STATIC_ROOT)
-STATIC_DIRS = {"data", "scripts", "js"}
 
 
 @app.get("/data/{file_path:path}")
 async def serve_data(file_path: str):
-    """Serve data files including nested paths (e.g. data/research/WOW.json)."""
-    return _serve_static("data", file_path)
+    """Serve data files from the live data/ directory (updated by CI/CD)."""
+    return _serve_file(DATA_ROOT, file_path)
 
 
-@app.get("/scripts/{file_path:path}")
-async def serve_scripts(file_path: str):
-    """Serve script files."""
-    return _serve_static("scripts", file_path)
-
-
-@app.get("/js/{file_path:path}")
-async def serve_js(file_path: str):
-    """Serve JS files."""
-    return _serve_static("js", file_path)
-
-
-def _serve_static(directory: str, file_path: str):
-    """Serve a static file from a whitelisted directory with security checks."""
-    if directory not in STATIC_DIRS:
-        raise HTTPException(status_code=403, detail="Access denied")
-    base_dir = (STATIC_ROOT / directory).resolve()
-    full_path = (base_dir / file_path).resolve()
-    # Security: ensure resolved path stays within the target directory
-    if not str(full_path).startswith(str(base_dir)):
+def _serve_file(base_dir: Path, file_path: str):
+    """Serve a static file with path-traversal protection."""
+    base = base_dir.resolve()
+    full_path = (base / file_path).resolve()
+    if not str(full_path).startswith(str(base)):
         raise HTTPException(status_code=403, detail="Access denied")
     if not full_path.exists() or not full_path.is_file():
         raise HTTPException(status_code=404, detail="File not found")
@@ -601,7 +590,14 @@ def _serve_static(directory: str, file_path: str):
 
 @app.get("/{full_path:path}")
 async def serve_frontend(full_path: str):
-    """Serve index.html for all non-API routes (SPA catch-all)."""
+    """Serve static files from dist/, falling back to index.html for SPA routes."""
+    if full_path:
+        candidate = (DIST_ROOT / full_path).resolve()
+        if (str(candidate).startswith(str(DIST_ROOT))
+                and candidate.exists()
+                and candidate.is_file()):
+            mime = MIME_TYPES.get(candidate.suffix, "application/octet-stream")
+            return FileResponse(candidate, media_type=mime)
     return FileResponse(config.INDEX_HTML_PATH, media_type="text/html")
 
 

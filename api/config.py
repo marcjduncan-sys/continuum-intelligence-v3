@@ -13,12 +13,17 @@ ALLOWED_ORIGINS = [
 PORT = int(os.getenv("PORT", "8000"))
 INDEX_HTML_PATH = os.path.realpath(os.getenv(
     "INDEX_HTML_PATH",
-    os.path.join(os.path.dirname(__file__), "..", "index.html"),
+    os.path.join(os.path.dirname(__file__), "..", "dist", "index.html"),
 ))
 # Project root directory — used to locate data/ and other assets
 PROJECT_ROOT = os.path.realpath(os.getenv(
     "PROJECT_ROOT",
     os.path.join(os.path.dirname(__file__), ".."),
+))
+# Built frontend directory (Vite output)
+DIST_DIR = os.path.realpath(os.getenv(
+    "DIST_DIR",
+    os.path.join(os.path.dirname(__file__), "..", "dist"),
 ))
 MAX_PASSAGES = 12
 MAX_CONVERSATION_TURNS = 20
