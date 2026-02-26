@@ -7902,9 +7902,17 @@ function initNarrativeTimelineChart(ticker) {
  */
 function destroyNarrativeTimelineChart(ticker) {
   var canvas = document.getElementById('nt-canvas-' + ticker);
-  if (canvas && canvas._ntChart) {
-    canvas._ntChart.destroy();
-    canvas._ntChart = null;
+  if (canvas) {
+    // Try stored reference first
+    if (canvas._ntChart) {
+      canvas._ntChart.destroy();
+      canvas._ntChart = null;
+    }
+    // Also check Chart.js global registry (handles DOM replacement cases)
+    var existing = (typeof Chart !== 'undefined' && Chart.getChart) ? Chart.getChart(canvas) : null;
+    if (existing) {
+      existing.destroy();
+    }
   }
 }
 
@@ -9489,6 +9497,8 @@ function updateLiveUI(ticker) {
             renderedPages.delete(ticker);
             var container = document.getElementById('page-report-' + ticker);
             if (container) {
+                // Destroy Chart.js instances BEFORE DOM replacement
+                destroyNarrativeTimelineChart(ticker);
                 container.innerHTML = renderReportPage(STOCK_DATA[ticker]);
                 setupScrollSpy('page-report-' + ticker);
                 if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
@@ -9497,7 +9507,6 @@ function updateLiveUI(ticker) {
                     window.applyNarrativeAnalysis(ticker);
                 }
                 // Init narrative timeline chart after DOM render
-                destroyNarrativeTimelineChart(ticker);
                 initNarrativeTimelineChart(ticker);
             }
             renderedPages.add(ticker);
@@ -11447,9 +11456,20 @@ function _pollRefreshStatus(ticker) {
                     var resultResp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker + '/result');
                     if (resultResp.ok) {
                         var updatedData = await resultResp.json();
-                        // Merge into global stock data and re-render
+                        // Normalise ISO currency codes to symbols
+                        var currencyMap = {'AUD':'A$','USD':'US$','GBP':'£','EUR':'€'};
+                        if (updatedData.currency && currencyMap[updatedData.currency]) {
+                            updatedData.currency = currencyMap[updatedData.currency];
+                        }
+                        // Merge into global stock data, preserving live price patches
                         if (typeof STOCK_DATA !== 'undefined') {
+                            var livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
                             STOCK_DATA[ticker] = updatedData;
+                            if (livePrice !== undefined) STOCK_DATA[ticker]._livePrice = livePrice;
+                        }
+                        // Destroy Chart.js instances before DOM replacement
+                        if (typeof destroyNarrativeTimelineChart === 'function') {
+                            destroyNarrativeTimelineChart(ticker.toUpperCase());
                         }
                         // Re-render the report page
                         var container = document.getElementById('page-report-' + ticker.toUpperCase());

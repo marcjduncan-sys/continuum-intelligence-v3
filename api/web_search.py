@@ -100,7 +100,7 @@ async def fetch_yahoo_price(ticker: str) -> dict[str, Any]:
             "high_52w": round(high_52w, 2),
             "low_52w": round(low_52w, 2),
             "market_cap": meta.get("marketCap"),
-            "currency": meta.get("currency", "AUD"),
+            "currency": {"AUD": "A$", "USD": "US$", "GBP": "£", "EUR": "€"}.get(meta.get("currency", "AUD"), meta.get("currency", "A$")),
             "price_history": price_history,
             "fetched_at": datetime.now(timezone.utc).isoformat(),
         }
