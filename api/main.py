@@ -14,7 +14,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 import anthropic
-from fastapi import BackgroundTasks, FastAPI, HTTPException
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field
@@ -436,21 +436,34 @@ def _run_batch_background(batch_id: str, tickers: list[str]):
 
 
 @app.post("/api/refresh-all")
-async def trigger_refresh_all(background_tasks: BackgroundTasks):
-    """Trigger a batch refresh for all stocks with research data."""
+async def trigger_refresh_all(
+    background_tasks: BackgroundTasks,
+    request: Request,
+):
+    """Trigger a batch refresh for all (or specified) stocks."""
     if is_batch_running():
         raise HTTPException(
             status_code=409,
             detail="A batch refresh is already in progress",
         )
 
-    # Discover all tickers from research data files
-    data_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
-    tickers = sorted(
-        p.stem.upper()
-        for p in data_dir.glob("*.json")
-        if p.stem != "_index"
-    )
+    # Accept optional {"tickers": ["BHP", "CBA"]} to refresh only a subset
+    body = {}
+    try:
+        body = await request.json()
+    except Exception:
+        pass
+
+    if body.get("tickers"):
+        tickers = sorted(set(t.upper() for t in body["tickers"]))
+    else:
+        # Discover all tickers from research data files
+        data_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
+        tickers = sorted(
+            p.stem.upper()
+            for p in data_dir.glob("*.json")
+            if p.stem != "_index"
+        )
 
     if not tickers:
         raise HTTPException(status_code=404, detail="No research data found")

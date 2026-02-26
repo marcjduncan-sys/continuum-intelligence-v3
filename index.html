@@ -11816,9 +11816,19 @@ async function triggerRefreshAll() {
     if (btn) { btn.disabled = true; btn.textContent = 'Refreshing...'; }
 
     try {
+        // On retry, send only tickers not already cached this session
+        var cachedKeys = Object.keys(_batchCachedTickers).filter(function(k) { return _batchCachedTickers[k]; });
+        var bodyPayload = {};
+        if (cachedKeys.length > 0) {
+            var allTickers = ['BHP','CBA','CSL','DRO','DXS','FMG','GMG','GYG','HRZ','MQG','NAB','OCL','PME','RFG','RIO','SIG','WDS','WOR','WOW','WTC','XRO'];
+            var remaining = allTickers.filter(function(t) { return cachedKeys.indexOf(t) === -1; });
+            if (remaining.length > 0) bodyPayload.tickers = remaining;
+        }
+
         var resp = await fetch(REFRESH_API_BASE + '/api/refresh-all', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyPayload)
         });
 
         if (resp.status === 409) {
@@ -11835,10 +11845,11 @@ async function triggerRefreshAll() {
 
         var data = await resp.json();
         _batchStartTime = Date.now();
-        _batchCachedTickers = {};
+        // Don't reset _batchCachedTickers — preserve already-cached from prior run
 
-        // Build the ticker grid
-        _buildBatchGrid(data.tickers);
+        // Build the grid showing all 21 tickers (cached ones pre-marked green)
+        var allTickers = ['BHP','CBA','CSL','DRO','DXS','FMG','GMG','GYG','HRZ','MQG','NAB','OCL','PME','RFG','RIO','SIG','WDS','WOR','WOW','WTC','XRO'];
+        _buildBatchGrid(allTickers);
         _showBatchModal();
         _startBatchPolling();
 
@@ -11854,10 +11865,15 @@ function _buildBatchGrid(tickers) {
     if (!grid) return;
     var html = '';
     for (var i = 0; i < tickers.length; i++) {
-        html += '<div class="batch-card status-queued" id="batch-card-' + tickers[i] + '">' +
-            '<div class="batch-card-ticker">' + tickers[i] + '</div>' +
-            '<div class="batch-card-mini-bar"><div class="batch-card-mini-fill" style="width:0%"></div></div>' +
-            '<div class="batch-card-icon">\u25CB</div>' +
+        var t = tickers[i];
+        var isCached = _batchCachedTickers[t];
+        var statusClass = isCached ? 'status-completed' : 'status-queued';
+        var icon = isCached ? '\u2713' : '\u25CB';
+        var fill = isCached ? '100' : '0';
+        html += '<div class="batch-card ' + statusClass + '" id="batch-card-' + t + '">' +
+            '<div class="batch-card-ticker">' + t + '</div>' +
+            '<div class="batch-card-mini-bar"><div class="batch-card-mini-fill" style="width:' + fill + '%"></div></div>' +
+            '<div class="batch-card-icon">' + icon + '</div>' +
         '</div>';
     }
     grid.innerHTML = html;

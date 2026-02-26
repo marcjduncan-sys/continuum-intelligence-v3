@@ -172,7 +172,7 @@ _gather_semaphore: asyncio.Semaphore | None = None
 def _get_batch_semaphore() -> asyncio.Semaphore:
     global _batch_semaphore
     if _batch_semaphore is None:
-        _batch_semaphore = asyncio.Semaphore(3)
+        _batch_semaphore = asyncio.Semaphore(2)
     return _batch_semaphore
 
 
@@ -180,7 +180,7 @@ def _get_gather_semaphore() -> asyncio.Semaphore:
     """Limit concurrent data-gathering to avoid OOM on Railway."""
     global _gather_semaphore
     if _gather_semaphore is None:
-        _gather_semaphore = asyncio.Semaphore(5)
+        _gather_semaphore = asyncio.Semaphore(3)
     return _gather_semaphore
 
 
