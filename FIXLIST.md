@@ -13,16 +13,21 @@
 - Kept on external API calls (fetch-live-prices, fetch-announcements) and secondary steps
 
 ## 3. Add concurrency groups to all workflows that commit to the repo
-**Status**: PENDING
-- Prevents race conditions when multiple workflows run simultaneously
-- All committing workflows need `concurrency:` with cancel-in-progress
+**Status**: DONE
+- Added `concurrency: group: ${{ github.workflow }}, cancel-in-progress: false`
+- Applied to all 5 legacy workflows: live-prices, update-prices, narrative-analysis, research-update, event-monitor
+- `continuum-update.yml` (active) already had concurrency
 
 ## 4. Fix announcements scraper
-**Status**: PENDING
-- `fetch-announcements.js` returns zero results
-- Diagnose root cause locally, then fix
+**Status**: DONE
+- Root cause: `market_sensitive=false` filtered to ONLY non-market-sensitive filings,
+  excluding all significant announcements (results, guidance) which are market_sensitive=true
+- Fix: removed the `market_sensitive` URL parameter — now fetches all announcements
+- Also made response parsing resilient to both `{ data: [...] }` and bare array responses
 
 ## 5. Make STOCK_CONFIG data-driven
-**Status**: PENDING
-- `run-automated-analysis.js` hardcodes stock config (base weights, characteristics)
-- Extract to a JSON config file so adding/removing stocks doesn't require code changes
+**Status**: DONE (already implemented)
+- `run-automated-analysis.js` line 40: `const STOCK_CONFIG = getAnalysisConfig();`
+- `getAnalysisConfig()` reads from `data/config/tickers.json` via `scripts/lib/registry.js`
+- All 20 active tickers have `analysisConfig` blocks (peakPrice, baseWeights, characteristics, hypothesisNames)
+- No code changes required — confirmed data-driven

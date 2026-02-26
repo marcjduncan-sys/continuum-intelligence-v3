@@ -59,18 +59,23 @@ function fetchURL(url) {
 }
 
 async function fetchASXAnnouncements(ticker) {
-  // ASX public announcements API
-  const url = `https://www.asx.com.au/asx/1/company/${ticker}/announcements?count=${ANNOUNCEMENTS_PER_TICKER}&market_sensitive=false`;
+  // ASX public announcements API — no market_sensitive filter so we get all
+  // announcements (both sensitive and non-sensitive). Previously filtering to
+  // market_sensitive=false excluded most significant announcements (results,
+  // guidance, etc.) which are market_sensitive=true.
+  const url = `https://www.asx.com.au/asx/1/company/${ticker}/announcements?count=${ANNOUNCEMENTS_PER_TICKER}`;
 
   try {
     const raw = await fetchURL(url);
     const data = JSON.parse(raw);
 
-    if (!data.data || !Array.isArray(data.data)) {
+    // API may return { data: [...] } or an array directly
+    const items = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : null);
+    if (!items) {
       return [];
     }
 
-    return data.data.map(ann => ({
+    return items.map(ann => ({
       id: ann.id || null,
       date: ann.document_date || ann.document_release_date || null,
       headline: ann.header || ann.title || '',

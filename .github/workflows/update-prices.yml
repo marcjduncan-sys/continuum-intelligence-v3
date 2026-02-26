@@ -5,6 +5,10 @@ name: Daily Market Monitor (Legacy)
 on:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
