@@ -11051,7 +11051,7 @@ function _pollRefreshStatus(ticker) {
                             STOCK_DATA[ticker] = updatedData;
                         }
                         // Re-render the report page
-                        var container = document.getElementById('page-report-' + ticker.toLowerCase());
+                        var container = document.getElementById('page-report-' + ticker.toUpperCase());
                         if (container && typeof renderReportPage === 'function') {
                             container.innerHTML = renderReportPage(updatedData);
                             // Re-initialise any chart/interactive elements
