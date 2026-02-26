@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.24,
-      "status": "LOW",
+      "survival_score": 0.19,
+      "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-02-26T05:36:48.027Z"
+      "last_updated": "2026-02-26T06:41:14.070Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.3,
+      "survival_score": 0.25,
       "status": "LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-02-26T05:36:48.027Z"
+      "last_updated": "2026-02-26T06:41:14.070Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Cost pressures, competitive threats, or macro headwinds.",
       "upside": null,
       "risk_plain": "Material downside if multiple risks crystallise simultaneously.",
-      "survival_score": 0.28,
+      "survival_score": 0.33,
       "status": "LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-02-26T05:36:48.027Z"
+      "last_updated": "2026-02-26T06:41:14.070Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -47,18 +47,26 @@
       "what_to_watch": "Industry disruption signals and regulatory changes.",
       "upside": null,
       "risk_plain": "If disruption materialises, prior assumptions become invalid.",
-      "survival_score": 0.18,
-      "status": "VERY_LOW",
+      "survival_score": 0.23,
+      "status": "LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-02-26T05:36:48.027Z"
+      "last_updated": "2026-02-26T06:41:14.070Z"
     }
   },
-  "dominant": "N2",
-  "confidence": "LOW",
+  "dominant": "N3",
+  "confidence": "MODERATE",
   "alert_state": "NORMAL",
   "current_price": 12.76,
   "big_picture": "Objective Corporation Limited (ASX: OCL) — coverage initiated. Full analysis pending.",
-  "last_flip": null,
+  "last_flip": {
+    "date": "2026-02-26",
+    "from": "N2",
+    "to": "N3",
+    "trigger": "Automated: survival score shift (Base Case/Managed → Risk/Downside)",
+    "price_at_flip": 12.76,
+    "from_survival": 0.25,
+    "to_survival": 0.33
+  },
   "narrative_history": [],
   "evidence_items": [],
   "price_signals": [
@@ -346,8 +354,8 @@
     }
   },
   "price_evidence": {
-    "last_run": "2026-02-26T05:36:48.027Z",
+    "last_run": "2026-02-26T06:41:14.070Z",
     "classification": "SIGNIFICANT"
   },
-  "last_research_update": "2026-02-26T05:36:48.027Z"
+  "last_research_update": "2026-02-26T06:41:14.070Z"
 }
