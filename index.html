@@ -6893,7 +6893,172 @@ function renderPDFDownload(data) {
 
 function renderHypSidebar(data) {
   var t = data.ticker.toLowerCase();
-  return '<div class="hyp-sidebar" id="' + t + '-sidebar"></div>';
+  var ticker = data.ticker;
+
+  // ── Hypotheses (prepareHypotheses already ran) ──
+  var hypItems = '';
+  if (data.hypotheses && data.hypotheses.length > 0) {
+    var norm = normaliseScores(data.hypotheses);
+    for (var i = 0; i < data.hypotheses.length; i++) {
+      var h = data.hypotheses[i];
+      var dc = h.dirClass || 'dir-neutral';
+      var label = (h.title || '').replace(/^N\d+:\s*/, '');
+      hypItems += '<div class="hs-item">' +
+        '<div class="hs-dot ' + dc + '"></div>' +
+        '<div class="hs-label">' + label + '</div>' +
+        '<div class="hs-score ' + dc + '">' + norm[i] + '%</div>' +
+      '</div>';
+    }
+  }
+
+  // ── Skew ──
+  var skew = computeSkewScore(data);
+  var skewDir = skew.direction || 'balanced';
+  var skewLabel = skewDir.toUpperCase();
+  var skewScoreNum = skew.score || 0;
+  var skewScoreStr = (skewScoreNum > 0 ? '+' : '') + skewScoreNum;
+
+  // ── Three-layer signals ──
+  var tls = data.three_layer_signal || {};
+  var macSig = tls.macro_signal || 0;
+  var secSig = tls.sector_signal || 0;
+  var macCls = macSig > 10 ? 'dir-up' : macSig < -10 ? 'dir-down' : 'dir-neutral';
+  var secCls = secSig > 10 ? 'dir-up' : secSig < -10 ? 'dir-down' : 'dir-neutral';
+
+  // ── P/E and Rev Growth ──
+  var ref = (typeof REFERENCE_DATA !== 'undefined') ? REFERENCE_DATA[ticker] : null;
+  var peValue = '\u2014';
+  var revGrowthValue = '\u2014';
+  if (data.heroMetrics) {
+    for (var mi = 0; mi < data.heroMetrics.length; mi++) {
+      var mLabel = (data.heroMetrics[mi].label || '').toLowerCase();
+      if (mLabel === 'fwd p/e' || mLabel === 'p/e') peValue = data.heroMetrics[mi].value;
+      if (mLabel === 'rev growth' || mLabel === 'revenue growth') revGrowthValue = data.heroMetrics[mi].value;
+    }
+  }
+  if (ref) {
+    if (peValue === '\u2014' && ref.epsForward) {
+      var currentP = parseFloat(data._livePrice || data.price || data.current_price || 0);
+      if (currentP > 0) peValue = (currentP / ref.epsForward).toFixed(1) + 'x';
+    }
+    if (revGrowthValue === '\u2014' && ref.revenueGrowth != null) {
+      revGrowthValue = (ref.revenueGrowth > 0 ? '+' : '') + ref.revenueGrowth + '%';
+    }
+  }
+
+  // ── Price and change ──
+  var livePrice = parseFloat(data._livePrice || data.price || data.current_price || 0);
+  var ph = data.priceHistory;
+  var changePct = null;
+  if (ph && ph.length >= 2) {
+    changePct = ((ph[ph.length - 1] - ph[ph.length - 2]) / ph[ph.length - 2] * 100);
+  } else if (data.freshness && data.freshness.pricePctChange != null) {
+    changePct = data.freshness.pricePctChange;
+  }
+
+  // ── Valuation Range ──
+  var vr = null;
+  var vrBear = 0, vrFair = 0, vrBull = 0, vrZone = '', vrZoneCls = '';
+  var vrToBull = '', vrToBear = '';
+  if (data.hero && data.hero.position_in_range && data.hero.position_in_range.worlds &&
+      data.hero.position_in_range.worlds.length >= 4) {
+    var w = data.hero.position_in_range.worlds;
+    vrBear = w[1].price;
+    vrFair = (w[1].price + w[2].price) / 2;
+    vrBull = w[3].price;
+    vr = { low: vrBear, mid: vrFair, high: vrBull };
+  } else if (data.valuation_range) {
+    vr = data.valuation_range;
+    vrBear = vr.low;
+    vrFair = vr.mid;
+    vrBull = vr.high;
+  }
+  if (vr && livePrice > 0) {
+    if (livePrice < vrBear)      { vrZone = 'RED';   vrZoneCls = 'red'; }
+    else if (livePrice > vrFair) { vrZone = 'GREEN'; vrZoneCls = 'green'; }
+    else                         { vrZone = 'AMBER'; vrZoneCls = 'amber'; }
+    vrToBull = ((vrBull / livePrice - 1) * 100).toFixed(1);
+    vrToBear = ((vrBear / livePrice - 1) * 100).toFixed(1);
+  }
+
+  // ── Build HTML ──
+  var inner = '';
+
+  // 1. Stock ID
+  inner += '<div class="hs-stock-id">' +
+    '<div class="hs-stock-ticker">' + (data.tickerFull || data.ticker || ticker) + '</div>' +
+    '<div class="hs-price-row">';
+  if (livePrice > 0) {
+    inner += '<span class="hs-price">A$' + livePrice.toFixed(2) + '</span>';
+  }
+  if (changePct !== null) {
+    var chgCls = changePct >= 0 ? 'pos' : 'neg';
+    inner += '<span class="hs-change-badge ' + chgCls + '">' +
+      (changePct >= 0 ? '+' : '') + changePct.toFixed(1) + '%</span>';
+  }
+  inner += '</div>' +
+    '<div class="hs-stock-name">' + (data.company || '') + '</div>' +
+  '</div>';
+
+  // 2. DRIVER TRACKER + hypothesis items
+  inner += '<div class="hs-section-head">Driver Tracker</div>' + hypItems;
+
+  // 3. RISK SKEW
+  inner += '<div class="hs-subhead">Risk Skew</div>';
+  inner += '<div class="hs-overall-skew">' +
+    '<span class="hs-skew-dir ' + skewDir + '">' + skewLabel + '</span>' +
+    '<span class="hs-skew-score ' + skewDir + '">' + skewScoreStr + '</span>' +
+  '</div>';
+
+  // 4. EXT. ENVIRONMENT
+  inner += '<div class="hs-subhead">Ext. Environment</div>' +
+    '<div class="hs-env-row">' +
+      '<div class="hs-dot ' + macCls + '"></div>' +
+      '<span class="hs-env-label">Macro</span>' +
+      '<span class="hs-env-score">' + (macSig > 0 ? '+' : '') + macSig + '</span>' +
+    '</div>' +
+    '<div class="hs-env-row">' +
+      '<div class="hs-dot ' + secCls + '"></div>' +
+      '<span class="hs-env-label">Sector</span>' +
+      '<span class="hs-env-score">' + (secSig > 0 ? '+' : '') + secSig + '</span>' +
+    '</div>';
+
+  // 5. COMPANY
+  inner += '<div class="hs-subhead">Company</div>' +
+    '<div class="hs-company-row">' +
+      '<span class="hs-company-label">P/E</span>' +
+      '<span class="hs-company-value">' + peValue + '</span>' +
+    '</div>' +
+    '<div class="hs-company-row">' +
+      '<span class="hs-company-label">Rev Growth</span>' +
+      '<span class="hs-company-value">' + revGrowthValue + '</span>' +
+    '</div>';
+
+  // 6. VALUATION RANGE
+  if (vr && livePrice > 0) {
+    var vrRange = vrBull - vrBear || 1;
+    var vrCurrPct = Math.min(100, Math.max(0, ((livePrice - vrBear) / vrRange * 100))).toFixed(1);
+    inner += '<div class="hs-section-head">Valuation Range</div>' +
+      '<div class="hs-val-section">' +
+        '<div class="hs-val-header">' +
+          '<span class="hs-val-zone ' + vrZoneCls + '">' + vrZone + '</span>' +
+        '</div>' +
+        '<div class="hs-val-levels">' +
+          '<span>Bear<br>A$' + vrBear.toFixed(2) + '</span>' +
+          '<span>Fair<br>A$' + vrFair.toFixed(2) + '</span>' +
+          '<span>Bull<br>A$' + vrBull.toFixed(2) + '</span>' +
+        '</div>' +
+        '<div class="hs-val-bar">' +
+          '<div class="hs-val-marker" style="left:' + vrCurrPct + '%"></div>' +
+        '</div>' +
+        '<div class="hs-val-distances">' +
+          '<span class="neg">' + vrToBear + '% to bear</span>' +
+          '<span class="pos">+' + vrToBull + '% to bull</span>' +
+        '</div>' +
+      '</div>';
+  }
+
+  return '<div class="hyp-sidebar" id="' + t + '-sidebar">' + inner + '</div>';
 }
 
 function prepareHypotheses(data) {
