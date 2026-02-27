@@ -989,34 +989,34 @@ a:hover { color: var(--accent-sage); }
 .pir-bar-wrap {
     position: relative;
     margin-top: var(--space-md);
-    padding: 28px 0 52px;
+    padding: 25px 0 45px;
 }
 .pir-bar {
     position: relative;
-    height: 8px;
+    height: 12px;
     background: linear-gradient(to right, var(--signal-red), var(--signal-amber), var(--signal-green));
-    border-radius: 4px;
+    border-radius: 6px;
     margin: 0 16px;
 }
 .pir-world {
     position: absolute;
     transform: translateX(-50%);
     text-align: center;
-    top: 10px;
+    top: 14px;
 }
 .pir-world-tick {
     position: absolute;
-    top: -10px;
+    top: -14px;
     left: 50%;
     transform: translateX(-50%);
     width: 1px;
-    height: 10px;
+    height: 14px;
     background: rgba(138,154,184,0.4);
     margin: 0;
 }
 .pir-world-price {
     font-family: var(--font-data);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 600;
     color: var(--text-secondary);
     white-space: nowrap;
@@ -1030,7 +1030,7 @@ a:hover { color: var(--accent-sage); }
 .pir-current {
     position: absolute;
     transform: translateX(-50%);
-    top: -28px;
+    top: -24px;
     text-align: center;
     display: flex;
     flex-direction: column-reverse;
@@ -1043,17 +1043,14 @@ a:hover { color: var(--accent-sage); }
 }
 .pir-current-label {
     font-family: var(--font-data);
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 700;
     color: var(--accent-teal);
     white-space: nowrap;
     margin-bottom: 2px;
 }
 .pir-note {
-    font-size: 0.6rem;
-    color: var(--text-muted);
-    font-style: italic;
-    margin-top: var(--space-sm);
+    display: none;
 }
 
 /* 1.4 Valuation Range */
@@ -1066,30 +1063,30 @@ a:hover { color: var(--accent-sage); }
 .vr-badge.amber { background: rgba(212,160,60,0.15); color: var(--signal-amber); }
 .vr-badge.neutral { background: rgba(0,0,0,0.08); color: var(--text-muted); }
 .vr-badge.positive { background: rgba(61,170,109,0.15); color: var(--signal-green); }
-.vr-bar-wrap { position: relative; padding: 20px 0 44px; }
+.vr-bar-wrap { position: relative; padding: 25px 0 45px; margin-top: var(--space-md); }
 .vr-bar {
-    position: relative; height: 6px; border-radius: 3px; margin: 0 16px;
+    position: relative; height: 12px; border-radius: 6px; margin: 0 16px;
     background: linear-gradient(to right, var(--signal-red) 0%, var(--signal-amber) 40%, var(--signal-green) 100%);
 }
 .vr-marker {
-    position: absolute; transform: translateX(-50%); top: 8px;
+    position: absolute; transform: translateX(-50%); top: 14px;
     text-align: center; font-size: 0.6rem; color: var(--text-muted);
     white-space: nowrap;
 }
-.vr-marker-price { font-family: var(--font-data); font-size: 0.68rem; font-weight: 600; color: var(--text-secondary); }
-.vr-marker-label { font-size: 0.55rem; color: var(--text-muted); margin-top: 2px; }
+.vr-marker-price { font-family: var(--font-data); font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); }
+.vr-marker-label { font-size: 0.58rem; color: var(--text-muted); margin-top: 2px; }
 .vr-marker::before {
-    content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
-    width: 1px; height: 8px; background: rgba(138,154,184,0.4);
+    content: ''; position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    width: 1px; height: 14px; background: rgba(138,154,184,0.4);
 }
 .vr-current {
-    position: absolute; transform: translateX(-50%); bottom: calc(100% + 4px);
+    position: absolute; transform: translateX(-50%); top: -24px;
     text-align: center; white-space: nowrap;
-    font-family: var(--font-data); font-size: 0.68rem; font-weight: 700; color: var(--accent-teal);
+    font-family: var(--font-data); font-size: 0.72rem; font-weight: 700; color: var(--accent-teal);
 }
 .vr-current::after {
     content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-    width: 1px; height: 8px; background: var(--accent-teal);
+    width: 1px; height: 10px; background: var(--accent-teal);
 }
 .vr-stats {
     display: flex; gap: var(--space-md); flex-wrap: wrap;
