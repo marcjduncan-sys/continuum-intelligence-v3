@@ -151,11 +151,11 @@
 .pir-bar-wrap {
     position: relative;
     margin-top: var(--space-md);
-    padding: 25px 0 45px; /* Reduced padding for compact look */
+    padding: 25px 0 45px !important; /* Force reduced padding */
 }
 .pir-bar {
     position: relative;
-    height: 12px; /* Compact height */
+    height: 12px !important; /* Force compact height */
     background: linear-gradient(to right, var(--signal-red), var(--signal-amber), var(--signal-green));
     border-radius: 6px;
     margin: 0 16px;
@@ -164,15 +164,15 @@
     position: absolute;
     transform: translateX(-50%);
     text-align: center;
-    top: 18px; /* Adjusted for compact bar */
+    top: 18px !important; /* Force adjusted position */
 }
 .pir-world-tick {
     position: absolute;
-    top: -18px; /* Adjusted for compact bar */
+    top: -18px !important; /* Force adjusted position */
     left: 50%;
     transform: translateX(-50%);
     width: 1px;
-    height: 18px;
+    height: 18px !important;
     background: rgba(138,154,184,0.4);
     margin: 0;
 }
@@ -192,7 +192,7 @@
 .pir-current {
     position: absolute;
     transform: translateX(-50%);
-    top: -28px; /* Adjusted for compact bar */
+    top: -28px !important; /* Force adjusted position */
     text-align: center;
     display: flex;
     flex-direction: column-reverse;
@@ -212,7 +212,7 @@
     margin-bottom: 2px;
 }
 .pir-note {
-    display: none; /* Hide the indicative text */
+    display: none !important; /* Force hide the indicative text */
 }
 
 /* 1.4 Valuation Range */
@@ -228,11 +228,11 @@
 .vr-bar-wrap {
     position: relative;
     margin-top: var(--space-md);
-    padding: 25px 0 45px; /* Match compact PIR padding */
+    padding: 25px 0 45px !important; /* Match compact PIR padding */
 }
 .vr-bar {
     position: relative;
-    height: 12px; /* Match compact PIR height */
+    height: 12px !important; /* Match compact PIR height */
     background: linear-gradient(to right, var(--signal-red) 0%, var(--signal-amber) 40%, var(--signal-green) 100%);
     border-radius: 6px;
     margin: 0 16px;
@@ -240,7 +240,7 @@
 .vr-marker {
     position: absolute;
     transform: translateX(-50%);
-    top: 18px; /* Match compact PIR positioning */
+    top: 18px !important; /* Match compact PIR positioning */
     text-align: center;
     font-size: 0.6rem;
     color: var(--text-muted);
@@ -260,17 +260,17 @@
 .vr-marker::before {
     content: '';
     position: absolute;
-    top: -18px;
+    top: -18px !important;
     left: 50%;
     transform: translateX(-50%);
     width: 1px;
-    height: 18px;
+    height: 18px !important;
     background: rgba(138,154,184,0.4);
 }
 .vr-current {
     position: absolute;
     transform: translateX(-50%);
-    top: -28px;
+    top: -28px !important;
     text-align: center;
     white-space: nowrap;
     font-family: var(--font-data);
@@ -285,7 +285,7 @@
     left: 50%;
     transform: translateX(-50%);
     width: 1px;
-    height: 10px;
+    height: 10px !important;
     background: var(--accent-teal);
 }
 .vr-stats {
