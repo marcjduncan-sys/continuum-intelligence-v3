@@ -151,40 +151,40 @@
 .pir-bar-wrap {
     position: relative;
     margin-top: var(--space-md);
-    padding: 28px 0 52px;
+    padding: 35px 0 60px; /* Increased padding to match the thicker bar and labels */
 }
 .pir-bar {
     position: relative;
-    height: 16px;
+    height: 20px; /* Increased from 16px to 20px */
     background: linear-gradient(to right, var(--signal-red), var(--signal-amber), var(--signal-green));
-    border-radius: 8px;
+    border-radius: 10px; /* Adjusted radius */
     margin: 0 16px;
 }
 .pir-world {
     position: absolute;
     transform: translateX(-50%);
     text-align: center;
-    top: 10px;
+    top: 25px; /* Adjusted for thicker bar */
 }
 .pir-world-tick {
     position: absolute;
-    top: -10px;
+    top: -25px; /* Adjusted for thicker bar */
     left: 50%;
     transform: translateX(-50%);
-    width: 1px;
-    height: 10px;
-    background: rgba(138,154,184,0.4);
+    width: 2px; /* Thicker tick */
+    height: 25px; /* Longer tick */
+    background: rgba(138,154,184,0.6);
     margin: 0;
 }
 .pir-world-price {
     font-family: var(--font-data);
-    font-size: 0.72rem;
-    font-weight: 600;
+    font-size: 0.75rem; /* Slightly larger */
+    font-weight: 700; /* Bolder */
     color: var(--text-secondary);
     white-space: nowrap;
 }
 .pir-world-label {
-    font-size: 0.58rem;
+    font-size: 0.65rem; /* Slightly larger */
     color: var(--text-muted);
     white-space: nowrap;
     margin-top: 2px;
@@ -192,30 +192,30 @@
 .pir-current {
     position: absolute;
     transform: translateX(-50%);
-    top: -28px;
+    top: -35px; /* Adjusted for thicker bar */
     text-align: center;
     display: flex;
     flex-direction: column-reverse;
     align-items: center;
 }
 .pir-current-dot {
-    font-size: 0.7rem;
+    font-size: 0.9rem; /* Larger dot */
     color: var(--accent-teal);
     line-height: 1;
 }
 .pir-current-label {
     font-family: var(--font-data);
-    font-size: 0.7rem;
-    font-weight: 700;
+    font-size: 0.8rem; /* Larger label */
+    font-weight: 800; /* Extra bold */
     color: var(--accent-teal);
     white-space: nowrap;
     margin-bottom: 2px;
 }
 .pir-note {
-    font-size: 0.6rem;
+    font-size: 0.65rem;
     color: var(--text-muted);
     font-style: italic;
-    margin-top: var(--space-sm);
+    margin-top: var(--space-md);
 }
 
 /* 1.4 Valuation Range */
@@ -228,30 +228,68 @@
 .vr-badge.amber { background: rgba(212,160,60,0.15); color: var(--signal-amber); }
 .vr-badge.neutral { background: rgba(0,0,0,0.08); color: var(--text-muted); }
 .vr-badge.positive { background: rgba(61,170,109,0.15); color: var(--signal-green); }
-.vr-bar-wrap { position: relative; padding: 28px 0 52px; }
+.vr-bar-wrap {
+    position: relative;
+    margin-top: var(--space-md);
+    padding: 35px 0 60px; /* Match PIR padding */
+}
 .vr-bar {
-    position: relative; height: 16px; border-radius: 8px; margin: 0 16px;
+    position: relative;
+    height: 20px; /* Match PIR height */
     background: linear-gradient(to right, var(--signal-red) 0%, var(--signal-amber) 40%, var(--signal-green) 100%);
+    border-radius: 10px; /* Match PIR radius */
+    margin: 0 16px;
 }
 .vr-marker {
-    position: absolute; transform: translateX(-50%); top: 10px;
-    text-align: center; font-size: 0.6rem; color: var(--text-muted);
+    position: absolute;
+    transform: translateX(-50%);
+    top: 25px; /* Match PIR positioning */
+    text-align: center;
+    font-size: 0.65rem;
+    color: var(--text-muted);
     white-space: nowrap;
 }
-.vr-marker-price { font-family: var(--font-data); font-size: 0.68rem; font-weight: 600; color: var(--text-secondary); }
-.vr-marker-label { font-size: 0.55rem; color: var(--text-muted); margin-top: 2px; }
+.vr-marker-price {
+    font-family: var(--font-data);
+    font-size: 0.75rem; /* Match PIR font size */
+    font-weight: 700; /* Match PIR weight */
+    color: var(--text-secondary);
+}
+.vr-marker-label {
+    font-size: 0.65rem; /* Match PIR font size */
+    color: var(--text-muted);
+    margin-top: 2px;
+}
 .vr-marker::before {
-    content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-    width: 1px; height: 10px; background: rgba(138,154,184,0.4);
+    content: '';
+    position: absolute;
+    top: -25px; /* Match PIR tick length */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px; /* Match PIR tick width */
+    height: 25px; /* Match PIR tick height */
+    background: rgba(138,154,184,0.6);
 }
 .vr-current {
-    position: absolute; transform: translateX(-50%); top: -28px;
-    text-align: center; white-space: nowrap;
-    font-family: var(--font-data); font-size: 0.68rem; font-weight: 700; color: var(--accent-teal);
+    position: absolute;
+    transform: translateX(-50%);
+    top: -35px; /* Match PIR positioning */
+    text-align: center;
+    white-space: nowrap;
+    font-family: var(--font-data);
+    font-size: 0.8rem; /* Match PIR font size */
+    font-weight: 800; /* Match PIR weight */
+    color: var(--accent-teal);
 }
 .vr-current::after {
-    content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-    width: 1px; height: 10px; background: var(--accent-teal);
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px; /* Match PIR tick width */
+    height: 15px; /* Match PIR current tick height */
+    background: var(--accent-teal);
 }
 .vr-stats {
     display: flex; gap: var(--space-md); flex-wrap: wrap;
