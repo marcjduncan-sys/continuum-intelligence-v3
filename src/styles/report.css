@@ -151,40 +151,40 @@
 .pir-bar-wrap {
     position: relative;
     margin-top: var(--space-md);
-    padding: 35px 0 60px; /* Increased padding to match the thicker bar and labels */
+    padding: 25px 0 45px; /* Reduced padding for compact look */
 }
 .pir-bar {
     position: relative;
-    height: 20px; /* Increased from 16px to 20px */
+    height: 12px; /* Compact height */
     background: linear-gradient(to right, var(--signal-red), var(--signal-amber), var(--signal-green));
-    border-radius: 10px; /* Adjusted radius */
+    border-radius: 6px;
     margin: 0 16px;
 }
 .pir-world {
     position: absolute;
     transform: translateX(-50%);
     text-align: center;
-    top: 25px; /* Adjusted for thicker bar */
+    top: 18px; /* Adjusted for compact bar */
 }
 .pir-world-tick {
     position: absolute;
-    top: -25px; /* Adjusted for thicker bar */
+    top: -18px; /* Adjusted for compact bar */
     left: 50%;
     transform: translateX(-50%);
-    width: 2px; /* Thicker tick */
-    height: 25px; /* Longer tick */
-    background: rgba(138,154,184,0.6);
+    width: 1px;
+    height: 18px;
+    background: rgba(138,154,184,0.4);
     margin: 0;
 }
 .pir-world-price {
     font-family: var(--font-data);
-    font-size: 0.75rem; /* Slightly larger */
-    font-weight: 700; /* Bolder */
+    font-size: 0.7rem;
+    font-weight: 600;
     color: var(--text-secondary);
     white-space: nowrap;
 }
 .pir-world-label {
-    font-size: 0.65rem; /* Slightly larger */
+    font-size: 0.58rem;
     color: var(--text-muted);
     white-space: nowrap;
     margin-top: 2px;
@@ -192,30 +192,27 @@
 .pir-current {
     position: absolute;
     transform: translateX(-50%);
-    top: -35px; /* Adjusted for thicker bar */
+    top: -28px; /* Adjusted for compact bar */
     text-align: center;
     display: flex;
     flex-direction: column-reverse;
     align-items: center;
 }
 .pir-current-dot {
-    font-size: 0.9rem; /* Larger dot */
+    font-size: 0.7rem;
     color: var(--accent-teal);
     line-height: 1;
 }
 .pir-current-label {
     font-family: var(--font-data);
-    font-size: 0.8rem; /* Larger label */
-    font-weight: 800; /* Extra bold */
+    font-size: 0.72rem;
+    font-weight: 700;
     color: var(--accent-teal);
     white-space: nowrap;
     margin-bottom: 2px;
 }
 .pir-note {
-    font-size: 0.65rem;
-    color: var(--text-muted);
-    font-style: italic;
-    margin-top: var(--space-md);
+    display: none; /* Hide the indicative text */
 }
 
 /* 1.4 Valuation Range */
@@ -231,54 +228,54 @@
 .vr-bar-wrap {
     position: relative;
     margin-top: var(--space-md);
-    padding: 35px 0 60px; /* Match PIR padding */
+    padding: 25px 0 45px; /* Match compact PIR padding */
 }
 .vr-bar {
     position: relative;
-    height: 20px; /* Match PIR height */
+    height: 12px; /* Match compact PIR height */
     background: linear-gradient(to right, var(--signal-red) 0%, var(--signal-amber) 40%, var(--signal-green) 100%);
-    border-radius: 10px; /* Match PIR radius */
+    border-radius: 6px;
     margin: 0 16px;
 }
 .vr-marker {
     position: absolute;
     transform: translateX(-50%);
-    top: 25px; /* Match PIR positioning */
+    top: 18px; /* Match compact PIR positioning */
     text-align: center;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     color: var(--text-muted);
     white-space: nowrap;
 }
 .vr-marker-price {
     font-family: var(--font-data);
-    font-size: 0.75rem; /* Match PIR font size */
-    font-weight: 700; /* Match PIR weight */
+    font-size: 0.7rem;
+    font-weight: 600;
     color: var(--text-secondary);
 }
 .vr-marker-label {
-    font-size: 0.65rem; /* Match PIR font size */
+    font-size: 0.58rem;
     color: var(--text-muted);
     margin-top: 2px;
 }
 .vr-marker::before {
     content: '';
     position: absolute;
-    top: -25px; /* Match PIR tick length */
+    top: -18px;
     left: 50%;
     transform: translateX(-50%);
-    width: 2px; /* Match PIR tick width */
-    height: 25px; /* Match PIR tick height */
-    background: rgba(138,154,184,0.6);
+    width: 1px;
+    height: 18px;
+    background: rgba(138,154,184,0.4);
 }
 .vr-current {
     position: absolute;
     transform: translateX(-50%);
-    top: -35px; /* Match PIR positioning */
+    top: -28px;
     text-align: center;
     white-space: nowrap;
     font-family: var(--font-data);
-    font-size: 0.8rem; /* Match PIR font size */
-    font-weight: 800; /* Match PIR weight */
+    font-size: 0.72rem;
+    font-weight: 700;
     color: var(--accent-teal);
 }
 .vr-current::after {
@@ -287,8 +284,8 @@
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    width: 2px; /* Match PIR tick width */
-    height: 15px; /* Match PIR current tick height */
+    width: 1px;
+    height: 10px;
     background: var(--accent-teal);
 }
 .vr-stats {
