@@ -329,8 +329,16 @@ export function adjustHypothesisScores(stock, computed, ref) {
 
   for (var i = 0; i < stock.hypotheses.length; i++) {
     var hyp = stock.hypotheses[i];
-    var currentScore = parseInt(hyp.score);
-    if (isNaN(currentScore)) continue;
+
+    // Save original values on first adjustment — idempotency anchor.
+    // All subsequent hydrate() calls adjust from the original, preventing compounding.
+    if (hyp._origScore === undefined) {
+      hyp._origScore = parseInt(hyp.score) || 0;
+      hyp._origScoreMeta = hyp.scoreMeta || '';
+    }
+
+    var baseScore = hyp._origScore;
+    if (isNaN(baseScore)) continue;
 
     var adjustment = 0;
 
@@ -349,14 +357,14 @@ export function adjustHypothesisScores(stock, computed, ref) {
     }
 
     if (adjustment !== 0) {
-      var newScore = Math.max(5, Math.min(95, currentScore + adjustment));
+      var newScore = Math.max(5, Math.min(95, baseScore + adjustment));
       hyp.score = newScore + '%';
       hyp.scoreWidth = newScore + '%';
-      // Update score meta to indicate dynamic adjustment
+      // Replace scoreMeta (not append) to prevent tag stacking
       if (adjustment > 0) {
-        hyp.scoreMeta = hyp.scoreMeta + ' <span class="dynamic-adj">(+' + adjustment + ' price move)</span>';
+        hyp.scoreMeta = hyp._origScoreMeta + ' <span class="dynamic-adj">(+' + adjustment + ' price move)</span>';
       } else {
-        hyp.scoreMeta = hyp.scoreMeta + ' <span class="dynamic-adj">(' + adjustment + ' price move)</span>';
+        hyp.scoreMeta = hyp._origScoreMeta + ' <span class="dynamic-adj">(' + adjustment + ' price move)</span>';
       }
     }
   }
