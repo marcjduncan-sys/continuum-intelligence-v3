@@ -164,15 +164,15 @@
     position: absolute;
     transform: translateX(-50%);
     text-align: center;
-    top: 18px !important; /* Force adjusted position */
+    top: 14px !important; /* Adjusted for compact bar */
 }
 .pir-world-tick {
     position: absolute;
-    top: -18px !important; /* Force adjusted position */
+    top: -14px !important; /* Adjusted for compact bar */
     left: 50%;
     transform: translateX(-50%);
     width: 1px;
-    height: 18px !important;
+    height: 14px !important;
     background: rgba(138,154,184,0.4);
     margin: 0;
 }
@@ -192,7 +192,7 @@
 .pir-current {
     position: absolute;
     transform: translateX(-50%);
-    top: -28px !important; /* Force adjusted position */
+    top: -24px !important; /* Adjusted for compact bar */
     text-align: center;
     display: flex;
     flex-direction: column-reverse;
@@ -240,7 +240,7 @@
 .vr-marker {
     position: absolute;
     transform: translateX(-50%);
-    top: 18px !important; /* Match compact PIR positioning */
+    top: 14px !important; /* Match compact PIR positioning */
     text-align: center;
     font-size: 0.6rem;
     color: var(--text-muted);
@@ -260,17 +260,17 @@
 .vr-marker::before {
     content: '';
     position: absolute;
-    top: -18px !important;
+    top: -14px !important;
     left: 50%;
     transform: translateX(-50%);
     width: 1px;
-    height: 18px !important;
+    height: 14px !important;
     background: rgba(138,154,184,0.4);
 }
 .vr-current {
     position: absolute;
     transform: translateX(-50%);
-    top: -28px !important;
+    top: -24px !important;
     text-align: center;
     white-space: nowrap;
     font-family: var(--font-data);
@@ -659,6 +659,7 @@
     .section-nav-inner {
         max-width: var(--max-width);
         padding-right: var(--space-lg);
+        margin: 0 auto;
     }
 }
 @media (max-width: 1199px) {
