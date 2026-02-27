@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.46,
+      "survival_score": 0.48,
       "status": "MODERATE",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-02-27T08:00:03.083Z"
+      "last_updated": "2026-02-27T08:04:28.463Z"
     },
     "N2": {
       "label": "Speculative Premium Unwind",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.42,
+      "survival_score": 0.4,
       "status": "MODERATE",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-02-27T08:00:03.083Z"
+      "last_updated": "2026-02-27T08:04:28.463Z"
     },
     "N3": {
       "label": "Execution Risk",
@@ -38,7 +38,7 @@
       "survival_score": 0.06,
       "status": "VERY_LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-02-27T05:19:48.774Z"
+      "last_updated": "2026-02-27T08:04:28.463Z"
     },
     "N4": {
       "label": "Autonomous Systems Moat",
@@ -50,12 +50,12 @@
       "survival_score": 0.06,
       "status": "VERY_LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-02-27T00:03:03.373Z"
+      "last_updated": "2026-02-27T08:04:28.463Z"
     }
   },
   "dominant": "N1",
   "confidence": "LOW",
-  "alert_state": "NORMAL",
+  "alert_state": "OVERCORRECTION",
   "current_price": 3.62,
   "big_picture": "DroneShield (ASX: DRO) — coverage initiated. Full analysis pending.",
   "last_flip": {
@@ -68,7 +68,15 @@
     "to_survival": 0.44
   },
   "narrative_history": [],
-  "evidence_items": [],
+  "evidence_items": [
+    {
+      "date": "2026-02-27",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "Single-day move of +11.4% exceeds 10% threshold — possible overcorrection",
+      "auto_generated": true
+    }
+  ],
   "price_signals": [
     {
       "date": "2026-02-25",
@@ -79,11 +87,20 @@
       "cumulative_20d": 0,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-02-27",
+      "classification": "MATERIAL",
+      "daily_change_pct": 11.38,
+      "volume_multiplier": 1,
+      "cumulative_5d": 21.78,
+      "cumulative_20d": -22.15,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    1.72,
     1.75,
     2,
     2.17,
@@ -142,7 +159,8 @@
     3.25,
     3.25,
     3.25,
-    3.69
+    3.69,
+    3.62
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -357,5 +375,15 @@
   },
   "last_research_update": "2026-02-27T08:00:03.083Z",
   "price": 3.69,
-  "date": "26 February 2026"
+  "date": "26 February 2026",
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-02-27",
+    "triggerPrice": 3.62,
+    "direction": "up",
+    "movePct": 11.38,
+    "reviewDate": "2026-03-06",
+    "message": "Single-day move of +11.4% exceeds 10% threshold — possible overcorrection"
+  }
 }

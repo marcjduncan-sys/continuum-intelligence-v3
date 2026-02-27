@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.45,
+      "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-02-27T08:00:03.083Z"
+      "last_updated": "2026-02-27T08:04:28.476Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.45,
+      "survival_score": 0.46,
       "status": "MODERATE",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-02-27T08:00:03.083Z"
+      "last_updated": "2026-02-27T08:04:28.476Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -38,7 +38,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-02-26T05:36:48.027Z"
+      "last_updated": "2026-02-27T08:04:28.476Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -50,12 +50,12 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-02-26T01:30:48.610Z"
+      "last_updated": "2026-02-27T08:04:28.476Z"
     }
   },
   "dominant": "N1",
   "confidence": "LOW",
-  "alert_state": "NORMAL",
+  "alert_state": "OVERCORRECTION",
   "current_price": 58.41,
   "big_picture": "BHP Group (ASX: BHP) — coverage initiated. Full analysis pending.",
   "last_flip": {
@@ -105,7 +105,15 @@
       "to_survival": 0.46
     }
   ],
-  "evidence_items": [],
+  "evidence_items": [
+    {
+      "date": "2026-02-27",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "Single-day move of +10.8% exceeds 10% threshold — possible overcorrection",
+      "auto_generated": true
+    }
+  ],
   "price_signals": [
     {
       "date": "2026-02-24",
@@ -126,11 +134,20 @@
       "cumulative_20d": 2.8,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-02-27",
+      "classification": "MATERIAL",
+      "daily_change_pct": 10.75,
+      "volume_multiplier": 1,
+      "cumulative_5d": 12.95,
+      "cumulative_20d": 20.11,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    41.01,
     41.82,
     41.74,
     41.67,
@@ -189,7 +206,8 @@
     52.74,
     52.74,
     52.74,
-    57.75
+    57.75,
+    58.41
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -409,5 +427,15 @@
   },
   "last_research_update": "2026-02-27T08:00:03.083Z",
   "price": 57.75,
-  "date": "26 February 2026"
+  "date": "26 February 2026",
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-02-27",
+    "triggerPrice": 58.41,
+    "direction": "up",
+    "movePct": 10.75,
+    "reviewDate": "2026-03-06",
+    "message": "Single-day move of +10.8% exceeds 10% threshold — possible overcorrection"
+  }
 }

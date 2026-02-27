@@ -5,13 +5,11 @@
   "company": "Woolworths Group",
   "sector": "Consumer Staples",
   "sectorSub": "Grocery",
-  "price": 36.35,
+  "price": 36,
   "currency": "A$",
   "date": "27 February 2026",
   "reportId": "WOW-2026-001",
   "priceHistory": [
-    30.79,
-    30.88,
     30.78,
     30.55,
     30.5,
@@ -262,19 +260,20 @@
     31.69,
     31.94,
     31.96,
-    36.35
+    36.35,
+    36
   ],
   "heroDescription": "38% Grocery Market Share &bull; 202,000 Employees &bull; A$69.1B Revenue",
   "heroCompanyDescription": "Woolworths Group (ASX: WOW) is Australia's largest supermarket operator, commanding 38% of the domestic grocery market through its Woolworths and Metro brands. The group also operates Big W discount department stores, Petstock pet retail, and a growing e-commerce platform reaching 16.2% online penetration.",
   "heroMetrics": [
     {
       "label": "Mkt Cap",
-      "value": "A$39B",
+      "value": "A$43.9B",
       "colorClass": ""
     },
     {
       "label": "Fwd P/E",
-      "value": "23.9x",
+      "value": "26.9x",
       "colorClass": "premium"
     },
     {
@@ -338,12 +337,12 @@
   "featuredMetrics": [
     {
       "label": "Mkt Cap",
-      "value": "A$39B",
+      "value": "A$43.9B",
       "color": ""
     },
     {
       "label": "Fwd P/E",
-      "value": "23.9x",
+      "value": "26.9x",
       "color": "var(--accent-gold)"
     },
     {
@@ -376,7 +375,7 @@
       [
         [
           "Market Cap",
-          "A$39B",
+          "A$43.9B",
           "td-mono"
         ],
         [
@@ -400,12 +399,12 @@
       [
         [
           "Forward P/E",
-          "23.9x",
+          "26.9x",
           "td-mono td-amber"
         ],
         [
           "Trailing P/E",
-          "37.2x",
+          "42x",
           "td-mono td-amber"
         ]
       ],
@@ -602,7 +601,7 @@
     }
   ],
   "narrative": {
-    "theNarrative": "The market is pricing a <strong>managed turnaround under new CEO Amanda Bardwell</strong>. The embedded thesis is that FY25 was an aberration, impacted by $95M in industrial action costs, a CEO transition, and one-off supply chain disruption, and that FY26 marks the beginning of a recovery. The <span class=\"key-stat\">$400M</span> above-store cost-out program, e-commerce scaling at <span class=\"key-stat up\">+17%</span> growth rates, and simplified operations will restore Australian Food to mid-to-high single-digit EBIT growth. The premium valuation (<span class=\"key-stat\">23.9x</span> forward P/E) assumes this recovery is underway.",
+    "theNarrative": "The market is pricing a <strong>managed turnaround under new CEO Amanda Bardwell</strong>. The embedded thesis is that FY25 was an aberration, impacted by $95M in industrial action costs, a CEO transition, and one-off supply chain disruption, and that FY26 marks the beginning of a recovery. The <span class=\"key-stat\">$400M</span> above-store cost-out program, e-commerce scaling at <span class=\"key-stat up\">+17%</span> growth rates, and simplified operations will restore Australian Food to mid-to-high single-digit EBIT growth. The premium valuation (<span class=\"key-stat\">26.9x</span> forward P/E) assumes this recovery is underway.",
     "priceImplication": {
       "label": "Embedded Assumptions at A$31.96",
       "content": "<strong>Australian Food EBIT recovery:</strong> Mid-to-high single-digit growth in FY26, accelerating thereafter. <strong>Cost-out delivery:</strong> $400M savings realised by end CY25, not consumed by price investment. <strong>E-commerce scales profitably:</strong> 16%+ penetration without margin dilution. <strong>Regulatory manageable:</strong> Mandatory FGCC compliance costs absorbed; ACCC court outcome limited. <strong>Competitive position holds:</strong> Aldi stays offline; duopoly pricing power preserved. <strong>Big W returns to profit:</strong> Currently loss-making at -$63M EBIT."
@@ -1340,7 +1339,7 @@
     "regime": "Range-bound",
     "clarity": "Mixed",
     "price": {
-      "current": 31.96,
+      "current": 36,
       "currency": "A$"
     },
     "movingAverages": {
@@ -1479,7 +1478,7 @@
     "domainCount": "10 of 10",
     "hypothesesCount": "4 Active"
   },
-  "_alertState": "NORMAL",
+  "_alertState": "OVERCORRECTION",
   "hero": {
     "embedded_thesis": "At A$31.96, the price embeds a turnaround at a premium multiple. The 25x forward P/E implies Woolworths restores food EBIT margins toward historical levels, ACCC litigation resolves without structural remedies, and Big W stabilises. The market is pricing a recovery narrative that FY25 results did not support: NPAT fell 19%, Big W posted losses, and regulatory pressure intensified. The 1H FY26 results are the first genuine test of whether a trough has been reached or a new normal is being established.",
     "skew": "DOWNSIDE",
@@ -1518,5 +1517,15 @@
     }
   },
   "current_price": 36.35,
-  "last_price_update": "2026-02-26T08:58:25.683Z"
+  "last_price_update": "2026-02-26T08:58:25.683Z",
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-02-27",
+    "triggerPrice": 36,
+    "direction": "up",
+    "movePct": 12.64,
+    "reviewDate": "2026-03-06",
+    "message": "Single-day move of +12.6% exceeds 10% threshold — possible overcorrection"
+  }
 }

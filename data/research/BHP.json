@@ -5,7 +5,7 @@
   "company": "BHP Group",
   "sector": "Materials",
   "sectorSub": "Iron Ore Mining",
-  "price": 57.75,
+  "price": 58.41,
   "currency": "A$",
   "date": "27 February 2026",
   "reportId": "BHP-2026-001",
@@ -71,14 +71,15 @@
     51.13,
     50.36,
     52.74,
-    57.75
+    57.75,
+    58.41
   ],
   "heroDescription": "~50% Iron Ore Revenue &bull; Global Copper Expansion &bull; Jansen Potash FY27",
   "heroCompanyDescription": "BHP Group (ASX: BHP) is the world's largest diversified miner by market capitalisation. Core operations span iron ore (Pilbara, WA), copper (Escondida, Olympic Dam, OZ Minerals assets), metallurgical coal (BMA JV, Queensland), and potash (Jansen, Canada). Iron ore remains the dominant earnings contributor at ~50-55% of EBITDA, but copper is growing rapidly post the A$9.6B OZ Minerals acquisition. Nickel West was placed on care and maintenance in 2024 after a US$2.5B write-down.",
   "heroMetrics": [
     {
       "label": "Mkt Cap",
-      "value": "A$268B",
+      "value": "A$297B",
       "colorClass": ""
     },
     {
@@ -147,7 +148,7 @@
   "featuredMetrics": [
     {
       "label": "Mkt Cap",
-      "value": "A$268B",
+      "value": "A$297B",
       "color": ""
     },
     {
@@ -185,7 +186,7 @@
       [
         [
           "Market Cap",
-          "A$268B",
+          "A$297B",
           "td-mono"
         ],
         [
@@ -828,7 +829,7 @@
     "regime": "Uptrend",
     "clarity": "Clear",
     "price": {
-      "current": 52.74,
+      "current": 58.41,
       "currency": "A$"
     },
     "movingAverages": {
@@ -972,7 +973,7 @@
     "domainCount": "10 of 10",
     "hypothesesCount": "4 Active"
   },
-  "_alertState": "NORMAL",
+  "_alertState": "OVERCORRECTION",
   "hero": {
     "embedded_thesis": "At A$52.74, the price embeds moderate pessimism on iron ore without fully pricing the copper optionality. The ~15x forward P/E implies iron ore remains BHP's earnings anchor at current Chinese steel production levels, discounts Jansen potash ahead of first production, and assigns minimal value to Olympic Dam copper upside. The market prices copper growth as a hedge rather than a structural re-rating catalyst.",
     "skew": "UPSIDE",
@@ -1011,5 +1012,15 @@
     }
   },
   "current_price": 57.75,
-  "last_price_update": "2026-02-26T08:58:26.823Z"
+  "last_price_update": "2026-02-26T08:58:26.823Z",
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-02-27",
+    "triggerPrice": 58.41,
+    "direction": "up",
+    "movePct": 10.75,
+    "reviewDate": "2026-03-06",
+    "message": "Single-day move of +10.8% exceeds 10% threshold — possible overcorrection"
+  }
 }

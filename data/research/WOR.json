@@ -5,7 +5,7 @@
   "company": "Worley Limited",
   "sector": "Energy",
   "sectorSub": "Engineering &amp; Professional Services",
-  "price": 11.71,
+  "price": 11.34,
   "currency": "A$",
   "date": "27 February 2026",
   "reportId": "WOR-2026-001",
@@ -84,7 +84,8 @@
     12.5,
     12.8,
     12.85,
-    11.71
+    11.71,
+    11.34
   ],
   "heroDescription": "Global Engineering &amp; Professional Services &bull; ~35,000 Employees &bull; FY24: $10.2B Revenue",
   "heroCompanyDescription": "Worley Limited (ASX: WOR) is a global engineering, procurement, construction, and consulting (EPC&amp;C) company serving the energy, chemicals, and resources sectors. Formed from the 2019 merger of WorleyParsons and Jacobs ECR division, Worley now generates approximately 50% of revenue from sustainability-related projects (renewables, hydrogen, carbon capture, electrification) and 50% from traditional energy (LNG, upstream oil &amp; gas, downstream refining). The company operates across 48 countries and is positioning itself as the engineering partner for the energy transition.",
@@ -820,7 +821,7 @@
     "regime": "Downtrend — Bottoming Attempt",
     "clarity": "Low clarity, searching for base",
     "price": {
-      "current": 12.85,
+      "current": 11.34,
       "currency": "A$"
     },
     "movingAverages": {
@@ -982,5 +983,16 @@
     }
   },
   "current_price": 11.71,
-  "last_price_update": "2026-02-26T08:58:27.342Z"
+  "last_price_update": "2026-02-26T08:58:27.342Z",
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-02-27",
+    "triggerPrice": 11.34,
+    "direction": "down",
+    "movePct": -11.75,
+    "reviewDate": "2026-03-06",
+    "message": "Single-day move of -11.8% exceeds 10% threshold — possible overcorrection"
+  },
+  "_alertState": "OVERCORRECTION"
 }
