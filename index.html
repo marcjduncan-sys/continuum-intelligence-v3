@@ -1289,10 +1289,13 @@ a:hover { color: var(--accent-sage); }
     position: sticky;
     top: var(--nav-height);
     z-index: 50;
+    display: flex;
+    align-items: stretch;
+    padding-right: var(--space-lg);
 }
 .section-nav-inner {
-    max-width: var(--max-width);
-    margin: 0 auto;
+    flex: 1;
+    min-width: 0;
     padding: 0 var(--space-lg);
     display: flex;
     gap: var(--space-xs);
@@ -1313,8 +1316,8 @@ a:hover { color: var(--accent-sage); }
     border-bottom-color: var(--accent-teal);
 }
 .section-nav-toggle-all {
-    margin-left: auto;
     flex-shrink: 0;
+    align-self: center;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -1330,7 +1333,6 @@ a:hover { color: var(--accent-sage); }
     cursor: pointer;
     white-space: nowrap;
     transition: color 0.2s, border-color 0.2s;
-    align-self: center;
 }
 .section-nav-toggle-all:hover { color: var(--accent-teal); border-color: var(--accent-teal); }
 
