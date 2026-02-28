@@ -124,6 +124,11 @@ jobs:
             echo "::warning::History logger exited with code $HISTORY_EXIT"
           fi
 
+      - name: Sync research index
+        if: steps.market-check.outputs.skip != 'true'
+        run: |
+          node scripts/sync-index.js
+
       - name: Commit and push changes
         if: steps.market-check.outputs.skip != 'true'
         run: |

@@ -65,6 +65,9 @@ jobs:
       - name: Fetch ASX announcements (non-critical)
         run: node scripts/fetch-announcements.js || true
 
+      - name: Sync research index
+        run: node scripts/sync-index.js
+
       - name: Check for changes
         id: changes
         run: |
