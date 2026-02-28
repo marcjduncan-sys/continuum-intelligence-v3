@@ -30,7 +30,16 @@ export function renderReport(data) {
   prepareHypotheses(data);
   var t = data.ticker.toLowerCase();
 
+  var toggleAllBtn =
+    '<div class="sections-control-bar">' +
+      '<button class="sections-toggle-all-btn" onclick="window.toggleAllSections(this)" data-state="expanded" aria-label="Collapse all sections">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="18 15 12 9 6 15"/></svg>' +
+        '<span>Collapse All</span>' +
+      '</button>' +
+    '</div>';
+
   var mainContent =
+    toggleAllBtn +
     renderOvercorrectionBanner(data) +
     renderIdentity(data) +
     renderHypotheses(data) +

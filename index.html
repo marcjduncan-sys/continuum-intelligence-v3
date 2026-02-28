@@ -1289,13 +1289,10 @@ a:hover { color: var(--accent-sage); }
     position: sticky;
     top: var(--nav-height);
     z-index: 50;
-    display: flex;
-    align-items: stretch;
-    padding-right: var(--space-lg);
 }
 .section-nav-inner {
-    flex: 1;
-    min-width: 0;
+    max-width: var(--max-width);
+    margin: 0 auto;
     padding: 0 var(--space-lg);
     display: flex;
     gap: var(--space-xs);
@@ -1315,26 +1312,31 @@ a:hover { color: var(--accent-sage); }
     color: var(--accent-teal);
     border-bottom-color: var(--accent-teal);
 }
-.section-nav-toggle-all {
-    flex-shrink: 0;
-    align-self: center;
+.sections-control-bar {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--space-sm) var(--space-lg) 0;
+    display: flex;
+    justify-content: flex-end;
+}
+.sections-toggle-all-btn {
     display: flex;
     align-items: center;
     gap: 5px;
     font-size: 0.62rem;
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--text-muted);
     background: none;
     border: 1px solid var(--border);
     border-radius: 4px;
-    padding: 4px 10px;
+    padding: 5px 12px;
     cursor: pointer;
     white-space: nowrap;
     transition: color 0.2s, border-color 0.2s;
 }
-.section-nav-toggle-all:hover { color: var(--accent-teal); border-color: var(--accent-teal); }
+.sections-toggle-all-btn:hover { color: var(--accent-teal); border-color: var(--accent-teal); }
 
 /* --- Report Sections --- */
 .report-content {
