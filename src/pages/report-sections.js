@@ -290,7 +290,13 @@ export function renderSectionNav(data) {
   }
 
   return '<div class="section-nav">' +
-    '<div class="section-nav-inner">' + linksHtml + '</div>' +
+    '<div class="section-nav-inner">' +
+      linksHtml +
+      '<button class="section-nav-toggle-all" onclick="window.toggleAllSections(this)" data-state="expanded" aria-label="Collapse all sections">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="18 15 12 9 6 15"/></svg>' +
+        '<span>Collapse All</span>' +
+      '</button>' +
+    '</div>' +
   '</div>';
 }
 

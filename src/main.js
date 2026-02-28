@@ -80,6 +80,33 @@ window.initSectionToggles = function() {
     if (btn) btn.setAttribute('aria-expanded', 'true');
     section.classList.remove('collapsed');
   });
+  var allBtn = document.querySelector('.section-nav-toggle-all');
+  if (allBtn) { allBtn.dataset.state = 'expanded'; allBtn.querySelector('span').textContent = 'Collapse All'; allBtn.querySelector('svg polyline').setAttribute('points', '18 15 12 9 6 15'); }
+};
+
+window.toggleAllSections = function(btn) {
+  var isExpanded = btn.dataset.state === 'expanded';
+  var newState = isExpanded ? 'collapsed' : 'expanded';
+  document.querySelectorAll('.report-section').forEach(function(section) {
+    var body = section.querySelector('.rs-body');
+    var toggle = section.querySelector('.rs-toggle');
+    if (!body) return;
+    if (isExpanded) {
+      section.classList.add('collapsed');
+      body.style.display = 'none';
+      if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    } else {
+      section.classList.remove('collapsed');
+      body.style.display = '';
+      if (toggle) toggle.setAttribute('aria-expanded', 'true');
+    }
+  });
+  btn.dataset.state = newState;
+  var label = isExpanded ? 'Expand All' : 'Collapse All';
+  btn.querySelector('span').textContent = label;
+  btn.setAttribute('aria-label', label + ' sections');
+  var points = isExpanded ? '6 9 12 15 18 9' : '18 15 12 9 6 15';
+  btn.querySelector('svg polyline').setAttribute('points', points);
 };
 
 // Lazy-load SheetJS only when needed (portfolio upload interaction)
