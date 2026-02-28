@@ -3,6 +3,7 @@
 
 import { STOCK_DATA, FRESHNESS_DATA, FEATURED_ORDER, COMING_SOON } from '../lib/state.js';
 import { computeSkewScore } from '../lib/dom.js';
+import { on } from '../lib/data-events.js';
 
 var coverageSortDir = 0; // 0 = unsorted (default), 1 = desc (bearish first), -1 = asc (bullish first)
 
@@ -96,7 +97,7 @@ export function renderCoverageRow(data) {
     '<td class="td-ticker">' + data.ticker + '</td>' +
     '<td>' + data.company + '</td>' +
     '<td>' + data.sector + '</td>' +
-    '<td class="td-price">' + data.currency + data.price + '</td>' +
+    '<td class="td-price">' + data.currency + (data._livePrice || data.price) + '</td>' +
     '<td>' +
       '<div class="skew-cell">' +
         '<div class="skew-bar-track">' +
@@ -191,7 +192,7 @@ export function buildCoverageData() {
     var d = STOCK_DATA[t];
     coverageData[t] = {
       company: d.company,
-      price: d.price,
+      price: d._livePrice || d.price,
       skew: (d._skew || computeSkewScore(d)).direction,
       sector: d.sector
     };
@@ -280,4 +281,51 @@ export function initHomePage() {
 
   // Home stock search
   initHomeSearch();
+
+  // Listen for STOCK_DATA changes to keep coverage table and featured cards current
+  on('stock:updated', function(evt) {
+    _updateCoverageRow(evt.ticker);
+    _updateFeaturedCard(evt.ticker);
+  });
+}
+
+function _updateCoverageRow(ticker) {
+  var homePage = document.getElementById('page-home');
+  if (!homePage || !homePage.classList.contains('active')) return;
+
+  var tbody = document.getElementById('coverage-body');
+  if (!tbody) return;
+
+  var stock = STOCK_DATA[ticker];
+  if (!stock) return;
+
+  var rows = tbody.querySelectorAll('tr');
+  for (var i = 0; i < rows.length; i++) {
+    var tickerCell = rows[i].querySelector('.td-ticker');
+    if (tickerCell && tickerCell.textContent.trim() === ticker) {
+      var temp = document.createElement('tbody');
+      temp.innerHTML = renderCoverageRow(stock);
+      if (temp.firstElementChild) {
+        tbody.replaceChild(temp.firstElementChild, rows[i]);
+      }
+      return;
+    }
+  }
+}
+
+function _updateFeaturedCard(ticker) {
+  var homePage = document.getElementById('page-home');
+  if (!homePage || !homePage.classList.contains('active')) return;
+
+  var stock = STOCK_DATA[ticker];
+  if (!stock) return;
+
+  var card = document.querySelector('[data-ticker-card="' + ticker + '"]');
+  if (!card) return;
+
+  var temp = document.createElement('div');
+  temp.innerHTML = renderFeaturedCard(stock);
+  if (temp.firstElementChild) {
+    card.parentNode.replaceChild(temp.firstElementChild, card);
+  }
 }

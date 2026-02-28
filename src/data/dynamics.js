@@ -10,6 +10,7 @@
 import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA } from '../lib/state.js';
 import { fmtB, fmtPrice, fmtPct, fmtPE, signPct } from '../lib/format.js';
 import { computeSkewScore } from '../lib/dom.js';
+import { emit } from '../lib/data-events.js';
 
 // --- Core Computation ---
 
@@ -429,6 +430,7 @@ export function hydrate(ticker) {
       (FRESHNESS_DATA[ticker].priceAtReview || ref._anchors.price)) * 1000) / 10;
   }
 
+  emit('stock:updated', { ticker: ticker, computed: computed });
   return computed;
 }
 

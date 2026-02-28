@@ -4,6 +4,7 @@
 import { STOCK_DATA, REFERENCE_DATA } from '../lib/state.js';
 import { computeSkewScore, normaliseScores } from '../lib/dom.js';
 import { buildCoverageData } from './home.js';
+import { on } from '../lib/data-events.js';
 
 // Coverage data matching portal reports (built dynamically from STOCK_DATA)
 var COVERAGE_DATA = null;
@@ -754,4 +755,38 @@ export function initPortfolioPage() {
   if (savedPortfolio && savedPortfolio.length > 0) {
     renderPortfolioFromSaved(savedPortfolio);
   }
+
+  // Listen for STOCK_DATA changes to refresh portfolio with live prices
+  on('stock:updated', function() {
+    COVERAGE_DATA = null; // invalidate stale cache
+
+    var page = document.getElementById('page-portfolio');
+    if (!page || !page.classList.contains('active')) return;
+
+    var positions = loadPortfolio();
+    if (!positions || positions.length === 0) return;
+
+    // Recalculate prices and P&L from fresh STOCK_DATA
+    var coverageData = getCoverageData();
+    for (var i = 0; i < positions.length; i++) {
+      var p = positions[i];
+      var covered = coverageData[p.ticker];
+      if (covered) {
+        p.currentPrice = covered.price;
+        p.marketValue = p.currentPrice ? p.units * p.currentPrice : null;
+        p.costBasis = p.units * p.avgCost;
+        p.pnlDollar = p.marketValue !== null ? p.marketValue - p.costBasis : null;
+        p.pnlPercent = p.costBasis > 0 && p.pnlDollar !== null ? (p.pnlDollar / p.costBasis) * 100 : null;
+        p.skew = covered.skew;
+      }
+    }
+    var totalValue = positions.reduce(function(s, p) { return s + (p.marketValue || 0); }, 0);
+    positions.forEach(function(p) {
+      p.weight = totalValue > 0 && p.marketValue ? (p.marketValue / totalValue) * 100 : 0;
+      p.alignment = deriveAlignment(p.skew, p.weight);
+    });
+
+    savePortfolio(positions);
+    renderPortfolio(positions, totalValue);
+  });
 }

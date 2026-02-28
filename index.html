@@ -8161,7 +8161,7 @@ function buildSnapshotFromStock(ticker) {
     company: stock.company,
     sector: stock.sector,
     sectorSub: stock.sectorSub,
-    price: stock.price,
+    price: stock._livePrice || stock.price,
     currency: stock.currency,
     date: dateStr,
     version: 'v1.0',
@@ -8521,7 +8521,7 @@ function renderCoverageRow(data) {
     '<td class="td-ticker">' + data.ticker + '</td>' +
     '<td>' + data.company + '</td>' +
     '<td>' + data.sector + '</td>' +
-    '<td class="td-price">' + data.currency + data.price + '</td>' +
+    '<td class="td-price">' + data.currency + (data._livePrice || data.price) + '</td>' +
     '<td>' +
       '<div class="skew-cell">' +
         '<div class="skew-bar-track">' +
@@ -8619,7 +8619,7 @@ function buildCoverageData() {
     var d = STOCK_DATA[t];
     coverageData[t] = {
       company: d.company,
-      price: d.price,
+      price: d._livePrice || d.price,
       skew: (d._skew || computeSkewScore(d)).direction,
       sector: d.sector
     };
@@ -9044,6 +9044,9 @@ const ContinuumDynamics = (function() {
         (FRESHNESS_DATA[ticker].priceAtReview || ref._anchors.price)) * 1000) / 10;
     }
 
+    if (typeof window.DataEvents !== 'undefined') {
+      window.DataEvents.emit('stock:updated', { ticker: ticker, computed: computed });
+    }
     return computed;
   }
 
@@ -10269,14 +10272,113 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Also run the legacy prefetch for full chart data (3-year bars for TA charts)
     setTimeout(prefetchAllLiveData, 3000);
+
+    // --- Data change listeners (parent/dependant pattern) ---
+
+    // Home page: update coverage row + featured card on data change
+    window.DataEvents.on('stock:updated', function(evt) {
+        var homePage = document.getElementById('page-home');
+        if (!homePage || !homePage.classList.contains('active')) return;
+
+        var stock = STOCK_DATA[evt.ticker];
+        if (!stock) return;
+
+        // Update coverage table row
+        var tbody = document.getElementById('coverage-body');
+        if (tbody) {
+            var rows = tbody.querySelectorAll('tr');
+            for (var i = 0; i < rows.length; i++) {
+                var tickerCell = rows[i].querySelector('.td-ticker');
+                if (tickerCell && tickerCell.textContent.trim() === evt.ticker) {
+                    var temp = document.createElement('tbody');
+                    temp.innerHTML = renderCoverageRow(stock);
+                    if (temp.firstElementChild) {
+                        tbody.replaceChild(temp.firstElementChild, rows[i]);
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Update featured card
+        var card = document.querySelector('[data-ticker-card="' + evt.ticker + '"]');
+        if (card) {
+            var temp2 = document.createElement('div');
+            temp2.innerHTML = renderFeaturedCard(stock);
+            if (temp2.firstElementChild) {
+                card.parentNode.replaceChild(temp2.firstElementChild, card);
+            }
+        }
+    });
+
+    // Portfolio: invalidate coverage cache + refresh if visible
+    window.DataEvents.on('stock:updated', function() {
+        COVERAGE_DATA = buildCoverageData();
+
+        var page = document.getElementById('page-portfolio');
+        if (!page || !page.classList.contains('active')) return;
+
+        var positions = loadPortfolio();
+        if (!positions || positions.length === 0) return;
+
+        for (var i = 0; i < positions.length; i++) {
+            var p = positions[i];
+            var covered = COVERAGE_DATA[p.ticker];
+            if (covered) {
+                p.currentPrice = covered.price;
+                p.marketValue = p.currentPrice ? p.units * p.currentPrice : null;
+                p.costBasis = p.units * p.avgCost;
+                p.pnlDollar = p.marketValue !== null ? p.marketValue - p.costBasis : null;
+                p.pnlPercent = p.costBasis > 0 && p.pnlDollar !== null ? (p.pnlDollar / p.costBasis) * 100 : null;
+                p.skew = covered.skew;
+            }
+        }
+        var totalValue = positions.reduce(function(s, pp) { return s + (pp.marketValue || 0); }, 0);
+        positions.forEach(function(pp) {
+            pp.weight = totalValue > 0 && pp.marketValue ? (pp.marketValue / totalValue) * 100 : 0;
+            pp.alignment = deriveAlignment(pp.skew, pp.weight);
+        });
+        savePortfolio(positions);
+        renderPortfolio(positions, totalValue);
+    });
+
+    // Snapshots: rebuild stale snapshot data
+    window.DataEvents.on('stock:updated', function(evt) {
+        if (!SNAPSHOT_DATA[evt.ticker]) return;
+        SNAPSHOT_DATA[evt.ticker] = buildSnapshotFromStock(evt.ticker);
+    });
 });
+
+/* ============================================================
+   DATA EVENTS -- Lightweight event bus for data change propagation
+   ============================================================ */
+window.DataEvents = (function() {
+  var _listeners = {};
+  return {
+    on: function(event, fn) {
+      (_listeners[event] = _listeners[event] || []).push(fn);
+    },
+    off: function(event, fn) {
+      var arr = _listeners[event];
+      if (arr) _listeners[event] = arr.filter(function(f) { return f !== fn; });
+    },
+    emit: function(event, data) {
+      var arr = _listeners[event];
+      if (arr) {
+        for (var i = 0; i < arr.length; i++) {
+          try { arr[i](data); } catch(e) { console.warn('[DataEvents]', e); }
+        }
+      }
+    }
+  };
+})();
 
 /* ============================================================
    PORTFOLIO ENGINE
    ============================================================ */
 
 /* Coverage data matching portal reports (built dynamically from STOCK_DATA) */
-const COVERAGE_DATA = buildCoverageData();
+var COVERAGE_DATA = buildCoverageData();
 
 /* Upload zone setup */
 function setupUploadZone() {

@@ -127,7 +127,7 @@ export function buildCoverageData() {
     var d = STOCK_DATA[t];
     coverageData[t] = {
       company: d.company,
-      price: d.price,
+      price: d._livePrice || d.price,
       skew: (d._skew || computeSkewScore(d)).direction,
       sector: d.sector
     };

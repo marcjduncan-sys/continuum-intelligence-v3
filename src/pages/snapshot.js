@@ -5,6 +5,8 @@ import { STOCK_DATA, SNAPSHOT_DATA, SNAPSHOT_ORDER } from '../lib/state.js';
 import { normaliseScores, computeSkewScore } from '../lib/dom.js';
 import { renderPDFDownload } from './report-sections.js';
 import { prepareHypotheses } from './report-sections.js';
+import { on } from '../lib/data-events.js';
+import { renderedSnapshots } from '../lib/router.js';
 
 export function buildSnapshotFromStock(ticker) {
   var stock = STOCK_DATA[ticker];
@@ -220,7 +222,7 @@ export function buildSnapshotFromStock(ticker) {
     company: stock.company,
     sector: stock.sector,
     sectorSub: stock.sectorSub,
-    price: stock.price,
+    price: stock._livePrice || stock.price,
     currency: stock.currency,
     date: dateStr,
     version: 'v1.0',
@@ -494,3 +496,10 @@ export function renderSnapshot(ticker) {
   if (!data) return '<div class="snap-page"><p>Snapshot not available for ' + ticker + '</p></div>';
   return renderSnapshotPage(data);
 }
+
+// Listen for STOCK_DATA changes to invalidate stale snapshot data
+on('stock:updated', function(evt) {
+  if (!SNAPSHOT_DATA[evt.ticker]) return;
+  SNAPSHOT_DATA[evt.ticker] = buildSnapshotFromStock(evt.ticker);
+  renderedSnapshots.delete(evt.ticker);
+});

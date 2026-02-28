@@ -13,7 +13,7 @@
  */
 
 import { STOCK_DATA, REFERENCE_DATA } from '../lib/state.js';
-import { LiveData, fetchAndPatchLive } from './live-data.js';
+import { LiveData, fetchAndPatchLive, updateLiveUI } from './live-data.js';
 
 // ============================================================
 // MARKET FEED -- Live Price Polling & Market Status Engine
