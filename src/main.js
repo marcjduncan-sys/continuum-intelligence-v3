@@ -62,6 +62,29 @@ window.destroyNarrativeTimelineChart = destroyNarrativeTimelineChart;
 window.setupScrollSpy = setupScrollSpy;
 window.initNarrativeTimelineChart = initNarrativeTimelineChart;
 
+// Helper: find the active report page container
+function _activeReportPage() {
+  var active = document.querySelector('.page.active');
+  return (active && active.id && active.id.startsWith('page-report-')) ? active : null;
+}
+
+// Helper: derive ticker from a report section's id (e.g. "bhp-identity" -> "bhp")
+function _tickerFromSection(section) {
+  var id = section.id || '';
+  var dash = id.indexOf('-');
+  return dash > 0 ? id.substring(0, dash) : '';
+}
+
+// Helper: persist collapsed state to localStorage
+function _saveSectionState(ticker, sectionId, isCollapsed) {
+  if (!ticker) return;
+  var key = 'sec-state-' + ticker;
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) {}
+  state[sectionId] = isCollapsed;
+  try { localStorage.setItem(key, JSON.stringify(state)); } catch(e) {}
+}
+
 window.toggleSection = function(btn) {
   var section = btn.closest('.report-section');
   if (!section) return;
@@ -70,24 +93,40 @@ window.toggleSection = function(btn) {
   var isCollapsed = section.classList.toggle('collapsed');
   btn.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
   body.style.display = isCollapsed ? 'none' : '';
+  _saveSectionState(_tickerFromSection(section), section.id, isCollapsed);
 };
 
 window.initSectionToggles = function() {
-  document.querySelectorAll('.report-section').forEach(function(section) {
+  var page = _activeReportPage();
+  if (!page) return;
+  var ticker = page.id.replace('page-report-', '').toLowerCase();
+  var key = 'sec-state-' + ticker;
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) {}
+  page.querySelectorAll('.report-section').forEach(function(section) {
     var body = section.querySelector('.rs-body');
     var btn = section.querySelector('.rs-toggle');
-    if (body) body.style.display = '';
-    if (btn) btn.setAttribute('aria-expanded', 'true');
-    section.classList.remove('collapsed');
+    if (state[section.id]) {
+      section.classList.add('collapsed');
+      if (body) body.style.display = 'none';
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    } else {
+      section.classList.remove('collapsed');
+      if (body) body.style.display = '';
+      if (btn) btn.setAttribute('aria-expanded', 'true');
+    }
   });
-  var allBtn = document.querySelector('.sections-float-toggle');
+  var allBtn = page.querySelector('.sections-float-toggle');
   if (allBtn) { allBtn.dataset.state = 'expanded'; allBtn.querySelector('span').textContent = 'Collapse All'; allBtn.querySelector('svg polyline').setAttribute('points', '18 15 12 9 6 15'); }
 };
 
 window.toggleAllSections = function(btn) {
+  var page = _activeReportPage();
+  if (!page) return;
+  var ticker = page.id.replace('page-report-', '').toLowerCase();
   var isExpanded = btn.dataset.state === 'expanded';
   var newState = isExpanded ? 'collapsed' : 'expanded';
-  document.querySelectorAll('.report-section').forEach(function(section) {
+  page.querySelectorAll('.report-section').forEach(function(section) {
     var body = section.querySelector('.rs-body');
     var toggle = section.querySelector('.rs-toggle');
     if (!body) return;
@@ -100,6 +139,7 @@ window.toggleAllSections = function(btn) {
       body.style.display = '';
       if (toggle) toggle.setAttribute('aria-expanded', 'true');
     }
+    _saveSectionState(ticker, section.id, isExpanded);
   });
   btn.dataset.state = newState;
   var label = isExpanded ? 'Expand All' : 'Collapse All';

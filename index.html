@@ -1468,6 +1468,9 @@ a:hover { color: var(--accent-sage); }
 .report-section.collapsed .rs-body {
     display: none;
 }
+.page:not(.active) .sections-float-toggle {
+    display: none;
+}
 .rs-subtitle {
     font-size: 0.88rem; font-weight: 700;
     color: var(--accent-teal);
@@ -7991,6 +7994,12 @@ function renderReportPage(data) {
       '</div>' +
     '</div></div>';
 
+  var floatingToggle =
+    '<button class="sections-float-toggle" onclick="toggleAllSections(this)" data-state="expanded" aria-label="Collapse all sections">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="18 15 12 9 6 15"/></svg>' +
+      '<span>Collapse All</span>' +
+    '</button>';
+
   return renderReportHero(data) +
     renderSignalBars(data) +
     renderSkewBar(data) +
@@ -8001,7 +8010,8 @@ function renderReportPage(data) {
       renderHypSidebar(data) +
     '</div>' +
     renderPDFDownload(data) +
-    renderReportFooter(data);
+    renderReportFooter(data) +
+    floatingToggle;
 }
 
 // ============================================================
@@ -8010,7 +8020,11 @@ function renderReportPage(data) {
 function toggleSection(btn) {
   var section = btn.closest('.report-section');
   if (!section) return;
+  var body = section.querySelector('.rs-body');
+  if (!body) return;
   var isCollapsed = section.classList.toggle('collapsed');
+  btn.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+  body.style.display = isCollapsed ? 'none' : '';
   var sectionId = section.id;
   var ticker = sectionId.split('-')[0];
   var key = 'sec-state-' + ticker;
@@ -8030,8 +8044,54 @@ function initSectionToggles(ticker) {
   if (!page) return;
   var sections = page.querySelectorAll('.report-section[id]');
   sections.forEach(function(sec) {
-    if (state[sec.id]) sec.classList.add('collapsed');
+    var body = sec.querySelector('.rs-body');
+    var btn = sec.querySelector('.rs-toggle');
+    if (state[sec.id]) {
+      sec.classList.add('collapsed');
+      if (body) body.style.display = 'none';
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    } else {
+      sec.classList.remove('collapsed');
+      if (body) body.style.display = '';
+      if (btn) btn.setAttribute('aria-expanded', 'true');
+    }
   });
+  var allBtn = page.querySelector('.sections-float-toggle');
+  if (allBtn) { allBtn.dataset.state = 'expanded'; allBtn.querySelector('span').textContent = 'Collapse All'; allBtn.querySelector('svg polyline').setAttribute('points', '18 15 12 9 6 15'); }
+}
+
+function toggleAllSections(btn) {
+  var page = btn.closest('.page');
+  if (!page) return;
+  var ticker = page.id.replace('page-report-', '').toLowerCase();
+  var isExpanded = btn.dataset.state === 'expanded';
+  var newState = isExpanded ? 'collapsed' : 'expanded';
+  page.querySelectorAll('.report-section').forEach(function(section) {
+    var body = section.querySelector('.rs-body');
+    var toggle = section.querySelector('.rs-toggle');
+    if (!body) return;
+    if (isExpanded) {
+      section.classList.add('collapsed');
+      body.style.display = 'none';
+      if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    } else {
+      section.classList.remove('collapsed');
+      body.style.display = '';
+      if (toggle) toggle.setAttribute('aria-expanded', 'true');
+    }
+    // Persist per-section state
+    var key = 'sec-state-' + ticker;
+    var state = {};
+    try { state = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) {}
+    state[section.id] = isExpanded;
+    try { localStorage.setItem(key, JSON.stringify(state)); } catch(e) {}
+  });
+  btn.dataset.state = newState;
+  var label = isExpanded ? 'Expand All' : 'Collapse All';
+  btn.querySelector('span').textContent = label;
+  btn.setAttribute('aria-label', label + ' sections');
+  var points = isExpanded ? '6 9 12 15 18 9' : '18 15 12 9 6 15';
+  btn.querySelector('svg polyline').setAttribute('points', points);
 }
 
 // ============================================================

@@ -1397,8 +1397,8 @@ function loadNarrativeHistory(ticker, callback) {
 export function renderNarrativeTimeline(data) {
   var t = data.ticker.toLowerCase();
   return '<div class="report-section narrative-timeline-section" id="' + t + '-narrative-timeline">' +
-    '<div class="rs-number">Timeline</div>' +
-    '<div class="rs-title">Narrative Evolution</div>' +
+    RS_HDR('Timeline', 'Narrative Evolution') +
+    '<div class="rs-body">' +
     '<div class="rs-subtitle">How hypothesis survival scores and price have moved over time</div>' +
     '<div class="nt-chart-container">' +
       '<div class="nt-chart-header">' +
@@ -1412,6 +1412,7 @@ export function renderNarrativeTimeline(data) {
         '<canvas id="nt-canvas-' + data.ticker + '" style="display:none"></canvas>' +
       '</div>' +
       '<div class="nt-flip-legend" id="nt-legend-' + data.ticker + '"></div>' +
+    '</div>' +
     '</div>' +
   '</div>';
 }
