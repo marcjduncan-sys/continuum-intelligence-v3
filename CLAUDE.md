@@ -267,7 +267,10 @@ When patching STOCK_DATA with refreshed research data, preserve `_livePrice`, `p
 ### 7.9 Vite Base Path for GitHub Pages
 `vite.config.js` must set `base: '/continuum-intelligence-v3/'` because GitHub Pages serves from a project subdirectory, not the domain root. Without this, all Vite-generated asset paths (`/assets/...` for CSS bundles, font preloads, `@font-face` url() paths) resolve to the wrong root and 404. The inline `<style>` block in index.html is unaffected (it's not processed by Vite), so most pages appear to work -- only features with CSS exclusively in the Vite bundle (e.g. personalisation page) visibly break. If the repo is ever renamed or moved to a custom domain, this `base` value must be updated.
 
-### 7.10 Vite Build vs Dev: Two Different Worlds
+### 7.10 Hypothesis Score Idempotency
+`adjustHypothesisScores()` runs on every `hydrate()` call, which is triggered by boot, data load, and every live price update. It MUST be idempotent. The function saves `_origScore` and `_origScoreMeta` on each hypothesis before first adjustment and always adjusts from those originals. Never read `hyp.score` as the base for adjustment (it contains the previously-adjusted value). Never append to `hyp.scoreMeta` (use replace from `_origScoreMeta`). When STOCK_DATA[ticker] is replaced with fresh JSON (data load, batch refresh), `_origScore` is naturally cleared because the entire object is new. The function in `index.html` (production) and `src/data/dynamics.js` (dev) must stay in sync.
+
+### 7.11 Vite Build vs Dev: Two Different Worlds
 The `src/` module tree (`main.js`, `src/styles/`, etc.) is only active during `npm run dev`. In production builds, Vite processes `index.html` as the entry: it bundles `<link rel="stylesheet">` tags into a CSS asset and transforms font preloads, but the app's JS runs from inline `<script>` blocks in index.html (the original monolith code). There is no `<script type="module" src="src/main.js">` in the HTML. This means: (a) CSS for production must be in `<link>` tags in index.html OR in the inline `<style>` block, not in `src/styles/` imports, and (b) changes to `src/` JS modules have no effect on the production build.
 
 ---
@@ -275,6 +278,7 @@ The `src/` module tree (`main.js`, `src/styles/`, etc.) is only active during `n
 ## 8. File Coupling (Read Before Editing)
 
 ### 8.1 Never Modify Without Full Impact Analysis
+- `adjustHypothesisScores()` -- **MUST be idempotent.** Called on every `hydrate()`, which runs from boot, data load, and every live price update. Uses `_origScore`/`_origScoreMeta` anchors to prevent compounding. Never read `hyp.score` as adjustment base. Never append to `hyp.scoreMeta`. Exists in both `index.html` and `src/data/dynamics.js` — keep in sync.
 - `computeSkewScore()` -- **DO NOT call directly from renderers.** Use `data._skew` instead (cached during hydration). All 19 consumer sites use `data._skew || computeSkewScore(data)` as fallback. The canonical value is set once in `ContinuumDynamics.hydrate()` after `adjustHypothesisScores()` mutates hypothesis scores. Calling `computeSkewScore()` at different lifecycle points returns different results — the cache prevents this inconsistency.
 - `prepareHypotheses()` -- remaps N1-N4 labels across evidence, discriminators, tripwires, gaps, verdict, alignment table
 - `normaliseScores()` -- floor 5, ceiling 80, scale to 100%. Used by DNE engine, frontend skew, and must be replicated by backend scripts
