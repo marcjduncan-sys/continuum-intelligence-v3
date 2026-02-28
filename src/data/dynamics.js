@@ -400,6 +400,14 @@ export function hydrate(ticker) {
   // 2b. Cache canonical skew score (single source of truth for all renderers)
   stock._skew = computeSkewScore(stock);
 
+  // 2c. Sync hero.skew and skew.direction with computed _skew so all render sites agree
+  if (stock.hero) {
+    stock.hero.skew = stock._skew.direction.toUpperCase();
+  }
+  if (stock.skew) {
+    stock.skew.direction = stock._skew.direction;
+  }
+
   // 3. All text fields (narrative, descriptions, rationale, evidence)
   // Skip fields that shouldn't be text-replaced
   var textTargets = [
