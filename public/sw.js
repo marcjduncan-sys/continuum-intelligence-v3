@@ -6,7 +6,7 @@
  * Stale-while-revalidate for the main HTML shell.
  */
 
-const CACHE_NAME = 'continuum-v2.1.0';
+const CACHE_NAME = 'continuum-v2.2.0';
 const RESEARCH_CACHE = 'continuum-research-v1';
 
 // Static assets to pre-cache on install
@@ -64,6 +64,11 @@ self.addEventListener('fetch', event => {
   // Live market data endpoint: network-only (never cache)
   if (url.pathname.includes('/data/prices/') || url.pathname.includes('yahoo')) {
     return; // Let browser handle normally
+  }
+
+  // Vite dev server paths: network-only (never cache dev modules)
+  if (url.pathname.startsWith('/src/') || url.pathname.startsWith('/@vite/') || url.pathname.startsWith('/@fs/') || url.pathname.startsWith('/node_modules/')) {
+    return;
   }
 
   // Static assets (CSS, JS scripts, fonts, images): cache-first
