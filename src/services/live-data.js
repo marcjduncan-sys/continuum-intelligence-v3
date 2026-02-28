@@ -276,6 +276,7 @@ export function updateLiveUI(ticker) {
                 // Destroy Chart.js instances BEFORE DOM replacement
                 destroyNarrativeTimelineChart(ticker);
                 container.innerHTML = renderReport(STOCK_DATA[ticker]);
+                if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
                 setupScrollSpy('page-report-' + ticker);
                 if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
                 // Re-apply narrative analysis after re-render

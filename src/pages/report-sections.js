@@ -5,6 +5,14 @@ import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA, FEATURED_ORDER } from '../l
 import { renderSparkline } from '../lib/format.js';
 import { normaliseScores, computeSkewScore } from '../lib/dom.js';
 
+const RS_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+function RS_HDR(num, title) {
+  return '<div class="rs-header"><div class="rs-header-text">' +
+    '<div class="rs-number">' + num + '</div>' +
+    '<div class="rs-title">' + title + '</div>' +
+    '</div><button class="rs-toggle" onclick="window.toggleSection(this)" aria-label="Toggle section">' + RS_CHEVRON + '</button></div>';
+}
+
 export function renderReportHero(data) {
   var metricsHtml = '';
   for (var i = 0; i < data.heroMetrics.length; i++) {
@@ -304,14 +312,14 @@ export function renderIdentity(data) {
   }
 
   return '<div class="report-section" id="' + t + '-identity">' +
-    '<div class="rs-number">Section 01</div>' +
-    '<div class="rs-title">Identity &amp; Snapshot</div>' +
+    RS_HDR('Section 01', 'Identity &amp; Snapshot') +
+    '<div class="rs-body">' +
     '<table class="identity-table">' +
       '<thead><tr><th>Metric</th><th>Value</th><th>Metric</th><th>Value</th></tr></thead>' +
       '<tbody>' + rowsHtml + '</tbody>' +
     '</table>' +
     '<p class="rs-text"><strong>Business overview:</strong> ' + id.overview + '</p>' +
-  '</div>';
+  '</div></div>';
 }
 
 export function renderHypotheses(data) {
@@ -363,10 +371,10 @@ export function renderHypotheses(data) {
   }
 
   return '<div class="report-section" id="' + t + '-hypotheses">' +
-    '<div class="rs-number">Section 02</div>' +
-    '<div class="rs-title">Competing Hypotheses</div>' +
+    RS_HDR('Section 02', 'Competing Hypotheses') +
+    '<div class="rs-body">' +
     cardsHtml +
-  '</div>';
+  '</div></div>';
 }
 
 export function renderNarrative(data) {
@@ -374,8 +382,8 @@ export function renderNarrative(data) {
   var n = data.narrative;
 
   return '<div class="report-section" id="' + t + '-narrative">' +
-    '<div class="rs-number">Section 03</div>' +
-    '<div class="rs-title">Dominant Narrative</div>' +
+    RS_HDR('Section 03', 'Dominant Narrative') +
+    '<div class="rs-body">' +
     '<div class="rs-subtitle">The Narrative</div>' +
     '<p class="rs-text">' + n.theNarrative + '</p>' +
     '<div class="rs-subtitle">The Price Implication</div>' +
@@ -387,7 +395,7 @@ export function renderNarrative(data) {
     '<p class="rs-text">' + n.evidenceCheck + '</p>' +
     '<div class="rs-subtitle">Narrative Stability</div>' +
     '<p class="rs-text">' + n.narrativeStability + '</p>' +
-  '</div>';
+  '</div></div>';
 }
 
 export function renderEvidenceCard(card) {
@@ -502,12 +510,12 @@ export function renderEvidence(data) {
   var alignmentHtml = renderAlignmentSummary(data);
 
   return '<div class="report-section" id="' + t + '-evidence">' +
-    '<div class="rs-number">Section 04</div>' +
-    '<div class="rs-title">Cross-Domain Evidence Synthesis</div>' +
+    RS_HDR('Section 04', 'Cross-Domain Evidence Synthesis') +
+    '<div class="rs-body">' +
     '<p class="rs-text">' + ev.intro + '</p>' +
     cardsHtml +
     alignmentHtml +
-  '</div>';
+  '</div></div>';
 }
 
 export function renderDiscriminators(data) {
@@ -526,8 +534,8 @@ export function renderDiscriminators(data) {
   }
 
   return '<div class="report-section" id="' + t + '-discriminates">' +
-    '<div class="rs-number">Section 05</div>' +
-    '<div class="rs-title">What Discriminates</div>' +
+    RS_HDR('Section 05', 'What Discriminates') +
+    '<div class="rs-body">' +
     '<p class="rs-text">' + d.intro + '</p>' +
     '<table class="disc-table">' +
       '<thead><tr><th>Diagnosticity</th><th>Evidence</th><th>Discriminates Between</th><th>Current Reading</th></tr></thead>' +
@@ -537,7 +545,7 @@ export function renderDiscriminators(data) {
       '<div class="callout-label">Non-Discriminating Evidence &mdash; Assessed &amp; Discarded</div>' +
       '<p>' + d.nonDiscriminating + '</p>' +
     '</div>' +
-  '</div>';
+  '</div></div>';
 }
 
 export function renderTripwires(data) {
@@ -567,11 +575,11 @@ export function renderTripwires(data) {
   }
 
   return '<div class="report-section" id="' + t + '-tripwires">' +
-    '<div class="rs-number">Section 06</div>' +
-    '<div class="rs-title">What We\'re Watching</div>' +
+    RS_HDR('Section 06', 'What We\'re Watching') +
+    '<div class="rs-body">' +
     '<p class="rs-text">' + tw.intro + '</p>' +
     cardsHtml +
-  '</div>';
+  '</div></div>';
 }
 
 export function renderGaps(data) {
@@ -596,8 +604,8 @@ export function renderGaps(data) {
   }
 
   return '<div class="report-section" id="' + t + '-gaps">' +
-    '<div class="rs-number">Section 07</div>' +
-    '<div class="rs-title">Evidence Gaps &amp; Integrity Notes</div>' +
+    RS_HDR('Section 07', 'Evidence Gaps &amp; Integrity Notes') +
+    '<div class="rs-body">' +
     '<div class="rs-subtitle">Domain Coverage Assessment</div>' +
     '<table class="gaps-table">' +
       '<thead><tr><th>Domain</th><th>Coverage</th><th>Freshness</th><th>Confidence</th></tr></thead>' +
@@ -607,7 +615,7 @@ export function renderGaps(data) {
     calloutsHtml +
     '<div class="rs-subtitle">Analytical Limitations</div>' +
     '<p class="rs-text">' + g.analyticalLimitations + '</p>' +
-  '</div>';
+  '</div></div>';
 }
 
 export function computeMA(arr, period) {
@@ -955,8 +963,8 @@ export function renderTechnicalAnalysis(data) {
   '</div>';
 
   return '<div class="report-section ta-section" id="' + t + '-technical">' +
-    '<div class="rs-number">Section 08</div>' +
-    '<div class="rs-title">Technical Structure</div>' +
+    RS_HDR('Section 08', 'Technical Structure') +
+    '<div class="rs-body">' +
     chartHtml +
     regimeHtml +
     maHtml +
@@ -967,7 +975,7 @@ export function renderTechnicalAnalysis(data) {
     mrHtml +
     relHtml +
     footerHtml +
-  '</div>';
+  '</div></div>';
 }
 
 export function renderReportFooter(data) {

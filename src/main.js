@@ -62,6 +62,26 @@ window.destroyNarrativeTimelineChart = destroyNarrativeTimelineChart;
 window.setupScrollSpy = setupScrollSpy;
 window.initNarrativeTimelineChart = initNarrativeTimelineChart;
 
+window.toggleSection = function(btn) {
+  var section = btn.closest('.report-section');
+  if (!section) return;
+  var body = section.querySelector('.rs-body');
+  if (!body) return;
+  var isCollapsed = section.classList.toggle('collapsed');
+  btn.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+  body.style.display = isCollapsed ? 'none' : '';
+};
+
+window.initSectionToggles = function() {
+  document.querySelectorAll('.report-section').forEach(function(section) {
+    var body = section.querySelector('.rs-body');
+    var btn = section.querySelector('.rs-toggle');
+    if (body) body.style.display = '';
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+    section.classList.remove('collapsed');
+  });
+};
+
 // Lazy-load SheetJS only when needed (portfolio upload interaction)
 window.loadSheetJS = function(callback) {
   if (typeof window.XLSX !== 'undefined') { if (callback) callback(); return; }

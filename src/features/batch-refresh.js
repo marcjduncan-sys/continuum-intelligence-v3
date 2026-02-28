@@ -125,6 +125,7 @@ function _pollRefreshStatus(ticker) {
                         var container = document.getElementById('page-report-' + ticker);
                         if (container && typeof window.renderReportPage === 'function') {
                             container.innerHTML = window.renderReportPage(STOCK_DATA[ticker]);
+                            if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
                             // Re-initialise scroll spy and charts
                             if (typeof window.setupScrollSpy === 'function') window.setupScrollSpy('page-report-' + ticker);
                             if (typeof window.initNarrativeTimelineChart === 'function') window.initNarrativeTimelineChart(ticker);
@@ -405,6 +406,7 @@ async function _fetchAndCacheSingleTicker(ticker) {
             var container = document.getElementById('page-report-' + ticker);
             if (container && typeof window.renderReportPage === 'function') {
                 container.innerHTML = window.renderReportPage(STOCK_DATA[ticker]);
+                if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
                 if (typeof window.setupScrollSpy === 'function') window.setupScrollSpy('page-report-' + ticker);
                 if (typeof window.initNarrativeTimelineChart === 'function') window.initNarrativeTimelineChart(ticker);
                 if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
@@ -481,6 +483,7 @@ async function _fetchAndMergeBatchResults() {
                 var container = document.getElementById('page-report-' + currentTicker);
                 if (container && typeof window.renderReportPage === 'function') {
                     container.innerHTML = window.renderReportPage(STOCK_DATA[currentTicker]);
+                    if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
                     if (typeof window.setupScrollSpy === 'function') window.setupScrollSpy('page-report-' + currentTicker);
                     if (typeof window.initNarrativeTimelineChart === 'function') window.initNarrativeTimelineChart(currentTicker);
                     if (typeof window.initInlineChat === 'function') window.initInlineChat(currentTicker);

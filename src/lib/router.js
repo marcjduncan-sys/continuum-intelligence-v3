@@ -109,6 +109,7 @@ export function route() {
                   container.innerHTML = _pageRenderers.renderReportPage(data);
                 }
                 renderedPages.add(ticker);
+                if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
                 if (_pageRenderers.setupScrollSpy) _pageRenderers.setupScrollSpy('page-' + hash);
                 if (_pageRenderers.populateSidebar) _pageRenderers.populateSidebar(ticker);
                 if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
@@ -123,6 +124,7 @@ export function route() {
             container.innerHTML = _pageRenderers.renderReportPage(STOCK_DATA[ticker]);
           }
           renderedPages.add(ticker);
+          if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
           if (_pageRenderers.setupScrollSpy) _pageRenderers.setupScrollSpy('page-' + hash);
           if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
           if (_pageRenderers.initNarrativeTimelineChart) _pageRenderers.initNarrativeTimelineChart(ticker);
