@@ -1,10 +1,17 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { cpSync } from 'fs';
 
 export default defineConfig({
   base: '/',
   root: '.',
   publicDir: 'public',
+  plugins: [{
+    name: 'copy-data',
+    closeBundle() {
+      cpSync('data', 'dist/data', { recursive: true });
+    }
+  }],
   build: {
     outDir: 'dist',
     rollupOptions: {
