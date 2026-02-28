@@ -80,7 +80,7 @@ window.initSectionToggles = function() {
     if (btn) btn.setAttribute('aria-expanded', 'true');
     section.classList.remove('collapsed');
   });
-  var allBtn = document.querySelector('.sections-toggle-all-btn');
+  var allBtn = document.querySelector('.sections-float-toggle');
   if (allBtn) { allBtn.dataset.state = 'expanded'; allBtn.querySelector('span').textContent = 'Collapse All'; allBtn.querySelector('svg polyline').setAttribute('points', '18 15 12 9 6 15'); }
 };
 
