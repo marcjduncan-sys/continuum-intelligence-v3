@@ -31,7 +31,7 @@ export function getFeaturedOrder() {
 // Modules can import FEATURED_ORDER and call .forEach(), .map(), etc.
 export const FEATURED_ORDER = new Proxy([], {
   get(target, prop, receiver) {
-    const keys = Object.keys(STOCK_DATA);
+    const keys = Object.keys(STOCK_DATA).sort();
     if (prop === 'length') return keys.length;
     if (typeof prop === 'string' && !isNaN(/** @type {any} */(prop))) return keys[Number(prop)];
     const val = keys[prop];
@@ -52,7 +52,7 @@ export function getSnapshotOrder() {
 // Proxy-backed array that always reflects current STOCK_DATA keys.
 export const SNAPSHOT_ORDER = new Proxy([], {
   get(target, prop, receiver) {
-    const keys = Object.keys(STOCK_DATA);
+    const keys = Object.keys(STOCK_DATA).sort();
     if (prop === 'length') return keys.length;
     if (typeof prop === 'string' && !isNaN(/** @type {any} */(prop))) return keys[Number(prop)];
     const val = keys[prop];

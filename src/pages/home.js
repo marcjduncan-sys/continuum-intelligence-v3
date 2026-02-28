@@ -248,6 +248,7 @@ export function initHomePage() {
   // Populate featured cards
   var featuredGrid = document.getElementById('featured-grid');
   if (featuredGrid) {
+    featuredGrid.innerHTML = '';
     FEATURED_ORDER.forEach(function(ticker) {
       if (STOCK_DATA[ticker]) {
         featuredGrid.innerHTML += renderFeaturedCard(STOCK_DATA[ticker]);
@@ -258,6 +259,7 @@ export function initHomePage() {
   // Populate coverage table
   var coverageBody = document.getElementById('coverage-body');
   if (coverageBody) {
+    coverageBody.innerHTML = '';
     FEATURED_ORDER.forEach(function(ticker) {
       if (STOCK_DATA[ticker]) {
         coverageBody.innerHTML += renderCoverageRow(STOCK_DATA[ticker]);
@@ -271,6 +273,7 @@ export function initHomePage() {
   // Populate footer research links
   var footerLinks = document.getElementById('footer-research-links');
   if (footerLinks) {
+    footerLinks.innerHTML = '';
     FEATURED_ORDER.forEach(function(ticker) {
       var d = STOCK_DATA[ticker];
       if (d) {

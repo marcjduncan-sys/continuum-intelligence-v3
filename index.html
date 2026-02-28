@@ -501,15 +501,15 @@ a:hover { color: var(--accent-sage); }
 /* --- Featured Report Cards --- */
 .featured-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: var(--space-lg);
-    margin-bottom: var(--space-2xl);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
 }
 .featured-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: var(--space-lg);
+    padding: 12px var(--space-md);
     cursor: pointer;
     transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     position: relative;
@@ -532,32 +532,32 @@ a:hover { color: var(--accent-sage); }
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-xs);
 }
 .fc-ticker {
-    font-size: 1.4rem; font-weight: 800;
+    font-size: 1.1rem; font-weight: 800;
     letter-spacing: -0.01em;
     color: var(--text-primary);
 }
 .fc-company {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     color: var(--text-secondary);
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
 .fc-sector {
-    font-size: 0.6rem; font-weight: 600;
+    font-size: 0.58rem; font-weight: 600;
     letter-spacing: 0.06em; text-transform: uppercase;
     color: var(--text-muted);
 }
 .fc-price {
     font-family: var(--font-data);
-    font-size: 1.6rem; font-weight: 700;
+    font-size: 1.2rem; font-weight: 700;
     text-align: right;
 }
 .fc-metrics {
-    display: flex; gap: var(--space-lg);
-    margin-bottom: var(--space-md);
-    padding-bottom: var(--space-md);
+    display: flex; gap: var(--space-md);
+    margin-bottom: var(--space-xs);
+    padding-bottom: var(--space-xs);
     border-bottom: 1px solid var(--border);
 }
 .fc-metric-label {
@@ -10018,7 +10018,7 @@ const MarketFeed = (function() {
 })();
 
 // Featured card display order
-const FEATURED_ORDER = Object.keys(STOCK_DATA);
+const FEATURED_ORDER = Object.keys(STOCK_DATA).sort();
 
 // Coming soon stubs
 const COMING_SOON = [
