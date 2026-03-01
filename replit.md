@@ -45,4 +45,8 @@ Required in `api/.env` or as Replit secrets:
 ## Development Notes
 - Node.js 20+ required (Vite 7 requirement)
 - Python 3.12 used for backend
-- The `vite.config.js` sets `base: '/'` for local dev (was originally `/continuum-intelligence-v3/` for GitHub Pages)
+
+## CRITICAL: Do NOT Modify These Files
+- **`vite.config.js`** — The `base` field MUST stay as `'/continuum-intelligence-v3/'`. The production deployment is GitHub Pages which serves from a subdirectory. Changing base to `'/'` causes all CSS, fonts, and assets to 404 in production. Do NOT change the base, plugins, or build config.
+- **`CLAUDE.md`** — Project architecture documentation. Do not modify or delete.
+- **`data/`** — Managed by CI/CD pipelines. Do not manually edit JSON files in this directory.

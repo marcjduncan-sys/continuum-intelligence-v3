@@ -30,6 +30,12 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
+      - name: Validate Vite base path
+        run: |
+          if ! grep -q "base: '/continuum-intelligence-v3/'" vite.config.js; then
+            echo "::error::vite.config.js base path has been changed! Must be '/continuum-intelligence-v3/' for GitHub Pages."
+            exit 1
+          fi
       - name: Run unit tests
         run: npx vitest run
       - name: Build
