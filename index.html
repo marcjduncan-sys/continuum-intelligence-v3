@@ -11604,6 +11604,8 @@ var REFRESH_API_BASE = (window.location.hostname === 'localhost' || window.locat
         ? 'https://imaginative-vision-production-16cb.up.railway.app'
         : '';  // Same origin on Railway
 
+var CI_API_KEY = window.CI_API_KEY || '';
+
 var _refreshPollers = {};
 
 async function triggerRefresh(ticker) {
@@ -11627,7 +11629,7 @@ async function triggerRefresh(ticker) {
         // POST to trigger refresh
         var resp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY }
         });
 
         if (resp.status === 409) {
@@ -11997,7 +11999,7 @@ async function triggerRefreshAll() {
 
         var resp = await fetch(REFRESH_API_BASE + '/api/refresh-all', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY },
             body: JSON.stringify(bodyPayload)
         });
 
@@ -12622,7 +12624,7 @@ async function _fetchAndMergeBatchResults() {
         // API call
         fetch(CHAT_API_BASE, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY },
             body: JSON.stringify(requestBody)
         })
         .then(function(res) {
@@ -12897,7 +12899,7 @@ async function _fetchAndMergeBatchResults() {
 
     fetch(API_BASE, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY },
       body: JSON.stringify(requestBody)
     })
     .then(function(res) {

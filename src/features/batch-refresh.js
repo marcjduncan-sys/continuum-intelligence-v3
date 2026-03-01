@@ -20,6 +20,8 @@ var REFRESH_API_BASE = window.location.hostname.includes('github.io')
     ? 'https://imaginative-vision-production-16cb.up.railway.app'
     : '';  // Same origin (Vite proxy in dev, Railway in prod)
 
+var CI_API_KEY = window.CI_API_KEY || '';
+
 var _refreshPollers = {};
 
 // ============================================================
@@ -47,7 +49,7 @@ async function triggerRefresh(ticker) {
         // POST to trigger refresh
         var resp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY }
         });
 
         if (resp.status === 409) {
@@ -191,7 +193,7 @@ async function triggerRefreshAll() {
 
         var resp = await fetch(REFRESH_API_BASE + '/api/refresh-all', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY },
             body: JSON.stringify(bodyPayload)
         });
 

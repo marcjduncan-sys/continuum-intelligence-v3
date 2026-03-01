@@ -1305,10 +1305,11 @@ function pnSendChat() {
     var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     var apiOrigin = window.CHAT_API_URL ||
         (isLocal ? 'http://localhost:8000' : PRODUCTION_API);
+    var apiKey = window.CI_API_KEY || '';
 
     fetch(apiOrigin + '/api/research-chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
         body: JSON.stringify({
             ticker: pnState.chatTicker,
             question: question,

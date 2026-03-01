@@ -9,15 +9,20 @@ import asyncio
 import json
 import logging
 import os
+import re
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 import anthropic
-from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, Field
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 import config
 from ingest import ingest, get_tickers, get_passage_count
@@ -28,7 +33,27 @@ from refresh import (
 )
 from retriever import retrieve
 
-logging.basicConfig(level=logging.INFO)
+
+# ---------------------------------------------------------------------------
+# Structured JSON logging
+# ---------------------------------------------------------------------------
+
+class _JSONFormatter(logging.Formatter):
+    def format(self, record):
+        log_obj = {
+            "time": self.formatTime(record),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+        }
+        if record.exc_info and record.exc_info[0]:
+            log_obj["exception"] = self.formatException(record.exc_info)
+        return json.dumps(log_obj)
+
+
+_handler = logging.StreamHandler()
+_handler.setFormatter(_JSONFormatter())
+logging.basicConfig(level=logging.INFO, handlers=[_handler])
 logger = logging.getLogger(__name__)
 
 
@@ -80,26 +105,47 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=config.ALLOWED_ORIGINS + ["*"],
+    allow_origins=config.ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "X-API-Key"],
 )
 
-# Anthropic client (lazy init)
-_client: anthropic.Anthropic | None = None
+# Rate limiter (in-memory, resets on Railway restart — acceptable)
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
+# ---------------------------------------------------------------------------
+# API key authentication
+# ---------------------------------------------------------------------------
+
+_api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+TICKER_PATTERN = re.compile(r"^[A-Z0-9]{1,6}$")
+
+
+async def verify_api_key(api_key: str | None = Depends(_api_key_header)):
+    """Validate API key on protected endpoints.
+
+    If CI_API_KEY is empty, authentication is disabled (dev mode).
+    """
+    if not config.CI_API_KEY:
+        return
+    if not api_key or api_key != config.CI_API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid or missing API key")
+
+
+# Anthropic client (delegates to shared singleton in config)
 def _get_client() -> anthropic.Anthropic:
-    global _client
-    if _client is None:
-        if not config.ANTHROPIC_API_KEY:
-            raise HTTPException(
-                status_code=500,
-                detail="ANTHROPIC_API_KEY not configured. Set it as an environment variable.",
-            )
-        _client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
-    return _client
+    try:
+        return config.get_anthropic_client()
+    except RuntimeError:
+        raise HTTPException(
+            status_code=500,
+            detail="ANTHROPIC_API_KEY not configured. Set it as an environment variable.",
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -204,7 +250,8 @@ def _build_context(passages: list[dict], ticker: str) -> str:
 # ---------------------------------------------------------------------------
 
 @app.post("/api/research-chat", response_model=ResearchChatResponse)
-async def research_chat(request: ResearchChatRequest):
+@limiter.limit("30/minute")
+async def research_chat(request: Request, body: ResearchChatRequest, _=Depends(verify_api_key)):
     """
     Research chat endpoint.
 
@@ -212,13 +259,15 @@ async def research_chat(request: ResearchChatRequest):
     history. Retrieves relevant research passages and returns an LLM-generated
     response grounded in the research.
     """
-    ticker = request.ticker.upper()
+    ticker = body.ticker.upper()
+    if not TICKER_PATTERN.match(ticker):
+        raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{ticker}'")
 
     # Validate ticker — skip for personalised chat with custom system prompt
     available = get_tickers()
     has_research = ticker in available
 
-    if not has_research and not request.custom_system_prompt:
+    if not has_research and not body.custom_system_prompt:
         raise HTTPException(
             status_code=404,
             detail=f"Ticker '{ticker}' not found. Available: {', '.join(available)}",
@@ -229,9 +278,9 @@ async def research_chat(request: ResearchChatRequest):
     context = ""
     if has_research:
         passages = retrieve(
-            query=request.question,
+            query=body.question,
             ticker=ticker,
-            thesis_alignment=request.thesis_alignment,
+            thesis_alignment=body.thesis_alignment,
             max_passages=config.MAX_PASSAGES,
         )
         context = _build_context(passages, ticker)
@@ -240,7 +289,7 @@ async def research_chat(request: ResearchChatRequest):
     messages = []
 
     # Add conversation history (truncated to limit)
-    history = request.conversation_history[-config.MAX_CONVERSATION_TURNS * 2:]
+    history = body.conversation_history[-config.MAX_CONVERSATION_TURNS * 2:]
     for msg in history:
         messages.append({"role": msg.role, "content": msg.content})
 
@@ -252,19 +301,19 @@ async def research_chat(request: ResearchChatRequest):
         )
     else:
         user_message = f"**Stock:** {ticker}\n"
-    if request.thesis_alignment:
-        user_message += f"**Thesis alignment:** {request.thesis_alignment}\n"
-    user_message += f"**Question:** {request.question}"
+    if body.thesis_alignment:
+        user_message += f"**Thesis alignment:** {body.thesis_alignment}\n"
+    user_message += f"**Question:** {body.question}"
 
     messages.append({"role": "user", "content": user_message})
 
     # Call Claude
     client = _get_client()
-    effective_system = request.custom_system_prompt or request.system_prompt or SYSTEM_PROMPT
+    effective_system = body.custom_system_prompt or body.system_prompt or SYSTEM_PROMPT
     try:
         response = client.messages.create(
             model=config.ANTHROPIC_MODEL,
-            max_tokens=1024,
+            max_tokens=config.CHAT_MAX_TOKENS,
             system=effective_system,
             messages=messages,
         )
@@ -333,13 +382,21 @@ def _run_refresh_background(ticker: str):
 
 
 @app.post("/api/refresh/{ticker}")
-async def trigger_refresh(ticker: str, background_tasks: BackgroundTasks):
+@limiter.limit("5/minute")
+async def trigger_refresh(
+    request: Request,
+    ticker: str,
+    background_tasks: BackgroundTasks,
+    _=Depends(verify_api_key),
+):
     """
     Trigger a data refresh for a single stock.
 
     Returns 409 if a refresh is already running for this ticker.
     """
     ticker = ticker.upper()
+    if not TICKER_PATTERN.match(ticker):
+        raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{ticker}'")
 
     # Validate ticker exists in research data
     data_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
@@ -411,9 +468,11 @@ async def refresh_result(ticker: str):
             detail=f"Refresh still in progress: {job.stage_label}",
         )
 
-    # Return the updated research data
+    # Return the updated research data and free memory
     if job.result:
-        return job.result
+        data = job.result
+        job.result = None  # Free memory after delivery
+        return data
 
     # Fallback: read from disk
     data_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
@@ -439,9 +498,11 @@ def _run_batch_background(batch_id: str, tickers: list[str]):
 
 
 @app.post("/api/refresh-all")
+@limiter.limit("1/hour")
 async def trigger_refresh_all(
-    background_tasks: BackgroundTasks,
     request: Request,
+    background_tasks: BackgroundTasks,
+    _=Depends(verify_api_key),
 ):
     """Trigger a batch refresh for all (or specified) stocks."""
     if is_batch_running():
@@ -451,14 +512,18 @@ async def trigger_refresh_all(
         )
 
     # Accept optional {"tickers": ["BHP", "CBA"]} to refresh only a subset
-    body = {}
+    raw_body: dict = {}
     try:
-        body = await request.json()
+        raw_body = await request.json()
     except Exception:
         pass
 
-    if body.get("tickers"):
-        tickers = sorted(set(t.upper() for t in body["tickers"]))
+    if raw_body.get("tickers"):
+        # Validate each requested ticker
+        for t in raw_body["tickers"]:
+            if not TICKER_PATTERN.match(t.upper()):
+                raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{t}'")
+        tickers = sorted(set(t.upper() for t in raw_body["tickers"]))
     else:
         # Discover all tickers from research data files
         data_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
@@ -579,8 +644,21 @@ async def serve_data(file_path: str):
     return _serve_file(DATA_ROOT, file_path)
 
 
+_CACHE_RULES: dict[str, str] = {
+    ".js": "public, max-age=31536000, immutable",
+    ".css": "public, max-age=31536000, immutable",
+    ".woff2": "public, max-age=31536000, immutable",
+    ".woff": "public, max-age=31536000, immutable",
+    ".ttf": "public, max-age=31536000, immutable",
+    ".json": "public, max-age=300",
+    ".svg": "public, max-age=86400",
+    ".png": "public, max-age=86400",
+    ".ico": "public, max-age=86400",
+}
+
+
 def _serve_file(base_dir: Path, file_path: str):
-    """Serve a static file with path-traversal protection."""
+    """Serve a static file with path-traversal protection and cache headers."""
     base = base_dir.resolve()
     full_path = (base / file_path).resolve()
     if not str(full_path).startswith(str(base)):
@@ -588,7 +666,11 @@ def _serve_file(base_dir: Path, file_path: str):
     if not full_path.exists() or not full_path.is_file():
         raise HTTPException(status_code=404, detail="File not found")
     mime = MIME_TYPES.get(full_path.suffix, "application/octet-stream")
-    return FileResponse(full_path, media_type=mime)
+    headers: dict[str, str] = {}
+    cc = _CACHE_RULES.get(full_path.suffix)
+    if cc:
+        headers["Cache-Control"] = cc
+    return FileResponse(full_path, media_type=mime, headers=headers if headers else None)
 
 
 @app.get("/{full_path:path}")
@@ -600,7 +682,11 @@ async def serve_frontend(full_path: str):
                 and candidate.exists()
                 and candidate.is_file()):
             mime = MIME_TYPES.get(candidate.suffix, "application/octet-stream")
-            return FileResponse(candidate, media_type=mime)
+            headers: dict[str, str] = {}
+            cc = _CACHE_RULES.get(candidate.suffix)
+            if cc:
+                headers["Cache-Control"] = cc
+            return FileResponse(candidate, media_type=mime, headers=headers if headers else None)
     return FileResponse(config.INDEX_HTML_PATH, media_type="text/html")
 
 

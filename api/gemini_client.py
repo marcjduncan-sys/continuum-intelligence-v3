@@ -5,9 +5,9 @@ Uses the google-genai SDK (new unified SDK, replaces google-generativeai).
 Gemini 2.5 Flash: fast, cheap, native JSON mode via response_mime_type.
 """
 
+import asyncio
 import json
 import logging
-import time
 from typing import Any
 
 from google import genai
@@ -30,7 +30,7 @@ def _get_client() -> genai.Client:
     return _client
 
 
-def gemini_completion(
+async def gemini_completion(
     system_prompt: str,
     user_prompt: str,
     *,
@@ -41,7 +41,7 @@ def gemini_completion(
     max_retries: int = 2,
 ) -> dict[str, Any] | str:
     """
-    Call Gemini generate_content API.
+    Call Gemini generate_content API (async-safe).
 
     Parameters
     ----------
@@ -80,7 +80,8 @@ def gemini_completion(
     last_error = None
     for attempt in range(max_retries + 1):
         try:
-            response = client.models.generate_content(
+            response = await asyncio.to_thread(
+                client.models.generate_content,
                 model=effective_model,
                 contents=user_prompt,
                 config=gen_config,
@@ -118,19 +119,19 @@ def gemini_completion(
                 logger.warning(
                     f"Gemini rate limit hit, retrying in {wait}s (attempt {attempt + 1})"
                 )
-                time.sleep(wait)
+                await asyncio.sleep(wait)
                 continue
 
             # Transient server errors
             if "500" in str(e) or "503" in str(e):
                 logger.warning(f"Gemini server error, retrying (attempt {attempt + 1})")
-                time.sleep(1)
+                await asyncio.sleep(1)
                 continue
 
             # Non-retryable error
             logger.error(f"Gemini API error: {e}")
             if attempt < max_retries:
-                time.sleep(1)
+                await asyncio.sleep(1)
             else:
                 raise
 

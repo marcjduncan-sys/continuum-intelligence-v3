@@ -21,8 +21,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-import anthropic
-
 import config
 from gemini_client import gemini_completion
 from web_search import gather_all_data
@@ -201,6 +199,37 @@ def is_batch_running() -> bool:
     return False
 
 
+_JOB_TTL_SECONDS = 3600  # 1 hour
+
+
+def _evict_stale_jobs() -> None:
+    """Remove completed/failed jobs older than TTL to prevent memory leaks."""
+    now = time.time()
+    stale_tickers = [
+        t
+        for t, j in refresh_jobs.items()
+        if j.status in ("completed", "failed")
+        and j.completed_at
+        and now - j.completed_at > _JOB_TTL_SECONDS
+    ]
+    for t in stale_tickers:
+        del refresh_jobs[t]
+    stale_batches = [
+        bid
+        for bid, j in batch_jobs.items()
+        if j.status in ("completed", "failed", "partially_failed")
+        and j.completed_at
+        and now - j.completed_at > _JOB_TTL_SECONDS
+    ]
+    for bid in stale_batches:
+        del batch_jobs[bid]
+    if stale_tickers or stale_batches:
+        logger.info(
+            f"Evicted {len(stale_tickers)} stale ticker jobs, "
+            f"{len(stale_batches)} stale batch jobs"
+        )
+
+
 async def _run_single_in_batch(
     ticker: str, batch_job: BatchRefreshJob
 ) -> dict | None:
@@ -289,6 +318,7 @@ async def _run_single_in_batch(
 
 async def run_batch_refresh(batch_id: str, tickers: list[str]) -> dict:
     """Execute batch refresh for all tickers with controlled parallelism."""
+    _evict_stale_jobs()
     batch_job = BatchRefreshJob(batch_id=batch_id, tickers=tickers, status="in_progress")
     batch_jobs[batch_id] = batch_job
 
@@ -539,6 +569,7 @@ async def run_refresh(ticker: str) -> dict:
     dict
         The updated research JSON.
     """
+    _evict_stale_jobs()
     ticker = ticker.upper()
     job = RefreshJob(ticker=ticker)
     refresh_jobs[ticker] = job
@@ -645,7 +676,7 @@ async def _run_evidence_specialists(
 Please assess each evidence card against this new data and return the updated assessment as JSON."""
 
     try:
-        result = gemini_completion(
+        result = await gemini_completion(
             system_prompt=EVIDENCE_UPDATE_SYSTEM,
             user_prompt=user_prompt,
             json_mode=True,
@@ -763,14 +794,14 @@ Please provide the FULL updated JSON with all narrative rewrites and tripwire up
         if not config.ANTHROPIC_API_KEY:
             # Fallback: use Gemini for synthesis if Claude not configured
             logger.warning(f"[{ticker}] No Anthropic key, using Gemini for synthesis")
-            return gemini_completion(
+            return await gemini_completion(
                 system_prompt=HYPOTHESIS_UPDATE_SYSTEM,
                 user_prompt=user_prompt,
                 json_mode=True,
             )
 
         # Use Claude for the judgment-heavy synthesis
-        client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
+        client = config.get_anthropic_client()
         response = client.messages.create(
             model=config.ANTHROPIC_MODEL,
             max_tokens=6144,

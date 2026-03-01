@@ -27,6 +27,7 @@ var apiOrigin = window.CHAT_API_URL
         : isGitHubPages ? PRODUCTION_API
         : '');  // Same origin (Vite proxy in dev, Railway in prod)
 var CHAT_API_BASE = apiOrigin + '/api/research-chat';
+var CI_API_KEY = window.CI_API_KEY || '';
 
 // --- Shared system prompt (used by FAB, inline, and thesis chat) ---
 export var ANALYST_SYSTEM_PROMPT = 'You are a senior equity research analyst at Continuum Intelligence. You speak in the first person plural ("we", "our analysis", "our framework"). You are direct, precise, and opinionated -- like a fund manager talking to another fund manager. ' +
@@ -269,7 +270,7 @@ function sendMessage() {
     // API call
     fetch(CHAT_API_BASE, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY },
         body: JSON.stringify({
             ticker: currentTicker,
             question: question,
@@ -505,7 +506,7 @@ function sendInlineMessage(ticker, question) {
 
     fetch(INLINE_API_BASE, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY },
         body: JSON.stringify({ ticker: ticker, question: question, conversation_history: history, system_prompt: ANALYST_SYSTEM_PROMPT })
     })
     .then(function(res) {
