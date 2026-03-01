@@ -270,7 +270,10 @@ When patching STOCK_DATA with refreshed research data, preserve `_livePrice`, `p
 ### 7.10 Hypothesis Score Idempotency
 `adjustHypothesisScores()` runs on every `hydrate()` call, which is triggered by boot, data load, and every live price update. It MUST be idempotent. The function saves `_origScore` and `_origScoreMeta` on each hypothesis before first adjustment and always adjusts from those originals. Never read `hyp.score` as the base for adjustment (it contains the previously-adjusted value). Never append to `hyp.scoreMeta` (use replace from `_origScoreMeta`). When STOCK_DATA[ticker] is replaced with fresh JSON (data load, batch refresh), `_origScore` is naturally cleared because the entire object is new. The function in `index.html` (production) and `src/data/dynamics.js` (dev) must stay in sync.
 
-### 7.11 Vite Build vs Dev: Two Different Worlds
+### 7.11 Live Price Change Display: Never Derive from stock.price
+`stock.price` is overwritten to the live price during data loading (`STOCK_DATA[ticker].price = livePrice` at line ~5638). Computing price change as `_livePrice - stock.price` will always yield zero. Use `stock._liveChange` and `stock._liveChangePct` (populated by `applyServerPrices()` from `live-prices.json`), falling back to `stock._livePrevClose` for the delta. The home page cards already use the server values correctly via `updateHomeCardPrice()`. The report hero at `updateLiveUI()` was the only site that had this bug.
+
+### 7.12 Vite Build vs Dev: Two Different Worlds
 The `src/` module tree (`main.js`, `src/styles/`, etc.) is only active during `npm run dev`. In production builds, Vite processes `index.html` as the entry: it bundles `<link rel="stylesheet">` tags into a CSS asset and transforms font preloads, but the app's JS runs from inline `<script>` blocks in index.html (the original monolith code). There is no `<script type="module" src="src/main.js">` in the HTML. This means: (a) CSS for production must be in `<link>` tags in index.html OR in the inline `<style>` block, not in `src/styles/` imports, and (b) changes to `src/` JS modules have no effect on the production build.
 
 ---
