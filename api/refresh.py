@@ -862,8 +862,17 @@ def _merge_updates(
                     m["value"] = f"A${price_data.get('low_52w', 0):.2f} - A${price_data.get('high_52w', 0):.2f}"
 
         # Update price history for sparkline
-        if price_data.get("price_history"):
-            updated["priceHistory"] = price_data["price_history"]
+        # Yahoo may return [{date, close}, ...] objects or plain [number, ...].
+        # Always normalise to plain numbers before storing.
+        raw_ph = price_data.get("price_history")
+        if raw_ph:
+            if isinstance(raw_ph[0], dict):
+                updated["priceHistory"] = [
+                    pt["close"] for pt in raw_ph
+                    if isinstance(pt, dict) and pt.get("close") is not None
+                ]
+            else:
+                updated["priceHistory"] = raw_ph
 
     # -- Evidence card updates --
     evidence_cards = evidence_update.get("cards", [])
