@@ -9568,8 +9568,9 @@ function updateLiveUI(ticker) {
     if (stock._livePrice) {
         var priceEl = document.querySelector('#page-report-' + ticker + ' .rh-price');
         if (priceEl) {
-            var change = stock._livePrice - stock.price;
-            var changePct = (change / stock.price) * 100;
+            var prevClose = stock._livePrevClose || stock.price;
+            var change = stock._liveChange != null ? stock._liveChange : (stock._livePrice - prevClose);
+            var changePct = stock._liveChangePct != null ? stock._liveChangePct : (prevClose ? (change / prevClose) * 100 : 0);
             var sign = change >= 0 ? '+' : '';
             var cls = change >= 0 ? 'positive' : 'negative';
             priceEl.innerHTML = '<span class="rh-price-currency">' + stock.currency + '</span>' +
