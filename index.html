@@ -9443,9 +9443,14 @@ const LiveData = (function() {
     stock._liveChart = liveData;
     stock._liveTA = computeLiveTA(liveData.bars, stock.technicalAnalysis);
 
-    // Update the displayed price
+    // Update the displayed price and change data
     if (liveData.currentPrice) {
       stock._livePrice = liveData.currentPrice;
+      if (liveData.previousClose) {
+        stock._livePrevClose = liveData.previousClose;
+        stock._liveChange = liveData.currentPrice - liveData.previousClose;
+        stock._liveChangePct = (stock._liveChange / liveData.previousClose) * 100;
+      }
     }
   }
 
