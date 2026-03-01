@@ -5709,8 +5709,12 @@ function loadFullResearchData(ticker, callback) {
       var cachedData = JSON.parse(cached);
       // Use cached data if it has a _lastRefreshed timestamp (written by refresh pipeline)
       if (cachedData._lastRefreshed) {
-        var livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
-        var livePriceHistory = STOCK_DATA[ticker] ? STOCK_DATA[ticker].priceHistory : undefined;
+        var prev = STOCK_DATA[ticker] || {};
+        var livePrice = prev._livePrice;
+        var livePriceHistory = prev.priceHistory;
+        var livePrevClose = prev._livePrevClose;
+        var liveChange = prev._liveChange;
+        var liveChangePct = prev._liveChangePct;
         STOCK_DATA[ticker] = cachedData;
         STOCK_DATA[ticker]._indexOnly = false;
         STOCK_DATA[ticker]._fromCache = true;
@@ -5720,6 +5724,11 @@ function loadFullResearchData(ticker, callback) {
         }
         if (livePriceHistory) {
           STOCK_DATA[ticker].priceHistory = livePriceHistory;
+        }
+        if (livePrevClose !== undefined) {
+          STOCK_DATA[ticker]._livePrevClose = livePrevClose;
+          STOCK_DATA[ticker]._liveChange = liveChange;
+          STOCK_DATA[ticker]._liveChangePct = liveChangePct;
         }
         if (typeof ContinuumDynamics !== 'undefined' && ContinuumDynamics.hydrate) {
           ContinuumDynamics.hydrate(ticker);
@@ -5744,8 +5753,12 @@ function loadFullResearchData(ticker, callback) {
       try {
         var fullData = JSON.parse(xhr.responseText);
         // Merge full data into STOCK_DATA, preserving any live price patches
-        var livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
-        var livePriceHistory = STOCK_DATA[ticker] ? STOCK_DATA[ticker].priceHistory : undefined;
+        var prev = STOCK_DATA[ticker] || {};
+        var livePrice = prev._livePrice;
+        var livePriceHistory = prev.priceHistory;
+        var livePrevClose = prev._livePrevClose;
+        var liveChange = prev._liveChange;
+        var liveChangePct = prev._liveChangePct;
         STOCK_DATA[ticker] = fullData;
         STOCK_DATA[ticker]._indexOnly = false;
         // Restore live price if it was patched
@@ -5755,6 +5768,11 @@ function loadFullResearchData(ticker, callback) {
         }
         if (livePriceHistory) {
           STOCK_DATA[ticker].priceHistory = livePriceHistory;
+        }
+        if (livePrevClose !== undefined) {
+          STOCK_DATA[ticker]._livePrevClose = livePrevClose;
+          STOCK_DATA[ticker]._liveChange = liveChange;
+          STOCK_DATA[ticker]._liveChangePct = liveChangePct;
         }
         // Re-hydrate with ContinuumDynamics if available
         if (typeof ContinuumDynamics !== 'undefined' && ContinuumDynamics.hydrate) {
@@ -9501,10 +9519,13 @@ async function fetchAndPatchLive(ticker) {
         } else {
             _liveFetched.add(ticker);
             showDataStatus(ticker, 'static');
+            // Still update UI — MarketFeed may have already set _liveChange from server data
+            if (stock._livePrice) updateLiveUI(ticker);
         }
     } catch(e) {
         _liveFetched.add(ticker);
         showDataStatus(ticker, 'static');
+        if (stock._livePrice) updateLiveUI(ticker);
     }
 }
 
@@ -10466,6 +10487,24 @@ window.addEventListener('DOMContentLoaded', () => {
     if (savedPortfolio && savedPortfolio.length > 0) {
         renderPortfolioFromSaved(savedPortfolio);
     }
+
+    // Pre-hydrate STOCK_DATA with live price change data immediately (before MarketFeed polling)
+    // This ensures report hero shows correct change on first render.
+    fetch('data/live-prices.json?t=' + Date.now(), { cache: 'no-store' })
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .then(function(data) {
+            if (!data || !data.prices) return;
+            for (var ticker in data.prices) {
+                var p = data.prices[ticker];
+                var stock = STOCK_DATA[ticker];
+                if (!stock || !p.p) continue;
+                stock._livePrice = p.p;
+                stock._livePrevClose = p.pc;
+                stock._liveChange = p.c;
+                stock._liveChangePct = p.cp;
+            }
+        })
+        .catch(function() {});
 
     // Start live market feed with auto-polling (replaces one-shot prefetch)
     setTimeout(function() {
