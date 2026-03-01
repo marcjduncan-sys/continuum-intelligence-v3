@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import { cpSync } from 'fs';
 
 export default defineConfig({
-  base: '/',
+  base: '/continuum-intelligence-v3/',
   root: '.',
   publicDir: 'public',
   plugins: [{
