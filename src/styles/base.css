@@ -41,6 +41,28 @@
     outline-offset: 2px;
 }
 
+/* --- Touch Targets (WCAG 2.5.5 — 44x44px minimum) --- */
+.theme-toggle {
+    min-width: 44px;
+    min-height: 44px;
+}
+.rs-toggle,
+.msb-refresh-btn,
+.sections-float-toggle {
+    position: relative;
+}
+.rs-toggle::after,
+.msb-refresh-btn::after,
+.sections-float-toggle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 44px;
+    min-height: 44px;
+}
+
 /* --- Reduced Motion (A13) --- */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -70,7 +92,7 @@ a:hover { color: var(--accent-sage); }
 /* Theme toggle button */
 .theme-toggle {
     display: flex; align-items: center; justify-content: center;
-    width: 32px; height: 32px; border: 1px solid var(--border);
+    width: 44px; height: 44px; border: 1px solid var(--border);
     border-radius: 6px; background: transparent; cursor: pointer;
     color: var(--text-muted); transition: color 0.2s, border-color 0.2s, background 0.2s;
     margin-left: var(--space-sm);
@@ -194,7 +216,7 @@ a:hover { color: var(--accent-sage); }
     padding: var(--space-lg);
     margin-top: var(--space-xl);
 }
-.about-disclaimer h4 {
+.about-disclaimer-heading {
     font-size: 0.65rem; font-weight: 700;
     letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--text-muted);

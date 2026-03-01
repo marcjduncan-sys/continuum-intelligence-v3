@@ -8,6 +8,11 @@
     <meta property="og:title" content="Continuum Intelligence  --  Independent Cross-Domain Equity Research">
     <meta property="og:description" content="Evidence-driven equity analysis across 10 domains. Built by former UBS and Goldman Sachs executives.">
     <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Continuum Intelligence">
+    <meta name="twitter:description" content="Evidence-driven equity analysis across 10 domains. Built by former UBS and Goldman Sachs executives.">
+    <link rel="canonical" href="https://marcjduncan-sys.github.io/continuum-intelligence-v3/">
+    <link rel="icon" href="favicon.ico">
     <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
@@ -113,6 +118,14 @@
     --font-narrative: 'Source Serif 4', Georgia, 'Times New Roman', serif;
     --font-data: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
 
+    /* Type Scale */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.5rem;
+    --font-size-2xl: 2rem;
+
     /* Spacing */
     --space-xs: 4px;
     --space-sm: 8px;
@@ -137,7 +150,7 @@
     --bg-card: #FFFFFF;
     --text-primary: #1A1F2E;
     --text-secondary: #4A5568;
-    --text-muted: #718096;
+    --text-muted: #5C6878;
     --border: #E2E8F0;
     --border-light: #CBD5E0;
     --accent-teal: #0E8A7D;
@@ -239,7 +252,7 @@ a:hover { color: var(--accent-sage); }
 /* Theme toggle button */
 .theme-toggle {
     display: flex; align-items: center; justify-content: center;
-    width: 32px; height: 32px; border: 1px solid var(--border);
+    width: 44px; height: 44px; border: 1px solid var(--border);
     border-radius: 6px; background: transparent; cursor: pointer;
     color: var(--text-muted); transition: color 0.2s, border-color 0.2s, background 0.2s;
     margin-left: var(--space-sm);
@@ -291,6 +304,9 @@ a:hover { color: var(--accent-sage); }
     letter-spacing: 0.04em; text-transform: uppercase;
     color: var(--text-secondary);
     padding: 6px 0;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
     border-bottom: 2px solid transparent;
     transition: color 0.2s, border-color 0.2s;
 }
@@ -341,7 +357,7 @@ a:hover { color: var(--accent-sage); }
     max-width: 320px;
 }
 .footer-links { display: flex; gap: var(--space-2xl); }
-.footer-links-col h4 {
+.footer-col-heading {
     font-size: 0.6rem; font-weight: 700;
     letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--text-muted);
@@ -1474,6 +1490,18 @@ a:hover { color: var(--accent-sage); }
     align-items: center;
     margin-top: 2px;
     transition: color 0.2s, border-color 0.2s;
+    position: relative;
+}
+.rs-toggle::after,
+.msb-refresh-btn::after,
+.sections-float-toggle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 44px;
+    min-height: 44px;
 }
 .rs-toggle:hover { color: var(--accent-teal); border-color: var(--accent-teal); }
 .rs-toggle svg {
@@ -2724,7 +2752,7 @@ a:hover { color: var(--accent-sage); }
     padding: var(--space-lg);
     margin-top: var(--space-xl);
 }
-.about-disclaimer h4 {
+.about-disclaimer-heading {
     font-size: 0.65rem; font-weight: 700;
     letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--text-muted);
@@ -3995,6 +4023,7 @@ a:hover { color: var(--accent-sage); }
 .msb-label.closed { color: var(--text-muted); }
 .msb-updated { color: var(--text-muted); opacity: 0.8; }
 .msb-refresh-btn {
+    position: relative;
     background: none; border: 1px solid var(--border); color: var(--text-muted);
     padding: 2px 8px; border-radius: 3px; cursor: pointer;
     font-family: var(--font-data); font-size: 0.6rem; font-weight: 600;
@@ -4668,7 +4697,7 @@ a:hover { color: var(--accent-sage); }
   border-bottom: 1.25px solid rgb(226, 232, 240);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  height: 40px;
+  height: 44px;
   display: flex;
   justify-content: center;
 }
@@ -4691,13 +4720,13 @@ a:hover { color: var(--accent-sage); }
   padding: 0 16px;
   font-size: 0.68rem;
   font-weight: 500;
-  color: rgb(113, 128, 150);
+  color: var(--text-muted);
   background: transparent;
   border: none;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: default;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-ui);
   white-space: nowrap;
   transition: color 0.2s, background 0.2s;
   opacity: 0.7;
@@ -4866,7 +4895,7 @@ a:hover { color: var(--accent-sage); }
 <!-- ============================================================
      MAIN CONTENT
      ============================================================ -->
-<main id="main-content">
+<main id="main-content" role="main">
 
 <!-- ============================================================
      PAGE: HOME
@@ -4914,7 +4943,7 @@ a:hover { color: var(--accent-sage); }
             <div class="home-search">
                 <div class="home-search-wrap">
                     <svg class="home-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" class="home-search-input" id="home-stock-search" placeholder="Search stocks…" autocomplete="off" spellcheck="false">
+                    <input type="text" class="home-search-input" id="home-stock-search" placeholder="Search stocks…" autocomplete="off" spellcheck="false" aria-label="Search research reports">
                 </div>
                 <div class="home-search-results" id="home-search-results"></div>
             </div>
@@ -4947,7 +4976,7 @@ a:hover { color: var(--accent-sage); }
     </div>
 
     <!-- Home Footer -->
-    <footer class="site-footer">
+    <footer class="site-footer" role="contentinfo">
         <div class="footer-inner">
             <div class="footer-top">
                 <div>
@@ -4956,11 +4985,11 @@ a:hover { color: var(--accent-sage); }
                 </div>
                 <div class="footer-links">
                     <div class="footer-links-col">
-                        <h4>Research</h4>
+                        <h2 class="footer-col-heading">Research</h2>
                         <div id="footer-research-links"></div>
                     </div>
                     <div class="footer-links-col">
-                        <h4>Company</h4>
+                        <h2 class="footer-col-heading">Company</h2>
                         <a href="#about" onclick="navigate('about')">About &amp; Methodology</a>
                     </div>
                 </div>
@@ -4987,7 +5016,7 @@ a:hover { color: var(--accent-sage); }
         <div id="snapshot-container"></div>
     </div>
 
-    <footer class="site-footer">
+    <footer class="site-footer" role="contentinfo">
         <div class="footer-inner">
             <div class="footer-bottom">
                 <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the ACH methodology.</div>
@@ -5189,7 +5218,7 @@ a:hover { color: var(--accent-sage); }
     </div>
 
     <!-- Portfolio Footer -->
-    <footer class="site-footer">
+    <footer class="site-footer" role="contentinfo">
         <div class="footer-inner">
             <div class="footer-bottom">
                 <div class="footer-disclaimer">This portal does not constitute personal financial advice. Position alignment analysis uses publicly available information and the Analysis of Competing Hypotheses (ACH) methodology. No buy, sell, or hold recommendations are made.</div>
@@ -5232,12 +5261,12 @@ a:hover { color: var(--accent-sage); }
         </div>
 
         <div class="about-disclaimer">
-            <h4>Legal Disclaimer</h4>
+            <h2 class="about-disclaimer-heading">Legal Disclaimer</h2>
             <p>Continuum Intelligence provides general information and analysis only. Nothing published on this portal constitutes personal financial advice under Australian law or any other jurisdiction. All factual claims are sourced from ASX filings, ACCC publications, ABS statistics, RBA data, company investor presentations, broker consensus data, and publicly available information. Hypothesis survival scores reflect editorial assessment based on the Analysis of Competing Hypotheses methodology. Readers should consult their own licensed financial advisors before making any investment decisions. Past performance is not indicative of future results. Continuum Intelligence, its principals, and contributors may hold positions in securities discussed. All content is provided "as is" without warranty of any kind.</p>
         </div>
     </div>
 
-    <footer class="site-footer">
+    <footer class="site-footer" role="contentinfo">
         <div class="footer-inner">
             <div class="footer-bottom">
                 <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the ACH methodology.</div>
@@ -5317,7 +5346,7 @@ a:hover { color: var(--accent-sage); }
 
     </div>
 
-    <footer class="site-footer">
+    <footer class="site-footer" role="contentinfo">
         <div class="footer-inner">
             <div class="footer-bottom">
                 <div class="footer-disclaimer">This comparator provides analysis based on publicly available research. It does not constitute investment advice.</div>
@@ -5968,7 +5997,7 @@ var RS_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 function RS_HDR(num, title) {
   return '<div class="rs-header"><div class="rs-header-text">' +
     '<div class="rs-number">' + num + '</div>' +
-    '<div class="rs-title">' + title + '</div>' +
+    '<h2 class="rs-title">' + title + '</h2>' +
     '</div><button class="rs-toggle" onclick="toggleSection(this)" aria-label="Toggle section">' + RS_CHEVRON + '</button></div>';
 }
 

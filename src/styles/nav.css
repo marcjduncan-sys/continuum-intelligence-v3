@@ -38,6 +38,9 @@
     letter-spacing: 0.04em; text-transform: uppercase;
     color: var(--text-secondary);
     padding: 6px 0;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
     border-bottom: 2px solid transparent;
     transition: color 0.2s, border-color 0.2s;
 }
@@ -58,7 +61,7 @@
   border-bottom: 1.25px solid rgb(226, 232, 240);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  height: 40px;
+  height: 44px;
   display: flex;
   justify-content: center;
 }
@@ -81,7 +84,7 @@
   padding: 0 16px;
   font-size: 0.68rem;
   font-weight: 500;
-  color: rgb(113, 128, 150);
+  color: var(--text-muted);
   background: transparent;
   border: none;
   letter-spacing: 0.05em;

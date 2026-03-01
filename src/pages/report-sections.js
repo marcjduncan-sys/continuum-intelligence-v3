@@ -9,7 +9,7 @@ const RS_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
 function RS_HDR(num, title) {
   return '<div class="rs-header"><div class="rs-header-text">' +
     '<div class="rs-number">' + num + '</div>' +
-    '<div class="rs-title">' + title + '</div>' +
+    '<h2 class="rs-title">' + title + '</h2>' +
     '</div><button class="rs-toggle" onclick="window.toggleSection(this)" aria-label="Toggle section">' + RS_CHEVRON + '</button></div>';
 }
 
