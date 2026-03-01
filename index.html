@@ -10143,6 +10143,17 @@ function route() {
         if (typeof pnOnRouteEnter === 'function') pnOnRouteEnter();
     }
 
+    // Hide the FAB chat on the personalisation page (it has its own embedded chat).
+    // On all other pages the FAB is the primary chat entry point.
+    var chatFabEl = document.getElementById('chatFab');
+    var chatPanelEl = document.getElementById('chatPanel');
+    if (hash === 'personalisation') {
+        if (chatPanelEl) chatPanelEl.classList.remove('open');
+        if (chatFabEl) { chatFabEl.classList.remove('hidden'); chatFabEl.style.display = 'none'; }
+    } else {
+        if (chatFabEl) chatFabEl.style.display = '';
+    }
+
     // Lazy render snapshot pages on first visit
     if (hash.startsWith('snapshot-')) {
         const ticker = hash.replace('snapshot-', '');
@@ -12294,8 +12305,31 @@ async function _fetchAndMergeBatchResults() {
     // --- State ---
     var isOpen          = false;
     var isLoading       = false;
-    var conversations   = {};   // { ticker: [ {role, content}, ... ] }
+    // Shared conversation store -- exposed globally so the personalisation tab
+    // and inline chat can read/write the same history per ticker.
+    if (!window._continuumChat) window._continuumChat = {};
+    var conversations   = window._continuumChat;   // { ticker: [ {role, content}, ... ] }
     var currentTicker   = '';
+
+    // --- Personalisation-aware system prompt ---
+    // If the user has completed a personalisation profile, use it for every chat.
+    // Falls back to null (server-side default) if no profile exists.
+    function getPersonalisedPrompt() {
+        try {
+            if (typeof pnBuildSystemPrompt !== 'function') return null;
+            var raw = localStorage.getItem('continuum_personalisation_profile');
+            if (!raw) return null;
+            var data = JSON.parse(raw);
+            if (!data || data.version !== 2 || !data.state || !data.state.profile) return null;
+            var s = data.state;
+            return pnBuildSystemPrompt(
+                s.profile,
+                s.firm   || {},
+                s.fund   || {},
+                s.portfolioSkipped ? [] : (s.portfolio || [])
+            );
+        } catch (e) { return null; }
+    }
 
     // --- Populate ticker dropdown ---
     function populateTickerSelect() {
@@ -12500,15 +12534,22 @@ async function _fetchAndMergeBatchResults() {
             return;
         }
 
+        // Build request -- inject personalised system prompt if profile exists
+        var requestBody = {
+            ticker: currentTicker,
+            question: question,
+            conversation_history: history
+        };
+        var personalisedPrompt = getPersonalisedPrompt();
+        if (personalisedPrompt) {
+            requestBody.custom_system_prompt = personalisedPrompt;
+        }
+
         // API call
         fetch(CHAT_API_BASE, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                ticker: currentTicker,
-                question: question,
-                conversation_history: history
-            })
+            body: JSON.stringify(requestBody)
         })
         .then(function(res) {
             if (!res.ok) {
@@ -12657,8 +12698,28 @@ async function _fetchAndMergeBatchResults() {
         : window.location.origin);
   var API_BASE = apiOrigin + '/api/research-chat';
 
-  var inlineConversations = {};
+  // Share conversation store with FAB chat and personalisation tab
+  if (!window._continuumChat) window._continuumChat = {};
+  var inlineConversations = window._continuumChat;
   var inlineLoading = {};
+
+  // Personalisation-aware system prompt for inline chat
+  function getInlinePersonalisedPrompt() {
+      try {
+          if (typeof pnBuildSystemPrompt !== 'function') return null;
+          var raw = localStorage.getItem('continuum_personalisation_profile');
+          if (!raw) return null;
+          var data = JSON.parse(raw);
+          if (!data || data.version !== 2 || !data.state || !data.state.profile) return null;
+          var s = data.state;
+          return pnBuildSystemPrompt(
+              s.profile,
+              s.firm   || {},
+              s.fund   || {},
+              s.portfolioSkipped ? [] : (s.portfolio || [])
+          );
+      } catch (e) { return null; }
+  }
 
   function escHtml(s) {
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -12742,21 +12803,28 @@ async function _fetchAndMergeBatchResults() {
       return { role: m.role, content: m.content };
     });
 
-    var systemPrompt = 'You are a senior equity research analyst at Continuum Intelligence. You speak in the first person plural ("we", "our analysis", "our framework"). You are direct, precise, and opinionated  --  like a fund manager talking to another fund manager. ' +
-      'VOICE RULES: ' +
-      'Never use markdown headers (## or ###). Write in flowing paragraphs. ' +
-      'Never use bullet point dashes or asterisks for lists. Weave points into natural sentences. ' +
-      'Never begin a response with "Based on" or "Here is" or "Sure" or "Great question". ' +
-      'Never say "I"  --  always "we" or speak in the declarative. ' +
-      'When presenting numbers, weave them into sentences: "At 25x forward earnings on consensus EPS of $1.34, you get to $33.40  --  roughly 5% above the current print" NOT "Forward EPS: A$1.336, multiplied by 25 = A$33.40". ' +
-      'Reference specific evidence items and hypothesis labels naturally: "The N2 erosion thesis is gaining weight here  --  margins are the tell." ' +
-      'Be opinionated. Take positions. "We think the market is wrong about X" is better than "There are arguments on both sides." ' +
-      'Use the vocabulary of an institutional investor: "the print", "the tape", "the multiple", "re-rate", "de-rate", "the street", "consensus", "buy-side", "the name".';
+    // Use personalised prompt if available, otherwise fall back to generic analyst voice
+    var personalisedPrompt = getInlinePersonalisedPrompt();
+    var requestBody = { ticker: ticker, question: question, conversation_history: history };
+    if (personalisedPrompt) {
+      requestBody.custom_system_prompt = personalisedPrompt;
+    } else {
+      requestBody.system_prompt = 'You are a senior equity research analyst at Continuum Intelligence. You speak in the first person plural ("we", "our analysis", "our framework"). You are direct, precise, and opinionated  --  like a fund manager talking to another fund manager. ' +
+        'VOICE RULES: ' +
+        'Never use markdown headers (## or ###). Write in flowing paragraphs. ' +
+        'Never use bullet point dashes or asterisks for lists. Weave points into natural sentences. ' +
+        'Never begin a response with "Based on" or "Here is" or "Sure" or "Great question". ' +
+        'Never say "I"  --  always "we" or speak in the declarative. ' +
+        'When presenting numbers, weave them into sentences: "At 25x forward earnings on consensus EPS of $1.34, you get to $33.40  --  roughly 5% above the current print" NOT "Forward EPS: A$1.336, multiplied by 25 = A$33.40". ' +
+        'Reference specific evidence items and hypothesis labels naturally: "The N2 erosion thesis is gaining weight here  --  margins are the tell." ' +
+        'Be opinionated. Take positions. "We think the market is wrong about X" is better than "There are arguments on both sides." ' +
+        'Use the vocabulary of an institutional investor: "the print", "the tape", "the multiple", "re-rate", "de-rate", "the street", "consensus", "buy-side", "the name".';
+    }
 
     fetch(API_BASE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ticker: ticker, question: question, conversation_history: history, system_prompt: systemPrompt })
+      body: JSON.stringify(requestBody)
     })
     .then(function(res) {
       if (!res.ok) throw new Error('Request failed (' + res.status + ')');

@@ -1219,11 +1219,23 @@ function renderWizardFooter() {
 // CHAT LOGIC
 // =========================================================================
 
+// Shared conversation store -- same object as FAB chat uses.
+// Both the FAB button and personalisation tab read/write here so
+// switching between them continues the same conversation.
+function pnGetSharedConvo() {
+    if (!window._continuumChat) window._continuumChat = {};
+    var ticker = pnState.chatTicker;
+    if (!ticker) return [];
+    if (!window._continuumChat[ticker]) window._continuumChat[ticker] = [];
+    return window._continuumChat[ticker];
+}
+
 function renderChatMessages() {
     var el = document.getElementById('pn-chat-messages');
     if (!el) return;
 
-    if (pnState.chatHistory.length === 0) {
+    var convo = pnGetSharedConvo();
+    if (convo.length === 0) {
         el.innerHTML = '<div class="pn-chat-welcome">' +
             '<div class="pn-chat-welcome-title">Your calibrated analyst is ready</div>' +
             '<div class="pn-chat-welcome-text">Select a stock above and ask any research question. ' +
@@ -1233,8 +1245,8 @@ function renderChatMessages() {
     }
 
     var html = '';
-    for (var i = 0; i < pnState.chatHistory.length; i++) {
-        var msg = pnState.chatHistory[i];
+    for (var i = 0; i < convo.length; i++) {
+        var msg = convo[i];
         var cls = 'pn-chat-msg ' + msg.role;
         var content = msg.role === 'assistant' ? formatMarkdown(msg.content) : escapeHtml(msg.content);
         html += '<div class="' + cls + '">' + content + '</div>';
@@ -1277,7 +1289,8 @@ function pnSendChat() {
     var question = input.value.trim();
     if (!question || !pnState.chatTicker) return;
 
-    pnState.chatHistory.push({ role: 'user', content: question });
+    var convo = pnGetSharedConvo();
+    convo.push({ role: 'user', content: question });
     input.value = '';
     input.style.height = 'auto';
     if (sendBtn) sendBtn.disabled = true;
@@ -1294,10 +1307,10 @@ function pnSendChat() {
     );
 
     var history = [];
-    for (var i = 0; i < pnState.chatHistory.length - 1; i++) {
+    for (var i = 0; i < convo.length - 1; i++) {
         history.push({
-            role: pnState.chatHistory[i].role,
-            content: pnState.chatHistory[i].content
+            role: convo[i].role,
+            content: convo[i].content
         });
     }
 
@@ -1323,7 +1336,7 @@ function pnSendChat() {
     .then(function(data) {
         hideChatTyping();
         pnState.chatLoading = false;
-        pnState.chatHistory.push({ role: 'assistant', content: data.response });
+        convo.push({ role: 'assistant', content: data.response });
         renderChatMessages();
         if (sendBtn) sendBtn.disabled = false;
     })
@@ -1601,7 +1614,8 @@ function bindStep5Inputs() {
     if (tickerSelect) {
         tickerSelect.addEventListener('change', function() {
             pnState.chatTicker = this.value;
-            pnState.chatHistory = [];
+            // No need to clear history -- shared store keys by ticker,
+            // so switching tickers just shows that ticker's conversation.
             renderChatMessages();
             if (sendBtn && input) {
                 sendBtn.disabled = !input.value.trim() || !this.value;
@@ -1621,7 +1635,10 @@ function bindStep5Inputs() {
                 pnState.portfolioSkipped = false;
                 pnState.assessment = { ipip: {}, crt: {}, philosophy: {}, bias: {}, preferences: {} };
                 pnState.profile = null;
-                pnState.chatHistory = [];
+                // Clear all shared conversations on profile reset
+                if (window._continuumChat) {
+                    for (var k in window._continuumChat) delete window._continuumChat[k];
+                }
                 pnState.chatTicker = '';
                 pnState.assessmentBlock = 0;
                 pnRefresh();
