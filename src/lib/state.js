@@ -62,7 +62,7 @@ export const SNAPSHOT_ORDER = new Proxy([], {
 });
 
 // Valid static pages for route validation
-export const VALID_STATIC_PAGES = new Set(['home', 'snapshots', 'portfolio', 'thesis', 'personalisation', 'about']);
+export const VALID_STATIC_PAGES = new Set(['home', 'snapshots', 'portfolio', 'comparator', 'personalisation', 'about']);
 
 // --- Accessors ---
 

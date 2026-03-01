@@ -514,6 +514,8 @@ a:hover { color: var(--accent-sage); }
     transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 .featured-card:hover {
     border-color: var(--accent-teal);
@@ -574,6 +576,7 @@ a:hover { color: var(--accent-sage); }
     display: flex;
     align-items: center;
     gap: var(--space-sm);
+    margin-top: auto;
 }
 .skew-badge {
     font-family: var(--font-data);
@@ -616,12 +619,26 @@ a:hover { color: var(--accent-sage); }
 }
 .skew-bar-bull {
     height: 100%;
-    background: var(--signal-green);
+    background-color: var(--signal-green);
+    background-image: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.15) 2px,
+        rgba(255,255,255,0.15) 4px
+    );
     transition: width 0.3s ease;
 }
 .skew-bar-bear {
     height: 100%;
-    background: var(--signal-red);
+    background-color: var(--signal-red);
+    background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.15) 2px,
+        rgba(255,255,255,0.15) 4px
+    );
     transition: width 0.3s ease;
 }
 .skew-score {
@@ -714,6 +731,10 @@ a:hover { color: var(--accent-sage); }
     font-size: 0.72rem;
     color: var(--text-secondary);
     line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 .fc-date {
     font-family: var(--font-data);
@@ -1267,19 +1288,19 @@ a:hover { color: var(--accent-sage); }
 /* Report-scoped lighter bar colours */
 .signal-bars-section .skew-bar-bull,
 .risk-skew-bar .skew-bar-bull {
-    background: #5BC88A;
+    background-color: #5BC88A;
 }
 .signal-bars-section .skew-bar-bear,
 .risk-skew-bar .skew-bar-bear {
-    background: #E87A7A;
+    background-color: #E87A7A;
 }
 [data-theme="light"] .signal-bars-section .skew-bar-bull,
 [data-theme="light"] .risk-skew-bar .skew-bar-bull {
-    background: #6DD49A;
+    background-color: #6DD49A;
 }
 [data-theme="light"] .signal-bars-section .skew-bar-bear,
 [data-theme="light"] .risk-skew-bar .skew-bar-bear {
-    background: #E88A8A;
+    background-color: #E88A8A;
 }
 
 /* --- Report Page: Section Nav --- */
@@ -4751,7 +4772,7 @@ a:hover { color: var(--accent-sage); }
             <a href="#home" class="active" data-nav="home">Research</a>
             <a href="#snapshots" data-nav="snapshots">Snapshots</a>
             <a href="#portfolio" data-nav="portfolio">Portfolio</a>
-            <a href="#thesis" data-nav="thesis">Comparator</a>
+            <a href="#comparator" data-nav="comparator">Comparator</a>
             <a href="#personalisation" data-nav="personalisation">Personalisation</a>
             <a href="#about" data-nav="about">About</a>
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
@@ -5229,7 +5250,7 @@ a:hover { color: var(--accent-sage); }
 <!-- ============================================================
      PAGE: THESIS COMPARATOR
      ============================================================ -->
-<div class="page" id="page-thesis">
+<div class="page" id="page-comparator">
     <div class="tc-section">
         
         <div class="tc-hero">
@@ -8496,11 +8517,11 @@ function renderSnapshotPage(data) {
       '<div class="snap-price-meta">' + priceMetricsHtml + '</div>' +
     '</div>' +
 
-    '<div class="snap-risk-skew-bar">' +
+    '<div class="snap-risk-skew-bar" aria-label="Thesis skew: ' + data.riskSkew.direction + '">' +
       '<span class="snap-risk-skew-label">Thesis Skew</span>' +
       '<span class="snap-risk-skew-badge ' + data.riskSkew.direction + '">' + data.riskSkew.badge + '</span>' +
       (data.riskSkew.computed ?
-        '<div class="skew-bar-track" style="width:64px;height:7px;margin:0 4px">' +
+        '<div class="skew-bar-track" style="width:64px;height:7px;margin:0 4px" role="img" aria-hidden="true">' +
           '<div class="skew-bar-bull" style="width:' + data.riskSkew.computed.bull + '%"></div>' +
           '<div class="skew-bar-bear" style="width:' + data.riskSkew.computed.bear + '%"></div>' +
         '</div>' +
@@ -8613,8 +8634,8 @@ function renderFeaturedCard(data) {
       '</div>' +
     '</div>' +
     '<div class="fc-metrics">' + metricsHtml + '</div>' +
-    '<div class="fc-skew">' +
-      '<div class="skew-bar-track" style="width:48px;height:6px">' +
+    '<div class="fc-skew" aria-label="Thesis skew: ' + scoreLabel + ', ' + dir + '">' +
+      '<div class="skew-bar-track" style="width:48px;height:6px" role="img" aria-hidden="true">' +
         '<div class="skew-bar-bull" style="width:' + skew.bull + '%"></div>' +
         '<div class="skew-bar-bear" style="width:' + skew.bear + '%"></div>' +
       '</div>' +
@@ -8677,8 +8698,8 @@ function renderCoverageRow(data) {
     '<td>' + data.sector + '</td>' +
     '<td class="td-price">' + data.currency + (data._livePrice || data.price) + '</td>' +
     '<td>' +
-      '<div class="skew-cell">' +
-        '<div class="skew-bar-track">' +
+      '<div class="skew-cell" aria-label="Thesis skew: ' + scoreLabel + ', ' + skew.direction + '">' +
+        '<div class="skew-bar-track" role="img" aria-hidden="true">' +
           '<div class="skew-bar-bull" style="width:' + skew.bull + '%"></div>' +
           '<div class="skew-bar-bear" style="width:' + skew.bear + '%"></div>' +
         '</div>' +
@@ -10026,7 +10047,7 @@ const COMING_SOON = [
 
 /* --- Hash Router --- */
 // Valid static pages for route validation
-const VALID_STATIC_PAGES = new Set(['home', 'snapshots', 'portfolio', 'thesis', 'personalisation', 'about']);
+const VALID_STATIC_PAGES = new Set(['home', 'snapshots', 'portfolio', 'comparator', 'personalisation', 'about']);
 
 function navigate(page) {
     window.location.hash = page;
@@ -10206,7 +10227,7 @@ window.addEventListener('hashchange', function() {
     } else if (hash.startsWith('snapshot-')) {
         pageName = hash.replace('snapshot-', '') + ' Snapshot';
     } else {
-        var names = { home: 'Research Home', snapshots: 'Investment Snapshots', portfolio: 'Portfolio Intelligence', thesis: 'Investment Thesis Comparator', personalisation: 'Personalisation', about: 'About' };
+        var names = { home: 'Research Home', snapshots: 'Investment Snapshots', portfolio: 'Portfolio Intelligence', comparator: 'Investment Thesis Comparator', personalisation: 'Personalisation', about: 'About' };
         pageName = names[hash] || hash;
     }
     announcePageChange('Navigated to ' + pageName);
@@ -11646,7 +11667,7 @@ function _resetRefreshUI(ticker) {
   <div class="batch-modal-content">
     <div class="batch-modal-header">
       <h2 class="batch-modal-title">Refreshing All Research</h2>
-      <button class="batch-modal-close" onclick="closeBatchModal()">&times;</button>
+      <button class="batch-modal-close" onclick="closeBatchModal()" aria-label="Close batch refresh modal">&times;</button>
     </div>
     <div class="batch-overall">
       <div class="batch-progress-track">

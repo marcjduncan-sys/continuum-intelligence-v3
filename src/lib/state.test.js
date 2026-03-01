@@ -20,7 +20,7 @@ describe('VALID_STATIC_PAGES', () => {
     expect(VALID_STATIC_PAGES.size).toBe(6);
   });
   it('contains all static page names', () => {
-    ['home', 'snapshots', 'portfolio', 'thesis', 'personalisation', 'about']
+    ['home', 'snapshots', 'portfolio', 'comparator', 'personalisation', 'about']
       .forEach(page => expect(VALID_STATIC_PAGES.has(page)).toBe(true));
   });
   it('rejects unknown pages', () => {
