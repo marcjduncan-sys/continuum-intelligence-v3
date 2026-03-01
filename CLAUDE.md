@@ -276,6 +276,9 @@ When patching STOCK_DATA with refreshed research data, preserve `_livePrice`, `p
 ### 7.12 Vite Build vs Dev: Two Different Worlds
 The `src/` module tree (`main.js`, `src/styles/`, etc.) is only active during `npm run dev`. In production builds, Vite processes `index.html` as the entry: it bundles `<link rel="stylesheet">` tags into a CSS asset and transforms font preloads, but the app's JS runs from inline `<script>` blocks in index.html (the original monolith code). There is no `<script type="module" src="src/main.js">` in the HTML. This means: (a) CSS for production must be in `<link>` tags in index.html OR in the inline `<style>` block, not in `src/styles/` imports, and (b) changes to `src/` JS modules have no effect on the production build.
 
+### 7.13 priceHistory Must Be Plain Numbers
+Yahoo Finance sometimes returns price history as `[{date, close}, ...]` objects instead of plain `[number, ...]` arrays. The refresh pipeline (`api/refresh.py`) normalises this before storing, but any new code path that writes `priceHistory` must ensure the array contains only numbers. Object-format data corrupts the sparkline chart on report pages. If priceHistory looks wrong (smooth exponential curve, missing detail), run `node scripts/backfill-price-history.js TICKER` to replace it with ~252 real daily closes from Yahoo, then `node scripts/sync-index.js` to propagate to `_index.json`. The GitHub Actions workflow "Backfill Price History" automates this.
+
 ---
 
 ## 8. File Coupling (Read Before Editing)
