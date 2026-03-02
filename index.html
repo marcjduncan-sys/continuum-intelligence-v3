@@ -11992,7 +11992,7 @@ async function triggerRefreshAll() {
         var cachedKeys = Object.keys(_batchCachedTickers).filter(function(k) { return _batchCachedTickers[k]; });
         var bodyPayload = {};
         if (cachedKeys.length > 0) {
-            var allTickers = ['BHP','CBA','CSL','DRO','DXS','FMG','GMG','GYG','HRZ','MQG','NAB','OCL','PME','RFG','RIO','SIG','WDS','WOR','WOW','WTC','XRO'];
+            var allTickers = Object.keys(STOCK_DATA).sort();
             var remaining = allTickers.filter(function(t) { return cachedKeys.indexOf(t) === -1; });
             if (remaining.length > 0) bodyPayload.tickers = remaining;
         }
@@ -12019,8 +12019,8 @@ async function triggerRefreshAll() {
         _batchStartTime = Date.now();
         // Don't reset _batchCachedTickers — preserve already-cached from prior run
 
-        // Build the grid showing all 21 tickers (cached ones pre-marked green)
-        var allTickers = ['BHP','CBA','CSL','DRO','DXS','FMG','GMG','GYG','HRZ','MQG','NAB','OCL','PME','RFG','RIO','SIG','WDS','WOR','WOW','WTC','XRO'];
+        // Build the grid showing all tickers (cached ones pre-marked green)
+        var allTickers = Object.keys(STOCK_DATA).sort();
         _buildBatchGrid(allTickers);
         _showBatchModal();
         _startBatchPolling();
