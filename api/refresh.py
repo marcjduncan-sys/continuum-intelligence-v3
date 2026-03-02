@@ -257,7 +257,11 @@ async def _run_single_in_batch(
             batch_job.per_ticker_status[ticker] = job.to_dict()
             logger.info(f"[BATCH][{ticker}] Stage 1: Gathering data...")
 
-            gathered = await gather_all_data(ticker, company_name)
+            gathered = await gather_all_data(
+                ticker, company_name,
+                sector=research.get("sector"),
+                sector_sub=research.get("sectorSub"),
+            )
 
         # ---- Stages 2-3: Acquire semaphore for LLM-heavy work ----
         async with semaphore:
@@ -598,7 +602,11 @@ async def run_refresh(ticker: str) -> dict:
         job.stage_index = 1
         logger.info(f"[{ticker}] Stage 1: Gathering data...")
 
-        gathered = await gather_all_data(ticker, company_name)
+        gathered = await gather_all_data(
+            ticker, company_name,
+            sector=research.get("sector"),
+            sector_sub=research.get("sectorSub"),
+        )
 
         # ---- Stage 2: Specialist Analysis (Gemini) ----
         job.status = "specialist_analysis"

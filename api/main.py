@@ -12,6 +12,7 @@ import os
 import re
 import time
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 
 import anthropic
@@ -365,6 +366,161 @@ async def list_tickers():
     return {
         "tickers": get_tickers(),
         "counts": get_passage_count(),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Add Stock endpoint
+# ---------------------------------------------------------------------------
+
+class AddStockRequest(BaseModel):
+    ticker: str = Field(..., description="ASX ticker code, e.g. 'MIN'")
+
+
+@app.post("/api/stocks/add")
+@limiter.limit("3/minute")
+async def add_stock(
+    body: AddStockRequest,
+    request: Request,
+    _=Depends(verify_api_key),
+):
+    """
+    Add a new stock to the coverage universe.
+
+    Auto-detects company name, sector, and industry from Yahoo Finance,
+    then creates all required data files so the stock is immediately
+    available for browsing and refresh.
+    """
+    from scaffold import (
+        fetch_company_metadata,
+        fetch_company_name,
+        build_research_scaffold,
+        build_tickers_entry,
+        build_index_entry,
+        build_reference_entry,
+        build_freshness_entry,
+    )
+    from web_search import fetch_yahoo_price
+
+    ticker = body.ticker.strip().upper()
+    if not TICKER_PATTERN.match(ticker):
+        raise HTTPException(status_code=400, detail=f"Invalid ticker: '{ticker}'")
+
+    # Check if already exists
+    data_dir = Path(config.PROJECT_ROOT) / "data"
+    research_dir = data_dir / "research"
+    if (research_dir / f"{ticker}.json").exists():
+        raise HTTPException(status_code=409, detail=f"{ticker} already exists")
+
+    # ---- Fetch company metadata + price in parallel ----
+    import asyncio as _aio
+    metadata_coro = fetch_company_metadata(ticker)
+    name_coro = fetch_company_name(ticker)
+    price_coro = fetch_yahoo_price(ticker)
+
+    metadata, company_name, price_data = await _aio.gather(
+        metadata_coro, name_coro, price_coro, return_exceptions=True,
+    )
+
+    # Handle errors
+    if isinstance(price_data, Exception) or (isinstance(price_data, dict) and "error" in price_data):
+        detail = str(price_data) if isinstance(price_data, Exception) else price_data.get("error")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Could not fetch price data for {ticker}.AX — is it a valid ASX ticker? ({detail})",
+        )
+
+    if isinstance(metadata, Exception):
+        logger.warning(f"Metadata fetch failed for {ticker}: {metadata}")
+        metadata = {}
+    elif isinstance(metadata, dict) and "error" in metadata:
+        logger.warning(f"Metadata fetch error for {ticker}: {metadata['error']}")
+        metadata = {}
+
+    if isinstance(company_name, Exception):
+        company_name = None
+
+    # Resolve fields
+    company = company_name or ticker
+    sector = metadata.get("sector", "Unknown")
+    industry = metadata.get("industry", "")
+
+    logger.info(f"[AddStock] {ticker}: company={company}, sector={sector}, industry={industry}")
+
+    # ---- Build scaffold + config entries ----
+    research_data = build_research_scaffold(ticker, company, sector, industry, price_data)
+    tickers_entry = build_tickers_entry(ticker, company, sector, industry, price_data)
+    index_entry = build_index_entry(ticker, company, sector, industry, price_data)
+    reference_entry = build_reference_entry(ticker, price_data)
+    freshness_entry = build_freshness_entry(ticker, price_data.get("price", 0))
+
+    # ---- Write files ----
+    # 1. Research JSON
+    research_dir.mkdir(parents=True, exist_ok=True)
+    with open(research_dir / f"{ticker}.json", "w") as f:
+        json.dump(research_data, f, indent=2, ensure_ascii=False)
+    logger.info(f"[AddStock] Saved data/research/{ticker}.json")
+
+    # 2. _index.json
+    index_path = research_dir / "_index.json"
+    try:
+        with open(index_path) as f:
+            index = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        index = {}
+    index[ticker] = index_entry
+    with open(index_path, "w") as f:
+        json.dump(index, f, indent=2, ensure_ascii=False)
+
+    # 3. tickers.json
+    tickers_path = data_dir / "config" / "tickers.json"
+    try:
+        with open(tickers_path) as f:
+            tickers_config = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        tickers_config = {"_version": 1, "tickers": {}}
+    tickers_config.setdefault("tickers", {})[ticker] = tickers_entry
+    tickers_config["_updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    with open(tickers_path, "w") as f:
+        json.dump(tickers_config, f, indent=2, ensure_ascii=False)
+
+    # 4. reference.json
+    reference_path = data_dir / "reference.json"
+    try:
+        with open(reference_path) as f:
+            reference = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        reference = {}
+    reference[ticker] = reference_entry
+    with open(reference_path, "w") as f:
+        json.dump(reference, f, indent=2, ensure_ascii=False)
+
+    # 5. freshness.json
+    freshness_path = data_dir / "freshness.json"
+    try:
+        with open(freshness_path) as f:
+            freshness = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        freshness = {}
+    freshness[ticker] = freshness_entry
+    with open(freshness_path, "w") as f:
+        json.dump(freshness, f, indent=2, ensure_ascii=False)
+
+    # ---- Re-ingest so chat API sees the new ticker ----
+    try:
+        ingest()
+        logger.info(f"[AddStock] Re-ingested passages after adding {ticker}")
+    except Exception as e:
+        logger.warning(f"[AddStock] Re-ingest failed (non-fatal): {e}")
+
+    return {
+        "status": "added",
+        "ticker": ticker,
+        "company": company,
+        "sector": sector,
+        "industry": industry,
+        "price": price_data.get("price"),
+        "currency": price_data.get("currency", "A$"),
     }
 
 

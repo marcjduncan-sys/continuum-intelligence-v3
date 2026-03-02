@@ -655,9 +655,18 @@ async def fetch_earnings_news(
 async def gather_all_data(
     ticker: str,
     company_name: str,
+    sector: str | None = None,
+    sector_sub: str | None = None,
 ) -> dict[str, Any]:
     """
     Gather all external data for a stock refresh in parallel.
+
+    Parameters
+    ----------
+    sector, sector_sub : str, optional
+        Used to look up commodity/macro templates when the ticker is NOT in
+        the curated SECTOR_COMMODITY_MAP.  Pass from the research JSON's
+        ``sector`` / ``sectorSub`` fields.
 
     Returns
     -------
@@ -670,10 +679,23 @@ async def gather_all_data(
     news_task = web_search_news(company_name, ticker)
     earnings_task = fetch_earnings_news(company_name, ticker)
 
-    # Macro / commodity tasks (only if ticker has a mapping)
+    # Macro / commodity tasks — check curated per-ticker map first, then
+    # fall back to sector-based templates so new stocks auto-get context.
     sector_config = SECTOR_COMMODITY_MAP.get(ticker.upper())
-    commodity_specs = sector_config.get("commodities", []) if sector_config else []
-    macro_queries = sector_config.get("macro_queries", []) if sector_config else []
+    sector_label = ""
+    if sector_config:
+        commodity_specs = sector_config.get("commodities", [])
+        macro_queries = sector_config.get("macro_queries", [])
+        sector_label = sector_config.get("label", "")
+    elif sector or sector_sub:
+        from scaffold import resolve_sector_commodities
+        resolved = resolve_sector_commodities(sector, sector_sub)
+        commodity_specs = resolved.get("commodities", [])
+        macro_queries = resolved.get("macro_queries", [])
+        sector_label = sector_sub or sector or ""
+    else:
+        commodity_specs = []
+        macro_queries = []
 
     commodity_tasks = [
         fetch_commodity_price(c["ticker"], c["name"]) for c in commodity_specs
@@ -729,9 +751,9 @@ async def gather_all_data(
 
     # Build macro_context block (None if no data available)
     macro_context = None
-    if sector_config and (commodity_prices or macro_news):
+    if (commodity_prices or macro_news):
         macro_context = {
-            "sector_label": sector_config.get("label", ""),
+            "sector_label": sector_label,
             "commodity_prices": commodity_prices,
             "macro_news": macro_news[:8],
         }
