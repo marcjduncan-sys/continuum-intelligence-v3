@@ -1129,50 +1129,60 @@ async def _run_coverage_initiation(
 This is INITIAL COVERAGE. Create a complete research analysis with all hypotheses, narrative \
 sections, verdict, tripwires, discriminators, and gaps assessment. Be thorough and specific."""
 
-    try:
-        if not config.ANTHROPIC_API_KEY:
-            logger.warning(f"[{ticker}] No Anthropic key, using Gemini for initiation")
-            return await gemini_completion(
+    # Try Claude first, fall back to Gemini on any failure
+    result = None
+
+    if config.ANTHROPIC_API_KEY:
+        try:
+            client = config.get_anthropic_client()
+            response = client.messages.create(
+                model=config.ANTHROPIC_MODEL,
+                max_tokens=8192,
+                temperature=0,
+                system=FULL_INITIATION_SYSTEM + "\n\nRespond with valid JSON only.",
+                messages=[{"role": "user", "content": user_prompt}],
+            )
+
+            text = ""
+            for block in response.content:
+                if block.type == "text":
+                    text += block.text
+
+            text = text.strip()
+            if text.startswith("```"):
+                text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+                text = text.rsplit("```", 1)[0]
+
+            result = json.loads(text)
+        except Exception as e:
+            logger.warning(f"[{ticker}] Claude initiation failed, falling back to Gemini: {e}")
+
+    # Fallback: use Gemini if Claude unavailable or failed
+    if result is None:
+        try:
+            logger.info(f"[{ticker}] Using Gemini for coverage initiation")
+            result = await gemini_completion(
                 system_prompt=FULL_INITIATION_SYSTEM,
                 user_prompt=user_prompt,
                 json_mode=True,
             )
+            if not isinstance(result, dict):
+                result = {}
+        except Exception as e:
+            logger.error(f"[{ticker}] Gemini initiation also failed: {e}", exc_info=True)
+            return {
+                "hypotheses": [],
+                "narrative_rewrite": f"Coverage initiation failed (both Claude and Gemini): {e}",
+                "verdict_update": None,
+            }
 
-        client = config.get_anthropic_client()
-        response = client.messages.create(
-            model=config.ANTHROPIC_MODEL,
-            max_tokens=8192,
-            temperature=0,
-            system=FULL_INITIATION_SYSTEM + "\n\nRespond with valid JSON only.",
-            messages=[{"role": "user", "content": user_prompt}],
-        )
-
-        text = ""
-        for block in response.content:
-            if block.type == "text":
-                text += block.text
-
-        text = text.strip()
-        if text.startswith("```"):
-            text = text.split("\n", 1)[1] if "\n" in text else text[3:]
-            text = text.rsplit("```", 1)[0]
-
-        result = json.loads(text)
-        logger.info(
-            f"[{ticker}] Coverage initiation: "
-            f"{len(result.get('hypotheses', []))} hypotheses, "
-            f"{len(result.get('tripwires', []))} tripwires, "
-            f"{len(result.get('discriminators', []))} discriminators"
-        )
-        return result
-
-    except Exception as e:
-        logger.error(f"[{ticker}] Coverage initiation failed: {e}", exc_info=True)
-        return {
-            "hypotheses": [],
-            "narrative_rewrite": f"Coverage initiation failed: {e}",
-            "verdict_update": None,
-        }
+    logger.info(
+        f"[{ticker}] Coverage initiation: "
+        f"{len(result.get('hypotheses', []))} hypotheses, "
+        f"{len(result.get('tripwires', []))} tripwires, "
+        f"{len(result.get('discriminators', []))} discriminators"
+    )
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -1426,47 +1436,55 @@ before today, set status to "resolved" in tripwire_updates.
 
 Please provide the FULL updated JSON with all narrative rewrites and tripwire updates."""
 
-    try:
-        if not config.ANTHROPIC_API_KEY:
-            # Fallback: use Gemini for synthesis if Claude not configured
-            logger.warning(f"[{ticker}] No Anthropic key, using Gemini for synthesis")
-            return await gemini_completion(
+    # Try Claude first, fall back to Gemini on any failure
+    result = None
+
+    if config.ANTHROPIC_API_KEY:
+        try:
+            client = config.get_anthropic_client()
+            response = client.messages.create(
+                model=config.ANTHROPIC_MODEL,
+                max_tokens=6144,
+                temperature=0,
+                system=HYPOTHESIS_UPDATE_SYSTEM + "\n\nRespond with valid JSON only.",
+                messages=[{"role": "user", "content": user_prompt}],
+            )
+
+            text = ""
+            for block in response.content:
+                if block.type == "text":
+                    text += block.text
+
+            text = text.strip()
+            if text.startswith("```"):
+                text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+                text = text.rsplit("```", 1)[0]
+
+            result = json.loads(text)
+        except Exception as e:
+            logger.warning(f"[{ticker}] Claude synthesis failed, falling back to Gemini: {e}")
+
+    # Fallback: use Gemini if Claude unavailable or failed
+    if result is None:
+        try:
+            logger.info(f"[{ticker}] Using Gemini for hypothesis synthesis")
+            result = await gemini_completion(
                 system_prompt=HYPOTHESIS_UPDATE_SYSTEM,
                 user_prompt=user_prompt,
                 json_mode=True,
             )
+            if not isinstance(result, dict):
+                result = {}
+        except Exception as e:
+            logger.error(f"[{ticker}] Gemini synthesis also failed: {e}")
+            return {
+                "hypotheses": [],
+                "narrative_update": f"Synthesis unavailable: {e}",
+                "verdict_update": None,
+                "key_catalyst": None,
+            }
 
-        # Use Claude for the judgment-heavy synthesis
-        client = config.get_anthropic_client()
-        response = client.messages.create(
-            model=config.ANTHROPIC_MODEL,
-            max_tokens=6144,
-            temperature=0,
-            system=HYPOTHESIS_UPDATE_SYSTEM + "\n\nRespond with valid JSON only.",
-            messages=[{"role": "user", "content": user_prompt}],
-        )
-
-        text = ""
-        for block in response.content:
-            if block.type == "text":
-                text += block.text
-
-        # Parse JSON from Claude response (may have markdown code fences)
-        text = text.strip()
-        if text.startswith("```"):
-            text = text.split("\n", 1)[1] if "\n" in text else text[3:]
-            text = text.rsplit("```", 1)[0]
-
-        return json.loads(text)
-
-    except Exception as e:
-        logger.error(f"[{ticker}] Hypothesis synthesis failed: {e}")
-        return {
-            "hypotheses": [],
-            "narrative_update": f"Synthesis unavailable: {e}",
-            "verdict_update": None,
-            "key_catalyst": None,
-        }
+    return result
 
 
 # ---------------------------------------------------------------------------
