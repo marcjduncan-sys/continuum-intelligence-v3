@@ -1056,6 +1056,8 @@ Please create all 10 evidence domain cards for this stock based on the available
             system_prompt=EVIDENCE_CREATION_SYSTEM,
             user_prompt=user_prompt,
             json_mode=True,
+            max_tokens=6144,
+            max_retries=4,
         )
         cards = result.get("cards", []) if isinstance(result, dict) else []
         logger.info(f"[{ticker}] Evidence creation returned {len(cards)} cards")
@@ -1165,6 +1167,8 @@ sections, verdict, tripwires, discriminators, and gaps assessment. Be thorough a
                 system_prompt=FULL_INITIATION_SYSTEM,
                 user_prompt=user_prompt,
                 json_mode=True,
+                max_tokens=8192,
+                max_retries=4,
             )
             if not isinstance(result, dict):
                 result = {}
@@ -1472,6 +1476,8 @@ Please provide the FULL updated JSON with all narrative rewrites and tripwire up
                 system_prompt=HYPOTHESIS_UPDATE_SYSTEM,
                 user_prompt=user_prompt,
                 json_mode=True,
+                max_tokens=6144,
+                max_retries=4,
             )
             if not isinstance(result, dict):
                 result = {}
