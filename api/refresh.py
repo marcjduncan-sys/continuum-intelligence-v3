@@ -463,7 +463,12 @@ Return a JSON object with this structure:
 
 Only update cards where new data is genuinely material. For cards with no relevant new data, \
 set material_change to false and keep the finding unchanged.
-Be specific. Cite dates, numbers, and sources from the provided data."""
+Be specific. Cite dates, numbers, and sources from the provided data.
+
+You may also receive commodity prices and sector-relevant macro headlines. Use these to assess \
+how external market conditions affect the company's evidence cards — particularly the Economic \
+Data domain. For example, commodity price moves are material for miners and energy producers, \
+interest rate expectations matter for banks and REITs, and FX moves affect offshore earners."""
 
 HYPOTHESIS_UPDATE_SYSTEM = """\
 You are a senior equity research analyst at Continuum Intelligence. You assess competing \
@@ -528,6 +533,15 @@ at the current price). Must reference current price and recent events.",
     "source": "Source citation"
   }
 }
+
+MACRO & COMMODITY CONTEXT:
+You may receive commodity prices and sector macro headlines alongside company-specific data. \
+For commodity-exposed companies (miners, energy producers), commodity price movements are MATERIAL \
+to hypothesis weighting — a 10%+ move in iron ore, oil, or copper directly affects earnings and \
+should shift narrative emphasis. For rate-sensitive companies (banks, REITs), interest rate \
+expectations matter. For software/healthcare companies, AUD/USD affects earnings translation. \
+Incorporate these external factors where relevant. If a geopolitical event (war, sanctions, supply \
+disruption) is driving commodity moves, explain the causal chain in the narrative.
 
 CRITICAL RULES:
 - Today's date is provided in the prompt. Any event with a date before today has ALREADY HAPPENED.
@@ -661,6 +675,22 @@ async def _run_evidence_specialists(
     announcements = gathered.get("announcements", [])
     news = gathered.get("news", [])
 
+    # Format macro context if available
+    macro_section = ""
+    macro_ctx = gathered.get("macro_context")
+    if macro_ctx:
+        parts = [f"\n## Macro & Commodity Context ({macro_ctx.get('sector_label', '')})"]
+        for cp in macro_ctx.get("commodity_prices", []):
+            parts.append(f"- {cp['name']} ({cp['ticker']}): {cp['currency']}{cp['price']} ({cp['change_pct']:+.1f}% today)")
+        macro_news = macro_ctx.get("macro_news", [])
+        if macro_news:
+            parts.append("\n### Sector-Relevant Macro Headlines:")
+            for mn in macro_news[:5]:
+                parts.append(f"- {mn['title']} ({mn['source']})")
+                if mn.get("snippet"):
+                    parts.append(f"  > {mn['snippet'][:150]}")
+        macro_section = "\n".join(parts)
+
     user_prompt = f"""## Stock: {ticker} ({research.get('company', '')})
 ## Current Price: {price_data.get('price', 'N/A')} ({price_data.get('change_pct', 0):+.1f}%)
 
@@ -672,6 +702,7 @@ async def _run_evidence_specialists(
 
 ## Recent News Headlines:
 {json.dumps(news[:8], indent=2)}
+{macro_section}
 
 Please assess each evidence card against this new data and return the updated assessment as JSON."""
 
@@ -733,6 +764,27 @@ async def _run_hypothesis_synthesis(
 
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
+    # Format macro context if available
+    macro_section = ""
+    macro_ctx = gathered.get("macro_context")
+    if macro_ctx:
+        parts = [f"\n## Macro & Commodity Context ({macro_ctx.get('sector_label', '')})"]
+        parts.append("These are the key external drivers for this stock's sector:")
+        for cp in macro_ctx.get("commodity_prices", []):
+            parts.append(f"- {cp['name']}: {cp['currency']}{cp['price']} ({cp['change_pct']:+.1f}% today)")
+        macro_news = macro_ctx.get("macro_news", [])
+        if macro_news:
+            parts.append("\n### Sector Macro/Geopolitical Headlines (past week):")
+            for mn in macro_news[:6]:
+                parts.append(f"- {mn['title']} ({mn['source']})")
+                if mn.get("snippet"):
+                    parts.append(f"  > {mn['snippet'][:150]}")
+        parts.append(
+            "\nConsider how these macro factors affect hypothesis weightings, "
+            "the embedded thesis, and narrative sections."
+        )
+        macro_section = "\n".join(parts)
+
     user_prompt = f"""## TODAY'S DATE: {today}
 
 ## Stock: {ticker} ({research.get('company', '')})
@@ -780,6 +832,7 @@ async def _run_hypothesis_synthesis(
 
 ## Recent Earnings/Results News:
 {json.dumps(gathered.get('earnings_news', [])[:5], indent=2)}
+{macro_section}
 
 ## Current Tripwires (catalysts being watched):
 {json.dumps(tripwires_summary, indent=2)}
