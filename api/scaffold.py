@@ -331,10 +331,48 @@ def resolve_sector_commodities(
 # Yahoo Finance company metadata
 # ---------------------------------------------------------------------------
 
+async def _get_yahoo_crumb() -> tuple[str, dict[str, str]]:
+    """
+    Obtain a Yahoo Finance crumb token + cookies required for quoteSummary.
+
+    Flow (mirrors scripts/add-stock.js getYahooSession):
+      1. GET https://fc.yahoo.com/  → collect Set-Cookie headers
+      2. GET https://query2.finance.yahoo.com/v1/test/getcrumb with those cookies → crumb text
+
+    Returns
+    -------
+    (crumb, cookie_dict)  — crumb string and dict of cookies to forward.
+    Raises on failure.
+    """
+    client = _get_http_client()
+
+    # Step 1 — hit fc.yahoo.com to get cookies (especially the A3 cookie)
+    cookie_resp = await client.get(
+        "https://fc.yahoo.com/",
+        headers=YAHOO_HEADERS,
+        follow_redirects=True,
+    )
+    # Collect cookies from the response
+    cookies = dict(cookie_resp.cookies)
+
+    # Step 2 — fetch crumb using those cookies
+    crumb_resp = await client.get(
+        "https://query2.finance.yahoo.com/v1/test/getcrumb",
+        headers={**YAHOO_HEADERS, "Cookie": "; ".join(f"{k}={v}" for k, v in cookies.items())},
+    )
+    crumb_resp.raise_for_status()
+    crumb = crumb_resp.text.strip()
+
+    if not crumb or "html" in crumb.lower():
+        raise ValueError(f"Invalid crumb response: {crumb[:100]}")
+
+    return crumb, cookies
+
+
 async def fetch_company_metadata(ticker: str) -> dict[str, Any]:
     """
     Fetch company name, sector, industry, and description from Yahoo Finance
-    quoteSummary endpoint.
+    quoteSummary endpoint (with crumb/cookie authentication).
 
     Parameters
     ----------
@@ -347,12 +385,18 @@ async def fetch_company_metadata(ticker: str) -> dict[str, Any]:
     On failure returns dict with 'error' key.
     """
     yahoo_ticker = f"{ticker}.AX"
-    url = f"https://query1.finance.yahoo.com/v10/finance/quoteSummary/{yahoo_ticker}"
-    params = {"modules": "assetProfile"}
 
     client = _get_http_client()
     try:
-        resp = await client.get(url, params=params, headers=YAHOO_HEADERS)
+        # Get crumb + cookies (required for quoteSummary)
+        crumb, cookies = await _get_yahoo_crumb()
+        cookie_header = "; ".join(f"{k}={v}" for k, v in cookies.items())
+
+        url = f"https://query1.finance.yahoo.com/v10/finance/quoteSummary/{yahoo_ticker}"
+        params = {"modules": "assetProfile", "crumb": crumb}
+        headers = {**YAHOO_HEADERS, "Cookie": cookie_header}
+
+        resp = await client.get(url, params=params, headers=headers)
         resp.raise_for_status()
         data = resp.json()
 
