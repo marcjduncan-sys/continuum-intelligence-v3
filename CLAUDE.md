@@ -102,12 +102,13 @@ src/
 - **Build output:** ~194 KB JS (58 KB gzip) + 132 KB CSS (21 KB gzip)
 
 ### Backend (api/)
-- `main.py` -- FastAPI app, chat endpoints, refresh endpoints, static file serving
+- `main.py` -- FastAPI app, chat endpoints, refresh endpoints, `POST /api/stocks/add` endpoint, static file serving
 - `refresh.py` -- 4-stage refresh pipeline with in-memory job tracking
+- `scaffold.py` -- Stock scaffold generator: Yahoo Finance metadata fetcher (crumb/cookie auth), sector-to-commodity templates, research JSON scaffold builder. Used by `/api/stocks/add`
 - `config.py` -- env vars (ANTHROPIC_API_KEY, GEMINI_API_KEY, model names)
 - `ingest.py` / `retriever.py` -- BM25 passage retrieval for RAG chat
 - `gemini_client.py` -- Gemini API wrapper for specialist analysis
-- `web_search.py` -- Data gathering (Yahoo Finance, ASX, news)
+- `web_search.py` -- Data gathering (Yahoo Finance, ASX, news, commodity prices, macro news)
 
 ### Dynamic Narrative Engine (DNE) -- `js/dne/`
 The DNE is the analytical core of the frontend. It scores hypothesis survival, normalises weights, detects price dislocations, and renders the analytical UI. The DNE partially implements the three-layer architecture defined in the V2 design documents (see Section 4).
@@ -122,9 +123,9 @@ The DNE is the analytical core of the frontend. It scores hypothesis survival, n
 - `pdf.js` -- PDF report generation
 
 ### Refresh Pipeline (4 stages)
-1. **gathering_data** -- `gather_all_data()` fetches Yahoo Finance, ASX announcements, news
-2. **specialist_analysis** -- Gemini extracts structured evidence updates
-3. **hypothesis_synthesis** -- Claude re-weights hypotheses, updates narrative (temperature=0)
+1. **gathering_data** -- `gather_all_data()` fetches Yahoo Finance, ASX announcements, news, commodity prices, and macro headlines. Sector/commodity context uses per-ticker overrides (`SECTOR_COMMODITY_MAP` in `web_search.py`) with fallback to sector-based templates (`SECTOR_COMMODITY_TEMPLATES` in `scaffold.py`) for dynamically added stocks.
+2. **specialist_analysis** -- Gemini extracts structured evidence updates. Prompts include commodity prices and macro news when available for the stock's sector.
+3. **hypothesis_synthesis** -- Claude re-weights hypotheses, updates narrative (temperature=0). Receives sector/macro context to inform narrative.
 4. **writing_results** -- Merge into research JSON, update index
 
 ### Full Pipeline Architecture (Target State from Spec)
@@ -135,6 +136,16 @@ The current 4-stage pipeline is a simplified implementation. The full specificat
 - `GET /api/refresh-all/status` polls batch progress
 - `GET /api/refresh/{ticker}/result` fetches single ticker result
 - Dual semaphore concurrency control: `_gather_semaphore(3)` for Stage 1, `_batch_semaphore(2)` for Stages 2-3
+
+### Sector-Commodity Mapping (Macro Context)
+The refresh pipeline enriches each stock's analysis with commodity prices and macro news relevant to its sector. Two lookup mechanisms exist:
+
+1. **Per-ticker overrides** (`SECTOR_COMMODITY_MAP` in `web_search.py`): Hand-curated commodity tickers and macro queries for the original 21 stocks. Takes priority.
+2. **Sector-based templates** (`SECTOR_COMMODITY_TEMPLATES` in `scaffold.py`): Maps Yahoo Finance sector names (Basic Materials, Energy, Financial Services, Healthcare, Technology, etc.) to commodity tickers and macro queries. Used as fallback for any stock not in the per-ticker map (i.e. dynamically added stocks).
+
+`resolve_sector_commodities(sector, industry)` in `scaffold.py` performs the lookup with sub-sector keyword matching (e.g. industry containing "Gold" under "Basic Materials" gets gold/silver commodities instead of the generic copper/gold default).
+
+`gather_all_data()` in `web_search.py` accepts optional `sector` and `sector_sub` params. The refresh pipeline (`refresh.py`) passes these from the research JSON so dynamically added stocks get correct macro context.
 
 ### Three Refresh Cadences
 1. **Real-time price update** -- continuous polling via MarketFeed, no pipeline execution
@@ -276,7 +287,10 @@ When patching STOCK_DATA with refreshed research data, preserve `_livePrice`, `p
 ### 7.12 Vite Build vs Dev: Two Different Worlds
 The `src/` module tree (`main.js`, `src/styles/`, etc.) is only active during `npm run dev`. In production builds, Vite processes `index.html` as the entry: it bundles `<link rel="stylesheet">` tags into a CSS asset and transforms font preloads, but the app's JS runs from inline `<script>` blocks in index.html (the original monolith code). There is no `<script type="module" src="src/main.js">` in the HTML. This means: (a) CSS for production must be in `<link>` tags in index.html OR in the inline `<style>` block, not in `src/styles/` imports, and (b) changes to `src/` JS modules have no effect on the production build.
 
-### 7.13 priceHistory Must Be Plain Numbers
+### 7.13 Yahoo quoteSummary Requires Crumb/Cookie Auth
+Yahoo Finance's `quoteSummary` endpoint (used for sector/industry detection) requires a crumb token + cookies. Without them it returns `{"code":"Unauthorized","description":"Invalid Crumb"}`. The auth flow: (1) GET `https://fc.yahoo.com/` to seed cookies (A3 cookie), (2) GET `https://query2.finance.yahoo.com/v1/test/getcrumb` with those cookies to get crumb, (3) pass `crumb` as URL param + cookies to quoteSummary. Must use a **fresh httpx.AsyncClient** per call (not the shared `_http_client`) because cookies must propagate across all three requests via the client's native cookie jar. The chart endpoint (`/v8/finance/chart/`) does NOT require auth. See `_get_yahoo_crumb()` pattern in `scaffold.py` and `getYahooSession()` in `scripts/add-stock.js`.
+
+### 7.14 priceHistory Must Be Plain Numbers
 Yahoo Finance sometimes returns price history as `[{date, close}, ...]` objects instead of plain `[number, ...]` arrays. The refresh pipeline (`api/refresh.py`) normalises this before storing, but any new code path that writes `priceHistory` must ensure the array contains only numbers. Object-format data corrupts the sparkline chart on report pages. If priceHistory looks wrong (smooth exponential curve, missing detail), run `node scripts/backfill-price-history.js TICKER` to replace it with ~252 real daily closes from Yahoo, then `node scripts/sync-index.js` to propagate to `_index.json`. The GitHub Actions workflow "Backfill Price History" automates this.
 
 ---
@@ -567,9 +581,24 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ### Adding a New Ticker
-1. Create `data/research/{TICKER}.json` with full research schema (see Section 13 for structure)
-2. Update `data/research/_index.json`
-3. Ensure content complies with `docs/research-content-style-guide.md`
+
+**Via API (recommended for quick additions):**
+```bash
+curl -X POST https://imaginative-vision-production-16cb.up.railway.app/api/stocks/add \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: ct-int-2025-prod" \
+  -d '{"ticker": "MIN"}'
+```
+Returns `{status, ticker, company, sector, industry, price, currency}`. Auto-detects company name, sector, and industry from Yahoo Finance (quoteSummary with crumb/cookie auth). Creates research scaffold JSON, updates `_index.json`, `tickers.json`, `reference.json`, `freshness.json`, and re-ingests for chat. Rate limited to 3/minute. Returns 409 if ticker already exists.
+
+**Important:** Stocks added via API live on Railway's ephemeral filesystem and are lost on redeploy. To make permanent, also run `scripts/add-stock.js` locally with the same ticker and commit the generated files to git. The API is for rapid testing and preview; git-committed files are the durable source.
+
+New stocks automatically get commodity/macro context during refresh via sector-based templates in `scaffold.py`. The stock's Yahoo Finance sector (e.g. "Basic Materials", "Energy") maps to relevant commodity tickers (e.g. Copper, Gold, Brent Crude) and macro search queries.
+
+**Via CLI (for permanent additions):**
+1. `node scripts/add-stock.js --ticker MIN --company "Mineral Resources" --sector "Materials"` (creates all data files locally)
+2. Review and commit generated files
+3. Push to main (Railway auto-deploys, GitHub Pages auto-deploys)
 4. Ticker auto-appears in coverage table and batch refresh
 
 ### Adding a New Page
