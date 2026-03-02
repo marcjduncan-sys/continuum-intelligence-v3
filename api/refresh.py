@@ -27,6 +27,23 @@ from web_search import gather_all_data
 
 logger = logging.getLogger(__name__)
 
+
+# ---------------------------------------------------------------------------
+# Scaffold detection
+# ---------------------------------------------------------------------------
+
+def _is_scaffold(research: dict) -> bool:
+    """Detect if the research JSON is a scaffold (no real content yet)."""
+    # Check evidence cards are empty
+    cards = research.get("evidence", {}).get("cards", [])
+    if len(cards) == 0:
+        return True
+    # Check if all hypothesis scores are "?"
+    hypotheses = research.get("hypotheses", [])
+    if hypotheses and all(h.get("score") == "?" for h in hypotheses):
+        return True
+    return False
+
 # ---------------------------------------------------------------------------
 # Job tracking
 # ---------------------------------------------------------------------------
@@ -249,6 +266,10 @@ async def _run_single_in_batch(
         # Load existing research
         research = _load_research(ticker)
         company_name = research.get("company", ticker)
+        scaffold_mode = _is_scaffold(research)
+
+        if scaffold_mode:
+            logger.info(f"[BATCH][{ticker}] COVERAGE INITIATION — scaffold detected")
 
         # ---- Stage 1: Data Gathering (gather semaphore limits concurrency) ----
         async with gather_sem:
@@ -265,25 +286,35 @@ async def _run_single_in_batch(
 
         # ---- Stages 2-3: Acquire semaphore for LLM-heavy work ----
         async with semaphore:
-            # Stage 2: Specialist Analysis (Gemini)
+            # Stage 2: Evidence
             job.status = "specialist_analysis"
             job.stage_index = 2
             batch_job.per_ticker_status[ticker] = job.to_dict()
-            logger.info(f"[BATCH][{ticker}] Stage 2: Specialist analysis...")
+            if scaffold_mode:
+                logger.info(f"[BATCH][{ticker}] Stage 2: Creating evidence cards...")
+                evidence_update = await _run_evidence_creation(
+                    ticker, research, gathered
+                )
+            else:
+                logger.info(f"[BATCH][{ticker}] Stage 2: Specialist analysis...")
+                evidence_update = await _run_evidence_specialists(
+                    ticker, research, gathered
+                )
 
-            evidence_update = await _run_evidence_specialists(
-                ticker, research, gathered
-            )
-
-            # Stage 3: Hypothesis Synthesis (Claude)
+            # Stage 3: Hypothesis / Coverage Initiation
             job.status = "hypothesis_synthesis"
             job.stage_index = 3
             batch_job.per_ticker_status[ticker] = job.to_dict()
-            logger.info(f"[BATCH][{ticker}] Stage 3: Hypothesis synthesis...")
-
-            hypothesis_update = await _run_hypothesis_synthesis(
-                ticker, research, evidence_update, gathered
-            )
+            if scaffold_mode:
+                logger.info(f"[BATCH][{ticker}] Stage 3: Full coverage initiation...")
+                hypothesis_update = await _run_coverage_initiation(
+                    ticker, research, evidence_update, gathered
+                )
+            else:
+                logger.info(f"[BATCH][{ticker}] Stage 3: Hypothesis synthesis...")
+                hypothesis_update = await _run_hypothesis_synthesis(
+                    ticker, research, evidence_update, gathered
+                )
 
         # ---- Stage 4: Write Results (no semaphore) ----
         job.status = "writing_results"
@@ -291,9 +322,21 @@ async def _run_single_in_batch(
         batch_job.per_ticker_status[ticker] = job.to_dict()
         logger.info(f"[BATCH][{ticker}] Stage 4: Writing results...")
 
-        updated_research = _merge_updates(
-            research, gathered, evidence_update, hypothesis_update
-        )
+        if scaffold_mode:
+            updated_research = _merge_initiation(
+                research, gathered, evidence_update, hypothesis_update
+            )
+        else:
+            updated_research = _merge_updates(
+                research, gathered, evidence_update, hypothesis_update
+            )
+
+        # Generate technical analysis if missing
+        price_data = gathered.get("price_data", {})
+        if "error" not in price_data and not updated_research.get("technicalAnalysis"):
+            ta = _generate_technical_analysis(ticker, price_data, research.get("priceHistory", []))
+            if ta:
+                updated_research["technicalAnalysis"] = ta
 
         _save_research(ticker, updated_research)
         _update_index(ticker, updated_research)
@@ -442,6 +485,208 @@ def _update_index(ticker: str, data: dict) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Coverage initiation prompts (for scaffold → full research)
+# ---------------------------------------------------------------------------
+
+EVIDENCE_CREATION_SYSTEM = """\
+You are a specialist equity research analyst initiating coverage on a new ASX-listed stock.
+
+Given the company's sector, recent announcements, news, market data, and commodity/macro context, \
+CREATE a comprehensive set of 10 evidence domain cards from scratch.
+
+Return a JSON object with this exact structure:
+{
+  "cards": [
+    {
+      "number": 1,
+      "title": "1. Corporate Communications",
+      "epistemicClass": "ep-motivated",
+      "epistemicLabel": "Motivated",
+      "finding": "2-4 sentence finding based on available data. Be specific with numbers and dates.",
+      "tension": "1-2 sentence tension or counter-narrative. What contradicts the finding?",
+      "table": null,
+      "tags": [{"text": "Supports N1", "class": "supports"}],
+      "source": "Cited sources (ASX announcements, news, reports)"
+    }
+  ]
+}
+
+You MUST create exactly 10 cards with these domains:
+1. Corporate Communications (ep-motivated, Motivated) — company press releases, investor presentations
+2. Regulatory Filings & Financial Statements (ep-verified, Verified) — financial results, ASIC filings
+3. Broker Research (ep-modeled, Modelled) — consensus estimates, broker views (infer from news)
+4. Competitor Disclosures (ep-verified, Verified) — peer company announcements, market position
+5. Economic Data (ep-measured, Measured) — macro indicators, commodity prices, rates
+6. Alternative Data (ep-observed, Observed) — operational indicators, ESG, channel checks
+7. Academic Research (ep-peer, Peer-Reviewed) — industry studies, structural trends
+8. Media & Social (ep-unverified, Unverified) — financial media coverage, market commentary
+9. Leadership & Governance (ep-observed, Observed) — management changes, insider trades, governance
+10. Ownership & Capital Flows (ep-measured, Measured) — institutional holders, fund flows, capital structure
+
+Tag rules for cards:
+- Use "Supports N1" (class "supports") if the finding favours the growth/upside hypothesis
+- Use "Supports N2" (class "supports") if the finding favours the base case
+- Use "Supports N3" (class "contradicts") if the finding favours the risk/downside hypothesis
+- Use "Supports N4" (class "contradicts") if the finding favours a disruption/catalyst
+- Use "Ambiguous" (class "") if the evidence is mixed
+
+Be specific. Cite real data from the provided inputs. If you lack data for a domain, state what is \
+known from the available inputs and note the data limitation in the tension field."""
+
+
+FULL_INITIATION_SYSTEM = """\
+You are a senior equity research analyst at Continuum Intelligence initiating coverage on a new \
+ASX-listed stock. You use the Analysis of Competing Hypotheses (ACH) framework.
+
+Given the company overview, sector, recent data, evidence cards, and commodity/macro context, \
+create a COMPLETE research analysis from scratch. This is initial coverage — there is no existing \
+analysis to update.
+
+Return a JSON object with ALL of the following fields:
+
+{
+  "hypotheses": [
+    {
+      "tier": "n1",
+      "title": "N1: [Bullish/Growth/Recovery Scenario Title]",
+      "direction": "upside",
+      "updated_score": "XX%",
+      "updated_description": "2-3 sentence description of this bullish scenario. What needs to happen for this to play out?",
+      "supporting": ["Evidence point 1 supporting this hypothesis", "Evidence point 2"],
+      "contradicting": ["Evidence point against this hypothesis"]
+    },
+    {
+      "tier": "n2",
+      "title": "N2: [Base Case/Status Quo Title]",
+      "direction": "neutral",
+      "updated_score": "XX%",
+      "updated_description": "2-3 sentence base case scenario.",
+      "supporting": ["Supporting evidence"],
+      "contradicting": ["Contradicting evidence"]
+    },
+    {
+      "tier": "n3",
+      "title": "N3: [Bear Case/Risk/Downside Title]",
+      "direction": "downside",
+      "updated_score": "XX%",
+      "updated_description": "2-3 sentence bear case.",
+      "supporting": ["Supporting evidence"],
+      "contradicting": ["Contradicting evidence"]
+    },
+    {
+      "tier": "n4",
+      "title": "N4: [Disruption/Catalyst/Tail Scenario Title]",
+      "direction": "upside or downside",
+      "updated_score": "XX%",
+      "updated_description": "2-3 sentence tail risk or catalyst scenario.",
+      "supporting": ["Supporting evidence"],
+      "contradicting": ["Contradicting evidence"]
+    }
+  ],
+
+  "company_description": "4-6 sentence company overview using HTML. Describe what the company does, \
+its market position, key assets, and why it matters. Use <strong> for company name and key facts. \
+End with 'ASX: [TICKER]' reference.",
+
+  "skew": {
+    "direction": "bullish or bearish or neutral",
+    "rationale": "2-3 sentence explanation of the probability skew and what drives it."
+  },
+
+  "embedded_thesis": "3-5 sentence paragraph describing what the current price embeds. \
+Reference the CURRENT price. Describe what assumptions the market is making. Plain text, no HTML.",
+
+  "skew_description": "2-3 sentence summary of the hypothesis weightings and directional skew.",
+
+  "position_in_range": {
+    "worlds": [
+      {"label": "N1 Bull", "price": "$XX.XX", "gapPct": "+XX%"},
+      {"label": "N2 Base", "price": "$XX.XX", "gapPct": "+X% or -X%"},
+      {"label": "N3 Bear", "price": "$XX.XX", "gapPct": "-XX%"},
+      {"label": "N4 Tail", "price": "$XX.XX", "gapPct": "+/-XX%"}
+    ]
+  },
+
+  "narrative_rewrite": "Full dominant narrative (6-10 sentences). Use HTML: <strong> for emphasis, \
+<span class='key-stat'> for key numbers. Describe what is driving the stock right now, \
+key catalysts, risks, and what the evidence says.",
+
+  "price_implication": "HTML bullet-format content describing what the current price assumes. \
+Use <br> separators between bullets.",
+
+  "evidence_check": "HTML paragraph (3-5 sentences) assessing how strong the evidence base is. \
+What domains have good data? Where are the gaps? How consistent is the evidence?",
+
+  "narrative_stability": "HTML paragraph (3-5 sentences) evaluating how robust the current narrative \
+is. What could destabilise it? What is the next test?",
+
+  "verdict_update": "Updated verdict text (4-6 sentences). What is the market pricing? Is that right? \
+Where is the skew? Reference current price and key data points. Use <span class='key-stat'> for numbers.",
+
+  "next_decision_point": {
+    "event": "The next material upcoming catalyst",
+    "date": "Expected date (YYYY-MM-DD or descriptive like 'August 2026')",
+    "metric": "What to watch for",
+    "thresholds": "Specific levels or outcomes that would shift the thesis"
+  },
+
+  "key_catalyst": "The single most important upcoming catalyst",
+
+  "tripwires": [
+    {
+      "date": "MONTH YEAR",
+      "name": "Short catalyst name",
+      "conditions": [
+        {"if": "If [positive scenario]", "valence": "positive", "then": "Then [positive implication]"},
+        {"if": "If [negative scenario]", "valence": "negative", "then": "Then [negative implication]"}
+      ],
+      "source": "Source citation"
+    }
+  ],
+
+  "discriminators": [
+    {
+      "diagnosticity": "HIGH",
+      "diagnosticityClass": "disc-high",
+      "evidence": "Description of the high-diagnostic data point",
+      "discriminatesBetween": "N1 vs N3 (or whichever hypotheses)",
+      "currentReading": "Current status/level",
+      "readingClass": "td-amber or td-green or td-red"
+    }
+  ],
+
+  "gaps": {
+    "coverageRows": [
+      {
+        "domain": "Corporate Comms",
+        "coverageLevel": "full or good or limited",
+        "coverageLabel": "Full or Good or Limited",
+        "freshness": "Date or period of latest data",
+        "confidence": "High/Medium/Low with qualifier",
+        "confidenceClass": ""
+      }
+    ],
+    "couldntAssess": ["List of domains or data we could not assess"],
+    "analyticalLimitations": "Paragraph describing inherent limitations of the analysis."
+  },
+
+  "non_discriminating": "HTML bullet list of metrics that appear important but don't actually \
+discriminate between the competing hypotheses."
+}
+
+CRITICAL RULES:
+- The four hypothesis scores MUST sum to exactly 100%.
+- Use integer percentages (e.g., "35%", not "34.7%").
+- N2 (base case) should typically carry the highest weight for a new coverage initiation.
+- Tripwires must reference FUTURE events only.
+- Be specific with numbers, dates, and citations from the provided data.
+- If data is limited, say so explicitly rather than fabricating.
+- Create 3 discriminator rows and at least 2 tripwire cards.
+- Gaps should cover all 10 evidence domains.
+- Reference the current price throughout."""
+
+
+# ---------------------------------------------------------------------------
 # Gemini specialist prompts
 # ---------------------------------------------------------------------------
 
@@ -577,6 +822,10 @@ async def run_refresh(ticker: str) -> dict:
     """
     Execute the full 4-stage refresh pipeline for a single stock.
 
+    Detects scaffold data automatically and switches to coverage initiation
+    mode, which creates full research content from scratch instead of
+    incrementally updating.
+
     Parameters
     ----------
     ticker : str
@@ -596,6 +845,10 @@ async def run_refresh(ticker: str) -> dict:
         # Load existing research
         research = _load_research(ticker)
         company_name = research.get("company", ticker)
+        scaffold_mode = _is_scaffold(research)
+
+        if scaffold_mode:
+            logger.info(f"[{ticker}] COVERAGE INITIATION — scaffold detected, generating full research")
 
         # ---- Stage 1: Data Gathering ----
         job.status = "gathering_data"
@@ -608,32 +861,55 @@ async def run_refresh(ticker: str) -> dict:
             sector_sub=research.get("sectorSub"),
         )
 
-        # ---- Stage 2: Specialist Analysis (Gemini) ----
+        # ---- Stage 2: Evidence (Gemini) ----
         job.status = "specialist_analysis"
         job.stage_index = 2
-        logger.info(f"[{ticker}] Stage 2: Specialist analysis (Gemini)...")
-
-        evidence_update = await _run_evidence_specialists(
-            ticker, research, gathered
-        )
+        if scaffold_mode:
+            logger.info(f"[{ticker}] Stage 2: Creating evidence cards from scratch (Gemini)...")
+            evidence_update = await _run_evidence_creation(
+                ticker, research, gathered
+            )
+        else:
+            logger.info(f"[{ticker}] Stage 2: Specialist analysis (Gemini)...")
+            evidence_update = await _run_evidence_specialists(
+                ticker, research, gathered
+            )
 
         # ---- Stage 3: Hypothesis Synthesis (Claude) ----
         job.status = "hypothesis_synthesis"
         job.stage_index = 3
-        logger.info(f"[{ticker}] Stage 3: Hypothesis synthesis (Claude)...")
-
-        hypothesis_update = await _run_hypothesis_synthesis(
-            ticker, research, evidence_update, gathered
-        )
+        if scaffold_mode:
+            logger.info(f"[{ticker}] Stage 3: Full coverage initiation (Claude)...")
+            hypothesis_update = await _run_coverage_initiation(
+                ticker, research, evidence_update, gathered
+            )
+        else:
+            logger.info(f"[{ticker}] Stage 3: Hypothesis synthesis (Claude)...")
+            hypothesis_update = await _run_hypothesis_synthesis(
+                ticker, research, evidence_update, gathered
+            )
 
         # ---- Stage 4: Write Results ----
         job.status = "writing_results"
         job.stage_index = 4
         logger.info(f"[{ticker}] Stage 4: Writing results...")
 
-        updated_research = _merge_updates(
-            research, gathered, evidence_update, hypothesis_update
-        )
+        if scaffold_mode:
+            updated_research = _merge_initiation(
+                research, gathered, evidence_update, hypothesis_update
+            )
+        else:
+            updated_research = _merge_updates(
+                research, gathered, evidence_update, hypothesis_update
+            )
+
+        # Generate technical analysis from price data (both modes)
+        price_data = gathered.get("price_data", {})
+        if "error" not in price_data and not updated_research.get("technicalAnalysis"):
+            ta = _generate_technical_analysis(ticker, price_data, research.get("priceHistory", []))
+            if ta:
+                updated_research["technicalAnalysis"] = ta
+                logger.info(f"[{ticker}] Generated technical analysis section")
 
         _save_research(ticker, updated_research)
         _update_index(ticker, updated_research)
@@ -724,6 +1000,305 @@ Please assess each evidence card against this new data and return the updated as
     except Exception as e:
         logger.error(f"[{ticker}] Evidence specialist failed: {e}")
         return {"cards": [], "summary": f"Evidence update failed: {e}"}
+
+
+# ---------------------------------------------------------------------------
+# Stage 2 (scaffold): Evidence creation from scratch (Gemini)
+# ---------------------------------------------------------------------------
+
+async def _run_evidence_creation(
+    ticker: str,
+    research: dict,
+    gathered: dict,
+) -> dict:
+    """Create 10 evidence domain cards from scratch for a new stock."""
+    price_data = gathered.get("price_data", {})
+    announcements = gathered.get("announcements", [])
+    news = gathered.get("news", [])
+    earnings_news = gathered.get("earnings_news", [])
+
+    # Format macro context if available
+    macro_section = ""
+    macro_ctx = gathered.get("macro_context")
+    if macro_ctx:
+        parts = [f"\n## Macro & Commodity Context ({macro_ctx.get('sector_label', '')})"]
+        for cp in macro_ctx.get("commodity_prices", []):
+            parts.append(f"- {cp['name']} ({cp['ticker']}): {cp['currency']}{cp['price']} ({cp['change_pct']:+.1f}% today)")
+        macro_news = macro_ctx.get("macro_news", [])
+        if macro_news:
+            parts.append("\n### Sector-Relevant Macro Headlines:")
+            for mn in macro_news[:5]:
+                parts.append(f"- {mn['title']} ({mn['source']})")
+                if mn.get("snippet"):
+                    parts.append(f"  > {mn['snippet'][:200]}")
+        macro_section = "\n".join(parts)
+
+    user_prompt = f"""## INITIATING COVERAGE: {ticker} ({research.get('company', '')})
+## Sector: {research.get('sector', 'N/A')} / {research.get('sectorSub', 'N/A')}
+## Current Price: A${price_data.get('price', 'N/A')}
+## 52-Week Range: A${price_data.get('low_52w', 'N/A')} - A${price_data.get('high_52w', 'N/A')}
+## Market Cap: A${price_data.get('market_cap', 'N/A')}
+
+## Recent ASX Announcements:
+{json.dumps(announcements[:12], indent=2)}
+
+## Recent News Headlines:
+{json.dumps(news[:10], indent=2)}
+
+## Earnings/Results News:
+{json.dumps(earnings_news[:8], indent=2)}
+{macro_section}
+
+Please create all 10 evidence domain cards for this stock based on the available data."""
+
+    try:
+        result = await gemini_completion(
+            system_prompt=EVIDENCE_CREATION_SYSTEM,
+            user_prompt=user_prompt,
+            json_mode=True,
+        )
+        cards = result.get("cards", []) if isinstance(result, dict) else []
+        logger.info(f"[{ticker}] Evidence creation returned {len(cards)} cards")
+        return result if isinstance(result, dict) else {"cards": []}
+    except Exception as e:
+        logger.error(f"[{ticker}] Evidence creation failed: {e}")
+        return {"cards": [], "summary": f"Evidence creation failed: {e}"}
+
+
+# ---------------------------------------------------------------------------
+# Stage 3 (scaffold): Full coverage initiation (Claude)
+# ---------------------------------------------------------------------------
+
+async def _run_coverage_initiation(
+    ticker: str,
+    research: dict,
+    evidence_update: dict,
+    gathered: dict,
+) -> dict:
+    """Run Claude to generate full coverage analysis from scratch."""
+    price_data = gathered.get("price_data", {})
+    announcements = gathered.get("announcements", [])
+    news = gathered.get("news", [])
+    earnings_news = gathered.get("earnings_news", [])
+
+    # Format evidence cards just created by Gemini
+    evidence_cards = evidence_update.get("cards", [])
+    cards_text = json.dumps(evidence_cards[:10], indent=2) if evidence_cards else "No evidence cards available."
+
+    # Format macro context
+    macro_section = ""
+    macro_ctx = gathered.get("macro_context")
+    if macro_ctx:
+        parts = [f"\n## Macro & Commodity Context ({macro_ctx.get('sector_label', '')})"]
+        parts.append("Key external drivers for this stock's sector:")
+        for cp in macro_ctx.get("commodity_prices", []):
+            parts.append(f"- {cp['name']}: {cp['currency']}{cp['price']} ({cp['change_pct']:+.1f}% today)")
+        macro_news = macro_ctx.get("macro_news", [])
+        if macro_news:
+            parts.append("\n### Sector Macro Headlines:")
+            for mn in macro_news[:6]:
+                parts.append(f"- {mn['title']} ({mn['source']})")
+                if mn.get("snippet"):
+                    parts.append(f"  > {mn['snippet'][:200]}")
+        macro_section = "\n".join(parts)
+
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    user_prompt = f"""## INITIATING COVERAGE — TODAY'S DATE: {today}
+
+## Stock: {ticker} ({research.get('company', '')})
+## Sector: {research.get('sector', 'N/A')} / {research.get('sectorSub', 'N/A')}
+## Current Price: A${price_data.get('price', 'N/A')}
+## 52-Week High: A${price_data.get('high_52w', 'N/A')}
+## 52-Week Low: A${price_data.get('low_52w', 'N/A')}
+## Market Cap: A${price_data.get('market_cap', 'N/A')}
+
+## Evidence Cards (just created):
+{cards_text}
+
+## Recent ASX Announcements:
+{json.dumps(announcements[:8], indent=2)}
+
+## Recent News:
+{json.dumps(news[:8], indent=2)}
+
+## Earnings/Results News:
+{json.dumps(earnings_news[:5], indent=2)}
+{macro_section}
+
+This is INITIAL COVERAGE. Create a complete research analysis with all hypotheses, narrative \
+sections, verdict, tripwires, discriminators, and gaps assessment. Be thorough and specific."""
+
+    try:
+        if not config.ANTHROPIC_API_KEY:
+            logger.warning(f"[{ticker}] No Anthropic key, using Gemini for initiation")
+            return await gemini_completion(
+                system_prompt=FULL_INITIATION_SYSTEM,
+                user_prompt=user_prompt,
+                json_mode=True,
+            )
+
+        client = config.get_anthropic_client()
+        response = client.messages.create(
+            model=config.ANTHROPIC_MODEL,
+            max_tokens=8192,
+            temperature=0,
+            system=FULL_INITIATION_SYSTEM + "\n\nRespond with valid JSON only.",
+            messages=[{"role": "user", "content": user_prompt}],
+        )
+
+        text = ""
+        for block in response.content:
+            if block.type == "text":
+                text += block.text
+
+        text = text.strip()
+        if text.startswith("```"):
+            text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+            text = text.rsplit("```", 1)[0]
+
+        result = json.loads(text)
+        logger.info(
+            f"[{ticker}] Coverage initiation: "
+            f"{len(result.get('hypotheses', []))} hypotheses, "
+            f"{len(result.get('tripwires', []))} tripwires, "
+            f"{len(result.get('discriminators', []))} discriminators"
+        )
+        return result
+
+    except Exception as e:
+        logger.error(f"[{ticker}] Coverage initiation failed: {e}", exc_info=True)
+        return {
+            "hypotheses": [],
+            "narrative_rewrite": f"Coverage initiation failed: {e}",
+            "verdict_update": None,
+        }
+
+
+# ---------------------------------------------------------------------------
+# Technical analysis generation from price data
+# ---------------------------------------------------------------------------
+
+def _generate_technical_analysis(
+    ticker: str,
+    price_data: dict,
+    price_history: list,
+) -> dict | None:
+    """Generate technical analysis section from price history."""
+    if not price_history or len(price_history) < 10:
+        return None
+
+    prices = [float(p) for p in price_history if p is not None]
+    if len(prices) < 10:
+        return None
+
+    current_price = float(price_data.get("price", prices[-1]))
+    high_52w = float(price_data.get("high_52w", max(prices)))
+    low_52w = float(price_data.get("low_52w", min(prices)))
+
+    # Calculate moving averages
+    ma50 = sum(prices[-50:]) / min(len(prices), 50) if len(prices) >= 10 else current_price
+    ma200 = sum(prices) / len(prices)  # Use all available data as proxy
+
+    # Determine trend direction
+    recent_10 = prices[-10:]
+    older_10 = prices[-20:-10] if len(prices) >= 20 else prices[:10]
+    avg_recent = sum(recent_10) / len(recent_10)
+    avg_older = sum(older_10) / len(older_10)
+    trend_dir = "Up" if avg_recent > avg_older * 1.02 else ("Down" if avg_recent < avg_older * 0.98 else "Sideways")
+
+    # Golden / death cross
+    crossover_type = "Golden Cross" if ma50 > ma200 else "Death Cross"
+
+    # Drawdown from 52w high
+    drawdown = ((current_price - high_52w) / high_52w * 100)
+
+    # Range position (0=low, 100=high)
+    range_span = high_52w - low_52w
+    range_position = int((current_price - low_52w) / range_span * 100) if range_span > 0 else 50
+
+    # Volatility — avg daily range as %
+    daily_ranges = []
+    for i in range(1, min(len(prices), 31)):
+        daily_range = abs(prices[-i] - prices[-i - 1]) / prices[-i - 1] * 100 if prices[-i - 1] > 0 else 0
+        daily_ranges.append(daily_range)
+    avg_daily_range_30 = round(sum(daily_ranges) / len(daily_ranges), 1) if daily_ranges else 0
+
+    # Find peak and trough in available data
+    peak_price = max(prices)
+    peak_idx = prices.index(peak_price)
+    trough_price = min(prices)
+    trough_idx = prices.index(trough_price)
+
+    now = datetime.now(timezone.utc)
+
+    return {
+        "date": now.strftime("%d %B %Y"),
+        "period": "1 Year",
+        "source": "Continuum Technical Intelligence",
+        "regime": "Uptrend" if trend_dir == "Up" else ("Downtrend" if trend_dir == "Down" else "Consolidation"),
+        "clarity": "Clear" if abs(avg_recent - avg_older) / avg_older > 0.05 else "Mixed",
+        "price": {"current": round(current_price, 2), "currency": "A$"},
+        "movingAverages": {
+            "ma50": {"value": round(ma50, 1), "date": now.strftime("%d %b %Y")},
+            "ma200": {"value": round(ma200, 1), "date": now.strftime("%d %b %Y")},
+            "crossover": {
+                "type": crossover_type,
+                "date": now.strftime("%B %Y"),
+                "description": f"50-day MA ({crossover_type.split()[0].lower()}) above 200-day MA"
+                if crossover_type == "Golden Cross"
+                else f"50-day MA below 200-day MA ({crossover_type.lower()})",
+            },
+            "priceVsMa50": round((current_price - ma50) / ma50 * 100, 1),
+            "priceVsMa200": round((current_price - ma200) / ma200 * 100, 1),
+        },
+        "trend": {
+            "direction": trend_dir,
+            "duration": f"{min(len(prices) // 20, 12)} months",
+            "structure": f"Price in {trend_dir.lower()}trend relative to 50-day and 200-day moving averages.",
+            "peak": {"price": round(peak_price, 2), "date": "Recent"},
+            "trough": {"price": round(trough_price, 2), "date": "Recent"},
+            "drawdown": round(drawdown, 1),
+        },
+        "keyLevels": {
+            "support": {"price": round(min(prices[-20:]) if len(prices) >= 20 else trough_price, 2), "method": "Recent low / swing support"},
+            "resistance": {"price": round(max(prices[-20:]) if len(prices) >= 20 else peak_price, 2), "method": "Recent high / swing resistance"},
+            "fiftyTwoWeekHigh": {"price": round(high_52w, 2), "date": "Last 12 months"},
+            "fiftyTwoWeekLow": {"price": round(low_52w, 2), "date": "Last 12 months"},
+        },
+        "volume": {
+            "latestVs20DayAvg": 1.0,
+            "latestDate": now.strftime("%d %B %Y"),
+            "priorSpikes": [],
+        },
+        "volatility": {
+            "latestDailyRange": {
+                "high": round(max(prices[-2:]), 2) if len(prices) >= 2 else round(current_price, 2),
+                "low": round(min(prices[-2:]), 2) if len(prices) >= 2 else round(current_price, 2),
+                "date": now.strftime("%d %B %Y"),
+            },
+            "latestRangePercent": round(avg_daily_range_30, 1),
+            "avgDailyRangePercent30": round(avg_daily_range_30, 1),
+            "avgDailyRangePercent90": round(avg_daily_range_30, 1),
+        },
+        "meanReversion": {
+            "vsMa50": round((current_price - ma50) / ma50 * 100, 1),
+            "vsMa200": round((current_price - ma200) / ma200 * 100, 1),
+            "rangePosition": range_position,
+            "rangeHigh": round(high_52w, 2),
+            "rangeLow": round(low_52w, 2),
+        },
+        "inflectionPoints": [],
+        "relativePerformance": {
+            "vsIndex": {
+                "name": "S&P/ASX 200",
+                "period": "12 months",
+                "stockReturn": round((current_price - prices[0]) / prices[0] * 100, 1) if prices[0] > 0 else 0,
+                "indexReturn": 0,
+                "relativeReturn": round((current_price - prices[0]) / prices[0] * 100, 1) if prices[0] > 0 else 0,
+            },
+        },
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -1074,6 +1649,192 @@ def _merge_updates(
                     cards.append(new_tw)
             else:
                 cards.append(new_tw)
+
+    # -- Timestamp --
+    updated["date"] = now
+    updated["_lastRefreshed"] = datetime.now(timezone.utc).isoformat()
+
+    return updated
+
+
+def _merge_initiation(
+    research: dict,
+    gathered: dict,
+    evidence_update: dict,
+    hypothesis_update: dict,
+) -> dict:
+    """Merge coverage initiation results into the scaffold, replacing placeholders."""
+    updated = deepcopy(research)
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    price_data = gathered.get("price_data", {})
+
+    # -- Price update --
+    if "error" not in price_data:
+        updated["price"] = price_data.get("price", updated.get("price", ""))
+        updated["currency"] = price_data.get("currency", "A$")
+        # Update price history
+        raw_ph = price_data.get("price_history")
+        if raw_ph:
+            if isinstance(raw_ph[0], dict):
+                updated["priceHistory"] = [
+                    pt["close"] for pt in raw_ph
+                    if isinstance(pt, dict) and pt.get("close") is not None
+                ]
+            else:
+                updated["priceHistory"] = raw_ph
+
+    current_price = float(price_data.get("price", 0)) if "error" not in price_data else 0
+
+    # -- Replace evidence cards entirely --
+    evidence_cards = evidence_update.get("cards", [])
+    if evidence_cards:
+        if "evidence" not in updated:
+            updated["evidence"] = {}
+        updated["evidence"]["cards"] = evidence_cards
+        updated["evidence"]["intro"] = (
+            "Evidence is assessed across ten epistemic domains, ranked by reliability. "
+            "Each domain carries a distinct epistemic quality — from verified regulatory filings "
+            "to unverified media commentary — ensuring the analyst understands what the evidence "
+            "is before assessing what it means."
+        )
+        updated["evidence"]["alignmentSummary"] = None
+
+    # -- Replace hypotheses entirely --
+    hyp_updates = hypothesis_update.get("hypotheses", [])
+    if hyp_updates:
+        for hu in hyp_updates:
+            tier = hu.get("tier", "").lower()
+            for h in updated.get("hypotheses", []):
+                if h.get("tier", "").lower() == tier:
+                    h["score"] = hu.get("updated_score", h.get("score"))
+                    h["scoreWidth"] = hu.get("updated_score", h.get("scoreWidth"))
+                    h["scoreMeta"] = hu.get("rationale", "")
+                    h["description"] = hu.get("updated_description", h.get("description"))
+                    h["statusClass"] = "watching"
+                    h["statusText"] = "Active Coverage"
+                    # Replace supporting/contradicting evidence
+                    if hu.get("supporting"):
+                        h["supporting"] = hu["supporting"]
+                    if hu.get("contradicting"):
+                        h["contradicting"] = hu["contradicting"]
+                    break
+
+        # Update verdict scores
+        if "verdict" in updated and "scores" in updated["verdict"]:
+            for hu in hyp_updates:
+                tier = hu.get("tier", "").lower()
+                direction = hu.get("direction", "neutral")
+                dir_map = {
+                    "upside": ("&uarr;", "Upside"),
+                    "neutral": ("&rarr;", "Base"),
+                    "downside": ("&darr;", "Downside"),
+                    "up": ("&uarr;", "Rising"),
+                    "down": ("&darr;", "Falling"),
+                    "steady": ("&rarr;", "Steady"),
+                }
+                arrow, text = dir_map.get(direction, ("&rarr;", "Base"))
+                for vs in updated["verdict"]["scores"]:
+                    if vs.get("label", "").lower().startswith(tier[:2]):
+                        vs["score"] = hu.get("updated_score", vs.get("score"))
+                        vs["scoreColor"] = ""  # Remove muted color
+                        vs["dirArrow"] = arrow
+                        vs["dirText"] = text
+                        vs["dirColor"] = None
+                        break
+
+    # -- Company description --
+    if hypothesis_update.get("company_description"):
+        updated["heroCompanyDescription"] = hypothesis_update["company_description"]
+
+    # -- Skew --
+    if hypothesis_update.get("skew"):
+        skew_data = hypothesis_update["skew"]
+        if isinstance(skew_data, dict):
+            updated["skew"] = {
+                "direction": skew_data.get("direction", "neutral"),
+                "rationale": skew_data.get("rationale", ""),
+            }
+
+    # -- Hero section --
+    if "hero" not in updated:
+        updated["hero"] = {}
+    if hypothesis_update.get("embedded_thesis"):
+        updated["hero"]["embedded_thesis"] = hypothesis_update["embedded_thesis"]
+    if hypothesis_update.get("skew_description"):
+        updated["hero"]["skew_description"] = hypothesis_update["skew_description"]
+    if hypothesis_update.get("position_in_range"):
+        updated["hero"]["position_in_range"] = hypothesis_update["position_in_range"]
+    ndp = hypothesis_update.get("next_decision_point")
+    if ndp and isinstance(ndp, dict) and ndp.get("event"):
+        updated["hero"]["next_decision_point"] = {
+            "event": ndp["event"],
+            "date": ndp.get("date", "TBC"),
+            "metric": ndp.get("metric", ""),
+            "thresholds": ndp.get("thresholds", ""),
+        }
+
+    # -- Full narrative --
+    if "narrative" not in updated:
+        updated["narrative"] = {}
+    if hypothesis_update.get("narrative_rewrite"):
+        updated["narrative"]["theNarrative"] = (
+            f"<strong>[Coverage Initiated {now}]</strong> "
+            f"{hypothesis_update['narrative_rewrite']}"
+        )
+    if hypothesis_update.get("price_implication"):
+        updated["narrative"]["priceImplication"] = {
+            "label": f"Embedded Assumptions at A${current_price:.2f}" if current_price else "Embedded Assumptions",
+            "content": hypothesis_update["price_implication"],
+        }
+    if hypothesis_update.get("evidence_check"):
+        updated["narrative"]["evidenceCheck"] = hypothesis_update["evidence_check"]
+    if hypothesis_update.get("narrative_stability"):
+        updated["narrative"]["narrativeStability"] = hypothesis_update["narrative_stability"]
+
+    # -- Verdict --
+    if hypothesis_update.get("verdict_update"):
+        if "verdict" in updated and isinstance(updated["verdict"], dict):
+            updated["verdict"]["text"] = hypothesis_update["verdict_update"]
+
+    # -- Featured rationale --
+    if hypothesis_update.get("skew_description"):
+        updated["featuredRationale"] = hypothesis_update["skew_description"]
+
+    # -- Tripwires (replace entirely) --
+    tripwires_data = hypothesis_update.get("tripwires", [])
+    if tripwires_data:
+        if "tripwires" not in updated:
+            updated["tripwires"] = {}
+        updated["tripwires"]["cards"] = tripwires_data
+        updated["tripwires"]["intro"] = (
+            "The following catalysts could force a material revision to hypothesis weightings. "
+            "Each carries conditional outcomes that map to specific narrative shifts."
+        )
+
+    # -- Discriminators (replace entirely) --
+    discriminators_data = hypothesis_update.get("discriminators", [])
+    if discriminators_data:
+        updated["discriminators"] = {
+            "intro": (
+                "The following data points carry high diagnosticity — they can meaningfully "
+                "shift probability between competing hypotheses."
+            ),
+            "rows": discriminators_data,
+            "nonDiscriminating": hypothesis_update.get("non_discriminating"),
+        }
+
+    # -- Gaps (replace entirely) --
+    gaps_data = hypothesis_update.get("gaps")
+    if gaps_data and isinstance(gaps_data, dict):
+        updated["gaps"] = gaps_data
+
+    # -- Hero metrics refresh --
+    if "heroMetrics" in updated and current_price:
+        for m in updated["heroMetrics"]:
+            if m.get("label") == "Mkt Cap":
+                mc = price_data.get("market_cap")
+                if mc:
+                    updated["heroMetrics"][0]["value"] = f"A${mc}"
 
     # -- Timestamp --
     updated["date"] = now
