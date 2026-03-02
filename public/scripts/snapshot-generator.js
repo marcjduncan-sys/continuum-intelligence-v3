@@ -21,12 +21,10 @@
 (function(global) {
   'use strict';
 
-  // 18-stock coverage universe (excludes micro-caps HRZ, OCL, RFG)
-  var COVERAGE_UNIVERSE = [
-    'WOW', 'XRO', 'WTC', 'DRO', 'PME', 'GYG',
-    'CSL', 'MQG', 'GMG', 'WDS', 'SIG', 'FMG',
-    'DXS', 'NAB', 'BHP', 'CBA', 'RIO', 'WOR'
-  ];
+  // Coverage universe — dynamically derived from STOCK_DATA at runtime
+  var COVERAGE_UNIVERSE = (typeof STOCK_DATA !== 'undefined')
+    ? Object.keys(STOCK_DATA).sort()
+    : [];
 
   // ─── DATA EXTRACTION ────────────────────────────────────────
 
