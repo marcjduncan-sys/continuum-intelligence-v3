@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "").strip()
-ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-5-20250929")
+ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
 _DEFAULT_ORIGINS = (
     "https://marcjduncan-sys.github.io,"
     "http://localhost:3000,"
@@ -51,13 +51,13 @@ _anthropic_client: anthropic.Anthropic | None = None
 
 
 def get_anthropic_client() -> anthropic.Anthropic:
-    """Return the shared Anthropic client singleton (60s timeout)."""
+    """Return the shared Anthropic client singleton (300s timeout)."""
     global _anthropic_client
     if _anthropic_client is None:
         if not ANTHROPIC_API_KEY:
             raise RuntimeError("ANTHROPIC_API_KEY not configured")
         _anthropic_client = anthropic.Anthropic(
             api_key=ANTHROPIC_API_KEY,
-            timeout=60.0,
+            timeout=300.0,
         )
     return _anthropic_client

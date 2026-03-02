@@ -44,6 +44,15 @@ def _is_scaffold(research: dict) -> bool:
         return True
     return False
 
+
+def _has_real_evidence(research: dict) -> bool:
+    """Check if evidence cards have real content (not just scaffolds)."""
+    cards = research.get("evidence", {}).get("cards", [])
+    if len(cards) < 10:
+        return False
+    # If any card has a finding longer than 100 chars, it's real content
+    return any(len(c.get("finding", "")) > 100 for c in cards)
+
 # ---------------------------------------------------------------------------
 # Job tracking
 # ---------------------------------------------------------------------------
@@ -290,11 +299,14 @@ async def _run_single_in_batch(
             job.status = "specialist_analysis"
             job.stage_index = 2
             batch_job.per_ticker_status[ticker] = job.to_dict()
-            if scaffold_mode:
+            if scaffold_mode and not _has_real_evidence(research):
                 logger.info(f"[BATCH][{ticker}] Stage 2: Creating evidence cards...")
                 evidence_update = await _run_evidence_creation(
                     ticker, research, gathered
                 )
+            elif scaffold_mode and _has_real_evidence(research):
+                logger.info(f"[BATCH][{ticker}] Stage 2: Evidence already exists, skipping")
+                evidence_update = research.get("evidence", {}).get("cards", [])
             else:
                 logger.info(f"[BATCH][{ticker}] Stage 2: Specialist analysis...")
                 evidence_update = await _run_evidence_specialists(
@@ -864,11 +876,14 @@ async def run_refresh(ticker: str) -> dict:
         # ---- Stage 2: Evidence (Gemini) ----
         job.status = "specialist_analysis"
         job.stage_index = 2
-        if scaffold_mode:
+        if scaffold_mode and not _has_real_evidence(research):
             logger.info(f"[{ticker}] Stage 2: Creating evidence cards from scratch (Gemini)...")
             evidence_update = await _run_evidence_creation(
                 ticker, research, gathered
             )
+        elif scaffold_mode and _has_real_evidence(research):
+            logger.info(f"[{ticker}] Stage 2: Evidence cards already exist, skipping creation")
+            evidence_update = research.get("evidence", {}).get("cards", [])
         else:
             logger.info(f"[{ticker}] Stage 2: Specialist analysis (Gemini)...")
             evidence_update = await _run_evidence_specialists(
