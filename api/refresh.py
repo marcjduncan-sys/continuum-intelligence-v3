@@ -306,7 +306,7 @@ async def _run_single_in_batch(
                 )
             elif scaffold_mode and _has_real_evidence(research):
                 logger.info(f"[BATCH][{ticker}] Stage 2: Evidence already exists, skipping")
-                evidence_update = research.get("evidence", {}).get("cards", [])
+                evidence_update = {"cards": research.get("evidence", {}).get("cards", [])}
             else:
                 logger.info(f"[BATCH][{ticker}] Stage 2: Specialist analysis...")
                 evidence_update = await _run_evidence_specialists(
@@ -883,7 +883,7 @@ async def run_refresh(ticker: str) -> dict:
             )
         elif scaffold_mode and _has_real_evidence(research):
             logger.info(f"[{ticker}] Stage 2: Evidence cards already exist, skipping creation")
-            evidence_update = research.get("evidence", {}).get("cards", [])
+            evidence_update = {"cards": research.get("evidence", {}).get("cards", [])}
         else:
             logger.info(f"[{ticker}] Stage 2: Specialist analysis (Gemini)...")
             evidence_update = await _run_evidence_specialists(
