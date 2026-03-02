@@ -331,48 +331,14 @@ def resolve_sector_commodities(
 # Yahoo Finance company metadata
 # ---------------------------------------------------------------------------
 
-async def _get_yahoo_crumb() -> tuple[str, dict[str, str]]:
-    """
-    Obtain a Yahoo Finance crumb token + cookies required for quoteSummary.
-
-    Flow (mirrors scripts/add-stock.js getYahooSession):
-      1. GET https://fc.yahoo.com/  → collect Set-Cookie headers
-      2. GET https://query2.finance.yahoo.com/v1/test/getcrumb with those cookies → crumb text
-
-    Returns
-    -------
-    (crumb, cookie_dict)  — crumb string and dict of cookies to forward.
-    Raises on failure.
-    """
-    client = _get_http_client()
-
-    # Step 1 — hit fc.yahoo.com to get cookies (especially the A3 cookie)
-    cookie_resp = await client.get(
-        "https://fc.yahoo.com/",
-        headers=YAHOO_HEADERS,
-        follow_redirects=True,
-    )
-    # Collect cookies from the response
-    cookies = dict(cookie_resp.cookies)
-
-    # Step 2 — fetch crumb using those cookies
-    crumb_resp = await client.get(
-        "https://query2.finance.yahoo.com/v1/test/getcrumb",
-        headers={**YAHOO_HEADERS, "Cookie": "; ".join(f"{k}={v}" for k, v in cookies.items())},
-    )
-    crumb_resp.raise_for_status()
-    crumb = crumb_resp.text.strip()
-
-    if not crumb or "html" in crumb.lower():
-        raise ValueError(f"Invalid crumb response: {crumb[:100]}")
-
-    return crumb, cookies
-
-
 async def fetch_company_metadata(ticker: str) -> dict[str, Any]:
     """
     Fetch company name, sector, industry, and description from Yahoo Finance
     quoteSummary endpoint (with crumb/cookie authentication).
+
+    Uses a fresh httpx client with native cookie-jar so cookies from
+    fc.yahoo.com are automatically forwarded to the crumb and quoteSummary
+    endpoints.
 
     Parameters
     ----------
@@ -381,50 +347,66 @@ async def fetch_company_metadata(ticker: str) -> dict[str, Any]:
 
     Returns
     -------
-    dict with keys: company, sector, industry, description, website, employees.
+    dict with keys: sector, industry, description, website, employees.
     On failure returns dict with 'error' key.
     """
+    import httpx as _httpx
+
     yahoo_ticker = f"{ticker}.AX"
 
-    client = _get_http_client()
-    try:
-        # Get crumb + cookies (required for quoteSummary)
-        crumb, cookies = await _get_yahoo_crumb()
-        cookie_header = "; ".join(f"{k}={v}" for k, v in cookies.items())
+    # Use a fresh client with its own cookie jar — the shared client doesn't
+    # persist cookies, which breaks the crumb flow.
+    async with _httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
+        try:
+            # Step 1 — hit fc.yahoo.com to seed the cookie jar (A3 cookie)
+            await client.get("https://fc.yahoo.com/", headers=YAHOO_HEADERS)
 
-        url = f"https://query1.finance.yahoo.com/v10/finance/quoteSummary/{yahoo_ticker}"
-        params = {"modules": "assetProfile", "crumb": crumb}
-        headers = {**YAHOO_HEADERS, "Cookie": cookie_header}
+            # Step 2 — fetch crumb (cookies forwarded automatically)
+            crumb_resp = await client.get(
+                "https://query2.finance.yahoo.com/v1/test/getcrumb",
+                headers=YAHOO_HEADERS,
+            )
+            crumb_resp.raise_for_status()
+            crumb = crumb_resp.text.strip()
 
-        resp = await client.get(url, params=params, headers=headers)
-        resp.raise_for_status()
-        data = resp.json()
+            if not crumb or "html" in crumb.lower():
+                raise ValueError(f"Invalid crumb response: {crumb[:100]}")
 
-        results = data.get("quoteSummary", {}).get("result", [])
-        if not results:
-            return {"error": f"No quoteSummary data for {ticker}"}
+            logger.info(f"[YahooCrumb] Got crumb for {ticker} ({len(crumb)} chars)")
 
-        profile = results[0].get("assetProfile", {})
+            # Step 3 — quoteSummary with crumb (cookies forwarded automatically)
+            url = f"https://query1.finance.yahoo.com/v10/finance/quoteSummary/{yahoo_ticker}"
+            params = {"modules": "assetProfile", "crumb": crumb}
 
-        # Company name — quoteSummary doesn't always include it, so we'll
-        # also try the chart endpoint's meta.shortName in the caller
-        sector = profile.get("sector", "")
-        industry = profile.get("industry", "")
-        description = profile.get("longBusinessSummary", "")
-        website = profile.get("website", "")
-        employees = profile.get("fullTimeEmployees")
+            resp = await client.get(url, params=params, headers=YAHOO_HEADERS)
+            resp.raise_for_status()
+            data = resp.json()
 
-        return {
-            "sector": sector,
-            "industry": industry,
-            "description": description[:500] if description else "",
-            "website": website,
-            "employees": employees,
-        }
+            results = data.get("quoteSummary", {}).get("result", [])
+            if not results:
+                return {"error": f"No quoteSummary data for {ticker}"}
 
-    except Exception as e:
-        logger.error(f"Yahoo quoteSummary error for {ticker}: {e}")
-        return {"error": str(e)}
+            profile = results[0].get("assetProfile", {})
+
+            sector = profile.get("sector", "")
+            industry = profile.get("industry", "")
+            description = profile.get("longBusinessSummary", "")
+            website = profile.get("website", "")
+            employees = profile.get("fullTimeEmployees")
+
+            logger.info(f"[YahooMeta] {ticker}: sector={sector}, industry={industry}")
+
+            return {
+                "sector": sector,
+                "industry": industry,
+                "description": description[:500] if description else "",
+                "website": website,
+                "employees": employees,
+            }
+
+        except Exception as e:
+            logger.error(f"Yahoo quoteSummary error for {ticker}: {e}")
+            return {"error": str(e)}
 
 
 async def fetch_company_name(ticker: str) -> str | None:
