@@ -1,22 +1,22 @@
 {
   "summary": {
-    "runAt": "2026-03-02T06:09:33.403Z",
+    "runAt": "2026-03-02T08:00:52.882Z",
     "tickersAnalyzed": 24,
     "criticalDislocations": 15,
-    "highDislocations": 3,
+    "highDislocations": 4,
     "moderateDislocations": 3,
-    "normal": 3
+    "normal": 2
   },
   "results": {
     "WOW": {
       "ticker": "WOW",
       "dislocation": {
-        "severity": "NORMAL",
+        "severity": "MODERATE",
         "metrics": {
           "currentPrice": 36.68,
           "todayReturn": 1.89,
           "drawdownFromPeak": -8.3,
-          "zScore": 1.34,
+          "zScore": 1.84,
           "volumeRatio": 1.2
         },
         "pattern": "NORMAL"
@@ -31,16 +31,16 @@
         },
         "N2": {
           "longTerm": 35,
-          "shortTerm": 91.69999999999999,
-          "blended": 58,
-          "adjustment": 57,
+          "shortTerm": 95,
+          "blended": 59,
+          "adjustment": 113,
           "confidence": "LOW"
         },
         "N3": {
           "longTerm": 30,
-          "shortTerm": 77.25,
-          "blended": 49,
-          "adjustment": 47,
+          "shortTerm": 95,
+          "blended": 56,
+          "adjustment": 95,
           "confidence": "LOW"
         },
         "N4": {
@@ -59,10 +59,38 @@
         "reasoning": ""
       },
       "narrativeShift": {
-        "hasShift": false,
-        "shortTermView": "Consistent with research thesis",
-        "longTermView": "No material change",
-        "commentary": ""
+        "hasShift": true,
+        "shortTermView": "MODERATE: Price action suggests growing attention to Structural Margin Erosion. Research thesis not yet invalidated but under pressure.",
+        "longTermView": "Research-market divergence in Regulatory Squeeze (65pts), Structural Margin Erosion (60pts), Managed Turnaround (18.9pts), Competitive Disruption (18.9pts). All hypotheses show divergence.",
+        "commentary": "",
+        "divergences": [
+          {
+            "tier": "N3",
+            "name": "Regulatory Squeeze",
+            "gap": 65,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "N2",
+            "name": "Structural Margin Erosion",
+            "gap": 60,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "N1",
+            "name": "Managed Turnaround",
+            "gap": 18.9,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "N4",
+            "name": "Competitive Disruption",
+            "gap": 18.9,
+            "direction": "market discounting"
+          }
+        ],
+        "maxDivergence": 65,
+        "regimeChangeRisk": true
       },
       "hypothesisNames": {
         "N1": "Managed Turnaround",
@@ -84,7 +112,7 @@
           "currentPrice": 79.97,
           "todayReturn": -3.81,
           "drawdownFromPeak": -46.7,
-          "zScore": -3.85,
+          "zScore": -3.11,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -180,7 +208,7 @@
           "currentPrice": 45.29,
           "todayReturn": -4.73,
           "drawdownFromPeak": -43.4,
-          "zScore": -4.14,
+          "zScore": -3.66,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -276,7 +304,7 @@
           "currentPrice": 3.86,
           "todayReturn": 6.63,
           "drawdownFromPeak": -22.8,
-          "zScore": 5.35,
+          "zScore": 6.67,
           "volumeRatio": 2.5
         },
         "pattern": "STEADY_DECLINE"
@@ -372,7 +400,7 @@
           "currentPrice": 125.62,
           "todayReturn": -3.37,
           "drawdownFromPeak": -62.6,
-          "zScore": -2.77,
+          "zScore": -3.34,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -468,7 +496,7 @@
           "currentPrice": 19.14,
           "todayReturn": -0.83,
           "drawdownFromPeak": -36.2,
-          "zScore": -0.8,
+          "zScore": -0.67,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -564,7 +592,7 @@
           "currentPrice": 147.3,
           "todayReturn": 0.37,
           "drawdownFromPeak": -50.9,
-          "zScore": 0.49,
+          "zScore": -0.46,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -660,7 +688,7 @@
           "currentPrice": 199.86,
           "todayReturn": -6.38,
           "drawdownFromPeak": -20.1,
-          "zScore": -6.41,
+          "zScore": -5.43,
           "volumeRatio": 2.5
         },
         "pattern": "GAP_DOWN"
@@ -756,7 +784,7 @@
           "currentPrice": 28.87,
           "todayReturn": -0.24,
           "drawdownFromPeak": -17.5,
-          "zScore": -0.19,
+          "zScore": -0.01,
           "volumeRatio": 1.2
         },
         "pattern": "STEADY_DECLINE"
@@ -852,7 +880,7 @@
           "currentPrice": 30.24,
           "todayReturn": 6.82,
           "drawdownFromPeak": -13.6,
-          "zScore": 5.66,
+          "zScore": 6.48,
           "volumeRatio": 2.5
         },
         "pattern": "NORMAL"
@@ -948,7 +976,7 @@
           "currentPrice": 2.75,
           "todayReturn": -3.17,
           "drawdownFromPeak": -45,
-          "zScore": -3.08,
+          "zScore": -2.53,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -1044,7 +1072,7 @@
           "currentPrice": 20.5,
           "todayReturn": -3.03,
           "drawdownFromPeak": -18,
-          "zScore": -2.3,
+          "zScore": -2.18,
           "volumeRatio": 1.2
         },
         "pattern": "STEADY_DECLINE"
@@ -1140,7 +1168,7 @@
           "currentPrice": 6.68,
           "todayReturn": -0.45,
           "drawdownFromPeak": -44.3,
-          "zScore": -0.55,
+          "zScore": -0.29,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -1236,7 +1264,7 @@
           "currentPrice": 47.62,
           "todayReturn": -2.86,
           "drawdownFromPeak": 0.8,
-          "zScore": -2.35,
+          "zScore": -2.9,
           "volumeRatio": 1.2
         },
         "pattern": "NORMAL"
@@ -1327,12 +1355,12 @@
     "BHP": {
       "ticker": "BHP",
       "dislocation": {
-        "severity": "MODERATE",
+        "severity": "NORMAL",
         "metrics": {
           "currentPrice": 59.25,
           "todayReturn": 1.44,
           "drawdownFromPeak": 13.1,
-          "zScore": 1.7,
+          "zScore": 1.13,
           "volumeRatio": 1.2
         },
         "pattern": "NORMAL"
@@ -1347,17 +1375,17 @@
         },
         "N2": {
           "longTerm": 35,
-          "shortTerm": 95,
-          "blended": 59,
-          "adjustment": 86,
+          "shortTerm": 78.19999999999999,
+          "blended": 52,
+          "adjustment": 43,
           "confidence": "LOW"
         },
         "N3": {
           "longTerm": 30,
-          "shortTerm": 95,
-          "blended": 56,
-          "adjustment": 72,
-          "confidence": "LOW"
+          "shortTerm": 66,
+          "blended": 44,
+          "adjustment": 36,
+          "confidence": "MEDIUM"
         },
         "N4": {
           "longTerm": 35,
@@ -1375,38 +1403,10 @@
         "reasoning": ""
       },
       "narrativeShift": {
-        "hasShift": true,
-        "shortTermView": "MODERATE: Price action suggests growing attention to Base Case/Compression. Research thesis not yet invalidated but under pressure.",
-        "longTermView": "Research-market divergence in Risk/Downside (65pts), Base Case/Compression (60pts). Growth/Recovery, Disruption/Catalyst remain aligned.",
-        "commentary": "",
-        "divergences": [
-          {
-            "tier": "N3",
-            "name": "Risk/Downside",
-            "gap": 65,
-            "direction": "market elevated"
-          },
-          {
-            "tier": "N2",
-            "name": "Base Case/Compression",
-            "gap": 60,
-            "direction": "market elevated"
-          },
-          {
-            "tier": "N1",
-            "name": "Growth/Recovery",
-            "gap": 14.399999999999999,
-            "direction": "market discounting"
-          },
-          {
-            "tier": "N4",
-            "name": "Disruption/Catalyst",
-            "gap": 14.399999999999999,
-            "direction": "market discounting"
-          }
-        ],
-        "maxDivergence": 65,
-        "regimeChangeRisk": true
+        "hasShift": false,
+        "shortTermView": "Consistent with research thesis",
+        "longTermView": "No material change",
+        "commentary": ""
       },
       "hypothesisNames": {
         "N1": "Growth/Recovery",
@@ -1428,7 +1428,7 @@
           "currentPrice": 1.15,
           "todayReturn": 0.88,
           "drawdownFromPeak": -23.8,
-          "zScore": 1.08,
+          "zScore": 0.85,
           "volumeRatio": 1.2
         },
         "pattern": "STEADY_DECLINE"
@@ -1524,7 +1524,7 @@
           "currentPrice": 12.78,
           "todayReturn": -1.16,
           "drawdownFromPeak": -44.2,
-          "zScore": -0.85,
+          "zScore": -0.9,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -1620,7 +1620,7 @@
           "currentPrice": 1.13,
           "todayReturn": 3.67,
           "drawdownFromPeak": -52.5,
-          "zScore": 3.23,
+          "zScore": 2.99,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -1716,7 +1716,7 @@
           "currentPrice": 173.49,
           "todayReturn": -0.65,
           "drawdownFromPeak": 1.9,
-          "zScore": -0.35,
+          "zScore": -0.63,
           "volumeRatio": 1.2
         },
         "pattern": "NORMAL"
@@ -1779,12 +1779,12 @@
     "RIO": {
       "ticker": "RIO",
       "dislocation": {
-        "severity": "NORMAL",
+        "severity": "MODERATE",
         "metrics": {
           "currentPrice": 169.44,
           "todayReturn": 1.26,
           "drawdownFromPeak": 42.8,
-          "zScore": 0.92,
+          "zScore": 1.65,
           "volumeRatio": 1.2
         },
         "pattern": "STEADY_DECLINE"
@@ -1799,17 +1799,17 @@
         },
         "N2": {
           "longTerm": 40,
-          "shortTerm": 77.8,
-          "blended": 55,
-          "adjustment": 38,
-          "confidence": "MEDIUM"
+          "shortTerm": 95,
+          "blended": 62,
+          "adjustment": 76,
+          "confidence": "LOW"
         },
         "N3": {
           "longTerm": 35,
-          "shortTerm": 66.5,
-          "blended": 48,
-          "adjustment": 32,
-          "confidence": "MEDIUM"
+          "shortTerm": 95,
+          "blended": 59,
+          "adjustment": 63,
+          "confidence": "LOW"
         },
         "N4": {
           "longTerm": 30,
@@ -1827,10 +1827,38 @@
         "reasoning": "Severe drawdown (-42.81%) from peak indicates narrative regime change"
       },
       "narrativeShift": {
-        "hasShift": false,
-        "shortTermView": "Consistent with research thesis",
-        "longTermView": "No material change",
-        "commentary": ""
+        "hasShift": true,
+        "shortTermView": "MODERATE: Price action suggests growing attention to Energy Transition Portfolio. Research thesis not yet invalidated but under pressure.",
+        "longTermView": "Research-market divergence in China Demand Slowdown (60pts), Energy Transition Portfolio (55pts). Iron Ore Cash Generation, Growth Capex Risk remain aligned.",
+        "commentary": "",
+        "divergences": [
+          {
+            "tier": "N3",
+            "name": "China Demand Slowdown",
+            "gap": 60,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "N2",
+            "name": "Energy Transition Portfolio",
+            "gap": 55,
+            "direction": "market elevated"
+          },
+          {
+            "tier": "N1",
+            "name": "Iron Ore Cash Generation",
+            "gap": 12.600000000000001,
+            "direction": "market discounting"
+          },
+          {
+            "tier": "N4",
+            "name": "Growth Capex Risk",
+            "gap": 12.600000000000001,
+            "direction": "market discounting"
+          }
+        ],
+        "maxDivergence": 60,
+        "regimeChangeRisk": true
       },
       "hypothesisNames": {
         "N1": "Iron Ore Cash Generation",
@@ -1852,7 +1880,7 @@
           "currentPrice": 11.3,
           "todayReturn": -0.35,
           "drawdownFromPeak": -36.2,
-          "zScore": -0.35,
+          "zScore": -0.84,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -1943,12 +1971,12 @@
     "MIN": {
       "ticker": "MIN",
       "dislocation": {
-        "severity": "MODERATE",
+        "severity": "HIGH",
         "metrics": {
           "currentPrice": 59.7,
           "todayReturn": -2.1,
           "drawdownFromPeak": -6.7,
-          "zScore": -1.99,
+          "zScore": -2.57,
           "volumeRatio": 1.2
         },
         "pattern": "NORMAL"
@@ -1965,14 +1993,14 @@
           "longTerm": 35,
           "shortTerm": 95,
           "blended": 59,
-          "adjustment": 189,
+          "adjustment": 284,
           "confidence": "LOW"
         },
         "N3": {
           "longTerm": 30,
           "shortTerm": 95,
           "blended": 56,
-          "adjustment": 105,
+          "adjustment": 158,
           "confidence": "LOW"
         },
         "N4": {
@@ -1992,9 +2020,9 @@
       },
       "narrativeShift": {
         "hasShift": true,
-        "shortTermView": "MODERATE: Price action suggests growing attention to Base Case/Compression. Research thesis not yet invalidated but under pressure.",
+        "shortTermView": "HIGH: 2.1% move with 7% drawdown signals elevated concern around Base Case/Compression. Watch for acceleration or reversal.",
         "longTermView": "Research-market divergence in Risk/Downside (65pts), Base Case/Compression (60pts), Growth/Recovery (21pts), Disruption/Catalyst (21pts). All hypotheses show divergence.",
-        "commentary": "",
+        "commentary": "The 7% drawdown from peak is not matched by the static research thesis weights. The 65-point spread in Risk/Downside between research (30%) and market-implied (95%) views indicates the market is pricing a narrative regime shift that the long-term thesis has not yet incorporated. Action: Accelerate review cycle.",
         "divergences": [
           {
             "tier": "N3",
@@ -2044,7 +2072,7 @@
           "currentPrice": 7.21,
           "todayReturn": 6.66,
           "drawdownFromPeak": -10.5,
-          "zScore": 5.78,
+          "zScore": 6.46,
           "volumeRatio": 2.5
         },
         "pattern": "NORMAL"
@@ -2140,7 +2168,7 @@
           "currentPrice": 165.8,
           "todayReturn": -0.35,
           "drawdownFromPeak": -37,
-          "zScore": -0.6,
+          "zScore": -0.81,
           "volumeRatio": 1.2
         },
         "pattern": "DISTRIBUTION"
@@ -2229,5 +2257,5 @@
       }
     }
   },
-  "generatedAt": "2026-03-02T06:09:33.411Z"
+  "generatedAt": "2026-03-02T08:00:52.888Z"
 }
