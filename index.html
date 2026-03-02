@@ -7571,7 +7571,7 @@ function initNarrativeTimelineChart(ticker) {
     if (loading) loading.style.display = 'none';
     canvasCheck.style.display = 'block';
 
-    if (!histData || !histData.history || histData.history.length < 2) {
+    if (!histData || !histData.entries || histData.entries.length < 2) {
       // Not enough data  --  show empty state
       var wrap = document.getElementById('nt-wrap-' + ticker);
       if (wrap) {
@@ -7580,7 +7580,7 @@ function initNarrativeTimelineChart(ticker) {
       return;
     }
 
-    var history = histData.history;
+    var history = histData.entries;
     var flips = histData.flips || [];
 
     // Extract labels (dates) and datasets
