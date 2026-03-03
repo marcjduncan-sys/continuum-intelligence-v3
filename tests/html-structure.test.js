@@ -104,7 +104,7 @@ describe('Route Validation', () => {
   test('VALID_STATIC_PAGES allowlist exists', () => {
     expect(html).toContain('VALID_STATIC_PAGES');
     expect(html).toContain("'home'");
-    expect(html).toContain("'snapshots'");
+    expect(html).toContain("'deep-research'");
     expect(html).toContain("'portfolio'");
     expect(html).toContain("'about'");
   });

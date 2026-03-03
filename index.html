@@ -3757,11 +3757,11 @@ a:hover { color: var(--accent-sage); }
 /* #page-home .skew-bar-bear { } */
 /* #page-home .skew-score { } */
 
-/* --- Snapshots Page Scoped Overrides --- */
-/* #page-snapshots .hero { } */
-/* #page-snapshots .hero-title { } */
-/* #page-snapshots .hero-subtitle { } */
-/* #page-snapshots .site-footer { } */
+/* --- Deep Research Page Scoped Overrides --- */
+/* #page-deep-research .hero { } */
+/* #page-deep-research .hero-title { } */
+/* #page-deep-research .hero-subtitle { } */
+/* #page-deep-research .site-footer { } */
 
 /* --- Portfolio Page Scoped Overrides --- */
 /* #page-portfolio .hero { } */
@@ -3786,8 +3786,8 @@ a:hover { color: var(--accent-sage); }
     padding: 20px 0 !important;
 }
 
-/* Snapshot container is a wrapper  --  grid is on .snap-grid child */
-#snapshot-container {
+/* Deep Research container is a wrapper  --  grid is on child */
+#deep-research-container {
     width: 100%;
     padding: 20px 0;
 }
@@ -3826,6 +3826,87 @@ a:hover { color: var(--accent-sage); }
 .snapshot-card .sc-meta-value { font-family: var(--font-data); font-weight: 600; color: var(--text-secondary); }
 .snapshot-card .sc-skew { margin-top: var(--space-md); padding-top: var(--space-sm); border-top: 1px solid var(--border); display: flex; align-items: center; gap: var(--space-sm); }
 .snapshot-card .sc-skew-rationale { font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* ============================================================
+   DEEP RESEARCH  --  Listing Page Tiles
+   ============================================================ */
+.dr-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+    padding: 20px 0;
+}
+@media (max-width: 1024px) { .dr-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .dr-grid { grid-template-columns: 1fr; } }
+
+.dr-tile {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border);
+    border-radius: 6px;
+    padding: var(--space-lg);
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+.dr-tile:hover { border-color: var(--accent-teal); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.dr-tile:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
+.dr-tile.dr-skew-downside { border-left-color: var(--signal-red); }
+.dr-tile.dr-skew-upside   { border-left-color: var(--signal-green); }
+.dr-tile.dr-skew-balanced  { border-left-color: var(--signal-amber); }
+
+/* Header row: ticker + company on left, skew badge on right */
+.dr-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-sm); }
+.dr-ticker { font-family: var(--font-data); font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); }
+.dr-company { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
+.dr-sector { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-teal); background: rgba(26,158,143,0.12); padding: 2px 7px; border-radius: 3px; display: inline-block; margin-top: 4px; }
+
+/* Skew badge */
+.dr-skew-badge { font-family: var(--font-data); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
+.dr-skew-badge.badge-downside { color: var(--signal-red); background: rgba(220,53,69,0.1); }
+.dr-skew-badge.badge-upside   { color: var(--signal-green); background: rgba(40,167,69,0.1); }
+.dr-skew-badge.badge-balanced  { color: var(--signal-amber); background: rgba(255,193,7,0.1); }
+
+/* Thesis excerpt: the visual centrepiece */
+.dr-thesis {
+    font-family: var(--font-narrative);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Hypothesis weight bars */
+.dr-hyp-bars { display: flex; height: 6px; border-radius: 3px; overflow: hidden; gap: 2px; margin-top: auto; }
+.dr-hyp-seg { height: 100%; border-radius: 2px; min-width: 4px; transition: width 0.3s ease; }
+.dr-hyp-seg.seg-upside   { background: var(--signal-green); }
+.dr-hyp-seg.seg-downside  { background: var(--signal-red); }
+.dr-hyp-seg.seg-neutral   { background: var(--signal-amber); }
+
+/* Hypothesis legend (small labels beneath the bar) */
+.dr-hyp-legend { display: flex; gap: var(--space-sm); flex-wrap: wrap; margin-top: 4px; }
+.dr-hyp-label { font-family: var(--font-data); font-size: 0.58rem; color: var(--text-muted); display: flex; align-items: center; gap: 3px; }
+.dr-hyp-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+/* Footer row: evidence coverage + next catalyst */
+.dr-footer { display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-sm); border-top: 1px solid var(--border); margin-top: var(--space-sm); gap: var(--space-sm); }
+.dr-evidence { font-family: var(--font-data); font-size: 0.65rem; font-weight: 600; color: var(--text-muted); }
+.dr-evidence-count { color: var(--accent-teal); }
+.dr-catalyst { font-size: 0.65rem; color: var(--text-muted); text-align: right; }
+.dr-catalyst-event { font-weight: 600; color: var(--text-secondary); }
+
+/* Sort controls */
+.dr-sort-controls { display: flex; gap: var(--space-sm); margin-bottom: var(--space-md); flex-wrap: wrap; }
+.dr-sort-btn { font-family: var(--font-data); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 5px 12px; border: 1px solid var(--border); border-radius: 4px; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+.dr-sort-btn:hover { border-color: var(--accent-teal); color: var(--text-primary); }
+.dr-sort-btn.active { border-color: var(--accent-teal); color: var(--accent-teal); background: rgba(26,158,143,0.08); }
 
 /* --- Snapshot Report Page --- */
 .snap-page { max-width: 1240px; margin: 0 auto; padding: var(--space-md); }
@@ -4805,7 +4886,7 @@ a:hover { color: var(--accent-sage); }
         </a>
         <div class="nav-links">
             <a href="#home" class="active" data-nav="home">Research</a>
-            <a href="#snapshots" data-nav="snapshots">Snapshots</a>
+            <a href="#deep-research" data-nav="deep-research">Deep Research</a>
             <a href="#portfolio" data-nav="portfolio">Portfolio</a>
             <a href="#comparator" data-nav="comparator">Comparator</a>
             <a href="#personalisation" data-nav="personalisation">Personalisation</a>
@@ -5011,17 +5092,17 @@ a:hover { color: var(--accent-sage); }
 </div>
 
 <!-- ============================================================
-     PAGE: SNAPSHOTS
+     PAGE: DEEP RESEARCH
      ============================================================ -->
-<div class="page" id="page-snapshots">
+<div class="page" id="page-deep-research">
     <div class="page-inner">
         <div class="hero" style="text-align:left; padding-bottom: var(--space-lg);">
-            <div class="hero-tagline">Investment Snapshots</div>
-            <h1 class="hero-title" style="font-size:1.6rem">One-page evidence summaries</h1>
-            <p class="hero-subtitle" style="text-align:left; margin:0; max-width: none;">Each snapshot condenses a full Continuum research report into a single landscape view: hypotheses, evidence matrix, discriminating data, and tripwires at a glance.</p>
+            <div class="hero-tagline">Deep Research</div>
+            <h1 class="hero-title" style="font-size:1.6rem">Evidence-driven research in depth</h1>
+            <p class="hero-subtitle" style="text-align:left; margin:0; max-width: none;">Each deep research page condenses a full Continuum report into a single landscape view: hypotheses, evidence matrix, discriminating data, and tripwires.</p>
         </div>
 
-        <div id="snapshot-container"></div>
+        <div id="deep-research-container"></div>
     </div>
 
     <footer class="site-footer" role="contentinfo">
@@ -8555,7 +8636,7 @@ function renderSnapshotPage(data) {
   }
 
   return '<div class="snap-page">' +
-    '<a class="snap-back" href="#snapshots" onclick="navigate(\'snapshots\')">&larr; Back to Snapshots</a>' +
+    '<a class="snap-back" href="#deep-research" onclick="navigate(\'deep-research\')">&larr; Back to Deep Research</a>' +
     '<a class="snap-view-full" href="#report-' + data.ticker + '" onclick="navigate(\'report-' + data.ticker + '\')" style="float:right;margin-top:4px">View Full Report &rarr;</a>' +
     '<div class="snap-header">' +
       '<div class="snap-header-left">' +
@@ -10113,7 +10194,7 @@ const COMING_SOON = [
 
 /* --- Hash Router --- */
 // Valid static pages for route validation
-const VALID_STATIC_PAGES = new Set(['home', 'snapshots', 'portfolio', 'comparator', 'personalisation', 'about']);
+const VALID_STATIC_PAGES = new Set(['home', 'deep-research', 'portfolio', 'comparator', 'personalisation', 'about']);
 
 function navigate(page) {
     window.location.hash = page;
@@ -10271,7 +10352,7 @@ function route() {
     document.querySelectorAll('.nav-links a').forEach(a => {
         a.classList.remove('active');
         a.removeAttribute('aria-current');
-        if (a.dataset.nav === hash || (hash.startsWith('report-') && a.dataset.nav === 'home') || (hash.startsWith('snapshot-') && a.dataset.nav === 'snapshots')) {
+        if (a.dataset.nav === hash || (hash.startsWith('report-') && a.dataset.nav === 'home') || (hash.startsWith('snapshot-') && a.dataset.nav === 'deep-research')) {
             a.classList.add('active');
             a.setAttribute('aria-current', 'page');
         }
@@ -10302,9 +10383,9 @@ window.addEventListener('hashchange', function() {
         var t = hash.replace('report-', '');
         pageName = STOCK_DATA[t] ? STOCK_DATA[t].company + ' Research Report' : t + ' Report';
     } else if (hash.startsWith('snapshot-')) {
-        pageName = hash.replace('snapshot-', '') + ' Snapshot';
+        pageName = hash.replace('snapshot-', '') + ' Deep Research';
     } else {
-        var names = { home: 'Research Home', snapshots: 'Investment Snapshots', portfolio: 'Portfolio Intelligence', comparator: 'Investment Thesis Comparator', personalisation: 'Personalisation', about: 'About' };
+        var names = { home: 'Research Home', 'deep-research': 'Deep Research', portfolio: 'Portfolio Intelligence', comparator: 'Investment Thesis Comparator', personalisation: 'Personalisation', about: 'About' };
         pageName = names[hash] || hash;
     }
     announcePageChange('Navigated to ' + pageName);
@@ -13959,11 +14040,245 @@ function buildRetailHTML(stock) {
 <!-- Narrative Framework v2.0  --  Dislocation Alerts & Dynamic Weights -->
 <script src="scripts/narrative-framework-integration.js"></script>
 <script src="js/personalisation.js"></script>
-<!-- Snapshot Generator v2  --  runs after NFI + personalisation -->
-<script src="scripts/snapshot-generator.js"></script>
+<!-- Deep Research listing  --  runs after NFI + personalisation -->
+<!-- snapshot-generator.js disabled: listing page rebuilt as Deep Research tiles -->
+<!-- <script src="scripts/snapshot-generator.js"></script> -->
 <script>
+(function(global) {
+  'use strict';
+
+  // Stocks with completed deep research — add tickers here as new reports are produced
+  var DEEP_RESEARCH_TICKERS = ['RMC'];
+
+  var SECTOR_ORDER = ['Consumer Staples','Consumer Discretionary','Financials','Health Care',
+    'Information Technology','Industrials','Materials','Energy','Real Estate','Communication Services'];
+
+  function stripHtml(html) {
+    var tmp = document.createElement('div');
+    tmp.innerHTML = html || '';
+    return tmp.textContent || tmp.innerText || '';
+  }
+
+  function truncate(text, maxLen) {
+    if (!text || text.length <= maxLen) return text || '';
+    var cut = text.lastIndexOf(' ', maxLen);
+    if (cut < maxLen * 0.6) cut = maxLen;
+    return text.substring(0, cut) + '\u2026';
+  }
+
+  function escHtml(s) {
+    return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function extractTileData(ticker) {
+    var sd = (typeof STOCK_DATA !== 'undefined') ? STOCK_DATA[ticker] : null;
+    if (!sd) return null;
+
+    var company = sd.company || ticker;
+    var sector = sd.sector || '';
+    var sectorSub = sd.sectorSub || '';
+
+    // Thesis excerpt: use verdict text (strip HTML), fall back to featuredRationale
+    var thesisRaw = '';
+    if (sd.verdict && sd.verdict.text) thesisRaw = stripHtml(sd.verdict.text);
+    else if (sd.featuredRationale) thesisRaw = sd.featuredRationale;
+    var thesis = truncate(thesisRaw, 220);
+
+    // Skew direction
+    var skewDir = 'balanced';
+    if (sd.skew && sd.skew.direction) skewDir = sd.skew.direction.toLowerCase();
+    if (skewDir !== 'upside' && skewDir !== 'downside') skewDir = 'balanced';
+
+    // Hypothesis scores for weight bars
+    var hyps = [];
+    if (sd.hypotheses && Array.isArray(sd.hypotheses)) {
+      for (var i = 0; i < sd.hypotheses.length; i++) {
+        var h = sd.hypotheses[i];
+        hyps.push({
+          label: h.title || ('N' + (i+1)),
+          score: parseInt(h.score, 10) || 0,
+          direction: (h.direction || 'neutral').toLowerCase()
+        });
+      }
+    } else if (sd.verdict && sd.verdict.scores) {
+      for (var j = 0; j < sd.verdict.scores.length; j++) {
+        var vs = sd.verdict.scores[j];
+        hyps.push({
+          label: vs.label || ('N' + (j+1)),
+          score: parseInt(vs.score, 10) || 0,
+          direction: vs.scoreColor === 'var(--signal-green)' ? 'upside' : vs.scoreColor === 'var(--signal-red)' ? 'downside' : 'neutral'
+        });
+      }
+    }
+
+    // Evidence domain count (only available if full research loaded)
+    var evidenceCount = null;
+    if (sd.evidence && sd.evidence.cards) evidenceCount = sd.evidence.cards.length;
+
+    // Hypothesis count
+    var hypCount = hyps.length || 4;
+
+    // Next decision point
+    var nextEvent = null;
+    var nextDate = null;
+    if (sd.hero && sd.hero.next_decision_point) {
+      nextEvent = sd.hero.next_decision_point.event || null;
+      nextDate = sd.hero.next_decision_point.date || null;
+    }
+
+    // Footer disclaimer count
+    var domainCount = null;
+    if (sd.footer && sd.footer.domainCount) domainCount = sd.footer.domainCount;
+
+    return {
+      ticker: ticker,
+      company: company,
+      sector: sector,
+      sectorSub: sectorSub,
+      thesis: thesis,
+      skewDir: skewDir,
+      hyps: hyps,
+      hypCount: hypCount,
+      evidenceCount: evidenceCount,
+      domainCount: domainCount,
+      nextEvent: nextEvent,
+      nextDate: nextDate
+    };
+  }
+
+  function renderTile(d) {
+    // Skew badge
+    var badgeCls = 'badge-' + d.skewDir;
+    var badgeText = d.skewDir === 'downside' ? 'Downside' : d.skewDir === 'upside' ? 'Upside' : 'Balanced';
+
+    // Hypothesis bars
+    var barHtml = '';
+    var legendHtml = '';
+    var totalScore = 0;
+    for (var i = 0; i < d.hyps.length; i++) totalScore += d.hyps[i].score;
+    if (totalScore === 0) totalScore = 100;
+    for (var j = 0; j < d.hyps.length; j++) {
+      var h = d.hyps[j];
+      var pct = Math.round((h.score / totalScore) * 100);
+      var segCls = h.direction === 'upside' ? 'seg-upside' : h.direction === 'downside' ? 'seg-downside' : 'seg-neutral';
+      var dotColor = h.direction === 'upside' ? 'var(--signal-green)' : h.direction === 'downside' ? 'var(--signal-red)' : 'var(--signal-amber)';
+      barHtml += '<div class="dr-hyp-seg ' + segCls + '" style="width:' + pct + '%"></div>';
+      legendHtml += '<span class="dr-hyp-label"><span class="dr-hyp-dot" style="background:' + dotColor + '"></span>' + escHtml(h.label) + ' ' + h.score + '%</span>';
+    }
+
+    // Evidence line
+    var evidenceHtml = '';
+    if (d.domainCount) {
+      evidenceHtml = '<span class="dr-evidence"><span class="dr-evidence-count">' + escHtml(d.domainCount) + '</span> domains &bull; ' + d.hypCount + ' hypotheses</span>';
+    } else if (d.evidenceCount) {
+      evidenceHtml = '<span class="dr-evidence"><span class="dr-evidence-count">' + d.evidenceCount + '/10</span> domains &bull; ' + d.hypCount + ' hypotheses</span>';
+    } else {
+      evidenceHtml = '<span class="dr-evidence">' + d.hypCount + ' hypotheses</span>';
+    }
+
+    // Catalyst line
+    var catalystHtml = '';
+    if (d.nextEvent && d.nextDate) {
+      catalystHtml = '<span class="dr-catalyst"><span class="dr-catalyst-event">' + escHtml(d.nextEvent) + '</span> &bull; ' + escHtml(d.nextDate) + '</span>';
+    }
+
+    return '<div class="dr-tile dr-skew-' + d.skewDir + '" tabindex="0" role="link" ' +
+      'onclick="navigate(\'report-' + d.ticker + '\')" ' +
+      'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + d.ticker + '\')}">' +
+      '<div class="dr-header">' +
+        '<div>' +
+          '<div class="dr-ticker">' + escHtml(d.ticker) + '</div>' +
+          '<div class="dr-company">' + escHtml(d.company) + '</div>' +
+          (d.sector ? '<span class="dr-sector">' + escHtml(d.sector) + (d.sectorSub ? ' &bull; ' + escHtml(d.sectorSub) : '') + '</span>' : '') +
+        '</div>' +
+        '<span class="dr-skew-badge ' + badgeCls + '">' + badgeText + '</span>' +
+      '</div>' +
+      '<div class="dr-thesis">' + escHtml(d.thesis) + '</div>' +
+      '<div class="dr-hyp-bars">' + barHtml + '</div>' +
+      '<div class="dr-hyp-legend">' + legendHtml + '</div>' +
+      '<div class="dr-footer">' + evidenceHtml + catalystHtml + '</div>' +
+    '</div>';
+  }
+
+  function generateTiles(containerId, sortBy) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Collect tile data — only stocks in the curated deep research list
+    var tiles = [];
+    for (var i = 0; i < DEEP_RESEARCH_TICKERS.length; i++) {
+      var t = DEEP_RESEARCH_TICKERS[i];
+      if (!STOCK_DATA || !STOCK_DATA[t]) continue;
+      var d = extractTileData(t);
+      if (d) tiles.push(d);
+    }
+
+    // Sort
+    sortBy = sortBy || 'ticker';
+    if (sortBy === 'ticker') {
+      tiles.sort(function(a, b) { return a.ticker.localeCompare(b.ticker); });
+    } else if (sortBy === 'sector') {
+      tiles.sort(function(a, b) {
+        var ai = SECTOR_ORDER.indexOf(a.sector); if (ai < 0) ai = 99;
+        var bi = SECTOR_ORDER.indexOf(b.sector); if (bi < 0) bi = 99;
+        if (ai !== bi) return ai - bi;
+        return a.ticker.localeCompare(b.ticker);
+      });
+    } else if (sortBy === 'skew') {
+      var skewRank = { downside: 0, balanced: 1, upside: 2 };
+      tiles.sort(function(a, b) {
+        var sa = skewRank[a.skewDir] !== undefined ? skewRank[a.skewDir] : 1;
+        var sb = skewRank[b.skewDir] !== undefined ? skewRank[b.skewDir] : 1;
+        if (sa !== sb) return sa - sb;
+        return a.ticker.localeCompare(b.ticker);
+      });
+    }
+
+    // Render grid
+    var gridEl = container.querySelector('.dr-grid');
+    if (!gridEl) return;
+    var html = '';
+    for (var j = 0; j < tiles.length; j++) html += renderTile(tiles[j]);
+    gridEl.innerHTML = html;
+
+    console.log('[DeepResearch] Rendered ' + tiles.length + ' tiles (sorted by ' + sortBy + ')');
+  }
+
+  function initDeepResearch(containerId) {
+    console.log('[DeepResearch] Initialising #' + containerId + '...');
+    var container = document.getElementById(containerId);
+    if (!container) { console.warn('[DeepResearch] Container not found'); return; }
+
+    // Build sort controls + grid wrapper
+    container.innerHTML =
+      '<div class="dr-sort-controls">' +
+        '<button class="dr-sort-btn active" data-sort="ticker">A&ndash;Z</button>' +
+        '<button class="dr-sort-btn" data-sort="sector">Sector</button>' +
+        '<button class="dr-sort-btn" data-sort="skew">Skew</button>' +
+      '</div>' +
+      '<div class="dr-grid"></div>';
+
+    // Wire sort buttons
+    var buttons = container.querySelectorAll('.dr-sort-btn');
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].addEventListener('click', function() {
+        var sortBy = this.getAttribute('data-sort');
+        for (var b = 0; b < buttons.length; b++) buttons[b].classList.remove('active');
+        this.classList.add('active');
+        generateTiles(containerId, sortBy);
+      });
+    }
+
+    // Generate initial tiles
+    generateTiles(containerId, 'ticker');
+    console.log('[DeepResearch] Initialisation complete');
+  }
+
+  global.initDeepResearch = initDeepResearch;
+})(window);
+
 window.addEventListener('load', function() {
-  setTimeout(function() { initSnapshots('snapshot-container'); }, 1500);
+  setTimeout(function() { initDeepResearch('deep-research-container'); }, 1500);
 });
 </script>
 
