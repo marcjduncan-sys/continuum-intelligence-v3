@@ -11,10 +11,10 @@
       "what_to_watch": "FY26 organic AUM growth vs PEXA sector data; NIM with RBA on hold.",
       "upside": "1.30x P/B on FY27 equity = A$1.41/share (21% upside).",
       "risk_plain": "Organic growth 4% vs 25.3% sector suggests franchise may not be durable.",
-      "survival_score": 0.32,
+      "survival_score": 0.38,
       "status": "LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-03T07:57:12.106Z"
+      "last_updated": "2026-03-03T21:59:00.293Z"
     },
     "N2": {
       "label": "Structural Narrowing",
@@ -23,10 +23,10 @@
       "what_to_watch": "NIM trajectory as rate-cut benefit stabilises; organic AUM growth vs sector.",
       "upside": null,
       "risk_plain": "0.72x P/B on FY27 equity = A$0.69/share (41% downside).",
-      "survival_score": 0.39,
+      "survival_score": 0.37,
       "status": "LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-03T07:57:12.106Z"
+      "last_updated": "2026-03-03T21:59:00.293Z"
     },
     "N3": {
       "label": "Capital Extraction",
@@ -35,10 +35,10 @@
       "what_to_watch": "FY26 dividend/buyback rate; related party transaction volumes; strategy disclosure.",
       "upside": null,
       "risk_plain": "0.55x P/B on FY27 equity = A$0.47/share (60% downside).",
-      "survival_score": 0.14,
+      "survival_score": 0.07,
       "status": "VERY_LOW",
       "weighted_inconsistency": 4.5,
-      "last_updated": "2026-03-03T07:57:12.106Z"
+      "last_updated": "2026-03-03T21:59:00.293Z"
     },
     "N4": {
       "label": "Strategic Renewal",
@@ -47,18 +47,26 @@
       "what_to_watch": "Strategy disclosure content; capital return programme changes; remuneration linkage.",
       "upside": "1.60x P/B on FY28 equity = A$2.05/share (75% upside).",
       "risk_plain": "Lowest probability; requires fundamental shift in capital allocation.",
-      "survival_score": 0.15,
+      "survival_score": 0.18,
       "status": "VERY_LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-03T07:57:12.106Z"
+      "last_updated": "2026-03-03T21:59:00.293Z"
     }
   },
-  "dominant": "N2",
+  "dominant": "N1",
   "confidence": "LOW",
   "alert_state": "NORMAL",
-  "current_price": 1.15,
+  "current_price": 1.16,
   "big_picture": "Resimac Group (ASX: RMC) -- non-bank mortgage lender trading 12.8% above evidence-weighted fair value of A$1.02. 1H26 inflection impressive but rate-driven. Organic AUM growth 4% vs 25.3% sector. WAIT for FY26 result August 2026.",
-  "last_flip": null,
+  "last_flip": {
+    "date": "2026-03-03",
+    "from": "N2",
+    "to": "N1",
+    "trigger": "Automated: survival score shift (Structural Narrowing → Cyclical Trough)",
+    "price_at_flip": 1.16,
+    "from_survival": 0.37,
+    "to_survival": 0.38
+  },
   "narrative_history": [],
   "evidence_items": [],
   "price_signals": [
@@ -187,7 +195,7 @@
     "method": "scenario_weighted_v3",
     "computed_at": "2026-03-02T00:00:00.000Z"
   },
-  "last_price_update": "2026-03-02T00:00:00.000Z",
+  "last_price_update": "2026-03-03T21:59:00.184Z",
   "technicalAnalysis": {
     "date": "2 March 2026",
     "period": "1 Year",
@@ -207,12 +215,18 @@
         "value": 1.02,
         "date": "2 Mar 2026"
       },
+      "crossover": {
+        "type": "Golden Cross",
+        "date": "w/c 24 February 2026",
+        "description": "50-day MA crossed above 200-day MA following the 18.9% single-day advance on 1H26 results. Price has pushed above both averages but the crossover is extremely recent and unconfirmed."
+      },
       "priceVsMa50": 10.5,
       "priceVsMa200": 13.7
     },
     "trend": {
       "direction": "Up (nascent)",
       "duration": "5 days (from 1H26 results)",
+      "structure": "Extended base formation from July 2024 (A$0.79 low) to February 2026, punctuated by a sharp rally from A$0.94 to A$1.17 over 5 trading days following the 1H26 result. Prior to the result, the stock had been in a gradual uptrend from the July 2024 trough, gaining 55.7% over 318 days to A$1.23 (October 2025) before consolidating. The 1H26 result triggered a single-day 18.9% advance on 5x average volume.",
       "peak": {
         "price": 1.24,
         "date": "October 2025"
@@ -226,11 +240,11 @@
     "keyLevels": {
       "support": {
         "price": 1.05,
-        "method": "50-day MA"
+        "method": "50-day MA and prior consolidation zone around A$1.00-1.05"
       },
       "resistance": {
         "price": 1.24,
-        "method": "October 2025 high"
+        "method": "October 2025 high and pre-FY24 levels"
       },
       "fiftyTwoWeekHigh": {
         "price": 1.24,
@@ -241,22 +255,90 @@
         "date": "July 2024"
       }
     },
+    "volume": {
+      "latestVs20DayAvg": 3.5,
+      "latestDate": "25 February 2026",
+      "priorSpikes": [
+        {
+          "period": "25 February 2026",
+          "ratio": 5,
+          "context": "1H26 results release: 18.9% single-day advance"
+        },
+        {
+          "period": "February 2025",
+          "ratio": 2.5,
+          "context": "1H25 results: 8.7% rally on forward-looking re-rating"
+        }
+      ]
+    },
+    "volatility": {
+      "latestDailyRange": {
+        "high": 1.19,
+        "low": 1.12,
+        "date": "28 February 2026"
+      },
+      "latestRangePercent": 6,
+      "avgDailyRangePercent30": 3.5,
+      "avgDailyRangePercent90": 2.8
+    },
     "meanReversion": {
       "vsMa50": 10.5,
       "vsMa200": 13.7,
       "rangePosition": 82,
       "rangeHigh": 1.24,
       "rangeLow": 0.79
+    },
+    "inflectionPoints": [
+      {
+        "date": "July 2024",
+        "price": 0.79,
+        "event": "Post-FY24 results trough; CEO resignation"
+      },
+      {
+        "date": "February 2025",
+        "price": 0.94,
+        "event": "1H25 results: forward-looking re-rating (+8.7%)"
+      },
+      {
+        "date": "October 2025",
+        "price": 1.23,
+        "event": "52-week high; 55.7% advance from July 2024 trough"
+      },
+      {
+        "date": "25 February 2026",
+        "price": 1.17,
+        "event": "1H26 results: 18.9% single-day advance on 5x volume"
+      }
+    ],
+    "relativePerformance": {
+      "vsIndex": {
+        "name": "S&P/ASX 200",
+        "period": "12 months",
+        "stockReturn": 24.5,
+        "indexReturn": 6.9,
+        "relativeReturn": 17.6
+      },
+      "vsSector": {
+        "name": "S&P/ASX 200 Financials",
+        "period": "12 months",
+        "stockReturn": 24.5,
+        "sectorReturn": 8,
+        "relativeReturn": 16.5
+      }
     }
   },
   "price_evidence": {
-    "last_run": "2026-03-03T07:57:12.106Z",
+    "last_run": "2026-03-03T21:59:00.293Z",
     "classification": "NOISE"
   },
   "freshness": {
     "urgency": 0,
     "status": "OK",
-    "badge": "ok"
+    "badge": "ok",
+    "pricePctChange": 0.9
   },
-  "last_research_update": "2026-03-03T07:57:12.106Z"
+  "last_research_update": "2026-03-03T21:59:00.293Z",
+  "priceHistory": [
+    1.16
+  ]
 }
