@@ -242,6 +242,8 @@ export function renderSkewBar(data) {
 export function renderVerdict(data) {
   var v = data.verdict;
   var borderStyle = v.borderColor ? ' style="border-color: ' + v.borderColor + '"' : '';
+  var skewDir = (data.skew && data.skew.direction) || '';
+  var vtCls = skewDir === 'upside' ? ' vt-positive' : skewDir === 'downside' ? ' vt-negative' : '';
   var norm = normaliseScores(v.scores);
 
   var scoresHtml = '';
@@ -258,7 +260,7 @@ export function renderVerdict(data) {
 
   return '<div class="verdict-section">' +
     '<div class="verdict-inner"' + borderStyle + '>' +
-      '<div class="verdict-text">' + v.text + '</div>' +
+      '<div class="verdict-text' + vtCls + '">' + v.text + '</div>' +
       '<div class="verdict-scores">' + scoresHtml + '</div>' +
     '</div>' +
   '</div>';
@@ -929,26 +931,25 @@ export function renderTechnicalAnalysis(data) {
   '</div>';
 
   var relHtml = '';
-  if (ta.relativePerformance && ta.relativePerformance.vsIndex) {
+  if (ta.relativePerformance) {
     var rp = ta.relativePerformance;
-    var relRows = '<tr>' +
+    relHtml = '<div class="rs-subtitle">Relative Performance (' + rp.vsIndex.period + ')</div>' +
+      '<table class="ta-rel-table"><thead><tr>' +
+        '<th>Benchmark</th><th>Stock Return</th><th>Benchmark Return</th><th>Relative</th>' +
+      '</tr></thead><tbody>' +
+      '<tr>' +
         '<td style="font-family:var(--font-ui);font-weight:600;color:var(--text-primary)">' + rp.vsIndex.name + '</td>' +
         '<td style="color:' + (rp.vsIndex.stockReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (rp.vsIndex.stockReturn >= 0 ? '+' : '') + rp.vsIndex.stockReturn.toFixed(1) + '%</td>' +
         '<td style="color:' + (rp.vsIndex.indexReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (rp.vsIndex.indexReturn >= 0 ? '+' : '') + rp.vsIndex.indexReturn.toFixed(1) + '%</td>' +
         '<td style="color:' + (rp.vsIndex.relativeReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (rp.vsIndex.relativeReturn >= 0 ? '+' : '') + rp.vsIndex.relativeReturn.toFixed(1) + '%</td>' +
-      '</tr>';
-    if (rp.vsSector) {
-      relRows += '<tr>' +
+      '</tr>' +
+      '<tr>' +
         '<td style="font-family:var(--font-ui);font-weight:600;color:var(--text-primary)">' + rp.vsSector.name + '</td>' +
         '<td style="color:' + (rp.vsSector.stockReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (rp.vsSector.stockReturn >= 0 ? '+' : '') + rp.vsSector.stockReturn.toFixed(1) + '%</td>' +
         '<td style="color:' + (rp.vsSector.sectorReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (rp.vsSector.sectorReturn >= 0 ? '+' : '') + rp.vsSector.sectorReturn.toFixed(1) + '%</td>' +
         '<td style="color:' + (rp.vsSector.relativeReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (rp.vsSector.relativeReturn >= 0 ? '+' : '') + rp.vsSector.relativeReturn.toFixed(1) + '%</td>' +
-      '</tr>';
-    }
-    relHtml = '<div class="rs-subtitle">Relative Performance (' + rp.vsIndex.period + ')</div>' +
-      '<table class="ta-rel-table"><thead><tr>' +
-        '<th>Benchmark</th><th>Stock Return</th><th>Benchmark Return</th><th>Relative</th>' +
-      '</tr></thead><tbody>' + relRows + '</tbody></table>';
+      '</tr>' +
+      '</tbody></table>';
   }
 
   var levelsHtml = '<div class="rs-subtitle">Key Levels</div>' +
