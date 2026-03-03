@@ -9,24 +9,293 @@
   "currency": "A$",
   "date": "February 2026",
   "reportId": "GYG-2026-002",
-  "priceHistory": [45.32,44.99,38.58,35.9,34.97,35.46,35.2,34.6,34.41,32.9,33.6,33.72,32.47,33.39,32.65,32.83,33.23,33.38,33.35,33.1,32.79,34.17,34.21,33.85,34.26,33.6,33.29,32.26,32.22,31.9,32.21,31.94,31,30,31.1,31.77,33.74,33.26,33.5,33.4,32.22,31.5,32,32.21,32.89,32.49,32.8,32.17,32.46,31.65,31.93,31.18,31.81,32.99,32.32,31.99,32.57,31.92,32.42,32.79,32.38,31.98,31.55,31.1,31.3,30.45,30.95,30.51,30.65,30.39,30.25,29.5,30.41,30.01,29.47,28.87,29.49,29.14,29.04,29.01,28.94,29.41,29.22,29.22,28.72,28.98,29,28.04,27.5,28.29,28.65,28.32,27.52,27.92,28.63,28.19,28.54,27.93,27.33,27.37,27,27.81,27.32,27.61,27.47,27.2,27.61,27.65,27.35,27.95,26.93,26.72,27.55,27.53,27.67,27.84,28.41,28.88,28.43,28.65,28.76,27.71,27.51,27.88,27.94,28.21,28.97,28.97,23.7,25.54,26.01,26.3,25.52,25.24,25.5,24.5,23.72,23.61,23.62,23.77,24.18,23.75,23.7,25.22,26.53,25.79,25.1,25.29,25.43,24.9,25.5,24.72,24.52,24.87,25.2,25.98,25.91,25.6,26.25,26.41,26.52,27,26.39,25.69,25.07,24.53,25.31,25.2,25.35,25.05,24.75,24.99,24.41,25.72,26.04,26.19,26.01,26.75,26.72,25.39,25.75,24.8,24.43,24.84,24.74,24.87,24.38,23.95,23.86,23.43,22.97,21.99,22.55,21.89,21.53,21.97,22.87,23.39,23.62,23.23,22.22,22.43,22.31,22.31,22.15,21.45,21.21,21.6,21.05,21.14,21.75,21.23,20.82,22.06,22.32,22.44,22.12,22.21,21.9,21.65,21.58,21.73,20.94,21.08,21.5,20.77,20.91,20.94,21.7,21.52,21.72,22.4,21.96,21.89,22.44,23.3,23.76,23.55,22.43,22.18,21.94,22.1,20.68,20.47,20.3,20.87,20.84,19.31,19.12,19.5,19.4,19.3],
-
+  "priceHistory": [
+    45.32,
+    44.99,
+    38.58,
+    35.9,
+    34.97,
+    35.46,
+    35.2,
+    34.6,
+    34.41,
+    32.9,
+    33.6,
+    33.72,
+    32.47,
+    33.39,
+    32.65,
+    32.83,
+    33.23,
+    33.38,
+    33.35,
+    33.1,
+    32.79,
+    34.17,
+    34.21,
+    33.85,
+    34.26,
+    33.6,
+    33.29,
+    32.26,
+    32.22,
+    31.9,
+    32.21,
+    31.94,
+    31,
+    30,
+    31.1,
+    31.77,
+    33.74,
+    33.26,
+    33.5,
+    33.4,
+    32.22,
+    31.5,
+    32,
+    32.21,
+    32.89,
+    32.49,
+    32.8,
+    32.17,
+    32.46,
+    31.65,
+    31.93,
+    31.18,
+    31.81,
+    32.99,
+    32.32,
+    31.99,
+    32.57,
+    31.92,
+    32.42,
+    32.79,
+    32.38,
+    31.98,
+    31.55,
+    31.1,
+    31.3,
+    30.45,
+    30.95,
+    30.51,
+    30.65,
+    30.39,
+    30.25,
+    29.5,
+    30.41,
+    30.01,
+    29.47,
+    28.87,
+    29.49,
+    29.14,
+    29.04,
+    29.01,
+    28.94,
+    29.41,
+    29.22,
+    29.22,
+    28.72,
+    28.98,
+    29,
+    28.04,
+    27.5,
+    28.29,
+    28.65,
+    28.32,
+    27.52,
+    27.92,
+    28.63,
+    28.19,
+    28.54,
+    27.93,
+    27.33,
+    27.37,
+    27,
+    27.81,
+    27.32,
+    27.61,
+    27.47,
+    27.2,
+    27.61,
+    27.65,
+    27.35,
+    27.95,
+    26.93,
+    26.72,
+    27.55,
+    27.53,
+    27.67,
+    27.84,
+    28.41,
+    28.88,
+    28.43,
+    28.65,
+    28.76,
+    27.71,
+    27.51,
+    27.88,
+    27.94,
+    28.21,
+    28.97,
+    28.97,
+    23.7,
+    25.54,
+    26.01,
+    26.3,
+    25.52,
+    25.24,
+    25.5,
+    24.5,
+    23.72,
+    23.61,
+    23.62,
+    23.77,
+    24.18,
+    23.75,
+    23.7,
+    25.22,
+    26.53,
+    25.79,
+    25.1,
+    25.29,
+    25.43,
+    24.9,
+    25.5,
+    24.72,
+    24.52,
+    24.87,
+    25.2,
+    25.98,
+    25.91,
+    25.6,
+    26.25,
+    26.41,
+    26.52,
+    27,
+    26.39,
+    25.69,
+    25.07,
+    24.53,
+    25.31,
+    25.2,
+    25.35,
+    25.05,
+    24.75,
+    24.99,
+    24.41,
+    25.72,
+    26.04,
+    26.19,
+    26.01,
+    26.75,
+    26.72,
+    25.39,
+    25.75,
+    24.8,
+    24.43,
+    24.84,
+    24.74,
+    24.87,
+    24.38,
+    23.95,
+    23.86,
+    23.43,
+    22.97,
+    21.99,
+    22.55,
+    21.89,
+    21.53,
+    21.97,
+    22.87,
+    23.39,
+    23.62,
+    23.23,
+    22.22,
+    22.43,
+    22.31,
+    22.31,
+    22.15,
+    21.45,
+    21.21,
+    21.6,
+    21.05,
+    21.14,
+    21.75,
+    21.23,
+    20.82,
+    22.06,
+    22.32,
+    22.44,
+    22.12,
+    22.21,
+    21.9,
+    21.65,
+    21.58,
+    21.73,
+    20.94,
+    21.08,
+    21.5,
+    20.77,
+    20.91,
+    20.94,
+    21.7,
+    21.52,
+    21.72,
+    22.4,
+    21.96,
+    21.89,
+    22.44,
+    23.3,
+    23.76,
+    23.55,
+    22.43,
+    22.18,
+    21.94,
+    22.1,
+    20.68,
+    20.47,
+    20.3,
+    20.87,
+    20.84,
+    19.31,
+    19.12,
+    19.5,
+    19.4,
+    19.3
+  ],
   "heroDescription": "Fast-Casual QSR &bull; 256 Restaurants &bull; A$468M Revenue &bull; IPO June 2024",
   "heroCompanyDescription": "Guzman y Gomez (ASX: GYG) is an Australian fast-casual restaurant chain specialising in Mexican-inspired food with a clean-ingredient positioning. Founded in 2006 by Steven Marks, GYG listed on the ASX in June 2024 at A$22.00 per share, peaking at A$45.76 within eight months before correcting to A$17.53. The company operates 256 restaurants (FY25) across Australia, Singapore, Japan, and the United States, with 108 approved sites in the pipeline. Restaurant-level economics are strong (22% margins, 48-53% franchisee ROI), but comparable sales have decelerated from 15% (FY23) to 4-5% (H1 FY26). US operations are loss-making (A$13.2M EBITDA loss FY25) with the parent entity having written off its entire A$28.2M US investment.",
-
   "heroMetrics": [
-    { "label": "Mkt Cap", "value": "A$1.8B", "colorClass": "" },
-    { "label": "EWP", "value": "A$13.59", "colorClass": "negative" },
-    { "label": "Gap", "value": "&minus;23%", "colorClass": "negative" },
-    { "label": "Comps", "value": "4-5% (H1 FY26)", "colorClass": "negative" },
-    { "label": "Rest. Margin", "value": "22%", "colorClass": "positive" }
+    {
+      "label": "Mkt Cap",
+      "value": "A$1.8B",
+      "colorClass": ""
+    },
+    {
+      "label": "EWP",
+      "value": "A$13.59",
+      "colorClass": "negative"
+    },
+    {
+      "label": "Gap",
+      "value": "&minus;23%",
+      "colorClass": "negative"
+    },
+    {
+      "label": "Comps",
+      "value": "4-5% (H1 FY26)",
+      "colorClass": "negative"
+    },
+    {
+      "label": "Rest. Margin",
+      "value": "22%",
+      "colorClass": "positive"
+    }
   ],
-
   "skew": {
     "direction": "downside",
     "rationale": "72% combined weight on downside scenarios (N2 Decelerating Growth at 46% + N3 US Capital Destruction at 21% + N4 Franchise Stress at 5%). Evidence-weighted price A$13.59 vs market A$17.53. The market overweights the compounder narrative (N1) by 19 percentage points relative to the evidence. Three consecutive negative filing-day reactions confirm the pattern."
   },
-
   "verdict": {
     "text": "GYG is trading at <span class=\"key-stat\">A$17.53</span>, <strong>29% above the evidence-weighted price of approximately A$13.59</strong>. The market assigns 47% probability to the Australian Compounder narrative; the evidence supports 28%. Three consecutive half-year results have produced escalating negative filing-day reactions (<span class=\"key-stat\">&minus;9.2%, &minus;13.9%, &minus;17.6%</span>), and comparable sales have decelerated from <span class=\"key-stat\">15% (FY23) to 4&ndash;5% (H1 FY26)</span>. Unit economics remain strong: drive-thru AUV of <span class=\"key-stat\">A$6.9M</span>, restaurant-level margins of <span class=\"key-stat\">22%</span>, and franchisee ROI of <span class=\"key-stat\">48&ndash;53%</span>. The tension is real: excellent unit economics inside a decelerating growth trajectory. US operations are actively destroying value (<span class=\"key-stat\">A$13.2M</span> EBITDA loss FY25, losses doubling annually), and insider control (44%) prevents course correction. The H1 FY26 results will resolve more uncertainty in a single day than months of analysis can provide. <strong>WAIT for results.</strong>",
     "borderColor": null,
@@ -65,16 +334,30 @@
       }
     ]
   },
-
   "featuredMetrics": [
-    { "label": "Mkt Cap", "value": "A$1.8B", "color": "" },
-    { "label": "EWP", "value": "A$13.59", "color": "var(--signal-red)" },
-    { "label": "Gap", "value": "&minus;23%", "color": "var(--signal-red)" },
-    { "label": "Comps", "value": "4-5%", "color": "var(--signal-amber)" }
+    {
+      "label": "Mkt Cap",
+      "value": "A$1.8B",
+      "color": ""
+    },
+    {
+      "label": "EWP",
+      "value": "A$13.59",
+      "color": "var(--signal-red)"
+    },
+    {
+      "label": "Gap",
+      "value": "&minus;23%",
+      "color": "var(--signal-red)"
+    },
+    {
+      "label": "Comps",
+      "value": "4-5%",
+      "color": "var(--signal-amber)"
+    }
   ],
   "featuredPriceColor": "var(--signal-red)",
   "featuredRationale": "Evidence-weighted price 23% below market. Three consecutive negative filing-day reactions. Comps decelerating from 15% to 4%. Unit economics strong but growth trajectory weakening. US losses doubling annually. Verdict: WAIT for H1 FY26 results.",
-
   "thesisSummary": {
     "paragraphs": [
       "GYG listed at <span class=\"key-stat\">A$22</span> in June 2024 and peaked at <span class=\"key-stat\">A$45.76</span> within eight months, pricing the company at over 90 times trailing EBITDA. The market was paying for a rare Australian fast-casual compounder with institutional-grade unit economics: drive-thru AUV of A$6.9M, restaurant-level margins of 22%, franchisee ROI above 48%, and a repeat franchisee rate of 64%. That multiple has since compressed 74% to 23 times trailing EBITDA.",
@@ -83,23 +366,131 @@
       "The H1 FY26 results represent the single most important discriminating event. Australian comparable sales growth for Q3 and Q4 will bifurcate the probability distribution. Above 6%: the deceleration was cyclical and N1 regains credibility. Between 3% and 6%: N2 is confirmed. Below 3%: pure inflation pass-through, and the stock faces a further 30&ndash;40% downside. The structural position is WAIT. Results resolve more uncertainty in one day than months of analysis can provide."
     ]
   },
-
   "identity": {
     "rows": [
-      [["Ticker", "GYG.AX", "td-mono"], ["Exchange", "ASX", "td-mono"]],
-      [["Market Cap", "A$1.8B", "td-mono"], ["Sector", "Consumer Discretionary / QSR", "td-mono"]],
-      [["Share Price", "A$17.53", "td-mono"], ["Evidence-Weighted Price", "A$13.59 (&darr;23%)", "td-mono td-red"]],
-      [["Revenue (FY25)", "A$468M (+28%)", "td-mono"], ["Restaurant Count", "256 (FY25)", "td-mono"]],
-      [["Comps (H1 FY26)", "4.0&ndash;4.8%", "td-mono td-amber"], ["Drive-thru AUV", "A$6.9M", "td-mono td-green"]],
-      [["Restaurant-Level Margin", "22%", "td-mono td-green"], ["Franchisee ROI", "48&ndash;53%", "td-mono td-green"]],
-      [["US EBITDA Loss (FY25)", "(A$13.2M)", "td-mono td-red"], ["US Corp. Restaurant Margin", "&minus;57.5%", "td-mono td-red"]],
-      [["Cash", "A$281.7M", "td-mono td-green"], ["Debt", "Zero", "td-mono td-green"]],
-      [["Insider Control", "~44.3%", "td-mono td-amber"], ["IPO Price", "A$22.00 (Jun 2024)", "td-mono"]],
-      [["Next Catalyst", "H1 FY26 Results", "td-mono"], ["Verdict", "WAIT", "td-mono td-amber"]]
+      [
+        [
+          "Ticker",
+          "GYG.AX",
+          "td-mono"
+        ],
+        [
+          "Exchange",
+          "ASX",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Market Cap",
+          "A$1.8B",
+          "td-mono"
+        ],
+        [
+          "Sector",
+          "Consumer Discretionary / QSR",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Share Price",
+          "A$17.53",
+          "td-mono"
+        ],
+        [
+          "Evidence-Weighted Price",
+          "A$13.59 (&darr;23%)",
+          "td-mono td-red"
+        ]
+      ],
+      [
+        [
+          "Revenue (FY25)",
+          "A$468M (+28%)",
+          "td-mono"
+        ],
+        [
+          "Restaurant Count",
+          "256 (FY25)",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Comps (H1 FY26)",
+          "4.0&ndash;4.8%",
+          "td-mono td-amber"
+        ],
+        [
+          "Drive-thru AUV",
+          "A$6.9M",
+          "td-mono td-green"
+        ]
+      ],
+      [
+        [
+          "Restaurant-Level Margin",
+          "22%",
+          "td-mono td-green"
+        ],
+        [
+          "Franchisee ROI",
+          "48&ndash;53%",
+          "td-mono td-green"
+        ]
+      ],
+      [
+        [
+          "US EBITDA Loss (FY25)",
+          "(A$13.2M)",
+          "td-mono td-red"
+        ],
+        [
+          "US Corp. Restaurant Margin",
+          "&minus;57.5%",
+          "td-mono td-red"
+        ]
+      ],
+      [
+        [
+          "Cash",
+          "A$281.7M",
+          "td-mono td-green"
+        ],
+        [
+          "Debt",
+          "Zero",
+          "td-mono td-green"
+        ]
+      ],
+      [
+        [
+          "Insider Control",
+          "~44.3%",
+          "td-mono td-amber"
+        ],
+        [
+          "IPO Price",
+          "A$22.00 (Jun 2024)",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Next Catalyst",
+          "H1 FY26 Results",
+          "td-mono"
+        ],
+        [
+          "Verdict",
+          "WAIT",
+          "td-mono td-amber"
+        ]
+      ]
     ],
     "overview": "Guzman y Gomez (ASX: GYG) is an Australian fast-casual restaurant chain founded in 2006 by Steven Marks. The company listed on the ASX in June 2024 at A$22.00 per share, with TDM Growth Partners (20.6%), Steven Marks (9.6%), Barrenjoey Private Capital (8.1%), and Guy Russo (6.0%) forming a 44.3% insider/aligned bloc. GYG operates 256 restaurants across Australia, Singapore, Japan, and the United States, with a 108-site approved pipeline. The Australian franchise system generates industry-leading unit economics (22% restaurant-level margins, 48-53% franchisee ROI, 64% repeat franchisee rate). US operations are loss-making at negative 57.5% corporate restaurant margins. The A$29.6B Australian QSR market grows at 2.6% annually, meaning GYG's growth comes from share theft, not market expansion."
   },
-
   "hypotheses": [
     {
       "tier": "n1",
@@ -234,7 +625,6 @@
       "uniqueVulnerability": "The counter-evidence is overwhelming. Franchisee ROI at 48&ndash;53% with a 64% repeat rate makes system stress implausible in the near term. N4 exists as a tail risk to monitor, not a central scenario."
     }
   ],
-
   "narrative": {
     "theNarrative": "GYG listed at <span class=\"key-stat\">A$22</span> in June 2024 and peaked at <span class=\"key-stat\">A$45.76</span> within eight months, pricing the company at over <span class=\"key-stat\">90&times;</span> trailing EV/EBITDA. The market was paying for scarcity: the first listed fast-casual QSR operator on the ASX with institutional-grade unit economics. That premium has since compressed 74% to 23&times; trailing EBITDA. Three forces are driving the correction. Comparable sales have decelerated from 15% to 4&ndash;5%. US operations are actively destroying capital (A$13.2M EBITDA loss, losses doubling annually). Three consecutive half-year results have produced escalating negative filing-day reactions. The central tension: unit economics are excellent and widening (drive-thru AUV up 130% in five years, restaurant margins at 22%, franchisee ROI above 48%) while the aggregate growth rate that justified the IPO multiple is fading. <strong>The H1 FY26 comparable sales figure bifurcates the investment case.</strong>",
     "priceImplication": {
@@ -250,7 +640,6 @@
       "balanceSheetFragility": "The balance sheet is a fortress: A$281.7M cash, zero interest-bearing debt, net cash per share of approximately A$2.73. Solvency risk is absent under any plausible scenario. This eliminates the balance sheet as a source of downside surprise. The risk is entirely income-statement-driven (growth deceleration, margin compression, US losses) rather than balance-sheet-driven."
     }
   },
-
   "evidence": {
     "intro": "Ten evidence domains assessed across the epistemic hierarchy, updated for February 2026. Evidence ranked: <strong>Audited Statutory</strong> &gt; <strong>Objective Data</strong> &gt; <strong>Independent Sources</strong> &gt; <strong>Consensus</strong> &gt; <strong>Motivated</strong> &gt; <strong>Noise</strong>.",
     "cards": [
@@ -263,9 +652,18 @@
         "tension": "Management guidance on Australian operations has been reliable (guided 26 openings in FY24, delivered; guided 30 in FY25, revised to 31, delivered). US guidance is systematically vague with no measurable milestones. The framing of US operations as \"proof of concept\" allows indefinite capital destruction without triggering governance accountability.",
         "table": null,
         "tags": [
-          { "text": "Supports N1", "class": "supports" },
-          { "text": "Neutral N2", "class": "neutral" },
-          { "text": "Contradicts N3", "class": "contradicts" }
+          {
+            "text": "Supports N1",
+            "class": "supports"
+          },
+          {
+            "text": "Neutral N2",
+            "class": "neutral"
+          },
+          {
+            "text": "Contradicts N3",
+            "class": "contradicts"
+          }
         ],
         "source": "GYG FY25 Results Presentation; ASX announcements; Investor presentations"
       },
@@ -277,20 +675,71 @@
         "finding": "<strong>Cash flow inflection confirmed; growth deceleration confirmed; US write-off confirmed.</strong> FY25 revenue A$468M (+28%). OCF A$57.3M (inflection from negative A$9.7M). FCF still negative (A$7.2M) but H2 FY25 positive (A$1.1M). Gross margin stable at 75.7%. EBIT margin 5.4%. ROE 3.9%. Net income A$14.4M. Parent entity wrote off entire A$28.2M US investment to zero. US EBITDA loss A$13.2M. Franchisees on royalty relief increased from 4 to 6.",
         "tension": "The statutory filings confirm both the bull case (unit economics work, cash flow inflecting, balance sheet strong) and the bear case (growth decelerating, US destroying value, governance metrics weak). The evidence does not resolve the tension; it sharpens it.",
         "table": {
-          "headers": ["Metric", "FY23", "FY24", "FY25", "Trajectory"],
+          "headers": [
+            "Metric",
+            "FY23",
+            "FY24",
+            "FY25",
+            "Trajectory"
+          ],
           "rows": [
-            ["Revenue (A$M)", "276.6", "365.0", "468.0", "+28% but decelerating"],
-            ["Comps Growth", "15.0%", "8.1%", "4&ndash;5% (H1 FY26)", "Declining each period"],
-            ["OCF (A$M)", "23.9", "(9.7)", "57.3", "Inflection confirmed"],
-            ["Net Income (A$M)", "(2.2)", "(13.9)", "14.4", "Breakeven, fragile"],
-            ["US EBITDA Loss", "n/a", "(6.8)", "(13.2)", "Doubling annually"],
-            ["Restaurants", "168", "227", "256", "Pipeline: 108 approved"]
+            [
+              "Revenue (A$M)",
+              "276.6",
+              "365.0",
+              "468.0",
+              "+28% but decelerating"
+            ],
+            [
+              "Comps Growth",
+              "15.0%",
+              "8.1%",
+              "4&ndash;5% (H1 FY26)",
+              "Declining each period"
+            ],
+            [
+              "OCF (A$M)",
+              "23.9",
+              "(9.7)",
+              "57.3",
+              "Inflection confirmed"
+            ],
+            [
+              "Net Income (A$M)",
+              "(2.2)",
+              "(13.9)",
+              "14.4",
+              "Breakeven, fragile"
+            ],
+            [
+              "US EBITDA Loss",
+              "n/a",
+              "(6.8)",
+              "(13.2)",
+              "Doubling annually"
+            ],
+            [
+              "Restaurants",
+              "168",
+              "227",
+              "256",
+              "Pipeline: 108 approved"
+            ]
           ]
         },
         "tags": [
-          { "text": "Supports N1 (unit econ)", "class": "supports" },
-          { "text": "Supports N2 (deceleration)", "class": "supports" },
-          { "text": "Supports N3 (US losses)", "class": "supports" }
+          {
+            "text": "Supports N1 (unit econ)",
+            "class": "supports"
+          },
+          {
+            "text": "Supports N2 (deceleration)",
+            "class": "supports"
+          },
+          {
+            "text": "Supports N3 (US losses)",
+            "class": "supports"
+          }
         ],
         "source": "GYG FY25 Annual Report; Appendix 4E; Parent entity financials"
       },
@@ -303,9 +752,18 @@
         "tension": "Sell-side coverage was initiated at IPO with growth assumptions that have not materialised. The pattern of escalating negative filing-day reactions is diagnostic: institutional investors are selling into results faster each time. This pattern typically precedes a major consensus revision cycle.",
         "table": null,
         "tags": [
-          { "text": "Neutral N1", "class": "neutral" },
-          { "text": "Supports N2", "class": "supports" },
-          { "text": "Neutral N3/N4", "class": "neutral" }
+          {
+            "text": "Neutral N1",
+            "class": "neutral"
+          },
+          {
+            "text": "Supports N2",
+            "class": "supports"
+          },
+          {
+            "text": "Neutral N3/N4",
+            "class": "neutral"
+          }
         ],
         "source": "Bloomberg consensus; ASX market data; Filing-day return analysis"
       },
@@ -317,18 +775,52 @@
         "finding": "<strong>Australian QSR is a 2.6% growth market; GYG wins through share theft, not market expansion.</strong> The A$29.6B market supports over 5,000 QSR outlets with 75%+ of Australians within 3km of both Subway and McDonald's. GYG's growth requires taking customers from incumbents. McDonald's overtook GYG on Australian same-store sales growth in Q4 2025, the first time this has happened since GYG's listing. McDonald's promotional intensity in cost-of-living environments is the primary competitive threat to GYG's pricing power.",
         "tension": "GYG's clean-food differentiation is genuine (100% proprietary ingredients, no freezers in stores). Whether this positioning sustains a premium when the largest QSR operator adapts its marketing toward health-conscious consumers is the competitive question. GYG's delivery exposure (26.6% of sales) adds margin vulnerability through platform commissions.",
         "table": {
-          "headers": ["Metric", "GYG", "McDonald's", "Industry Avg"],
+          "headers": [
+            "Metric",
+            "GYG",
+            "McDonald's",
+            "Industry Avg"
+          ],
           "rows": [
-            ["Restaurant-Level Margin", "22%", "~18%", "10&ndash;22%"],
-            ["Average Transaction Value", "A$21.27", "~A$14", "A$18.62"],
-            ["Transaction Age Skew (18-24)", "27.7%", "~16%", "16.0%"],
-            ["Comps (Latest)", "4&ndash;5%", "~5%", "2&ndash;3%"]
+            [
+              "Restaurant-Level Margin",
+              "22%",
+              "~18%",
+              "10&ndash;22%"
+            ],
+            [
+              "Average Transaction Value",
+              "A$21.27",
+              "~A$14",
+              "A$18.62"
+            ],
+            [
+              "Transaction Age Skew (18-24)",
+              "27.7%",
+              "~16%",
+              "16.0%"
+            ],
+            [
+              "Comps (Latest)",
+              "4&ndash;5%",
+              "~5%",
+              "2&ndash;3%"
+            ]
           ]
         },
         "tags": [
-          { "text": "Supports N1 (unit econ)", "class": "supports" },
-          { "text": "Supports N2 (competition)", "class": "supports" },
-          { "text": "Neutral N3/N4", "class": "neutral" }
+          {
+            "text": "Supports N1 (unit econ)",
+            "class": "supports"
+          },
+          {
+            "text": "Supports N2 (competition)",
+            "class": "supports"
+          },
+          {
+            "text": "Neutral N3/N4",
+            "class": "neutral"
+          }
         ],
         "source": "IBISWorld; ABS retail data; Company filings; Industry analysis"
       },
@@ -341,9 +833,18 @@
         "tension": "Economic conditions create a scissors effect: input costs rise (labour, ingredients) while consumer willingness to pay a premium weakens. GYG's average transaction value of A$21.27 is 14% above QSR average, making it more exposed to trade-down than mass-market competitors.",
         "table": null,
         "tags": [
-          { "text": "Contradicts N1", "class": "contradicts" },
-          { "text": "Supports N2", "class": "supports" },
-          { "text": "Neutral N3/N4", "class": "neutral" }
+          {
+            "text": "Contradicts N1",
+            "class": "contradicts"
+          },
+          {
+            "text": "Supports N2",
+            "class": "supports"
+          },
+          {
+            "text": "Neutral N3/N4",
+            "class": "neutral"
+          }
         ],
         "source": "ABS; Fair Work Commission; RBA; Industry reports"
       },
@@ -356,9 +857,18 @@
         "tension": "The relentless decline could reflect either the market correctly pricing a decelerating growth story or an overcorrection creating opportunity. The escalating filing-day pattern with no base formation favours the former interpretation. The absence of value-buyer accumulation despite fortress balance sheet and strong unit economics is notable.",
         "table": null,
         "tags": [
-          { "text": "Contradicts N1", "class": "contradicts" },
-          { "text": "Supports N2", "class": "supports" },
-          { "text": "Neutral N3/N4", "class": "neutral" }
+          {
+            "text": "Contradicts N1",
+            "class": "contradicts"
+          },
+          {
+            "text": "Supports N2",
+            "class": "supports"
+          },
+          {
+            "text": "Neutral N3/N4",
+            "class": "neutral"
+          }
         ],
         "source": "ASX market data; GYG price and volume history; Filing-day return analysis"
       },
@@ -371,9 +881,18 @@
         "tension": "The academic base rate for fast-casual IPO multiple compression supports N2. The franchise health literature provides N4 monitoring indicators but current readings (ROI 48&ndash;53%, relief at 6 stores) remain well within healthy ranges.",
         "table": null,
         "tags": [
-          { "text": "Supports N2", "class": "strong" },
-          { "text": "Supports N4 (monitoring)", "class": "supports" },
-          { "text": "Neutral N1/N3", "class": "neutral" }
+          {
+            "text": "Supports N2",
+            "class": "strong"
+          },
+          {
+            "text": "Supports N4 (monitoring)",
+            "class": "supports"
+          },
+          {
+            "text": "Neutral N1/N3",
+            "class": "neutral"
+          }
         ],
         "source": "Restaurant IPO performance literature; Franchise system health research"
       },
@@ -386,7 +905,10 @@
         "tension": "Retail sentiment is a coincident indicator, not a leading one. The shift from bullish to bearish reflects price action rather than driving it. Low analytical value.",
         "table": null,
         "tags": [
-          { "text": "Neutral all scenarios", "class": "neutral" }
+          {
+            "text": "Neutral all scenarios",
+            "class": "neutral"
+          }
         ],
         "source": "Financial media; Social media analysis"
       },
@@ -398,20 +920,57 @@
         "finding": "<strong>Insider control (44%) with weak accountability structures.</strong> Four aligned holders control 44.3% of votes: TDM Growth Partners (20.6%), Steven Marks (9.6%), Barrenjoey Private Capital (8.1%), Guy Russo (6.0%). Board independence is 43% (lacks majority). Remuneration and Nomination Committee has 2/3 non-independent members. LTI vests on time alone with zero performance conditions. No clawback provisions, succession plan, or board effectiveness review disclosed. CEO limited-recourse loan facilities of A$31.1M.",
         "tension": "The governance structure allows management to pursue value-destructive strategies (US expansion) without effective accountability. The domestic franchise operations demonstrate operational competence, making the governance risk selective rather than pervasive. The question is whether the capital allocation failures (US) eventually contaminate the operational strengths (Australia).",
         "table": {
-          "headers": ["Governance Item", "Status", "Severity"],
+          "headers": [
+            "Governance Item",
+            "Status",
+            "Severity"
+          ],
           "rows": [
-            ["US losses accelerating (A$13.2M FY25)", "Deteriorating", "Critical"],
-            ["Board lacks majority independence", "Stable", "Notable"],
-            ["CEO limited-recourse loans (A$31.1M)", "Deteriorating", "Notable"],
-            ["LTI: zero performance conditions", "Stable", "Notable"],
-            ["Franchisees on royalty relief (4 to 6)", "Slight deterioration", "Monitoring"],
-            ["SBC 62% of statutory net profit", "Stable", "Notable"]
+            [
+              "US losses accelerating (A$13.2M FY25)",
+              "Deteriorating",
+              "Critical"
+            ],
+            [
+              "Board lacks majority independence",
+              "Stable",
+              "Notable"
+            ],
+            [
+              "CEO limited-recourse loans (A$31.1M)",
+              "Deteriorating",
+              "Notable"
+            ],
+            [
+              "LTI: zero performance conditions",
+              "Stable",
+              "Notable"
+            ],
+            [
+              "Franchisees on royalty relief (4 to 6)",
+              "Slight deterioration",
+              "Monitoring"
+            ],
+            [
+              "SBC 62% of statutory net profit",
+              "Stable",
+              "Notable"
+            ]
           ]
         },
         "tags": [
-          { "text": "Contradicts N1", "class": "contradicts" },
-          { "text": "Supports N3", "class": "supports" },
-          { "text": "Supports N4 (monitoring)", "class": "supports" }
+          {
+            "text": "Contradicts N1",
+            "class": "contradicts"
+          },
+          {
+            "text": "Supports N3",
+            "class": "supports"
+          },
+          {
+            "text": "Supports N4 (monitoring)",
+            "class": "supports"
+          }
         ],
         "source": "GYG Annual Report; Corporate governance statement; ASX substantial holder notices"
       },
@@ -424,16 +983,24 @@
         "tension": "The escrow sell-down creates a one-time supply headwind that N1 proponents can cite as a temporary distortion. If the stock fails to recover once escrow selling clears, the deceleration thesis (N2) gains credibility. The timing of escrow resolution coincides with H1 FY26 results, making it difficult to disentangle supply effects from fundamental re-pricing.",
         "table": null,
         "tags": [
-          { "text": "Neutral N1 (temporary)", "class": "neutral" },
-          { "text": "Supports N2", "class": "supports" },
-          { "text": "Neutral N3/N4", "class": "neutral" }
+          {
+            "text": "Neutral N1 (temporary)",
+            "class": "neutral"
+          },
+          {
+            "text": "Supports N2",
+            "class": "supports"
+          },
+          {
+            "text": "Neutral N3/N4",
+            "class": "neutral"
+          }
         ],
         "source": "ASX substantial holder notices; Share registry data; Escrow timetable"
       }
     ],
     "alignmentSummary": null
   },
-
   "discriminators": {
     "intro": "Four data points carry high diagnosticity for discriminating between GYG's competing hypotheses. The H1 FY26 results represent the highest-magnitude single event.",
     "rows": [
@@ -472,7 +1039,6 @@
     ],
     "nonDiscriminating": "<strong>Retail sentiment</strong> (lagging, coincident with price) &bull; <strong>Insider selling by TDM</strong> (mandate transfer, not fundamental view change) &bull; <strong>Share-based compensation levels</strong> (structural, not variable) &bull; <strong>Buyback activity</strong> (at board discretion, price-insensitive signal)."
   },
-
   "tripwires": {
     "intro": "Three catalysts that would trigger reassessment of hypothesis weights, with specific thresholds defining positive and negative outcomes.",
     "cards": [
@@ -539,19 +1105,88 @@
       }
     ]
   },
-
   "gaps": {
     "coverageRows": [
-      { "domain": "Company Financials", "coverageLevel": "full", "coverageLabel": "Full", "freshness": "FY25 (current)", "confidence": "High (statutory)", "confidenceClass": "td-green" },
-      { "domain": "Unit Economics", "coverageLevel": "full", "coverageLabel": "Full", "freshness": "H1 FY26", "confidence": "High (auditable metrics)", "confidenceClass": "td-green" },
-      { "domain": "Competitive Data", "coverageLevel": "good", "coverageLabel": "Good", "freshness": "Current", "confidence": "High (independent)", "confidenceClass": "td-green" },
-      { "domain": "Governance", "coverageLevel": "full", "coverageLabel": "Full", "freshness": "Current", "confidence": "Critical (structural weaknesses)", "confidenceClass": "td-red" },
-      { "domain": "US Operations", "coverageLevel": "partial", "coverageLabel": "Partial", "freshness": "FY25", "confidence": "Low (minimal disclosure)", "confidenceClass": "td-red" },
-      { "domain": "Delivery Channel", "coverageLevel": "partial", "coverageLabel": "Partial", "freshness": "Undisclosed", "confidence": "Low (no channel-level data)", "confidenceClass": "td-red" },
-      { "domain": "Franchise System Health", "coverageLevel": "good", "coverageLabel": "Good", "freshness": "FY25", "confidence": "Medium (limited granularity)", "confidenceClass": "td-amber" },
-      { "domain": "Price Action", "coverageLevel": "good", "coverageLabel": "Good", "freshness": "Current", "confidence": "Moderate", "confidenceClass": "" },
-      { "domain": "Accounting Quality", "coverageLevel": "full", "coverageLabel": "Full", "freshness": "FY25", "confidence": "High (multiple forensic indicators)", "confidenceClass": "td-green" },
-      { "domain": "Escrow & Capital Flows", "coverageLevel": "good", "coverageLabel": "Good", "freshness": "August 2025", "confidence": "High (registry data)", "confidenceClass": "td-green" }
+      {
+        "domain": "Company Financials",
+        "coverageLevel": "full",
+        "coverageLabel": "Full",
+        "freshness": "FY25 (current)",
+        "confidence": "High (statutory)",
+        "confidenceClass": "td-green"
+      },
+      {
+        "domain": "Unit Economics",
+        "coverageLevel": "full",
+        "coverageLabel": "Full",
+        "freshness": "H1 FY26",
+        "confidence": "High (auditable metrics)",
+        "confidenceClass": "td-green"
+      },
+      {
+        "domain": "Competitive Data",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "Current",
+        "confidence": "High (independent)",
+        "confidenceClass": "td-green"
+      },
+      {
+        "domain": "Governance",
+        "coverageLevel": "full",
+        "coverageLabel": "Full",
+        "freshness": "Current",
+        "confidence": "Critical (structural weaknesses)",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "US Operations",
+        "coverageLevel": "partial",
+        "coverageLabel": "Partial",
+        "freshness": "FY25",
+        "confidence": "Low (minimal disclosure)",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Delivery Channel",
+        "coverageLevel": "partial",
+        "coverageLabel": "Partial",
+        "freshness": "Undisclosed",
+        "confidence": "Low (no channel-level data)",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Franchise System Health",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "FY25",
+        "confidence": "Medium (limited granularity)",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Price Action",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "Current",
+        "confidence": "Moderate",
+        "confidenceClass": ""
+      },
+      {
+        "domain": "Accounting Quality",
+        "coverageLevel": "full",
+        "coverageLabel": "Full",
+        "freshness": "FY25",
+        "confidence": "High (multiple forensic indicators)",
+        "confidenceClass": "td-green"
+      },
+      {
+        "domain": "Escrow & Capital Flows",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "August 2025",
+        "confidence": "High (registry data)",
+        "confidenceClass": "td-green"
+      }
     ],
     "couldntAssess": [
       "<strong>Delivery channel economics:</strong> 26.6% of network sales through high-commission platforms (25&ndash;35% of order value). Channel-level margins undisclosed. Delivery revenue likely materially lower-margin than dine-in/drive-thru, potentially eliminating restaurant-level profit on most delivery transactions",
@@ -562,17 +1197,25 @@
     ],
     "analyticalLimitations": "The delivery channel blind spot is the most significant gap. At 26.6% of network sales, undisclosed channel economics could materially affect the profitability trajectory in all scenarios. Platform commissions of 25&ndash;35% likely eliminate restaurant-level profit on delivery orders, meaning the 22% restaurant-level margin overstates economic profitability by an unknown amount. Additionally, the US operations lack sufficient disclosure to assess whether the 15-restaurant cap will hold or whether management will expand beyond it under the current governance structure."
   },
-
   "technicalAnalysis": {
     "date": "February 2026",
     "period": "Since IPO (June 2024)",
     "source": "Continuum Technical Intelligence",
     "regime": "Downtrend",
     "clarity": "Clear",
-    "price": { "current": 17.53, "currency": "A$" },
+    "price": {
+      "current": 17.53,
+      "currency": "A$"
+    },
     "movingAverages": {
-      "ma50": { "value": 21.50, "date": "Feb 2026" },
-      "ma200": { "value": 27.00, "date": "Feb 2026" },
+      "ma50": {
+        "value": 21.5,
+        "date": "Feb 2026"
+      },
+      "ma200": {
+        "value": 27,
+        "date": "Feb 2026"
+      },
       "crossover": {
         "type": "Death Cross",
         "date": "October 2024",
@@ -585,27 +1228,61 @@
       "direction": "Down",
       "duration": "14 months (from A$45.76 peak)",
       "structure": "Three-phase decline: IPO euphoria unwind (A$45 to A$33, first 3 months), sustained selling (A$33 to A$23, months 3-12), capitulation (A$23 to A$17, months 12-20). No evidence of base formation.",
-      "peak": { "price": 45.76, "date": "September 2024" },
-      "trough": { "price": 17.53, "date": "February 2026" },
+      "peak": {
+        "price": 45.76,
+        "date": "September 2024"
+      },
+      "trough": {
+        "price": 17.53,
+        "date": "February 2026"
+      },
       "drawdown": -61.7
     },
     "keyLevels": {
-      "support": { "price": 17.00, "method": "Round number; approaching psychological support at IPO discount" },
-      "resistance": { "price": 22.00, "method": "IPO price; prior support turned resistance" },
-      "fiftyTwoWeekHigh": { "price": 33.74, "date": "May 2025" },
-      "fiftyTwoWeekLow": { "price": 17.53, "date": "February 2026" }
+      "support": {
+        "price": 17,
+        "method": "Round number; approaching psychological support at IPO discount"
+      },
+      "resistance": {
+        "price": 22,
+        "method": "IPO price; prior support turned resistance"
+      },
+      "fiftyTwoWeekHigh": {
+        "price": 33.74,
+        "date": "May 2025"
+      },
+      "fiftyTwoWeekLow": {
+        "price": 17.53,
+        "date": "February 2026"
+      }
     },
     "volume": {
       "latestVs20DayAvg": 1.4,
       "latestDate": "February 2026",
       "priorSpikes": [
-        { "period": "w/c September 2024", "ratio": 2.8, "context": "Post-peak profit-taking; initial break below A$35" },
-        { "period": "w/c October 2024", "ratio": 2.1, "context": "Death cross week; institutional selling intensifies" },
-        { "period": "w/c January 2026", "ratio": 1.9, "context": "Break below IPO price A$22; retail capitulation" }
+        {
+          "period": "w/c September 2024",
+          "ratio": 2.8,
+          "context": "Post-peak profit-taking; initial break below A$35"
+        },
+        {
+          "period": "w/c October 2024",
+          "ratio": 2.1,
+          "context": "Death cross week; institutional selling intensifies"
+        },
+        {
+          "period": "w/c January 2026",
+          "ratio": 1.9,
+          "context": "Break below IPO price A$22; retail capitulation"
+        }
       ]
     },
     "volatility": {
-      "latestDailyRange": { "high": 19.50, "low": 17.53, "date": "February 2026" },
+      "latestDailyRange": {
+        "high": 19.5,
+        "low": 17.53,
+        "date": "February 2026"
+      },
       "latestRangePercent": 11.2,
       "avgDailyRangePercent30": 3.8,
       "avgDailyRangePercent90": 3.1
@@ -618,13 +1295,41 @@
       "rangeLow": 17.53
     },
     "inflectionPoints": [
-      { "date": "June 2024", "price": 22.00, "event": "IPO listing" },
-      { "date": "September 2024", "price": 45.76, "event": "All-time high; 90x EBITDA peak" },
-      { "date": "October 2024", "price": 33.00, "event": "Death cross; first filing-day negative" },
-      { "date": "March 2025", "price": 29.00, "event": "First escrow release (25%); selling intensifies" },
-      { "date": "August 2025", "price": 24.00, "event": "Second escrow release (75%); TDM sell-down visible" },
-      { "date": "January 2026", "price": 22.00, "event": "Break below IPO price; retail capitulation" },
-      { "date": "February 2026", "price": 17.53, "event": "New all-time low; third consecutive negative filing-day" }
+      {
+        "date": "June 2024",
+        "price": 22,
+        "event": "IPO listing"
+      },
+      {
+        "date": "September 2024",
+        "price": 45.76,
+        "event": "All-time high; 90x EBITDA peak"
+      },
+      {
+        "date": "October 2024",
+        "price": 33,
+        "event": "Death cross; first filing-day negative"
+      },
+      {
+        "date": "March 2025",
+        "price": 29,
+        "event": "First escrow release (25%); selling intensifies"
+      },
+      {
+        "date": "August 2025",
+        "price": 24,
+        "event": "Second escrow release (75%); TDM sell-down visible"
+      },
+      {
+        "date": "January 2026",
+        "price": 22,
+        "event": "Break below IPO price; retail capitulation"
+      },
+      {
+        "date": "February 2026",
+        "price": 17.53,
+        "event": "New all-time low; third consecutive negative filing-day"
+      }
     ],
     "relativePerformance": {
       "vsIndex": {
@@ -643,7 +1348,6 @@
       }
     }
   },
-
   "riskAsymmetry": {
     "upside": {
       "framing": "Requires ALL conditions",
@@ -668,7 +1372,6 @@
     "summary": "The asymmetry is unfavourable. The upside scenario (N1 at A$26.34) requires ALL five conditions and carries only 28% weight. The combined downside scenarios (N2 at A$11.77, N3 at A$7.62, N4 at A$3.76) carry 72% weight and require only ONE trigger from any of five independent conditions. The expected loss from downside scenarios exceeds the expected gain from upside. The fortress balance sheet (A$281.7M cash, zero debt) limits tail risk to income-statement impairment rather than existential crisis.",
     "marketDisagreement": "The evidence and the market disagree most on the probability that GYG remains a compounder. The market assigns 47% to N1; the evidence supports 28%. This 19 percentage point gap implies approximately A$3.60 per share of mispricing. The market has not yet fully priced the mathematical reality that comparable sales decelerating from 15% to 4% implies a mature franchise operator, not a hyper-growth compounder."
   },
-
   "conclusion": {
     "opening": "The evidence-weighted price is approximately <span class=\"key-stat\">A$13.59</span>. The market is at <span class=\"key-stat\">A$17.53</span>. That is a 23% gap to the downside, driven primarily by the market overweighting the compounder narrative (47% market-implied vs 28% evidence-weighted). The domestic franchise system is genuinely high quality: unit economics are widening, cash flow is inflecting, and the balance sheet is a fortress. But three forces work against the bull case: systematic comparable sales deceleration (15% to 4%), escalating US capital destruction (losses doubling annually), and a governance structure that prevents accountability on capital allocation.",
     "paths": [
@@ -690,7 +1393,6 @@
     ],
     "closing": "The structural position is WAIT. The H1 FY26 results will resolve more uncertainty in a single day than months of forensic analysis can provide. The evidence points toward downside (72% probability below current price), but the discriminating event is imminent. Positioning ahead of a high-magnitude binary event with directional but not robust conviction would be imprudent. After results: re-assess. If Path C materialises, the short case becomes compelling. If Path A materialises, the entire framework requires revision."
   },
-
   "hero": {
     "embedded_thesis": "At A$17.53, the market embeds roughly 47% probability on the compounder narrative and 53% on downside scenarios. The evidence assigns 28% to the compounder and 72% to downside. The disagreement centres on whether comparable sales deceleration from 15% to 4% is cyclical (post-IPO normalisation) or structural (mature franchise growth converging toward industry average).",
     "skew": "DOWNSIDE",
@@ -698,10 +1400,26 @@
     "position_in_range": {
       "current_price": 17.53,
       "worlds": [
-        { "label": "Franchise Stress", "price": 3.76, "gap_pct": 0 },
-        { "label": "US Capital Destruction", "price": 7.62, "gap_pct": 0.17 },
-        { "label": "Decelerating Growth", "price": 11.77, "gap_pct": 0.36 },
-        { "label": "Australian Compounder", "price": 26.34, "gap_pct": 1 }
+        {
+          "label": "Franchise Stress",
+          "price": 3.76,
+          "gap_pct": 0
+        },
+        {
+          "label": "US Capital Destruction",
+          "price": 7.62,
+          "gap_pct": 0.17
+        },
+        {
+          "label": "Decelerating Growth",
+          "price": 11.77,
+          "gap_pct": 0.36
+        },
+        {
+          "label": "Australian Compounder",
+          "price": 26.34,
+          "gap_pct": 1
+        }
       ],
       "note": "Scenario-implied prices based on probability-weighted EBITDA multiples. Evidence-weighted fair value: A$13.59."
     },
@@ -712,15 +1430,795 @@
       "thresholds": "Above 6%: deceleration cyclical, N1 regains credibility. 3-6%: N2 confirmed, stock trades A$14-18. Below 3%: structural deceleration, implies 30-40% further downside."
     }
   },
-
   "footer": {
     "disclaimer": "This report does not constitute personal financial advice. Continuum Intelligence maps financial data against a probability-weighted scenario framework. It describes the direction and magnitude of evidence relative to market pricing. All factual claims are sourced from ASX filings, company results presentations, and publicly available information. This report does not contain buy, sell, or hold recommendations.",
     "domainCount": "10 of 10",
     "hypothesesCount": "4 Active"
   },
-
   "_overcorrection": null,
   "_alertState": "NORMAL",
   "current_price": 17.53,
-  "last_price_update": "2026-02-28T00:00:00.000Z"
+  "last_price_update": "2026-02-28T00:00:00.000Z",
+  "industryStructure": {
+    "title": "A$29.6 billion market where incremental growth comes from share theft, not footprint expansion",
+    "overview": "The Australian QSR market compounded at 2.6% annually over five years. Over 75% of Australians live within 3km of both Subway and McDonald’s. Growth for any individual operator requires taking customers from incumbents, not serving unmet demand.",
+    "marketSize": "A$29.6B",
+    "growthRate": "2.6% CAGR (5-year)",
+    "competitors": {
+      "headers": [
+        "Operator",
+        "Locations",
+        "Format"
+      ],
+      "rows": [
+        [
+          "Subway",
+          "1,246",
+          "Sandwich / Sub"
+        ],
+        [
+          "McDonald’s",
+          "1,059",
+          "Burger / QSR"
+        ],
+        [
+          "KFC",
+          "800",
+          "Chicken / QSR"
+        ],
+        [
+          "Domino’s",
+          "724",
+          "Pizza / Delivery"
+        ],
+        [
+          "GYG",
+          "256",
+          "Mexican / Fast-Casual"
+        ]
+      ]
+    },
+    "costStructure": {
+      "headers": [
+        "Cost Category",
+        "% of Revenue",
+        "Variability"
+      ],
+      "rows": [
+        [
+          "Food & Packaging",
+          "28–35%",
+          "Semi-variable (commodity-linked)"
+        ],
+        [
+          "Labour",
+          "25–35%",
+          "Semi-fixed (minimum wage driven)"
+        ],
+        [
+          "Occupancy",
+          "8–15%",
+          "Fixed (lease-linked)"
+        ],
+        [
+          "Other Operating",
+          "5–10%",
+          "Variable"
+        ]
+      ]
+    },
+    "marginRange": "10–22% restaurant-level",
+    "competitionAxes": [
+      "Format economics (drive-thru vs strip vs food court)",
+      "Digital capability (ordering, delivery integration)",
+      "Value positioning (premium vs mass-market)"
+    ],
+    "keyInsight": "GYG’s A$6.9M drive-thru AUV and 22% restaurant margins represent top-of-range performance in a market where incumbents are entrenched and incremental growth must come from share theft. The structural question is whether clean-food differentiation sustains a premium in an environment where the largest operator (McDonald’s) is adapting its positioning."
+  },
+  "competitivePositioning": {
+    "title": "Domestic position widening at moderate confidence, driven by format economics and franchise system quality",
+    "overview": "GYG’s competitive advantages are quantifiable and widening in the Australian market. The risk is competitive convergence from incumbents with greater scale and marketing spend.",
+    "metrics": {
+      "headers": [
+        "Metric",
+        "GYG",
+        "McDonald’s",
+        "Industry Avg",
+        "Trajectory"
+      ],
+      "rows": [
+        [
+          "Drive-thru AUV",
+          "A$6.9M",
+          "n/a",
+          "n/a",
+          "A$3.0M (FY20) &rarr; A$6.9M (H1 FY26): +130%"
+        ],
+        [
+          "Restaurant-Level Margin",
+          "22.0%",
+          "~18%",
+          "10&ndash;22%",
+          "Top of range; stable"
+        ],
+        [
+          "Median Franchisee ROI",
+          "48&ndash;53%",
+          "n/a",
+          "~30%",
+          "Industry-leading"
+        ],
+        [
+          "Avg Transaction Value",
+          "A$21.27",
+          "~A$14",
+          "A$18.62",
+          "+14% premium to QSR avg"
+        ],
+        [
+          "Comparable Sales",
+          "4.0&ndash;4.8%",
+          "~5%",
+          "2&ndash;3%",
+          "15% (FY23) &rarr; 4% (H1 FY26)"
+        ],
+        [
+          "G&A / Network Sales",
+          "5.8%",
+          "n/a",
+          "n/a",
+          "Compressing from 6.7%"
+        ],
+        [
+          "Customer Age Skew (18-24)",
+          "27.7%",
+          "~16%",
+          "16.0%",
+          "Strong youth demographic"
+        ],
+        [
+          "Repeat Franchisee Rate",
+          "64%",
+          "n/a",
+          "n/a",
+          "Recent openings"
+        ]
+      ]
+    },
+    "strengths": [
+      "Proprietary clean-food supply chain (100% proprietary ingredients, no freezers in stores)",
+      "Drive-thru format economics (A$6.9M AUV, highest in QSR fast-casual)",
+      "Franchise system quality (48&ndash;53% ROI, 64% repeat rate, 108-site pipeline)",
+      "Youth demographic capture (27.7% of transactions from 18&ndash;24 age group vs 16% industry)"
+    ],
+    "vulnerabilities": [
+      "McDonald’s overtook GYG on same-store sales in Q4 2025: first competitive reversal since listing",
+      "Delivery platforms represent 26.6% of network sales at undisclosed (likely low) margins",
+      "US operations: &minus;57.5% corporate restaurant margins, A$13.2M EBITDA loss in FY25",
+      "Supply chain concentration: top 5 suppliers represent 60% of purchases"
+    ],
+    "keyInsight": "The domestic competitive position is widening on all measurable metrics (AUV, margins, franchise ROI). The risk is not current performance but trajectory: McDonald’s overtaking on comps in Q4 2025 is the first datapoint suggesting competitive convergence. Delivery margin opacity (26.6% of sales at unknown economics) is the largest structural blind spot."
+  },
+  "governance": {
+    "title": "Accountability mechanisms are nominal rather than structural",
+    "overview": "GYG’s governance framework creates the conditions for value-destructive capital allocation to persist. The domestic franchise operations demonstrate operational competence; the US expansion demonstrates that competence does not extend to disciplined capital allocation when accountability mechanisms are absent.",
+    "controlBloc": {
+      "headers": [
+        "Holder",
+        "Stake",
+        "Movement",
+        "Role"
+      ],
+      "rows": [
+        [
+          "TDM Growth Partners",
+          "20.6%",
+          "Declined from 36.1% at IPO",
+          "Pre-IPO investor; mandate transfers"
+        ],
+        [
+          "Steven Marks (Founder/Co-CEO)",
+          "9.6%",
+          "Stable",
+          "Founder; A$31.1M limited-recourse loans"
+        ],
+        [
+          "Barrenjoey Private Capital",
+          "8.1%",
+          "Post-IPO entry",
+          "Institutional alignment"
+        ],
+        [
+          "Guy Russo (Chair)",
+          "6.0%",
+          "Stable",
+          "Non-executive; former Kmart/Target"
+        ]
+      ]
+    },
+    "redFlags": {
+      "headers": [
+        "Issue",
+        "Status",
+        "Severity"
+      ],
+      "rows": [
+        [
+          "Board independence: 43%",
+          "Below best practice (majority independence)",
+          "Notable"
+        ],
+        [
+          "Rem & Nom Committee: 2/3 non-independent",
+          "Stable",
+          "Notable"
+        ],
+        [
+          "CEO limited-recourse loans: A$31.1M",
+          "Secured against shares; misalignment risk",
+          "Notable"
+        ],
+        [
+          "LTI: zero performance conditions",
+          "Time-vesting only; no hurdles",
+          "Notable"
+        ],
+        [
+          "Share-based compensation: 62% of FY25 statutory NP",
+          "Stable",
+          "Notable"
+        ],
+        [
+          "No clawback provisions disclosed",
+          "Stable",
+          "Critical"
+        ],
+        [
+          "No succession plan disclosed",
+          "Stable",
+          "Monitoring"
+        ],
+        [
+          "No board effectiveness review",
+          "Stable",
+          "Monitoring"
+        ],
+        [
+          "Franchisees on royalty relief: 4 &rarr; 6",
+          "Deteriorating",
+          "Monitoring"
+        ],
+        [
+          "US expansion: no defined exit criteria",
+          "Deteriorating",
+          "Critical"
+        ]
+      ]
+    },
+    "severityAssessment": "Governance weaknesses are concentrated in capital allocation accountability rather than operational oversight. The domestic franchise system operates effectively despite governance gaps, suggesting operational competence is embedded in the management team rather than the governance framework. The critical risk is the US expansion, where A$13.2M of annual capital destruction continues without binding exit criteria, and the 44% insider control bloc prevents external accountability. Severity: <strong>MEDIUM-HIGH</strong>. The governance structure does not currently impair domestic operations but actively enables value-destructive international expansion.",
+    "keyInsight": "The 44.3% aligned control bloc (TDM + Marks + Barrenjoey + Russo) makes external accountability mechanisms ineffective. Board independence at 43% is below the ASX Corporate Governance Principles best practice of majority independence. The Remuneration and Nomination Committee has 2 of 3 members who are non-independent. LTI vests on time alone with zero performance conditions. This structure allows the US expansion to continue without binding milestones or exit criteria."
+  },
+  "accountingQuality": {
+    "title": "Medium severity risk concentrated in the US restaurant impairment assessment",
+    "overview": "GYG’s accounting quality exhibits a split personality. Australian operations produce high-quality, cash-backed earnings with favourable forensic indicators. US operations contain a material impairment exposure that auditors have not flagged as a Key Audit Matter.",
+    "forensicIndicators": {
+      "headers": [
+        "Indicator",
+        "Value",
+        "Assessment"
+      ],
+      "rows": [
+        [
+          "OCF/NI Ratio",
+          "3.96&times;",
+          "Strong cash backing of reported earnings"
+        ],
+        [
+          "Sloan Accrual Ratio",
+          "&minus;0.05",
+          "Low accruals; favourable"
+        ],
+        [
+          "Beneish M-Score",
+          "&minus;2.55",
+          "Below &minus;1.78 threshold; low manipulation risk"
+        ],
+        [
+          "H2 FY25 FCF",
+          "+A$1.1M",
+          "First positive FCF half; inflection genuine but fragile"
+        ],
+        [
+          "Cash Balance",
+          "A$281.7M",
+          "Fortress; zero interest-bearing debt"
+        ],
+        [
+          "Auditor",
+          "Deloitte",
+          "Unqualified opinion; US impairment not flagged as KAM"
+        ]
+      ]
+    },
+    "exposures": {
+      "headers": [
+        "Exposure",
+        "Magnitude",
+        "Probability",
+        "% of FY25 NPAT"
+      ],
+      "rows": [
+        [
+          "US restaurant impairment",
+          "A$10&ndash;20M",
+          "40&ndash;50%",
+          "70&ndash;140%"
+        ],
+        [
+          "Franchise head lease defaults (10% assumption)",
+          "~A$16.5M",
+          "10&ndash;15%",
+          "~114%"
+        ],
+        [
+          "Goodwill from franchise acquisitions",
+          "A$10M+",
+          "Low",
+          "~69%"
+        ],
+        [
+          "Expected credit losses trajectory",
+          "A$603K on A$11.5M",
+          "Rising",
+          "n/a"
+        ]
+      ]
+    },
+    "usImpairmentAnalysis": "The parent entity wrote off its entire A$28.2M US investment to zero. The consolidated entity concluded no impairment was required despite corporate restaurant margins of &minus;57.5%. Cumulative unrecognised US tax losses total A$29.2M and are growing. Deloitte issued unqualified opinions across all periods; US impairment was not flagged as a Key Audit Matter. The gap between parent entity treatment (full write-off) and consolidated treatment (no impairment) creates material disclosure risk. If impairment is eventually recognised, the charge (A$10&ndash;20M) would represent 70&ndash;140% of FY25 net profit.",
+    "keyInsight": "Australian earnings quality is high: cash-backed (OCF/NI 3.96&times;), low accruals (Sloan &minus;0.05), low manipulation risk (Beneish &minus;2.55). The risk is concentrated entirely in the US impairment assessment, where the parent entity’s own treatment (full write-off to zero) contradicts the consolidated entity’s treatment (no impairment required). This asymmetry suggests future impairment recognition is probable."
+  },
+  "forwardGuidance": {
+    "title": "Above-average credibility on Australian operations; systematic avoidance on US milestones",
+    "overview": "GYG’s forward guidance exhibits a clear bifurcation. Australian operational guidance has been reliable across multiple periods. US guidance is systematically vague, with no quantified milestones that would trigger strategic review or exit.",
+    "guidanceItems": {
+      "headers": [
+        "Metric",
+        "Guidance",
+        "Track Record",
+        "Credibility"
+      ],
+      "rows": [
+        [
+          "Australian restaurant openings",
+          "32 gross (23 drive-thru, 9 strip)",
+          "FY24: guided 26, delivered. FY25: guided 30, delivered 31",
+          "High"
+        ],
+        [
+          "Australia segment EBITDA margin",
+          "6.0&ndash;6.2% of network sales",
+          "Consistent with trend",
+          "High"
+        ],
+        [
+          "Franchise royalty rate",
+          "Targeting >10% within 5 years of IPO (currently 8.6%)",
+          "Progressive increase",
+          "Medium"
+        ],
+        [
+          "G&A as % of network sales",
+          "Targeting ~5% over 5 years (currently 5.8%)",
+          "Compressing from 6.7%",
+          "Medium"
+        ],
+        [
+          "US expansion",
+          "Capped at 15 restaurants",
+          "No defined proof-of-concept metrics",
+          "Low"
+        ],
+        [
+          "Dividends",
+          "Interim and final from FY26",
+          "Maiden 12.6 cps paid Sep 2025",
+          "High"
+        ],
+        [
+          "Share buyback",
+          "A$100M on-market",
+          "Discretionary; board approval required",
+          "Medium"
+        ]
+      ]
+    },
+    "credibilityAssessment": "Australian guidance is above-average credibility. Management has met or exceeded restaurant opening targets in every reported period. Margin and G&A targets are consistent with observable trends. US guidance is the weak point: the 15-restaurant cap is management-imposed and non-binding, the \"proof of concept\" label is used without quantified success metrics, and there are no defined exit criteria that would trigger strategic review. The absence of US milestones creates open-ended capital destruction risk under the existing governance structure.",
+    "keyInsight": "Trust Australian operational guidance; discount US strategic commitments entirely. The credibility gap mirrors the governance gap: strong operational execution in a competitive domestic market, combined with undisciplined capital allocation in a market where the company has no competitive advantage."
+  },
+  "financialHistory": {
+    "title": "Five-year financial trajectory: growth decelerating, margins inflecting, cash flow turning",
+    "overview": "GYG’s financial history shows a company transitioning from hyper-growth to mature growth, with the cash flow inflection point occurring in FY25. The central question is whether the FY25 inflection represents a new normal (sustainable positive cash flow) or a temporary pause in the growth investment cycle.",
+    "table": {
+      "headers": [
+        "Metric",
+        "FY21",
+        "FY22",
+        "FY23",
+        "FY24",
+        "FY25"
+      ],
+      "rows": [
+        [
+          "Revenue (A$M)",
+          "131.0",
+          "184.5",
+          "276.6",
+          "365.0",
+          "468.0"
+        ],
+        [
+          "Revenue Growth",
+          "n/a",
+          "40.8%",
+          "49.9%",
+          "32.0%",
+          "28.2%"
+        ],
+        [
+          "Gross Margin",
+          "75.7%",
+          "76.0%",
+          "74.5%",
+          "76.0%",
+          "75.7%"
+        ],
+        [
+          "EBIT Margin",
+          "5.2%",
+          "5.4%",
+          "2.0%",
+          "&minus;1.1%",
+          "5.4%"
+        ],
+        [
+          "Net Margin",
+          "3.4%",
+          "3.2%",
+          "&minus;0.8%",
+          "&minus;3.8%",
+          "3.1%"
+        ],
+        [
+          "OCF (A$M)",
+          "22.9",
+          "29.0",
+          "23.9",
+          "&minus;9.7",
+          "57.3"
+        ],
+        [
+          "FCF (A$M)",
+          "&minus;1.1",
+          "&minus;8.0",
+          "&minus;19.4",
+          "&minus;16.2",
+          "&minus;7.2"
+        ],
+        [
+          "ROE",
+          "26.5%",
+          "23.5%",
+          "&minus;4.3%",
+          "&minus;3.4%",
+          "3.9%"
+        ],
+        [
+          "Restaurant Count",
+          "~120",
+          "~145",
+          "168",
+          "227",
+          "256"
+        ]
+      ]
+    },
+    "cashQuality": "OCF/NI of 3.96&times;, Sloan accrual ratio of &minus;0.05, Beneish M-Score of &minus;2.55. H2 FY25 produced the first positive FCF half (A$1.1M). Cash: A$281.7M, zero interest-bearing debt. Earnings quality is high; earnings quantity is the constraint.",
+    "keyInsight": "Revenue has compounded from A$131M (FY21) to A$468M (FY25), but the growth rate has decelerated in every period (41% &rarr; 50% &rarr; 32% &rarr; 28%). Gross margins are remarkably stable (74.5&ndash;76.0%), suggesting strong pricing power. The EBIT margin trough in FY24 (&minus;1.1%) reflected IPO costs and US losses; FY25 recovery to 5.4% is genuine but fragile at 4&ndash;5% comparable sales growth. OCF inflected from &minus;A$9.7M (FY24) to +A$57.3M (FY25), the most important single datapoint in the financial history."
+  },
+  "beliefTrajectory": {
+    "title": "Extreme variance to post-IPO valuation distribution",
+    "overview": "GYG’s market narrative has undergone a complete reversal in 20 months. The stock listed as a \"generational compounder\" at 90&times; EBITDA and now trades at 23&times;, below its IPO price. The belief trajectory tracks the transition from growth premium to mature operator discount.",
+    "milestones": [
+      {
+        "date": "June 2024",
+        "price": "A$22.00",
+        "event": "IPO listing at A$22.00. Oversubscribed. Priced as generational Australian compounder.",
+        "multiple": "~45&times; EV/EBITDA"
+      },
+      {
+        "date": "September 2024",
+        "price": "A$45.76",
+        "event": "All-time high. 90.4&times; trailing EV/EBITDA. Peak scarcity premium.",
+        "multiple": "90.4&times;"
+      },
+      {
+        "date": "October 2024",
+        "price": "~A$33",
+        "event": "First negative filing-day reaction (&minus;9.2%). Death cross. Institutional selling begins.",
+        "multiple": "~55&times;"
+      },
+      {
+        "date": "March 2025",
+        "price": "~A$29",
+        "event": "First escrow release (25% of pre-IPO shares). Selling intensifies.",
+        "multiple": "~42&times;"
+      },
+      {
+        "date": "August 2025",
+        "price": "~A$24",
+        "event": "Second escrow release (75%). TDM sell-down visible (36.1% to 20.6%). Second negative filing-day (&minus;13.9%).",
+        "multiple": "~35&times;"
+      },
+      {
+        "date": "January 2026",
+        "price": "~A$22",
+        "event": "Break below IPO price. Retail capitulation. Psychological support lost.",
+        "multiple": "~28&times;"
+      },
+      {
+        "date": "February 2026",
+        "price": "A$17.53",
+        "event": "New all-time low. Third consecutive negative filing-day (&minus;17.6%). 74% multiple compression from peak.",
+        "multiple": "23.1&times;"
+      }
+    ],
+    "marketDynamics": [
+      "Three consecutive filing-day reactions: &minus;9.2%, &minus;13.9%, &minus;17.6% (escalating severity)",
+      "Down-day volume: 1.87&times; up-day volume (capitulation indicator, not accumulation)",
+      "TDM Growth Partners reduced managed stake: 36.1% &rarr; 20.6% (mandate transfers, August 2025)",
+      "Shares outstanding: 91.5M (IPO) &rarr; 103M (post-escrow releases)",
+      "EBITDA doubled (A$33M &rarr; A$69M) yet multiple compressed 74%: fundamental improvement offset by re-rating"
+    ],
+    "keyInsight": "The belief trajectory reveals a market that has completely reversed its assessment of GYG in 20 months. The IPO narrative of a generational compounder is being replaced by a mature franchise operator narrative. The most telling datapoint: EBITDA doubled from A$33M to A$69M while the EV/EBITDA multiple compressed from 90.4&times; to 23.1&times;. The stock is cheaper on fundamentals than at IPO despite being a larger, more profitable business. This either represents an overcorrection (N1) or correct repricing (N2). The H1 FY26 results will determine which interpretation is correct."
+  },
+  "scenarioAnalysis": {
+    "title": "Probability-weighted scenario analysis with three-year earnings paths",
+    "overview": "Four competing scenarios with explicit earnings projections and valuation assumptions. Each scenario is assigned a probability weight based on the evidence assessment. The evidence-weighted price aggregates across all scenarios.",
+    "scenarios": [
+      {
+        "tier": "N1",
+        "title": "Australian Compounder Temporarily Mispriced",
+        "weight": 28,
+        "target": 26.34,
+        "resilience": "Moderate",
+        "earningsPath": {
+          "headers": [
+            "Metric",
+            "FY26E",
+            "FY27E",
+            "FY28E"
+          ],
+          "rows": [
+            [
+              "Revenue (A$M)",
+              "573",
+              "673",
+              "784"
+            ],
+            [
+              "EBITDA (A$M)",
+              "78",
+              "101",
+              "129"
+            ],
+            [
+              "Net Income (A$M)",
+              "29",
+              "41",
+              "55"
+            ],
+            [
+              "FCF (A$M)",
+              "13",
+              "24",
+              "38"
+            ]
+          ]
+        },
+        "valuation": {
+          "method": "25.0&times; FY27 EBITDA of A$101M",
+          "baseCase": "A$2,525M EV &rarr; A$26.34/share",
+          "range": "A$21.44 (20.0&times;) to A$31.24 (30.0&times;)"
+        },
+        "confirmIf": "Comparable sales reach 6%+ in any H2 FY26 quarter with a positive filing-day reaction",
+        "ruleOutIf": "Comparable sales fall below 3% or EV/EBITDA multiple compresses below 15&times;"
+      },
+      {
+        "tier": "N2",
+        "title": "Decelerating Growth Operator (Modal Outcome)",
+        "weight": 46,
+        "target": 11.77,
+        "resilience": "Strong",
+        "earningsPath": {
+          "headers": [
+            "Metric",
+            "FY26E",
+            "FY27E",
+            "FY28E"
+          ],
+          "rows": [
+            [
+              "Revenue (A$M)",
+              "559",
+              "618",
+              "669"
+            ],
+            [
+              "EBITDA (A$M)",
+              "67",
+              "71",
+              "70"
+            ],
+            [
+              "Net Income (A$M)",
+              "22",
+              "12*",
+              "19"
+            ],
+            [
+              "FCF (A$M)",
+              "14",
+              "27",
+              "25"
+            ]
+          ]
+        },
+        "valuation": {
+          "method": "15.0&times; FY28 EBITDA of A$70M",
+          "baseCase": "A$1,050M EV &rarr; A$11.77/share",
+          "range": "A$9.77 (12.0&times;) to A$13.77 (18.0&times;)"
+        },
+        "footnote": "*Includes A$15M US impairment charge",
+        "confirmIf": "Comparable sales fall below 3% in any quarter, confirming pure inflation pass-through",
+        "ruleOutIf": "Comparable sales re-accelerate to 8%+ for two consecutive quarters"
+      },
+      {
+        "tier": "N3",
+        "title": "US Capital Destruction Accelerates",
+        "weight": 21,
+        "target": 7.62,
+        "resilience": "Moderate",
+        "earningsPath": {
+          "headers": [
+            "Metric",
+            "FY26E",
+            "FY27E",
+            "FY28E"
+          ],
+          "rows": [
+            [
+              "Revenue (A$M)",
+              "561",
+              "623",
+              "672"
+            ],
+            [
+              "EBITDA (A$M)",
+              "63",
+              "65",
+              "64"
+            ],
+            [
+              "Net Income (A$M)",
+              "18",
+              "3*",
+              "10"
+            ],
+            [
+              "FCF (A$M)",
+              "5",
+              "16",
+              "15"
+            ]
+          ]
+        },
+        "valuation": {
+          "method": "10.0&times; FY28 EBITDA of A$64M",
+          "baseCase": "A$640M EV &rarr; A$7.62/share",
+          "range": "A$5.82 (7.0&times;) to A$9.41 (13.0&times;)"
+        },
+        "footnote": "*Includes A$20M US impairment charge",
+        "confirmIf": "US EBITDA loss exceeds A$8M in H1 FY26 (annualising above A$16M)",
+        "ruleOutIf": "US restaurant-level margins turn positive in any quarter"
+      },
+      {
+        "tier": "N4",
+        "title": "Franchise System Stress",
+        "weight": 5,
+        "target": 3.76,
+        "resilience": "Weak",
+        "earningsPath": {
+          "headers": [
+            "Metric",
+            "FY26E",
+            "FY27E",
+            "FY28E"
+          ],
+          "rows": [
+            [
+              "Revenue (A$M)",
+              "558",
+              "620",
+              "655"
+            ],
+            [
+              "EBITDA (A$M)",
+              "58",
+              "50",
+              "36"
+            ],
+            [
+              "Net Income (A$M)",
+              "14",
+              "5*",
+              "&minus;12"
+            ],
+            [
+              "FCF (A$M)",
+              "13",
+              "16",
+              "9"
+            ]
+          ]
+        },
+        "valuation": {
+          "method": "7.0&times; FY28 EBITDA of A$36M",
+          "baseCase": "A$252M EV &rarr; A$3.76/share",
+          "range": "A$2.74 (4.0&times;) to A$4.77 (10.0&times;)"
+        },
+        "footnote": "*Includes unspecified charges",
+        "confirmIf": "Franchisees on royalty relief exceed 10, or median franchise ROI falls below 40%",
+        "ruleOutIf": "Franchise ROI stabilises above 48% and royalty relief count falls to 4 or below"
+      }
+    ],
+    "ewpCalculation": {
+      "headers": [
+        "Scenario",
+        "Weight",
+        "Target",
+        "Contribution"
+      ],
+      "rows": [
+        [
+          "N1: Compounder Mispriced",
+          "28%",
+          "A$26.34",
+          "A$7.38"
+        ],
+        [
+          "N2: Decelerating Growth",
+          "46%",
+          "A$11.77",
+          "A$5.41"
+        ],
+        [
+          "N3: US Capital Destruction",
+          "21%",
+          "A$7.62",
+          "A$1.60"
+        ],
+        [
+          "N4: Franchise Stress",
+          "5%",
+          "A$3.76",
+          "A$0.19"
+        ]
+      ],
+      "ewp": 13.59,
+      "currentPrice": 17.53,
+      "gap": -22.5,
+      "gapDirection": "downside",
+      "robustness": "Directional (survives perturbation tests) but not magnitude-robust at ±10% threshold. Small shifts in N1/N2 weights (±5pp) change the EWP by A$0.70–1.20 but do not change the directional conclusion (overpriced)."
+    }
+  }
 }
