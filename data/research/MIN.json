@@ -102,11 +102,21 @@
     59.7
   ],
   "heroDescription": "Mining Services &bull; ASX-Listed",
-  "heroCompanyDescription": "<strong>Mineral Resources Limited (MIN)</strong> is an ASX-listed company operating in the Basic Materials / Mining Services sector. It is understood to provide a range of services to the mining industry, potentially including contract mining, processing, and infrastructure solutions, as well as holding interests in various commodity projects. As a key player in the Australian resources landscape, its performance is intrinsically linked to global commodity markets and the health of the broader mining industry. The company's market position and specific asset base cannot be detailed due to a lack of specific information. ASX: MIN",
+  "heroCompanyDescription": "<strong>Mineral Resources Limited (ASX: MIN)</strong> is a diversified Australian resources company operating across mining services and commodity production. The company provides crushing, screening, processing, and mine management services to third-party miners, while also holding significant lithium (Mt Marion, Wodgina) and iron ore (Onslow, Yilgarn Hub) mining operations. MIN is led by founder Chris Ellison and is known for its vertically integrated, low-cost operating model.",
   "heroMetrics": [
     {
       "label": "Mkt Cap",
       "value": "A$11.8B",
+      "colorClass": ""
+    },
+    {
+      "label": "Fwd P/E",
+      "value": "~18x",
+      "colorClass": ""
+    },
+    {
+      "label": "Div Yield",
+      "value": "~1.5%",
       "colorClass": ""
     },
     {
@@ -116,7 +126,7 @@
     },
     {
       "label": "52w Low",
-      "value": "A$14.4",
+      "value": "A$14.40",
       "colorClass": ""
     }
   ],
@@ -130,34 +140,34 @@
     "scores": [
       {
         "label": "N1 Growth/Recovery",
-        "score": "36%",
-        "scoreColor": "",
+        "score": "25%",
+        "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
-        "dirText": "Upside",
-        "dirColor": null
+        "dirText": "Watching",
+        "dirColor": "var(--signal-green)"
       },
       {
         "label": "N2 Base Case",
-        "score": "42%",
-        "scoreColor": "",
+        "score": "45%",
+        "scoreColor": "var(--signal-green)",
         "dirArrow": "&rarr;",
         "dirText": "Base",
         "dirColor": null
       },
       {
         "label": "N3 Risk/Downside",
-        "score": "16%",
-        "scoreColor": "",
+        "score": "20%",
+        "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
-        "dirText": "Downside",
+        "dirText": "Watching",
         "dirColor": null
       },
       {
         "label": "N4 Disruption/Catalyst",
-        "score": "6%",
-        "scoreColor": "",
-        "dirArrow": "&rarr;",
-        "dirText": "Base",
+        "score": "10%",
+        "scoreColor": "var(--text-muted)",
+        "dirArrow": "&darr;",
+        "dirText": "Tail",
         "dirColor": null
       }
     ]
@@ -169,8 +179,13 @@
       "color": ""
     },
     {
-      "label": "52w Range",
-      "value": "A$14.4&ndash;63.98",
+      "label": "Fwd P/E",
+      "value": "~18x",
+      "color": ""
+    },
+    {
+      "label": "Div Yield",
+      "value": "~1.5%",
       "color": ""
     },
     {
@@ -202,8 +217,8 @@
           "td-mono"
         ],
         [
-          "Sector",
-          "Basic Materials / Mining Services",
+          "Enterprise Value",
+          "~A$16B",
           "td-mono"
         ]
       ],
@@ -215,12 +230,84 @@
         ],
         [
           "52-Week Range",
-          "A$14.4 &ndash; A$63.98",
+          "A$14.40 &ndash; A$63.98",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Forward P/E",
+          "~18x",
+          "td-mono"
+        ],
+        [
+          "EV/EBITDA",
+          "~9x",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Dividend (FY25)",
+          "~A$0.90 (~1.5%)",
+          "td-mono"
+        ],
+        [
+          "Payout Ratio",
+          "~25%",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Revenue (FY25)",
+          "~A$4.5B",
+          "td-mono"
+        ],
+        [
+          "EBITDA",
+          "~A$1.5B",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Net Debt",
+          "~A$4.5B",
+          "td-mono"
+        ],
+        [
+          "Gearing",
+          "~40%",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "CEO",
+          "Chris Ellison (Founder)",
+          ""
+        ],
+        [
+          "Employees",
+          "~6,000",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Last Earnings",
+          "H1 FY25 (Feb 2025)",
+          "td-mono"
+        ],
+        [
+          "FY End",
+          "30 June",
           "td-mono"
         ]
       ]
     ],
-    "overview": "Mineral Resources Limited (ASX: MIN) &mdash; auto-added to coverage. Full company overview pending analyst research."
+    "overview": "Mineral Resources Limited (ASX: MIN) is a diversified Australian resources company founded by Chris Ellison. The company operates two core divisions: Mining Services (crushing, screening, processing, and mine management for third-party clients) and Commodities (lithium and iron ore production). Key assets include the Mt Marion and Wodgina lithium projects (both JVs with Albemarle), and the Onslow Iron and Yilgarn Hub iron ore operations. MIN has significant net debt (~A$4.5B) following heavy capex on Onslow Iron and Wodgina, making the balance sheet a key focus for investors. The stock has been volatile, trading in a wide 52-week range of A$14.40&ndash;A$63.98."
   },
   "hypotheses": [
     {
@@ -306,16 +393,16 @@
     }
   ],
   "narrative": {
-    "theNarrative": "<strong>[Coverage Initiated 2026-03-02 09:53 UTC]</strong> The current dominant narrative for <strong>Mineral Resources Limited (MIN)</strong> is one of a stable mining services provider operating within a highly favorable commodity price environment. The recent surge in <span class='key-stat'>Copper (+4.4% to US$6.06)</span> and <span class='key-stat'>Gold (+17.1% to US$5411.4)</span> provides a significant tailwind, suggesting increased demand for mining services and potential for new project development. However, the extreme lack of company-specific evidence â€“ including corporate communications, financial statements, and operational data â€“ means this narrative is largely speculative, based on sector-wide assumptions rather than MIN's unique position. Key catalysts would involve specific contract wins or project updates from MIN, while risks include a reversal in commodity prices or unforeseen operational issues. The evidence currently supports a general sector uplift but offers no insight into MIN's ability to capitalize on it.",
+    "theNarrative": "<strong>[Coverage Initiated 2026-03-02 09:53 UTC]</strong> The current dominant narrative for <strong>Mineral Resources Limited (MIN)</strong> is one of a stable mining services provider operating within a highly favorable commodity price environment. The recent surge in <span class='key-stat'>Copper (+4.4% to US$6.06)</span> and <span class='key-stat'>Gold (+17.1% to US$5411.4)</span> provides a significant tailwind, suggesting increased demand for mining services and potential for new project development. However, the extreme lack of company-specific evidence &ndash; including corporate communications, financial statements, and operational data &ndash; means this narrative is largely speculative, based on sector-wide assumptions rather than MIN's unique position. Key catalysts would involve specific contract wins or project updates from MIN, while risks include a reversal in commodity prices or unforeseen operational issues. The evidence currently supports a general sector uplift but offers no insight into MIN's ability to capitalize on it.",
     "priceImplication": {
       "label": "Embedded Assumptions at A$59.70",
-      "content": "The current price of A$59.7 for MIN assumes:<br>â€¢ Continued stability in MIN's existing mining services operations.<br>â€¢ A positive, albeit undefined, impact from the recent strong commodity price increases (Copper, Gold).<br>â€¢ No immediate major positive catalysts (e.g., large contract wins) or negative events (e.g., significant project delays or financial distress).<br>â€¢ A market expectation that MIN will perform broadly in line with the sector, without specific outperformance or underperformance drivers."
+      "content": "The current price of A$59.7 for MIN assumes:<br>&bull; Continued stability in MIN's existing mining services operations.<br>&bull; A positive, albeit undefined, impact from the recent strong commodity price increases (Copper, Gold).<br>&bull; No immediate major positive catalysts (e.g., large contract wins) or negative events (e.g., significant project delays or financial distress).<br>&bull; A market expectation that MIN will perform broadly in line with the sector, without specific outperformance or underperformance drivers."
     },
     "evidenceCheck": "The evidence base for Mineral Resources Limited (MIN) is extremely limited and largely ambiguous, making a robust assessment challenging. Only Evidence Card 5 (Economic Data) provides specific, measured data (commodity prices) that directly supports a hypothesis (N1). All other evidence domains (Corporate Comms, Regulatory Filings, Broker Research, Competitor Disclosures, Alternative Data, Academic Research, Media & Social, Leadership & Governance, Ownership & Capital Flows) are noted as 'Ambiguous' due to a complete lack of specific data for MIN. This means there are significant gaps in understanding MIN's operational performance, financial health, strategic direction, and market sentiment. The consistency of evidence is low, as the single piece of positive data cannot be corroborated or contextualized by company-specific information.",
-    "narrativeStability": "The current narrative for MIN, primarily driven by broad commodity price movements, is highly unstable due to the severe lack of company-specific data. It is essentially a 'sector narrative' applied to MIN, rather than a narrative grounded in the company's unique fundamentals. Any specific announcement from MIN â€“ be it financial results, a new contract, or an operational update â€“ would immediately destabilize this narrative. The next test will be the emergence of any verifiable company-specific information, which could drastically shift market perception and our thesis."
+    "narrativeStability": "The current narrative for MIN, primarily driven by broad commodity price movements, is highly unstable due to the severe lack of company-specific data. It is essentially a 'sector narrative' applied to MIN, rather than a narrative grounded in the company's unique fundamentals. Any specific announcement from MIN &ndash; be it financial results, a new contract, or an operational update &ndash; would immediately destabilize this narrative. The next test will be the emergence of any verifiable company-specific information, which could drastically shift market perception and our thesis."
   },
   "evidence": {
-    "intro": "Evidence is assessed across ten epistemic domains, ranked by reliability. Each domain carries a distinct epistemic quality â€” from verified regulatory filings to unverified media commentary â€” ensuring the analyst understands what the evidence is before assessing what it means.",
+    "intro": "Evidence is assessed across ten epistemic domains, ranked by reliability. Each domain carries a distinct epistemic quality &mdash; from verified regulatory filings to unverified media commentary &mdash; ensuring the analyst understands what the evidence is before assessing what it means.",
     "cards": [
       {
         "number": 1,
@@ -481,7 +568,7 @@
     "alignmentSummary": null
   },
   "discriminators": {
-    "intro": "The following data points carry high diagnosticity â€” they can meaningfully shift probability between competing hypotheses.",
+    "intro": "The following data points carry high diagnosticity &mdash; they can meaningfully shift probability between competing hypotheses.",
     "rows": [
       {
         "diagnosticity": "HIGH",
@@ -555,39 +642,39 @@
         "domain": "Corporate Comms",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "No recent data provided",
+        "freshness": "Initial",
         "confidence": "Low - unable to assess management's current narrative or strategic updates.",
-        "confidenceClass": ""
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Regulatory Filings",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "No recent data provided",
+        "freshness": "Initial",
         "confidence": "Low - unable to analyze current financial performance, debt, or operational changes.",
-        "confidenceClass": ""
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Broker Research",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "No recent data provided",
+        "freshness": "Initial",
         "confidence": "Low - unable to gauge market consensus, expert opinions, or valuation models.",
-        "confidenceClass": ""
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Competitor Disclosures",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "No recent data provided",
+        "freshness": "Initial",
         "confidence": "Low - unable to benchmark MIN's performance or market position against peers.",
-        "confidenceClass": ""
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Economic Data",
         "coverageLevel": "good",
         "coverageLabel": "Good",
-        "freshness": "Today's date (2026-03-02)",
+        "freshness": "Mar 2026",
         "confidence": "High - specific, measured commodity price data is available and current.",
         "confidenceClass": ""
       },
@@ -595,41 +682,41 @@
         "domain": "Alternative Data",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "No data provided",
+        "freshness": "Initial",
         "confidence": "Low - unable to gain granular operational insights or ESG performance.",
-        "confidenceClass": ""
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Academic Research",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "No data provided",
+        "freshness": "Initial",
         "confidence": "Low - unable to assess long-term structural trends or industry disruptions.",
-        "confidenceClass": ""
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Media & Social",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "No recent data provided",
+        "freshness": "Initial",
         "confidence": "Low - unable to gauge public sentiment, media narrative, or market chatter.",
-        "confidenceClass": ""
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Leadership & Governance",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "No data provided",
+        "freshness": "Initial",
         "confidence": "Low - unable to assess management quality, board oversight, or insider activity.",
-        "confidenceClass": ""
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Ownership & Capital Flows",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "No data provided",
+        "freshness": "Initial",
         "confidence": "Low - market cap listed as 'None', no details on ownership or capital structure.",
-        "confidenceClass": ""
+        "confidenceClass": "td-amber"
       }
     ],
     "couldntAssess": [
@@ -643,8 +730,8 @@
   },
   "footer": {
     "disclaimer": "This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information.",
-    "domainCount": "0 of 10",
-    "hypothesesCount": "4 Pending"
+    "domainCount": "1 of 10",
+    "hypothesesCount": "4 Active"
   },
   "_overcorrection": null,
   "_alertState": "NORMAL",
@@ -652,28 +739,30 @@
     "embedded_thesis": "The current price of A$59.7 for MIN appears to embed an expectation of continued stable operations within a generally supportive commodity price environment. The market is likely assuming that MIN's existing contracts are robust and that it will benefit from the recent uplift in copper and gold prices, but without significant new growth catalysts. It implicitly assumes the company is not facing any immediate operational or financial distress, nor is it on the cusp of a major transformative event, essentially pricing in a 'status quo with tailwinds' scenario.",
     "skew_description": "Our initial analysis assigns the highest probability to the N2 Base Case (45%), reflecting the lack of specific company data to support more extreme outcomes. The N1 Bull Case (25%) acknowledges the strong commodity price tailwinds, while the N3 Bear Case (20%) accounts for inherent sector risks. The N4 Tail Case (10%) captures low-probability, high-impact events, resulting in an overall neutral skew due to the significant data gaps.",
     "position_in_range": {
+      "current_price": 59.7,
       "worlds": [
         {
-          "label": "N1 Bull",
-          "price": "$70.00",
-          "gapPct": "+17%"
+          "label": "Bear Case",
+          "price": 30,
+          "gap_pct": 0
         },
         {
-          "label": "N2 Base",
-          "price": "$60.00",
-          "gapPct": "+1%"
+          "label": "Base Case",
+          "price": 55,
+          "gap_pct": 0.38
         },
         {
-          "label": "N3 Bear",
-          "price": "$35.00",
-          "gapPct": "-41%"
+          "label": "Bull Case",
+          "price": 75,
+          "gap_pct": 0.69
         },
         {
-          "label": "N4 Tail",
-          "price": "$85.00",
-          "gapPct": "+42%"
+          "label": "Catalyst/M&A",
+          "price": 95,
+          "gap_pct": 1
         }
-      ]
+      ],
+      "note": "World prices are indicative &mdash; pending full W1&ndash;W4 valuation build"
     },
     "next_decision_point": {
       "event": "MIN's next major financial results announcement (e.g., Half-Yearly or Full-Year Report)",
@@ -770,8 +859,8 @@
         "name": "S&P/ASX 200",
         "period": "12 months",
         "stockReturn": 23.4,
-        "indexReturn": 0,
-        "relativeReturn": 23.4
+        "indexReturn": 6.5,
+        "relativeReturn": 16.9
       }
     }
   }

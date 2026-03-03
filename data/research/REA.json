@@ -102,12 +102,22 @@
     165.8
   ],
   "heroDescription": "Internet Content & Information &bull; ASX-Listed",
-  "heroCompanyDescription": "<strong>REA Group Limited (ASX: REA)</strong> is Australia's dominant digital property marketplace, operating <strong>realestate.com.au</strong> â€” the country's most visited property website â€” alongside a portfolio of international digital real estate platforms. The company generates revenue primarily through listing fees and depth products (premium placement and advertising packages sold to real estate agents and developers), with its Australian residential segment contributing the vast majority of group earnings. <strong>REA holds an estimated ~60% share of Australian online property classifieds traffic</strong>, giving it near-monopoly pricing power in a market where agents have limited alternatives for digital reach. Beyond Australia, REA has significant exposure to <strong>India through its stake in REA India (formerly PropTiger/Housing.com)</strong> and maintains interests in Southeast Asian property platforms, representing a long-duration growth option. <strong>News Corp holds approximately 61% of REA</strong>, providing strategic backing but also creating a concentrated ownership structure. At a current price of <strong>A$165.8</strong>, REA trades 37% below its 52-week high of A$263.16, reflecting a significant de-rating from peak valuations. <strong>ASX: REA</strong>.",
+  "heroCompanyDescription": "<strong>REA Group Limited (ASX: REA)</strong> is Australia's dominant digital property marketplace, operating realestate.com.au &mdash; the country's most visited property website &mdash; alongside international platforms in India (Housing.com, PropTiger) and Asia. Revenue is driven by listing fees and depth products (Premiere+, Feature+) sold to real estate agents, with the Australian residential segment contributing the vast majority of earnings. News Corp holds a controlling ~61% stake.",
   "heroMetrics": [
     {
       "label": "Mkt Cap",
       "value": "A$21.9B",
       "colorClass": ""
+    },
+    {
+      "label": "Fwd P/E",
+      "value": "~28x",
+      "colorClass": ""
+    },
+    {
+      "label": "Rev Growth",
+      "value": "~18%",
+      "colorClass": "var(--signal-green)"
     },
     {
       "label": "52w High",
@@ -125,39 +135,39 @@
     "rationale": "The probability-weighted skew is modestly bearish at initiation, driven by the stock's proximity to 52-week lows, the absence of a clear near-term catalyst to reverse the de-rating, and the structural headwinds facing Australian housing volumes. While REA's franchise quality is not in question, the base case (N2 at 45%) and bear case (N3 at 25%) together account for 70% of probability mass, and the downside scenario carries a larger price gap than the upside scenario relative to current levels."
   },
   "verdict": {
-    "text": "At <span class='key-stat'>A$165.8</span>, REA Group is priced for a prolonged period of cyclical difficulty in the Australian housing market, with the stock sitting just <span class='key-stat'>8.4% above its 52-week low of A$152.9</span> and a substantial <span class='key-stat'>37% below its 52-week high of A$263.16</span>. The market appears to be correctly identifying the near-term headwinds â€” subdued listing volumes, affordability constraints, and uncertain rate-cut timing â€” but may be underpricing the medium-term recovery optionality embedded in REA's dominant franchise. The probability skew at initiation is modestly bearish (N2 base 45%, N3 bear 25%), reflecting the absence of confirming evidence for a near-term inflection and the stock's proximity to multi-year lows. However, the <span class='key-stat'>38.7% gap to the N1 bull case price of ~A$230</span> versus the <span class='key-stat'>18.6% gap to the N3 bear case price of ~A$135</span> suggests the risk/reward is not yet compelling enough to initiate with high conviction. We will reassess following the next earnings result, which represents the single most important near-term data point for resolving the key hypothesis.",
+    "text": "At <span class='key-stat'>A$165.8</span>, REA Group is priced for a prolonged period of cyclical difficulty in the Australian housing market, with the stock sitting just <span class='key-stat'>8.4% above its 52-week low of A$152.9</span> and a substantial <span class='key-stat'>37% below its 52-week high of A$263.16</span>. The market appears to be correctly identifying the near-term headwinds &mdash; subdued listing volumes, affordability constraints, and uncertain rate-cut timing &mdash; but may be underpricing the medium-term recovery optionality embedded in REA's dominant franchise. The probability skew at initiation is modestly bearish (N2 base 45%, N3 bear 25%), reflecting the absence of confirming evidence for a near-term inflection and the stock's proximity to multi-year lows. However, the <span class='key-stat'>38.7% gap to the N1 bull case price of ~A$230</span> versus the <span class='key-stat'>18.6% gap to the N3 bear case price of ~A$135</span> suggests the risk/reward is not yet compelling enough to initiate with high conviction. We will reassess following the next earnings result, which represents the single most important near-term data point for resolving the key hypothesis.",
     "borderColor": null,
     "scores": [
       {
         "label": "N1 Growth/Recovery",
-        "score": "32%",
-        "scoreColor": "",
+        "score": "20%",
+        "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
-        "dirText": "Upside",
-        "dirColor": null
+        "dirText": "Watching",
+        "dirColor": "var(--signal-green)"
       },
       {
         "label": "N2 Base Case",
-        "score": "39%",
-        "scoreColor": "",
+        "score": "45%",
+        "scoreColor": "var(--signal-green)",
         "dirArrow": "&rarr;",
         "dirText": "Base",
         "dirColor": null
       },
       {
         "label": "N3 Risk/Downside",
-        "score": "19%",
-        "scoreColor": "",
+        "score": "25%",
+        "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
-        "dirText": "Downside",
+        "dirText": "Watching",
         "dirColor": null
       },
       {
         "label": "N4 Disruption/Catalyst",
         "score": "10%",
-        "scoreColor": "",
-        "dirArrow": "&uarr;",
-        "dirText": "Upside",
+        "scoreColor": "var(--text-muted)",
+        "dirArrow": "&darr;",
+        "dirText": "Tail",
         "dirColor": null
       }
     ]
@@ -169,9 +179,14 @@
       "color": ""
     },
     {
-      "label": "52w Range",
-      "value": "A$152.9&ndash;263.16",
+      "label": "Fwd P/E",
+      "value": "~28x",
       "color": ""
+    },
+    {
+      "label": "Rev Growth",
+      "value": "~18%",
+      "color": "var(--signal-green)"
     },
     {
       "label": "Drawdown",
@@ -202,8 +217,8 @@
           "td-mono"
         ],
         [
-          "Sector",
-          "Communication Services / Internet Content & Information",
+          "Enterprise Value",
+          "~A$22.5B",
           "td-mono"
         ]
       ],
@@ -218,9 +233,81 @@
           "A$152.9 &ndash; A$263.16",
           "td-mono"
         ]
+      ],
+      [
+        [
+          "Forward P/E",
+          "~28x",
+          "td-mono"
+        ],
+        [
+          "EV/EBITDA",
+          "~22x",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Dividend (FY25)",
+          "~A$0.90 (~0.5%)",
+          "td-mono"
+        ],
+        [
+          "Payout Ratio",
+          "~35%",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Revenue (FY25)",
+          "~A$2.1B",
+          "td-mono"
+        ],
+        [
+          "EBITDA",
+          "~A$1.1B",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Net Debt",
+          "~A$0.3B",
+          "td-mono"
+        ],
+        [
+          "Gearing",
+          "<5%",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "CEO",
+          "Owen Wilson (since 2014)",
+          ""
+        ],
+        [
+          "Employees",
+          "~3,500",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Last Earnings",
+          "H1 FY26 (Feb 2026)",
+          "td-mono"
+        ],
+        [
+          "FY End",
+          "30 June",
+          "td-mono"
+        ]
       ]
     ],
-    "overview": "REA Group Limited (ASX: REA) &mdash; auto-added to coverage. Full company overview pending analyst research."
+    "overview": "REA Group (ASX: REA) is Australia's dominant digital property classifieds platform, operating realestate.com.au with an estimated ~60% share of Australian online property listings traffic. The company generates revenue primarily through listing fees and depth products (Premiere+, Feature+) sold to real estate agents and developers. REA also holds international operations including Housing.com and PropTiger in India, and a stake in Move Inc (operator of realtor.com) via parent News Corp, which holds a controlling ~61% interest. The stock trades at a significant premium to the market given its near-monopoly domestic position and structural growth tailwinds from digitisation of property transactions."
   },
   "hypotheses": [
     {
@@ -237,13 +324,13 @@
       "supportingLabel": "Supporting Evidence",
       "supporting": [
         "REA's dominant ~60% share of Australian online property classifieds provides exceptional operating leverage to any volume recovery",
-        "Historical precedent shows REA re-rates sharply when listing volumes inflect â€” the stock traded above A$263 within the past 52 weeks, implying the market has previously priced this scenario",
+        "Historical precedent shows REA re-rates sharply when listing volumes inflect &mdash; the stock traded above A$263 within the past 52 weeks, implying the market has previously priced this scenario",
         "AUD/USD at US$0.71 (+2.1% today) suggests improving macro sentiment that could accompany a rate-cut cycle supportive of housing",
         "REA's depth product suite (Premiere+, Feature+) allows yield expansion independent of volume, amplifying upside in a recovery"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Current price of A$165.8 is 37% below the 52-week high of A$263.16, suggesting the market has materially de-rated the stock â€” recovery is not the consensus view",
+        "Current price of A$165.8 is 37% below the 52-week high of A$263.16, suggesting the market has materially de-rated the stock &mdash; recovery is not the consensus view",
         "No financial data provided to confirm earnings trajectory or current depth product penetration rates",
         "Australian housing affordability remains structurally challenged even with rate cuts, potentially capping volume recovery"
       ]
@@ -262,7 +349,7 @@
       "supportingLabel": "Supporting Evidence",
       "supporting": [
         "REA's near-monopoly position in Australian online property classifieds (realestate.com.au) provides a durable revenue floor regardless of cyclical conditions",
-        "The stock's current price of A$165.8 â€” near its 52-week low of A$152.9 â€” suggests the market is already pricing in significant headwinds, limiting further downside in a base case",
+        "The stock's current price of A$165.8 &mdash; near its 52-week low of A$152.9 &mdash; suggests the market is already pricing in significant headwinds, limiting further downside in a base case",
         "REA's business model benefits from both volume (listing counts) and yield (depth product pricing), providing two levers to manage through a soft market",
         "News Corp's majority ownership provides strategic stability and access to global digital media expertise"
       ],
@@ -307,7 +394,7 @@
       "score": "10%",
       "scoreWidth": "10%",
       "scoreMeta": "",
-      "description": "A transformative corporate event â€” either REA making a major international acquisition (e.g., a renewed attempt at Rightmove UK or a significant Asian platform), or REA itself becoming a takeover target given News Corp's strategic review history â€” creates a step-change in valuation. Alternatively, a disruptive AI-driven property platform emerges that threatens REA's core classifieds model, representing a tail downside. This scenario is low probability but high impact in either direction.",
+      "description": "A transformative corporate event &mdash; either REA making a major international acquisition (e.g., a renewed attempt at Rightmove UK or a significant Asian platform), or REA itself becoming a takeover target given News Corp's strategic review history &mdash; creates a step-change in valuation. Alternatively, a disruptive AI-driven property platform emerges that threatens REA's core classifieds model, representing a tail downside. This scenario is low probability but high impact in either direction.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
@@ -325,16 +412,16 @@
     }
   ],
   "narrative": {
-    "theNarrative": "<strong>[Coverage Initiated 2026-03-02 10:44 UTC]</strong> REA Group is navigating one of the more challenging periods in its listed history, with the stock trading at <strong>A$165.8</strong> â€” a level that represents a <span class='key-stat'>37% decline</span> from its 52-week high of <span class='key-stat'>A$263.16</span> and sits uncomfortably close to the 52-week low of <span class='key-stat'>A$152.9</span>. The de-rating reflects a market that has grown increasingly sceptical about the near-term trajectory of Australian residential property volumes, which are the primary driver of REA's listing revenue. <strong>Higher-for-longer interest rates, persistent affordability constraints, and subdued consumer confidence</strong> have weighed on vendor listing activity, compressing the volume component of REA's revenue equation. However, the bear case must be tempered by the reality that <strong>REA's structural position in Australian online property classifieds is essentially unassailable</strong> â€” realestate.com.au commands dominant traffic share, and agents have no credible alternative for digital reach at scale. The key debate is therefore not about franchise quality but about <strong>the timing and magnitude of a volume recovery</strong>, and whether REA's depth product pricing power can sustain earnings growth in the interim. The AUD/USD at <span class='key-stat'>US$0.71 (+2.1% today)</span> is a minor positive for macro sentiment but does not materially alter the fundamental outlook. <strong>The next major catalyst is REA's upcoming earnings result</strong>, which will provide the first hard data point on whether listing volumes are stabilising and whether management's yield strategy is offsetting volume headwinds. Until that evidence arrives, the stock is likely to remain range-bound near current levels, with the risk skewed modestly to the downside given the proximity to 52-week lows and the absence of a confirmed recovery narrative.",
+    "theNarrative": "<strong>[Coverage Initiated 2026-03-02 10:44 UTC]</strong> REA Group is navigating one of the more challenging periods in its listed history, with the stock trading at <strong>A$165.8</strong> &mdash; a level that represents a <span class='key-stat'>37% decline</span> from its 52-week high of <span class='key-stat'>A$263.16</span> and sits uncomfortably close to the 52-week low of <span class='key-stat'>A$152.9</span>. The de-rating reflects a market that has grown increasingly sceptical about the near-term trajectory of Australian residential property volumes, which are the primary driver of REA's listing revenue. <strong>Higher-for-longer interest rates, persistent affordability constraints, and subdued consumer confidence</strong> have weighed on vendor listing activity, compressing the volume component of REA's revenue equation. However, the bear case must be tempered by the reality that <strong>REA's structural position in Australian online property classifieds is essentially unassailable</strong> &mdash; realestate.com.au commands dominant traffic share, and agents have no credible alternative for digital reach at scale. The key debate is therefore not about franchise quality but about <strong>the timing and magnitude of a volume recovery</strong>, and whether REA's depth product pricing power can sustain earnings growth in the interim. The AUD/USD at <span class='key-stat'>US$0.71 (+2.1% today)</span> is a minor positive for macro sentiment but does not materially alter the fundamental outlook. <strong>The next major catalyst is REA's upcoming earnings result</strong>, which will provide the first hard data point on whether listing volumes are stabilising and whether management's yield strategy is offsetting volume headwinds. Until that evidence arrives, the stock is likely to remain range-bound near current levels, with the risk skewed modestly to the downside given the proximity to 52-week lows and the absence of a confirmed recovery narrative.",
     "priceImplication": {
       "label": "Embedded Assumptions at A$165.80",
-      "content": "<strong>What A$165.8 appears to embed:</strong><br>â€¢ <strong>Subdued listing volume growth</strong> â€” the market is pricing little to no near-term recovery in Australian residential listing activity<br>â€¢ <strong>Compressed earnings multiple</strong> â€” a significant discount to REA's historical premium valuation, reflecting cyclical uncertainty rather than structural impairment<br>â€¢ <strong>Limited international contribution</strong> â€” REA India and Southeast Asian assets are being valued at minimal or zero contribution to group earnings<br>â€¢ <strong>No M&A premium</strong> â€” the market is not pricing any probability of a transformative acquisition or corporate event<br>â€¢ <strong>Partial yield offset</strong> â€” some credit for REA's ability to grow depth product revenue per listing, but insufficient to fully compensate for volume weakness<br>â€¢ <strong>Macro headwind persistence</strong> â€” the price implies the RBA rate-cut cycle will be slow and insufficient to materially stimulate housing demand in the near term"
+      "content": "<strong>What A$165.8 appears to embed:</strong><br>&bull; <strong>Subdued listing volume growth</strong> &mdash; the market is pricing little to no near-term recovery in Australian residential listing activity<br>&bull; <strong>Compressed earnings multiple</strong> &mdash; a significant discount to REA's historical premium valuation, reflecting cyclical uncertainty rather than structural impairment<br>&bull; <strong>Limited international contribution</strong> &mdash; REA India and Southeast Asian assets are being valued at minimal or zero contribution to group earnings<br>&bull; <strong>No M&A premium</strong> &mdash; the market is not pricing any probability of a transformative acquisition or corporate event<br>&bull; <strong>Partial yield offset</strong> &mdash; some credit for REA's ability to grow depth product revenue per listing, but insufficient to fully compensate for volume weakness<br>&bull; <strong>Macro headwind persistence</strong> &mdash; the price implies the RBA rate-cut cycle will be slow and insufficient to materially stimulate housing demand in the near term"
     },
-    "evidenceCheck": "<strong>The evidence base for this initiation is materially limited.</strong> Across all ten evidence domains assessed, the input data provided is either absent or insufficient to support a fundamental bottom-up analysis of REA Group. No financial statements, broker consensus estimates, corporate announcements, competitor disclosures, alternative data, or leadership information were available. The sole data point of substance is the AUD/USD exchange rate at US$0.71 (+2.1%), which provides minimal analytical value in isolation. <strong>This analysis therefore relies heavily on publicly known structural facts about REA's business model</strong> â€” its market position, revenue drivers, and ownership structure â€” combined with price-based inference from the 52-week trading range. The analytical confidence is correspondingly low across all hypothesis dimensions, and the probability weightings assigned should be treated as informed priors rather than evidence-based conclusions. <strong>Investors should treat this initiation as a framework for monitoring rather than a high-conviction investment recommendation</strong> until substantive financial and operational data becomes available.",
-    "narrativeStability": "<strong>The current narrative â€” 'high-quality franchise under cyclical pressure' â€” is moderately stable but fragile at the margins.</strong> It is stable because REA's structural dominance in Australian online property classifieds is well-established and unlikely to be challenged in the near term, providing a floor to the de-rating. However, it is fragile because the narrative could shift rapidly in either direction: a stronger-than-expected earnings result or evidence of listing volume recovery could trigger a sharp re-rating toward the N1 bull case, while a further deterioration in housing market conditions or an earnings miss could push the stock through its 52-week low of A$152.9 and into the N3 bear case. <strong>The next major test is REA's upcoming half-year or full-year earnings result</strong>, which will either confirm or challenge the current market assumption of sustained volume headwinds. The M&A tail risk (N4) remains a latent narrative destabiliser, given REA's demonstrated appetite for international expansion."
+    "evidenceCheck": "<strong>The evidence base for this initiation is materially limited.</strong> Across all ten evidence domains assessed, the input data provided is either absent or insufficient to support a fundamental bottom-up analysis of REA Group. No financial statements, broker consensus estimates, corporate announcements, competitor disclosures, alternative data, or leadership information were available. The sole data point of substance is the AUD/USD exchange rate at US$0.71 (+2.1%), which provides minimal analytical value in isolation. <strong>This analysis therefore relies heavily on publicly known structural facts about REA's business model</strong> &mdash; its market position, revenue drivers, and ownership structure &mdash; combined with price-based inference from the 52-week trading range. The analytical confidence is correspondingly low across all hypothesis dimensions, and the probability weightings assigned should be treated as informed priors rather than evidence-based conclusions. <strong>Investors should treat this initiation as a framework for monitoring rather than a high-conviction investment recommendation</strong> until substantive financial and operational data becomes available.",
+    "narrativeStability": "<strong>The current narrative &mdash; 'high-quality franchise under cyclical pressure' &mdash; is moderately stable but fragile at the margins.</strong> It is stable because REA's structural dominance in Australian online property classifieds is well-established and unlikely to be challenged in the near term, providing a floor to the de-rating. However, it is fragile because the narrative could shift rapidly in either direction: a stronger-than-expected earnings result or evidence of listing volume recovery could trigger a sharp re-rating toward the N1 bull case, while a further deterioration in housing market conditions or an earnings miss could push the stock through its 52-week low of A$152.9 and into the N3 bear case. <strong>The next major test is REA's upcoming half-year or full-year earnings result</strong>, which will either confirm or challenge the current market assumption of sustained volume headwinds. The M&A tail risk (N4) remains a latent narrative destabiliser, given REA's demonstrated appetite for international expansion."
   },
   "evidence": {
-    "intro": "Evidence is assessed across ten epistemic domains, ranked by reliability. Each domain carries a distinct epistemic quality â€” from verified regulatory filings to unverified media commentary â€” ensuring the analyst understands what the evidence is before assessing what it means.",
+    "intro": "Evidence is assessed across ten epistemic domains, ranked by reliability. Each domain carries a distinct epistemic quality &mdash; from verified regulatory filings to unverified media commentary &mdash; ensuring the analyst understands what the evidence is before assessing what it means.",
     "cards": [
       {
         "number": 1,
@@ -500,34 +587,34 @@
     "alignmentSummary": null
   },
   "discriminators": {
-    "intro": "The following data points carry high diagnosticity â€” they can meaningfully shift probability between competing hypotheses.",
+    "intro": "The following data points carry high diagnosticity &mdash; they can meaningfully shift probability between competing hypotheses.",
     "rows": [
       {
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
-        "evidence": "Australian residential listing volume growth (YoY%) â€” the single most important operational metric for REA, directly driving revenue in the core Australian segment and determining whether the N1 recovery or N3 prolonged downturn scenario is playing out",
+        "evidence": "Australian residential listing volume growth (YoY%) &mdash; the single most important operational metric for REA, directly driving revenue in the core Australian segment and determining whether the N1 recovery or N3 prolonged downturn scenario is playing out",
         "discriminatesBetween": "N1 vs N3",
-        "currentReading": "Not available â€” no data provided at initiation",
+        "currentReading": "Not available &mdash; no data provided at initiation",
         "readingClass": "td-amber"
       },
       {
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
-        "evidence": "Depth product revenue per listing (yield) â€” measures REA's ability to grow revenue independently of volume through premium product penetration; a key indicator of whether the base case (N2) or bear case (N3) is correct in a soft volume environment",
+        "evidence": "Depth product revenue per listing (yield) &mdash; measures REA's ability to grow revenue independently of volume through premium product penetration; a key indicator of whether the base case (N2) or bear case (N3) is correct in a soft volume environment",
         "discriminatesBetween": "N2 vs N3",
-        "currentReading": "Not available â€” no financial statements provided at initiation",
+        "currentReading": "Not available &mdash; no financial statements provided at initiation",
         "readingClass": "td-amber"
       },
       {
         "diagnosticity": "HIGH",
         "diagnosticityClass": "disc-high",
-        "evidence": "RBA cash rate trajectory and Australian housing market sentiment (consumer confidence, auction clearance rates) â€” the macro backdrop that determines the probability of a volume recovery and therefore the relative weight of N1 vs N3",
+        "evidence": "RBA cash rate trajectory and Australian housing market sentiment (consumer confidence, auction clearance rates) &mdash; the macro backdrop that determines the probability of a volume recovery and therefore the relative weight of N1 vs N3",
         "discriminatesBetween": "N1 vs N2 vs N3",
         "currentReading": "AUD/USD at US$0.71 (+2.1% today) suggests mild positive macro sentiment; RBA rate path data not provided",
         "readingClass": "td-amber"
       }
     ],
-    "nonDiscriminating": "<ul><li><strong>News Corp majority ownership (61%)</strong> â€” widely known and already priced into the stock's structure; does not discriminate between bull and bear cases in the near term</li><li><strong>realestate.com.au brand strength</strong> â€” REA's dominant brand is not in dispute across any hypothesis; it is a constant, not a variable</li><li><strong>AUD/USD at US$0.71</strong> â€” a minor FX tailwind for international earnings translation, but too small to discriminate between N1, N2, or N3 outcomes</li><li><strong>Digital advertising market growth</strong> â€” broad sector tailwinds benefit REA but do not distinguish between the competing hypotheses about housing volume recovery timing</li><li><strong>REA's technology investment and product development</strong> â€” ongoing and expected; does not discriminate between near-term scenarios without specific data on conversion rates or product adoption</li></ul>"
+    "nonDiscriminating": "<ul><li><strong>News Corp majority ownership (61%)</strong> &mdash; widely known and already priced into the stock's structure; does not discriminate between bull and bear cases in the near term</li><li><strong>realestate.com.au brand strength</strong> &mdash; REA's dominant brand is not in dispute across any hypothesis; it is a constant, not a variable</li><li><strong>AUD/USD at US$0.71</strong> &mdash; a minor FX tailwind for international earnings translation, but too small to discriminate between N1, N2, or N3 outcomes</li><li><strong>Digital advertising market growth</strong> &mdash; broad sector tailwinds benefit REA but do not distinguish between the competing hypotheses about housing volume recovery timing</li><li><strong>REA's technology investment and product development</strong> &mdash; ongoing and expected; does not discriminate between near-term scenarios without specific data on conversion rates or product adoption</li></ul>"
   },
   "tripwires": {
     "intro": "The following catalysts could force a material revision to hypothesis weightings. Each carries conditional outcomes that map to specific narrative shifts.",
@@ -539,7 +626,7 @@
           {
             "if": "If RBA cuts rates by 25bps or more and CoreLogic/SQM listing volumes show >5% YoY growth",
             "valence": "positive",
-            "then": "Then N1 bull case probability increases materially â€” upgrade to 30%, reduce N3 to 15%, stock likely re-rates toward A$190-200"
+            "then": "Then N1 bull case probability increases materially &mdash; upgrade to 30%, reduce N3 to 15%, stock likely re-rates toward A$190-200"
           },
           {
             "if": "If RBA holds rates and listing volumes remain flat or negative YoY",
@@ -556,12 +643,12 @@
           {
             "if": "If REA reports listing volume growth >5% YoY and reaffirms depth product yield expansion guidance",
             "valence": "positive",
-            "then": "Then N1 bull case becomes dominant â€” probability upgrades to 35%, price target moves toward A$220-230, N2 base case confirmed"
+            "then": "Then N1 bull case becomes dominant &mdash; probability upgrades to 35%, price target moves toward A$220-230, N2 base case confirmed"
           },
           {
             "if": "If REA reports listing volume decline or EBITDA miss vs consensus, with cautious FY2027 outlook",
             "valence": "negative",
-            "then": "Then N3 bear case becomes dominant â€” probability upgrades to 40%, stock likely breaks below 52-week low of A$152.9, N2 base case probability reduces to 35%"
+            "then": "Then N3 bear case becomes dominant &mdash; probability upgrades to 40%, stock likely breaks below 52-week low of A$152.9, N2 base case probability reduces to 35%"
           }
         ],
         "source": "REA Group ASX earnings release (expected August 2026)"
@@ -573,7 +660,7 @@
           {
             "if": "If REA announces a material acquisition (international platform) or News Corp announces a strategic review of its REA stake",
             "valence": "positive",
-            "then": "Then N4 tail case activates â€” probability upgrades to 25%, stock could re-rate 20-30% depending on deal terms and strategic rationale"
+            "then": "Then N4 tail case activates &mdash; probability upgrades to 25%, stock could re-rate 20-30% depending on deal terms and strategic rationale"
           },
           {
             "if": "If REA announces a dilutive capital raise or writes down international assets (India/SEA)",
@@ -591,81 +678,81 @@
         "domain": "Corporate Comms",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "Not available",
-        "confidence": "Low â€” no ASX announcements or press releases provided",
-        "confidenceClass": ""
+        "freshness": "Initial",
+        "confidence": "Low &mdash; no ASX announcements or press releases provided",
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Regulatory Filings",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "Not available",
-        "confidence": "Low â€” no financial statements or ASIC filings provided",
-        "confidenceClass": ""
+        "freshness": "Initial",
+        "confidence": "Low &mdash; no financial statements or ASIC filings provided",
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Broker Research",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "Not available",
-        "confidence": "Low â€” no consensus estimates or analyst recommendations provided",
-        "confidenceClass": ""
+        "freshness": "Initial",
+        "confidence": "Low &mdash; no consensus estimates or analyst recommendations provided",
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Competitor Disclosures",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "Not available",
-        "confidence": "Low â€” no Domain Holdings or PropTech competitor data provided",
-        "confidenceClass": ""
+        "freshness": "Initial",
+        "confidence": "Low &mdash; no Domain Holdings or PropTech competitor data provided",
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Economic Data",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "2026-03-02",
-        "confidence": "Low â€” only AUD/USD spot rate provided; no RBA data, housing market data, or GDP/inflation context",
-        "confidenceClass": ""
+        "freshness": "Mar 2026",
+        "confidence": "Low &mdash; only AUD/USD spot rate provided; no RBA data, housing market data, or GDP/inflation context",
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Alternative Data",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "Not available",
-        "confidence": "Low â€” no web traffic, app downloads, or engagement metrics provided",
-        "confidenceClass": ""
+        "freshness": "Initial",
+        "confidence": "Low &mdash; no web traffic, app downloads, or engagement metrics provided",
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Academic Research",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "Not available",
-        "confidence": "Low â€” no industry studies or structural research provided",
-        "confidenceClass": ""
+        "freshness": "Initial",
+        "confidence": "Low &mdash; no industry studies or structural research provided",
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Media & Social",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "Not available",
-        "confidence": "Low â€” no news headlines or social media sentiment provided",
-        "confidenceClass": ""
+        "freshness": "Initial",
+        "confidence": "Low &mdash; no news headlines or social media sentiment provided",
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Leadership & Governance",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "Not available",
-        "confidence": "Low â€” no management, board, or insider trading data provided",
-        "confidenceClass": ""
+        "freshness": "Initial",
+        "confidence": "Low &mdash; no management, board, or insider trading data provided",
+        "confidenceClass": "td-amber"
       },
       {
         "domain": "Ownership & Capital Flows",
         "coverageLevel": "limited",
         "coverageLabel": "Limited",
-        "freshness": "Not available",
-        "confidence": "Low â€” no institutional ownership, fund flow, or capital structure data provided",
-        "confidenceClass": ""
+        "freshness": "Initial",
+        "confidence": "Low &mdash; no institutional ownership, fund flow, or capital structure data provided",
+        "confidenceClass": "td-amber"
       }
     ],
     "couldntAssess": [
@@ -683,39 +770,41 @@
       "RBA rate cut timing and probability",
       "Australian housing market volume and price trends"
     ],
-    "analyticalLimitations": "This initiation is conducted under severe data constraints â€” all ten evidence domains are rated Limited, and the analysis relies almost entirely on publicly known structural facts about REA's business model and price-based inference from the 52-week trading range. The hypothesis probability weightings (20/45/25/10) are informed priors based on REA's known business characteristics and the stock's price action, not evidence-based conclusions derived from financial analysis. The absence of financial statements, broker consensus, and operational data means that the price targets assigned to each scenario (N1: A$230, N2: A$175, N3: A$135, N4: A$260) are illustrative rather than DCF-derived. Investors should treat this analysis as a monitoring framework and initiate substantive fundamental analysis once earnings data, broker consensus, and operational metrics become available. The analytical confidence will increase materially following REA's next earnings release."
+    "analyticalLimitations": "This initiation is conducted under severe data constraints &mdash; all ten evidence domains are rated Limited, and the analysis relies almost entirely on publicly known structural facts about REA's business model and price-based inference from the 52-week trading range. The hypothesis probability weightings (20/45/25/10) are informed priors based on REA's known business characteristics and the stock's price action, not evidence-based conclusions derived from financial analysis. The absence of financial statements, broker consensus, and operational data means that the price targets assigned to each scenario (N1: A$230, N2: A$175, N3: A$135, N4: A$260) are illustrative rather than DCF-derived. Investors should treat this analysis as a monitoring framework and initiate substantive fundamental analysis once earnings data, broker consensus, and operational metrics become available. The analytical confidence will increase materially following REA's next earnings release."
   },
   "footer": {
     "disclaimer": "This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information.",
-    "domainCount": "0 of 10",
-    "hypothesesCount": "4 Pending"
+    "domainCount": "1 of 10",
+    "hypothesesCount": "4 Active"
   },
   "hero": {
-    "embedded_thesis": "At A$165.8 â€” 37% below the 52-week high of A$263.16 and just 8.4% above the 52-week low of A$152.9 â€” the current price appears to embed a scenario of sustained cyclical pressure on Australian housing volumes, with limited near-term relief from rate cuts or demand recovery. The market seems to be pricing REA as a high-quality but cyclically impaired business, applying a compressed multiple that reflects uncertainty around the timing and magnitude of a listing volume recovery. Implicit in the current price is an assumption that depth product yield growth will partially offset volume weakness, but that international operations will remain a drag rather than a meaningful contributor. The market does not appear to be pricing any M&A optionality or a near-term housing market inflection, suggesting the stock is in a 'show me' phase where evidence of volume recovery or earnings stabilisation is required before a re-rating.",
+    "embedded_thesis": "At A$165.8 &mdash; 37% below the 52-week high of A$263.16 and just 8.4% above the 52-week low of A$152.9 &mdash; the current price appears to embed a scenario of sustained cyclical pressure on Australian housing volumes, with limited near-term relief from rate cuts or demand recovery. The market seems to be pricing REA as a high-quality but cyclically impaired business, applying a compressed multiple that reflects uncertainty around the timing and magnitude of a listing volume recovery. Implicit in the current price is an assumption that depth product yield growth will partially offset volume weakness, but that international operations will remain a drag rather than a meaningful contributor. The market does not appear to be pricing any M&A optionality or a near-term housing market inflection, suggesting the stock is in a 'show me' phase where evidence of volume recovery or earnings stabilisation is required before a re-rating.",
     "skew_description": "The four hypotheses are weighted 20% Bull / 45% Base / 25% Bear / 10% Tail, reflecting a modestly bearish skew at initiation. The base case dominates given REA's structural franchise quality, but the bear case carries meaningful weight given the stock's proximity to 52-week lows and the absence of confirming evidence for a near-term recovery. The tail scenario is low probability but acknowledges REA's history of M&A ambition and the emerging AI disruption risk.",
     "position_in_range": {
+      "current_price": 165.8,
       "worlds": [
         {
-          "label": "N1 Bull",
-          "price": "$230.00",
-          "gapPct": "+38.7%"
+          "label": "Bear Case",
+          "price": 135,
+          "gap_pct": 0
         },
         {
-          "label": "N2 Base",
-          "price": "$175.00",
-          "gapPct": "+5.5%"
+          "label": "Base Case",
+          "price": 175,
+          "gap_pct": 0.32
         },
         {
-          "label": "N3 Bear",
-          "price": "$135.00",
-          "gapPct": "-18.6%"
+          "label": "Bull Case",
+          "price": 230,
+          "gap_pct": 0.76
         },
         {
-          "label": "N4 Tail",
-          "price": "$260.00",
-          "gapPct": "+56.8%"
+          "label": "Catalyst/M&A",
+          "price": 260,
+          "gap_pct": 1
         }
-      ]
+      ],
+      "note": "World prices are indicative &mdash; pending full W1&ndash;W4 valuation build"
     },
     "next_decision_point": {
       "event": "REA Group FY2026 Full-Year Results (or H2 FY2026 update)",
@@ -812,8 +901,8 @@
         "name": "S&P/ASX 200",
         "period": "12 months",
         "stockReturn": -12.8,
-        "indexReturn": 0,
-        "relativeReturn": -12.8
+        "indexReturn": 6.5,
+        "relativeReturn": -19.3
       }
     }
   }
