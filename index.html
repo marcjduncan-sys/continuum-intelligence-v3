@@ -10214,6 +10214,10 @@ function route() {
         var ticker = hash.replace('report-', '');
         isValidRoute = typeof STOCK_DATA !== 'undefined' && STOCK_DATA.hasOwnProperty(ticker);
     }
+    if (!isValidRoute && hash.startsWith('deep-report-')) {
+        var drTicker = hash.replace('deep-report-', '');
+        isValidRoute = typeof STOCK_DATA !== 'undefined' && STOCK_DATA.hasOwnProperty(drTicker);
+    }
     if (!isValidRoute && hash.startsWith('snapshot-')) {
         var snapTicker = hash.replace('snapshot-', '');
         // Accept if snapshot exists OR if stock data exists (snapshot will be built on demand)
@@ -10228,7 +10232,7 @@ function route() {
     }
 
     // Auto-create page divs for dynamically added stocks (safe  --  validated above)
-    if ((hash.startsWith('report-') || hash.startsWith('snapshot-')) && !document.getElementById('page-' + hash)) {
+    if ((hash.startsWith('report-') || hash.startsWith('deep-report-') || hash.startsWith('snapshot-')) && !document.getElementById('page-' + hash)) {
         const div = document.createElement('div');
         div.className = 'page';
         div.id = 'page-' + hash;
@@ -10274,6 +10278,33 @@ function route() {
         // Fetch live data asynchronously and update chart + hero price
         if (STOCK_DATA[ticker]) {
             fetchAndPatchLive(ticker);
+        }
+    }
+
+    // Lazy render deep research report pages (standalone, separate from Research tab)
+    if (hash.startsWith('deep-report-')) {
+        var drTicker = hash.replace('deep-report-', '');
+        var drKey = '_dr_' + drTicker;
+        if (!renderedPages.has(drKey) && STOCK_DATA[drTicker]) {
+            var drContainer = document.getElementById('page-' + hash);
+            if (drContainer) {
+                if (STOCK_DATA[drTicker]._indexOnly) {
+                    drContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Deep Research&hellip;</div><div style="font-size:0.9rem">Fetching report for ' + STOCK_DATA[drTicker].company + '</div></div></div>';
+                    loadFullResearchData(drTicker, function(data) {
+                        if (data) {
+                            drContainer.innerHTML = '<a class="snap-back" href="#deep-research" onclick="navigate(\'deep-research\')">&larr; Back to Deep Research</a>' + renderReportPage(data);
+                            initSectionToggles(drTicker);
+                            renderedPages.add(drKey);
+                            initNarrativeTimelineChart(drTicker);
+                        }
+                    });
+                } else {
+                    drContainer.innerHTML = '<a class="snap-back" href="#deep-research" onclick="navigate(\'deep-research\')">&larr; Back to Deep Research</a>' + renderReportPage(STOCK_DATA[drTicker]);
+                    initSectionToggles(drTicker);
+                    renderedPages.add(drKey);
+                    initNarrativeTimelineChart(drTicker);
+                }
+            }
         }
     }
 
@@ -10352,7 +10383,7 @@ function route() {
     document.querySelectorAll('.nav-links a').forEach(a => {
         a.classList.remove('active');
         a.removeAttribute('aria-current');
-        if (a.dataset.nav === hash || (hash.startsWith('report-') && a.dataset.nav === 'home') || (hash.startsWith('snapshot-') && a.dataset.nav === 'deep-research')) {
+        if (a.dataset.nav === hash || (hash.startsWith('report-') && a.dataset.nav === 'home') || (hash.startsWith('deep-report-') && a.dataset.nav === 'deep-research') || (hash.startsWith('snapshot-') && a.dataset.nav === 'deep-research')) {
             a.classList.add('active');
             a.setAttribute('aria-current', 'page');
         }
@@ -10379,7 +10410,10 @@ window.addEventListener('hashchange', function() {
     // Announce the page change
     var hash = window.location.hash.slice(1) || 'home';
     var pageName = hash;
-    if (hash.startsWith('report-')) {
+    if (hash.startsWith('deep-report-')) {
+        var dr = hash.replace('deep-report-', '');
+        pageName = STOCK_DATA[dr] ? STOCK_DATA[dr].company + ' Deep Research' : dr + ' Deep Research';
+    } else if (hash.startsWith('report-')) {
         var t = hash.replace('report-', '');
         pageName = STOCK_DATA[t] ? STOCK_DATA[t].company + ' Research Report' : t + ' Report';
     } else if (hash.startsWith('snapshot-')) {
@@ -14183,8 +14217,8 @@ function buildRetailHTML(stock) {
     }
 
     return '<div class="dr-tile dr-skew-' + d.skewDir + '" tabindex="0" role="link" ' +
-      'onclick="navigate(\'report-' + d.ticker + '\')" ' +
-      'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + d.ticker + '\')}">' +
+      'onclick="navigate(\'deep-report-' + d.ticker + '\')" ' +
+      'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'deep-report-' + d.ticker + '\')}">' +
       '<div class="dr-header">' +
         '<div>' +
           '<div class="dr-ticker">' + escHtml(d.ticker) + '</div>' +
