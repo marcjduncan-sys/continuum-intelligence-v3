@@ -272,7 +272,8 @@ def _get_http_client() -> httpx.AsyncClient:
 
 async def fetch_yahoo_price(ticker: str) -> dict[str, Any]:
     """
-    Fetch current price, change, volume, and 52-week range from Yahoo Finance.
+    Fetch current price, change, volume, 52-week range, and financial
+    metrics from Yahoo Finance.
 
     Parameters
     ----------
@@ -282,15 +283,20 @@ async def fetch_yahoo_price(ticker: str) -> dict[str, Any]:
     Returns
     -------
     dict with keys: price, change, change_pct, volume, high_52w, low_52w,
-                    market_cap, currency, price_history (last 90 days).
+                    market_cap, currency, price_history (up to 250 days),
+                    forward_pe, trailing_pe, ev_to_ebitda, dividend_yield,
+                    dividend_per_share, revenue, ebitda, total_debt,
+                    enterprise_value, employees, sector, industry.
     """
     yahoo_ticker = f"{ticker}.AX"
-    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{yahoo_ticker}"
-    params = {"interval": "1d", "range": "1y"}
-
     client = _get_http_client()
+
+    # --- 1. Chart data (price + history) ---
+    chart_url = f"https://query1.finance.yahoo.com/v8/finance/chart/{yahoo_ticker}"
+    chart_params = {"interval": "1d", "range": "1y"}
+
     try:
-        resp = await client.get(url, params=params, headers=YAHOO_HEADERS)
+        resp = await client.get(chart_url, params=chart_params, headers=YAHOO_HEADERS)
         resp.raise_for_status()
         data = resp.json()
 
@@ -315,17 +321,21 @@ async def fetch_yahoo_price(ticker: str) -> dict[str, Any]:
         high_52w = max(valid_closes) if valid_closes else price
         low_52w = min(valid_closes) if valid_closes else price
 
-        # Last 90 days of price history for sparkline
+        # Up to 250 days of price history (for 200-day MA + buffer)
         price_history = []
-        cutoff_90d = len(timestamps) - 90
-        for i in range(max(0, cutoff_90d), len(timestamps)):
+        cutoff = max(0, len(timestamps) - 250)
+        for i in range(cutoff, len(timestamps)):
             if i < len(closes) and closes[i] is not None:
                 price_history.append({
                     "date": datetime.fromtimestamp(timestamps[i], tz=timezone.utc).strftime("%Y-%m-%d"),
                     "close": round(closes[i], 2),
                 })
 
-        return {
+        currency = {"AUD": "A$", "USD": "US$", "GBP": "£", "EUR": "€"}.get(
+            meta.get("currency", "AUD"), meta.get("currency", "A$")
+        )
+
+        base_result = {
             "price": round(price, 2),
             "change": round(change, 2),
             "change_pct": change_pct,
@@ -333,14 +343,98 @@ async def fetch_yahoo_price(ticker: str) -> dict[str, Any]:
             "high_52w": round(high_52w, 2),
             "low_52w": round(low_52w, 2),
             "market_cap": meta.get("marketCap"),
-            "currency": {"AUD": "A$", "USD": "US$", "GBP": "£", "EUR": "€"}.get(meta.get("currency", "AUD"), meta.get("currency", "A$")),
+            "currency": currency,
             "price_history": price_history,
             "fetched_at": datetime.now(timezone.utc).isoformat(),
         }
 
     except Exception as e:
-        logger.error(f"Yahoo Finance error for {ticker}: {e}")
+        logger.error(f"Yahoo Finance chart error for {ticker}: {e}")
         return {"error": str(e)}
+
+    # --- 2. Financial metrics from quoteSummary ---
+    financials = await _fetch_yahoo_financials(yahoo_ticker, client)
+    base_result.update(financials)
+
+    return base_result
+
+
+async def _fetch_yahoo_financials(yahoo_ticker: str, client: httpx.AsyncClient) -> dict[str, Any]:
+    """
+    Fetch detailed financial metrics from Yahoo Finance's quoteSummary endpoint.
+
+    Returns a dict of financial metrics. Missing fields are set to None.
+    """
+    url = f"https://query1.finance.yahoo.com/v10/finance/quoteSummary/{yahoo_ticker}"
+    modules = "defaultKeyStatistics,financialData,summaryDetail,assetProfile"
+    params = {"modules": modules}
+
+    financials: dict[str, Any] = {
+        "forward_pe": None,
+        "trailing_pe": None,
+        "ev_to_ebitda": None,
+        "dividend_yield": None,
+        "dividend_per_share": None,
+        "revenue": None,
+        "ebitda": None,
+        "total_debt": None,
+        "enterprise_value": None,
+        "employees": None,
+        "sector": None,
+        "industry": None,
+    }
+
+    try:
+        resp = await client.get(url, params=params, headers=YAHOO_HEADERS)
+        resp.raise_for_status()
+        data = resp.json()
+
+        qr = data.get("quoteSummary", {}).get("result", [])
+        if not qr:
+            logger.warning(f"No quoteSummary data for {yahoo_ticker}")
+            return financials
+
+        summary = qr[0]
+
+        # --- defaultKeyStatistics ---
+        dks = summary.get("defaultKeyStatistics", {})
+        financials["forward_pe"] = _yf_raw(dks.get("forwardPE"))
+        financials["enterprise_value"] = _yf_raw(dks.get("enterpriseValue"))
+        financials["ev_to_ebitda"] = _yf_raw(dks.get("enterpriseToEbitda"))
+
+        # --- financialData ---
+        fd = summary.get("financialData", {})
+        financials["revenue"] = _yf_raw(fd.get("totalRevenue"))
+        financials["ebitda"] = _yf_raw(fd.get("ebitda"))
+        financials["total_debt"] = _yf_raw(fd.get("totalDebt"))
+
+        # --- summaryDetail ---
+        sd = summary.get("summaryDetail", {})
+        financials["trailing_pe"] = _yf_raw(sd.get("trailingPE"))
+        financials["dividend_yield"] = _yf_raw(sd.get("dividendYield"))
+        financials["dividend_per_share"] = _yf_raw(sd.get("dividendRate"))
+
+        # --- assetProfile ---
+        ap = summary.get("assetProfile", {})
+        financials["employees"] = ap.get("fullTimeEmployees")
+        financials["sector"] = ap.get("sector")
+        financials["industry"] = ap.get("industry")
+
+    except Exception as e:
+        logger.warning(f"Yahoo quoteSummary error for {yahoo_ticker}: {e}")
+
+    return financials
+
+
+def _yf_raw(field: Any) -> float | None:
+    """Extract raw numeric value from Yahoo Finance's {raw, fmt} wrapper."""
+    if field is None:
+        return None
+    if isinstance(field, dict):
+        return field.get("raw")
+    if isinstance(field, (int, float)):
+        return float(field)
+    return None
 
 
 # ---------------------------------------------------------------------------

@@ -23,6 +23,7 @@ from typing import Any
 
 import config
 from gemini_client import gemini_completion
+from validate_research import fix as validate_fix, validate as validate_check
 from web_search import gather_all_data
 
 logger = logging.getLogger(__name__)
@@ -457,7 +458,12 @@ def _load_research(ticker: str) -> dict:
 
 
 def _save_research(ticker: str, data: dict) -> None:
-    """Save updated research JSON."""
+    """Save updated research JSON (with auto-fix pass)."""
+    # Auto-fix common data quality issues before persisting
+    data = validate_fix(data)
+    errors = validate_check(data)
+    if errors:
+        logger.warning(f"[{ticker}] Validation warnings after fix: {errors}")
     path = _data_dir() / f"{ticker}.json"
     with open(path, "w") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
@@ -611,12 +617,14 @@ Reference the CURRENT price. Describe what assumptions the market is making. Pla
   "skew_description": "2-3 sentence summary of the hypothesis weightings and directional skew.",
 
   "position_in_range": {
+    "current_price": 42.50,
     "worlds": [
-      {"label": "N1 Bull", "price": "$XX.XX", "gapPct": "+XX%"},
-      {"label": "N2 Base", "price": "$XX.XX", "gapPct": "+X% or -X%"},
-      {"label": "N3 Bear", "price": "$XX.XX", "gapPct": "-XX%"},
-      {"label": "N4 Tail", "price": "$XX.XX", "gapPct": "+/-XX%"}
-    ]
+      {"label": "Bear Case", "price": 35.00},
+      {"label": "Base Case", "price": 42.00},
+      {"label": "Bull Case", "price": 55.00},
+      {"label": "Catalyst", "price": 65.00}
+    ],
+    "note": "World prices are indicative -- pending full W1-W4 valuation build"
   },
 
   "narrative_rewrite": "Full dominant narrative (6-10 sentences). Use HTML: <strong> for emphasis, \
@@ -695,7 +703,12 @@ CRITICAL RULES:
 - If data is limited, say so explicitly rather than fabricating.
 - Create 3 discriminator rows and at least 2 tripwire cards.
 - Gaps should cover all 10 evidence domains.
-- Reference the current price throughout."""
+- Reference the current price throughout.
+- CRITICAL: Do not use emoji characters anywhere in your response. Use only ASCII text, HTML entities, and standard punctuation.
+- position_in_range.worlds prices MUST be plain numbers (e.g. 35.00), NOT dollar-sign strings.
+- position_in_range.worlds labels must be descriptive (e.g. "Bear Case", "Bull Case"), NOT "N1 Bull" or "N2 Base".
+- Each gap coverageRow must have confidenceClass set to one of: "td-green", "td-amber", "td-red".
+- Return the response as a single JSON object with no markdown fences."""
 
 
 # ---------------------------------------------------------------------------
@@ -1121,6 +1134,38 @@ async def _run_coverage_initiation(
 
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
+    # Build financial context from Yahoo quoteSummary data
+    def _fc(key, label, fmt="raw"):
+        v = price_data.get(key)
+        if v is None:
+            return f"- {label}: N/A"
+        if fmt == "pct":
+            return f"- {label}: {v * 100:.1f}%"
+        if fmt == "big":
+            abs_v = abs(v)
+            if abs_v >= 1e12:
+                return f"- {label}: A${v / 1e12:.1f}T"
+            if abs_v >= 1e9:
+                return f"- {label}: A${v / 1e9:.1f}B"
+            if abs_v >= 1e6:
+                return f"- {label}: A${v / 1e6:.0f}M"
+            return f"- {label}: A${v:,.0f}"
+        if fmt == "ratio":
+            return f"- {label}: {v:.1f}x"
+        return f"- {label}: {v}"
+
+    financial_context = "\n".join([
+        "\n## FINANCIAL DATA (from Yahoo Finance):",
+        _fc("forward_pe", "Forward P/E", "ratio"),
+        _fc("trailing_pe", "Trailing P/E", "ratio"),
+        _fc("ev_to_ebitda", "EV/EBITDA", "ratio"),
+        _fc("dividend_yield", "Dividend Yield", "pct"),
+        _fc("revenue", "Revenue (FY)", "big"),
+        _fc("ebitda", "EBITDA (FY)", "big"),
+        _fc("total_debt", "Total Debt", "big"),
+        _fc("enterprise_value", "Enterprise Value", "big"),
+    ])
+
     user_prompt = f"""## INITIATING COVERAGE — TODAY'S DATE: {today}
 
 ## Stock: {ticker} ({research.get('company', '')})
@@ -1129,6 +1174,7 @@ async def _run_coverage_initiation(
 ## 52-Week High: A${price_data.get('high_52w', 'N/A')}
 ## 52-Week Low: A${price_data.get('low_52w', 'N/A')}
 ## Market Cap: A${price_data.get('market_cap', 'N/A')}
+{financial_context}
 
 ## Evidence Cards (just created):
 {cards_text}
@@ -1772,10 +1818,19 @@ def _merge_initiation(
                     "steady": ("&rarr;", "Steady"),
                 }
                 arrow, text = dir_map.get(direction, ("&rarr;", "Base"))
+                # Derive scoreColor from hypothesis direction
+                color_map = {
+                    "upside": "var(--signal-green)",
+                    "bullish": "var(--signal-green)",
+                    "neutral": "var(--signal-amber)",
+                    "downside": "var(--signal-amber)",
+                    "bearish": "var(--text-muted)",
+                }
+                score_color = color_map.get(direction, "var(--text-muted)")
                 for vs in updated["verdict"]["scores"]:
                     if vs.get("label", "").lower().startswith(tier[:2]):
                         vs["score"] = hu.get("updated_score", vs.get("score"))
-                        vs["scoreColor"] = ""  # Remove muted color
+                        vs["scoreColor"] = score_color
                         vs["dirArrow"] = arrow
                         vs["dirText"] = text
                         vs["dirColor"] = None
@@ -1802,7 +1857,25 @@ def _merge_initiation(
     if hypothesis_update.get("skew_description"):
         updated["hero"]["skew_description"] = hypothesis_update["skew_description"]
     if hypothesis_update.get("position_in_range"):
-        updated["hero"]["position_in_range"] = hypothesis_update["position_in_range"]
+        pir = hypothesis_update["position_in_range"]
+        # Ensure current_price is set and numeric
+        if "current_price" not in pir or pir["current_price"] is None:
+            pir["current_price"] = current_price
+        else:
+            try:
+                pir["current_price"] = float(str(pir["current_price"]).replace("$", "").replace(",", ""))
+            except (ValueError, TypeError):
+                pir["current_price"] = current_price
+        # Ensure world prices are plain numbers, not dollar strings
+        for w in pir.get("worlds", []):
+            if isinstance(w.get("price"), str):
+                try:
+                    w["price"] = float(w["price"].replace("$", "").replace(",", ""))
+                except (ValueError, TypeError):
+                    pass
+            # Remove gapPct if present (frontend calculates gap from prices)
+            w.pop("gapPct", None)
+        updated["hero"]["position_in_range"] = pir
     ndp = hypothesis_update.get("next_decision_point")
     if ndp and isinstance(ndp, dict) and ndp.get("event"):
         updated["hero"]["next_decision_point"] = {
@@ -1869,11 +1942,67 @@ def _merge_initiation(
 
     # -- Hero metrics refresh --
     if "heroMetrics" in updated and current_price:
+        # Build lookup of fresh values keyed by label
+        def _fmt_big(v, cur="A$"):
+            if v is None or v == 0:
+                return None
+            abs_v = abs(v)
+            if abs_v >= 1e12:
+                return f"{cur}{v / 1e12:.1f}T"
+            if abs_v >= 1e9:
+                return f"{cur}{v / 1e9:.1f}B"
+            if abs_v >= 1e6:
+                return f"{cur}{v / 1e6:.0f}M"
+            return f"{cur}{v:,.0f}"
+
+        mc_str = _fmt_big(price_data.get("market_cap"))
+        fwd_pe = price_data.get("forward_pe") or price_data.get("trailing_pe")
+        pe_str = f"{fwd_pe:.1f}x" if fwd_pe else None
+        div_y = price_data.get("dividend_yield")
+        div_str = f"{div_y * 100:.1f}%" if div_y is not None else None
+        h52 = price_data.get("high_52w")
+        l52 = price_data.get("low_52w")
+        cur = price_data.get("currency", "A$")
+
+        label_value_map = {}
+        if mc_str:
+            label_value_map["Mkt Cap"] = mc_str
+        if pe_str:
+            label_value_map["Fwd P/E"] = pe_str
+        if div_str:
+            label_value_map["Div Yield"] = div_str
+        if h52 is not None:
+            label_value_map["52w High"] = f"{cur}{h52}"
+        if l52 is not None:
+            label_value_map["52w Low"] = f"{cur}{l52}"
+
         for m in updated["heroMetrics"]:
-            if m.get("label") == "Mkt Cap":
-                mc = price_data.get("market_cap")
-                if mc:
-                    updated["heroMetrics"][0]["value"] = f"A${mc}"
+            fresh = label_value_map.get(m.get("label"))
+            if fresh:
+                m["value"] = fresh
+
+    # -- Gaps: ensure confidenceClass on coverage rows --
+    if "gaps" in updated and "coverageRows" in updated["gaps"]:
+        for row in updated["gaps"]["coverageRows"]:
+            if not row.get("confidenceClass"):
+                conf = (row.get("confidence") or "").lower()
+                if "high" in conf:
+                    row["confidenceClass"] = "td-green"
+                elif "medium" in conf or "moderate" in conf:
+                    row["confidenceClass"] = "td-amber"
+                else:
+                    row["confidenceClass"] = "td-red"
+
+    # -- Footer counts from actual data --
+    evidence_cards = updated.get("evidence", {}).get("cards", [])
+    hyp_list = updated.get("hypotheses", [])
+    active_hyps = [h for h in hyp_list if h.get("score") and h["score"] != "?"]
+    updated.setdefault("footer", {})
+    if evidence_cards:
+        domains_covered = len({c.get("name", "").split(":")[0].strip() for c in evidence_cards if c.get("name")})
+        updated["footer"]["domainCount"] = f"{domains_covered} of 10"
+    if active_hyps:
+        updated["footer"]["hypothesesCount"] = f"{len(active_hyps)} Active"
 
     # -- Timestamp --
     updated["date"] = now

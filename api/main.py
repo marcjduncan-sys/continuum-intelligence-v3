@@ -406,10 +406,13 @@ async def add_stock(
     if not TICKER_PATTERN.match(ticker):
         raise HTTPException(status_code=400, detail=f"Invalid ticker: '{ticker}'")
 
-    # Check if already exists
+    # Check if already exists (check both data/ and dist/data/ directories)
     data_dir = Path(config.PROJECT_ROOT) / "data"
     research_dir = data_dir / "research"
-    if (research_dir / f"{ticker}.json").exists():
+    dist_research_check = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
+    if (research_dir / f"{ticker}.json").exists() or (
+        dist_research_check.exists() and (dist_research_check / f"{ticker}.json").exists()
+    ):
         raise HTTPException(status_code=409, detail=f"{ticker} already exists")
 
     # ---- Fetch company metadata + price in parallel ----
@@ -455,11 +458,18 @@ async def add_stock(
     freshness_entry = build_freshness_entry(ticker, price_data.get("price", 0))
 
     # ---- Write files ----
-    # 1. Research JSON
+    # 1. Research JSON — write to BOTH data/ (static serve) and dist/data/ (refresh pipeline)
     research_dir.mkdir(parents=True, exist_ok=True)
     with open(research_dir / f"{ticker}.json", "w") as f:
         json.dump(research_data, f, indent=2, ensure_ascii=False)
     logger.info(f"[AddStock] Saved data/research/{ticker}.json")
+
+    # Also write to dist/data/research/ so refresh pipeline can find it
+    dist_research_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
+    if dist_research_dir.exists() and dist_research_dir != research_dir.resolve():
+        with open(dist_research_dir / f"{ticker}.json", "w") as f:
+            json.dump(research_data, f, indent=2, ensure_ascii=False)
+        logger.info(f"[AddStock] Also saved dist/data/research/{ticker}.json")
 
     # 2. _index.json
     index_path = research_dir / "_index.json"
@@ -471,6 +481,18 @@ async def add_stock(
     index[ticker] = index_entry
     with open(index_path, "w") as f:
         json.dump(index, f, indent=2, ensure_ascii=False)
+
+    # Also update dist/data/research/_index.json for refresh pipeline
+    dist_index_path = dist_research_dir / "_index.json" if dist_research_dir.exists() else None
+    if dist_index_path and dist_index_path != index_path.resolve() and dist_index_path.exists():
+        try:
+            with open(dist_index_path) as f:
+                dist_index = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            dist_index = {}
+        dist_index[ticker] = index_entry
+        with open(dist_index_path, "w") as f:
+            json.dump(dist_index, f, indent=2, ensure_ascii=False)
 
     # 3. tickers.json
     tickers_path = data_dir / "config" / "tickers.json"

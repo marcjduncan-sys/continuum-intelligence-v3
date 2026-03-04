@@ -482,13 +482,64 @@ def build_research_scaffold(
 
     drawdown = f"-{(1 - price / high_52w) * 100:.1f}%" if high_52w > 0 else "0.0%"
 
-    # Extract last 60 daily closes for sparkline
+    # --- Financial metrics from Yahoo quoteSummary ---
+    forward_pe = market_data.get("forward_pe")
+    trailing_pe = market_data.get("trailing_pe")
+    ev_to_ebitda = market_data.get("ev_to_ebitda")
+    dividend_yield = market_data.get("dividend_yield")
+    revenue = market_data.get("revenue")
+    ebitda = market_data.get("ebitda")
+    total_debt = market_data.get("total_debt")
+    enterprise_value = market_data.get("enterprise_value")
+    employees = market_data.get("employees")
+
+    # Format helpers
+    def _fmt_ratio(v, suffix="x"):
+        if v is None or v == 0:
+            return "N/A"
+        return f"{v:.1f}{suffix}"
+
+    def _fmt_pct(v):
+        if v is None:
+            return "N/A"
+        return f"{v * 100:.1f}%"
+
+    def _fmt_big(v, cur="A$"):
+        if v is None or v == 0:
+            return "N/A"
+        abs_v = abs(v)
+        if abs_v >= 1e12:
+            return f"{cur}{v / 1e12:.1f}T"
+        if abs_v >= 1e9:
+            return f"{cur}{v / 1e9:.1f}B"
+        if abs_v >= 1e6:
+            return f"{cur}{v / 1e6:.0f}M"
+        return f"{cur}{v:,.0f}"
+
+    pe_str = _fmt_ratio(forward_pe or trailing_pe)
+    ev_ebitda_str = _fmt_ratio(ev_to_ebitda)
+    div_yield_str = _fmt_pct(dividend_yield)
+    revenue_str = _fmt_big(revenue, currency)
+    ebitda_str = _fmt_big(ebitda, currency)
+    debt_str = _fmt_big(total_debt, currency)
+    ev_str = _fmt_big(enterprise_value, currency)
+    employees_str = f"~{employees:,}" if employees else "N/A"
+
+    # Colour class for dividend yield
+    if dividend_yield is not None and dividend_yield > 0.03:
+        yield_color_class = "text-green"
+    elif dividend_yield is not None and dividend_yield > 0:
+        yield_color_class = ""
+    else:
+        yield_color_class = ""
+
+    # Extract up to 250 daily closes for 200-day MA + sparkline
     price_history_raw = market_data.get("price_history", [])
     if price_history_raw and isinstance(price_history_raw[0], dict):
         # from fetch_yahoo_price — list of {date, close}
-        price_history = [p["close"] for p in price_history_raw[-60:]]
+        price_history = [p["close"] for p in price_history_raw[-250:]]
     elif price_history_raw:
-        price_history = price_history_raw[-60:]
+        price_history = price_history_raw[-250:]
     else:
         price_history = [price]
 
@@ -513,6 +564,8 @@ def build_research_scaffold(
         ),
         "heroMetrics": [
             {"label": "Mkt Cap", "value": market_cap_str, "colorClass": ""},
+            {"label": "Fwd P/E", "value": pe_str, "colorClass": ""},
+            {"label": "Div Yield", "value": div_yield_str, "colorClass": yield_color_class},
             {"label": "52w High", "value": f"{currency}{high_52w}", "colorClass": ""},
             {"label": "52w Low", "value": f"{currency}{low_52w}", "colorClass": ""},
         ],
@@ -561,11 +614,8 @@ def build_research_scaffold(
         # Featured card
         "featuredMetrics": [
             {"label": "Mkt Cap", "value": market_cap_str, "color": ""},
-            {
-                "label": "52w Range",
-                "value": f"{currency}{low_52w}&ndash;{currency}{high_52w}",
-                "color": "",
-            },
+            {"label": "Fwd P/E", "value": pe_str, "color": ""},
+            {"label": "Div Yield", "value": div_yield_str, "color": "var(--signal-green)" if yield_color_class else ""},
             {"label": "Drawdown", "value": drawdown, "color": ""},
         ],
         "featuredPriceColor": "",
@@ -575,20 +625,12 @@ def build_research_scaffold(
         "identity": {
             "rows": [
                 [
-                    [f"Ticker", f"{ticker}.AX", "td-mono"],
+                    ["Ticker", f"{ticker}.AX", "td-mono"],
                     ["Exchange", "ASX", "td-mono"],
                 ],
                 [
                     ["Market Cap", market_cap_str, "td-mono"],
-                    [
-                        "Sector",
-                        (
-                            f"{sector} / {sector_sub}"
-                            if sector_sub and sector_sub != sector
-                            else sector
-                        ),
-                        "td-mono",
-                    ],
+                    ["Enterprise Value", ev_str, "td-mono"],
                 ],
                 [
                     ["Share Price", f"{currency}{price}", "td-mono"],
@@ -598,7 +640,25 @@ def build_research_scaffold(
                         "td-mono",
                     ],
                 ],
-            ],
+                [
+                    ["Forward P/E", pe_str, "td-mono"],
+                    ["EV/EBITDA", ev_ebitda_str, "td-mono"],
+                ],
+                [
+                    ["Dividend Yield", div_yield_str, "td-mono"],
+                    ["Revenue (FY)", revenue_str, "td-mono"],
+                ],
+            ]
+            + (
+                [
+                    [
+                        ["Total Debt", debt_str, "td-mono"],
+                        ["Employees", employees_str, "td-mono"],
+                    ]
+                ]
+                if total_debt or employees
+                else []
+            ),
             "overview": (
                 f"{company} (ASX: {ticker}) &mdash; auto-added to coverage. "
                 f"Full company overview pending analyst research."

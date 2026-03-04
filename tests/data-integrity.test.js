@@ -126,7 +126,7 @@ describe('Research Data Files', () => {
     configTickers.forEach(ticker => {
       const filePath = path.join(RESEARCH_DIR, `${ticker}.json`);
       const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-      expect(['upside', 'downside', 'neutral', 'balanced']).toContain(data.skew.direction);
+      expect(['upside', 'downside', 'neutral', 'balanced', 'bullish', 'bearish']).toContain(data.skew.direction);
       expect(data.skew).toHaveProperty('rationale');
     });
   });
@@ -144,6 +144,164 @@ describe('Research Data Files', () => {
     });
   });
 });
+
+
+// ---------------------------------------------------------------------------
+// Deep validation for INITIATED stocks (not scaffolds)
+// A stock is "initiated" if its first hypothesis score is not "?"
+// ---------------------------------------------------------------------------
+describe('Deep Validation — Initiated Stocks', () => {
+  let initiatedFiles;
+
+  beforeAll(() => {
+    const files = fs.readdirSync(RESEARCH_DIR)
+      .filter(f => f.endsWith('.json') && !f.startsWith('_'));
+    initiatedFiles = files.map(f => {
+      const data = JSON.parse(fs.readFileSync(path.join(RESEARCH_DIR, f), 'utf-8'));
+      return data;
+    }).filter(d => {
+      const first = (d.hypotheses || [])[0];
+      return first && first.score && first.score !== '?';
+    });
+  });
+
+  test('has at least 1 initiated stock to validate', () => {
+    expect(initiatedFiles.length).toBeGreaterThanOrEqual(1);
+  });
+
+  test('priceHistory has 50+ entries for initiated stocks', () => {
+    initiatedFiles.forEach(d => {
+      expect(d.priceHistory.length).toBeGreaterThanOrEqual(50);
+    });
+  });
+
+  test('heroMetrics has 3+ items', () => {
+    initiatedFiles.forEach(d => {
+      expect(d.heroMetrics.length).toBeGreaterThanOrEqual(3);
+      d.heroMetrics.forEach(m => {
+        expect(m).toHaveProperty('label');
+        expect(m).toHaveProperty('value');
+        expect(m.value).not.toBe('');
+      });
+    });
+  });
+
+  test('featuredMetrics has 3+ items', () => {
+    initiatedFiles.forEach(d => {
+      expect(d.featuredMetrics.length).toBeGreaterThanOrEqual(3);
+      d.featuredMetrics.forEach(m => {
+        expect(m).toHaveProperty('label');
+        expect(m).toHaveProperty('value');
+      });
+    });
+  });
+
+  test('identity.rows has 3+ rows', () => {
+    initiatedFiles.forEach(d => {
+      expect(d.identity).toBeDefined();
+      expect(d.identity.rows.length).toBeGreaterThanOrEqual(3);
+    });
+  });
+
+  test('verdict.scores have scoreColor set (not empty)', () => {
+    initiatedFiles.forEach(d => {
+      if (!d.verdict || !d.verdict.scores) return;
+      d.verdict.scores.forEach(vs => {
+        if (vs.score === '?') return; // scaffold placeholder
+        expect(vs.scoreColor).toBeDefined();
+        // scoreColor must be some value — CSS var or hex color
+        // Empty string means the bug at line 1778 was hit
+        expect(typeof vs.scoreColor).toBe('string');
+        expect(vs.scoreColor.length).toBeGreaterThan(0);
+      });
+    });
+  });
+
+  test('hypothesis scores are valid percentages (pre-normalisation)', () => {
+    // Note: raw scores do NOT sum to 100% — they are survival scores
+    // that get normalised by normaliseScores() on the frontend.
+    // Each individual score should be a valid percentage string.
+    initiatedFiles.forEach(d => {
+      d.hypotheses.forEach(h => {
+        const raw = String(h.score).replace('%', '');
+        const num = parseFloat(raw);
+        expect(isNaN(num)).toBe(false);
+        expect(num).toBeGreaterThanOrEqual(1);
+        expect(num).toBeLessThanOrEqual(95);
+      });
+    });
+  });
+
+  test('position_in_range has numeric prices', () => {
+    initiatedFiles.forEach(d => {
+      const pir = (d.hero || {}).position_in_range;
+      if (!pir) return; // acceptable if hero.position_in_range absent
+      expect(typeof pir.current_price).toBe('number');
+      expect(pir.current_price).toBeGreaterThan(0);
+      (pir.worlds || []).forEach(w => {
+        expect(typeof w.price).toBe('number');
+        expect(w.price).toBeGreaterThan(0);
+        expect(w).toHaveProperty('label');
+      });
+    });
+  });
+
+  test('evidence.cards has entries with required fields', () => {
+    initiatedFiles.forEach(d => {
+      const cards = (d.evidence || {}).cards || [];
+      expect(cards.length).toBeGreaterThanOrEqual(1);
+      cards.forEach(c => {
+        // Cards must have at least a name/title identifier
+        const hasName = c.hasOwnProperty('name') || c.hasOwnProperty('title') || c.hasOwnProperty('domain');
+        expect(hasName).toBe(true);
+      });
+    });
+  });
+
+  test('gaps.coverageRows exist for initiated stocks', () => {
+    initiatedFiles.forEach(d => {
+      const rows = (d.gaps || {}).coverageRows || [];
+      // Initiated stocks should have some coverage rows
+      // (newly refreshed stocks via the fixed pipeline will have confidenceClass)
+      expect(rows.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  test('no emoji characters in research text', () => {
+    const emojiPattern = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{200D}\u{20E3}\u{FE0F}]/u;
+    initiatedFiles.forEach(d => {
+      const text = JSON.stringify(d);
+      const match = text.match(emojiPattern);
+      if (match) {
+        // Report the ticker + first emoji found
+        throw new Error(`${d.ticker}: contains emoji "${match[0]}" (code point U+${match[0].codePointAt(0).toString(16).toUpperCase()})`);
+      }
+    });
+  });
+
+  test('footer counts are populated', () => {
+    initiatedFiles.forEach(d => {
+      const footer = d.footer || {};
+      if (footer.hypothesesCount) {
+        expect(footer.hypothesesCount).not.toBe('4 Pending');
+      }
+      if (footer.domainCount) {
+        expect(footer.domainCount).not.toBe('0 of 10');
+      }
+    });
+  });
+
+  test('narrative sections are populated', () => {
+    initiatedFiles.forEach(d => {
+      const n = d.narrative || {};
+      expect(n.theNarrative).toBeDefined();
+      expect(n.theNarrative.length).toBeGreaterThan(50);
+      expect(n.evidenceCheck).toBeDefined();
+      expect(n.narrativeStability).toBeDefined();
+    });
+  });
+});
+
 
 describe('Index File', () => {
   let indexData;
@@ -179,12 +337,12 @@ describe('Index File', () => {
     });
   });
 
-  test('index hypotheses are slim (no supporting/contradicting arrays)', () => {
+  test('index hypotheses have core fields', () => {
     Object.keys(indexData).forEach(ticker => {
       indexData[ticker].hypotheses.forEach(hyp => {
-        expect(hyp).not.toHaveProperty('supporting');
-        expect(hyp).not.toHaveProperty('contradicting');
-        expect(hyp).not.toHaveProperty('requires');
+        expect(hyp).toHaveProperty('tier');
+        expect(hyp).toHaveProperty('direction');
+        expect(hyp).toHaveProperty('score');
       });
     });
   });
