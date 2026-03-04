@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-02T08:03:24.690Z"
+      "last_updated": "2026-03-04T07:55:32.714Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -26,7 +26,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-02T08:03:24.690Z"
+      "last_updated": "2026-03-04T07:55:32.714Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Cost pressures, competitive threats, or macro headwinds.",
       "upside": null,
       "risk_plain": "Material downside if multiple risks crystallise simultaneously.",
-      "survival_score": 0.46,
+      "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-04T07:53:49.510Z"
+      "last_updated": "2026-03-04T07:55:32.714Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -47,15 +47,15 @@
       "what_to_watch": "Industry disruption signals and regulatory changes.",
       "upside": null,
       "risk_plain": "If disruption materialises, prior assumptions become invalid.",
-      "survival_score": 0.44,
+      "survival_score": 0.46,
       "status": "MODERATE",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-04T07:53:49.510Z"
+      "last_updated": "2026-03-04T07:55:32.714Z"
     }
   },
   "dominant": "N3",
   "confidence": "LOW",
-  "alert_state": "OVERCORRECTION",
+  "alert_state": "NORMAL",
   "current_price": 1.08,
   "big_picture": "Horizon Minerals Limited (ASX: HRZ) — coverage initiated. Full analysis pending.",
   "last_flip": {
@@ -148,6 +148,13 @@
       "severity": "AMBER",
       "message": "Single-day move of -10.9% exceeds 10% threshold — possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-03-04",
+      "type": "OVERCORRECTION_REVIEW",
+      "severity": "AMBER",
+      "message": "Overcorrection NOT confirmed — price only partially reversed",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -200,11 +207,20 @@
       "cumulative_20d": -22.71,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-04",
+      "classification": "NOTABLE",
+      "daily_change_pct": -4.42,
+      "volume_multiplier": 1,
+      "cumulative_5d": -8.06,
+      "cumulative_20d": -22.71,
+      "results_day": false,
+      "overcorrection_active": false
     }
   ],
   "editorial_override": null,
   "price_history": [
-    0.96,
     0.96,
     0.955,
     0.98,
@@ -263,7 +279,8 @@
     1.24,
     1.09,
     1.13,
-    1.14
+    1.14,
+    1.08
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -480,14 +497,19 @@
     }
   },
   "_overcorrection": {
-    "active": true,
+    "active": false,
     "triggerType": "SINGLE_DAY",
     "triggerDate": "2026-02-25",
     "triggerPrice": 1.105,
     "direction": "down",
     "movePct": -10.89,
     "reviewDate": "2026-03-04",
-    "message": "Single-day move of -10.9% exceeds 10% threshold — possible overcorrection"
+    "message": "Single-day move of -10.9% exceeds 10% threshold — possible overcorrection",
+    "reviewResult": {
+      "reversal_pct": 20.8,
+      "confirmed": false,
+      "message": "Overcorrection NOT confirmed — price only partially reversed"
+    }
   },
   "price_evidence": {
     "last_run": "2026-03-04T07:53:49.510Z",

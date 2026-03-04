@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.17,
+      "survival_score": 0.16,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-04T07:53:49.510Z"
+      "last_updated": "2026-03-04T07:55:32.710Z"
     },
     "N2": {
       "label": "Commodity Cycle Risk",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.31,
+      "survival_score": 0.3,
       "status": "LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-04T07:53:49.510Z"
+      "last_updated": "2026-03-04T07:55:32.710Z"
     },
     "N3": {
       "label": "Green Energy Execution",
@@ -35,10 +35,10 @@
       "what_to_watch": "Cost pressures, competitive threats, or macro headwinds.",
       "upside": null,
       "risk_plain": "Material downside if multiple risks crystallise simultaneously.",
-      "survival_score": 0.26,
+      "survival_score": 0.27,
       "status": "LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-04T07:53:49.510Z"
+      "last_updated": "2026-03-04T07:55:32.710Z"
     },
     "N4": {
       "label": "FFI Capital Drain",
@@ -47,15 +47,15 @@
       "what_to_watch": "Industry disruption signals and regulatory changes.",
       "upside": null,
       "risk_plain": "If disruption materialises, prior assumptions become invalid.",
-      "survival_score": 0.26,
+      "survival_score": 0.27,
       "status": "LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-04T07:53:49.510Z"
+      "last_updated": "2026-03-04T07:55:32.710Z"
     }
   },
   "dominant": "N2",
   "confidence": "LOW",
-  "alert_state": "NORMAL",
+  "alert_state": "OVERCORRECTION",
   "current_price": 19,
   "big_picture": "Fortescue Ltd (ASX: FMG) — coverage initiated. Full analysis pending.",
   "last_flip": {
@@ -78,7 +78,15 @@
       "to_survival": 0.42
     }
   ],
-  "evidence_items": [],
+  "evidence_items": [
+    {
+      "date": "2026-03-04",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "Single-day move of -10.1% exceeds 10% threshold — possible overcorrection",
+      "auto_generated": true
+    }
+  ],
   "price_signals": [
     {
       "date": "2026-02-25",
@@ -119,11 +127,20 @@
       "cumulative_20d": -6.63,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-04",
+      "classification": "MATERIAL",
+      "daily_change_pct": -10.12,
+      "volume_multiplier": 1,
+      "cumulative_5d": -2.59,
+      "cumulative_20d": -8.85,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    21,
     21.5,
     21.3,
     21.41,
@@ -182,7 +199,8 @@
     20.1,
     20.85,
     21.14,
-    19.58
+    19.58,
+    19
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -403,5 +421,15 @@
   },
   "last_research_update": "2026-03-04T07:53:49.510Z",
   "price": 20.85,
-  "date": "26 February 2026"
+  "date": "26 February 2026",
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-03-04",
+    "triggerPrice": 19,
+    "direction": "down",
+    "movePct": -10.12,
+    "reviewDate": "2026-03-11",
+    "message": "Single-day move of -10.1% exceeds 10% threshold — possible overcorrection"
+  }
 }
