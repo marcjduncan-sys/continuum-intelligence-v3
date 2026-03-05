@@ -66,7 +66,7 @@ Neutral hypotheses contribute zero. No sqrt amplification. No company weight mul
 **Build:** `npm run dev` (Vite dev server) / `npm run build` (production → `dist/`)
 
 ```
-index.html (~726 lines — HTML shell only, no inline CSS/JS)
+index.html (~768 lines — HTML shell only, no inline CSS/JS)
 src/
 ├── main.js                    Entry point — boots app, exposes window globals
 ├── styles/                    11 CSS modules imported via styles/index.css
@@ -99,7 +99,7 @@ src/
 
 - **CDN deps** loaded via `<script>` tags: Chart.js, marked.js, DOMPurify, SheetJS (lazy)
 - **5 classic (non-module) scripts:** 3 DNE engines, personalisation.js, snapshot-generator.js
-- **Build output:** ~194 KB JS (58 KB gzip) + 132 KB CSS (21 KB gzip)
+- **Build output:** ~211 KB JS (63 KB gzip) + 142 KB CSS (22 KB gzip)
 
 ### Backend (api/)
 - `main.py` -- FastAPI app, chat endpoints, refresh endpoints, `POST /api/stocks/add` endpoint, static file serving
@@ -284,8 +284,8 @@ When patching STOCK_DATA with refreshed research data, preserve `_livePrice`, `p
 ### 7.11 Live Price Change Display: Never Derive from stock.price
 `stock.price` is overwritten to the live price during data loading (`STOCK_DATA[ticker].price = livePrice` at line ~5638). Computing price change as `_livePrice - stock.price` will always yield zero. Use `stock._liveChange` and `stock._liveChangePct` (populated by `applyServerPrices()` from `live-prices.json`), falling back to `stock._livePrevClose` for the delta. The home page cards already use the server values correctly via `updateHomeCardPrice()`. The report hero at `updateLiveUI()` was the only site that had this bug.
 
-### 7.12 Vite Build vs Dev: Two Different Worlds
-The `src/` module tree (`main.js`, `src/styles/`, etc.) is only active during `npm run dev`. In production builds, Vite processes `index.html` as the entry: it bundles `<link rel="stylesheet">` tags into a CSS asset and transforms font preloads, but the app's JS runs from inline `<script>` blocks in index.html (the original monolith code). There is no `<script type="module" src="src/main.js">` in the HTML. This means: (a) CSS for production must be in `<link>` tags in index.html OR in the inline `<style>` block, not in `src/styles/` imports, and (b) changes to `src/` JS modules have no effect on the production build.
+### 7.12 src/ Modules Are Production (Modularisation Complete Feb 2026)
+The `src/` module tree IS the production codebase. `index.html` contains `<script type="module" src="./src/main.js">` and no inline `<script>` or `<style>` blocks. Vite bundles `src/styles/index.css` into the production CSS asset and `src/main.js` (with all its imports) into the JS bundle. All JS logic changes go in `src/` modules. All CSS changes go in `src/styles/`. The previous monolith (13,700-line `index.html`) was fully extracted: JS removed in Phase 2 (14,761 → 5,987 lines), CSS removed in Phase 3 (5,987 → 768 lines). Do not add inline `<script>` or `<style>` blocks to `index.html`.
 
 ### 7.13 Yahoo quoteSummary Requires Crumb/Cookie Auth
 Yahoo Finance's `quoteSummary` endpoint (used for sector/industry detection) requires a crumb token + cookies. Without them it returns `{"code":"Unauthorized","description":"Invalid Crumb"}`. The auth flow: (1) GET `https://fc.yahoo.com/` to seed cookies (A3 cookie), (2) GET `https://query2.finance.yahoo.com/v1/test/getcrumb` with those cookies to get crumb, (3) pass `crumb` as URL param + cookies to quoteSummary. Must use a **fresh httpx.AsyncClient** per call (not the shared `_http_client`) because cookies must propagate across all three requests via the client's native cookie jar. The chart endpoint (`/v8/finance/chart/`) does NOT require auth. See `_get_yahoo_crumb()` pattern in `scaffold.py` and `getYahooSession()` in `scripts/add-stock.js`.
@@ -561,7 +561,7 @@ Push to `main` branch. GitHub Actions runs `npm ci → npx vitest run → npm ru
 Push to `main`. Railway auto-deploys from `api/` directory via `railway.json` and `Procfile`.
 
 ### Pre-Push Checklist
-1. `npm run test:unit` -- all Vitest tests pass
+1. `npm run test:all` -- all 170 unit tests pass (Jest + Vitest)
 2. `npm run build` -- production build succeeds
 3. `git status` -- no unintended files staged
 4. `git diff` -- review what's actually changing
@@ -578,8 +578,9 @@ Push to `main`. Railway auto-deploys from `api/` directory via `railway.json` an
 npm run dev              # Vite dev server (localhost:5173+), proxies /api to Railway
 npm run build            # Production build → dist/
 npm run preview          # Serve dist/ locally
-npm run test:unit        # Vitest (104 tests on src/ modules)
-npm run test:all         # Jest + Vitest (145 total)
+npm run test:unit        # Vitest (109 tests on src/ modules)
+npm run test:all         # Jest + Vitest (170 total)
+npm run test:e2e         # Playwright smoke tests (requires build first)
 npm run typecheck        # tsc --noEmit (JSDoc type checking)
 npm run test:unit:watch  # Vitest watch mode (re-runs on save)
 ```
@@ -630,19 +631,23 @@ New stocks automatically get commodity/macro context during refresh via sector-b
 ## 16. Testing
 
 ### 16.1 Automated Tests
-Two test runners coexist (disjoint scopes, no conflict):
+Three test runners coexist (disjoint scopes, no conflict):
 
 | Runner | Command | Scope | Module system |
 |--------|---------|-------|---------------|
-| **Vitest** | `npm run test:unit` | `src/**/*.test.js` (104 tests) | ESM |
-| **Jest** | `npm test` | `tests/*.test.js` (41 tests) | CommonJS |
+| **Vitest** | `npm run test:unit` | `src/**/*.test.js` (109 tests) | ESM |
+| **Jest** | `npm test` | `tests/*.test.js` (61 tests) | CommonJS |
+| **Playwright** | `npm run test:e2e` | `tests/e2e/*.spec.js` (6 tests) | ESM |
 
-- `npm run test:all` — runs both suites sequentially
+- `npm run test:all` — runs Jest + Vitest sequentially (170 unit tests)
+- `npm run test:e2e` — Playwright smoke tests (requires `npm run build` first; starts `vite preview` automatically)
 - `npm run test:unit:coverage` — Vitest with V8 coverage
 - `npm run typecheck` — tsc with checkJs (scoped to tested files in tsconfig.json)
 - CI: `npx vitest run` gates deployment in `.github/workflows/deploy.yml`
 
 Test files are co-located: `src/lib/format.test.js` next to `src/lib/format.js`.
+
+**E2E tests** (`tests/e2e/smoke.spec.js`) cover: home page loads, BHP report renders, portfolio/deep-research/about pages activate, invalid route falls back to home. Config in `playwright.config.js` — base URL is `http://localhost:4173/continuum-intelligence-v3/`.
 
 ### 16.2 Manual Verification
 Automated tests cover pure logic. UI and integration still require manual checks:
@@ -658,7 +663,7 @@ Automated tests cover pure logic. UI and integration still require manual checks
 
 ## 17. Known Issues
 
-- `personalisation.js` has a SyntaxError (`Unexpected identifier 'PRODUCTION_API'`) affecting the Personalisation tab (fixed in modularisation — `isLocal` ternary corrected)
+- Personalisation tab SyntaxError (`Unexpected identifier 'PRODUCTION_API'`) was fixed during modularisation Phase 2 — no longer an issue
 - Service worker returns 404 (non-critical)
 - Coverage table "UPDATED" column may show stale dates after refresh (pipeline may not update the `date` field, or table reads from static data rather than localStorage cache)
 - Backend skew scripts (`scripts/calc-idio-signal.js`, `scripts/calc-composite-sentiment.js`) still use old sqrt formula. Frontend is correct. Backend values in `data/stocks/*.json` are stale. See `DEVELOPER-BRIEF-Skew-Scoring-Simplification.md` for TODO list.
