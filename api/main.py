@@ -484,7 +484,7 @@ async def add_stock(
 
     # Also update dist/data/research/_index.json for refresh pipeline
     dist_index_path = dist_research_dir / "_index.json" if dist_research_dir.exists() else None
-    if dist_index_path and dist_index_path != index_path.resolve() and dist_index_path.exists():
+    if dist_index_path and dist_index_path.resolve() != index_path.resolve() and dist_index_path.exists():
         try:
             with open(dist_index_path) as f:
                 dist_index = json.load(f)

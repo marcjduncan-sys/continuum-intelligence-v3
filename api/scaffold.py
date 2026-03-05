@@ -564,7 +564,7 @@ def build_research_scaffold(
         # Hero
         "heroDescription": f"{sector_sub or sector} &bull; ASX-Listed",
         "heroCompanyDescription": (
-            f"{company} (ASX: {ticker}) &mdash; coverage initiated. "
+            f"{company} (ASX: {ticker}): coverage initiated. "
             f"Full analysis pending."
         ),
         "heroMetrics": [

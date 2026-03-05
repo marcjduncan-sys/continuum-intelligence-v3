@@ -55,7 +55,7 @@ Net = Sum(upside hypothesis normalised weights) - Sum(downside hypothesis normal
 ```
 Neutral hypotheses contribute zero. No sqrt amplification. No company weight multiplier. No macro/sector/tech overlay. Normalisation via `normaliseScores()` with floor=5, ceiling=80, scale to 100% is retained. See `DEVELOPER-BRIEF-Skew-Scoring-Simplification.md` in the project OneDrive for the full specification of changes done and remaining.
 
-**Backend skew scripts (`scripts/calc-idio-signal.js`, `scripts/calc-composite-sentiment.js`) still use the OLD formula.** These are marked TODO in the developer brief. The frontend computes live from hypothesis data and is correct. The backend values in `data/stocks/*.json` are stale.
+**Backend skew scripts (`scripts/calc-idio-signal.js`, `scripts/calc-composite-sentiment.js`) use the correct formula.** Both import `computeSkewScore` from `js/dne/normalise.js` (no sqrt amplification). The developer brief TODO for these scripts is complete.
 
 ---
 
@@ -100,6 +100,13 @@ src/
 - **CDN deps** loaded via `<script>` tags: Chart.js, marked.js, DOMPurify, SheetJS (lazy)
 - **5 classic (non-module) scripts:** 3 DNE engines, personalisation.js, snapshot-generator.js
 - **Build output:** ~211 KB JS (63 KB gzip) + 142 KB CSS (22 KB gzip)
+
+**UI Layout Conventions (Critical):**
+- `initDeepResearch()` in `src/pages/home.js` must target `'deep-research-container'` (the inner div inside `.page-inner`), NOT `'page-deep-research'` (the outer page div). Targeting the outer div bypasses `.page-inner`'s `max-width: 1240px` constraint, causing tiles to render full-width without margins.
+- Deep Research grid uses `repeat(auto-fit, minmax(280px, 1fr))` — this collapses empty tracks when fewer than 4 stocks are present. Do not use a fixed column count (`repeat(4, 1fr)`) or a ghost column will appear.
+- `.dr-ticker` and `.dr-thesis` use `var(--font-ui)` (Inter), consistent with the report page. Do not use `--font-data` (JetBrains Mono) or `--font-narrative` (Source Serif 4) for DR tiles.
+- Featured cards grid uses `minmax(260px, 1fr)` for 4-per-row at desktop widths.
+- `.fc-skew-rationale` is clamped to 3 lines via `-webkit-line-clamp: 3`. Never remove this clamp — unclamped rationale text (MIN, REA have 300-350px) inflates all cards in the same grid row via CSS Grid row-stretch behaviour.
 
 ### Backend (api/)
 - `main.py` -- FastAPI app, chat endpoints, refresh endpoints, `POST /api/stocks/add` endpoint, static file serving
@@ -279,7 +286,7 @@ When patching STOCK_DATA with refreshed research data, preserve `_livePrice`, `p
 `vite.config.js` must set `base: '/continuum-intelligence-v3/'` because GitHub Pages serves from a project subdirectory, not the domain root. Without this, all Vite-generated asset paths (`/assets/...` for CSS bundles, font preloads, `@font-face` url() paths) resolve to the wrong root and 404. The inline `<style>` block in index.html is unaffected (it's not processed by Vite), so most pages appear to work -- only features with CSS exclusively in the Vite bundle (e.g. personalisation page) visibly break. If the repo is ever renamed or moved to a custom domain, this `base` value must be updated.
 
 ### 7.10 Hypothesis Score Idempotency
-`adjustHypothesisScores()` runs on every `hydrate()` call, which is triggered by boot, data load, and every live price update. It MUST be idempotent. The function saves `_origScore` and `_origScoreMeta` on each hypothesis before first adjustment and always adjusts from those originals. Never read `hyp.score` as the base for adjustment (it contains the previously-adjusted value). Never append to `hyp.scoreMeta` (use replace from `_origScoreMeta`). When STOCK_DATA[ticker] is replaced with fresh JSON (data load, batch refresh), `_origScore` is naturally cleared because the entire object is new. The function in `index.html` (production) and `src/data/dynamics.js` (dev) must stay in sync.
+`adjustHypothesisScores()` runs on every `hydrate()` call, which is triggered by boot, data load, and every live price update. It MUST be idempotent. The function saves `_origScore` and `_origScoreMeta` on each hypothesis before first adjustment and always adjusts from those originals. Never read `hyp.score` as the base for adjustment (it contains the previously-adjusted value). Never append to `hyp.scoreMeta` (use replace from `_origScoreMeta`). When STOCK_DATA[ticker] is replaced with fresh JSON (data load, batch refresh), `_origScore` is naturally cleared because the entire object is new. The canonical implementation lives in `src/data/dynamics.js`.
 
 ### 7.11 Live Price Change Display: Never Derive from stock.price
 `stock.price` is overwritten to the live price during data loading (`STOCK_DATA[ticker].price = livePrice` at line ~5638). Computing price change as `_livePrice - stock.price` will always yield zero. Use `stock._liveChange` and `stock._liveChangePct` (populated by `applyServerPrices()` from `live-prices.json`), falling back to `stock._livePrevClose` for the delta. The home page cards already use the server values correctly via `updateHomeCardPrice()`. The report hero at `updateLiveUI()` was the only site that had this bug.
@@ -316,8 +323,8 @@ Any new data loading path must account for stocks that exist in localStorage but
 - `normaliseScores()` -- floor 5, ceiling 80, scale to 100%. Used by DNE engine, frontend skew, and must be replicated by backend scripts
 - `route()` -- master router, controls all page activation
 - `loadFullResearchData()` -- feeds all report/snapshot renders
-- `data-ticker-card` attribute -- queried by live price updater at lines 8495, 8556, 8731
-- `.fc-price` class -- queried by live price updater at line 8734
+- `data-ticker-card` attribute -- queried by live price updater in `src/services/market-feed.js`
+- `.fc-price` class -- queried by live price updater in `src/services/market-feed.js`
 
 ### 8.2 CSS Scoping Rule
 Never edit shared CSS classes (`.hero`, `.site-footer`, `.section-header`, `.skew-badge`) directly. Always scope with page ID: `#page-home .hero-title { ... }`
@@ -664,9 +671,9 @@ Automated tests cover pure logic. UI and integration still require manual checks
 ## 17. Known Issues
 
 - Personalisation tab SyntaxError (`Unexpected identifier 'PRODUCTION_API'`) was fixed during modularisation Phase 2 — no longer an issue
-- Service worker returns 404 (non-critical)
-- Coverage table "UPDATED" column may show stale dates after refresh (pipeline may not update the `date` field, or table reads from static data rather than localStorage cache)
-- Backend skew scripts (`scripts/calc-idio-signal.js`, `scripts/calc-composite-sentiment.js`) still use old sqrt formula. Frontend is correct. Backend values in `data/stocks/*.json` are stale. See `DEVELOPER-BRIEF-Skew-Scoring-Simplification.md` for TODO list.
+- Service worker CACHE_NAME updated to `continuum-v3.0.0` — 404 was a stale V2 cache name, now resolved
+- Coverage table "UPDATED" column date staleness fixed — boot sequence now patches STOCK_DATA dates from localStorage cached research before the home page renders
+- Backend skew scripts (`scripts/calc-idio-signal.js`, `scripts/calc-composite-sentiment.js`) already use the correct formula (no sqrt). Note is closed.
 - V2 event-scraper scripts (`event-scraper.js`, `narrative-generator.js`, `update-html.js`) exist in the parent repo but are not used by V3. V3's refresh pipeline replaces this automation.
 - DNE engines (`js/dne/`) still loaded as classic scripts — not yet converted to ES modules
 - `tsconfig.json` only covers 4 files in `include` — expand as JSDoc is added to more modules

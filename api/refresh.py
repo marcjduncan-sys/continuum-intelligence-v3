@@ -1320,9 +1320,9 @@ def _generate_technical_analysis(
             "crossover": {
                 "type": crossover_type,
                 "date": now.strftime("%B %Y"),
-                "description": f"50-day MA ({crossover_type.split()[0].lower()}) above 200-day MA"
+                "description": "50-day MA crossed above 200-day MA (golden cross)"
                 if crossover_type == "Golden Cross"
-                else f"50-day MA below 200-day MA ({crossover_type.lower()})",
+                else "50-day MA crossed below 200-day MA (death cross)",
             },
             "priceVsMa50": round((current_price - ma50) / ma50 * 100, 1),
             "priceVsMa200": round((current_price - ma200) / ma200 * 100, 1),

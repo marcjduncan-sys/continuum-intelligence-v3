@@ -186,6 +186,26 @@ async function boot() {
         indexData[t]._indexOnly = true;
       });
       initStockData(indexData);
+
+      // Patch dates from localStorage cached research (newer than git-committed _index.json).
+      // After a refresh the new date lives in ci_research_TICKER but the coverage table reads
+      // STOCK_DATA[ticker].date which was just populated from the static _index.json.
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('ci_research_')) {
+            const ticker = key.slice('ci_research_'.length);
+            if (STOCK_DATA[ticker]) {
+              try {
+                const cached = JSON.parse(localStorage.getItem(key));
+                if (cached && cached.date) {
+                  STOCK_DATA[ticker].date = cached.date;
+                }
+              } catch (e) { /* ignore parse errors on individual entries */ }
+            }
+          }
+        }
+      } catch (e) { /* localStorage may be unavailable (private browsing, quota) */ }
     }
 
     if (refResponse.ok) {
