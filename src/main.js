@@ -226,7 +226,7 @@ async function boot() {
   initChat();
   initAboutPage();
   initAddStock();
-  initDeepResearch('page-deep-research');
+  initDeepResearch('deep-research-container');
 
   // --- Theme toggle ---
   var themeToggle = document.getElementById('themeToggle');
