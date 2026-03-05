@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from web_search import _get_http_client, YAHOO_HEADERS, SECTOR_COMMODITY_MAP
+from refresh import _generate_technical_analysis
 
 logger = logging.getLogger(__name__)
 
@@ -543,6 +544,10 @@ def build_research_scaffold(
     else:
         price_history = [price]
 
+    # Generate technical analysis from available price data
+    ta_price_data = {"price": price, "high_52w": high_52w, "low_52w": low_52w}
+    ta_section = _generate_technical_analysis(ticker, ta_price_data, price_history)
+
     return {
         "ticker": ticker,
         "tickerFull": f"{ticker}.AX",
@@ -785,6 +790,9 @@ def build_research_scaffold(
                 "and population."
             ),
         },
+
+        # Technical Analysis (computed from price history)
+        "technicalAnalysis": ta_section,
 
         # Footer
         "footer": {
