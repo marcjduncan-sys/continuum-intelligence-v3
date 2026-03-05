@@ -711,3 +711,73 @@
     .coverage-table thead th { padding: 6px 8px; }
     .coverage-table tbody td { padding: 8px; }
 }
+
+/* ============================================================
+   DEEP RESEARCH  --  Listing Page Tiles
+   ============================================================ */
+#deep-research-container {
+    width: 100%;
+    padding: 20px 0;
+}
+.dr-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+    padding: 20px 0;
+}
+@media (max-width: 1024px) { .dr-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .dr-grid { grid-template-columns: 1fr; } }
+.dr-tile {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border);
+    border-radius: 6px;
+    padding: var(--space-lg);
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+.dr-tile:hover { border-color: var(--accent-teal); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.dr-tile:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
+.dr-tile.dr-skew-downside { border-left-color: var(--signal-red); }
+.dr-tile.dr-skew-upside   { border-left-color: var(--signal-green); }
+.dr-tile.dr-skew-balanced  { border-left-color: var(--signal-amber); }
+.dr-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-sm); }
+.dr-ticker { font-family: var(--font-data); font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); }
+.dr-company { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
+.dr-sector { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-teal); background: rgba(26,158,143,0.12); padding: 2px 7px; border-radius: 3px; display: inline-block; margin-top: 4px; }
+.dr-skew-badge { font-family: var(--font-data); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
+.dr-skew-badge.badge-downside { color: var(--signal-red); background: rgba(220,53,69,0.1); }
+.dr-skew-badge.badge-upside   { color: var(--signal-green); background: rgba(40,167,69,0.1); }
+.dr-skew-badge.badge-balanced  { color: var(--signal-amber); background: rgba(255,193,7,0.1); }
+.dr-thesis {
+    font-family: var(--font-narrative);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.dr-hyp-bars { display: flex; height: 6px; border-radius: 3px; overflow: hidden; gap: 2px; margin-top: auto; }
+.dr-hyp-seg { height: 100%; border-radius: 2px; min-width: 4px; transition: width 0.3s ease; }
+.dr-hyp-seg.seg-upside   { background: var(--signal-green); }
+.dr-hyp-seg.seg-downside  { background: var(--signal-red); }
+.dr-hyp-seg.seg-neutral   { background: var(--signal-amber); }
+.dr-hyp-legend { display: flex; gap: var(--space-sm); flex-wrap: wrap; margin-top: 4px; }
+.dr-hyp-label { font-family: var(--font-data); font-size: 0.58rem; color: var(--text-muted); display: flex; align-items: center; gap: 3px; }
+.dr-hyp-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.dr-footer { display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-sm); border-top: 1px solid var(--border); margin-top: var(--space-sm); gap: var(--space-sm); }
+.dr-evidence { font-family: var(--font-data); font-size: 0.65rem; font-weight: 600; color: var(--text-muted); }
+.dr-evidence-count { color: var(--accent-teal); }
+.dr-catalyst { font-size: 0.65rem; color: var(--text-muted); text-align: right; }
+.dr-catalyst-event { font-weight: 600; color: var(--text-secondary); }
+.dr-sort-controls { display: flex; gap: var(--space-sm); margin-bottom: var(--space-md); flex-wrap: wrap; }
+.dr-sort-btn { font-family: var(--font-data); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 5px 12px; border: 1px solid var(--border); border-radius: 4px; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+.dr-sort-btn:hover { border-color: var(--accent-teal); color: var(--text-primary); }
+.dr-sort-btn.active { border-color: var(--accent-teal); color: var(--accent-teal); background: rgba(26,158,143,0.08); }

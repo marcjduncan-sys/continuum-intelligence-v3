@@ -200,3 +200,176 @@
   color: #333;
   border-color: #ccc;
 }
+
+/* ── Add Stock button ── */
+.btn-add-stock {
+  background: linear-gradient(135deg, #0a1f2f 0%, #143a5a 100%);
+  color: #579bfc;
+  border: 1px solid rgba(87,155,252,0.3);
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-add-stock:hover {
+  background: linear-gradient(135deg, #143a5a 0%, #1a4e7a 100%);
+  border-color: rgba(87,155,252,0.6);
+  box-shadow: 0 0 12px rgba(87,155,252,0.15);
+}
+[data-theme="light"] .btn-add-stock {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  color: #1565c0;
+  border-color: rgba(21,101,192,0.3);
+}
+
+/* ── Add Stock modal ── */
+.add-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.add-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+}
+.add-modal-content {
+  position: relative;
+  background: #0d1b14;
+  border: 1px solid rgba(87,155,252,0.25);
+  border-radius: 12px;
+  width: 420px;
+  max-width: 92vw;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+[data-theme="light"] .add-modal-content {
+  background: #fff;
+  border-color: #ccc;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+.add-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.add-modal-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #e0e0e0;
+  margin: 0;
+}
+[data-theme="light"] .add-modal-title { color: #1a1a1a; }
+.add-modal-close {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.add-modal-close:hover { color: #fff; }
+.add-modal-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #aaa;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+[data-theme="light"] .add-modal-label { color: #666; }
+.add-modal-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.06);
+  color: #e0e0e0;
+  font-size: 1.1rem;
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  outline: none;
+  box-sizing: border-box;
+}
+.add-modal-input:focus {
+  border-color: rgba(87,155,252,0.5);
+  box-shadow: 0 0 0 2px rgba(87,155,252,0.15);
+}
+[data-theme="light"] .add-modal-input {
+  background: #f5f5f5;
+  border-color: #ccc;
+  color: #1a1a1a;
+}
+.add-modal-status {
+  min-height: 22px;
+  margin-top: 12px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+.add-modal-status.info { color: #579bfc; }
+.add-modal-status.success { color: #00c875; }
+.add-modal-status.error { color: #e44258; }
+.add-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+.add-modal-cancel {
+  background: rgba(255,255,255,0.08);
+  color: #ccc;
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+.add-modal-cancel:hover { background: rgba(255,255,255,0.15); }
+[data-theme="light"] .add-modal-cancel {
+  background: #f0f0f0;
+  color: #333;
+  border-color: #ccc;
+}
+.add-modal-submit {
+  background: linear-gradient(135deg, #0a2f1f 0%, #145a3a 100%);
+  color: #00c875;
+  border: 1px solid rgba(0,200,117,0.3);
+  padding: 8px 24px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.add-modal-submit:hover {
+  background: linear-gradient(135deg, #145a3a 0%, #1a7a4e 100%);
+  border-color: rgba(0,200,117,0.6);
+}
+.add-modal-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+[data-theme="light"] .add-modal-submit {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  color: #1b5e20;
+  border-color: rgba(27,94,32,0.3);
+}
+.add-modal-spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(0,200,117,0.3);
+  border-top-color: #00c875;
+  border-radius: 50%;
+  animation: add-spin 0.6s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes add-spin { to { transform: rotate(360deg); } }
