@@ -28,8 +28,12 @@ export function loadFullResearchData(ticker, callback) {
       var cachedData = JSON.parse(cached);
       // Use cached data if it has a _lastRefreshed timestamp (written by refresh pipeline)
       if (cachedData._lastRefreshed) {
-        var livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
-        var livePriceHistory = STOCK_DATA[ticker] ? STOCK_DATA[ticker].priceHistory : undefined;
+        var prev = STOCK_DATA[ticker] || {};
+        var livePrice = prev._livePrice;
+        var livePriceHistory = prev.priceHistory;
+        var livePrevClose = prev._livePrevClose;
+        var liveChange = prev._liveChange;
+        var liveChangePct = prev._liveChangePct;
         STOCK_DATA[ticker] = cachedData;
         STOCK_DATA[ticker]._indexOnly = false;
         STOCK_DATA[ticker]._fromCache = true;
@@ -39,6 +43,11 @@ export function loadFullResearchData(ticker, callback) {
         }
         if (livePriceHistory) {
           STOCK_DATA[ticker].priceHistory = livePriceHistory;
+        }
+        if (livePrevClose !== undefined) {
+          STOCK_DATA[ticker]._livePrevClose = livePrevClose;
+          STOCK_DATA[ticker]._liveChange = liveChange;
+          STOCK_DATA[ticker]._liveChangePct = liveChangePct;
         }
         if (window.ContinuumDynamics && window.ContinuumDynamics.hydrate) {
           window.ContinuumDynamics.hydrate(ticker);

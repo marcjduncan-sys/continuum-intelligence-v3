@@ -12,6 +12,11 @@ import { announcePageChange } from './dom.js';
 const renderedPages = new Set();
 const renderedSnapshots = new Set();
 
+// Railway API base (same pattern as batch-refresh.js)
+var _REFRESH_API_BASE = window.location.hostname.includes('github.io')
+  ? 'https://imaginative-vision-production-16cb.up.railway.app'
+  : '';
+
 // Page renderer callbacks -- wired in during integration (Phase 6)
 let _pageRenderers = {};
 
@@ -47,7 +52,7 @@ export function initRouter(pageRenderers) {
     } else if (hash.startsWith('snapshot-')) {
       pageName = hash.replace('snapshot-', '') + ' Snapshot';
     } else {
-      var names = { home: 'Research Home', snapshots: 'Investment Snapshots', portfolio: 'Portfolio Intelligence', comparator: 'Investment Thesis Comparator', personalisation: 'Personalisation', about: 'About' };
+      var names = { home: 'Research Home', 'deep-research': 'Deep Research', portfolio: 'Portfolio Intelligence', comparator: 'Investment Thesis Comparator', personalisation: 'Personalisation', about: 'About' };
       pageName = names[hash] || hash;
     }
     announcePageChange('Navigated to ' + pageName);
@@ -71,6 +76,15 @@ export function route() {
   if (!isValidRoute && hash.startsWith('report-')) {
     var ticker = hash.replace('report-', '');
     isValidRoute = typeof STOCK_DATA !== 'undefined' && STOCK_DATA.hasOwnProperty(ticker);
+    // Allow route for dynamically-added stocks not yet in STOCK_DATA
+    // (e.g. different browser, no localStorage -- will fetch from Railway)
+    if (!isValidRoute && /^[A-Z0-9]{1,6}$/.test(ticker)) {
+      isValidRoute = true; // permit route; render block fetches on demand
+    }
+  }
+  if (!isValidRoute && hash.startsWith('deep-report-')) {
+    var drTicker = hash.replace('deep-report-', '');
+    isValidRoute = typeof STOCK_DATA !== 'undefined' && STOCK_DATA.hasOwnProperty(drTicker);
   }
   if (!isValidRoute && hash.startsWith('snapshot-')) {
     var snapTicker = hash.replace('snapshot-', '');
@@ -86,7 +100,7 @@ export function route() {
   }
 
   // Auto-create page divs for dynamically added stocks (safe -- validated above)
-  if ((hash.startsWith('report-') || hash.startsWith('snapshot-')) && !document.getElementById('page-' + hash)) {
+  if ((hash.startsWith('report-') || hash.startsWith('deep-report-') || hash.startsWith('snapshot-')) && !document.getElementById('page-' + hash)) {
     const div = document.createElement('div');
     div.className = 'page';
     div.id = 'page-' + hash;
@@ -96,11 +110,46 @@ export function route() {
   // Lazy render report pages on first visit
   if (hash.startsWith('report-')) {
     const ticker = hash.replace('report-', '');
-    if (!renderedPages.has(ticker) && STOCK_DATA[ticker]) {
+    if (!renderedPages.has(ticker)) {
       const container = document.getElementById('page-' + hash);
       if (container) {
-        // Show loading state
-        if (STOCK_DATA[ticker]._indexOnly) {
+        // If stock not in STOCK_DATA at all, try fetching from Railway (dynamically-added stock)
+        if (!STOCK_DATA[ticker]) {
+          container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Research Data&hellip;</div><div style="font-size:0.9rem">Fetching report for ' + ticker + ' from server</div></div></div>';
+          (async function() {
+            try {
+              var scaffoldResp = await fetch(_REFRESH_API_BASE + '/data/research/' + ticker + '.json');
+              if (!scaffoldResp.ok) throw new Error('HTTP ' + scaffoldResp.status);
+              var scaffoldData = await scaffoldResp.json();
+              scaffoldData._lastRefreshed = scaffoldData._lastRefreshed || new Date().toISOString();
+              try { localStorage.setItem('ci_research_' + ticker, JSON.stringify(scaffoldData)); } catch(e) {}
+              var currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00a3','EUR':'\u20ac'};
+              STOCK_DATA[ticker] = scaffoldData;
+              STOCK_DATA[ticker]._indexOnly = false;
+              if (scaffoldData.currency && currencyMap[scaffoldData.currency]) {
+                STOCK_DATA[ticker].currency = currencyMap[scaffoldData.currency];
+              }
+              if (typeof window.ContinuumDynamics !== 'undefined' && window.ContinuumDynamics.hydrate) {
+                window.ContinuumDynamics.hydrate(ticker);
+              }
+              if (_pageRenderers.renderReportPage) {
+                container.innerHTML = _pageRenderers.renderReportPage(STOCK_DATA[ticker]);
+              }
+              renderedPages.add(ticker);
+              if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
+              if (_pageRenderers.setupScrollSpy) _pageRenderers.setupScrollSpy('page-' + hash);
+              if (_pageRenderers.populateSidebar) _pageRenderers.populateSidebar(ticker);
+              if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
+              if (typeof window.applyNarrativeAnalysis === 'function') window.applyNarrativeAnalysis(ticker);
+              if (_pageRenderers.initNarrativeTimelineChart) _pageRenderers.initNarrativeTimelineChart(ticker);
+              if (_pageRenderers.fetchAndPatchLive) _pageRenderers.fetchAndPatchLive(ticker);
+              console.log('[Route] Fetched dynamically-added stock ' + ticker + ' from Railway');
+            } catch(err) {
+              container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Stock Not Found</div><div style="font-size:0.9rem">' + ticker + ' is not in coverage. <a href="#home" style="color:var(--brand-green)">Return to home</a></div></div></div>';
+              console.warn('[Route] Failed to fetch ' + ticker + ':', err);
+            }
+          })();
+        } else if (STOCK_DATA[ticker]._indexOnly) {
           container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Research Data&hellip;</div><div style="font-size:0.9rem">Fetching full report for ' + STOCK_DATA[ticker].company + '</div></div></div>';
           if (_pageRenderers.loadFullResearchData) {
             _pageRenderers.loadFullResearchData(ticker, function(data) {
@@ -211,7 +260,7 @@ export function route() {
   document.querySelectorAll('.nav-links a').forEach(a => {
     a.classList.remove('active');
     a.removeAttribute('aria-current');
-    if (a.dataset.nav === hash || (hash.startsWith('report-') && a.dataset.nav === 'home') || (hash.startsWith('snapshot-') && a.dataset.nav === 'snapshots')) {
+    if (a.dataset.nav === hash || (hash.startsWith('report-') && a.dataset.nav === 'home') || (hash.startsWith('deep-report-') && a.dataset.nav === 'deep-research') || (hash.startsWith('snapshot-') && a.dataset.nav === 'deep-research')) {
       a.classList.add('active');
       a.setAttribute('aria-current', 'page');
     }

@@ -182,7 +182,7 @@ function computeLiveTA(bars, staticTA) {
 
 // Patch a STOCK_DATA entry with live data
 function patchStockData(ticker, liveData) {
-    var stock = window.STOCK_DATA[ticker];
+    var stock = STOCK_DATA[ticker];
     if (!stock || !liveData) return;
 
     // Store live chart data on the stock object
@@ -311,11 +311,13 @@ export function updateLiveUI(ticker) {
     }
 
     // 2) Update hero price with live indicator
+    // Rule 7.11: never derive change from stock.price (overwritten to live price).
+    // Use server-supplied _liveChange/_liveChangePct from applyServerPrices().
     if (stock._livePrice) {
         var priceEl = document.querySelector('#page-report-' + ticker + ' .rh-price');
         if (priceEl) {
-            var change = stock._livePrice - stock.price;
-            var changePct = (change / stock.price) * 100;
+            var change = stock._liveChange !== undefined ? stock._liveChange : 0;
+            var changePct = stock._liveChangePct !== undefined ? stock._liveChangePct : 0;
             var sign = change >= 0 ? '+' : '';
             var cls = change >= 0 ? 'positive' : 'negative';
             priceEl.innerHTML = '<span class="rh-price-currency">' + stock.currency + '</span>' +

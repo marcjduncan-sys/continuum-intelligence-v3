@@ -31,6 +31,10 @@ import { setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineCha
 import { initChat } from './features/chat.js';
 import { initBatchRefresh, closeBatchModal } from './features/batch-refresh.js';
 import { generatePDFReport } from './features/pdf.js';
+import { initAddStock, openAddStockModal, closeAddStockModal, submitAddStock } from './features/add-stock.js';
+
+// Deep Research page
+import { initDeepResearch } from './pages/deep-research.js';
 
 // Services
 import { MarketFeed } from './services/market-feed.js';
@@ -46,6 +50,9 @@ window.sortCoverageTable = sortCoverageTable;
 window.clearPortfolio = clearPortfolio;
 window.tcAnalyze = tcAnalyze;
 window.closeBatchModal = closeBatchModal;
+window.openAddStockModal = openAddStockModal;
+window.closeAddStockModal = closeAddStockModal;
+window.submitAddStock = submitAddStock;
 
 // Expose state and utility globals needed by classic (non-module) scripts
 // (snapshot-generator.js, personalisation.js, DNE engines)
@@ -218,6 +225,8 @@ async function boot() {
   initThesisPage();
   initChat();
   initAboutPage();
+  initAddStock();
+  initDeepResearch('page-deep-research');
 
   // --- Theme toggle ---
   var themeToggle = document.getElementById('themeToggle');
