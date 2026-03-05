@@ -293,6 +293,15 @@ Yahoo Finance's `quoteSummary` endpoint (used for sector/industry detection) req
 ### 7.14 priceHistory Must Be Plain Numbers
 Yahoo Finance sometimes returns price history as `[{date, close}, ...]` objects instead of plain `[number, ...]` arrays. The refresh pipeline (`api/refresh.py`) normalises this before storing, but any new code path that writes `priceHistory` must ensure the array contains only numbers. Object-format data corrupts the sparkline chart on report pages. If priceHistory looks wrong (smooth exponential curve, missing detail), run `node scripts/backfill-price-history.js TICKER` to replace it with ~252 real daily closes from Yahoo, then `node scripts/sync-index.js` to propagate to `_index.json`. The GitHub Actions workflow "Backfill Price History" automates this.
 
+### 7.15 Dynamically-Added Stocks Live on Railway, Not GitHub Pages
+Stocks added via the "+ Add Stock" button (`POST /api/stocks/add`) create research JSON and update `_index.json` on Railway's ephemeral filesystem only. GitHub Pages serves the static `_index.json` committed to git, which does not include these stocks. Three mechanisms ensure dynamically-added stocks survive:
+
+1. **localStorage cache (`ci_research_TICKER`):** The Add Stock flow caches the scaffold JSON to localStorage immediately. On page reload, a boot-time scan injects any `ci_research_*` entries not already in STOCK_DATA.
+2. **Railway fallback in route handler:** When navigating to `#report-TICKER` for an unknown stock, the router fetches the scaffold from Railway on demand rather than falling back to home.
+3. **Permanence requires git commit:** Railway restarts wipe dynamically-added files. To make a stock permanent, also run `node scripts/add-stock.js --ticker TICKER` locally and commit the generated files. The API is for rapid preview; git-committed files are the durable source.
+
+Any new data loading path must account for stocks that exist in localStorage but not in `_index.json`.
+
 ---
 
 ## 8. File Coupling (Read Before Editing)
