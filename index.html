@@ -5817,6 +5817,41 @@ const REFERENCE_DATA = {
   }
 })();
 
+// Restore dynamically-added stocks from localStorage that aren't in _index.json
+// (stocks added via Add Stock button live on Railway, not GitHub Pages)
+(function() {
+  try {
+    var currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00a3','EUR':'\u20ac'};
+    var added = 0;
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (key && key.startsWith('ci_research_')) {
+        var t = key.replace('ci_research_', '');
+        if (!STOCK_DATA[t]) {
+          try {
+            var d = JSON.parse(localStorage.getItem(key));
+            if (d && d.ticker) {
+              STOCK_DATA[t] = d;
+              STOCK_DATA[t]._indexOnly = false;
+              STOCK_DATA[t]._fromCache = true;
+              if (d.currency && currencyMap[d.currency]) {
+                STOCK_DATA[t].currency = currencyMap[d.currency];
+              }
+              if (typeof ContinuumDynamics !== 'undefined' && ContinuumDynamics.hydrate) {
+                ContinuumDynamics.hydrate(t);
+              }
+              added++;
+            }
+          } catch (e) { /* skip malformed */ }
+        }
+      }
+    }
+    if (added) console.log('[StockDataLoader] Restored ' + added + ' dynamically-added stock(s) from localStorage');
+  } catch (err) {
+    console.warn('[StockDataLoader] localStorage scan failed:', err);
+  }
+})();
+
 // Async loader for full research data (called before rendering a report page)
 function loadFullResearchData(ticker, callback) {
   if (STOCK_DATA[ticker] && !STOCK_DATA[ticker]._indexOnly) {
@@ -10218,6 +10253,11 @@ function route() {
     if (!isValidRoute && hash.startsWith('report-')) {
         var ticker = hash.replace('report-', '');
         isValidRoute = typeof STOCK_DATA !== 'undefined' && STOCK_DATA.hasOwnProperty(ticker);
+        // Allow route for dynamically-added stocks not yet in STOCK_DATA
+        // (e.g. different browser, no localStorage — will fetch from Railway)
+        if (!isValidRoute && /^[A-Z0-9]{1,6}$/.test(ticker)) {
+            isValidRoute = true; // permit route; render block will fetch on demand
+        }
     }
     if (!isValidRoute && hash.startsWith('deep-report-')) {
         var drTicker = hash.replace('deep-report-', '');
@@ -10247,11 +10287,45 @@ function route() {
     // Lazy render report pages on first visit
     if (hash.startsWith('report-')) {
         const ticker = hash.replace('report-', '');
-        if (!renderedPages.has(ticker) && STOCK_DATA[ticker]) {
+        if (!renderedPages.has(ticker)) {
             const container = document.getElementById('page-' + hash);
             if (container) {
-                // Show loading state
-                if (STOCK_DATA[ticker]._indexOnly) {
+                // If stock not in STOCK_DATA at all, try fetching from Railway (dynamically-added stock)
+                if (!STOCK_DATA[ticker]) {
+                    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Research Data&hellip;</div><div style="font-size:0.9rem">Fetching report for ' + ticker + ' from server</div></div></div>';
+                    (async function() {
+                        try {
+                            var scaffoldResp = await fetch(REFRESH_API_BASE + '/data/research/' + ticker + '.json');
+                            if (!scaffoldResp.ok) throw new Error('HTTP ' + scaffoldResp.status);
+                            var scaffoldData = await scaffoldResp.json();
+                            scaffoldData._lastRefreshed = scaffoldData._lastRefreshed || new Date().toISOString();
+                            try { localStorage.setItem('ci_research_' + ticker, JSON.stringify(scaffoldData)); } catch(e){}
+                            var currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00a3','EUR':'\u20ac'};
+                            STOCK_DATA[ticker] = scaffoldData;
+                            STOCK_DATA[ticker]._indexOnly = false;
+                            if (scaffoldData.currency && currencyMap[scaffoldData.currency]) {
+                                STOCK_DATA[ticker].currency = currencyMap[scaffoldData.currency];
+                            }
+                            if (typeof ContinuumDynamics !== 'undefined' && ContinuumDynamics.hydrate) {
+                                ContinuumDynamics.hydrate(ticker);
+                            }
+                            container.innerHTML = renderReportPage(STOCK_DATA[ticker]);
+                            initSectionToggles(ticker);
+                            renderedPages.add(ticker);
+                            setupScrollSpy('page-' + hash);
+                            populateSidebar(ticker);
+                            if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
+                            if (typeof window.applyNarrativeAnalysis === 'function') window.applyNarrativeAnalysis(ticker);
+                            initNarrativeTimelineChart(ticker);
+                            fetchAndPatchLive(ticker);
+                            console.log('[Route] Fetched dynamically-added stock ' + ticker + ' from Railway');
+                        } catch(err) {
+                            container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Stock Not Found</div><div style="font-size:0.9rem">' + ticker + ' is not in coverage. <a href="#home" style="color:var(--brand-green)">Return to home</a></div></div></div>';
+                            console.warn('[Route] Failed to fetch ' + ticker + ':', err);
+                        }
+                    })();
+                } else if (STOCK_DATA[ticker]._indexOnly) {
+                    // Show loading state
                     container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Research Data&hellip;</div><div style="font-size:0.9rem">Fetching full report for ' + STOCK_DATA[ticker].company + '</div></div></div>';
                     loadFullResearchData(ticker, function(data) {
                         if (data) {
@@ -12411,6 +12485,9 @@ async function submitAddStock(event) {
                     }
                 }
                 console.log('[AddStock] Scaffold loaded for ' + ticker);
+                // Re-render coverage table and featured grid so new stock appears on home page
+                if (typeof renderCoverageTable === 'function') renderCoverageTable();
+                if (typeof renderFeaturedGrid === 'function') renderFeaturedGrid();
             } else {
                 console.warn('[AddStock] Scaffold fetch returned ' + scaffoldResp.status + ', report may show empty');
             }
