@@ -104,7 +104,7 @@ src/
 ### Backend (api/)
 - `main.py` -- FastAPI app, chat endpoints, refresh endpoints, `POST /api/stocks/add` endpoint, static file serving
 - `refresh.py` -- 4-stage refresh pipeline with in-memory job tracking
-- `scaffold.py` -- Stock scaffold generator: Yahoo Finance metadata fetcher (crumb/cookie auth), sector-to-commodity templates, research JSON scaffold builder. Used by `/api/stocks/add`
+- `scaffold.py` -- Stock scaffold generator: Yahoo Finance metadata fetcher (crumb/cookie auth), sector-to-commodity templates, research JSON scaffold builder, technical analysis at creation time. Used by `/api/stocks/add`
 - `config.py` -- env vars (ANTHROPIC_API_KEY, GEMINI_API_KEY, model names)
 - `ingest.py` / `retriever.py` -- BM25 passage retrieval for RAG chat
 - `gemini_client.py` -- Gemini API wrapper for specialist analysis
@@ -301,6 +301,9 @@ Stocks added via the "+ Add Stock" button (`POST /api/stocks/add`) create resear
 3. **Permanence requires git commit:** Railway restarts wipe dynamically-added files. To make a stock permanent, also run `node scripts/add-stock.js --ticker TICKER` locally and commit the generated files. The API is for rapid preview; git-committed files are the durable source.
 
 Any new data loading path must account for stocks that exist in localStorage but not in `_index.json`.
+
+### 7.16 Scaffold Generates technicalAnalysis at Creation Time
+`scaffold.py` imports `_generate_technical_analysis()` from `refresh.py` and calls it during `build_research_scaffold()`. This means newly-added stocks have a complete technical analysis section (moving averages, trend, support/resistance, volatility, drawdown, range position) computed from the ~250-day Yahoo Finance price history fetched at scaffold time. Previously, `technicalAnalysis` was only generated during Stage 4 of the refresh pipeline, leaving new stocks without a TA section until manually refreshed. The function returns `None` gracefully if fewer than 10 price data points are available. If `_generate_technical_analysis()` is ever moved or renamed in `refresh.py`, the import in `scaffold.py` must be updated.
 
 ---
 
