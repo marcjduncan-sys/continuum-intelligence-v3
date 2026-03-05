@@ -443,9 +443,11 @@
     50% { opacity: 0.6; }
 }
 .catalyst-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
     font-family: var(--font-data);
     font-size: 0.55rem;
     font-weight: 500;
