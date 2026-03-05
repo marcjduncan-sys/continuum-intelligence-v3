@@ -181,7 +181,7 @@
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: var(--space-lg);
+    padding: 14px;
     cursor: pointer;
     transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     position: relative;
@@ -204,10 +204,10 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: var(--space-md);
+    margin-bottom: 10px;
 }
 .fc-ticker {
-    font-size: 1.4rem; font-weight: 800;
+    font-size: 1.1rem; font-weight: 800;
     letter-spacing: -0.01em;
     color: var(--text-primary);
 }
@@ -223,13 +223,13 @@
 }
 .fc-price {
     font-family: var(--font-data);
-    font-size: 1.6rem; font-weight: 700;
+    font-size: 1.3rem; font-weight: 700;
     text-align: right;
 }
 .fc-metrics {
-    display: flex; gap: var(--space-lg);
-    margin-bottom: var(--space-md);
-    padding-bottom: var(--space-md);
+    display: flex; gap: var(--space-md);
+    margin-bottom: 8px;
+    padding-bottom: 8px;
     border-bottom: 1px solid var(--border);
 }
 .fc-metric-label {
@@ -386,12 +386,16 @@
     font-size: 0.72rem;
     color: var(--text-secondary);
     line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 .fc-date {
     font-family: var(--font-data);
     font-size: 0.6rem;
     color: var(--text-muted);
-    margin-top: var(--space-md);
+    margin-top: 8px;
     display: flex;
     align-items: center;
     gap: var(--space-sm);
