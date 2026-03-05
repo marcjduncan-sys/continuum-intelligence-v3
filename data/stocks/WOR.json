@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-04T07:55:32.718Z"
+      "last_updated": "2026-03-05T08:01:00.720Z"
     },
     "N2": {
       "label": "Traditional Energy Cash Cow",
@@ -26,7 +26,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-04T07:55:32.718Z"
+      "last_updated": "2026-03-05T08:01:00.720Z"
     },
     "N3": {
       "label": "Margin Pressure",
@@ -35,10 +35,10 @@
       "what_to_watch": "Quarterly EBITA margin, fixed-price contract run-off, sustainability vs traditional margin gap.",
       "upside": null,
       "risk_plain": "If margins cannot reach 8%+ by FY26, the market will question management execution credibility.",
-      "survival_score": 0.45,
+      "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-05T07:57:00.769Z"
+      "last_updated": "2026-03-05T08:01:00.720Z"
     },
     "N4": {
       "label": "Cyclical Downturn",
@@ -47,10 +47,10 @@
       "what_to_watch": "Global recession indicators, oil price, government clean energy subsidy policies, backlog cancellations.",
       "upside": null,
       "risk_plain": "In past downturns revenue fell 20-30% and margins compressed to near-zero; elevated leverage amplifies risk.",
-      "survival_score": 0.45,
+      "survival_score": 0.46,
       "status": "MODERATE",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-05T07:57:00.769Z"
+      "last_updated": "2026-03-05T08:01:00.720Z"
     }
   },
   "dominant": "N3",
@@ -175,6 +175,13 @@
       "severity": "AMBER",
       "message": "Single-day move of -11.8% exceeds 10% threshold — possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-03-05",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "5-day cumulative move of -16.6% exceeds 15% threshold — possible overcorrection",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -237,11 +244,20 @@
       "cumulative_20d": -14.39,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-05",
+      "classification": "NOTABLE",
+      "daily_change_pct": -2.39,
+      "volume_multiplier": 1,
+      "cumulative_5d": -16.58,
+      "cumulative_20d": -17.54,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    10.8,
     10.5,
     10.2,
     10,
@@ -300,7 +316,8 @@
     11.71,
     11.34,
     11.3,
-    10.72
+    10.72,
+    11.03
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -515,12 +532,12 @@
   "date": "26 February 2026",
   "_overcorrection": {
     "active": true,
-    "triggerType": "SINGLE_DAY",
-    "triggerDate": "2026-02-27",
-    "triggerPrice": 11.34,
+    "triggerType": "FIVE_DAY_CUMULATIVE",
+    "triggerDate": "2026-03-05",
+    "triggerPrice": 11.03,
     "direction": "down",
-    "movePct": -11.75,
-    "reviewDate": "2026-03-06",
-    "message": "Single-day move of -11.8% exceeds 10% threshold — possible overcorrection"
+    "movePct": -2.39,
+    "reviewDate": "2026-03-12",
+    "message": "5-day cumulative move of -16.6% exceeds 15% threshold — possible overcorrection"
   }
 }
