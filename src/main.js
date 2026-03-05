@@ -285,6 +285,15 @@ async function boot() {
   console.log('[Continuum] Module system ready');
 }
 
+// Global error monitoring
+window.addEventListener('error', function(event) {
+  console.error('[CI:Error] Uncaught error:', event.message, 'at', event.filename + ':' + event.lineno + ':' + event.colno, event.error);
+});
+
+window.addEventListener('unhandledrejection', function(event) {
+  console.error('[CI:Error] Unhandled promise rejection:', event.reason);
+});
+
 // Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {

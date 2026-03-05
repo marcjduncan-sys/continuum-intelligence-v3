@@ -15,11 +15,13 @@
     "test:unit:watch": "vitest",
     "test:unit:coverage": "vitest run --coverage",
     "test:all": "jest --verbose && vitest run",
+    "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "extract-data": "node scripts/extract-stock-data.js",
     "validate": "npm run lint && npm run test:all"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^8.56.0",
     "jest": "^29.7.0",

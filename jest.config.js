@@ -1,6 +1,6 @@
 module.exports = {
   testEnvironment: 'jsdom',
-  testMatch: ['**/tests/**/*.test.js'],
+  testMatch: ['<rootDir>/tests/**/*.test.js'],
   collectCoverageFrom: [
     'scripts/**/*.js',
     '!scripts/extract-stock-data.js',

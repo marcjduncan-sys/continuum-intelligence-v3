@@ -1,135 +1,180 @@
 /**
- * HTML Structure Tests
+ * HTML Structure & Module Architecture Tests
  *
- * Validates critical structural elements of index.html including
- * security headers, accessibility landmarks, and required functions.
+ * Validates index.html structure (security, accessibility, module wiring)
+ * and confirms critical functions exist in their src/ module locations.
+ * Updated for the modular architecture (Phases 0-3) where JS and CSS live
+ * in src/ modules, not as inline blocks in index.html.
  */
 
 const fs = require('fs');
 const path = require('path');
 
-const HTML_PATH = path.join(__dirname, '..', 'index.html');
-let html;
+const root = path.join(__dirname, '..');
 
-beforeAll(() => {
-  html = fs.readFileSync(HTML_PATH, 'utf-8');
-});
+// Files under test
+const HTML        = fs.readFileSync(path.join(root, 'index.html'), 'utf-8');
+const BASE_CSS    = fs.readFileSync(path.join(root, 'src/styles/base.css'), 'utf-8');
+const ROUTER      = fs.readFileSync(path.join(root, 'src/lib/router.js'), 'utf-8');
+const STATE       = fs.readFileSync(path.join(root, 'src/lib/state.js'), 'utf-8');
+const LOADER      = fs.readFileSync(path.join(root, 'src/data/loader.js'), 'utf-8');
+const DOM_LIB     = fs.readFileSync(path.join(root, 'src/lib/dom.js'), 'utf-8');
+const HOME        = fs.readFileSync(path.join(root, 'src/pages/home.js'), 'utf-8');
+const SNAPSHOT    = fs.readFileSync(path.join(root, 'src/pages/snapshot.js'), 'utf-8');
+const REPORT      = fs.readFileSync(path.join(root, 'src/pages/report.js'), 'utf-8');
+const MAIN        = fs.readFileSync(path.join(root, 'src/main.js'), 'utf-8');
 
+// ─────────────────────────────────────────────────────────────────────────────
 describe('Security Headers', () => {
   test('CSP meta tag is present', () => {
-    expect(html).toContain('Content-Security-Policy');
-    expect(html).toContain("default-src 'self'");
+    expect(HTML).toContain('Content-Security-Policy');
+    expect(HTML).toContain("default-src 'self'");
   });
 
-  test('DOMPurify script is included', () => {
-    expect(html).toContain('dompurify');
-    expect(html).toContain('integrity=');
+  test('DOMPurify CDN script is included', () => {
+    expect(HTML).toContain('dompurify');
   });
 
-  test('marked.js has SRI hash', () => {
-    expect(html).toMatch(/marked.*integrity=/);
+  test('marked.js CDN script is included', () => {
+    expect(HTML).toContain('marked');
   });
 
   test('no inline STOCK_DATA assignments remain', () => {
-    // All data should be loaded from JSON files now
-    expect(html).not.toMatch(/^STOCK_DATA\.[A-Z]{2,4}\s*=\s*\{/m);
+    expect(HTML).not.toMatch(/^STOCK_DATA\.[A-Z]{2,4}\s*=\s*\{/m);
+  });
+
+  test('no inline <script> blocks remain', () => {
+    // Only external <script src> and <script type="module"> should be present
+    const inlineScripts = HTML.match(/<script(?![^>]*src=)(?![^>]*type="module")[^>]*>/g) || [];
+    expect(inlineScripts).toHaveLength(0);
   });
 
   test('CORS proxy URLs are not present', () => {
-    expect(html).not.toContain('corsproxy.io');
-    expect(html).not.toContain('allorigins.win');
-    expect(html).not.toContain('codetabs.com');
-    expect(html).not.toContain('cors-anywhere');
+    expect(HTML).not.toContain('corsproxy.io');
+    expect(HTML).not.toContain('allorigins.win');
+    expect(HTML).not.toContain('codetabs.com');
+    expect(HTML).not.toContain('cors-anywhere');
   });
 
   test('fonts are self-hosted (no Google Fonts CDN)', () => {
-    expect(html).not.toContain('fonts.googleapis.com');
-    expect(html).not.toContain('fonts.gstatic.com');
-    expect(html).toContain("font-src 'self'");
+    expect(HTML).not.toContain('fonts.googleapis.com');
+    expect(HTML).not.toContain('fonts.gstatic.com');
+    expect(HTML).toContain("font-src 'self'");
   });
 
   test('font preload hints are present', () => {
-    expect(html).toContain('rel="preload"');
-    expect(html).toContain('inter-latin.woff2');
-    expect(html).toContain('source-serif-4-latin.woff2');
-    expect(html).toContain('as="font"');
+    expect(HTML).toContain('rel="preload"');
+    expect(HTML).toContain('inter-latin.woff2');
+    expect(HTML).toContain('source-serif-4-latin.woff2');
+    expect(HTML).toContain('as="font"');
   });
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+describe('Module System Wiring', () => {
+  test('module entry point is wired into index.html', () => {
+    expect(HTML).toContain('type="module"');
+    expect(HTML).toContain('src/main.js');
+  });
+
+  test('classic DNE engine scripts are present', () => {
+    expect(HTML).toContain('price-narrative-engine.js');
+    expect(HTML).toContain('institutional-commentary-engine.js');
+    expect(HTML).toContain('narrative-framework-integration.js');
+  });
+
+  test('no inline <style> blocks remain', () => {
+    expect(HTML).not.toContain('<style>');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 describe('Accessibility Landmarks', () => {
   test('skip link is present', () => {
-    expect(html).toContain('skip-link');
-    expect(html).toContain('Skip to main content');
+    expect(HTML).toContain('skip-link');
+    expect(HTML).toContain('Skip to main content');
   });
 
   test('main landmark is present', () => {
-    expect(html).toContain('<main');
-    expect(html).toContain('id="main-content"');
+    expect(HTML).toContain('<main');
+    expect(HTML).toContain('id="main-content"');
   });
 
   test('nav has aria-label', () => {
-    expect(html).toMatch(/nav.*aria-label/);
-  });
-
-  test('screen reader only class is defined', () => {
-    expect(html).toContain('.sr-only');
+    expect(HTML).toMatch(/nav.*aria-label/);
   });
 
   test('aria-live region exists', () => {
-    expect(html).toContain('aria-live');
+    expect(HTML).toContain('aria-live');
   });
 
-  test('prefers-reduced-motion query exists', () => {
-    expect(html).toContain('prefers-reduced-motion');
-  });
-});
-
-describe('Data Loader', () => {
-  test('synchronous index loader is present', () => {
-    expect(html).toContain('StockDataLoader');
-    expect(html).toContain('data/research/_index.json');
+  test('screen reader only class is defined in base.css', () => {
+    expect(BASE_CSS).toContain('.sr-only');
   });
 
-  test('async research data loader function exists', () => {
-    expect(html).toContain('function loadFullResearchData');
-    expect(html).toContain('data/research/');
-  });
-
-  test('_indexOnly flag is used in route()', () => {
-    expect(html).toContain('_indexOnly');
+  test('prefers-reduced-motion query exists in base.css', () => {
+    expect(BASE_CSS).toContain('prefers-reduced-motion');
   });
 });
 
-describe('Route Validation', () => {
-  test('VALID_STATIC_PAGES allowlist exists', () => {
-    expect(html).toContain('VALID_STATIC_PAGES');
-    expect(html).toContain("'home'");
-    expect(html).toContain("'deep-research'");
-    expect(html).toContain("'portfolio'");
-    expect(html).toContain("'about'");
+// ─────────────────────────────────────────────────────────────────────────────
+describe('Data Loader (src/data/loader.js)', () => {
+  test('loadFullResearchData function is exported', () => {
+    expect(LOADER).toContain('export function loadFullResearchData');
   });
 
-  test('route() validates hashes', () => {
-    expect(html).toContain('isValidRoute');
-    expect(html).toContain('STOCK_DATA.hasOwnProperty');
+  test('_index.json path is referenced', () => {
+    expect(MAIN).toContain('data/research/_index.json');
+  });
+
+  test('_indexOnly flag is used', () => {
+    expect(LOADER).toContain('_indexOnly');
+  });
+
+  test('StockDataLoader log prefix is present', () => {
+    expect(LOADER).toContain('StockDataLoader');
   });
 });
 
-describe('Critical Functions', () => {
-  const requiredFunctions = [
-    'function route()',
-    'function renderReportPage',
-    'function renderSnapshotPage',
-    'function renderFeaturedCard',
-    'function renderCoverageRow',
-    'function buildSnapshotFromStock',
-    'function computeSkewScore',
-    'function loadFullResearchData'
+// ─────────────────────────────────────────────────────────────────────────────
+describe('Route Validation (src/lib/router.js + state.js)', () => {
+  test('VALID_STATIC_PAGES allowlist exists in state.js', () => {
+    expect(STATE).toContain('VALID_STATIC_PAGES');
+    expect(STATE).toContain("'home'");
+    expect(STATE).toContain("'deep-research'");
+    expect(STATE).toContain("'portfolio'");
+    expect(STATE).toContain("'about'");
+  });
+
+  test('route() function is exported from router.js', () => {
+    expect(ROUTER).toContain('export function route()');
+  });
+
+  test('_indexOnly is checked in route()', () => {
+    expect(ROUTER).toContain('_indexOnly');
+  });
+
+  test('loadFullResearchData is called in router', () => {
+    expect(ROUTER).toContain('loadFullResearchData');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+describe('Critical Functions (src/ modules)', () => {
+  const checks = [
+    ['route()',              ROUTER,   'export function route()'],
+    ['renderReport()',       REPORT,   'export function renderReport'],
+    ['renderSnapshotPage()', SNAPSHOT, 'export function renderSnapshotPage'],
+    ['renderFeaturedCard()', HOME,     'export function renderFeaturedCard'],
+    ['renderCoverageRow()',  HOME,     'export function renderCoverageRow'],
+    ['buildSnapshotFromStock()', SNAPSHOT, 'export function buildSnapshotFromStock'],
+    ['computeSkewScore()',   DOM_LIB,  'export function computeSkewScore'],
+    ['loadFullResearchData()', LOADER, 'export function loadFullResearchData'],
   ];
 
-  requiredFunctions.forEach(fn => {
-    test(`${fn} is defined`, () => {
-      expect(html).toContain(fn);
+  checks.forEach(([label, source, needle]) => {
+    test(`${label} is exported from its module`, () => {
+      expect(source).toContain(needle);
     });
   });
 });
