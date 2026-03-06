@@ -224,6 +224,9 @@ export function renderPortfolio(positions, totalValue) {
   summary.style.display = '';
   actions.style.display = '';
 
+  /* Strategy context bar */
+  renderStrategyBar();
+
   /* Render diagnostics, reweighting, and alerts */
   renderPortfolioDiagnostics(positions, totalValue);
   renderReweighting(positions, totalValue);
@@ -241,6 +244,32 @@ export function formatNum(n, decimals) {
   if (abs >= 1000000) return (n / 1000000).toFixed(1) + 'M';
   if (abs >= 1000) return n.toLocaleString('en-AU', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   return n.toFixed(decimals);
+}
+
+function getPersonalisationFund() {
+  try {
+    var raw = localStorage.getItem('continuum_personalisation_profile');
+    if (!raw) return null;
+    var data = JSON.parse(raw);
+    if (!data || data.version !== 2) return null;
+    return (data.state && data.state.fund) ? data.state.fund : null;
+  } catch (e) { return null; }
+}
+
+function renderStrategyBar() {
+  var el = document.getElementById('portfolioStrategyBar');
+  if (!el) return;
+  var fund = getPersonalisationFund();
+  if (!fund || (!fund.strategy && !fund.geography && !fund.benchmark)) {
+    el.style.display = 'none';
+    return;
+  }
+  el.innerHTML =
+    (fund.strategy ? '<div class="port-sb-item"><span class="port-sb-label">Strategy</span><span class="port-sb-value">' + fund.strategy + '</span></div>' : '') +
+    (fund.geography ? '<div class="port-sb-item"><span class="port-sb-label">Geography</span><span class="port-sb-value">' + fund.geography + '</span></div>' : '') +
+    (fund.benchmark ? '<div class="port-sb-item"><span class="port-sb-label">Benchmark</span><span class="port-sb-value">' + fund.benchmark + '</span></div>' : '') +
+    '<div class="port-sb-item"><span class="port-sb-label">Risk Budget</span><span class="port-sb-value">' + (fund.riskBudget || 10) + '% TE</span></div>';
+  el.style.display = '';
 }
 
 export function renderPortfolioDiagnostics(positions, totalValue) {
@@ -356,15 +385,15 @@ export function renderReweighting(positions, totalValue) {
     if (tc) {
       var probs = [tc.n1.prob, tc.n2.prob, tc.n3.prob, tc.n4.prob];
       var maxProb = Math.max.apply(null, probs);
-      // High conviction in dominant thesis = slight boost
       if (maxProb > 40) multiplier *= 1.05;
-      // Contrarian / uphill = slight reduction
       if (tc.primary === 'uphill') multiplier *= 0.9;
     }
 
     scores.push({
       ticker: p.ticker,
       company: p.company,
+      units: p.units,
+      currentPrice: p.currentPrice,
       currentWeight: p.weight,
       skew: cd.skew,
       rawScore: baseWeight * multiplier
@@ -380,20 +409,31 @@ export function renderReweighting(positions, totalValue) {
   // Sort by largest delta
   scores.sort(function(a, b) { return Math.abs(b.suggestedWeight - b.currentWeight) - Math.abs(a.suggestedWeight - a.currentWeight); });
 
-  // Render table
+  // Strategy context header
+  var fund = getPersonalisationFund();
+  var strategyHtml = '';
+  if (fund && (fund.strategy || fund.geography || fund.benchmark)) {
+    strategyHtml = '<div class="rw-strategy-context">' +
+      (fund.strategy ? '<span class="rw-sc-pill"><span class="rw-sc-label">Strategy</span><span class="rw-sc-value">' + fund.strategy + '</span></span>' : '') +
+      (fund.geography ? '<span class="rw-sc-pill"><span class="rw-sc-label">Geography</span><span class="rw-sc-value">' + fund.geography + '</span></span>' : '') +
+      (fund.benchmark ? '<span class="rw-sc-pill"><span class="rw-sc-label">Benchmark</span><span class="rw-sc-value">' + fund.benchmark + '</span></span>' : '') +
+      '<span class="rw-sc-pill"><span class="rw-sc-label">Risk Budget</span><span class="rw-sc-value">' + (fund.riskBudget || 10) + '% TE</span></span>' +
+    '</div>';
+  }
+
+  // Render table rows
   var rows = '';
   scores.forEach(function(s) {
     var delta = s.suggestedWeight - s.currentWeight;
-    var absDelta = Math.abs(delta);
     var action, actionCls, deltaCls;
 
     if (delta > 2) {
-      action = 'Increase';
-      actionCls = 'increase';
+      action = 'Buy';
+      actionCls = 'buy';
       deltaCls = 'increase';
     } else if (delta < -2) {
-      action = 'Reduce';
-      actionCls = 'reduce';
+      action = 'Sell';
+      actionCls = 'sell';
       deltaCls = 'reduce';
     } else {
       action = 'Hold';
@@ -401,33 +441,43 @@ export function renderReweighting(positions, totalValue) {
       deltaCls = 'hold';
     }
 
+    // Share amount: |delta%| * totalValue / price = shares to trade
+    var sharesDisplay = '--';
+    if (action !== 'Hold' && s.currentPrice && s.currentPrice > 0) {
+      var deltaValue = Math.abs(delta / 100) * totalValue;
+      sharesDisplay = Math.round(deltaValue / s.currentPrice).toLocaleString('en-AU');
+    }
+
     var skewArrow = s.skew === 'upside' ? '&#9650; UPSIDE' :
                     s.skew === 'downside' ? '&#9660; DOWNSIDE' : '&#9670; BALANCED';
     var skewCls = s.skew;
-
-    var maxBar = Math.max(s.currentWeight, s.suggestedWeight, 1);
 
     rows += '<tr>' +
       '<td><span class="rw-ticker">' + s.ticker + '</span></td>' +
       '<td>' + s.company + '</td>' +
       '<td><span class="skew-badge ' + skewCls + '">' + skewArrow + '</span></td>' +
+      '<td class="rw-units">' + formatNum(s.units, 0) + '</td>' +
       '<td><span class="rw-pct">' + s.currentWeight.toFixed(1) + '%</span></td>' +
       '<td><span class="rw-pct">' + s.suggestedWeight.toFixed(1) + '%</span></td>' +
       '<td><span class="rw-delta ' + deltaCls + '">' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%</span></td>' +
       '<td><span class="rw-action ' + actionCls + '">' + action + '</span></td>' +
+      '<td class="rw-shares">' + sharesDisplay + '</td>' +
     '</tr>';
   });
 
   bodyEl.innerHTML =
+    strategyHtml +
     '<table class="rw-table">' +
       '<thead><tr>' +
         '<th>Ticker</th>' +
         '<th>Company</th>' +
         '<th>Evidence</th>' +
+        '<th>Units</th>' +
         '<th>Current</th>' +
         '<th>Suggested</th>' +
         '<th>Delta</th>' +
         '<th>Action</th>' +
+        '<th>Share Amount</th>' +
       '</tr></thead>' +
       '<tbody>' + rows + '</tbody>' +
     '</table>';
@@ -545,13 +595,15 @@ export function clearPortfolio() {
   document.getElementById('portfolioActions').style.display = 'none';
   document.getElementById('portfolioBody').innerHTML = '';
 
-  /* Hide diagnostics, reweighting, and alerts */
+  /* Hide diagnostics, reweighting, alerts, and strategy bar */
   var diag = document.getElementById('portfolioDiagnostics');
   var reweight = document.getElementById('portfolioReweighting');
   var alertsEl = document.getElementById('changeAlertsSection');
+  var strategyBar = document.getElementById('portfolioStrategyBar');
   if (diag) diag.style.display = 'none';
   if (reweight) reweight.style.display = 'none';
   if (alertsEl) alertsEl.style.display = 'none';
+  if (strategyBar) strategyBar.style.display = 'none';
 }
 
 export function populateSidebar(ticker) {

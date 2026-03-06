@@ -446,6 +446,37 @@
     color: var(--text-muted);
 }
 
+/* Strategy Context Bar */
+.port-strategy-bar {
+    display: flex;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+    background: rgba(26, 158, 143, 0.06);
+    border: 1px solid rgba(26, 158, 143, 0.2);
+    border-radius: 6px;
+    padding: var(--space-md) var(--space-lg);
+    margin-bottom: var(--space-md);
+}
+.port-sb-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 120px;
+}
+.port-sb-label {
+    font-size: 0.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+}
+.port-sb-value {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent-teal);
+}
+
 /* --- Evidence-Aligned Reweighting --- */
 .port-reweight-section { margin-top: var(--space-xl); }
 .port-reweight-body {
@@ -502,7 +533,41 @@
 .rw-action { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
 .rw-action.increase { color: var(--signal-green); }
 .rw-action.reduce { color: var(--signal-red); }
+.rw-action.buy { color: var(--signal-green); }
+.rw-action.sell { color: var(--signal-red); }
 .rw-action.hold { color: var(--text-muted); }
+.rw-units { font-family: var(--font-data); font-size: 0.75rem; color: var(--text-secondary); }
+.rw-shares { font-family: var(--font-data); font-size: 0.75rem; color: var(--text-secondary); text-align: right; }
+/* Strategy context pills inside the Reweighting section */
+.rw-strategy-context {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    background: rgba(26, 158, 143, 0.04);
+    border-bottom: 1px solid var(--border);
+}
+.rw-sc-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 10px;
+}
+.rw-sc-label {
+    font-size: 0.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+}
+.rw-sc-value {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent-teal);
+}
 .port-reweight-disclaimer {
     font-size: 0.72rem;
     color: var(--text-muted);
