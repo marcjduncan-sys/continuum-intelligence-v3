@@ -14,8 +14,9 @@ export function renderFeaturedCard(data) {
   var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
 
   var metricsHtml = '';
-  for (var i = 0; i < data.featuredMetrics.length; i++) {
-    var m = data.featuredMetrics[i];
+  var _metrics = data.featuredMetrics || [];
+  for (var i = 0; i < _metrics.length; i++) {
+    var m = _metrics[i];
     var colorStyle = m.color ? ' style="color:' + m.color + '"' : '';
     metricsHtml += '<div><div class="fc-metric-label">' + m.label + '</div><div class="fc-metric-value"' + colorStyle + '>' + m.value + '</div></div>';
   }
@@ -26,9 +27,9 @@ export function renderFeaturedCard(data) {
   return '<div class="featured-card skew-' + dir + '" data-ticker-card="' + data.ticker + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
     '<div class="fc-top">' +
       '<div>' +
-        '<div class="fc-ticker">' + data.tickerFull + '</div>' +
+        '<div class="fc-ticker">' + (data.tickerFull || data.ticker) + '</div>' +
         '<div class="fc-company">' + data.company + '</div>' +
-        '<div class="fc-sector">' + data.sector + ' &bull; ' + data.sectorSub + '</div>' +
+        '<div class="fc-sector">' + data.sector + (data.sectorSub ? ' &bull; ' + data.sectorSub : '') + '</div>' +
       '</div>' +
       '<div class="fc-price"' + priceStyle + '>' +
         '<span style="font-size:0.8rem; color:var(--text-muted)">' + data.currency + '</span>' + data.price +
@@ -83,14 +84,15 @@ export function renderCoverageRow(data) {
       '<span class="skew-tooltip-weight">' + h.weight + '%</span>' +
     '</div>';
   }
+  var _rationale = (data.skew && data.skew.rationale) ? data.skew.rationale : '';
   var tooltipHtml = '<div class="skew-tooltip">' +
     '<div class="skew-tooltip-title">Hypothesis Weights</div>' +
     tooltipRows +
-    '<div class="skew-tooltip-rationale">' + data.skew.rationale.substring(0, 160) + (data.skew.rationale.length > 160 ? '&hellip;' : '') + '</div>' +
+    (_rationale ? '<div class="skew-tooltip-rationale">' + _rationale.substring(0, 160) + (_rationale.length > 160 ? '&hellip;' : '') + '</div>' : '') +
   '</div>';
 
   // Format date as short form: "10 Feb 2026"
-  var dateParts = data.date.split(' ');
+  var dateParts = (data.date || '').split(' ');
   var shortDate = dateParts[0] + ' ' + (dateParts[1] ? dateParts[1].substring(0, 3) : '') + ' ' + (dateParts[2] || '');
 
   return '<tr data-skew-score="' + skew.score + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
@@ -251,7 +253,8 @@ export function initHomePage() {
     featuredGrid.innerHTML = '';
     FEATURED_ORDER.forEach(function(ticker) {
       if (STOCK_DATA[ticker]) {
-        featuredGrid.innerHTML += renderFeaturedCard(STOCK_DATA[ticker]);
+        try { featuredGrid.innerHTML += renderFeaturedCard(STOCK_DATA[ticker]); }
+        catch(e) { console.warn('[Home] renderFeaturedCard failed for', ticker, e); }
       }
     });
   }
@@ -262,7 +265,8 @@ export function initHomePage() {
     coverageBody.innerHTML = '';
     FEATURED_ORDER.forEach(function(ticker) {
       if (STOCK_DATA[ticker]) {
-        coverageBody.innerHTML += renderCoverageRow(STOCK_DATA[ticker]);
+        try { coverageBody.innerHTML += renderCoverageRow(STOCK_DATA[ticker]); }
+        catch(e) { console.warn('[Home] renderCoverageRow failed for', ticker, e); }
       }
     });
     COMING_SOON.forEach(function(stub) {
@@ -277,7 +281,7 @@ export function initHomePage() {
     FEATURED_ORDER.forEach(function(ticker) {
       var d = STOCK_DATA[ticker];
       if (d) {
-        footerLinks.innerHTML += '<a href="#report-' + ticker + '" onclick="navigate(\'report-' + ticker + '\')">' + d.company + ' (' + d.tickerFull + ')</a>';
+        footerLinks.innerHTML += '<a href="#report-' + ticker + '" onclick="navigate(\'report-' + ticker + '\')">' + d.company + ' (' + (d.tickerFull || ticker) + ')</a>';
       }
     });
   }

@@ -187,22 +187,33 @@ async function boot() {
       });
       initStockData(indexData);
 
-      // Patch dates from localStorage cached research (newer than git-committed _index.json).
-      // After a refresh the new date lives in ci_research_TICKER but the coverage table reads
-      // STOCK_DATA[ticker].date which was just populated from the static _index.json.
+      // Restore stocks from localStorage.
+      // Two cases:
+      //   1. Stock IS in _index.json → patch the date from the newer cached copy.
+      //   2. Stock NOT in _index.json (added via "Add Stock" modal) → restore full scaffold
+      //      so it appears in the Research tab after every page load.
+      const _currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00a3','EUR':'\u20ac'};
       try {
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
           if (key && key.startsWith('ci_research_')) {
             const ticker = key.slice('ci_research_'.length);
-            if (STOCK_DATA[ticker]) {
-              try {
-                const cached = JSON.parse(localStorage.getItem(key));
-                if (cached && cached.date) {
-                  STOCK_DATA[ticker].date = cached.date;
+            try {
+              const cached = JSON.parse(localStorage.getItem(key));
+              if (!cached) continue;
+              if (STOCK_DATA[ticker]) {
+                // Case 1: already in index -- just patch the review date
+                if (cached.date) STOCK_DATA[ticker].date = cached.date;
+              } else if (cached.ticker || cached.company) {
+                // Case 2: stock added via modal, not in _index.json -- restore full scaffold
+                cached._indexOnly = false;
+                if (cached.currency && _currencyMap[cached.currency]) {
+                  cached.currency = _currencyMap[cached.currency];
                 }
-              } catch (e) { /* ignore parse errors on individual entries */ }
-            }
+                STOCK_DATA[ticker] = cached;
+                console.log('[Boot] Restored modal-added stock from localStorage:', ticker);
+              }
+            } catch (e) { /* ignore parse errors on individual entries */ }
           }
         }
       } catch (e) { /* localStorage may be unavailable (private browsing, quota) */ }
