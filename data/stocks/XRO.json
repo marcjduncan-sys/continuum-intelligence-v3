@@ -14,7 +14,7 @@
       "survival_score": 0.07,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-06T04:55:47.800Z"
+      "last_updated": "2026-03-06T07:56:06.258Z"
     },
     "N2": {
       "label": "Valuation Compression",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.51,
+      "survival_score": 0.61,
       "status": "MODERATE",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-06T07:53:50.093Z"
+      "last_updated": "2026-03-06T07:56:06.258Z"
     },
     "N3": {
       "label": "AI Disruption Risk",
@@ -35,10 +35,10 @@
       "what_to_watch": "Cost pressures, competitive threats, or macro headwinds.",
       "upside": null,
       "risk_plain": "Material downside if multiple risks crystallise simultaneously.",
-      "survival_score": 0.21,
+      "survival_score": 0.16,
       "status": "LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-06T07:53:50.093Z"
+      "last_updated": "2026-03-06T07:56:06.258Z"
     },
     "N4": {
       "label": "Competitive Pressure",
@@ -47,15 +47,15 @@
       "what_to_watch": "Industry disruption signals and regulatory changes.",
       "upside": null,
       "risk_plain": "If disruption materialises, prior assumptions become invalid.",
-      "survival_score": 0.21,
+      "survival_score": 0.16,
       "status": "LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-06T07:53:50.093Z"
+      "last_updated": "2026-03-06T07:56:06.258Z"
     }
   },
   "dominant": "N2",
   "confidence": "HIGH",
-  "alert_state": "NORMAL",
+  "alert_state": "OVERCORRECTION",
   "current_price": 87.63,
   "big_picture": "Xero Limited (ASX: XRO) — coverage initiated. Full analysis pending.",
   "last_flip": {
@@ -78,7 +78,15 @@
       "to_survival": 0.41
     }
   ],
-  "evidence_items": [],
+  "evidence_items": [
+    {
+      "date": "2026-03-06",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "Single-day move of +11.1% exceeds 10% threshold — possible overcorrection",
+      "auto_generated": true
+    }
+  ],
   "price_signals": [
     {
       "date": "2026-02-25",
@@ -139,11 +147,20 @@
       "cumulative_20d": -21.01,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-06",
+      "classification": "MATERIAL",
+      "daily_change_pct": 11.12,
+      "volume_multiplier": 1,
+      "cumulative_5d": 6.87,
+      "cumulative_20d": -14.32,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    122.25,
     121.84,
     121.44,
     121.2,
@@ -202,7 +219,8 @@
     83.14,
     79.97,
     78.86,
-    83.89
+    83.89,
+    87.63
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -438,5 +456,15 @@
   },
   "last_research_update": "2026-03-06T07:53:50.093Z",
   "price": 82.3,
-  "date": "26 February 2026"
+  "date": "26 February 2026",
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-03-06",
+    "triggerPrice": 87.63,
+    "direction": "up",
+    "movePct": 11.12,
+    "reviewDate": "2026-03-13",
+    "message": "Single-day move of +11.1% exceeds 10% threshold — possible overcorrection"
+  }
 }
