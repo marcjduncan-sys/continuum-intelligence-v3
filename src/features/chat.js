@@ -123,9 +123,9 @@ function populateTickerSelect() {
     syncTickerFromRoute();
 }
 
-var _tickerFromRoute = false; // true when currentTicker was auto-set from URL, not by user
-
 function syncTickerFromRoute() {
+    // Only SET coverage when navigating to a stock page -- never clear on navigation.
+    // The user controls clearing via the dropdown or Clear button.
     var hash = window.location.hash.slice(1) || '';
     var detected = '';
     if (hash.startsWith('report-'))   detected = hash.replace('report-', '').toUpperCase();
@@ -133,16 +133,9 @@ function syncTickerFromRoute() {
     if (detected && STOCK_DATA[detected]) {
         if (tickerSelect) tickerSelect.value = detected;
         currentTicker = detected;
-        _tickerFromRoute = true;
-    } else {
-        // Only clear if the ticker was auto-set by a route (not manually chosen by user)
-        if (_tickerFromRoute) {
-            if (tickerSelect) tickerSelect.value = '';
-            currentTicker = '';
-        }
-        _tickerFromRoute = false;
+        updateTickerBadge();
     }
-    updateTickerBadge();
+    // Non-stock pages: leave coverage unchanged
 }
 
 function updateTickerBadge() {
@@ -542,8 +535,9 @@ if (panel) {
         if (e.key === 'Escape' && isOpen && window.innerWidth < 1024) closePanel();
     });
 
-    // Navigation never resets coverage -- panel state is independent of routing
+    // Navigation: set coverage on stock pages, never clear it
     window.addEventListener('hashchange', function() {
+        syncTickerFromRoute();
         renderConversation();
     });
 
