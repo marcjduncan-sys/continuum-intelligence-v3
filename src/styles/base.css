@@ -84,7 +84,11 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
-    transition: background 0.3s, color 0.3s;
+    transition: background 0.3s, color 0.3s, padding-right 0.25s ease;
+    padding-right: var(--_ap-body-offset, 0px);
+}
+body.analyst-panel-open {
+    --_ap-body-offset: var(--analyst-panel-width);
 }
 a { color: var(--accent-teal); text-decoration: none; transition: color 0.2s; }
 a:hover { color: var(--accent-sage); }

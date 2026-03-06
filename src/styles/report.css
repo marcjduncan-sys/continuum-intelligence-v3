@@ -668,6 +668,18 @@
         margin: 0 auto;
     }
 }
+/* Analyst panel open: flip sidebar to left column */
+@media (min-width: 1200px) {
+    body.analyst-panel-open .report-content {
+        grid-template-columns: 220px 1fr;
+    }
+    body.analyst-panel-open .report-content .hyp-sidebar {
+        order: -1;
+    }
+    body.analyst-panel-open .report-content .report-main {
+        order: 1;
+    }
+}
 @media (max-width: 1199px) {
     .hyp-sidebar { display: none; }
     .report-main { min-width: 0; }

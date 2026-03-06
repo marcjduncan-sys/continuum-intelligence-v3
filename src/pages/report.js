@@ -28,7 +28,6 @@ import {
 
 export function renderReport(data) {
   prepareHypotheses(data);
-  var t = data.ticker.toLowerCase();
 
   var mainContent =
     renderOvercorrectionBanner(data) +
@@ -40,27 +39,7 @@ export function renderReport(data) {
     renderDiscriminators(data) +
     renderTripwires(data) +
     renderGaps(data) +
-    renderTechnicalAnalysis(data) +
-    '<div class="report-section" id="' + t + '-chat">' +
-      '<div class="rs-header"><div class="rs-header-text">' +
-        '<div class="rs-number">Research</div>' +
-        '<div class="rs-title">Research Chat</div>' +
-      '</div><button class="rs-toggle" onclick="window.toggleSection(this)" aria-label="Toggle section">' +
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
-      '</button></div>' +
-      '<div class="rs-body">' +
-      '<div class="rs-subtitle">Ask questions about ' + data.company + ' grounded in structured research data</div>' +
-      '<div class="chat-inline" data-ticker="' + data.ticker + '">' +
-        '<div class="chat-inline-messages" id="chat-inline-' + data.ticker + '" aria-live="polite" aria-relevant="additions"></div>' +
-        '<div class="chat-inline-input-area">' +
-          '<textarea class="chat-inline-input" placeholder="Ask about ' + data.company + '..." rows="1" aria-label="Ask a question about ' + data.company + '"></textarea>' +
-          '<button class="chat-inline-send" disabled aria-label="Send">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>' +
-          '</button>' +
-        '</div>' +
-      '</div>' +
-      '</div>' +
-    '</div>';
+    renderTechnicalAnalysis(data);
 
   var floatingToggle =
     '<button class="sections-float-toggle" onclick="window.toggleAllSections(this)" data-state="expanded" aria-label="Collapse all sections">' +

@@ -1009,7 +1009,7 @@ export function renderPDFDownload(data) {
         '</button>' +
         '<button class="btn-pdf-download retail" onclick="generatePDFReport(\'' + t + '\', \'retail\')">' +
           '<span class="btn-pdf-label">Investor Briefing <span class="btn-pdf-spinner"></span></span>' +
-          '<span class="btn-pdf-sub">Plain-language evidence summary</span>' +
+          '<span class="btn-pdf-sub">2-page briefing: ranges, narrative &amp; analysis</span>' +
         '</button>' +
       '</div>' +
     '</div>' +

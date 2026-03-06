@@ -33,7 +33,7 @@ export function navigate(page) {
  * @param {object} pageRenderers - Object with renderer functions:
  *   { renderReportPage, renderSnapshotPage, renderPersonalisationPage,
  *     loadFullResearchData, buildSnapshotFromStock, setupScrollSpy,
- *     populateSidebar, initInlineChat, applyNarrativeAnalysis,
+ *     populateSidebar, applyNarrativeAnalysis,
  *     initNarrativeTimelineChart, fetchAndPatchLive, initPersonalisationDemo,
  *     pnOnRouteEnter, renderPDFDownload }
  */
@@ -139,7 +139,6 @@ export function route() {
               if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
               if (_pageRenderers.setupScrollSpy) _pageRenderers.setupScrollSpy('page-' + hash);
               if (_pageRenderers.populateSidebar) _pageRenderers.populateSidebar(ticker);
-              if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
               if (typeof window.applyNarrativeAnalysis === 'function') window.applyNarrativeAnalysis(ticker);
               if (_pageRenderers.initNarrativeTimelineChart) _pageRenderers.initNarrativeTimelineChart(ticker);
               if (_pageRenderers.fetchAndPatchLive) _pageRenderers.fetchAndPatchLive(ticker);
@@ -161,7 +160,6 @@ export function route() {
                 if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
                 if (_pageRenderers.setupScrollSpy) _pageRenderers.setupScrollSpy('page-' + hash);
                 if (_pageRenderers.populateSidebar) _pageRenderers.populateSidebar(ticker);
-                if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
                 if (typeof window.applyNarrativeAnalysis === 'function') window.applyNarrativeAnalysis(ticker);
                 if (_pageRenderers.initNarrativeTimelineChart) _pageRenderers.initNarrativeTimelineChart(ticker);
                 if (_pageRenderers.fetchAndPatchLive) _pageRenderers.fetchAndPatchLive(ticker);
@@ -175,7 +173,6 @@ export function route() {
           renderedPages.add(ticker);
           if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
           if (_pageRenderers.setupScrollSpy) _pageRenderers.setupScrollSpy('page-' + hash);
-          if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
           if (_pageRenderers.initNarrativeTimelineChart) _pageRenderers.initNarrativeTimelineChart(ticker);
         }
       }

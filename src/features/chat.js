@@ -1,35 +1,37 @@
 /**
- * chat.js -- Research Chat FAB Controller + Inline Research Chat
+ * chat.js -- Persistent Analyst Panel
  *
- * Extracted from index.html lines ~12183-12784.
- * Contains both the floating chat panel (FAB) and the inline chat
- * widget embedded within report pages.
+ * Docked right-rail panel that persists across all page navigation.
+ * Replaces FAB popup and inline report chat.
  *
  * Depends on:
- *   - window.STOCK_DATA (global)
+ *   - window.STOCK_DATA (global, via state.js)
  *   - window.marked (CDN)
  *   - window.DOMPurify (CDN)
+ *   - window.pnBuildSystemPrompt (classic script js/personalisation.js)
  */
 
 import { STOCK_DATA } from '../lib/state.js';
 
 // ============================================================
-// RESEARCH CHAT -- FAB Controller
+// CONFIGURATION
 // ============================================================
 
-// --- Configuration ---
 var PRODUCTION_API = 'https://imaginative-vision-production-16cb.up.railway.app';
-var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-var isFile  = window.location.protocol === 'file:';
+var isLocal       = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+var isFile        = window.location.protocol === 'file:';
 var isGitHubPages = window.location.hostname.indexOf('github.io') !== -1;
-var apiOrigin = window.CHAT_API_URL
-    || (isFile ? '' // will trigger graceful error below
+var apiOrigin     = window.CHAT_API_URL
+    || (isFile        ? ''
         : isGitHubPages ? PRODUCTION_API
-        : '');  // Same origin (Vite proxy in dev, Railway in prod)
+        : '');
 var CHAT_API_BASE = apiOrigin + '/api/research-chat';
-var CI_API_KEY = window.CI_API_KEY || '';
+var CI_API_KEY    = window.CI_API_KEY || '';
 
-// --- Shared system prompt (used by FAB, inline, and thesis chat) ---
+// ============================================================
+// SYSTEM PROMPT (shared, used by thesis comparator and fallback)
+// ============================================================
+
 export var ANALYST_SYSTEM_PROMPT = 'You are a senior equity research analyst at Continuum Intelligence. You speak in the first person plural ("we", "our analysis", "our framework"). You are direct, precise, and opinionated -- like a fund manager talking to another fund manager. ' +
     'VOICE RULES: ' +
     'Never use markdown headers (#, ##, ###). Write in flowing paragraphs. ' +
@@ -48,85 +50,203 @@ export var ANALYST_SYSTEM_PROMPT = 'You are a senior equity research analyst at 
     'Never fabricate data, price targets, or financial metrics not in the provided research. ' +
     'If asked about a topic not covered in the research passages, say so directly.';
 
-// --- DOM refs ---
-var fab       = document.getElementById('chatFab');
-var panel     = document.getElementById('chatPanel');
-var closeBtn  = document.getElementById('chatClose');
-var messages  = document.getElementById('chatMessages');
-var input     = document.getElementById('chatInput');
-var sendBtn   = document.getElementById('chatSend');
-var select    = document.getElementById('chatTickerSelect');
-var subtitle  = document.getElementById('chatSubtitle');
+// ============================================================
+// PERSONALISATION INTEGRATION
+// ============================================================
 
-// --- State ---
-var isOpen          = false;
-var isLoading       = false;
-var conversations   = {};   // { ticker: [ {role, content}, ... ] }
-var currentTicker   = '';
+function loadPersonalisationProfile() {
+    try {
+        var raw = localStorage.getItem('continuum_personalisation_profile');
+        if (!raw) return null;
+        var data = JSON.parse(raw);
+        return (data && data.state && data.state.profile) ? data.state : null;
+    } catch (e) {
+        return null;
+    }
+}
 
-// --- Populate ticker dropdown ---
+function buildEffectiveSystemPrompt() {
+    var pnState = loadPersonalisationProfile();
+    if (pnState && typeof window.pnBuildSystemPrompt === 'function') {
+        try {
+            return window.pnBuildSystemPrompt(
+                pnState.profile,
+                pnState.firm,
+                pnState.fund,
+                pnState.portfolio || []
+            );
+        } catch (e) {
+            console.warn('[Analyst] pnBuildSystemPrompt threw:', e);
+        }
+    }
+    return ANALYST_SYSTEM_PROMPT;
+}
+
+function updateProfileStatusIndicator() {
+    var profileStatus = document.getElementById('apProfileStatus');
+    if (!profileStatus) return;
+    var pnState = loadPersonalisationProfile();
+    if (pnState && pnState.firm && pnState.firm.name) {
+        profileStatus.textContent = pnState.firm.name;
+        profileStatus.classList.add('loaded');
+    } else {
+        profileStatus.textContent = 'No profile';
+        profileStatus.classList.remove('loaded');
+    }
+}
+
+// ============================================================
+// DOM REFS
+// ============================================================
+
+var panel        = document.getElementById('analyst-panel');
+var fab          = document.getElementById('apFab');
+var collapseBtn  = document.getElementById('apCollapseBtn');
+var clearBtn     = document.getElementById('apClearBtn');
+var messages     = document.getElementById('apMessages');
+var input        = document.getElementById('apInput');
+var sendBtn      = document.getElementById('apSend');
+var tickerSelect = document.getElementById('apTickerSelect');
+var tickerBadge  = document.getElementById('apTickerBadge');
+
+// ============================================================
+// STATE
+// ============================================================
+
+var isOpen        = false;
+var isLoading     = false;
+var conversations = {};   // { ticker: [ {role, content, sources?, timestamp?}, ... ] }
+var currentTicker = '';
+
+// ============================================================
+// TICKER MANAGEMENT
+// ============================================================
+
 function populateTickerSelect() {
+    if (!tickerSelect) return;
     var tickers = Object.keys(STOCK_DATA).sort();
-    select.innerHTML = '';
+    tickerSelect.innerHTML = '<option value="">-- All coverage --</option>';
     tickers.forEach(function(t) {
         var opt = document.createElement('option');
         opt.value = t;
-        opt.textContent = t + '  --  ' + STOCK_DATA[t].company;
-        select.appendChild(opt);
+        opt.textContent = t + '  --  ' + (STOCK_DATA[t].company || t);
+        tickerSelect.appendChild(opt);
     });
-    // Try to detect current ticker from route
-    var hash = window.location.hash.slice(1) || '';
-    var detected = '';
-    if (hash.startsWith('report-')) detected = hash.replace('report-', '').toUpperCase();
-    if (hash.startsWith('snapshot-')) detected = hash.replace('snapshot-', '').toUpperCase();
-    if (detected && STOCK_DATA[detected]) {
-        select.value = detected;
-    }
-    currentTicker = select.value;
+    syncTickerFromRoute();
 }
 
-// --- Suggestions per stock ---
+function syncTickerFromRoute() {
+    var hash = window.location.hash.slice(1) || '';
+    var detected = '';
+    if (hash.startsWith('report-'))   detected = hash.replace('report-', '').toUpperCase();
+    if (hash.startsWith('snapshot-')) detected = hash.replace('snapshot-', '').toUpperCase();
+    if (detected && STOCK_DATA[detected]) {
+        if (tickerSelect) tickerSelect.value = detected;
+        currentTicker = detected;
+    } else {
+        if (tickerSelect) tickerSelect.value = '';
+        currentTicker = '';
+    }
+    updateTickerBadge();
+}
+
+function updateTickerBadge() {
+    if (!tickerBadge) return;
+    if (currentTicker && STOCK_DATA[currentTicker]) {
+        tickerBadge.textContent = currentTicker;
+    } else {
+        tickerBadge.textContent = 'ALL COVERAGE';
+    }
+    // Update textarea placeholder
+    if (input) {
+        var company = currentTicker && STOCK_DATA[currentTicker] ? STOCK_DATA[currentTicker].company : 'any covered stock';
+        input.placeholder = 'Ask about ' + company + '...';
+    }
+}
+
+// ============================================================
+// SUGGESTIONS
+// ============================================================
+
 function getSuggestions(ticker) {
+    if (ticker && STOCK_DATA[ticker]) {
+        return [
+            'What is the bull case for ' + ticker + '?',
+            'What are the key risks the market is underpricing?',
+            'Summarise the competing hypotheses and where weight is accumulating',
+            'What catalysts should I watch over the next 90 days?'
+        ];
+    }
     return [
-        'What is the bull case for ' + ticker + '?',
-        'What are the key risks?',
-        'Summarise the competing hypotheses',
-        'What catalysts should I watch?'
+        'Which names look most dislocated right now?',
+        'Compare the risk skew across your coverage',
+        'Which hypotheses are closest to being resolved?',
+        'Where is consensus most wrong?'
     ];
 }
 
-// --- Render welcome state ---
+// ============================================================
+// RENDERING
+// ============================================================
+
+function formatTime(ts) {
+    if (!ts) return '';
+    var d = new Date(ts);
+    var hh = String(d.getHours()).padStart(2, '0');
+    var mm = String(d.getMinutes()).padStart(2, '0');
+    return hh + ':' + mm;
+}
+
+function escapeHtml(str) {
+    var d = document.createElement('div');
+    d.textContent = str != null ? String(str) : '';
+    return d.innerHTML;
+}
+
+function renderMarkdown(text) {
+    if (typeof window.marked !== 'undefined' && window.marked.parse && typeof window.DOMPurify !== 'undefined') {
+        return window.DOMPurify.sanitize(window.marked.parse(text));
+    }
+    var html = escapeHtml(text);
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    html = html.replace(/^[-*]\s+(.+)$/gm, '<li>$1</li>');
+    html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
+    html = html.split(/\n{2,}/).map(function(block) {
+        block = block.trim();
+        if (!block) return '';
+        if (/^<(ul|ol|h[1-6]|div|blockquote)/.test(block)) return block;
+        return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
+    }).join('');
+    return html;
+}
+
 function renderWelcome() {
-    var ticker = currentTicker;
-    var company = STOCK_DATA[ticker] ? STOCK_DATA[ticker].company : ticker;
+    var suggs = getSuggestions(currentTicker);
+    var company = currentTicker && STOCK_DATA[currentTicker] ? STOCK_DATA[currentTicker].company : 'any covered stock';
     var html =
-        '<div class="chat-welcome">' +
-            '<div class="chat-welcome-icon">' +
-                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-                    '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' +
-                '</svg>' +
-            '</div>' +
-            '<div class="chat-welcome-title">Research Chat</div>' +
-            '<div class="chat-welcome-text">Ask questions about <strong>' + company + '</strong> grounded in our structured research data.</div>' +
-            '<div class="chat-suggestions">' +
-                getSuggestions(ticker).map(function(s) {
-                    return '<button class="chat-suggestion-btn" data-q="' + s.replace(/"/g, '&quot;') + '">' + s + '</button>';
+        '<div class="ap-welcome">' +
+            '<div class="ap-welcome-title">Analyst Ready</div>' +
+            '<div class="ap-welcome-text">Ask questions about <strong>' + escapeHtml(company) + '</strong> grounded in our structured ACH research framework.</div>' +
+            '<div class="ap-suggestions">' +
+                suggs.map(function(s) {
+                    return '<button class="ap-suggestion" data-q="' + escapeHtml(s) + '">' + escapeHtml(s) + '</button>';
                 }).join('') +
             '</div>' +
         '</div>';
     messages.innerHTML = html;
-
-    // Bind suggestion clicks
-    messages.querySelectorAll('.chat-suggestion-btn').forEach(function(btn) {
+    messages.querySelectorAll('.ap-suggestion').forEach(function(btn) {
         btn.addEventListener('click', function() {
             input.value = btn.getAttribute('data-q');
+            updateSendButton();
             sendMessage();
         });
     });
 }
 
-// --- Render conversation ---
 function renderConversation() {
+    if (!messages) return;
     var convo = conversations[currentTicker] || [];
     if (convo.length === 0) {
         renderWelcome();
@@ -135,34 +255,53 @@ function renderConversation() {
 
     var html = '';
     convo.forEach(function(msg) {
+        var role     = msg.role === 'user' ? 'user' : 'analyst';
+        var roleLabel = msg.role === 'user' ? 'YOU' : 'ANALYST';
+        var timeStr  = formatTime(msg.timestamp);
+
+        html += '<div class="ap-msg-row">';
+        html += '<div class="ap-msg-meta">';
+        html += '<span class="ap-msg-role ' + role + '">' + roleLabel + '</span>';
+        if (timeStr) html += '<span class="ap-msg-time">' + timeStr + '</span>';
+        html += '</div>';
+        html += '<div class="ap-msg-body">';
+
         if (msg.role === 'user') {
-            html += '<div class="chat-msg user">' + escapeHtml(msg.content) + '</div>';
+            html += '<p>' + escapeHtml(msg.content) + '</p>';
         } else {
-            html += '<div class="chat-msg assistant">' + renderMarkdown(msg.content);
+            html += renderMarkdown(msg.content);
             if (msg.sources && msg.sources.length > 0) {
-                var id = 'src-' + Math.random().toString(36).substr(2, 6);
-                html += '<button class="chat-sources-toggle" data-target="' + id + '">' +
-                    msg.sources.length + ' source' + (msg.sources.length === 1 ? '' : 's') + ' &#9662;</button>';
-                html += '<div class="chat-sources-list" id="' + id + '">';
+                var srcId = 'ap-src-' + Math.random().toString(36).substr(2, 6);
+                html += '<div class="ap-sources">';
+                html += '<button class="ap-sources-toggle" data-target="' + srcId + '">' +
+                    msg.sources.length + ' source' + (msg.sources.length === 1 ? '' : 's') + ' &#9662;' +
+                    '</button>';
+                html += '<div class="ap-sources-list" id="' + srcId + '">';
                 msg.sources.forEach(function(s) {
-                    html += '<div class="chat-source-item">' +
-                        '<span class="cs-label">' + escapeHtml(s.section) + ' / ' + escapeHtml(s.subsection) + '</span>' +
-                        escapeHtml(s.content) +
-                    '</div>';
+                    html += '<div class="ap-source-item">';
+                    if (s.section || s.subsection) {
+                        html += '<span class="ap-source-domain">' +
+                            escapeHtml((s.section || '') + (s.subsection ? ' / ' + s.subsection : '')) +
+                            '</span> ';
+                    }
+                    html += escapeHtml(s.content || '');
+                    html += '</div>';
                 });
                 html += '</div>';
+                html += '</div>';
             }
-            html += '</div>';
         }
+        html += '</div>';
+        html += '</div>';
     });
+
     messages.innerHTML = html;
     scrollToBottom();
     bindSourceToggles();
 }
 
-// --- Bind source toggle buttons ---
 function bindSourceToggles() {
-    messages.querySelectorAll('.chat-sources-toggle').forEach(function(btn) {
+    messages.querySelectorAll('.ap-sources-toggle').forEach(function(btn) {
         btn.addEventListener('click', function() {
             var target = document.getElementById(btn.getAttribute('data-target'));
             if (target) target.classList.toggle('open');
@@ -170,125 +309,90 @@ function bindSourceToggles() {
     });
 }
 
-// --- Simple markdown renderer ---
-function renderMarkdown(text) {
-    // If marked + DOMPurify available, use them for richer rendering
-    if (typeof window.marked !== 'undefined' && window.marked.parse && typeof window.DOMPurify !== 'undefined') {
-        return window.DOMPurify.sanitize(window.marked.parse(text));
-    }
-    // Escape HTML first, then apply markdown
-    var html = escapeHtml(text);
-    // Bold
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    // Italic
-    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    // Inline code
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-    // Headers (### and ####)
-    html = html.replace(/^####\s+(.+)$/gm, '<h4>$1</h4>');
-    html = html.replace(/^###\s+(.+)$/gm, '<h3>$1</h3>');
-    // Unordered list items
-    html = html.replace(/^[-*]\s+(.+)$/gm, '<li>$1</li>');
-    // Wrap consecutive <li> in <ul>
-    html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
-    // Paragraphs: split on double newline
-    html = html.split(/\n{2,}/).map(function(block) {
-        block = block.trim();
-        if (!block) return '';
-        // Don't wrap if already a block element
-        if (/^<(ul|ol|h[1-6]|div|blockquote)/.test(block)) return block;
-        return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
-    }).join('');
-    return html;
-}
+// ============================================================
+// TYPING INDICATOR
+// ============================================================
 
-function escapeHtml(str) {
-    var d = document.createElement('div');
-    d.textContent = str;
-    return d.innerHTML;
-}
-
-// --- Typing indicator ---
 function showTyping() {
     var el = document.createElement('div');
-    el.className = 'chat-typing';
-    el.id = 'chatTypingIndicator';
-    el.innerHTML = '<div class="chat-typing-dot"></div><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div>';
+    el.className = 'ap-typing';
+    el.id = 'apTypingIndicator';
+    el.innerHTML =
+        '<span class="ap-typing-label">ANALYST</span>' +
+        '<div class="ap-typing-dots">' +
+            '<div class="ap-typing-dot"></div>' +
+            '<div class="ap-typing-dot"></div>' +
+            '<div class="ap-typing-dot"></div>' +
+        '</div>';
     messages.appendChild(el);
     scrollToBottom();
 }
+
 function hideTyping() {
-    var el = document.getElementById('chatTypingIndicator');
+    var el = document.getElementById('apTypingIndicator');
     if (el) el.remove();
 }
 
-// --- Scroll helpers ---
 function scrollToBottom() {
-    messages.scrollTop = messages.scrollHeight;
+    if (messages) messages.scrollTop = messages.scrollHeight;
 }
 
-// --- Send message ---
+// ============================================================
+// SEND MESSAGE
+// ============================================================
+
 function sendMessage() {
-    var question = input.value.trim();
-    if (!question || isLoading || !currentTicker) return;
+    var question = input ? input.value.trim() : '';
+    if (!question || isLoading) return;
 
-    // Init conversation array for this ticker if needed
-    if (!conversations[currentTicker]) {
-        conversations[currentTicker] = [];
-    }
-    var convo = conversations[currentTicker];
+    var ticker = currentTicker || (tickerSelect ? tickerSelect.value : '');
 
-    // Add user message
-    convo.push({ role: 'user', content: question });
-    input.value = '';
-    input.style.height = 'auto';
+    if (!conversations[ticker]) conversations[ticker] = [];
+    var convo = conversations[ticker];
+
+    var now = Date.now();
+    convo.push({ role: 'user', content: question, timestamp: now });
+    if (input) { input.value = ''; input.style.height = 'auto'; }
     updateSendButton();
     renderConversation();
     showTyping();
 
     isLoading = true;
-    sendBtn.disabled = true;
+    if (sendBtn) sendBtn.disabled = true;
 
-    // Build conversation history (exclude current message)
+    // Build history (exclude the just-added user message)
     var history = convo.slice(0, -1).map(function(m) {
-        return { role: m.role, content: m.content };
+        return { role: m.role === 'user' ? 'user' : 'assistant', content: m.content };
     });
 
-    // Guard: file:// protocol cannot reach the API
     if (isFile) {
         hideTyping();
-        var errorEl = document.createElement('div');
-        errorEl.className = 'chat-error';
-        errorEl.textContent = 'Chat requires the hosted version. Open the Railway / Render URL instead of a local file.';
-        messages.appendChild(errorEl);
-        scrollToBottom();
+        appendError('Chat requires the hosted version. Open via the Railway or GitHub Pages URL.');
         isLoading = false;
         updateSendButton();
         return;
     }
 
-    // API call
+    // Always read personalisation fresh from localStorage on each send
+    var systemPrompt = buildEffectiveSystemPrompt();
+
     fetch(CHAT_API_BASE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY },
         body: JSON.stringify({
-            ticker: currentTicker,
+            ticker: ticker,
             question: question,
             conversation_history: history,
-            system_prompt: ANALYST_SYSTEM_PROMPT
+            system_prompt: systemPrompt
         })
     })
     .then(function(res) {
         if (!res.ok) {
             return res.text().then(function(body) {
                 var detail = '';
-                try {
-                    var parsed = JSON.parse(body);
-                    detail = parsed.detail || '';
-                } catch(e) { /* non-JSON response */ }
-
+                try { detail = JSON.parse(body).detail || ''; } catch(e) {}
                 if (res.status === 502 && detail.indexOf('authentication_error') !== -1) {
-                    throw new Error('API key error  --  the server\'s Anthropic key may be invalid. Check the ANTHROPIC_API_KEY environment variable.');
+                    throw new Error('API key error -- the server Anthropic key may be invalid.');
                 }
                 if (res.status === 502) {
                     throw new Error('The AI service returned an error. Please try again in a moment.');
@@ -303,21 +407,16 @@ function sendMessage() {
         convo.push({
             role: 'assistant',
             content: data.response,
-            sources: data.sources || []
+            sources: data.sources || [],
+            timestamp: Date.now()
         });
         renderConversation();
     })
     .catch(function(err) {
         hideTyping();
         var msg = err.message || 'Something went wrong. Please try again.';
-        if (msg === 'Failed to fetch') {
-            msg = 'Cannot reach the API. Check that the server is running and accessible.';
-        }
-        var errorEl = document.createElement('div');
-        errorEl.className = 'chat-error';
-        errorEl.textContent = msg;
-        messages.appendChild(errorEl);
-        scrollToBottom();
+        if (msg === 'Failed to fetch') msg = 'Cannot reach the API. Check that the server is running.';
+        appendError(msg);
     })
     .finally(function() {
         isLoading = false;
@@ -325,307 +424,173 @@ function sendMessage() {
     });
 }
 
-// --- Auto-resize textarea ---
-function autoResize() {
-    input.style.height = 'auto';
-    input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+function appendError(msg) {
+    var el = document.createElement('div');
+    el.className = 'ap-error';
+    el.textContent = msg;
+    if (messages) {
+        messages.appendChild(el);
+        scrollToBottom();
+    }
 }
 
-// --- Enable/disable send button ---
+// ============================================================
+// INPUT HELPERS
+// ============================================================
+
+function autoResize() {
+    if (!input) return;
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+}
+
 function updateSendButton() {
+    if (!sendBtn || !input) return;
     sendBtn.disabled = !input.value.trim() || isLoading;
 }
 
-// --- Open/Close ---
-function openChat() {
+// ============================================================
+// OPEN / CLOSE
+// ============================================================
+
+function openPanel() {
+    if (!panel) return;
     populateTickerSelect();
-    panel.classList.add('open');
-    fab.classList.add('hidden');
-    fab.setAttribute('aria-expanded', 'true');
+    updateProfileStatusIndicator();
+    panel.classList.add('ap-open');
+    document.body.classList.add('analyst-panel-open');
     isOpen = true;
+    if (fab) { fab.setAttribute('aria-expanded', 'true'); }
+    if (collapseBtn) collapseBtn.setAttribute('aria-label', 'Collapse analyst panel');
     renderConversation();
-    input.focus();
-    updateSubtitle();
+    if (input) input.focus();
+    console.log('[Analyst] Panel opened');
 }
-function closeChat() {
-    panel.classList.remove('open');
-    fab.classList.remove('hidden');
-    fab.setAttribute('aria-expanded', 'false');
+
+function closePanel() {
+    if (!panel) return;
+    panel.classList.remove('ap-open');
+    document.body.classList.remove('analyst-panel-open');
     isOpen = false;
-    fab.focus(); // Return focus to FAB on close
-}
-
-function updateSubtitle() {
-    var company = STOCK_DATA[currentTicker] ? STOCK_DATA[currentTicker].company : currentTicker;
-    subtitle.textContent = company;
-}
-
-// --- Event listeners ---
-fab.addEventListener('click', openChat);
-closeBtn.addEventListener('click', closeChat);
-
-input.addEventListener('input', function() {
-    autoResize();
-    updateSendButton();
-});
-input.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
+    if (fab) {
+        fab.setAttribute('aria-expanded', 'false');
+        if (window.innerWidth < 1024) fab.style.display = 'flex';
     }
-});
+    console.log('[Analyst] Panel closed');
+}
 
-sendBtn.addEventListener('click', sendMessage);
+function togglePanel() {
+    if (isOpen) closePanel(); else openPanel();
+}
 
-select.addEventListener('change', function() {
-    currentTicker = select.value;
-    renderConversation();
-    updateSubtitle();
-});
+// ============================================================
+// CLEAR CONVERSATION
+// ============================================================
 
-// Sync ticker when navigating to a report page
-window.addEventListener('hashchange', function() {
-    if (!isOpen) return;
-    var hash = window.location.hash.slice(1) || '';
-    var detected = '';
-    if (hash.startsWith('report-')) detected = hash.replace('report-', '').toUpperCase();
-    if (hash.startsWith('snapshot-')) detected = hash.replace('snapshot-', '').toUpperCase();
-    if (detected && STOCK_DATA[detected] && detected !== currentTicker) {
-        select.value = detected;
-        currentTicker = detected;
+function clearConversation() {
+    conversations[currentTicker] = [];
+    renderWelcome();
+}
+
+// ============================================================
+// EVENT LISTENERS
+// ============================================================
+
+if (panel) {
+    // FAB opens panel on mobile
+    if (fab) {
+        fab.addEventListener('click', function() { openPanel(); });
+    }
+
+    // Collapse/close button
+    if (collapseBtn) {
+        collapseBtn.addEventListener('click', closePanel);
+    }
+
+    // Clear conversation
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearConversation);
+    }
+
+    // Ticker select change
+    if (tickerSelect) {
+        tickerSelect.addEventListener('change', function() {
+            currentTicker = tickerSelect.value;
+            updateTickerBadge();
+            renderConversation();
+        });
+    }
+
+    // Input events
+    if (input) {
+        input.addEventListener('input', function() {
+            autoResize();
+            updateSendButton();
+        });
+
+        input.addEventListener('keydown', function(e) {
+            // Cmd/Ctrl+Enter sends; plain Enter adds newline
+            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    }
+
+    // Send button
+    if (sendBtn) {
+        sendBtn.addEventListener('click', sendMessage);
+    }
+
+    // Escape closes on mobile
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && isOpen && window.innerWidth < 1024) closePanel();
+    });
+
+    // Sync ticker on route change (always, panel stays open)
+    window.addEventListener('hashchange', function() {
+        syncTickerFromRoute();
+        updateTickerBadge();
+        // Rebuild conversation view if ticker changed
         renderConversation();
-        updateSubtitle();
-    }
-});
+    });
 
-// Close on Escape
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && isOpen) closeChat();
-});
-
-
-// ============================================================
-// INLINE RESEARCH CHAT (within report pages)
-// ============================================================
-
-var INLINE_API_BASE = (function() {
-    var PRODUCTION_API_INLINE = 'https://imaginative-vision-production-16cb.up.railway.app';
-    var isLocalInline = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    var isGitHubPagesInline = window.location.hostname.indexOf('github.io') !== -1;
-    var origin = window.CHAT_API_URL
-        || (isLocalInline ? ''
-            : isGitHubPagesInline ? PRODUCTION_API_INLINE
-            : '');
-    return origin + '/api/research-chat';
-})();
-
-var inlineConversations = {};
-var inlineLoading = {};
-
-function escHtml(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function renderMd(text) {
-    if (typeof window.marked !== 'undefined' && window.marked.parse) {
-        var raw = window.marked.parse(text);
-        // Sanitize to prevent XSS from AI responses or compromised backend
-        if (typeof window.DOMPurify !== 'undefined') return window.DOMPurify.sanitize(raw);
-        return raw;
-    }
-    // Fallback if marked.js hasn't loaded
-    return escHtml(text).replace(/\n/g, '<br>');
-}
-
-function getInlineSuggestions(ticker) {
-    return [
-        'What is the bull case for ' + ticker + '?',
-        'What are the key risks?',
-        'Summarise the competing hypotheses',
-        'What catalysts should I watch?'
-    ];
-}
-
-function renderInlineMessages(ticker) {
-    var el = document.getElementById('chat-inline-' + ticker);
-    if (!el) return;
-    var convo = inlineConversations[ticker] || [];
-    if (convo.length === 0) {
-        var company = STOCK_DATA[ticker] ? STOCK_DATA[ticker].company : ticker;
-        var sugs = getInlineSuggestions(ticker);
-        el.innerHTML =
-            '<div class="chat-inline-welcome">' +
-              '<p>Ask questions about <strong>' + company + '</strong> grounded in structured research data.</p>' +
-              '<div class="chat-inline-suggestions">' +
-                sugs.map(function(s) {
-                    return '<button class="chat-inline-suggestion" data-q="' + s.replace(/"/g, '&quot;') + '">' + s + '</button>';
-                }).join('') +
-              '</div>' +
-            '</div>';
-        return;
-    }
-    var html = '';
-    convo.forEach(function(msg) {
-        if (msg.role === 'user') {
-            html += '<div class="chat-msg user">' + escHtml(msg.content) + '</div>';
+    // Handle viewport resize: auto-open at desktop, hide FAB
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 1024) {
+            if (!isOpen) openPanel();
+            if (fab) fab.style.display = 'none';
         } else {
-            html += '<div class="chat-msg assistant">' + renderMd(msg.content) + '</div>';
-        }
-    });
-    el.innerHTML = html;
-    el.scrollTop = el.scrollHeight;
-}
-
-function sendInlineMessage(ticker, question) {
-    if (!question || inlineLoading[ticker]) return;
-    if (!inlineConversations[ticker]) inlineConversations[ticker] = [];
-    var convo = inlineConversations[ticker];
-    convo.push({ role: 'user', content: question });
-    renderInlineMessages(ticker);
-    inlineLoading[ticker] = true;
-
-    // Show typing indicator
-    var el = document.getElementById('chat-inline-' + ticker);
-    if (el) {
-        var typing = document.createElement('div');
-        typing.className = 'chat-typing';
-        typing.id = 'inline-typing-' + ticker;
-        typing.innerHTML = '<div class="chat-typing-dot"></div><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div>';
-        el.appendChild(typing);
-        el.scrollTop = el.scrollHeight;
-    }
-
-    // Disable send button
-    var container = document.querySelector('.chat-inline[data-ticker="' + ticker + '"]');
-    var inlineSendBtn = container ? container.querySelector('.chat-inline-send') : null;
-    if (inlineSendBtn) inlineSendBtn.disabled = true;
-
-    var history = convo.slice(0, -1).map(function(m) {
-        return { role: m.role, content: m.content };
-    });
-
-    fetch(INLINE_API_BASE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY },
-        body: JSON.stringify({ ticker: ticker, question: question, conversation_history: history, system_prompt: ANALYST_SYSTEM_PROMPT })
-    })
-    .then(function(res) {
-        if (!res.ok) throw new Error('Request failed (' + res.status + ')');
-        return res.json();
-    })
-    .then(function(data) {
-        var t = document.getElementById('inline-typing-' + ticker);
-        if (t) t.remove();
-        convo.push({ role: 'assistant', content: data.response });
-        renderInlineMessages(ticker);
-    })
-    .catch(function(err) {
-        var t = document.getElementById('inline-typing-' + ticker);
-        if (t) t.remove();
-        if (el) {
-            var errEl = document.createElement('div');
-            errEl.className = 'chat-error';
-            errEl.textContent = err.message || 'Something went wrong.';
-            el.appendChild(errEl);
-            el.scrollTop = el.scrollHeight;
-        }
-    })
-    .finally(function() {
-        inlineLoading[ticker] = false;
-        if (inlineSendBtn) {
-            var inp = container ? container.querySelector('.chat-inline-input') : null;
-            inlineSendBtn.disabled = !(inp && inp.value.trim());
+            if (fab) fab.style.display = isOpen ? 'none' : 'flex';
         }
     });
 }
 
-// Event delegation for inline chat
-document.addEventListener('click', function(e) {
-    // Suggestion button click
-    var sugBtn = e.target.closest('.chat-inline-suggestion');
-    if (sugBtn) {
-        var sugContainer = sugBtn.closest('.chat-inline');
-        if (sugContainer) {
-            var ticker = sugContainer.getAttribute('data-ticker');
-            var q = sugBtn.getAttribute('data-q');
-            var inp = sugContainer.querySelector('.chat-inline-input');
-            if (inp) inp.value = '';
-            sendInlineMessage(ticker, q);
-        }
+// ============================================================
+// INIT
+// ============================================================
+
+export function initChat() {
+    if (!panel) {
+        console.warn('[Analyst] #analyst-panel not found -- analyst panel disabled');
         return;
     }
 
-    // Send button click
-    var clickedSendBtn = e.target.closest('.chat-inline-send');
-    if (clickedSendBtn) {
-        var sendContainer = clickedSendBtn.closest('.chat-inline');
-        if (sendContainer) {
-            var sendTicker = sendContainer.getAttribute('data-ticker');
-            var sendInp = sendContainer.querySelector('.chat-inline-input');
-            if (sendInp && sendInp.value.trim()) {
-                sendInlineMessage(sendTicker, sendInp.value.trim());
-                sendInp.value = '';
-                sendInp.style.height = 'auto';
-                clickedSendBtn.disabled = true;
-            }
-        }
-        return;
-    }
-});
-
-// Handle input and enter key via delegation
-document.addEventListener('input', function(e) {
-    if (e.target.classList.contains('chat-inline-input')) {
-        var inputContainer = e.target.closest('.chat-inline');
-        if (inputContainer) {
-            var inputSendBtn = inputContainer.querySelector('.chat-inline-send');
-            if (inputSendBtn) inputSendBtn.disabled = !e.target.value.trim();
-            e.target.style.height = 'auto';
-            e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
-        }
-    }
-});
-
-document.addEventListener('keydown', function(e) {
-    if (e.target.classList.contains('chat-inline-input') && e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        var keyContainer = e.target.closest('.chat-inline');
-        if (keyContainer) {
-            var keyTicker = keyContainer.getAttribute('data-ticker');
-            if (e.target.value.trim()) {
-                sendInlineMessage(keyTicker, e.target.value.trim());
-                e.target.value = '';
-                e.target.style.height = 'auto';
-                var keySendBtn = keyContainer.querySelector('.chat-inline-send');
-                if (keySendBtn) keySendBtn.disabled = true;
-            }
-        }
-    }
-});
-
-// Initialize welcome state for any already-rendered inline chats
-document.querySelectorAll('.chat-inline').forEach(function(container) {
-    var ticker = container.getAttribute('data-ticker');
-    if (ticker) renderInlineMessages(ticker);
-});
-
-// Expose for dynamic page renders
-window.initInlineChat = function(ticker) {
-    renderInlineMessages(ticker);
-};
-
-// ============================================================
-// EXPORTS
-// ============================================================
-
-export function initChat(ticker) {
-    if (ticker && STOCK_DATA[ticker]) {
-        currentTicker = ticker;
-        if (select) select.value = ticker;
-    }
     populateTickerSelect();
-    renderConversation();
-    updateSubtitle();
+    updateProfileStatusIndicator();
+
+    // Auto-open at desktop widths; show FAB on mobile
+    if (window.innerWidth >= 1024) {
+        openPanel();
+    } else {
+        if (fab) fab.style.display = 'flex';
+    }
+
+    console.log('[Analyst] Initialised, panel', window.innerWidth >= 1024 ? 'open' : 'collapsed (mobile)');
 }
 
-export { openChat, closeChat };
+// ============================================================
+// EXPORTS (public API)
+// ============================================================
+
+export { openPanel as openChat, closePanel as closeChat };
