@@ -130,9 +130,12 @@ function syncTickerFromRoute() {
     var detected = '';
     if (hash.startsWith('report-'))   detected = hash.replace('report-', '').toUpperCase();
     if (hash.startsWith('snapshot-')) detected = hash.replace('snapshot-', '').toUpperCase();
-    if (detected && STOCK_DATA[detected]) {
-        if (tickerSelect) tickerSelect.value = detected;
+    if (detected) {
+        // Trust the route -- data may not be loaded yet when hashchange fires
         currentTicker = detected;
+        if (tickerSelect && tickerSelect.querySelector('option[value="' + detected + '"]')) {
+            tickerSelect.value = detected;
+        }
         updateTickerBadge();
     }
     // Non-stock pages: leave coverage unchanged
