@@ -137,14 +137,10 @@ export function processPortfolioData(rows) {
   }
 
   /* Calculate weights */
-  var totalValue = positions.reduce(function(s, p) { return s + (p.marketValue || 0); }, 0);
-  positions.forEach(function(p) {
-    p.weight = totalValue > 0 && p.marketValue ? (p.marketValue / totalValue) * 100 : 0;
-    p.alignment = deriveAlignment(p.skew, p.weight);
-  });
+  var expo = calcWeights(positions);
 
   savePortfolio(positions);
-  renderPortfolio(positions, totalValue);
+  renderPortfolio(positions, expo.totalLong, expo);
 }
 
 export function deriveAlignment(skew, weight) {
@@ -166,7 +162,32 @@ export function deriveAlignment(skew, weight) {
   return { label: 'N/A', cls: 'not-covered' };
 }
 
-export function renderPortfolio(positions, totalValue) {
+function calcWeights(positions) {
+  var totalLong = 0, totalShortAbs = 0;
+  positions.forEach(function(p) {
+    if (p.marketValue === null || p.marketValue === undefined) return;
+    if (p.marketValue >= 0) totalLong += p.marketValue;
+    else totalShortAbs += Math.abs(p.marketValue);
+  });
+  positions.forEach(function(p) {
+    if (p.marketValue === null || p.marketValue === undefined) {
+      p.weight = 0;
+    } else if (p.marketValue >= 0) {
+      p.weight = totalLong > 0 ? (p.marketValue / totalLong) * 100 : 0;
+    } else {
+      p.weight = totalShortAbs > 0 ? -(Math.abs(p.marketValue) / totalShortAbs) * 100 : 0;
+    }
+    p.alignment = deriveAlignment(p.skew, p.weight);
+  });
+  return {
+    totalLong: totalLong,
+    totalShortAbs: totalShortAbs,
+    netExposure: totalLong - totalShortAbs,
+    grossExposure: totalLong + totalShortAbs
+  };
+}
+
+export function renderPortfolio(positions, totalLong, expo) {
   var body = document.getElementById('portfolioBody');
   var table = document.getElementById('portfolioTable');
   var summary = document.getElementById('portfolioSummary');
@@ -208,14 +229,22 @@ export function renderPortfolio(positions, totalValue) {
   var totalCost = positions.reduce(function(s, p) { return s + p.costBasis; }, 0);
   var totalPnLPct = totalCost > 0 ? (totalPnL / totalCost) * 100 : 0;
 
-  var alignedWeight = 0, contraWeight = 0, neutralWeight = 0;
+  var grossExp = expo.grossExposure || 1;
+  var alignedDollar = 0, contraDollar = 0, neutralDollar = 0;
   positions.forEach(function(p) {
-    if (p.alignment.cls === 'aligned') alignedWeight += p.weight;
-    else if (p.alignment.cls === 'contradicts' || p.alignment.cls === 'exceeds') contraWeight += p.weight;
-    else neutralWeight += p.weight;
+    var absMV = Math.abs(p.marketValue || 0);
+    if (p.alignment.cls === 'aligned') alignedDollar += absMV;
+    else if (p.alignment.cls === 'contradicts' || p.alignment.cls === 'exceeds') contraDollar += absMV;
+    else neutralDollar += absMV;
   });
+  var alignedWeight = (alignedDollar / grossExp) * 100;
+  var contraWeight = (contraDollar / grossExp) * 100;
+  var neutralWeight = (neutralDollar / grossExp) * 100;
 
-  document.getElementById('summaryValue').textContent = 'A$' + formatNum(totalValue, 0);
+  document.getElementById('summaryLong').textContent = 'A$' + formatNum(expo.totalLong, 0);
+  document.getElementById('summaryShort').textContent = 'A$' + formatNum(expo.totalShortAbs, 0);
+  document.getElementById('summaryNet').textContent = 'A$' + formatNum(expo.netExposure, 0);
+  document.getElementById('summaryGross').textContent = 'A$' + formatNum(expo.grossExposure, 0);
   var pnlEl = document.getElementById('summaryPnL');
   pnlEl.textContent = (totalPnL >= 0 ? '+' : '') + 'A$' + formatNum(totalPnL, 0) + ' (' + (totalPnLPct >= 0 ? '+' : '') + formatNum(totalPnLPct, 1) + '%)';
   pnlEl.className = 'portfolio-summary-value ' + (totalPnL >= 0 ? 'positive' : 'negative');
@@ -233,14 +262,14 @@ export function renderPortfolio(positions, totalValue) {
   renderStrategyBar();
 
   /* Render diagnostics, reweighting, and alerts */
-  renderPortfolioDiagnostics(positions, totalValue);
-  renderReweighting(positions, totalValue);
+  renderPortfolioDiagnostics(positions, expo.grossExposure);
+  renderReweighting(positions, expo.totalLong);
   renderChangeAlerts(positions);
 }
 
 export function renderPortfolioFromSaved(positions) {
-  var totalValue = positions.reduce(function(s, p) { return s + (p.marketValue || 0); }, 0);
-  renderPortfolio(positions, totalValue);
+  var expo = calcWeights(positions);
+  renderPortfolio(positions, expo.totalLong, expo);
 }
 
 export function formatNum(n, decimals) {
@@ -347,7 +376,9 @@ export function renderPortfolioDiagnostics(positions, totalValue) {
   }
 
   var alignmentEl = document.getElementById('portAlignmentScore');
-  var alignedWeight = positions.reduce(function(s, p) { return s + (p.alignment.cls === 'aligned' ? p.weight : 0); }, 0);
+  var diagGross = positions.reduce(function(s, p) { return s + Math.abs(p.marketValue || 0); }, 0);
+  var alignedDollarDiag = positions.reduce(function(s, p) { return s + (p.alignment.cls === 'aligned' ? Math.abs(p.marketValue || 0) : 0); }, 0);
+  var alignedWeight = diagGross > 0 ? (alignedDollarDiag / diagGross) * 100 : 0;
 
   if (alignedWeight > 50) {
     alignmentEl.innerHTML = '<span class="success-highlight">' + formatNum(alignedWeight, 0) + '% aligned</span> with Continuum. Your book largely reflects our evidence-based view.';
@@ -888,13 +919,9 @@ export function initPortfolioPage() {
         p.skew = covered.skew;
       }
     }
-    var totalValue = positions.reduce(function(s, p) { return s + (p.marketValue || 0); }, 0);
-    positions.forEach(function(p) {
-      p.weight = totalValue > 0 && p.marketValue ? (p.marketValue / totalValue) * 100 : 0;
-      p.alignment = deriveAlignment(p.skew, p.weight);
-    });
+    var expo = calcWeights(positions);
 
     savePortfolio(positions);
-    renderPortfolio(positions, totalValue);
+    renderPortfolio(positions, expo.totalLong, expo);
   });
 }
