@@ -122,7 +122,34 @@ export async function submitAddStock(event) {
                 if (typeof window.renderFeaturedGrid === 'function') window.renderFeaturedGrid();
                 console.log('[AddStock] Scaffold loaded for ' + ticker);
             } else {
-                console.warn('[AddStock] Scaffold fetch returned ' + scaffoldResp.status + ', report may show empty');
+                console.warn('[AddStock] Scaffold fetch returned ' + scaffoldResp.status + ', using minimal stub');
+                // Scaffold not ready yet -- create a minimal stub so the stock appears
+                // in the Research tab and the report page loads without "Stock Not Found".
+                // The refresh poller below will populate full data once Railway finishes.
+                var stub = {
+                    ticker: ticker,
+                    tickerFull: ticker + '.AX',
+                    company: company,
+                    sector: data.sector || 'Unknown',
+                    sectorSub: '',
+                    price: data.price || 0,
+                    currency: 'A$',
+                    date: new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }),
+                    hypotheses: [],
+                    skew: { direction: 'balanced', rationale: 'Research initialising...' },
+                    featuredMetrics: [],
+                    featuredRationale: 'Research being generated.',
+                    _indexOnly: false,
+                    _stub: true,
+                    _lastRefreshed: new Date().toISOString()
+                };
+                try { localStorage.setItem('ci_research_' + ticker, JSON.stringify(stub)); } catch(e) {}
+                STOCK_DATA[ticker] = stub;
+                if (typeof window.ContinuumDynamics !== 'undefined' && window.ContinuumDynamics.hydrate) {
+                    window.ContinuumDynamics.hydrate(ticker);
+                }
+                if (typeof window.renderCoverageTable === 'function') window.renderCoverageTable();
+                if (typeof window.renderFeaturedGrid === 'function') window.renderFeaturedGrid();
             }
         } catch (scaffoldErr) {
             console.warn('[AddStock] Failed to fetch scaffold:', scaffoldErr);
