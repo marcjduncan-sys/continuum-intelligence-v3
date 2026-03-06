@@ -1180,7 +1180,7 @@ function buildInvestorBriefingHTML(stock) {
     '@media print{' +
       'body{margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
       '@page{size:A4 portrait;margin:6mm 8mm;}' +
-      '.page-1{page-break-after:always;display:flex;flex-direction:column;justify-content:space-between;min-height:277mm;}' +
+      '.page-1{page-break-after:always;}' +
       '.ev3-card,.tw2-card{page-break-inside:avoid;}' +
     '}';
 
