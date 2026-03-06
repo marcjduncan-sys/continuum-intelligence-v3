@@ -1558,6 +1558,37 @@ Please provide the FULL updated JSON with all narrative rewrites and tripwire up
 # Stage 4: Merge updates into research JSON
 # ---------------------------------------------------------------------------
 
+def _compute_skew_from_hypotheses(hypotheses: list) -> str:
+    """
+    Compute skew direction from hypothesis scores.
+    Mirrors JS normaliseScores() (floor=5, ceiling=80) + computeSkewScore().
+    Returns 'upside', 'downside', or 'balanced'.
+    """
+    if not hypotheses:
+        return "balanced"
+    raw = []
+    for h in hypotheses:
+        s = h.get("score", "50%")
+        try:
+            raw.append(max(5.0, min(80.0, float(str(s).strip("%")))))
+        except (ValueError, TypeError):
+            raw.append(50.0)
+    total = sum(raw) or 1.0
+    norm = [r / total * 100 for r in raw]
+    net = 0.0
+    for i, h in enumerate(hypotheses):
+        direction = (h.get("direction") or "neutral").lower()
+        if direction == "upside":
+            net += norm[i]
+        elif direction == "downside":
+            net -= norm[i]
+    if net > 5:
+        return "upside"
+    elif net < -5:
+        return "downside"
+    return "balanced"
+
+
 def _merge_updates(
     research: dict,
     gathered: dict,
@@ -1567,6 +1598,9 @@ def _merge_updates(
     """Merge all updates into a copy of the research JSON."""
     updated = deepcopy(research)
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+    # Capture existing skew before any hypothesis updates — used for momentum signal
+    old_skew = (updated.get("hero") or {}).get("skew", "")
 
     # -- Price update --
     price_data = gathered.get("price_data", {})
@@ -1652,6 +1686,11 @@ def _merge_updates(
                 "metric": ndp.get("metric", ""),
                 "thresholds": ndp.get("thresholds", ""),
             }
+        # Persist previous skew and recompute hero.skew from refreshed hypothesis scores
+        updated["hero"]["previousSkew"] = old_skew
+        updated["hero"]["skew"] = _compute_skew_from_hypotheses(
+            updated.get("hypotheses", [])
+        ).upper()
 
     # -- Full narrative rewrite --
     if "narrative" in updated and isinstance(updated["narrative"], dict):

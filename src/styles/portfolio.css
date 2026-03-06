@@ -546,6 +546,9 @@
 .rw-stab-low  { color: var(--signal-red); }
 .rw-stab-none { color: var(--text-muted); }
 .rw-stab-none::before { content: ''; }
+/* Momentum arrows (skew direction change since last refresh) */
+.rw-mom-up   { color: var(--signal-green); font-weight: 700; margin-left: 4px; font-size: 0.8rem; }
+.rw-mom-down { color: var(--signal-red);   font-weight: 700; margin-left: 4px; font-size: 0.8rem; }
 /* Uncovered positions — dimmed rows */
 .rw-row-uncovered td { opacity: 0.5; }
 /* Strategy context pills inside the Reweighting section */

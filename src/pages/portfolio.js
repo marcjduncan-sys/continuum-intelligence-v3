@@ -401,6 +401,21 @@ function getSkewStability(ticker) {
   return first.length > 35 ? first.slice(0, 35) + '\u2026' : first;
 }
 
+function getSkewMomentum(ticker) {
+  var stock = STOCK_DATA[ticker];
+  if (!stock || !stock.hero) return null;
+  var prev = (stock.hero.previousSkew || '').toLowerCase();
+  var curr = (stock.hero.skew || '').toLowerCase();
+  if (!prev || !curr || prev === curr) return 'stable';
+  if (prev === 'downside' && curr === 'upside') return 'strongly-improving';
+  if ((prev === 'downside' && curr === 'balanced') ||
+      (prev === 'balanced' && curr === 'upside')) return 'improving';
+  if (prev === 'upside' && curr === 'downside') return 'strongly-weakening';
+  if ((prev === 'upside' && curr === 'balanced') ||
+      (prev === 'balanced' && curr === 'downside')) return 'weakening';
+  return 'stable';
+}
+
 function stabilityClass(label) {
   if (!label) return 'rw-stab-none';
   var l = label.toLowerCase();
@@ -603,10 +618,19 @@ export function renderReweighting(positions, totalValue) {
       ? '<span class="rw-delta hold">SHORT</span>'
       : '<span class="rw-delta ' + deltaCls + '">' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%</span>';
 
-    // Conviction (narrative stability) cell
+    // Conviction (narrative stability) + skew momentum arrow
     var stabLabel = s.stability || '--';
     var stabCls = stabilityClass(s.stability);
-    var convictionCell = '<span class="rw-stability ' + stabCls + '">' + stabLabel + '</span>';
+    var momentum = s.covered ? getSkewMomentum(s.ticker) : null;
+    var momentumHtml = '';
+    if (momentum && momentum !== 'stable') {
+      var mArrow = momentum === 'strongly-improving' ? '&#8648;' :
+                   momentum === 'improving'          ? '&#8593;' :
+                   momentum === 'strongly-weakening' ? '&#8650;' : '&#8595;';
+      var mCls = momentum.includes('improving') ? 'rw-mom-up' : 'rw-mom-down';
+      momentumHtml = ' <span class="' + mCls + '">' + mArrow + '</span>';
+    }
+    var convictionCell = '<span class="rw-stability ' + stabCls + '">' + stabLabel + '</span>' + momentumHtml;
 
     rows += '<tr>' +
       '<td><span class="rw-ticker">' + s.ticker + '</span></td>' +
