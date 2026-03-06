@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.09,
+      "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-06T04:55:47.800Z"
+      "last_updated": "2026-03-06T05:13:41.832Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.11,
+      "survival_score": 0.06,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-06T04:55:47.800Z"
+      "last_updated": "2026-03-06T05:13:41.832Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Cost pressures, competitive threats, or macro headwinds.",
       "upside": null,
       "risk_plain": "Material downside if multiple risks crystallise simultaneously.",
-      "survival_score": 0.4,
+      "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-06T04:55:47.800Z"
+      "last_updated": "2026-03-06T05:13:41.832Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -47,25 +47,25 @@
       "what_to_watch": "Industry disruption signals and regulatory changes.",
       "upside": null,
       "risk_plain": "If disruption materialises, prior assumptions become invalid.",
-      "survival_score": 0.4,
+      "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-06T04:55:47.800Z"
+      "last_updated": "2026-03-06T05:13:41.832Z"
     }
   },
-  "dominant": "N3",
+  "dominant": "N4",
   "confidence": "LOW",
   "alert_state": "OVERCORRECTION",
-  "current_price": 52.84,
+  "current_price": 52.89,
   "big_picture": "BHP Group (ASX: BHP) — coverage initiated. Full analysis pending.",
   "last_flip": {
-    "date": "2026-03-05",
-    "from": "N2",
-    "to": "N3",
-    "trigger": "Automated: survival score shift (Base Case/Managed → Risk/Downside)",
-    "price_at_flip": 55.15,
-    "from_survival": 0.21,
-    "to_survival": 0.3
+    "date": "2026-03-06",
+    "from": "N3",
+    "to": "N4",
+    "trigger": "Automated: survival score shift (Risk/Downside → Disruption/Catalyst)",
+    "price_at_flip": 52.89,
+    "from_survival": 0.44,
+    "to_survival": 0.45
   },
   "narrative_history": [
     {
@@ -229,6 +229,15 @@
       "price_at_flip": 55.68,
       "from_survival": 0.39,
       "to_survival": 0.41
+    },
+    {
+      "date": "2026-03-05",
+      "from": "N2",
+      "to": "N3",
+      "trigger": "Automated: survival score shift (Base Case/Managed → Risk/Downside)",
+      "price_at_flip": 55.15,
+      "from_survival": 0.21,
+      "to_survival": 0.3
     }
   ],
   "evidence_items": [
@@ -453,15 +462,16 @@
     55.09,
     55.15,
     56.1,
-    52.84
+    52.84,
+    52.89
   ],
   "freshness": {
-    "pricePctChange": -5.8,
-    "urgency": 20,
-    "status": "MODERATE",
-    "badge": "moderate"
+    "pricePctChange": 0.1,
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
   },
-  "last_price_update": "2026-03-06T04:55:47.659Z",
+  "last_price_update": "2026-03-06T05:13:41.527Z",
   "technicalAnalysis": {
     "date": "16 February 2026",
     "period": "1 Year",
@@ -469,7 +479,7 @@
     "regime": "Uptrend",
     "clarity": "Clear",
     "price": {
-      "current": 52.84,
+      "current": 52.89,
       "currency": "A$"
     },
     "movingAverages": {
@@ -609,10 +619,10 @@
     }
   },
   "price_evidence": {
-    "last_run": "2026-03-06T04:55:47.800Z",
+    "last_run": "2026-03-06T05:13:41.832Z",
     "classification": "SIGNIFICANT"
   },
-  "last_research_update": "2026-03-06T04:55:47.800Z",
+  "last_research_update": "2026-03-06T05:13:41.832Z",
   "price": 57.75,
   "date": "26 February 2026",
   "_overcorrection": {
