@@ -488,7 +488,7 @@ export function renderReweighting(positions, totalValue) {
     if (isShort) {
       // Short positions are outside the long-only weight model.
       // Determine action from alignment instead of delta.
-      var shortAligned = (s.skew === 'downside');
+      var shortAligned = (s.skew === 'downside' || s.skew === 'balanced');
       sharesDisplay = '--';
       if (shortAligned) {
         action = 'Hold';
