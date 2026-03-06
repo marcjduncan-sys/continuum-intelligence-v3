@@ -538,6 +538,16 @@
 .rw-action.hold { color: var(--text-muted); }
 .rw-units { font-family: var(--font-data); font-size: 0.75rem; color: var(--text-secondary); }
 .rw-shares { font-family: var(--font-data); font-size: 0.75rem; color: var(--text-secondary); text-align: right; }
+/* Conviction (narrative stability) column */
+.rw-stability { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.02em; white-space: nowrap; }
+.rw-stability::before { content: '\25CF  '; }
+.rw-stab-high { color: var(--signal-green); }
+.rw-stab-mid  { color: var(--signal-amber, #f59e0b); }
+.rw-stab-low  { color: var(--signal-red); }
+.rw-stab-none { color: var(--text-muted); }
+.rw-stab-none::before { content: ''; }
+/* Uncovered positions — dimmed rows */
+.rw-row-uncovered td { opacity: 0.5; }
 /* Strategy context pills inside the Reweighting section */
 .rw-strategy-context {
     display: flex;

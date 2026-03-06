@@ -389,20 +389,42 @@ export function renderPortfolioDiagnostics(positions, totalValue) {
   }
 }
 
+// Extract the bolded stability label from narrativeStability prose
+function getSkewStability(ticker) {
+  var stock = STOCK_DATA[ticker];
+  if (!stock || !stock.narrative || !stock.narrative.narrativeStability) return null;
+  var raw = stock.narrative.narrativeStability;
+  var match = raw.match(/^<strong>(.*?)<\/strong>/i);
+  if (match) return match[1].replace(/\.$/, '').trim();
+  // Fallback: first clause before period
+  var first = raw.replace(/<[^>]+>/g, '').split(/\.\s/)[0];
+  return first.length > 35 ? first.slice(0, 35) + '\u2026' : first;
+}
+
+function stabilityClass(label) {
+  if (!label) return 'rw-stab-none';
+  var l = label.toLowerCase();
+  if (l.includes('high') || l === 'stable' || l.includes('very stable')) return 'rw-stab-high';
+  if (l.includes('low') || l.includes('unstable') || l.includes('shift') || l.includes('weak')) return 'rw-stab-low';
+  return 'rw-stab-mid'; // moderate / fairly stable / etc.
+}
+
 export function renderReweighting(positions, totalValue) {
   var sectionEl = document.getElementById('portfolioReweighting');
   var bodyEl = document.getElementById('reweightBody');
   if (!sectionEl || !bodyEl) return;
 
-  var coverageData = getCoverageData();
-  var TC_DATA = getTcData();
-
-  // Only show for covered positions
-  var covered = positions.filter(function(p) { return coverageData[p.ticker]; });
-  if (covered.length === 0) {
+  if (positions.length === 0) {
     sectionEl.style.display = 'none';
     return;
   }
+
+  var coverageData = getCoverageData();
+  var TC_DATA = getTcData();
+
+  // Separate covered from uncovered
+  var covered = positions.filter(function(p) { return coverageData[p.ticker]; });
+  var uncovered = positions.filter(function(p) { return !coverageData[p.ticker]; });
 
   // Calculate evidence scores — long-only model, shorts processed separately
   var longs = covered.filter(function(p) { return p.units >= 0; });
@@ -435,7 +457,9 @@ export function renderReweighting(positions, totalValue) {
       currentPrice: p.currentPrice,
       currentWeight: p.weight,
       skew: cd.skew,
-      rawScore: baseWeight * multiplier
+      rawScore: baseWeight * multiplier,
+      stability: getSkewStability(p.ticker),
+      covered: true
     });
   });
 
@@ -445,7 +469,7 @@ export function renderReweighting(positions, totalValue) {
     s.suggestedWeight = totalScore > 0 ? (s.rawScore / totalScore) * 100 : 0;
   });
 
-  // Append shorts at the end (outside the weight model, rawScore = 0)
+  // Append covered shorts (outside the weight model)
   shorts.forEach(function(p) {
     var cd = coverageData[p.ticker];
     scores.push({
@@ -456,12 +480,31 @@ export function renderReweighting(positions, totalValue) {
       currentWeight: p.weight,
       skew: cd.skew,
       rawScore: 0,
-      suggestedWeight: 0
+      suggestedWeight: 0,
+      stability: getSkewStability(p.ticker),
+      covered: true
     });
   });
 
-  // Sort longs by largest delta; shorts always at bottom
+  // Append uncovered positions at the bottom
+  uncovered.forEach(function(p) {
+    scores.push({
+      ticker: p.ticker,
+      company: p.company,
+      units: p.units,
+      currentPrice: p.currentPrice,
+      currentWeight: p.weight,
+      skew: null,
+      rawScore: 0,
+      suggestedWeight: 0,
+      stability: null,
+      covered: false
+    });
+  });
+
+  // Sort: covered longs (by delta desc), covered shorts, uncovered last
   scores.sort(function(a, b) {
+    if (a.covered !== b.covered) return a.covered ? -1 : 1;
     var aShort = a.units < 0, bShort = b.units < 0;
     if (aShort !== bShort) return aShort ? 1 : -1;
     return Math.abs(b.suggestedWeight - b.currentWeight) - Math.abs(a.suggestedWeight - a.currentWeight);
@@ -483,7 +526,22 @@ export function renderReweighting(positions, totalValue) {
   var rows = '';
   scores.forEach(function(s) {
     var isShort = s.units < 0;
-    var action, actionCls, deltaCls, sharesDisplay;
+    var action, actionCls, deltaCls, sharesDisplay, delta;
+
+    if (!s.covered) {
+      // Uncovered: no research data, show position details only
+      rows += '<tr class="rw-row-uncovered">' +
+        '<td><span class="rw-ticker">' + s.ticker + '</span></td>' +
+        '<td>' + s.company + '</td>' +
+        '<td><span style="color:var(--text-muted);font-size:0.72rem">No coverage</span></td>' +
+        '<td class="rw-units">' + formatNum(s.units, 0) + '</td>' +
+        '<td><span class="rw-pct">' + s.currentWeight.toFixed(1) + '%</span></td>' +
+        '<td colspan="3" style="color:var(--text-muted);font-size:0.72rem;text-align:center">Not in Continuum coverage</td>' +
+        '<td class="rw-shares">--</td>' +
+        '<td style="color:var(--text-muted)">--</td>' +
+      '</tr>';
+      return;
+    }
 
     if (isShort) {
       // Short positions are outside the long-only weight model.
@@ -504,7 +562,7 @@ export function renderReweighting(positions, totalValue) {
         }
       }
     } else {
-      var delta = s.suggestedWeight - s.currentWeight;
+      delta = s.suggestedWeight - s.currentWeight;
 
       // Balanced skew: no directional conviction — never add or cut a long position
       if (s.skew === 'balanced') {
@@ -545,6 +603,11 @@ export function renderReweighting(positions, totalValue) {
       ? '<span class="rw-delta hold">SHORT</span>'
       : '<span class="rw-delta ' + deltaCls + '">' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%</span>';
 
+    // Conviction (narrative stability) cell
+    var stabLabel = s.stability || '--';
+    var stabCls = stabilityClass(s.stability);
+    var convictionCell = '<span class="rw-stability ' + stabCls + '">' + stabLabel + '</span>';
+
     rows += '<tr>' +
       '<td><span class="rw-ticker">' + s.ticker + '</span></td>' +
       '<td>' + s.company + '</td>' +
@@ -555,6 +618,7 @@ export function renderReweighting(positions, totalValue) {
       '<td>' + deltaCell + '</td>' +
       '<td><span class="rw-action ' + actionCls + '">' + action + '</span></td>' +
       '<td class="rw-shares">' + sharesDisplay + '</td>' +
+      '<td>' + convictionCell + '</td>' +
     '</tr>';
   });
 
@@ -571,6 +635,7 @@ export function renderReweighting(positions, totalValue) {
         '<th>Delta</th>' +
         '<th>Action</th>' +
         '<th>Share Amount</th>' +
+        '<th>Conviction</th>' +
       '</tr></thead>' +
       '<tbody>' + rows + '</tbody>' +
     '</table>';
