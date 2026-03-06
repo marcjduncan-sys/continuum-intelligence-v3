@@ -579,24 +579,40 @@ export function renderReweighting(positions, totalValue) {
     } else {
       delta = s.suggestedWeight - s.currentWeight;
 
-      // Balanced skew: no directional conviction — never add or cut a long position
+      // Skew-gated action logic: evidence direction constrains allowable actions
       if (s.skew === 'balanced') {
+        // No directional conviction — never add or cut a long position
         action = 'Hold';
         actionCls = 'hold';
         deltaCls = 'hold';
         sharesDisplay = '--';
-      } else if (delta > 2) {
-        action = 'Buy';
-        actionCls = 'buy';
-        deltaCls = 'increase';
-      } else if (delta < -2) {
-        action = 'Sell';
-        actionCls = 'sell';
-        deltaCls = 'reduce';
+      } else if (s.skew === 'downside') {
+        // Downside skew: never initiate or add. Only reduce if overweight, else hold.
+        if (delta < -2) {
+          action = 'Sell';
+          actionCls = 'sell';
+          deltaCls = 'reduce';
+        } else {
+          action = 'Hold';
+          actionCls = 'hold';
+          deltaCls = 'hold';
+          sharesDisplay = '--';
+        }
       } else {
-        action = 'Hold';
-        actionCls = 'hold';
-        deltaCls = 'hold';
+        // Upside skew: full delta logic applies
+        if (delta > 2) {
+          action = 'Buy';
+          actionCls = 'buy';
+          deltaCls = 'increase';
+        } else if (delta < -2) {
+          action = 'Sell';
+          actionCls = 'sell';
+          deltaCls = 'reduce';
+        } else {
+          action = 'Hold';
+          actionCls = 'hold';
+          deltaCls = 'hold';
+        }
       }
 
       // Share amount: |delta%| * totalValue / price = shares to trade
