@@ -1362,3 +1362,59 @@
         min-width: 15px;
     }
 }
+
+/* ---- Step 5: Calibration confirmation card ---- */
+.pn-calibration-ready {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 48px 32px;
+    text-align: center;
+    flex: 1;
+}
+
+.pn-calibration-icon {
+    color: var(--brand-green, #00c875);
+    opacity: 0.9;
+}
+
+.pn-calibration-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+    letter-spacing: 0.01em;
+}
+
+.pn-calibration-body {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #666);
+    max-width: 380px;
+    line-height: 1.6;
+}
+
+.pn-calibration-chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.pn-chip {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid var(--brand-green, #00c875);
+    background: transparent;
+    color: var(--brand-green, #00c875);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.pn-chip:hover {
+    background: var(--brand-green, #00c875);
+    color: #fff;
+}

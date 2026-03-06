@@ -538,22 +538,8 @@ if (panel) {
         if (e.key === 'Escape' && isOpen && window.innerWidth < 1024) closePanel();
     });
 
-    // Navigation: set coverage on stock pages, never clear it.
-    // Auto-hide on personalisation page (has its own embedded chat); restore on exit.
-    var _wasOpenBeforePersonalisation = false;
+    // Navigation: set coverage on stock pages, never clear it
     window.addEventListener('hashchange', function() {
-        var hash = window.location.hash.slice(1) || '';
-        if (hash === 'personalisation') {
-            _wasOpenBeforePersonalisation = isOpen;
-            if (isOpen) closePanel();
-            if (panel) panel.style.display = 'none';
-        } else {
-            if (panel) panel.style.display = '';
-            if (_wasOpenBeforePersonalisation && !isOpen && window.innerWidth >= 1024) {
-                openPanel();
-            }
-            _wasOpenBeforePersonalisation = false;
-        }
         syncTickerFromRoute();
         renderConversation();
     });
@@ -582,11 +568,8 @@ export function initChat() {
     populateTickerSelect();
 
 
-    // Auto-open at desktop widths; suppress on personalisation page (has its own chat)
-    var initHash = window.location.hash.slice(1) || '';
-    if (initHash === 'personalisation') {
-        if (panel) panel.style.display = 'none';
-    } else if (window.innerWidth >= 1024) {
+    // Auto-open at desktop widths; show FAB on mobile
+    if (window.innerWidth >= 1024) {
         openPanel();
     } else {
         if (fab) fab.style.display = 'flex';
