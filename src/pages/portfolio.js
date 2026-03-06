@@ -506,7 +506,13 @@ export function renderReweighting(positions, totalValue) {
     } else {
       var delta = s.suggestedWeight - s.currentWeight;
 
-      if (delta > 2) {
+      // Balanced skew: no directional conviction — never add or cut a long position
+      if (s.skew === 'balanced') {
+        action = 'Hold';
+        actionCls = 'hold';
+        deltaCls = 'hold';
+        sharesDisplay = '--';
+      } else if (delta > 2) {
         action = 'Buy';
         actionCls = 'buy';
         deltaCls = 'increase';
@@ -521,7 +527,7 @@ export function renderReweighting(positions, totalValue) {
       }
 
       // Share amount: |delta%| * totalValue / price = shares to trade
-      sharesDisplay = '--';
+      if (!sharesDisplay) sharesDisplay = '--';
       if (action !== 'Hold' && s.currentPrice && s.currentPrice > 0) {
         var deltaValue = Math.abs(delta / 100) * totalValue;
         sharesDisplay = Math.round(deltaValue / s.currentPrice).toLocaleString('en-AU');
