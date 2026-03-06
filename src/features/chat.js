@@ -82,18 +82,6 @@ function buildEffectiveSystemPrompt() {
     return ANALYST_SYSTEM_PROMPT;
 }
 
-function updateProfileStatusIndicator() {
-    var profileStatus = document.getElementById('apProfileStatus');
-    if (!profileStatus) return;
-    var pnState = loadPersonalisationProfile();
-    if (pnState && pnState.firm && pnState.firm.name) {
-        profileStatus.textContent = pnState.firm.name;
-        profileStatus.classList.add('loaded');
-    } else {
-        profileStatus.textContent = 'No profile';
-        profileStatus.classList.remove('loaded');
-    }
-}
 
 // ============================================================
 // DOM REFS
@@ -135,6 +123,8 @@ function populateTickerSelect() {
     syncTickerFromRoute();
 }
 
+var _tickerFromRoute = false; // true when currentTicker was auto-set from URL, not by user
+
 function syncTickerFromRoute() {
     var hash = window.location.hash.slice(1) || '';
     var detected = '';
@@ -143,9 +133,14 @@ function syncTickerFromRoute() {
     if (detected && STOCK_DATA[detected]) {
         if (tickerSelect) tickerSelect.value = detected;
         currentTicker = detected;
+        _tickerFromRoute = true;
     } else {
-        if (tickerSelect) tickerSelect.value = '';
-        currentTicker = '';
+        // Only clear if the ticker was auto-set by a route (not manually chosen by user)
+        if (_tickerFromRoute) {
+            if (tickerSelect) tickerSelect.value = '';
+            currentTicker = '';
+        }
+        _tickerFromRoute = false;
     }
     updateTickerBadge();
 }
@@ -456,7 +451,7 @@ function updateSendButton() {
 function openPanel() {
     if (!panel) return;
     populateTickerSelect();
-    updateProfileStatusIndicator();
+
     panel.classList.add('ap-open');
     document.body.classList.add('analyst-panel-open');
     isOpen = true;
@@ -577,7 +572,7 @@ export function initChat() {
     }
 
     populateTickerSelect();
-    updateProfileStatusIndicator();
+
 
     // Auto-open at desktop widths; show FAB on mobile
     if (window.innerWidth >= 1024) {
