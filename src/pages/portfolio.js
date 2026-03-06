@@ -149,13 +149,18 @@ export function processPortfolioData(rows) {
 
 export function deriveAlignment(skew, weight) {
   if (!skew) return { label: 'Not covered', cls: 'not-covered' };
-  if (skew === 'upside') return { label: 'Aligned with skew', cls: 'aligned' };
+  var isShort = weight < 0;
+  if (skew === 'upside') {
+    if (isShort) return { label: 'Contradicts skew', cls: 'contradicts' };
+    return { label: 'Aligned with skew', cls: 'aligned' };
+  }
   if (skew === 'downside') {
+    if (isShort) return { label: 'Aligned with skew', cls: 'aligned' };
     if (weight > 15) return { label: 'Exposure exceeds conviction', cls: 'exceeds' };
     return { label: 'Contradicts skew', cls: 'contradicts' };
   }
   if (skew === 'balanced') {
-    if (weight > 15) return { label: 'Exposure exceeds conviction', cls: 'exceeds' };
+    if (Math.abs(weight) > 15) return { label: 'Exposure exceeds conviction', cls: 'exceeds' };
     return { label: 'Balanced exposure', cls: 'neutral' };
   }
   return { label: 'N/A', cls: 'not-covered' };
@@ -368,11 +373,14 @@ export function renderReweighting(positions, totalValue) {
     return;
   }
 
-  // Calculate evidence scores
-  var scores = [];
-  var baseWeight = 100 / covered.length;
+  // Calculate evidence scores — long-only model, shorts processed separately
+  var longs = covered.filter(function(p) { return p.units >= 0; });
+  var shorts = covered.filter(function(p) { return p.units < 0; });
+  var baseWeight = longs.length > 0 ? 100 / longs.length : 0;
 
-  covered.forEach(function(p) {
+  var scores = [];
+
+  longs.forEach(function(p) {
     var cd = coverageData[p.ticker];
     var tc = TC_DATA[p.ticker];
 
@@ -400,14 +408,33 @@ export function renderReweighting(positions, totalValue) {
     });
   });
 
-  // Normalize suggested weights to 100%
+  // Normalize suggested weights to 100% (longs only)
   var totalScore = scores.reduce(function(s, x) { return s + x.rawScore; }, 0);
   scores.forEach(function(s) {
-    s.suggestedWeight = (s.rawScore / totalScore) * 100;
+    s.suggestedWeight = totalScore > 0 ? (s.rawScore / totalScore) * 100 : 0;
   });
 
-  // Sort by largest delta
-  scores.sort(function(a, b) { return Math.abs(b.suggestedWeight - b.currentWeight) - Math.abs(a.suggestedWeight - a.currentWeight); });
+  // Append shorts at the end (outside the weight model, rawScore = 0)
+  shorts.forEach(function(p) {
+    var cd = coverageData[p.ticker];
+    scores.push({
+      ticker: p.ticker,
+      company: p.company,
+      units: p.units,
+      currentPrice: p.currentPrice,
+      currentWeight: p.weight,
+      skew: cd.skew,
+      rawScore: 0,
+      suggestedWeight: 0
+    });
+  });
+
+  // Sort longs by largest delta; shorts always at bottom
+  scores.sort(function(a, b) {
+    var aShort = a.units < 0, bShort = b.units < 0;
+    if (aShort !== bShort) return aShort ? 1 : -1;
+    return Math.abs(b.suggestedWeight - b.currentWeight) - Math.abs(a.suggestedWeight - a.currentWeight);
+  });
 
   // Strategy context header
   var fund = getPersonalisationFund();
@@ -424,33 +451,62 @@ export function renderReweighting(positions, totalValue) {
   // Render table rows
   var rows = '';
   scores.forEach(function(s) {
-    var delta = s.suggestedWeight - s.currentWeight;
-    var action, actionCls, deltaCls;
+    var isShort = s.units < 0;
+    var action, actionCls, deltaCls, sharesDisplay;
 
-    if (delta > 2) {
-      action = 'Buy';
-      actionCls = 'buy';
-      deltaCls = 'increase';
-    } else if (delta < -2) {
-      action = 'Sell';
-      actionCls = 'sell';
-      deltaCls = 'reduce';
+    if (isShort) {
+      // Short positions are outside the long-only weight model.
+      // Determine action from alignment instead of delta.
+      var shortAligned = (s.skew === 'downside');
+      sharesDisplay = '--';
+      if (shortAligned) {
+        action = 'Hold';
+        actionCls = 'hold';
+        deltaCls = 'hold';
+      } else {
+        // Short in an upside-skew stock: suggest covering
+        action = 'Cover';
+        actionCls = 'sell';
+        deltaCls = 'reduce';
+        if (s.currentPrice && s.currentPrice > 0) {
+          sharesDisplay = Math.abs(s.units).toLocaleString('en-AU');
+        }
+      }
     } else {
-      action = 'Hold';
-      actionCls = 'hold';
-      deltaCls = 'hold';
-    }
+      var delta = s.suggestedWeight - s.currentWeight;
 
-    // Share amount: |delta%| * totalValue / price = shares to trade
-    var sharesDisplay = '--';
-    if (action !== 'Hold' && s.currentPrice && s.currentPrice > 0) {
-      var deltaValue = Math.abs(delta / 100) * totalValue;
-      sharesDisplay = Math.round(deltaValue / s.currentPrice).toLocaleString('en-AU');
+      if (delta > 2) {
+        action = 'Buy';
+        actionCls = 'buy';
+        deltaCls = 'increase';
+      } else if (delta < -2) {
+        action = 'Sell';
+        actionCls = 'sell';
+        deltaCls = 'reduce';
+      } else {
+        action = 'Hold';
+        actionCls = 'hold';
+        deltaCls = 'hold';
+      }
+
+      // Share amount: |delta%| * totalValue / price = shares to trade
+      sharesDisplay = '--';
+      if (action !== 'Hold' && s.currentPrice && s.currentPrice > 0) {
+        var deltaValue = Math.abs(delta / 100) * totalValue;
+        sharesDisplay = Math.round(deltaValue / s.currentPrice).toLocaleString('en-AU');
+      }
     }
 
     var skewArrow = s.skew === 'upside' ? '&#9650; UPSIDE' :
                     s.skew === 'downside' ? '&#9660; DOWNSIDE' : '&#9670; BALANCED';
     var skewCls = s.skew;
+    // For short positions the long-only weight model doesn't apply
+    var suggestedCell = isShort
+      ? '<span style="color:var(--text-muted)">--</span>'
+      : '<span class="rw-pct">' + s.suggestedWeight.toFixed(1) + '%</span>';
+    var deltaCell = isShort
+      ? '<span class="rw-delta hold">SHORT</span>'
+      : '<span class="rw-delta ' + deltaCls + '">' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%</span>';
 
     rows += '<tr>' +
       '<td><span class="rw-ticker">' + s.ticker + '</span></td>' +
@@ -458,8 +514,8 @@ export function renderReweighting(positions, totalValue) {
       '<td><span class="skew-badge ' + skewCls + '">' + skewArrow + '</span></td>' +
       '<td class="rw-units">' + formatNum(s.units, 0) + '</td>' +
       '<td><span class="rw-pct">' + s.currentWeight.toFixed(1) + '%</span></td>' +
-      '<td><span class="rw-pct">' + s.suggestedWeight.toFixed(1) + '%</span></td>' +
-      '<td><span class="rw-delta ' + deltaCls + '">' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%</span></td>' +
+      '<td>' + suggestedCell + '</td>' +
+      '<td>' + deltaCell + '</td>' +
       '<td><span class="rw-action ' + actionCls + '">' + action + '</span></td>' +
       '<td class="rw-shares">' + sharesDisplay + '</td>' +
     '</tr>';
