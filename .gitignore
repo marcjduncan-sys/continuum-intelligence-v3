@@ -138,8 +138,10 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-# Claude Code session files
-.claude/
+# Claude Code session files (ignore everything except committed config)
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
 
 # Windows system files
 desktop.ini

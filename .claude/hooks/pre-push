@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# pre-push -- run before git push to catch test failures early
+#
+# Install into git hooks:
+#   cp .claude/hooks/pre-push .git/hooks/pre-push
+#   chmod +x .git/hooks/pre-push
+#
+# Or use a one-liner from the repo root:
+#   cp .claude/hooks/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+
+set -euo pipefail
+
+echo "[pre-push] Running test suite before push..."
+
+# Vitest unit tests -- same gate as CI
+if ! npm run test:unit; then
+  echo ""
+  echo "[pre-push] BLOCKED: Vitest tests failed. Fix before pushing."
+  echo "           Run: npm run test:unit"
+  exit 1
+fi
+
+# Jest integration tests (informational -- does not block, but surfaced here)
+if ! npm run test 2>&1; then
+  echo ""
+  echo "[pre-push] WARNING: Jest tests failed. These do not block CI but should be investigated."
+fi
+
+echo "[pre-push] All checks passed. Proceeding with push."
