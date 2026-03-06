@@ -542,11 +542,8 @@ if (panel) {
         if (e.key === 'Escape' && isOpen && window.innerWidth < 1024) closePanel();
     });
 
-    // Sync ticker on route change (always, panel stays open)
+    // Navigation never resets coverage -- panel state is independent of routing
     window.addEventListener('hashchange', function() {
-        syncTickerFromRoute();
-        updateTickerBadge();
-        // Rebuild conversation view if ticker changed
         renderConversation();
     });
 
