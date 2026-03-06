@@ -861,6 +861,30 @@ function buildInvestorBriefingHTML(stock) {
     '</div>';
   }
 
+  // Price Sparkline for Page 1
+  var sparkHtml2 = '';
+  if (stock.priceHistory && stock.priceHistory.length > 10) {
+    var sp2 = stock.priceHistory;
+    var sp2Min = sp2[0], sp2Max = sp2[0];
+    for (var sp2i = 1; sp2i < sp2.length; sp2i++) {
+      if (sp2[sp2i] < sp2Min) sp2Min = sp2[sp2i];
+      if (sp2[sp2i] > sp2Max) sp2Max = sp2[sp2i];
+    }
+    var sp2Last = sp2[sp2.length - 1], sp2First2 = sp2[0];
+    var sp2Chg = ((sp2Last / sp2First2 - 1) * 100).toFixed(1);
+    var sp2Cls = sp2Last >= sp2First2 ? 'ib2-pos' : 'ib2-neg';
+    sparkHtml2 =
+      '<div class="ib-block">' +
+        '<div class="ib-block-label">1-YEAR PRICE HISTORY (' + e(stock.currency || '') + ')</div>' +
+        '<div class="ib2-spark-meta">' +
+          '<span>Low: ' + e(stock.currency || '') + sp2Min.toFixed(2) + '</span>' +
+          '<span class="' + sp2Cls + '">' + (sp2Last >= sp2First2 ? '+' : '') + sp2Chg + '% (1Y)</span>' +
+          '<span>High: ' + e(stock.currency || '') + sp2Max.toFixed(2) + '</span>' +
+        '</div>' +
+        buildSparklineSVG(sp2, 550, 70) +
+      '</div>';
+  }
+
   // Hypothesis bars
   var hypBarsHtml = '<div class="ib-block">' +
     '<div class="ib-block-label">HYPOTHESIS SURVIVAL SCORES</div>';
@@ -868,7 +892,7 @@ function buildInvestorBriefingHTML(stock) {
     var h2 = hyps[hi2];
     var score2 = normScores[hi2] || 0;
     var dc = dirColor(h2.direction || '');
-    var desc2 = trunc(h2.description || '', 150);
+    var desc2 = trunc(h2.description || '', 240);
     hypBarsHtml += '<div class="hyp-bar">' +
       '<div class="hyp-bar-hdr">' +
         '<span class="hyp-bar-title">' + e(stripHtml(h2.title || '')) + '</span>' +
@@ -1062,7 +1086,7 @@ function buildInvestorBriefingHTML(stock) {
     '.ibm-label{font-size:5.8pt;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;}' +
     '.ibm-value{font-size:8.5pt;font-weight:700;color:#1e3a5f;}' +
     /* Block containers */
-    '.ib-block{margin-bottom:7px;}' +
+    '.ib-block{margin-bottom:10px;}' +
     '.ib-block-label{font-size:6pt;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;' +
       'color:#94a3b8;margin-bottom:3px;border-bottom:1px solid #e2e8f0;padding-bottom:2px;}' +
     '.ib-block-label-row{display:flex;align-items:center;justify-content:space-between;' +
@@ -1075,41 +1099,45 @@ function buildInvestorBriefingHTML(stock) {
     '.skew-bal{background:#fef3c7;color:#92400e;}' +
     '.ib-skew-text{font-size:6.8pt;color:#475569;line-height:1.4;}' +
     /* Position in Range */
-    '.pir-wrap{position:relative;margin:18px 0 8px 0;}' +
-    '.pir-bar{position:relative;height:6px;background:#e2e8f0;border-radius:3px;margin:0 6px;}' +
-    '.pir-world{position:absolute;transform:translateX(-50%);top:-16px;text-align:center;white-space:nowrap;}' +
-    '.pir-tick{width:1px;height:14px;background:#94a3b8;margin:0 auto;}' +
-    '.pir-price{font-size:5.5pt;font-weight:700;color:#334155;margin-top:1px;}' +
-    '.pir-lbl{font-size:5pt;color:#94a3b8;}' +
-    '.pir-current{position:absolute;transform:translateX(-50%);top:-5px;text-align:center;}' +
-    '.pir-dot{font-size:8pt;color:#0f2e57;line-height:1;}' +
-    '.pir-cur-lbl{font-size:5.5pt;font-weight:700;color:#0f2e57;white-space:nowrap;}' +
-    '.pir-note{font-size:5.8pt;color:#94a3b8;margin-top:2px;font-style:italic;}' +
+    '.pir-wrap{position:relative;margin:26px 0 14px 0;}' +
+    '.pir-bar{position:relative;height:14px;background:#e2e8f0;border-radius:5px;margin:0 6px;}' +
+    '.pir-world{position:absolute;transform:translateX(-50%);top:-22px;text-align:center;white-space:nowrap;}' +
+    '.pir-tick{width:1px;height:20px;background:#94a3b8;margin:0 auto;}' +
+    '.pir-price{font-size:6pt;font-weight:700;color:#334155;margin-top:2px;}' +
+    '.pir-lbl{font-size:5.5pt;color:#94a3b8;}' +
+    '.pir-current{position:absolute;transform:translateX(-50%);top:-10px;text-align:center;}' +
+    '.pir-dot{font-size:10pt;color:#0f2e57;line-height:1;}' +
+    '.pir-cur-lbl{font-size:6pt;font-weight:700;color:#0f2e57;white-space:nowrap;}' +
+    '.pir-note{font-size:6pt;color:#94a3b8;margin-top:4px;font-style:italic;}' +
     /* Valuation Range */
-    '.vr-wrap{position:relative;margin:18px 0 6px 0;}' +
-    '.vr-bar{position:relative;height:10px;background:#f1f5f9;border-radius:4px;margin:0 6px;}' +
-    '.vr-zone{position:absolute;top:0;bottom:0;border-radius:2px;}' +
+    '.vr-wrap{position:relative;margin:24px 0 6px 0;}' +
+    '.vr-bar{position:relative;height:18px;background:#f1f5f9;border-radius:5px;margin:0 6px;}' +
+    '.vr-zone{position:absolute;top:0;bottom:0;border-radius:3px;}' +
     '.bear-zone{background:#fee2e2;opacity:0.5;}' +
     '.fair-zone{background:#dcfce7;opacity:0.5;}' +
-    '.vr-current{position:absolute;transform:translateX(-50%);top:-14px;font-size:6pt;font-weight:700;color:#0f2e57;white-space:nowrap;}' +
-    '.vr-marker{position:absolute;transform:translateX(-50%);top:12px;text-align:center;}' +
-    '.vr-m-price{font-size:5.5pt;font-weight:700;color:#334155;white-space:nowrap;}' +
-    '.vr-m-lbl{font-size:5pt;color:#94a3b8;}' +
+    '.vr-current{position:absolute;transform:translateX(-50%);top:-16px;font-size:6.5pt;font-weight:700;color:#0f2e57;white-space:nowrap;}' +
+    '.vr-marker{position:absolute;transform:translateX(-50%);top:22px;text-align:center;}' +
+    '.vr-m-price{font-size:6pt;font-weight:700;color:#334155;white-space:nowrap;}' +
+    '.vr-m-lbl{font-size:5.5pt;color:#94a3b8;}' +
     '.vr-badge{font-size:6pt;font-weight:700;padding:1px 5px;border-radius:2px;}' +
     '.vr-pos{background:#dcfce7;color:#166534;}' +
     '.vr-amber{background:#fef3c7;color:#92400e;}' +
     '.vr-neu{background:#f0f4fa;color:#334155;}' +
-    '.vr-stats{display:flex;gap:10px;font-size:6pt;margin-top:22px;flex-wrap:wrap;}' +
+    '.vr-stats{display:flex;gap:10px;font-size:6pt;margin-top:36px;flex-wrap:wrap;}' +
     '.pos{color:#16a34a;font-weight:600;}' +
     '.neg{color:#dc2626;}' +
     /* Hypothesis bars */
-    '.hyp-bar{margin-bottom:5px;}' +
-    '.hyp-bar-hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;}' +
-    '.hyp-bar-title{font-size:7.5pt;font-weight:700;color:#102a43;}' +
-    '.hyp-bar-score{font-size:7.5pt;font-weight:800;}' +
-    '.hyp-bar-track{height:5px;background:#f1f5f9;border-radius:3px;margin-bottom:2px;}' +
-    '.hyp-bar-fill{height:100%;border-radius:3px;}' +
-    '.hyp-bar-desc{font-size:6.2pt;color:#64748b;line-height:1.35;}' +
+    '.hyp-bar{margin-bottom:8px;}' +
+    '.hyp-bar-hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;}' +
+    '.hyp-bar-title{font-size:8pt;font-weight:700;color:#102a43;}' +
+    '.hyp-bar-score{font-size:8pt;font-weight:800;}' +
+    '.hyp-bar-track{height:8px;background:#f1f5f9;border-radius:4px;margin-bottom:3px;}' +
+    '.hyp-bar-fill{height:100%;border-radius:4px;}' +
+    '.hyp-bar-desc{font-size:6.8pt;color:#64748b;line-height:1.45;}' +
+    /* Sparkline in page 1 */
+    '.ib2-spark-meta{display:flex;justify-content:space-between;font-size:6.2pt;color:#64748b;margin-bottom:4px;padding:0 2px;}' +
+    '.ib2-pos{color:#16a34a;font-weight:700;}' +
+    '.ib2-neg{color:#dc2626;font-weight:700;}' +
     /* Page 2 containers */
     '.body{font-size:7pt;color:#334155;line-height:1.45;margin:2px 0 4px 0;}' +
     /* Tables */
@@ -1152,9 +1180,8 @@ function buildInvestorBriefingHTML(stock) {
     '@media print{' +
       'body{margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
       '@page{size:A4 portrait;margin:6mm 8mm;}' +
-      '.page-1{page-break-after:always;}' +
+      '.page-1{page-break-after:always;display:flex;flex-direction:column;justify-content:space-between;min-height:277mm;}' +
       '.ev3-card,.tw2-card{page-break-inside:avoid;}' +
-      '.ib-block{page-break-inside:avoid;}' +
     '}';
 
   // ── ASSEMBLY ──────────────────────────────────────────────
@@ -1175,6 +1202,7 @@ function buildInvestorBriefingHTML(stock) {
       skewHtml +
       pirHtml +
       vrHtml +
+      sparkHtml2 +
       hypBarsHtml +
     '</div>' +
     '<div class="page page-2">' +
