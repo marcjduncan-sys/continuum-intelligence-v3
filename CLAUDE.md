@@ -11,9 +11,9 @@ You are a senior engineer maintaining a production equity research platform used
 ```bash
 npm run dev          # Dev server on port 5000, proxies /api → localhost:8000
 npm run build        # Vite build → dist/; copies data/ → dist/data/
-npm run test         # Jest suite (tests/, src/**/*.test.js)
-npm run test:unit    # Vitest suite — what CI runs; must pass before pushing
-npm run test:all     # Jest + Vitest combined
+npm run test         # Jest suite (tests/, src/**/*.test.js) — 61 tests
+npm run test:unit    # Vitest suite — what CI runs; must pass before pushing — 124 tests
+npm run test:all     # Jest + Vitest combined — 185 tests total
 npm run lint         # ESLint over scripts/ and src/ only (not js/)
 npm run validate     # lint + test:all — run before any push
 ```
@@ -43,7 +43,15 @@ npm run validate     # lint + test:all — run before any push
 
 ## Current State — 2026-03-07
 
-No active migrations. The extraction of logic from `index.html` into `src/` modules is complete.
+**Phase 0 COMPLETE (2026-03-07).** The extraction of logic from `index.html` into `src/` modules is complete. `computeSkewScore` canonicalised to zero-contribution convention (commit `4493e8c`; see `docs/decisions/003-computeskewscore-neutral-convention.md`). `VALID_STATIC_PAGES` confirmed correct: `home`, `deep-research`, `portfolio`, `comparator`, `personalisation`, `about`.
+
+**Phase 1 COMPLETE (2026-03-07).**
+- [x] Add Stock modal (`src/features/add-stock.js`) -- already fully implemented, no changes needed.
+- [x] Deep Research page (`src/pages/deep-research.js`) -- already fully implemented; fixed hardcoded `DEEP_RESEARCH_TICKERS`, replaced with `_deepResearch` flag (commit `ddada42`).
+- [x] Portfolio extraction -- already complete; fixed `renderChangeAlerts`, replaced fake demo data with real `_overcorrection`, freshness, and skew signals (commit `3d9591d`). 15 Vitest tests added.
+- [x] TC_DATA externalised to `data/tc.json` -- follows `reference.json` pattern, `initTcData()` wired in `boot()` (commit `415095e`).
+
+**Phase 2 ready to begin.**
 
 **Recent bug history (last six commits):**
 - `d02f65c` Fixed downside-skew stocks never showing Buy action in the Evidence-Aligned Reweighting table ([src/pages/portfolio.js](src/pages/portfolio.js) around line 589). Do not refactor the skew-gate block without re-verifying all three branches (upside/balanced/downside) against the rules in MEMORY.md.
