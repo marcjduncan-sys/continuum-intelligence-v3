@@ -148,7 +148,7 @@ export function normaliseScores(items) {
 /**
  * Compute skew score from hypothesis weights (v3 framework)
  * Principle 5: Thesis Skew is derived mechanically from hypothesis scores and sentiment tags.
- * NEUTRAL hypotheses split 50/50 between bull and bear.
+ * NEUTRAL hypotheses contribute zero directional weight.
  * Direction thresholds: >+5 = upside, <-5 = downside, else balanced.
  * @param {{ hypotheses?: Array<{ score: string|number, direction: string, title?: string, tier?: string }> }} data
  * @returns {SkewResult}
@@ -169,9 +169,9 @@ export function computeSkewScore(data) {
     } else if (dir === 'downside') {
       bear += w;
     } else {
-      // NEUTRAL/BALANCED: split equally per v3 framework
-      bull += w / 2;
-      bear += w / 2;
+      // Neutral hypotheses contribute zero directional weight.
+      // Bull+bear represents genuine directional conviction only.
+      // Convention adopted 2026-03-07 -- see docs/decisions/
     }
     breakdown.push({ title: hyps[i].title || hyps[i].tier, direction: dir, weight: w });
   }

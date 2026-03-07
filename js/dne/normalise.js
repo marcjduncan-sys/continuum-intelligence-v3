@@ -121,7 +121,7 @@
    * Compute skew score from hypothesis data.
    *
    * Net = sum(upside normalised weights) - sum(downside normalised weights).
-   * Neutral hypotheses contribute zero.
+   * Neutral hypotheses contribute zero directional weight.
    *
    * @param {Object} data — must have `.hypotheses` array where each item has
    *                        `.score` (string/number) and `.direction` ('upside'|'downside'|'neutral').
@@ -142,8 +142,11 @@
         bull += w;
       } else if (dir === 'downside') {
         bear += w;
+      } else {
+        // Neutral hypotheses contribute zero directional weight.
+        // Bull+bear represents genuine directional conviction only.
+        // Convention adopted 2026-03-07 -- see docs/decisions/
       }
-      // neutral: contributes zero to both bull and bear
       breakdown.push({ title: hyps[i].title || hyps[i].tier, direction: dir, weight: w });
     }
     bull = Math.round(bull);

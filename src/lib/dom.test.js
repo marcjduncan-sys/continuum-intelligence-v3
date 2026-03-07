@@ -103,7 +103,7 @@ describe('computeSkewScore', () => {
     expect(result.direction).toBe('downside');
   });
 
-  it('splits neutral hypotheses 50/50', () => {
+  it('neutral hypotheses contribute zero directional weight', () => {
     var data = {
       hypotheses: [
         { score: 50, direction: 'neutral', title: 'Base', tier: 'n1' },
@@ -111,8 +111,9 @@ describe('computeSkewScore', () => {
       ]
     };
     var result = computeSkewScore(data);
-    expect(result.bull).toBe(50);
-    expect(result.bear).toBe(50);
+    expect(result.bull).toBe(0);
+    expect(result.bear).toBe(0);
+    expect(result.score).toBe(0);
     expect(result.direction).toBe('balanced');
   });
 
