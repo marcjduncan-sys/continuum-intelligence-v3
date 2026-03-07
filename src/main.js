@@ -2,7 +2,7 @@ import './styles/index.css';
 
 // State management
 import {
-  STOCK_DATA, initStockData, initReferenceData, initFreshnessData,
+  STOCK_DATA, initStockData, initReferenceData, initFreshnessData, initTcData,
   REFERENCE_DATA, FRESHNESS_DATA, SNAPSHOT_DATA, SNAPSHOT_ORDER
 } from './lib/state.js';
 
@@ -173,10 +173,11 @@ async function boot() {
 
   // Load _index.json, reference.json, and freshness.json in parallel
   try {
-    const [indexResponse, refResponse, freshResponse] = await Promise.all([
+    const [indexResponse, refResponse, freshResponse, tcResponse] = await Promise.all([
       fetch('data/research/_index.json'),
       fetch('data/reference.json'),
-      fetch('data/freshness.json')
+      fetch('data/freshness.json'),
+      fetch('data/tc.json')
     ]);
 
     if (indexResponse.ok) {
@@ -227,6 +228,11 @@ async function boot() {
     if (freshResponse.ok) {
       const freshData = await freshResponse.json();
       initFreshnessData(freshData);
+    }
+
+    if (tcResponse.ok) {
+      const tcData = await tcResponse.json();
+      initTcData(tcData);
     }
   } catch (err) {
     console.warn('[Continuum] Failed to load data:', err);

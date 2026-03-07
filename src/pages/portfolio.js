@@ -1,7 +1,7 @@
 // portfolio.js — Portfolio engine
 // Extracted from index.html without logic changes
 
-import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA } from '../lib/state.js';
+import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA, getTcData } from '../lib/state.js';
 import { computeSkewScore, normaliseScores } from '../lib/dom.js';
 import { buildCoverageData } from './home.js';
 import { on } from '../lib/data-events.js';
@@ -14,12 +14,6 @@ function getCoverageData() {
   return COVERAGE_DATA;
 }
 
-// TC_DATA is imported from thesis.js but to avoid circular dependency,
-// we access it via the window global set by thesis.js
-function getTcData() {
-  // TC_DATA is defined in thesis.js and also remains on window from index.html
-  return window.TC_DATA || {};
-}
 
 export function setupUploadZone() {
   var zone = document.getElementById('uploadZone');
@@ -311,11 +305,10 @@ export function renderPortfolioDiagnostics(positions, totalValue) {
   if (!diagnosticsEl) return;
   diagnosticsEl.style.display = '';
 
-  var TC_DATA = getTcData();
   var hypothesisValues = { n1: 0, n2: 0, n3: 0, n4: 0, unknown: 0 };
 
   positions.forEach(function(p) {
-    var data = TC_DATA[p.ticker];
+    var data = getTcData(p.ticker);
     if (!data) {
       hypothesisValues.unknown += (p.marketValue || 0);
       return;
@@ -353,7 +346,7 @@ export function renderPortfolioDiagnostics(positions, totalValue) {
 
   var contrarianEl = document.getElementById('portContrarianOpp');
   var contrarianPositions = positions.filter(function(p) {
-    var data = TC_DATA[p.ticker];
+    var data = getTcData(p.ticker);
     return data && data.primary === 'uphill';
   });
 
@@ -435,7 +428,6 @@ export function renderReweighting(positions, totalValue) {
   }
 
   var coverageData = getCoverageData();
-  var TC_DATA = getTcData();
 
   // Separate covered from uncovered
   var covered = positions.filter(function(p) { return coverageData[p.ticker]; });
@@ -450,7 +442,7 @@ export function renderReweighting(positions, totalValue) {
 
   longs.forEach(function(p) {
     var cd = coverageData[p.ticker];
-    var tc = TC_DATA[p.ticker];
+    var tc = getTcData(p.ticker);
 
     // Conviction multiplier based on skew direction
     var multiplier = 1.0;
