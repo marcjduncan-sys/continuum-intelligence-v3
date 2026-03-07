@@ -1798,4 +1798,6 @@ window.pnOnRouteEnter = function() {
     }
 };
 
+window.pnBuildSystemPrompt = pnBuildSystemPrompt;
+
 })();
