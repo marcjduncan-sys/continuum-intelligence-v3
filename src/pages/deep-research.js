@@ -3,7 +3,7 @@
  *
  * Extracted from index.html lines ~14505-14741.
  * Renders the Deep Research tile grid with sort controls.
- * Tickers in DEEP_RESEARCH_TICKERS have completed full deep-research reports.
+ * Tickers with `_deepResearch: true` in their research JSON are included.
  *
  * Depends on:
  *   - STOCK_DATA from state.js
@@ -12,9 +12,6 @@
 
 import { STOCK_DATA } from '../lib/state.js';
 import { escapeHtml } from '../lib/dom.js';
-
-// Stocks with completed deep research -- add tickers here as new reports are produced
-var DEEP_RESEARCH_TICKERS = ['RMC', 'WTC', 'GYG'];
 
 var SECTOR_ORDER = ['Consumer Staples', 'Consumer Discretionary', 'Financials', 'Health Care',
     'Information Technology', 'Industrials', 'Materials', 'Energy', 'Real Estate', 'Communication Services'];
@@ -160,9 +157,10 @@ function generateTiles(containerId, sortBy) {
     var container = document.getElementById(containerId);
     if (!container) return;
 
+    var deepTickers = Object.keys(STOCK_DATA).filter(function(t) { return STOCK_DATA[t]._deepResearch === true; });
     var tiles = [];
-    for (var i = 0; i < DEEP_RESEARCH_TICKERS.length; i++) {
-        var t = DEEP_RESEARCH_TICKERS[i];
+    for (var i = 0; i < deepTickers.length; i++) {
+        var t = deepTickers[i];
         if (!STOCK_DATA[t]) continue;
         var d = extractTileData(t);
         if (d) tiles.push(d);

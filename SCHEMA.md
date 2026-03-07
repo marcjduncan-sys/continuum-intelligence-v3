@@ -421,3 +421,17 @@ A **scaffold** stock (pre-initiation) has placeholder data:
 An **initiated** stock (post-Claude analysis) must pass all 18 validation rules above.
 
 Deep validation checks (rules 1-18) apply only to initiated stocks.
+
+---
+
+## Section 18: System Control Fields
+
+Fields prefixed with `_` are system-managed. They are not rendered in the UI and do not need to be present in scaffold files unless noted.
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `_deepResearch` | boolean | NO | absent (false) | Controls inclusion in the Deep Research page. Set `true` on tickers with full deep research coverage. Omit entirely for scaffold and stub tickers -- absence is treated as false. |
+| `_overcorrection` | object\|null | NO | `null` | Populated by `api/refresh.py` when a single-day price move exceeds the overcorrection threshold. |
+| `_alertState` | string | NO | `"NORMAL"` | Alert state string, written alongside `_overcorrection`. Values: `"NORMAL"`, `"OVERCORRECTION"`. |
+| `current_price` | number | NO | -- | Live price written by the `live-prices` workflow. Not present on scaffold files. |
+| `last_price_update` | string | NO | -- | ISO 8601 timestamp of last live-price update. |
