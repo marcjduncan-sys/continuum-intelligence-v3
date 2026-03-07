@@ -1,7 +1,7 @@
 // portfolio.js — Portfolio engine
 // Extracted from index.html without logic changes
 
-import { STOCK_DATA, REFERENCE_DATA } from '../lib/state.js';
+import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA } from '../lib/state.js';
 import { computeSkewScore, normaliseScores } from '../lib/dom.js';
 import { buildCoverageData } from './home.js';
 import { on } from '../lib/data-events.js';
@@ -692,66 +692,82 @@ export function renderChangeAlerts(positions) {
   sectionEl.style.display = '';
 
   var alerts = [];
-  var tickers = positions.map(function(p) { return p.ticker; });
 
-  if (tickers.includes('XRO')) {
-    alerts.push({
-      type: 'critical',
-      icon: '\uD83D\uDD34',
-      title: 'XRO: N3 Probability Increased',
-      text: 'AI disruption thesis strengthened following Claude 4 announcement. N3 (Execution Failure) raised from 35% -> 42%.',
-      ticker: 'XRO',
-      time: '2 hours ago',
-      impact: 'Affects 15% of portfolio'
-    });
-  }
+  for (var i = 0; i < positions.length; i++) {
+    var p = positions[i];
+    var ticker = p.ticker;
+    var sd = STOCK_DATA[ticker];
+    if (!sd) continue;
 
-  if (tickers.includes('WOW')) {
-    alerts.push({
-      type: 'warning',
-      icon: '\uD83D\uDFE1',
-      title: 'WOW: Earnings Preview',
-      text: 'Q1 FY26 results due Feb 25. Consensus expects 11.8% EBIT growth vs management guidance of "mid-to-high single digits". Watch for N1/N2 inflection.',
-      ticker: 'WOW',
-      time: '1 day ago',
-      impact: 'Affects 12% of portfolio'
-    });
-  }
+    var fd = FRESHNESS_DATA[ticker];
+    var weightPct = Math.abs(Math.round(p.weight || 0));
+    var weightStr = 'Affects ' + weightPct + '% of portfolio';
 
-  if (tickers.includes('CSL')) {
-    alerts.push({
-      type: 'info',
-      icon: '\uD83D\uDD35',
-      title: 'CSL: Plasma Collection Update',
-      text: 'Weekly collection data shows continued normalization. N1 (Recovery) probability stable at 45%. No change to thesis.',
-      ticker: 'CSL',
-      time: '3 days ago',
-      impact: 'Affects 20% of portfolio'
-    });
-  }
+    // 1. OVERCORRECTION (critical)
+    if (sd._alertState === 'OVERCORRECTION' && sd._overcorrection && sd._overcorrection.active) {
+      var oc = sd._overcorrection;
+      var dirLabel = oc.direction === 'up' ? 'upside' : 'downside';
+      alerts.push({
+        type: 'critical',
+        icon: '\uD83D\uDD34',
+        title: ticker + ': ' + dirLabel + ' overcorrection signal',
+        text: oc.message || '',
+        ticker: ticker,
+        time: 'Triggered ' + (oc.triggerDate || ''),
+        impact: weightStr + ' \u00B7 Review by ' + (oc.reviewDate || '')
+      });
+      continue;
+    }
 
-  if (tickers.includes('WTC')) {
-    alerts.push({
-      type: 'critical',
-      icon: '\uD83D\uDD34',
-      title: 'WTC: Governance Concerns Escalate',
-      text: 'Additional board member resignation. N3 (Governance Risk) elevated from 30% -> 35%. Review position sizing.',
-      ticker: 'WTC',
-      time: '4 hours ago',
-      impact: 'Affects 8% of portfolio'
-    });
-  }
+    // 2. CATALYST DUE/OVERDUE
+    if (fd && fd.nearestCatalystDays !== undefined &&
+        fd.nearestCatalystDays <= 7 && fd.nearestCatalystDays >= -14) {
+      var days = fd.nearestCatalystDays;
+      var dayStr = days < 0
+        ? Math.abs(days) + (Math.abs(days) === 1 ? ' day' : ' days') + ' overdue'
+        : days === 0 ? 'today'
+        : 'in ' + days + (days === 1 ? ' day' : ' days');
+      alerts.push({
+        type: 'warning',
+        icon: '\uD83D\uDFE1',
+        title: ticker + ': catalyst ' + (days < 0 ? 'overdue' : 'approaching'),
+        text: (fd.nearestCatalyst || '') + ' \u00B7 ' + (fd.nearestCatalystDate || ''),
+        ticker: ticker,
+        time: dayStr,
+        impact: weightStr
+      });
+      continue;
+    }
 
-  if (alerts.length < 2) {
-    alerts.push({
-      type: 'info',
-      icon: '\uD83D\uDCCA',
-      title: 'Market: ASX 200 Volatility Elevated',
-      text: 'VIX-equivalent at 18-month high. Consider position sizing across all hypotheses.',
-      ticker: 'MARKET',
-      time: '5 hours ago',
-      impact: 'Broad market'
-    });
+    // 3. STALE THESIS
+    if (fd && fd.status === 'STALE') {
+      alerts.push({
+        type: 'warning',
+        icon: '\uD83D\uDFE1',
+        title: ticker + ': thesis stale',
+        text: 'Last reviewed ' + (fd.reviewDate || '') + '. ' + (fd.nearestCatalyst || '') + ' may have passed.',
+        ticker: ticker,
+        time: fd.reviewDate || '',
+        impact: weightStr
+      });
+      continue;
+    }
+
+    // 4. SKEW MOMENTUM
+    var hero = sd.hero || {};
+    var prevSkew = (hero.previousSkew || '').toLowerCase();
+    var currSkew = (hero.skew || '').toLowerCase();
+    if (prevSkew && currSkew && prevSkew !== currSkew) {
+      alerts.push({
+        type: 'info',
+        icon: '\uD83D\uDD35',
+        title: ticker + ': skew direction changed',
+        text: (hero.previousSkew || '') + ' \u2192 ' + (hero.skew || ''),
+        ticker: ticker,
+        time: '',
+        impact: weightStr
+      });
+    }
   }
 
   if (alerts.length > 0 && feedEl) {
@@ -763,7 +779,7 @@ export function renderChangeAlerts(positions) {
           '<div class="change-alert-text">' + a.text + '</div>' +
           '<div class="change-alert-meta">' +
             '<span class="change-alert-ticker">' + a.ticker + '</span>' +
-            '<span>\u23F1 ' + a.time + '</span>' +
+            (a.time ? '<span>\u23F1 ' + a.time + '</span>' : '') +
             '<span>\uD83D\uDCBC ' + a.impact + '</span>' +
           '</div>' +
         '</div>' +
