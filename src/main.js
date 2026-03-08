@@ -28,7 +28,7 @@ import { initAboutPage } from './pages/about.js';
 import { setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineChart } from './pages/report-sections.js';
 
 // Features
-import { initChat } from './features/chat.js';
+import { initChat, VOICE_RULES } from './features/chat.js';
 import { initBatchRefresh, closeBatchModal } from './features/batch-refresh.js';
 import { generatePDFReport } from './features/pdf.js';
 import { initAddStock, openAddStockModal, closeAddStockModal, submitAddStock } from './features/add-stock.js';
@@ -53,6 +53,7 @@ window.closeBatchModal = closeBatchModal;
 window.openAddStockModal = openAddStockModal;
 window.closeAddStockModal = closeAddStockModal;
 window.submitAddStock = submitAddStock;
+window.CI_VOICE_RULES = VOICE_RULES;
 
 // Expose state and utility globals needed by classic (non-module) scripts
 // (snapshot-generator.js, personalisation.js, DNE engines)

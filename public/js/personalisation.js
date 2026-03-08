@@ -697,7 +697,7 @@ function pnBuildSystemPrompt(profile, firm, fund, portfolio) {
 
     p += 'Cognitive Reflection: ' + profile.crt.score + '/6 (' + profile.crt.label + ')\n';
     if (profile.crt.score >= 5) {
-        p += 'HIGH CRT: This manager will rationalise away directive warnings. Use Socratic questioning for bias counter-interventions \u2014 ask questions that expose the bias rather than telling them they are biased.\n';
+        p += 'HIGH CRT: This manager will rationalise away directive warnings. Use Socratic questioning for bias counter-interventions: ask questions that expose the bias rather than telling them they are biased.\n';
     } else if (profile.crt.score <= 2) {
         p += 'LOW CRT: Use direct, clear bias warnings rather than subtle Socratic framing. Be explicit about cognitive traps.\n';
     } else {
@@ -733,15 +733,13 @@ function pnBuildSystemPrompt(profile, firm, fund, portfolio) {
     p += 'Update frequency: ' + profile.preferences.updateFrequency + '\n';
     p += 'Under stress: ' + profile.preferences.stressResponse + '\n\n';
 
-    p += '## VOICE & STYLE\n';
-    p += 'Speak as "we" (Continuum Intelligence). Never say "I". Be direct and opinionated.\n';
-    p += 'Reference specific evidence from the research passages. Take positions.\n';
-    p += 'Use the vocabulary of an institutional investor: "the print", "the tape", "the multiple", "re-rate", "de-rate", "the street", "consensus".\n';
-    p += 'Never use markdown headers (## or ###). Write in flowing paragraphs.\n';
-    p += 'Never begin a response with "Based on" or "Here is" or "Sure". Get straight to the analysis.\n';
-    p += 'When presenting numbers, weave them into sentences naturally.\n';
-    p += 'Ground every claim in the provided research passages. Cite specific evidence.\n';
-    p += 'Never fabricate data, price targets, or financial metrics not in the provided research.\n';
+    // Append canonical voice rules (shared with analyst panel)
+    if (typeof window.CI_VOICE_RULES === 'string') {
+        p += window.CI_VOICE_RULES;
+    } else {
+        // Fallback if main.js hasn't booted yet (should not happen in normal flow)
+        p += '\n\nVOICE: Speak as "we". Never "I". Be direct. No markdown headers. No em-dashes. No filler phrases. Ground claims in research. 150-300 words.\n';
+    }
 
     return p;
 }
@@ -1106,26 +1104,6 @@ function renderStep5() {
     '</div>';
 }
 
-function renderChatHeader() {
-    var tickers = (typeof STOCK_DATA !== 'undefined') ? Object.keys(STOCK_DATA).sort() : [];
-    var tickerOptions = '';
-    for (var i = 0; i < tickers.length; i++) {
-        var sel = tickers[i] === pnState.chatTicker ? ' selected' : '';
-        var company = '';
-        if (typeof STOCK_DATA !== 'undefined' && STOCK_DATA[tickers[i]]) {
-            company = STOCK_DATA[tickers[i]].company || tickers[i];
-        }
-        tickerOptions += '<option value="' + tickers[i] + '"' + sel + '>' + tickers[i] + (company ? ' \u2014 ' + company : '') + '</option>';
-    }
-
-    return '<div class="pn-chat-header">' +
-        '<h3>Research Chat</h3>' +
-        '<select class="pn-chat-ticker-select" id="pn-chat-ticker">' +
-            '<option value="">Select stock...</option>' +
-            tickerOptions +
-        '</select>' +
-    '</div>';
-}
 
 function renderProfileSidebar() {
     if (!pnState.profile) {
@@ -1216,140 +1194,6 @@ function renderWizardFooter() {
     '</div>';
 }
 
-
-// =========================================================================
-// CHAT LOGIC
-// =========================================================================
-
-// Shared conversation store -- same object as FAB chat uses.
-// Both the FAB button and personalisation tab read/write here so
-// switching between them continues the same conversation.
-function pnGetSharedConvo() {
-    if (!window._continuumChat) window._continuumChat = {};
-    var ticker = pnState.chatTicker;
-    if (!ticker) return [];
-    if (!window._continuumChat[ticker]) window._continuumChat[ticker] = [];
-    return window._continuumChat[ticker];
-}
-
-function renderChatMessages() {
-    var el = document.getElementById('pn-chat-messages');
-    if (!el) return;
-
-    var convo = pnGetSharedConvo();
-    if (convo.length === 0) {
-        el.innerHTML = '<div class="pn-chat-welcome">' +
-            '<div class="pn-chat-welcome-title">Your calibrated analyst is ready</div>' +
-            '<div class="pn-chat-welcome-text">Select a stock above and ask any research question. ' +
-                'The AI will deliver analysis calibrated to your cognitive profile, biases, and preferences.</div>' +
-        '</div>';
-        return;
-    }
-
-    var html = '';
-    for (var i = 0; i < convo.length; i++) {
-        var msg = convo[i];
-        var cls = 'pn-chat-msg ' + msg.role;
-        var content = msg.role === 'assistant' ? formatMarkdown(msg.content) : escapeHtml(msg.content);
-        html += '<div class="' + cls + '">' + content + '</div>';
-    }
-    el.innerHTML = html;
-    el.scrollTop = el.scrollHeight;
-}
-
-function showChatTyping() {
-    var el = document.getElementById('pn-chat-messages');
-    if (!el) return;
-    var typing = document.createElement('div');
-    typing.className = 'pn-chat-typing';
-    typing.id = 'pn-chat-typing';
-    typing.innerHTML = '<span class="pn-chat-typing-dot"></span><span class="pn-chat-typing-dot"></span><span class="pn-chat-typing-dot"></span>';
-    el.appendChild(typing);
-    el.scrollTop = el.scrollHeight;
-}
-
-function hideChatTyping() {
-    var typing = document.getElementById('pn-chat-typing');
-    if (typing) typing.remove();
-}
-
-function appendChatError(message) {
-    var el = document.getElementById('pn-chat-messages');
-    if (!el) return;
-    var err = document.createElement('div');
-    err.className = 'pn-chat-msg error';
-    err.textContent = message;
-    el.appendChild(err);
-    el.scrollTop = el.scrollHeight;
-}
-
-function pnSendChat() {
-    var input = document.getElementById('pn-chat-input');
-    var sendBtn = document.getElementById('pn-chat-send');
-    if (!input || pnState.chatLoading) return;
-
-    var question = input.value.trim();
-    if (!question || !pnState.chatTicker) return;
-
-    var convo = pnGetSharedConvo();
-    convo.push({ role: 'user', content: question });
-    input.value = '';
-    input.style.height = 'auto';
-    if (sendBtn) sendBtn.disabled = true;
-    pnState.chatLoading = true;
-
-    renderChatMessages();
-    showChatTyping();
-
-    var systemPrompt = pnBuildSystemPrompt(
-        pnState.profile,
-        pnState.firm,
-        pnState.fund,
-        pnState.portfolioSkipped ? [] : pnState.portfolio
-    );
-
-    var history = [];
-    for (var i = 0; i < convo.length - 1; i++) {
-        history.push({
-            role: convo[i].role,
-            content: convo[i].content
-        });
-    }
-
-    var PRODUCTION_API = 'https://imaginative-vision-production-16cb.up.railway.app';
-    var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    var apiOrigin = window.CHAT_API_URL ||
-        (isLocal ? 'http://localhost:8000' : PRODUCTION_API);
-    var apiKey = window.CI_API_KEY || '';
-
-    fetch(apiOrigin + '/api/research-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
-        body: JSON.stringify({
-            ticker: pnState.chatTicker,
-            question: question,
-            conversation_history: history,
-            custom_system_prompt: systemPrompt
-        })
-    })
-    .then(function(res) {
-        if (!res.ok) throw new Error('Request failed (' + res.status + ')');
-        return res.json();
-    })
-    .then(function(data) {
-        hideChatTyping();
-        pnState.chatLoading = false;
-        convo.push({ role: 'assistant', content: data.response });
-        renderChatMessages();
-        if (sendBtn) sendBtn.disabled = false;
-    })
-    .catch(function(err) {
-        hideChatTyping();
-        pnState.chatLoading = false;
-        appendChatError(err.message || 'Something went wrong. Please try again.');
-        if (sendBtn) sendBtn.disabled = false;
-    });
-}
 
 
 // =========================================================================
@@ -1583,48 +1427,7 @@ function bindPreferenceInputs() {
 }
 
 function bindStep5Inputs() {
-    var input = document.getElementById('pn-chat-input');
-    var sendBtn = document.getElementById('pn-chat-send');
-    var tickerSelect = document.getElementById('pn-chat-ticker');
     var resetBtn = document.getElementById('pn-reset-profile');
-
-    if (!pnState.chatTicker && tickerSelect && tickerSelect.value) {
-        pnState.chatTicker = tickerSelect.value;
-    }
-
-    renderChatMessages();
-
-    if (input) {
-        input.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-            if (sendBtn) sendBtn.disabled = !this.value.trim() || !pnState.chatTicker;
-        });
-        input.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                pnSendChat();
-            }
-        });
-    }
-
-    if (sendBtn) {
-        sendBtn.addEventListener('click', function() {
-            pnSendChat();
-        });
-    }
-
-    if (tickerSelect) {
-        tickerSelect.addEventListener('change', function() {
-            pnState.chatTicker = this.value;
-            // No need to clear history -- shared store keys by ticker,
-            // so switching tickers just shows that ticker's conversation.
-            renderChatMessages();
-            if (sendBtn && input) {
-                sendBtn.disabled = !input.value.trim() || !this.value;
-            }
-        });
-    }
 
     if (resetBtn) {
         resetBtn.addEventListener('click', function() {
@@ -1638,11 +1441,6 @@ function bindStep5Inputs() {
                 pnState.portfolioSkipped = false;
                 pnState.assessment = { ipip: {}, crt: {}, philosophy: {}, bias: {}, preferences: {} };
                 pnState.profile = null;
-                // Clear all shared conversations on profile reset
-                if (window._continuumChat) {
-                    for (var k in window._continuumChat) delete window._continuumChat[k];
-                }
-                pnState.chatTicker = '';
                 pnState.assessmentBlock = 0;
                 pnRefresh();
             }
@@ -1793,9 +1591,7 @@ window.initPersonalisationDemo = function() {
 };
 
 window.pnOnRouteEnter = function() {
-    if (pnState.currentStep === 5) {
-        renderChatMessages();
-    }
+    // No-op. Retained because src/main.js calls it on route enter.
 };
 
 window.pnBuildSystemPrompt = pnBuildSystemPrompt;
