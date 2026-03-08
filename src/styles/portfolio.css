@@ -49,32 +49,34 @@
 /* Summary Bar */
 .portfolio-summary-bar {
     display: flex;
-    gap: var(--space-md);
-    flex-wrap: wrap;
+    gap: var(--space-sm);
+    flex-wrap: nowrap;
     background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: var(--space-md) var(--space-lg);
-    margin-bottom: var(--space-xl);
+    padding: var(--space-xs) var(--space-md);
+    margin-bottom: var(--space-md);
 }
 .portfolio-summary-item {
     flex: 1;
-    min-width: 140px;
-    padding: var(--space-sm) 0;
+    min-width: 0;
+    padding: 4px 0;
 }
 .portfolio-summary-label {
-    font-size: 0.55rem;
+    font-size: 0.5rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     color: var(--text-muted);
-    margin-bottom: 2px;
+    margin-bottom: 1px;
+    white-space: nowrap;
 }
 .portfolio-summary-value {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     font-weight: 700;
     font-family: var(--font-data);
     color: var(--text-primary);
+    white-space: nowrap;
 }
 .portfolio-summary-value.positive { color: var(--signal-green); }
 .portfolio-summary-value.negative { color: var(--signal-red); }
@@ -157,7 +159,7 @@
 .portfolio-actions {
     display: flex;
     gap: var(--space-sm);
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-sm);
 }
 .portfolio-btn {
     font-size: 0.65rem;
@@ -446,37 +448,6 @@
     color: var(--text-muted);
 }
 
-/* Strategy Context Bar */
-.port-strategy-bar {
-    display: flex;
-    gap: var(--space-lg);
-    flex-wrap: wrap;
-    background: rgba(26, 158, 143, 0.06);
-    border: 1px solid rgba(26, 158, 143, 0.2);
-    border-radius: 6px;
-    padding: var(--space-md) var(--space-lg);
-    margin-bottom: var(--space-md);
-}
-.port-sb-item {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex: 1;
-    min-width: 120px;
-}
-.port-sb-label {
-    font-size: 0.5rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-}
-.port-sb-value {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--accent-teal);
-}
-
 /* --- Evidence-Aligned Reweighting --- */
 .port-reweight-section { margin-top: var(--space-xl); }
 .port-reweight-body {
@@ -533,54 +504,7 @@
 .rw-action { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
 .rw-action.increase { color: var(--signal-green); }
 .rw-action.reduce { color: var(--signal-red); }
-.rw-action.buy { color: var(--signal-green); }
-.rw-action.sell { color: var(--signal-red); }
 .rw-action.hold { color: var(--text-muted); }
-.rw-units { font-family: var(--font-data); font-size: 0.75rem; color: var(--text-secondary); }
-.rw-shares { font-family: var(--font-data); font-size: 0.75rem; color: var(--text-secondary); text-align: right; }
-/* Conviction (narrative stability) column */
-.rw-stability { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.02em; white-space: nowrap; }
-.rw-stability::before { content: '\25CF  '; }
-.rw-stab-high { color: var(--signal-green); }
-.rw-stab-mid  { color: var(--signal-amber, #f59e0b); }
-.rw-stab-low  { color: var(--signal-red); }
-.rw-stab-none { color: var(--text-muted); }
-.rw-stab-none::before { content: ''; }
-/* Momentum arrows (skew direction change since last refresh) */
-.rw-mom-up   { color: var(--signal-green); font-weight: 700; margin-left: 4px; font-size: 0.8rem; }
-.rw-mom-down { color: var(--signal-red);   font-weight: 700; margin-left: 4px; font-size: 0.8rem; }
-/* Uncovered positions — dimmed rows */
-.rw-row-uncovered td { opacity: 0.5; }
-/* Strategy context pills inside the Reweighting section */
-.rw-strategy-context {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-sm);
-    padding: var(--space-md) var(--space-lg);
-    background: rgba(26, 158, 143, 0.04);
-    border-bottom: 1px solid var(--border);
-}
-.rw-sc-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--bg-elevated);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 3px 10px;
-}
-.rw-sc-label {
-    font-size: 0.5rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-}
-.rw-sc-value {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--accent-teal);
-}
 .port-reweight-disclaimer {
     font-size: 0.72rem;
     color: var(--text-muted);

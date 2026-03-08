@@ -302,14 +302,11 @@
     <div class="page-inner">
 
         <!-- Portfolio Header -->
-        <div class="hero" style="text-align:left; padding-bottom: var(--space-lg);">
+        <div class="hero" style="text-align:left; padding-bottom: var(--space-xs);">
             <div class="hero-tagline">Portfolio Intelligence</div>
             <h1 class="hero-title" style="font-size:1.6rem">Position Alignment Analysis</h1>
             <p class="hero-subtitle" style="text-align:left; margin:0; max-width: none;">Upload your portfolio to see how your positions align with Continuum's evidence-based risk skew assessments across the coverage universe.</p>
         </div>
-
-        <!-- Strategy Context Bar (shown when portfolio loaded and personalisation set) -->
-        <div class="port-strategy-bar" id="portfolioStrategyBar" style="display:none"></div>
 
         <!-- Upload Zone -->
         <div class="portfolio-upload-zone" id="uploadZone">
@@ -330,20 +327,8 @@
         <!-- Summary Bar (hidden until data loaded) -->
         <div class="portfolio-summary-bar" id="portfolioSummary" style="display:none">
             <div class="portfolio-summary-item">
-                <div class="portfolio-summary-label">Long Book</div>
-                <div class="portfolio-summary-value positive" id="summaryLong">--</div>
-            </div>
-            <div class="portfolio-summary-item">
-                <div class="portfolio-summary-label">Short Book</div>
-                <div class="portfolio-summary-value negative" id="summaryShort">--</div>
-            </div>
-            <div class="portfolio-summary-item">
-                <div class="portfolio-summary-label">Net Position</div>
-                <div class="portfolio-summary-value" id="summaryNet">--</div>
-            </div>
-            <div class="portfolio-summary-item">
-                <div class="portfolio-summary-label">Gross Position</div>
-                <div class="portfolio-summary-value" id="summaryGross">--</div>
+                <div class="portfolio-summary-label">Total Value</div>
+                <div class="portfolio-summary-value" id="summaryValue">--</div>
             </div>
             <div class="portfolio-summary-item">
                 <div class="portfolio-summary-label">Unrealised P&amp;L</div>
@@ -704,68 +689,57 @@
 </main><!-- /main-content -->
 
 <!-- ============================================================
-     ANALYST PANEL — persistent docked right-rail
+     RESEARCH CHAT WIDGET
      ============================================================ -->
 
-<aside id="analyst-panel" class="analyst-panel" aria-label="Research Analyst" role="complementary">
-
-    <div class="ap-header">
-        <div class="ap-header-left">
-            <div class="ap-header-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-                </svg>
-            </div>
-            <div class="ap-header-text">
-                <div class="ap-header-title">ANALYST</div>
-                <div class="ap-context-bar">
-                    <span class="ap-ticker-badge" id="apTickerBadge">ALL COVERAGE</span>
-                </div>
-            </div>
-        </div>
-        <div class="ap-header-actions">
-            <button class="ap-clear-btn" id="apClearBtn" title="Clear conversation" aria-label="Clear conversation">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                </svg>
-            </button>
-            <button class="ap-collapse-btn" id="apCollapseBtn" title="Collapse panel" aria-label="Collapse analyst panel">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <polyline points="9 18 15 12 9 6"/>
-                </svg>
-            </button>
-        </div>
-    </div>
-
-    <div class="ap-ticker-bar">
-        <label for="apTickerSelect" class="ap-ticker-label">Coverage:</label>
-        <select class="ap-ticker-select" id="apTickerSelect" aria-label="Select stock for analyst"></select>
-    </div>
-
-    <div class="ap-messages" id="apMessages" aria-live="polite" role="log" aria-label="Analyst conversation"></div>
-
-    <div class="ap-input-area">
-        <label for="apInput" class="sr-only">Ask the analyst a question</label>
-        <textarea class="ap-input" id="apInput" placeholder="Ask about this stock..." rows="1" aria-label="Ask the analyst a question"></textarea>
-        <div class="ap-input-actions">
-            <span class="ap-shortcut-hint">⌘↵</span>
-            <button class="ap-send-btn" id="apSend" disabled aria-label="Send message">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                </svg>
-            </button>
-        </div>
-    </div>
-
-</aside>
-
-<!-- Mobile FAB — shown below 1024px only -->
-<button class="ap-fab" id="apFab" aria-label="Open analyst" aria-expanded="false" aria-controls="analyst-panel">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<!-- FAB Button -->
+<button class="chat-fab" id="chatFab" title="Ask the research analyst" aria-label="Open research chat" aria-expanded="false" aria-controls="chatPanel">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
     </svg>
-    <span>Analyst</span>
+    Analyst
 </button>
+
+<!-- Chat Panel -->
+<div class="chat-panel" id="chatPanel">
+    <div class="chat-header">
+        <div class="chat-header-left">
+            <div class="chat-header-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+            </div>
+            <div>
+                <div class="chat-header-title">Research Chat</div>
+                <div class="chat-header-subtitle" id="chatSubtitle">Ask about any covered stock</div>
+            </div>
+        </div>
+        <button class="chat-close-btn" id="chatClose" aria-label="Close chat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="chat-ticker-bar">
+        <label for="chatTickerSelect" class="chat-ticker-label">Stock:</label>
+        <select class="chat-ticker-select" id="chatTickerSelect" aria-label="Select stock for chat"></select>
+    </div>
+
+    <div class="chat-messages" id="chatMessages" aria-live="polite" aria-relevant="additions">
+        <!-- Welcome state rendered by JS -->
+    </div>
+
+    <div class="chat-input-area">
+        <label for="chatInput" class="sr-only">Ask a question about this stock</label>
+        <textarea class="chat-input" id="chatInput" placeholder="Ask about this stock..." rows="1" aria-label="Ask a question about this stock"></textarea>
+        <button class="chat-send-btn" id="chatSend" disabled aria-label="Send message">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+        </button>
+    </div>
+</div>
 
 
 <!-- Chart.js for narrative timeline visualisation -->
