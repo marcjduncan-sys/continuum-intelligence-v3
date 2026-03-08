@@ -6,7 +6,7 @@
  * Stale-while-revalidate for the main HTML shell.
  */
 
-const CACHE_NAME = 'continuum-v3.0.0';
+const CACHE_NAME = 'continuum-v3.1.0';
 const RESEARCH_CACHE = 'continuum-research-v1';
 
 // Static assets to pre-cache on install
