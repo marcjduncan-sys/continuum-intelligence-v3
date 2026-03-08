@@ -14,11 +14,13 @@
       "Bash(git pull*)",
       "Bash(git add*)",
       "Bash(git commit*)",
+      "Bash(git push)",
       "Bash(git branch*)",
       "Bash(git checkout*)",
       "Bash(git tag*)",
-      "Bash(curl https://imaginative-vision-production-16cb.up.railway.app/api/health)",
-      "Bash(curl https://imaginative-vision-production-16cb.up.railway.app/api/refresh/*/status)"
+      "Bash(grep:*)",
+      "Bash(curl https://imaginative-vision-production-16cb.up.railway.app/api/health*)",
+      "Bash(curl https://imaginative-vision-production-16cb.up.railway.app/api/status*)"
     ],
     "deny": [
       "Bash(git push --force*)",
@@ -27,7 +29,9 @@
       "Bash(git clean -f*)",
       "Bash(rm -rf src*)",
       "Bash(rm -rf data*)",
-      "Bash(rm -rf dist*)"
+      "Bash(rm -rf dist*)",
+      "Bash(npm run deploy:*)",
+      "Bash(railway:*)"
     ]
   },
   "hooks": {

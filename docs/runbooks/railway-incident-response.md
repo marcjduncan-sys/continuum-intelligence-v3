@@ -10,10 +10,20 @@ Use this runbook when the Railway backend is unresponsive, returning errors, or 
 curl https://imaginative-vision-production-16cb.up.railway.app/api/health
 ```
 
-**Expected:** `{"status": "ok"}` with HTTP 200.
+**Expected (HTTP 200):**
+```json
+{
+  "status": "healthy",
+  "tickers": ["WOW", "XRO", ...],
+  "passage_counts": {"WOW": 12, ...},
+  "total_passages": 347
+}
+```
+
 **If timeout or 5xx:** Railway is down or starting up. Proceed to Step 2.
 **If 401/403:** API key issue. Check environment variables (Step 4).
-**If 200 but chat/refresh broken:** Logic error. Check logs (Step 3).
+**If 200 but `status` is not `"healthy"`:** Service started but data did not load. Check logs (Step 3).
+**If 200 but chat/refresh broken:** Logic error or rate limit hit. Check logs (Step 3) and rate limits (Step 5).
 
 ---
 
@@ -34,6 +44,7 @@ In the Railway dashboard, open **Logs** for the running service. Filter for:
 - `RuntimeError: ANTHROPIC_API_KEY not configured` -- missing env var (see Step 4)
 - `FileNotFoundError` on `data/research/TICKER.json` -- `dist/` was not built or `INDEX_HTML_PATH` is wrong
 - `RateLimitExceeded` -- Anthropic or Gemini API rate limit hit during batch refresh; wait and retry
+- `OOMKilled` or memory-related errors -- Railway's 512 MB memory limit was exceeded; a large batch refresh or simultaneous requests may trigger this; restart the service and re-trigger the job
 
 ---
 
@@ -54,7 +65,24 @@ If a variable was recently rotated or deleted, add it back and redeploy.
 
 ---
 
-## Step 5 — Check `dist/` build
+## Step 5 — Check rate limits
+
+Railway's rate limiters are **in-memory only** and reset on every restart. If the service was recently restarted, rate limit state is cleared.
+
+| Endpoint | Limit |
+|---|---|
+| Chat (`/api/chat`) | 30 requests / minute |
+| Single refresh (`/api/refresh/TICKER`) | 5 requests / minute |
+| Batch refresh (`/api/refresh/batch`) | 1 request / hour |
+| Add stock (`/api/stocks/add`) | 3 requests / minute |
+
+If a user hits a rate limit, they receive a 429 response. Wait for the window to expire or restart the service to clear the counter. Note: restarting also terminates any in-flight refresh jobs (see Step 6).
+
+**Semaphore limits:** `api/main.py` uses semaphores to cap concurrent LLM calls. If logs show semaphore-related blocking, a batch refresh may be saturating the concurrent slot limit. Wait for the batch to complete before triggering additional refreshes.
+
+---
+
+## Step 6 — Check `dist/` build
 
 Railway runs `npm run build` as part of its deploy. If this failed silently:
 
@@ -64,7 +92,7 @@ Railway runs `npm run build` as part of its deploy. If this failed silently:
 
 ---
 
-## Step 6 — In-flight job loss
+## Step 7 — In-flight job loss
 
 If a refresh or batch job was running during a Railway restart, the job record is lost (in-memory only). The frontend poller will eventually time out. The user will see an error.
 
@@ -72,7 +100,7 @@ Resolution: trigger the refresh again from the UI. There is no state to recover.
 
 ---
 
-## Step 7 — Escalation
+## Step 8 — Escalation
 
 If Railway is down at the infrastructure level (not a code or config issue):
 - Check [Railway status page](https://status.railway.app) for incidents
@@ -85,3 +113,4 @@ If Railway is down at the infrastructure level (not a code or config issue):
 
 - Railway redeploys on every push to `main` via `.github/workflows/deploy.yml`. If a recent push broke the API, revert the commit and push again.
 - Research data written to Railway's disk is ephemeral. A redeploy resets `dist/data/research/` to the git state at deploy time. This is expected behaviour, not data loss.
+- Do not use `/api/refresh/TICKER` to test whether a new ticker was scaffolded correctly. That endpoint requires `data/research/TICKER.json` to already exist and will return 404 otherwise. Use `/api/health` to confirm the service is up, then check the file exists in git.
