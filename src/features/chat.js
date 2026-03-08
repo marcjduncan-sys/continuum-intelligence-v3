@@ -117,7 +117,14 @@ var tickerBadge  = document.getElementById('apTickerBadge');
 
 var isOpen        = false;
 var isLoading     = false;
-var conversations = {};   // { ticker: [ {role, content, sources?, timestamp?}, ... ] }
+var conversations = (function() {
+    try {
+        var saved = sessionStorage.getItem('ci_conversations');
+        return saved ? JSON.parse(saved) : {};
+    } catch(e) {
+        return {};
+    }
+}());
 var currentTicker = '';
 
 // ============================================================
@@ -357,6 +364,7 @@ function sendMessage() {
 
     var now = Date.now();
     convo.push({ role: 'user', content: question, timestamp: now });
+    try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) {}
     if (input) { input.value = ''; input.style.height = 'auto'; }
     updateSendButton();
     renderConversation();
@@ -415,6 +423,7 @@ function sendMessage() {
             sources: data.sources || [],
             timestamp: Date.now()
         });
+        try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) {}
         renderConversation();
     })
     .catch(function(err) {
@@ -494,6 +503,7 @@ function togglePanel() {
 
 function clearConversation() {
     conversations[currentTicker] = [];
+    try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) {}
     renderWelcome();
 }
 

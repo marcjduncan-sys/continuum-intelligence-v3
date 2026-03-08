@@ -43,6 +43,8 @@ CHAT_MAX_TOKENS = int(os.getenv("CHAT_MAX_TOKENS", "2048"))
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
+DATABASE_URL = os.getenv("DATABASE_URL", "")
+
 # ---------------------------------------------------------------------------
 # Shared Anthropic client (singleton with timeout)
 # ---------------------------------------------------------------------------
