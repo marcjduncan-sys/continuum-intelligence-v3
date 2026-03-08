@@ -42,7 +42,7 @@ npm run validate     # lint + test:all — run before any push
 
 ---
 
-## Current State — 2026-03-07
+## Current State — 2026-03-08
 
 **Phase 0 COMPLETE (2026-03-07).** The extraction of logic from `index.html` into `src/` modules is complete. `computeSkewScore` canonicalised to zero-contribution convention (commit `4493e8c`; see `docs/decisions/003-computeskewscore-neutral-convention.md`). `VALID_STATIC_PAGES` confirmed correct: `home`, `deep-research`, `portfolio`, `comparator`, `personalisation`, `about`.
 
