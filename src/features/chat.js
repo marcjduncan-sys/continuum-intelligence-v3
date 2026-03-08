@@ -128,6 +128,77 @@ var conversations = (function() {
 var currentTicker = '';
 
 // ============================================================
+// DB PERSISTENCE
+// ============================================================
+
+// Per-session cache of conversationId per ticker (avoids creating duplicate conversations)
+var dbConversationIds = {};
+
+async function _ensureConversation(ticker) {
+    if (!ticker) return null;
+    if (dbConversationIds[ticker]) return dbConversationIds[ticker];
+    if (isFile) return null;
+    var token   = window.CI_AUTH && window.CI_AUTH.getToken();
+    var guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
+    if (!token && !guestId) return null;
+
+    var headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    try {
+        var res = await fetch(apiOrigin + '/api/conversations', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ ticker: ticker, guest_id: token ? null : guestId })
+        });
+        if (!res.ok) return null;
+        var data = await res.json();
+        dbConversationIds[ticker] = data.id;
+        return data.id;
+    } catch (e) {
+        return null;
+    }
+}
+
+function _persistMessage(ticker, role, content, sources) {
+    // Fire and forget -- DB failures must never block the chat UI
+    _ensureConversation(ticker).then(function(convId) {
+        if (!convId) return;
+        var token   = window.CI_AUTH && window.CI_AUTH.getToken();
+        var headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+        fetch(apiOrigin + '/api/conversations/' + convId + '/messages', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ role: role, content: content, sources_json: sources || null })
+        }).catch(function() { /* silent -- no impact on UX */ });
+    });
+}
+
+function _restoreFromDB(ticker) {
+    if (!ticker || isFile) return Promise.resolve();
+    var token   = window.CI_AUTH && window.CI_AUTH.getToken();
+    var guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
+    if (!token && !guestId) return Promise.resolve();
+
+    var headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    var url = apiOrigin + '/api/conversations/' + encodeURIComponent(ticker) +
+              (token ? '' : ('?guest_id=' + encodeURIComponent(guestId)));
+    return fetch(url, { headers: headers })
+        .then(function(res) { return res.ok ? res.json() : null; })
+        .then(function(data) {
+            if (!data || !data.messages || data.messages.length === 0) return;
+            if (data.conversation_id) dbConversationIds[ticker] = data.conversation_id;
+            // DB wins over sessionStorage for cross-session history
+            conversations[ticker] = data.messages.map(function(m) {
+                return { role: m.role, content: m.content, sources: m.sources_json || [], timestamp: 0 };
+            });
+            try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) {}
+        })
+        .catch(function() { /* silent -- degrades to sessionStorage */ });
+}
+
+// ============================================================
 // TICKER MANAGEMENT
 // ============================================================
 
@@ -365,6 +436,7 @@ function sendMessage() {
     var now = Date.now();
     convo.push({ role: 'user', content: question, timestamp: now });
     try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) {}
+    _persistMessage(ticker, 'user', question, null);
     if (input) { input.value = ''; input.style.height = 'auto'; }
     updateSendButton();
     renderConversation();
@@ -389,9 +461,12 @@ function sendMessage() {
     // Always read personalisation fresh from localStorage on each send
     var systemPrompt = buildEffectiveSystemPrompt();
 
+    var _fetchHeaders = { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY };
+    var _fetchToken = window.CI_AUTH && window.CI_AUTH.getToken();
+    if (_fetchToken) _fetchHeaders['Authorization'] = 'Bearer ' + _fetchToken;
     fetch(CHAT_API_BASE, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY },
+        headers: _fetchHeaders,
         body: JSON.stringify({
             ticker: ticker,
             question: question,
@@ -424,6 +499,7 @@ function sendMessage() {
             timestamp: Date.now()
         });
         try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) {}
+        _persistMessage(ticker, 'assistant', data.response, data.sources || null);
         renderConversation();
     })
     .catch(function(err) {
@@ -565,7 +641,7 @@ if (panel) {
     // Navigation: set coverage on stock pages, never clear it
     window.addEventListener('hashchange', function() {
         syncTickerFromRoute();
-        renderConversation();
+        _restoreFromDB(currentTicker).then(renderConversation);
     });
 
     // Handle viewport resize: auto-open at desktop, hide FAB
@@ -590,7 +666,7 @@ export function initChat() {
     }
 
     populateTickerSelect();
-
+    _restoreFromDB(currentTicker).then(renderConversation);
 
     // Auto-open at desktop widths; show FAB on mobile
     if (window.innerWidth >= 1024) {

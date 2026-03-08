@@ -46,6 +46,20 @@ GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 
 # ---------------------------------------------------------------------------
+# Auth
+# ---------------------------------------------------------------------------
+
+JWT_SECRET = os.getenv("JWT_SECRET", "dev-insecure-secret")
+JWT_EXPIRY_DAYS = int(os.getenv("JWT_EXPIRY_DAYS", "30"))
+
+# Email (SMTP) -- for OTP delivery. Optional: falls back to log-only if unset.
+EMAIL_FROM = os.getenv("EMAIL_FROM", "")
+SMTP_HOST = os.getenv("SMTP_HOST", "")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_PASS = os.getenv("SMTP_PASS", "")
+
+# ---------------------------------------------------------------------------
 # Shared Anthropic client (singleton with timeout)
 # ---------------------------------------------------------------------------
 

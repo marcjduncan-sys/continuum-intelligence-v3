@@ -27,6 +27,8 @@ from slowapi.util import get_remote_address
 
 import config
 import db
+from auth import router as auth_router
+from conversations import router as conversations_router
 from ingest import ingest, get_tickers, get_passage_count
 from refresh import (
     RefreshJob, refresh_jobs, get_job, is_running, run_refresh,
@@ -160,6 +162,9 @@ app.add_middleware(
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+app.include_router(auth_router)
+app.include_router(conversations_router)
 
 
 # ---------------------------------------------------------------------------

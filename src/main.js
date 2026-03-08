@@ -28,6 +28,7 @@ import { initAboutPage } from './pages/about.js';
 import { setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineChart } from './pages/report-sections.js';
 
 // Features
+import { initAuth, showAuthModal, hideAuthModal } from './features/auth.js';
 import { initChat, VOICE_RULES } from './features/chat.js';
 import { initBatchRefresh, closeBatchModal } from './features/batch-refresh.js';
 import { generatePDFReport } from './features/pdf.js';
@@ -261,6 +262,7 @@ async function boot() {
   initBatchRefresh();
   initPortfolioPage();
   initThesisPage();
+  initAuth();
   initChat();
   initAboutPage();
   initAddStock();
