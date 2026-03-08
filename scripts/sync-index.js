@@ -23,7 +23,7 @@ const INDEX_FIELDS = [
   'price', 'currency', 'date', 'reportId', 'priceHistory',
   'heroDescription', 'heroCompanyDescription', 'heroMetrics',
   'skew', 'verdict', 'featuredMetrics', 'featuredPriceColor', 'featuredRationale',
-  'hypotheses', 'identity', 'footer'
+  'hypotheses', 'identity', 'footer', '_deepResearch'
 ];
 
 function main() {
