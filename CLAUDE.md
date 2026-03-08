@@ -52,14 +52,18 @@ npm run validate     # lint + test:all — run before any push
 - [x] Portfolio extraction -- already complete; fixed `renderChangeAlerts`, replaced fake demo data with real `_overcorrection`, freshness, and skew signals (commit `3d9591d`). 15 Vitest tests added.
 - [x] TC_DATA externalised to `data/tc.json` -- follows `reference.json` pattern, `initTcData()` wired in `boot()` (commit `415095e`).
 
-**Phase 2 ready to begin.**
+**Session work (2026-03-08):**
+- [x] Shadow copy elimination complete (commit `f309fef`): deleted root-level `js/personalisation.js`, reconciled 57 divergent lines into `public/js/personalisation.js`, updated all references in CLAUDE.md and `src/features/chat.js`.
+- [x] Thesis Comparator rebuilt with LLM pipeline (commit `bebcb9c`): `tcAnalyze()` now POSTs to `/api/research-chat` with a structured ACH system prompt; `renderComparatorResult()` parses the ALIGNMENT line, populates hypothesis map from `tc.json`, and renders supporting/contradicting evidence. Loading animation, error state, and contrarian banner CSS added. Enter key wired. Verified end-to-end against WOW with real Railway responses on preview server.
+
+**Phase 2 ready to begin.** No Phase 2 tasks were started this session.
 
 **Recent bug history (last six commits):**
-- `d02f65c` Fixed downside-skew stocks never showing Buy action in the Evidence-Aligned Reweighting table ([src/pages/portfolio.js](src/pages/portfolio.js) around line 589). Do not refactor the skew-gate block without re-verifying all three branches (upside/balanced/downside) against the rules in MEMORY.md.
-- `5cb85f2` Restored analyst panel and portfolio HTML after `58b2c99` wiped them. If the analyst panel ever disappears from the DOM, check whether a stale `index.html` was pushed.
+- `bebcb9c` Replaced regex-based Thesis Comparator wireframe with LLM-powered pipeline. `tcAnalyze()` calls `/api/research-chat`; response parsed into ACH alignment banner, hypothesis map, and evidence columns. Enter key submits thesis.
+- `f309fef` Eliminated root-level `js/personalisation.js` shadow copy. The production file is `public/js/personalisation.js` (served via Vite `publicDir: 'public'`). The root-level copy was never served in production -- fixes applied to it had no effect. 57 divergent lines reconciled into `public/js/`, root copy deleted. The `js/dne/` directory is retained.
+- `bd69294` Same shadow copy discovery; initial fix attempt superseded by `f309fef`.
 - `6485b04` Fixed modal-added stocks disappearing from Research tab. The fix is the `else` branch at [src/main.js:207](src/main.js#L207). If this branch is removed, all stocks added via "+ Add Stock" will vanish on reload.
 - `4b84b7c` Fixed "Stock Not Found" on Add Stock when Railway scaffold is still generating. Fix lives in [src/features/add-stock.js](src/features/add-stock.js) as the `_stub: true` fallback. Do not remove it.
-- `bd69294` Eliminated root-level `js/personalisation.js` shadow copy. The production file is `public/js/personalisation.js` (served via Vite `publicDir: 'public'`). The root-level copy was never served in production -- fixes applied to it had no effect. 57 divergent lines reconciled into `public/js/`, root copy deleted. The `js/dne/` directory is retained.
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
