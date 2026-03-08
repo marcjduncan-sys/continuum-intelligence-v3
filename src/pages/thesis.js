@@ -20,75 +20,256 @@ export function tcSelectStock(ticker) {
 export function tcAnalyze() {
   if (!tcSelectedTicker) { alert('Please select a stock first'); return; }
 
-  var data = getTcData(tcSelectedTicker);
-  if (!data) {
-    document.getElementById('tc-results').innerHTML = '<div class="tc-banner"><div class="tc-banner-label">Thesis comparison not yet available for ' + tcSelectedTicker + '. Full analysis coming soon.</div></div>';
-    document.getElementById('tc-results').style.display = 'block';
+  var thesis = document.getElementById('tc-thesis-input').value.trim();
+  if (!thesis || thesis.length < 20) {
+    alert('Please enter a substantive thesis (at least a sentence or two).');
     return;
   }
-  var thesis = document.getElementById('tc-thesis-input').value.toLowerCase();
 
-  var primaryTier = data.primary;
-  if (thesis.length > 50) {
-    var scores = { n1: 0, n2: 0, n3: 0, n4: 0 };
-    if (/growth|recovery|expansion|synergy|dominance|leadership|success/i.test(thesis)) scores.n1 += 2;
-    if (/bull|bullish|outperform|buy/i.test(thesis)) scores.n1 += 1;
-    if (/normalize|moderate|decline|cyclical|slowdown|steady|base/i.test(thesis)) scores.n2 += 2;
-    if (/hold|neutral|fair value/i.test(thesis)) scores.n2 += 1;
-    if (/risk|execution|failure|challenge|problem|concern|bear/i.test(thesis)) scores.n3 += 2;
-    if (/short|sell|underperform|avoid/i.test(thesis)) scores.n3 += 1;
-    if (/disrupt|competition|threat|obsolete|replace/i.test(thesis)) scores.n4 += 2;
+  // Show loading state
+  var resultsEl = document.getElementById('tc-results');
+  resultsEl.classList.add('active');
+  resultsEl.scrollIntoView({ behavior: 'smooth' });
 
-    var maxScore = Math.max(scores.n1, scores.n2, scores.n3, scores.n4);
-    if (maxScore > 0) {
-      var entries = Object.keys(scores);
-      for (var ei = 0; ei < entries.length; ei++) {
-        if (scores[entries[ei]] === maxScore) { primaryTier = entries[ei]; break; }
+  var banner = document.getElementById('tc-banner');
+  banner.className = 'tc-banner loading';
+  document.getElementById('tc-banner-label').textContent = 'Analysing your thesis against ' + tcSelectedTicker + ' research...';
+  document.getElementById('tc-banner-hypothesis').textContent = '';
+  document.getElementById('tc-banner-desc').textContent = '';
+  document.getElementById('tc-map-rows').innerHTML = '<div class="tc-loading"><div class="tc-loading-dot"></div><div class="tc-loading-dot"></div><div class="tc-loading-dot"></div></div>';
+  document.getElementById('tc-analysis-text').innerHTML = '';
+  document.getElementById('tc-supporting').innerHTML = '';
+  document.getElementById('tc-contradicting').innerHTML = '';
+
+  // Disable the button during analysis
+  var btn = document.querySelector('.tc-analyze-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Analysing...'; }
+
+  var systemPrompt = buildComparatorPrompt(tcSelectedTicker);
+
+  var apiBase = (window.location.hostname.indexOf('github.io') !== -1)
+    ? 'https://imaginative-vision-production-16cb.up.railway.app'
+    : '';
+
+  fetch(apiBase + '/api/research-chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-Key': window.CI_API_KEY || ''
+    },
+    body: JSON.stringify({
+      ticker: tcSelectedTicker,
+      question: thesis,
+      system_prompt: systemPrompt
+    })
+  })
+  .then(function(res) {
+    if (!res.ok) throw new Error('Analysis failed (' + res.status + ')');
+    return res.json();
+  })
+  .then(function(data) {
+    renderComparatorResult(data.response, tcSelectedTicker);
+  })
+  .catch(function(err) {
+    renderComparatorError(err.message);
+  })
+  .finally(function() {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<span>Analyse My Thesis</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>'; }
+  });
+}
+
+function buildComparatorPrompt(ticker) {
+  var tcData = getTcData(ticker);
+
+  var prompt = 'You are the Thesis Comparator engine for Continuum Intelligence. ';
+  prompt += 'The user has submitted an investment thesis for ' + ticker + '. ';
+  prompt += 'Your job is to compare their thesis against the platform\'s four competing hypotheses (N1 through N4) using the research passages provided.\n\n';
+
+  prompt += 'RESPONSE FORMAT (you must follow this exactly):\n\n';
+
+  prompt += '1. Start with a single line: ALIGNMENT: [N1/N2/N3/N4] followed by the hypothesis name.\n';
+  prompt += '   This is the hypothesis the user\'s thesis most closely aligns with.\n';
+  prompt += '   If their thesis does not clearly align with any single hypothesis, write: ALIGNMENT: CONTRARIAN\n\n';
+
+  prompt += '2. Then write a section headed ANALYSIS (plain text, no markdown headers).\n';
+  prompt += '   In 150-250 words, explain:\n';
+  prompt += '   - Which hypothesis their thesis supports and why\n';
+  prompt += '   - Where their thesis diverges from the platform\'s evidence base\n';
+  prompt += '   - What probability weight the platform assigns to their preferred outcome\n';
+  prompt += '   - Whether they are aligned with or against the dominant narrative\n\n';
+
+  prompt += '3. Then a section headed SUPPORTING EVIDENCE (plain text, no markdown headers).\n';
+  prompt += '   List 3-5 specific evidence items from the research that support the user\'s view.\n';
+  prompt += '   Each item on its own line, prefixed with a bullet character.\n';
+  prompt += '   Use the actual evidence from the research passages, not generic statements.\n\n';
+
+  prompt += '4. Then a section headed CONTRADICTING EVIDENCE (plain text, no markdown headers).\n';
+  prompt += '   List 3-5 specific evidence items the user may be underweighting or ignoring.\n';
+  prompt += '   Each item on its own line, prefixed with a bullet character.\n';
+  prompt += '   These should be the strongest challenges to their thesis from the research.\n\n';
+
+  prompt += '5. Then a section headed DISCRIMINATORS (plain text, no markdown headers).\n';
+  prompt += '   Identify 1-3 upcoming data points or catalysts that will resolve the tension between the user\'s thesis and the competing hypotheses.\n';
+  prompt += '   Each on its own line, prefixed with a bullet character.\n\n';
+
+  prompt += 'VOICE RULES:\n';
+  prompt += '- Speak as "we" (Continuum\'s research team). Never "I".\n';
+  prompt += '- Be direct and opinionated. "Your thesis is pricing in X but ignoring Y" is good.\n';
+  prompt += '- No markdown headers (no #). Use the section names as plain text labels.\n';
+  prompt += '- No em-dashes. Use commas, colons, or full stops.\n';
+  prompt += '- No filler phrases. No "it is important to note". No "notably".\n';
+  prompt += '- Reference hypothesis tiers by label: N1, N2, N3, N4.\n';
+  prompt += '- Use institutional language: "the print", "consensus", "the street", "the multiple".\n';
+
+  if (tcData) {
+    prompt += '\nHYPOTHESIS REFERENCE (from platform data):\n';
+    ['n1','n2','n3','n4'].forEach(function(tier) {
+      var h = tcData[tier];
+      if (h) {
+        prompt += tier.toUpperCase() + ': ' + h.name + ' (' + h.prob + '% probability) - ' + h.desc + '\n';
       }
+    });
+  }
+
+  return prompt;
+}
+
+function renderComparatorResult(text, ticker) {
+  var tcData = getTcData(ticker);
+
+  // Parse alignment from first line
+  var lines = text.split('\n');
+  var alignment = 'contrarian';
+  var alignmentName = '';
+  for (var i = 0; i < Math.min(lines.length, 5); i++) {
+    var match = lines[i].match(/^ALIGNMENT:\s*(N[1-4]|CONTRARIAN)/i);
+    if (match) {
+      alignment = match[1].toLowerCase();
+      alignmentName = lines[i].replace(/^ALIGNMENT:\s*(N[1-4]|CONTRARIAN)\s*/i, '').replace(/^[:\-]\s*/, '').trim();
+      break;
     }
   }
 
-  tcCurrentAlignment = primaryTier;
+  tcCurrentAlignment = alignment;
 
+  // Banner
   var banner = document.getElementById('tc-banner');
-  banner.className = 'tc-banner ' + primaryTier;
+  banner.className = 'tc-banner ' + alignment;
 
-  var tierData = data[primaryTier];
-  if (primaryTier === 'uphill') {
+  if (alignment === 'contrarian') {
     document.getElementById('tc-banner-label').textContent = 'Your thesis position:';
-    document.getElementById('tc-banner-hypothesis').textContent = '\u26A0\uFE0F PUSHING UPHILL';
-    document.getElementById('tc-banner-desc').textContent = "Your view doesn't clearly align with any single hypothesis. You're making a contrarian bet.";
+    document.getElementById('tc-banner-hypothesis').textContent = '\u26A0\uFE0F CONTRARIAN';
+    document.getElementById('tc-banner-desc').textContent = alignmentName || "Your view doesn't clearly align with any single hypothesis. You're making a contrarian bet.";
   } else {
+    var tierData = tcData ? tcData[alignment] : null;
     document.getElementById('tc-banner-label').textContent = 'Your thesis aligns most closely with:';
-    document.getElementById('tc-banner-hypothesis').textContent = primaryTier.toUpperCase() + ': ' + tierData.name;
-    document.getElementById('tc-banner-desc').textContent = tierData.desc;
+    document.getElementById('tc-banner-hypothesis').textContent = alignment.toUpperCase() + ': ' + (tierData ? tierData.name : alignmentName);
+    document.getElementById('tc-banner-desc').textContent = tierData ? tierData.desc : alignmentName;
   }
 
+  // Hypothesis map rows
   var rowsContainer = document.getElementById('tc-map-rows');
-  rowsContainer.innerHTML = ['n1','n2','n3','n4'].map(function(tier) {
-    var tData = data[tier];
-    var isMatch = tier === primaryTier;
-    var stance = isMatch ? 'supports' : 'contradicts';
-    return '<div class="tc-row">' +
-      '<div class="tc-indicator ' + tier + (isMatch ? ' match' : '') + '">' + tier.toUpperCase() + '</div>' +
-      '<div class="tc-info">' +
-        '<div class="tc-name">' + tier.toUpperCase() + ': ' + tData.name + '</div>' +
-        '<div class="tc-prob">Continuum: ' + tData.prob + '% probability</div>' +
-      '</div>' +
-      '<span class="tc-stance ' + stance + '">' + stance.toUpperCase() + '</span>' +
-    '</div>';
-  }).join('');
+  if (tcData) {
+    rowsContainer.innerHTML = ['n1','n2','n3','n4'].map(function(tier) {
+      var tData = tcData[tier];
+      if (!tData) return '';
+      var isMatch = tier === alignment;
+      var stance = isMatch ? 'supports' : 'contradicts';
+      return '<div class="tc-row">' +
+        '<div class="tc-indicator ' + tier + (isMatch ? ' match' : '') + '">' + tier.toUpperCase() + '</div>' +
+        '<div class="tc-info">' +
+          '<div class="tc-name">' + tier.toUpperCase() + ': ' + tData.name + '</div>' +
+          '<div class="tc-prob">Continuum: ' + tData.prob + '% probability</div>' +
+        '</div>' +
+        '<span class="tc-stance ' + stance + '">' + stance.toUpperCase() + '</span>' +
+      '</div>';
+    }).join('');
+  } else {
+    rowsContainer.innerHTML =
+      '<div class="tc-no-tc-data">Hypothesis probability data not yet available for ' + ticker + '. Analysis is grounded in full research content.</div>';
+  }
 
-  document.getElementById('tc-analysis-text').innerHTML = data.analysis;
-  document.getElementById('tc-supporting').innerHTML = data.supporting.map(function(item) {
+  // Parse sections from the response
+  var analysisText = extractSection(text, 'ANALYSIS');
+  var supportingItems = extractBulletList(text, 'SUPPORTING EVIDENCE');
+  var contradictingItems = extractBulletList(text, 'CONTRADICTING EVIDENCE');
+  var discriminatorItems = extractBulletList(text, 'DISCRIMINATORS');
+
+  // Render analysis
+  document.getElementById('tc-analysis-text').innerHTML = formatParagraphs(analysisText);
+
+  // Render supporting evidence
+  document.getElementById('tc-supporting').innerHTML = supportingItems.map(function(item) {
     return '<div class="tc-evidence-item"><span class="tc-evidence-icon support">&#10003;</span><span>' + item + '</span></div>';
   }).join('');
-  document.getElementById('tc-contradicting').innerHTML = data.contradicting.map(function(item) {
+
+  // Render contradicting evidence
+  document.getElementById('tc-contradicting').innerHTML = contradictingItems.map(function(item) {
     return '<div class="tc-evidence-item"><span class="tc-evidence-icon contradict">!</span><span>' + item + '</span></div>';
   }).join('');
 
-  document.getElementById('tc-results').classList.add('active');
-  document.getElementById('tc-results').scrollIntoView({ behavior: 'smooth' });
+  // Render discriminators if present
+  if (discriminatorItems.length > 0) {
+    var discHtml = '<div class="tc-evidence-col" style="grid-column: 1 / -1; margin-top: 1.5rem;">' +
+      '<div class="tc-evidence-header">Key Discriminators to Watch</div>' +
+      discriminatorItems.map(function(item) {
+        return '<div class="tc-evidence-item"><span class="tc-evidence-icon disc">\u25C6</span><span>' + item + '</span></div>';
+      }).join('') +
+      '</div>';
+    var grid = document.querySelector('.tc-evidence-grid');
+    if (grid) {
+      var existing = grid.querySelector('.tc-evidence-col[style]');
+      if (existing) existing.remove();
+      grid.insertAdjacentHTML('beforeend', discHtml);
+    }
+  }
+}
+
+function extractSection(text, sectionName) {
+  var pattern = new RegExp(sectionName + '[:\\s]*\\n([\\s\\S]*?)(?=\\n(?:ALIGNMENT|ANALYSIS|SUPPORTING EVIDENCE|CONTRADICTING EVIDENCE|DISCRIMINATORS)[:\\s]*\\n|$)', 'i');
+  var match = text.match(pattern);
+  if (match) return match[1].trim();
+
+  // Fallback: find the section name and take everything until the next all-caps label
+  var idx = text.indexOf(sectionName);
+  if (idx === -1) return '';
+  var rest = text.substring(idx + sectionName.length).replace(/^[:\s]+/, '');
+  var nextSection = rest.match(/\n[A-Z][A-Z ]{5,}[:\s]*\n/);
+  if (nextSection) return rest.substring(0, nextSection.index).trim();
+  return rest.trim();
+}
+
+function extractBulletList(text, sectionName) {
+  var section = extractSection(text, sectionName);
+  if (!section) return [];
+  return section.split(/\n/).filter(function(line) {
+    return line.trim().length > 0;
+  }).map(function(line) {
+    return line.replace(/^[\s]*[\u2022\u2023\u25E6\u2043\u2219\-\*\u25CF\u25CB\u25AA\u25BA]\s*/, '').trim();
+  }).filter(function(item) {
+    return item.length > 10;
+  });
+}
+
+function formatParagraphs(text) {
+  if (!text) return '<p>Analysis unavailable.</p>';
+  return text.split(/\n\n+/).map(function(para) {
+    return '<p>' + para.replace(/\n/g, ' ').trim() + '</p>';
+  }).filter(function(p) {
+    return p !== '<p></p>';
+  }).join('');
+}
+
+function renderComparatorError(message) {
+  var banner = document.getElementById('tc-banner');
+  banner.className = 'tc-banner error';
+  document.getElementById('tc-banner-label').textContent = 'Analysis unavailable';
+  document.getElementById('tc-banner-hypothesis').textContent = '';
+  document.getElementById('tc-banner-desc').textContent = message || 'Could not reach the analysis engine. Try again in a moment.';
+  document.getElementById('tc-map-rows').innerHTML = '';
+  document.getElementById('tc-analysis-text').innerHTML = '';
+  document.getElementById('tc-supporting').innerHTML = '';
+  document.getElementById('tc-contradicting').innerHTML = '';
 }
 
 // ============================================================
@@ -237,6 +418,17 @@ export function initThesisPage() {
       card.innerHTML = '<div class="tc-stock-ticker">' + ticker + '</div>' +
                        '<div class="tc-stock-name">' + (stock.company || ticker) + '</div>';
       tcGrid.appendChild(card);
+    });
+  }
+
+  // Enter key on the thesis textarea submits analysis (Shift+Enter inserts newline)
+  var tcTextarea = document.getElementById('tc-thesis-input');
+  if (tcTextarea) {
+    tcTextarea.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        tcAnalyze();
+      }
     });
   }
 
