@@ -55,13 +55,15 @@ npm run validate     # lint + test:all — run before any push
 **Session work (2026-03-08):**
 - [x] Shadow copy elimination complete (commit `f309fef`): deleted root-level `js/personalisation.js`, reconciled 57 divergent lines into `public/js/personalisation.js`, updated all references in CLAUDE.md and `src/features/chat.js`.
 - [x] Thesis Comparator rebuilt with LLM pipeline (commit `bebcb9c`): `tcAnalyze()` now POSTs to `/api/research-chat` with a structured ACH system prompt; `renderComparatorResult()` parses the ALIGNMENT line, populates hypothesis map from `tc.json`, and renders supporting/contradicting evidence. Loading animation, error state, and contrarian banner CSS added. Enter key wired. Verified end-to-end against WOW with real Railway responses on preview server.
+- [x] Analyst chat consistency and voice rules unified (commit `236bfee`): extracted `VOICE_RULES` constant from `src/features/chat.js` (16 rules, single source of truth); bridged to `window.CI_VOICE_RULES` in `src/main.js`; `pnBuildSystemPrompt()` now appends `window.CI_VOICE_RULES` instead of its own abbreviated copy; em-dash on line 700 of `public/js/personalisation.js` fixed; ~189 lines of dead Step 5 centre-panel chat code removed (`pnGetSharedConvo`, `renderChatMessages`, `showChatTyping`, `hideChatTyping`, `appendChatError`, `renderChatHeader`, `pnSendChat`); `bindStep5Inputs` and `pnOnRouteEnter` simplified; `window._continuumChat` fully eliminated. 185/185 tests passing.
 
-**Phase 2 ready to begin.** No Phase 2 tasks were started this session.
+**Phase 2 ready to begin.** No Phase 2 tasks were started in these sessions.
 
 **Recent bug history (last six commits):**
+- `236bfee` Unified analyst chat voice rules; removed dead personalisation chat code. `VOICE_RULES` is now the single source of truth in `src/features/chat.js`, bridged to `window.CI_VOICE_RULES`. `pnBuildSystemPrompt()` appends it instead of its own abbreviated copy. Step 5 chat UI dead code (~189 lines) removed.
+- `7165776` Bumped service worker cache to `v3.1.0` to evict stale JS bundles after shadow copy fix.
 - `bebcb9c` Replaced regex-based Thesis Comparator wireframe with LLM-powered pipeline. `tcAnalyze()` calls `/api/research-chat`; response parsed into ACH alignment banner, hypothesis map, and evidence columns. Enter key submits thesis.
 - `f309fef` Eliminated root-level `js/personalisation.js` shadow copy. The production file is `public/js/personalisation.js` (served via Vite `publicDir: 'public'`). The root-level copy was never served in production -- fixes applied to it had no effect. 57 divergent lines reconciled into `public/js/`, root copy deleted. The `js/dne/` directory is retained.
-- `bd69294` Same shadow copy discovery; initial fix attempt superseded by `f309fef`.
 - `6485b04` Fixed modal-added stocks disappearing from Research tab. The fix is the `else` branch at [src/main.js:207](src/main.js#L207). If this branch is removed, all stocks added via "+ Add Stock" will vanish on reload.
 - `4b84b7c` Fixed "Stock Not Found" on Add Stock when Railway scaffold is still generating. Fix lives in [src/features/add-stock.js](src/features/add-stock.js) as the `_stub: true` fallback. Do not remove it.
 
