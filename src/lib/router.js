@@ -49,6 +49,9 @@ export function initRouter(pageRenderers) {
     if (hash.startsWith('report-')) {
       var t = hash.replace('report-', '');
       pageName = STOCK_DATA[t] ? STOCK_DATA[t].company + ' Research Report' : t + ' Report';
+    } else if (hash.startsWith('deep-report-')) {
+      var t2 = hash.replace('deep-report-', '');
+      pageName = STOCK_DATA[t2] ? STOCK_DATA[t2].company + ' Deep Research Report' : t2 + ' Deep Report';
     } else if (hash.startsWith('snapshot-')) {
       pageName = hash.replace('snapshot-', '') + ' Snapshot';
     } else {
@@ -60,6 +63,88 @@ export function initRouter(pageRenderers) {
 
   // Run initial route
   route();
+}
+
+/**
+ * Shared helper: lazy-render a stock research report into its page div.
+ * Called for both report-TICKER and deep-report-TICKER routes.
+ * renderedPages is keyed by full hash so the two page divs are independent.
+ * @param {string} hash   - full hash, e.g. "report-WOW" or "deep-report-WOW"
+ * @param {string} ticker - uppercase ticker, e.g. "WOW"
+ */
+function renderStockReport(hash, ticker) {
+  if (renderedPages.has(hash)) return;
+  const container = document.getElementById('page-' + hash);
+  if (!container) return;
+
+  // Path 1: stock not in STOCK_DATA -- fetch from Railway (dynamically-added stock)
+  if (!STOCK_DATA[ticker]) {
+    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Research Data&hellip;</div><div style="font-size:0.9rem">Fetching report for ' + ticker + ' from server</div></div></div>';
+    (async function() {
+      try {
+        var scaffoldResp = await fetch(_REFRESH_API_BASE + '/data/research/' + ticker + '.json');
+        if (!scaffoldResp.ok) throw new Error('HTTP ' + scaffoldResp.status);
+        var scaffoldData = await scaffoldResp.json();
+        scaffoldData._lastRefreshed = scaffoldData._lastRefreshed || new Date().toISOString();
+        try { localStorage.setItem('ci_research_' + ticker, JSON.stringify(scaffoldData)); } catch(e) {}
+        var currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00a3','EUR':'\u20ac'};
+        STOCK_DATA[ticker] = scaffoldData;
+        STOCK_DATA[ticker]._indexOnly = false;
+        if (scaffoldData.currency && currencyMap[scaffoldData.currency]) {
+          STOCK_DATA[ticker].currency = currencyMap[scaffoldData.currency];
+        }
+        if (typeof window.ContinuumDynamics !== 'undefined' && window.ContinuumDynamics.hydrate) {
+          window.ContinuumDynamics.hydrate(ticker);
+        }
+        if (_pageRenderers.renderReportPage) {
+          container.innerHTML = _pageRenderers.renderReportPage(STOCK_DATA[ticker]);
+        }
+        renderedPages.add(hash);
+        if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
+        if (_pageRenderers.setupScrollSpy) _pageRenderers.setupScrollSpy('page-' + hash);
+        if (_pageRenderers.populateSidebar) _pageRenderers.populateSidebar(ticker);
+        if (typeof window.applyNarrativeAnalysis === 'function') window.applyNarrativeAnalysis(ticker);
+        if (_pageRenderers.initNarrativeTimelineChart) _pageRenderers.initNarrativeTimelineChart(ticker);
+        if (_pageRenderers.fetchAndPatchLive) _pageRenderers.fetchAndPatchLive(ticker);
+        console.log('[Route] Fetched dynamically-added stock ' + ticker + ' from Railway');
+      } catch(err) {
+        container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Stock Not Found</div><div style="font-size:0.9rem">' + ticker + ' is not in coverage. <a href="#home" style="color:var(--brand-green)">Return to home</a></div></div></div>';
+        console.warn('[Route] Failed to fetch ' + ticker + ':', err);
+      }
+    })();
+  }
+
+  // Path 2: stock is index-only -- load full research data then render
+  else if (STOCK_DATA[ticker]._indexOnly) {
+    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Research Data&hellip;</div><div style="font-size:0.9rem">Fetching full report for ' + STOCK_DATA[ticker].company + '</div></div></div>';
+    if (_pageRenderers.loadFullResearchData) {
+      _pageRenderers.loadFullResearchData(ticker, function(data) {
+        if (data) {
+          if (_pageRenderers.renderReportPage) {
+            container.innerHTML = _pageRenderers.renderReportPage(data);
+          }
+          renderedPages.add(hash);
+          if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
+          if (_pageRenderers.setupScrollSpy) _pageRenderers.setupScrollSpy('page-' + hash);
+          if (_pageRenderers.populateSidebar) _pageRenderers.populateSidebar(ticker);
+          if (typeof window.applyNarrativeAnalysis === 'function') window.applyNarrativeAnalysis(ticker);
+          if (_pageRenderers.initNarrativeTimelineChart) _pageRenderers.initNarrativeTimelineChart(ticker);
+          if (_pageRenderers.fetchAndPatchLive) _pageRenderers.fetchAndPatchLive(ticker);
+        }
+      });
+    }
+  }
+
+  // Path 3: fully loaded -- render immediately
+  else {
+    if (_pageRenderers.renderReportPage) {
+      container.innerHTML = _pageRenderers.renderReportPage(STOCK_DATA[ticker]);
+    }
+    renderedPages.add(hash);
+    if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
+    if (_pageRenderers.setupScrollSpy) _pageRenderers.setupScrollSpy('page-' + hash);
+    if (_pageRenderers.initNarrativeTimelineChart) _pageRenderers.initNarrativeTimelineChart(ticker);
+  }
 }
 
 /**
@@ -110,73 +195,21 @@ export function route() {
   // Lazy render report pages on first visit
   if (hash.startsWith('report-')) {
     const ticker = hash.replace('report-', '');
-    if (!renderedPages.has(ticker)) {
-      const container = document.getElementById('page-' + hash);
-      if (container) {
-        // If stock not in STOCK_DATA at all, try fetching from Railway (dynamically-added stock)
-        if (!STOCK_DATA[ticker]) {
-          container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Research Data&hellip;</div><div style="font-size:0.9rem">Fetching report for ' + ticker + ' from server</div></div></div>';
-          (async function() {
-            try {
-              var scaffoldResp = await fetch(_REFRESH_API_BASE + '/data/research/' + ticker + '.json');
-              if (!scaffoldResp.ok) throw new Error('HTTP ' + scaffoldResp.status);
-              var scaffoldData = await scaffoldResp.json();
-              scaffoldData._lastRefreshed = scaffoldData._lastRefreshed || new Date().toISOString();
-              try { localStorage.setItem('ci_research_' + ticker, JSON.stringify(scaffoldData)); } catch(e) {}
-              var currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00a3','EUR':'\u20ac'};
-              STOCK_DATA[ticker] = scaffoldData;
-              STOCK_DATA[ticker]._indexOnly = false;
-              if (scaffoldData.currency && currencyMap[scaffoldData.currency]) {
-                STOCK_DATA[ticker].currency = currencyMap[scaffoldData.currency];
-              }
-              if (typeof window.ContinuumDynamics !== 'undefined' && window.ContinuumDynamics.hydrate) {
-                window.ContinuumDynamics.hydrate(ticker);
-              }
-              if (_pageRenderers.renderReportPage) {
-                container.innerHTML = _pageRenderers.renderReportPage(STOCK_DATA[ticker]);
-              }
-              renderedPages.add(ticker);
-              if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
-              if (_pageRenderers.setupScrollSpy) _pageRenderers.setupScrollSpy('page-' + hash);
-              if (_pageRenderers.populateSidebar) _pageRenderers.populateSidebar(ticker);
-              if (typeof window.applyNarrativeAnalysis === 'function') window.applyNarrativeAnalysis(ticker);
-              if (_pageRenderers.initNarrativeTimelineChart) _pageRenderers.initNarrativeTimelineChart(ticker);
-              if (_pageRenderers.fetchAndPatchLive) _pageRenderers.fetchAndPatchLive(ticker);
-              console.log('[Route] Fetched dynamically-added stock ' + ticker + ' from Railway');
-            } catch(err) {
-              container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Stock Not Found</div><div style="font-size:0.9rem">' + ticker + ' is not in coverage. <a href="#home" style="color:var(--brand-green)">Return to home</a></div></div></div>';
-              console.warn('[Route] Failed to fetch ' + ticker + ':', err);
-            }
-          })();
-        } else if (STOCK_DATA[ticker]._indexOnly) {
-          container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Research Data&hellip;</div><div style="font-size:0.9rem">Fetching full report for ' + STOCK_DATA[ticker].company + '</div></div></div>';
-          if (_pageRenderers.loadFullResearchData) {
-            _pageRenderers.loadFullResearchData(ticker, function(data) {
-              if (data) {
-                if (_pageRenderers.renderReportPage) {
-                  container.innerHTML = _pageRenderers.renderReportPage(data);
-                }
-                renderedPages.add(ticker);
-                if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
-                if (_pageRenderers.setupScrollSpy) _pageRenderers.setupScrollSpy('page-' + hash);
-                if (_pageRenderers.populateSidebar) _pageRenderers.populateSidebar(ticker);
-                if (typeof window.applyNarrativeAnalysis === 'function') window.applyNarrativeAnalysis(ticker);
-                if (_pageRenderers.initNarrativeTimelineChart) _pageRenderers.initNarrativeTimelineChart(ticker);
-                if (_pageRenderers.fetchAndPatchLive) _pageRenderers.fetchAndPatchLive(ticker);
-              }
-            });
-          }
-        } else {
-          if (_pageRenderers.renderReportPage) {
-            container.innerHTML = _pageRenderers.renderReportPage(STOCK_DATA[ticker]);
-          }
-          renderedPages.add(ticker);
-          if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
-          if (_pageRenderers.setupScrollSpy) _pageRenderers.setupScrollSpy('page-' + hash);
-          if (_pageRenderers.initNarrativeTimelineChart) _pageRenderers.initNarrativeTimelineChart(ticker);
-        }
-      }
+    renderStockReport(hash, ticker);
+    // Apply narrative analysis (alerts, ST/LT weights, market-responsive narrative)
+    if (typeof window.applyNarrativeAnalysis === 'function') {
+      window.applyNarrativeAnalysis(ticker);
     }
+    // Fetch live data asynchronously and update chart + hero price
+    if (STOCK_DATA[ticker] && _pageRenderers.fetchAndPatchLive) {
+      _pageRenderers.fetchAndPatchLive(ticker);
+    }
+  }
+
+  // Lazy render deep-report pages on first visit (same renderer as report-)
+  if (hash.startsWith('deep-report-')) {
+    const ticker = hash.replace('deep-report-', '');
+    renderStockReport(hash, ticker);
     // Apply narrative analysis (alerts, ST/LT weights, market-responsive narrative)
     if (typeof window.applyNarrativeAnalysis === 'function') {
       window.applyNarrativeAnalysis(ticker);
@@ -263,9 +296,11 @@ export function route() {
     }
   });
 
-  // Populate hypothesis sidebar for report pages
-  if (hash.startsWith('report-')) {
-    const ticker = hash.replace('report-', '');
+  // Populate hypothesis sidebar for report and deep-report pages
+  if (hash.startsWith('report-') || hash.startsWith('deep-report-')) {
+    const ticker = hash.startsWith('deep-report-')
+      ? hash.replace('deep-report-', '')
+      : hash.replace('report-', '');
     if (_pageRenderers.populateSidebar) _pageRenderers.populateSidebar(ticker);
   }
 }
