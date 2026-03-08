@@ -8,7 +8,7 @@
  *   - window.STOCK_DATA (global, via state.js)
  *   - window.marked (CDN)
  *   - window.DOMPurify (CDN)
- *   - window.pnBuildSystemPrompt (classic script js/personalisation.js)
+ *   - window.pnBuildSystemPrompt (classic script public/js/personalisation.js)
  */
 
 import { STOCK_DATA } from '../lib/state.js';

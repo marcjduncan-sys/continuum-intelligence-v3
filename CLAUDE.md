@@ -28,16 +28,17 @@ npm run validate     # lint + test:all — run before any push
 ## Architecture Constraints
 
 - **`index.html` is owned by GitHub Actions.** The `continuum-update`, `update-daily`, `update-intraday`, and `live-prices` workflows all commit directly to `main`. Never edit `index.html` from a local copy that has not been pulled. One stale push caused commit `58b2c99`, which simultaneously broke the analyst panel, portfolio DOM, dark mode, and comparator.
-- **`js/personalisation.js` and the DNE engine scripts load before `src/main.js`.** They are classic `<script>` tags, not ES modules. They write `window.renderPersonalisationPage`, `window.initPersonalisationDemo`, `window.pnBuildSystemPrompt`, and `window.TC_DATA`. If `src/main.js` is loaded before them, those globals will be undefined and `initChat()`, `initRouter()`, and `initThesisPage()` will silently fail.
+- **`public/js/personalisation.js` and the DNE engine scripts load before `src/main.js`.** They are classic `<script>` tags, not ES modules. They write `window.renderPersonalisationPage`, `window.initPersonalisationDemo`, `window.pnBuildSystemPrompt`, and `window.TC_DATA`. If `src/main.js` is loaded before them, those globals will be undefined and `initChat()`, `initRouter()`, and `initThesisPage()` will silently fail.
 - **Never replace the `STOCK_DATA`, `REFERENCE_DATA`, `FRESHNESS_DATA`, or `SNAPSHOT_DATA` object references.** They are exported by reference from `src/lib/state.js` and aliased to `window.*`. Replace the reference and every module holding the old pointer will silently diverge. Use `initStockData()`, `setStockData()`, `patchStock()`, or `Object.assign()` instead.
 - **`FEATURED_ORDER` and `SNAPSHOT_ORDER` are Proxy objects** backed by live `Object.keys(STOCK_DATA)`. Do not destructure them into a plain array at module load time; they will become stale immediately. Call `.forEach()`, `.map()`, etc. at render time, not at import time.
 - **`src/lib/state.js` owns all global state.** No module may declare its own copy of stock, freshness, reference, or snapshot data. The only exceptions are local caches invalidated within the same render cycle.
 - **`api/` is the Railway backend (FastAPI/Python), not part of the GitHub Pages build.** Changes to `api/` require a Railway redeploy, not `npm run build`. The frontend connects to `https://imaginative-vision-production-16cb.up.railway.app` when on GitHub Pages, and to `localhost:8000` (via Vite proxy) in dev.
 - **`Documents/continuum-v3/` is a dead git worktree.** It contains its own `node_modules`, test files, and stale source. Never edit files there. The active codebase is at the repo root.
 - **Do not touch `data/research/_index.json` manually.** It is the canonical stock list and the authoritative source for stock count (currently 25 tickers). Editing it locally will conflict with the next automated commit. When adding a new ticker, update `_index.json` and `data/reference.json` -- do not rely on `REFERENCE_DATA` in `index.html`, which is a known defect covering fewer tickers than `_index.json`. Note: `reference.json` currently has 25 entries (RMC corrected 2026-03-07).
-- **`js/personalisation.js` is NOT linted by ESLint** (`npm run lint` covers `scripts/` and `src/` only). Bugs there will not surface in CI.
+- **`public/js/personalisation.js` is NOT linted by ESLint** (`npm run lint` covers `scripts/` and `src/` only). Bugs there will not surface in CI.
 - **`window.CI_API_KEY` injection is undocumented.** It is not set in `index.html`; Claude Code configured the injection mechanism. Do not modify anything related to `CI_API_KEY` without first grepping the entire repo for all references and tracing the injection point. If it is broken, check (in order): Railway environment variables, GitHub Secrets, any `<script>` tag in `index.html` setting the global.
 - **GitHub Actions secrets are not documented in the repo.** Do not rename or delete secrets without checking every workflow file for references first. To diagnose a failing workflow: open the workflow YAML, find which secret it references, then verify that secret exists at GitHub repo Settings > Secrets and variables > Actions.
+- **`js/personalisation.js` (root-level) was deleted 2026-03-08.** The canonical file is `public/js/personalisation.js`, which Vite copies verbatim to `dist/js/personalisation.js` via `publicDir: 'public'`. The root-level `js/` directory still exists for `js/dne/` (the DNE engine). Do not recreate `js/personalisation.js` at the repo root -- it is never served in production and creates a shadow copy problem where fixes appear to apply but have no effect.
 
 ---
 
@@ -58,6 +59,7 @@ npm run validate     # lint + test:all — run before any push
 - `5cb85f2` Restored analyst panel and portfolio HTML after `58b2c99` wiped them. If the analyst panel ever disappears from the DOM, check whether a stale `index.html` was pushed.
 - `6485b04` Fixed modal-added stocks disappearing from Research tab. The fix is the `else` branch at [src/main.js:207](src/main.js#L207). If this branch is removed, all stocks added via "+ Add Stock" will vanish on reload.
 - `4b84b7c` Fixed "Stock Not Found" on Add Stock when Railway scaffold is still generating. Fix lives in [src/features/add-stock.js](src/features/add-stock.js) as the `_stub: true` fallback. Do not remove it.
+- `bd69294` Eliminated root-level `js/personalisation.js` shadow copy. The production file is `public/js/personalisation.js` (served via Vite `publicDir: 'public'`). The root-level copy was never served in production -- fixes applied to it had no effect. 57 divergent lines reconciled into `public/js/`, root copy deleted. The `js/dne/` directory is retained.
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
@@ -81,7 +83,7 @@ npm run validate     # lint + test:all — run before any push
 
 - **Before editing `index.html`:** run `git pull origin main` and confirm you are at the latest commit. No exceptions.
 - **Before touching the skew-gate logic in `src/pages/portfolio.js`:** re-read the three-branch rules in MEMORY.md. The logic has been broken twice.
-- **If a bug is in `js/personalisation.js`:** stop and flag it. That file is ~1,300 lines, untested by CI, and owns the personalisation pipeline. Changes have outsized blast radius.
+- **If a bug is in `public/js/personalisation.js`:** stop and flag it. That file is ~1,800 lines, untested by CI, and owns the personalisation pipeline. Changes have outsized blast radius.
 - **If a fix touches more than two files:** enter Plan Mode. Present the diff surface before writing code.
 - **If a Jest test fails but Vitest passes:** report it rather than patching to silence it. Jest uses jsdom; some DOM interactions behave differently. Do not block the task on a Jest-only failure.
 - **If you find a bug unrelated to the current task:** record it in a note and raise it. Do not fix it inline. Silent scope creep has caused multiple regressions in this codebase.

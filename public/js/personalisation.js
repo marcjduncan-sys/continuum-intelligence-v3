@@ -1085,19 +1085,21 @@ function renderStep5() {
 
     return '<div class="pn-step pn-step-chat" data-step="5">' +
         '<div class="pn-step-header">' +
-            '<h2 class="pn-step-heading">Calibrated Research Chat</h2>' +
-            '<p class="pn-step-desc">Your cognitive profile is now active. Ask research questions and see how analysis is calibrated to your decision-making style.</p>' +
+            '<h2 class="pn-step-heading">Calibrated AI Active</h2>' +
+            '<p class="pn-step-desc">Your cognitive profile is now active. The Analyst incorporates your firm context, strategy mandate, portfolio, and cognitive style on every question.</p>' +
         '</div>' +
         '<div class="pn-chat-layout">' +
             renderProfileSidebar() +
             '<div class="pn-chat-main">' +
-                renderChatHeader() +
-                '<div class="pn-chat-messages" id="pn-chat-messages"></div>' +
-                '<div class="pn-chat-input-area">' +
-                    '<textarea class="pn-chat-input" id="pn-chat-input" placeholder="Ask about a stock..." rows="1"></textarea>' +
-                    '<button class="pn-chat-send" id="pn-chat-send" disabled>' +
-                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>' +
-                    '</button>' +
+                '<div class="pn-calibration-ready">' +
+                    '<div class="pn-calibration-icon">' +
+                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
+                    '</div>' +
+                    '<div class="pn-calibration-title">Profile loaded into Analyst</div>' +
+                    '<div class="pn-calibration-body">Your Analyst panel (top right) now has full context of your firm, mandate, holdings, and cognitive biases. Every research question you ask is filtered through this profile.</div>' +
+                    '<div class="pn-calibration-chips">' +
+                        '<button class="pn-chip" onclick="window.location.hash=\'#home\'">Browse coverage \u2192</button>' +
+                    '</div>' +
                 '</div>' +
             '</div>' +
         '</div>' +
@@ -1219,11 +1221,23 @@ function renderWizardFooter() {
 // CHAT LOGIC
 // =========================================================================
 
+// Shared conversation store -- same object as FAB chat uses.
+// Both the FAB button and personalisation tab read/write here so
+// switching between them continues the same conversation.
+function pnGetSharedConvo() {
+    if (!window._continuumChat) window._continuumChat = {};
+    var ticker = pnState.chatTicker;
+    if (!ticker) return [];
+    if (!window._continuumChat[ticker]) window._continuumChat[ticker] = [];
+    return window._continuumChat[ticker];
+}
+
 function renderChatMessages() {
     var el = document.getElementById('pn-chat-messages');
     if (!el) return;
 
-    if (pnState.chatHistory.length === 0) {
+    var convo = pnGetSharedConvo();
+    if (convo.length === 0) {
         el.innerHTML = '<div class="pn-chat-welcome">' +
             '<div class="pn-chat-welcome-title">Your calibrated analyst is ready</div>' +
             '<div class="pn-chat-welcome-text">Select a stock above and ask any research question. ' +
@@ -1233,8 +1247,8 @@ function renderChatMessages() {
     }
 
     var html = '';
-    for (var i = 0; i < pnState.chatHistory.length; i++) {
-        var msg = pnState.chatHistory[i];
+    for (var i = 0; i < convo.length; i++) {
+        var msg = convo[i];
         var cls = 'pn-chat-msg ' + msg.role;
         var content = msg.role === 'assistant' ? formatMarkdown(msg.content) : escapeHtml(msg.content);
         html += '<div class="' + cls + '">' + content + '</div>';
@@ -1277,7 +1291,8 @@ function pnSendChat() {
     var question = input.value.trim();
     if (!question || !pnState.chatTicker) return;
 
-    pnState.chatHistory.push({ role: 'user', content: question });
+    var convo = pnGetSharedConvo();
+    convo.push({ role: 'user', content: question });
     input.value = '';
     input.style.height = 'auto';
     if (sendBtn) sendBtn.disabled = true;
@@ -1294,10 +1309,10 @@ function pnSendChat() {
     );
 
     var history = [];
-    for (var i = 0; i < pnState.chatHistory.length - 1; i++) {
+    for (var i = 0; i < convo.length - 1; i++) {
         history.push({
-            role: pnState.chatHistory[i].role,
-            content: pnState.chatHistory[i].content
+            role: convo[i].role,
+            content: convo[i].content
         });
     }
 
@@ -1324,7 +1339,7 @@ function pnSendChat() {
     .then(function(data) {
         hideChatTyping();
         pnState.chatLoading = false;
-        pnState.chatHistory.push({ role: 'assistant', content: data.response });
+        convo.push({ role: 'assistant', content: data.response });
         renderChatMessages();
         if (sendBtn) sendBtn.disabled = false;
     })
@@ -1602,7 +1617,8 @@ function bindStep5Inputs() {
     if (tickerSelect) {
         tickerSelect.addEventListener('change', function() {
             pnState.chatTicker = this.value;
-            pnState.chatHistory = [];
+            // No need to clear history -- shared store keys by ticker,
+            // so switching tickers just shows that ticker's conversation.
             renderChatMessages();
             if (sendBtn && input) {
                 sendBtn.disabled = !input.value.trim() || !this.value;
@@ -1622,7 +1638,10 @@ function bindStep5Inputs() {
                 pnState.portfolioSkipped = false;
                 pnState.assessment = { ipip: {}, crt: {}, philosophy: {}, bias: {}, preferences: {} };
                 pnState.profile = null;
-                pnState.chatHistory = [];
+                // Clear all shared conversations on profile reset
+                if (window._continuumChat) {
+                    for (var k in window._continuumChat) delete window._continuumChat[k];
+                }
                 pnState.chatTicker = '';
                 pnState.assessmentBlock = 0;
                 pnRefresh();
