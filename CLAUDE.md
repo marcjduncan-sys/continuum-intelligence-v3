@@ -42,7 +42,7 @@ npm run validate     # lint + test:all — run before any push
 
 ---
 
-## Current State — 2026-03-08
+## Current State — 2026-03-09
 
 **Phase 0 COMPLETE (2026-03-07).** The extraction of logic from `index.html` into `src/` modules is complete. `computeSkewScore` canonicalised to zero-contribution convention (commit `4493e8c`; see `docs/decisions/003-computeskewscore-neutral-convention.md`). `VALID_STATIC_PAGES` confirmed correct: `home`, `deep-research`, `portfolio`, `comparator`, `personalisation`, `about`.
 
@@ -57,21 +57,34 @@ npm run validate     # lint + test:all — run before any push
 - [x] Thesis Comparator rebuilt with LLM pipeline (commit `bebcb9c`): `tcAnalyze()` now POSTs to `/api/research-chat` with a structured ACH system prompt; `renderComparatorResult()` parses the ALIGNMENT line, populates hypothesis map from `tc.json`, and renders supporting/contradicting evidence. Loading animation, error state, and contrarian banner CSS added. Enter key wired. Verified end-to-end against WOW with real Railway responses on preview server.
 - [x] Analyst chat consistency and voice rules unified (commit `236bfee`): extracted `VOICE_RULES` constant from `src/features/chat.js` (16 rules, single source of truth); bridged to `window.CI_VOICE_RULES` in `src/main.js`; `pnBuildSystemPrompt()` now appends `window.CI_VOICE_RULES` instead of its own abbreviated copy; em-dash on line 700 of `public/js/personalisation.js` fixed; ~189 lines of dead Step 5 centre-panel chat code removed (`pnGetSharedConvo`, `renderChatMessages`, `showChatTyping`, `hideChatTyping`, `appendChatError`, `renderChatHeader`, `pnSendChat`); `bindStep5Inputs` and `pnOnRouteEnter` simplified; `window._continuumChat` fully eliminated. 185/185 tests passing.
 
-**Phase 2 in progress.** Auth + conversation persistence commit (`566e945`).
+**Phase 2 CODE COMPLETE (2026-03-09). Pending: DATABASE_URL in Railway.**
+- [x] Track A (auth backend): OTP email flow, JWT HS256, `api/auth.py`, `api/email_service.py`, `api/config.py`, `api/migrations/002_auth.sql` -- commit `566e945`.
+- [x] Track B (conversation persistence): `api/conversations.py`, `api/db.py` helpers, `POST /api/conversations`, `GET /api/conversations/{ticker}` -- commit `566e945`.
+- [x] Track C (frontend): `src/features/auth.js` (guest UUID, JWT storage, two-step OTP modal), surgical edits to `src/features/chat.js` (`_ensureConversation`, `_persistMessage`, `_restoreFromDB`), `initAuth()` wired in `src/main.js` before `initChat()` -- commit `566e945`.
+- [x] Railway 502 fix: `asyncio.wait_for(asyncpg.create_pool(...), timeout=15.0)` in `api/db.py`; removed lifespan pre-warm from `api/main.py` -- commit `9a8dad7`.
+- [ ] **ACTION REQUIRED**: Provision PostgreSQL in Railway dashboard and confirm `DATABASE_URL` is injected into the Continuum service. After provisioning, `run_migrations()` runs automatically on first DB request and applies `001_initial.sql` + `002_auth.sql`.
+- [ ] **ACTION REQUIRED**: Add SMTP env vars (`EMAIL_FROM`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`) to Railway dashboard for live OTP email delivery. Until set, OTP codes are logged server-side only.
+- [ ] **ACTION REQUIRED**: Add `JWT_SECRET` (32-char hex) to Railway dashboard. Current fallback `dev-insecure-secret` is not safe for production.
 
-**Session work (2026-03-09):**
+**Session work (2026-03-09 session 2):**
+- [x] Diagnosed Railway 502: `asyncpg.create_pool(timeout=10.0)` controls `pool.acquire()` timeout, not TCP connect. Initial connections hung indefinitely during rolling deploys.
+- [x] Fixed with `asyncio.wait_for()` (15s hard deadline) + removed lifespan pre-warm (commit `9a8dad7`). Confirmed healthy: `curl /api/health` returns 25 tickers, 851 passages.
+- [x] Smoke-tested Phase 2 endpoints: DB endpoints return 503 (DATABASE_URL not set -- user action required). OTP endpoint returns 200 (silent no-op when DB unavailable -- correct behaviour).
+- [x] Confirmed Track C fully implemented in prior session. 185/185 tests passing.
+
+**Session work (2026-03-09 session 1):**
 - [x] Session audit: scraped 78 Claude sessions across 6 projects, categorised usage patterns into skills/plugins/agents/CLAUDE.md recommendations
 - [x] Built 3 new CI skills: `ci:bug-repro` (autonomous bug reproducer), `ci:stock-integrity` (data integrity audit), `ci:add-ticker` (stock onboarding workflow)
 - [x] Confirmed 5 pre-existing CI skills functional: `ci:session-close`, `ci:session-debrief`, `ci:push-safe`, `ci:deploy-check`, `ci:verify-deploy`
 - [x] Railway monitor MCP evaluated and skipped (redundant; covered by existing skills)
 
 **Recent bug history (last six commits):**
+- `9a8dad7` Fixed Railway 502: `asyncio.wait_for(asyncpg.create_pool(...), timeout=15.0)` in `db.py`. Removed pre-warm `await db.get_pool()` from `main.py` lifespan. Pool now initialises lazily on first DB request.
+- `566e945` Phase 2: auth + conversation persistence. OTP/JWT backend (`auth.py`, `email_service.py`), conversation CRUD (`conversations.py`, `db.py`), migration `002_auth.sql`, frontend `auth.js` and `chat.js` DB wiring.
 - `236bfee` Unified analyst chat voice rules; removed dead personalisation chat code. `VOICE_RULES` is now the single source of truth in `src/features/chat.js`, bridged to `window.CI_VOICE_RULES`. `pnBuildSystemPrompt()` appends it instead of its own abbreviated copy. Step 5 chat UI dead code (~189 lines) removed.
 - `7165776` Bumped service worker cache to `v3.1.0` to evict stale JS bundles after shadow copy fix.
 - `bebcb9c` Replaced regex-based Thesis Comparator wireframe with LLM-powered pipeline. `tcAnalyze()` calls `/api/research-chat`; response parsed into ACH alignment banner, hypothesis map, and evidence columns. Enter key submits thesis.
 - `f309fef` Eliminated root-level `js/personalisation.js` shadow copy. The production file is `public/js/personalisation.js` (served via Vite `publicDir: 'public'`). The root-level copy was never served in production -- fixes applied to it had no effect. 57 divergent lines reconciled into `public/js/`, root copy deleted. The `js/dne/` directory is retained.
-- `6485b04` Fixed modal-added stocks disappearing from Research tab. The fix is the `else` branch at [src/main.js:207](src/main.js#L207). If this branch is removed, all stocks added via "+ Add Stock" will vanish on reload.
-- `4b84b7c` Fixed "Stock Not Found" on Add Stock when Railway scaffold is still generating. Fix lives in [src/features/add-stock.js](src/features/add-stock.js) as the `_stub: true` fallback. Do not remove it.
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
