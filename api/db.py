@@ -27,14 +27,15 @@ async def get_pool():
 
     try:
         import asyncpg
-        _pool = await asyncpg.create_pool(
+        pool = await asyncpg.create_pool(
             database_url,
             min_size=1,
             max_size=10,
             command_timeout=30,
         )
         logger.info("asyncpg connection pool created")
-        await run_migrations(_pool)
+        await run_migrations(pool)
+        _pool = pool
         return _pool
     except Exception as exc:
         logger.error("Failed to create database pool: %s", exc)

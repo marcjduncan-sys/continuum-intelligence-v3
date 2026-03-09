@@ -118,13 +118,17 @@ async def get_conversation(
     This allows the frontend to gracefully degrade when DB is unavailable.
     """
     user_id, resolved_guest_id = _get_identity(request, guest_id)
-    pool = await db.get_pool()
-    conversation_id, messages = await db.get_conversation_by_ticker(
-        pool,
-        ticker=ticker,
-        user_id=user_id,
-        guest_id=resolved_guest_id,
-    )
+    try:
+        pool = await db.get_pool()
+        conversation_id, messages = await db.get_conversation_by_ticker(
+            pool,
+            ticker=ticker,
+            user_id=user_id,
+            guest_id=resolved_guest_id,
+        )
+    except Exception as exc:
+        logger.error("get_conversation failed for %s: %s", ticker, exc)
+        conversation_id, messages = None, []
     return {
         "conversation_id": conversation_id,
         "ticker": ticker.upper(),
