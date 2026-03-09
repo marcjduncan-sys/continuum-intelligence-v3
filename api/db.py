@@ -32,6 +32,7 @@ async def get_pool():
             min_size=1,
             max_size=10,
             command_timeout=30,
+            timeout=10.0,
         )
         logger.info("asyncpg connection pool created")
         await run_migrations(pool)
