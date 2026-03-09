@@ -133,8 +133,6 @@ async def lifespan(app: FastAPI):
     for ticker, count in sorted(counts.items()):
         logger.info(f"  {ticker}: {count} passages")
 
-    # Pre-warm database pool (no-op if DATABASE_URL not set)
-    await db.get_pool()
     yield
     await db.close_pool()
 

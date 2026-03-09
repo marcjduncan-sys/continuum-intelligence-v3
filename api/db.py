@@ -4,6 +4,7 @@ Database connection module -- asyncpg connection pool.
 If DATABASE_URL is not set, all functions are no-ops (dev mode tolerance).
 """
 
+import asyncio
 import json
 import logging
 import os
@@ -27,17 +28,22 @@ async def get_pool():
 
     try:
         import asyncpg
-        pool = await asyncpg.create_pool(
-            database_url,
-            min_size=1,
-            max_size=10,
-            command_timeout=30,
-            timeout=10.0,
+        pool = await asyncio.wait_for(
+            asyncpg.create_pool(
+                database_url,
+                min_size=1,
+                max_size=10,
+                command_timeout=30,
+            ),
+            timeout=15.0,
         )
         logger.info("asyncpg connection pool created")
         await run_migrations(pool)
         _pool = pool
         return _pool
+    except asyncio.TimeoutError:
+        logger.error("Database pool creation timed out after 15s -- continuing without DB")
+        return None
     except Exception as exc:
         logger.error("Failed to create database pool: %s", exc)
         return None
