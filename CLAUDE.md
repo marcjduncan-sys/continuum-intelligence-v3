@@ -66,25 +66,29 @@ npm run validate     # lint + test:all — run before any push
 - [ ] **ACTION REQUIRED**: Add SMTP env vars (`EMAIL_FROM`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`) to Railway dashboard for live OTP email delivery. Until set, OTP codes are logged server-side only.
 - [ ] **ACTION REQUIRED**: Add `JWT_SECRET` (32-char hex) to Railway dashboard. Current fallback `dev-insecure-secret` is not safe for production.
 
-**Session work (2026-03-09 session 2):**
-- [x] Diagnosed Railway 502: `asyncpg.create_pool(timeout=10.0)` controls `pool.acquire()` timeout, not TCP connect. Initial connections hung indefinitely during rolling deploys.
-- [x] Fixed with `asyncio.wait_for()` (15s hard deadline) + removed lifespan pre-warm (commit `9a8dad7`). Confirmed healthy: `curl /api/health` returns 25 tickers, 851 passages.
-- [x] Smoke-tested Phase 2 endpoints: DB endpoints return 503 (DATABASE_URL not set -- user action required). OTP endpoint returns 200 (silent no-op when DB unavailable -- correct behaviour).
-- [x] Confirmed Track C fully implemented in prior session. 185/185 tests passing.
+**Phase 3 COMPLETE (2026-03-09).**
+- [x] Wave 1A: Sign in button added to `.nav-actions` in `index.html`; `initAuth()` wires click handler, updates button text on `ci:auth:login` event -- commit `fbb7a35`.
+- [x] Wave 1B: Rolling summarisation (`api/summarise.py`, `api/db.py` context helpers, `api/migrations/003_summaries.sql`). `ResearchChatRequest` accepts `conversation_id`; handler calls `summarise_if_needed()` when provided. `chat.js` passes `dbConversationIds[ticker]` -- commit `fbb7a35`.
+- [x] Railway deploy fix: `from . import db` relative import in `summarise.py` crashed Railway at startup. Changed to bare `import db` matching project convention -- commit `28694bd`.
+- [x] Sign in button CSS fix: `.ci-signin-btn` rules were injected lazily in `_getOrCreateModal()`; button rendered with browser defaults until modal first opened. Moved to eager injection in `initAuth()` -- commit `208b2e3`. Verified: border styled, background transparent at page load.
+
+**Session work (2026-03-09 sessions 2-3):**
+- [x] Diagnosed Railway 502: `asyncpg.create_pool(timeout=10.0)` controls `pool.acquire()` timeout, not TCP connect. Fixed with `asyncio.wait_for()` (commit `9a8dad7`).
+- [x] Debugged three consecutive Railway healthcheck failures: root cause `from . import db` in `summarise.py`. Correct test context is `cd api/ && python3 -c "import summarise"` -- not `from api import summarise` which grants package context and masks the error.
+- [x] Phase 3 fully deployed and verified: `conversation_id` in OpenAPI schema; Sign in button styled correctly at page load.
 
 **Session work (2026-03-09 session 1):**
-- [x] Session audit: scraped 78 Claude sessions across 6 projects, categorised usage patterns into skills/plugins/agents/CLAUDE.md recommendations
-- [x] Built 3 new CI skills: `ci:bug-repro` (autonomous bug reproducer), `ci:stock-integrity` (data integrity audit), `ci:add-ticker` (stock onboarding workflow)
-- [x] Confirmed 5 pre-existing CI skills functional: `ci:session-close`, `ci:session-debrief`, `ci:push-safe`, `ci:deploy-check`, `ci:verify-deploy`
-- [x] Railway monitor MCP evaluated and skipped (redundant; covered by existing skills)
+- [x] Session audit: scraped 78 Claude sessions across 6 projects, categorised usage patterns into skills/plugins/agents/CLAUDE.md recommendations.
+- [x] Built 3 new CI skills: `ci:bug-repro` (autonomous bug reproducer), `ci:stock-integrity` (data integrity audit), `ci:add-ticker` (stock onboarding workflow).
+- [x] Confirmed 5 pre-existing CI skills functional: `ci:session-close`, `ci:session-debrief`, `ci:push-safe`, `ci:deploy-check`, `ci:verify-deploy`.
 
 **Recent bug history (last six commits):**
+- `208b2e3` Sign in button CSS injected eagerly in `initAuth()`. Was injected lazily inside `_getOrCreateModal()` -- button rendered with browser default styles until modal first opened.
+- `28694bd` Fixed Railway healthcheck failures: `from . import db` relative import in `summarise.py` crashes the app when loaded as a top-level module. Changed to bare `import db`.
+- `fbb7a35` Phase 3: rolling summarisation + auth entry point. `summarise.py` (new), `db.py` context helpers, `003_summaries.sql`, `ResearchChatRequest.conversation_id`, Sign in button in nav.
 - `9a8dad7` Fixed Railway 502: `asyncio.wait_for(asyncpg.create_pool(...), timeout=15.0)` in `db.py`. Removed pre-warm `await db.get_pool()` from `main.py` lifespan. Pool now initialises lazily on first DB request.
 - `566e945` Phase 2: auth + conversation persistence. OTP/JWT backend (`auth.py`, `email_service.py`), conversation CRUD (`conversations.py`, `db.py`), migration `002_auth.sql`, frontend `auth.js` and `chat.js` DB wiring.
-- `236bfee` Unified analyst chat voice rules; removed dead personalisation chat code. `VOICE_RULES` is now the single source of truth in `src/features/chat.js`, bridged to `window.CI_VOICE_RULES`. `pnBuildSystemPrompt()` appends it instead of its own abbreviated copy. Step 5 chat UI dead code (~189 lines) removed.
-- `7165776` Bumped service worker cache to `v3.1.0` to evict stale JS bundles after shadow copy fix.
-- `bebcb9c` Replaced regex-based Thesis Comparator wireframe with LLM-powered pipeline. `tcAnalyze()` calls `/api/research-chat`; response parsed into ACH alignment banner, hypothesis map, and evidence columns. Enter key submits thesis.
-- `f309fef` Eliminated root-level `js/personalisation.js` shadow copy. The production file is `public/js/personalisation.js` (served via Vite `publicDir: 'public'`). The root-level copy was never served in production -- fixes applied to it had no effect. 57 divergent lines reconciled into `public/js/`, root copy deleted. The `js/dne/` directory is retained.
+- `236bfee` Unified analyst chat voice rules; removed dead personalisation chat code. `VOICE_RULES` is now the single source of truth in `src/features/chat.js`, bridged to `window.CI_VOICE_RULES`.
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
