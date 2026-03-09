@@ -11,10 +11,10 @@
       "what_to_watch": "Q3 FY26 margins and online penetration rate. If Australian Food EBIT margin holds above 5.5% and e-commerce grows >20% YoY, this narrative strengthens.",
       "upside": "If digital transformation accelerates and margins expand further, the market could re-rate the stock to a premium multiple, driving 15-20% upside.",
       "risk_plain": "If competition from ALDI and Costco intensifies faster than expected, margin recovery could stall.",
-      "survival_score": 0.44,
+      "survival_score": 0.46,
       "status": "MODERATE",
       "weighted_inconsistency": 1.2,
-      "last_updated": "2026-03-09T08:01:28.851Z"
+      "last_updated": "2026-03-09T08:04:50.525Z"
     },
     "N2": {
       "label": "Managed/Base Case",
@@ -23,10 +23,10 @@
       "what_to_watch": "Revenue growth vs CPI inflation. If top-line growth consistently falls below inflation, the base case weakens.",
       "upside": "Steady dividend growth and defensive positioning could attract capital in a risk-off market environment.",
       "risk_plain": "If the economy slows significantly, even defensive names like Woolworths could see pressure on volumes.",
-      "survival_score": 0.46,
+      "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 2.1,
-      "last_updated": "2026-03-09T08:01:28.851Z"
+      "last_updated": "2026-03-09T08:04:50.525Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -38,7 +38,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 4.8,
-      "last_updated": "2026-02-27T08:04:28.458Z"
+      "last_updated": "2026-03-09T08:04:50.525Z"
     },
     "N4": {
       "label": "Disruption",
@@ -50,12 +50,12 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 6.3,
-      "last_updated": "2026-02-27T08:04:28.458Z"
+      "last_updated": "2026-03-09T08:04:50.525Z"
     }
   },
   "dominant": "N2",
   "confidence": "LOW",
-  "alert_state": "OVERCORRECTION",
+  "alert_state": "NORMAL",
   "alert_started": null,
   "current_price": 34.99,
   "big_picture": "Woolworths is Australia's largest supermarket chain, with around 37% market share. The company is currently in a recovery phase after a period of competitive pressure, with improving margins and a growing digital business.",
@@ -463,6 +463,13 @@
       "severity": "AMBER",
       "message": "Single-day move of +12.6% exceeds 10% threshold — possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-03-09",
+      "type": "OVERCORRECTION_REVIEW",
+      "severity": "AMBER",
+      "message": "Overcorrection NOT confirmed — price only partially reversed",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -545,11 +552,20 @@
       "cumulative_20d": 17.76,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-09",
+      "classification": "NOTABLE",
+      "daily_change_pct": -3.74,
+      "volume_multiplier": 1,
+      "cumulative_5d": 12.71,
+      "cumulative_20d": 17.76,
+      "results_day": false,
+      "overcorrection_active": false
     }
   ],
   "editorial_override": null,
   "price_history": [
-    28.08,
     28.09,
     27.95,
     28.39,
@@ -608,7 +624,8 @@
     31.96,
     31.96,
     36.35,
-    36
+    36,
+    34.99
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -843,13 +860,18 @@
   "price": 36.35,
   "date": "26 February 2026",
   "_overcorrection": {
-    "active": true,
+    "active": false,
     "triggerType": "SINGLE_DAY",
     "triggerDate": "2026-02-27",
     "triggerPrice": 36,
     "direction": "up",
     "movePct": 12.64,
     "reviewDate": "2026-03-06",
-    "message": "Single-day move of +12.6% exceeds 10% threshold — possible overcorrection"
+    "message": "Single-day move of +12.6% exceeds 10% threshold — possible overcorrection",
+    "reviewResult": {
+      "reversal_pct": 22.2,
+      "confirmed": false,
+      "message": "Overcorrection NOT confirmed — price only partially reversed"
+    }
   }
 }

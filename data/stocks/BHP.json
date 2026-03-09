@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-06T07:56:06.272Z"
+      "last_updated": "2026-03-09T08:04:50.541Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -26,7 +26,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-06T07:56:06.272Z"
+      "last_updated": "2026-03-09T08:04:50.541Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -38,7 +38,7 @@
       "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-06T07:56:06.272Z"
+      "last_updated": "2026-03-09T08:04:50.541Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -50,12 +50,12 @@
       "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-06T07:56:06.272Z"
+      "last_updated": "2026-03-09T08:04:50.541Z"
     }
   },
   "dominant": "N3",
   "confidence": "LOW",
-  "alert_state": "OVERCORRECTION",
+  "alert_state": "OVERCORRECTION_CONFIRMED",
   "current_price": 50.1,
   "big_picture": "BHP Group (ASX: BHP) — coverage initiated. Full analysis pending.",
   "last_flip": {
@@ -263,6 +263,13 @@
       "severity": "AMBER",
       "message": "5-day cumulative move of +16.0% exceeds 15% threshold — possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-03-09",
+      "type": "OVERCORRECTION_REVIEW",
+      "severity": "GREEN",
+      "message": "Overcorrection CONFIRMED — 594% reversal since trigger",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -345,11 +352,20 @@
       "cumulative_20d": 7.07,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-09",
+      "classification": "SIGNIFICANT",
+      "daily_change_pct": -9.16,
+      "volume_multiplier": 1,
+      "cumulative_5d": -8.55,
+      "cumulative_20d": 4.43,
+      "results_day": false,
+      "overcorrection_active": false
     }
   ],
   "editorial_override": null,
   "price_history": [
-    42.56,
     42.96,
     44.5,
     44.84,
@@ -408,7 +424,8 @@
     59.25,
     55.68,
     55.15,
-    52.81
+    52.81,
+    50.1
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -648,13 +665,18 @@
   "price": 57.75,
   "date": "26 February 2026",
   "_overcorrection": {
-    "active": true,
+    "active": false,
     "triggerType": "FIVE_DAY_CUMULATIVE",
     "triggerDate": "2026-03-02",
     "triggerPrice": 59.25,
     "direction": "up",
     "movePct": 2.6,
     "reviewDate": "2026-03-09",
-    "message": "5-day cumulative move of +16.0% exceeds 15% threshold — possible overcorrection"
+    "message": "5-day cumulative move of +16.0% exceeds 15% threshold — possible overcorrection",
+    "reviewResult": {
+      "reversal_pct": 594,
+      "confirmed": true,
+      "message": "Overcorrection CONFIRMED — 594% reversal since trigger"
+    }
   }
 }

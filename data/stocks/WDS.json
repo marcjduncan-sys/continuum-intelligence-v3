@@ -14,7 +14,7 @@
       "survival_score": 0.8,
       "status": "HIGH",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-03T08:01:05.415Z"
+      "last_updated": "2026-03-09T08:04:50.535Z"
     },
     "N2": {
       "label": "Commodity Price Risk",
@@ -26,7 +26,7 @@
       "survival_score": 0.1,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-03T08:01:05.415Z"
+      "last_updated": "2026-03-09T08:04:50.535Z"
     },
     "N3": {
       "label": "Energy Transition Risk",
@@ -38,7 +38,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-03T08:01:05.415Z"
+      "last_updated": "2026-03-09T08:04:50.535Z"
     },
     "N4": {
       "label": "Scarborough Delivery",
@@ -50,7 +50,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-03T08:01:05.415Z"
+      "last_updated": "2026-03-09T08:04:50.535Z"
     }
   },
   "dominant": "N1",
@@ -74,6 +74,13 @@
       "type": "OVERCORRECTION_TRIGGER",
       "severity": "AMBER",
       "message": "5-day cumulative move of +17.1% exceeds 15% threshold — possible overcorrection",
+      "auto_generated": true
+    },
+    {
+      "date": "2026-03-09",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "5-day cumulative move of +18.0% exceeds 15% threshold — possible overcorrection",
       "auto_generated": true
     }
   ],
@@ -147,11 +154,20 @@
       "cumulative_20d": 26.58,
       "results_day": false,
       "overcorrection_active": true
+    },
+    {
+      "date": "2026-03-09",
+      "classification": "NOTABLE",
+      "daily_change_pct": 3.7,
+      "volume_multiplier": 1,
+      "cumulative_5d": 18,
+      "cumulative_20d": 26.58,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    25.27,
     25.02,
     24.93,
     25.16,
@@ -210,7 +226,8 @@
     27.94,
     28.31,
     30.24,
-    30.48
+    30.48,
+    31.36
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -448,11 +465,11 @@
   "_overcorrection": {
     "active": true,
     "triggerType": "FIVE_DAY_CUMULATIVE",
-    "triggerDate": "2026-03-03",
-    "triggerPrice": 30.48,
+    "triggerDate": "2026-03-09",
+    "triggerPrice": 31.36,
     "direction": "up",
-    "movePct": 7.67,
-    "reviewDate": "2026-03-10",
-    "message": "5-day cumulative move of +17.1% exceeds 15% threshold — possible overcorrection"
+    "movePct": 3.7,
+    "reviewDate": "2026-03-16",
+    "message": "5-day cumulative move of +18.0% exceeds 15% threshold — possible overcorrection"
   }
 }
