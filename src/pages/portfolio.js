@@ -598,76 +598,48 @@ export function renderReweighting(positions, totalValue) {
       return;
     }
 
+    delta = s.suggestedWeight - s.currentWeight;
+    sharesDisplay = '--';
+
     if (isShort) {
-      delta = s.suggestedWeight - s.currentWeight;
-      // Skew-gated short action rules
+      // Short action rules: skew determines whether position is aligned
       if (s.skew === 'upside') {
-        // Short in an upside-skew stock: cover the position
-        action = 'Cover';
-        actionCls = 'sell';
-        deltaCls = 'reduce';
-      } else if (s.skew === 'balanced') {
-        action = 'Hold';
-        actionCls = 'hold';
-        deltaCls = 'hold';
+        // Evidence contradicts being short — always cover
+        action = 'Cover'; actionCls = 'sell'; deltaCls = 'reduce';
+      } else if (s.skew === 'downside') {
+        // Evidence supports short — delta logic for sizing
+        if (delta > 5) { action = 'Increase'; actionCls = 'buy'; deltaCls = 'increase'; }
+        else if (delta < -5) { action = 'Reduce'; actionCls = 'sell'; deltaCls = 'reduce'; }
+        else { action = 'Hold'; actionCls = 'hold'; deltaCls = 'hold'; }
       } else {
-        // Downside skew: aligned with short — hold
-        action = 'Hold';
-        actionCls = 'hold';
-        deltaCls = 'hold';
+        // Balanced — delta logic
+        if (delta > 5) { action = 'Increase'; actionCls = 'buy'; deltaCls = 'increase'; }
+        else if (delta < -5) { action = 'Reduce'; actionCls = 'sell'; deltaCls = 'reduce'; }
+        else { action = 'Hold'; actionCls = 'hold'; deltaCls = 'hold'; }
       }
-      // Share amount for actionable shorts
-      sharesDisplay = '--';
-      if (action === 'Cover' && s.currentPrice && s.currentPrice > 0) {
+      if (action === 'Cover' && s.currentPrice > 0) {
         sharesDisplay = Math.abs(s.units).toLocaleString('en-AU');
-      } else if (action !== 'Hold' && s.currentPrice && s.currentPrice > 0) {
-        var shortDeltaValue = Math.abs(delta / 100) * totalValue;
-        sharesDisplay = Math.round(shortDeltaValue / s.currentPrice).toLocaleString('en-AU');
+      } else if (action !== 'Hold' && s.currentPrice > 0) {
+        sharesDisplay = Math.round(Math.abs(delta / 100) * totalValue / s.currentPrice).toLocaleString('en-AU');
       }
     } else {
-      delta = s.suggestedWeight - s.currentWeight;
-
-      // Skew-gated action logic: evidence direction constrains allowable actions
-      if (s.skew === 'balanced') {
-        // No directional conviction — never add or cut a long position
-        action = 'Hold';
-        actionCls = 'hold';
-        deltaCls = 'hold';
-        sharesDisplay = '--';
-      } else if (s.skew === 'downside') {
-        // Downside skew: never initiate or add. Only reduce if overweight, else hold.
-        if (delta < -2) {
-          action = 'Sell';
-          actionCls = 'sell';
-          deltaCls = 'reduce';
-        } else {
-          action = 'Hold';
-          actionCls = 'hold';
-          deltaCls = 'hold';
-          sharesDisplay = '--';
-        }
+      // Long action rules: skew determines whether position is aligned
+      if (s.skew === 'downside') {
+        // Evidence contradicts being long — always sell
+        action = 'Sell'; actionCls = 'sell'; deltaCls = 'reduce';
+      } else if (s.skew === 'upside') {
+        // Evidence supports long — full delta logic
+        if (delta > 5) { action = 'Buy'; actionCls = 'buy'; deltaCls = 'increase'; }
+        else if (delta < -5) { action = 'Sell'; actionCls = 'sell'; deltaCls = 'reduce'; }
+        else { action = 'Hold'; actionCls = 'hold'; deltaCls = 'hold'; }
       } else {
-        // Upside skew: full delta logic applies
-        if (delta > 2) {
-          action = 'Buy';
-          actionCls = 'buy';
-          deltaCls = 'increase';
-        } else if (delta < -2) {
-          action = 'Sell';
-          actionCls = 'sell';
-          deltaCls = 'reduce';
-        } else {
-          action = 'Hold';
-          actionCls = 'hold';
-          deltaCls = 'hold';
-        }
+        // Balanced — delta logic
+        if (delta > 5) { action = 'Buy'; actionCls = 'buy'; deltaCls = 'increase'; }
+        else if (delta < -5) { action = 'Sell'; actionCls = 'sell'; deltaCls = 'reduce'; }
+        else { action = 'Hold'; actionCls = 'hold'; deltaCls = 'hold'; }
       }
-
-      // Share amount: |delta%| * totalValue / price = shares to trade
-      if (!sharesDisplay) sharesDisplay = '--';
-      if (action !== 'Hold' && s.currentPrice && s.currentPrice > 0) {
-        var deltaValue = Math.abs(delta / 100) * totalValue;
-        sharesDisplay = Math.round(deltaValue / s.currentPrice).toLocaleString('en-AU');
+      if (action !== 'Hold' && s.currentPrice > 0) {
+        sharesDisplay = Math.round(Math.abs(delta / 100) * totalValue / s.currentPrice).toLocaleString('en-AU');
       }
     }
 
