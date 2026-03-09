@@ -3364,6 +3364,8 @@ a:hover { color: var(--accent-sage); }
 .rw-action.increase { color: var(--signal-green); }
 .rw-action.reduce { color: var(--signal-red); }
 .rw-action.hold { color: var(--text-muted); }
+.rw-action.sell-all { color: var(--signal-red); font-weight: 700; }
+.rw-action.buy { color: var(--signal-green); }
 .port-reweight-disclaimer {
     font-size: 0.72rem;
     color: var(--text-muted);
@@ -10934,89 +10936,164 @@ function renderReweighting(positions, totalValue) {
     const bodyEl = document.getElementById('reweightBody');
     if (!sectionEl || !bodyEl) return;
 
-    // Only show for covered positions
     const covered = positions.filter(p => COVERAGE_DATA[p.ticker]);
     if (covered.length === 0) {
         sectionEl.style.display = 'none';
         return;
     }
 
-    // Calculate evidence scores
-    const scores = [];
+    // Calculate evidence-aligned scores
     const baseWeight = 100 / covered.length;
+    const scores = [];
 
     covered.forEach(p => {
         const cd = COVERAGE_DATA[p.ticker];
         const tc = TC_DATA[p.ticker];
+        const isShort = p.units < 0;
+        let rawScore;
 
-        // Conviction multiplier based on skew direction
-        let multiplier = 1.0;
-        if (cd.skew === 'upside') multiplier = 1.3;
-        else if (cd.skew === 'downside') multiplier = 0.7;
+        // Alignment: contradicting positions get zero weight
+        const contradicting = (!isShort && cd.skew === 'downside') ||
+                              (isShort && cd.skew === 'upside');
 
-        // Adjust for hypothesis strength from TC_DATA
-        if (tc) {
-            const probs = [tc.n1.prob, tc.n2.prob, tc.n3.prob, tc.n4.prob];
-            const maxProb = Math.max(...probs);
-            // High conviction in dominant thesis = slight boost
-            if (maxProb > 40) multiplier *= 1.05;
-            // Contrarian / uphill = slight reduction
-            if (tc.primary === 'uphill') multiplier *= 0.9;
+        if (contradicting) {
+            rawScore = 0;
+        } else {
+            let multiplier = 1.0;
+            const aligned = (!isShort && cd.skew === 'upside') ||
+                            (isShort && cd.skew === 'downside');
+            if (aligned) multiplier = 1.3;
+
+            if (tc) {
+                const probs = [tc.n1.prob, tc.n2.prob, tc.n3.prob, tc.n4.prob];
+                const maxProb = Math.max(...probs);
+                if (maxProb > 40) multiplier *= 1.05;
+                if (tc.primary === 'uphill') multiplier *= 0.9;
+            }
+
+            rawScore = baseWeight * multiplier;
         }
 
         scores.push({
             ticker: p.ticker,
             company: p.company,
+            units: p.units,
+            currentPrice: p.currentPrice,
             currentWeight: p.weight,
             skew: cd.skew,
-            rawScore: baseWeight * multiplier
+            isShort: isShort,
+            rawScore: rawScore
         });
     });
 
-    // Normalize suggested weights to 100%
+    // Normalise: only non-zero scores participate in denominator
     const totalScore = scores.reduce((s, x) => s + x.rawScore, 0);
     scores.forEach(s => {
-        s.suggestedWeight = (s.rawScore / totalScore) * 100;
+        if (s.rawScore === 0) {
+            s.suggestedWeight = 0;
+        } else {
+            s.suggestedWeight = totalScore > 0 ? (s.rawScore / totalScore) * 100 : 0;
+        }
     });
 
-    // Sort by largest delta
-    scores.sort((a, b) => Math.abs(b.suggestedWeight - b.currentWeight) - Math.abs(a.suggestedWeight - a.currentWeight));
+    // Derive action + share amount
+    scores.forEach(s => {
+        const delta = s.suggestedWeight - s.currentWeight;
+        s.delta = delta;
+
+        if (!s.isShort) {
+            if (s.skew === 'downside') {
+                s.action = 'Sell All';
+                s.actionCls = 'sell-all';
+                s.deltaCls = 'reduce';
+                s.shareAction = formatNum(Math.abs(s.units), 0);
+            } else if (s.skew === 'upside') {
+                if (delta < -1) {
+                    s.action = 'Trim';
+                    s.actionCls = 'reduce';
+                    s.deltaCls = 'reduce';
+                    s.shareAction = s.currentPrice > 0
+                        ? formatNum(Math.round(Math.abs(delta / 100) * totalValue / s.currentPrice), 0)
+                        : '--';
+                } else {
+                    s.action = 'Hold';
+                    s.actionCls = 'hold';
+                    s.deltaCls = 'hold';
+                    s.shareAction = '--';
+                }
+            } else {
+                if (delta < -5) {
+                    s.action = 'Trim';
+                    s.actionCls = 'reduce';
+                    s.deltaCls = 'reduce';
+                    s.shareAction = s.currentPrice > 0
+                        ? formatNum(Math.round(Math.abs(delta / 100) * totalValue / s.currentPrice), 0)
+                        : '--';
+                } else {
+                    s.action = 'Hold';
+                    s.actionCls = 'hold';
+                    s.deltaCls = 'hold';
+                    s.shareAction = '--';
+                }
+            }
+        } else {
+            if (s.skew === 'upside') {
+                s.action = 'Buy to Close';
+                s.actionCls = 'buy';
+                s.deltaCls = 'increase';
+                s.shareAction = formatNum(Math.abs(s.units), 0);
+            } else if (s.skew === 'downside') {
+                if (delta < -1) {
+                    s.action = 'Trim Short';
+                    s.actionCls = 'reduce';
+                    s.deltaCls = 'reduce';
+                    s.shareAction = s.currentPrice > 0
+                        ? formatNum(Math.round(Math.abs(delta / 100) * totalValue / s.currentPrice), 0)
+                        : '--';
+                } else {
+                    s.action = 'Hold';
+                    s.actionCls = 'hold';
+                    s.deltaCls = 'hold';
+                    s.shareAction = '--';
+                }
+            } else {
+                if (delta < -5) {
+                    s.action = 'Trim Short';
+                    s.actionCls = 'reduce';
+                    s.deltaCls = 'reduce';
+                    s.shareAction = s.currentPrice > 0
+                        ? formatNum(Math.round(Math.abs(delta / 100) * totalValue / s.currentPrice), 0)
+                        : '--';
+                } else {
+                    s.action = 'Hold';
+                    s.actionCls = 'hold';
+                    s.deltaCls = 'hold';
+                    s.shareAction = '--';
+                }
+            }
+        }
+    });
+
+    // Sort by largest |delta|
+    scores.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
 
     // Render table
     let rows = '';
     scores.forEach(s => {
-        const delta = s.suggestedWeight - s.currentWeight;
-        const absDelta = Math.abs(delta);
-        let action, actionCls, deltaCls;
-
-        if (delta > 2) {
-            action = 'Increase';
-            actionCls = 'increase';
-            deltaCls = 'increase';
-        } else if (delta < -2) {
-            action = 'Reduce';
-            actionCls = 'reduce';
-            deltaCls = 'reduce';
-        } else {
-            action = 'Hold';
-            actionCls = 'hold';
-            deltaCls = 'hold';
-        }
-
         const skewArrow = s.skew === 'upside' ? '&#9650; UPSIDE' :
                           s.skew === 'downside' ? '&#9660; DOWNSIDE' : '&#9670; BALANCED';
         const skewCls = s.skew;
-
-        const maxBar = Math.max(s.currentWeight, s.suggestedWeight, 1);
 
         rows += '<tr>' +
             '<td><span class="rw-ticker">' + s.ticker + '</span></td>' +
             '<td>' + s.company + '</td>' +
             '<td><span class="skew-badge ' + skewCls + '">' + skewArrow + '</span></td>' +
+            '<td class="rw-units">' + formatNum(Math.abs(s.units), 0) + '</td>' +
             '<td><span class="rw-pct">' + s.currentWeight.toFixed(1) + '%</span></td>' +
             '<td><span class="rw-pct">' + s.suggestedWeight.toFixed(1) + '%</span></td>' +
-            '<td><span class="rw-delta ' + deltaCls + '">' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%</span></td>' +
-            '<td><span class="rw-action ' + actionCls + '">' + action + '</span></td>' +
+            '<td><span class="rw-delta ' + s.deltaCls + '">' + (s.delta >= 0 ? '+' : '') + s.delta.toFixed(1) + '%</span></td>' +
+            '<td><span class="rw-action ' + s.actionCls + '">' + s.action + '</span></td>' +
+            '<td class="rw-shares">' + s.shareAction + '</td>' +
         '</tr>';
     });
 
@@ -11026,10 +11103,12 @@ function renderReweighting(positions, totalValue) {
                 '<th>Ticker</th>' +
                 '<th>Company</th>' +
                 '<th>Evidence</th>' +
+                '<th>Units</th>' +
                 '<th>Current</th>' +
                 '<th>Suggested</th>' +
                 '<th>Delta</th>' +
                 '<th>Action</th>' +
+                '<th>Shares</th>' +
             '</tr></thead>' +
             '<tbody>' + rows + '</tbody>' +
         '</table>';
