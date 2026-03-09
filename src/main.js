@@ -257,16 +257,22 @@ async function boot() {
     initPersonalisationDemo: window.initPersonalisationDemo
   });
 
-  // Initialize pages
-  initHomePage();
-  initBatchRefresh();
-  initPortfolioPage();
-  initThesisPage();
-  initAuth();
-  initChat();
-  initAboutPage();
-  initAddStock();
-  initDeepResearch('deep-research-container');
+  // Initialize pages (each wrapped so one failure does not block the rest)
+  var _inits = [
+    ['Home', initHomePage],
+    ['BatchRefresh', initBatchRefresh],
+    ['Portfolio', initPortfolioPage],
+    ['Thesis', initThesisPage],
+    ['Auth', initAuth],
+    ['Chat', initChat],
+    ['About', initAboutPage],
+    ['AddStock', initAddStock],
+    ['DeepResearch', function() { initDeepResearch('deep-research-container'); }]
+  ];
+  for (var _i = 0; _i < _inits.length; _i++) {
+    try { _inits[_i][1](); }
+    catch (e) { console.error('[Boot] init' + _inits[_i][0] + ' failed:', e); }
+  }
 
   // --- Theme toggle ---
   var themeToggle = document.getElementById('themeToggle');

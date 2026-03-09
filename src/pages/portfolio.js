@@ -140,22 +140,26 @@ export function processPortfolioData(rows) {
   var totalValue = positions.reduce(function(s, p) { return s + (p.marketValue || 0); }, 0);
   positions.forEach(function(p) {
     p.weight = totalValue > 0 && p.marketValue ? (p.marketValue / totalValue) * 100 : 0;
-    p.alignment = deriveAlignment(p.skew, p.weight);
+    p.alignment = deriveAlignment(p.skew, p.weight, p.units < 0);
   });
 
   savePortfolio(positions);
   renderPortfolio(positions, totalValue);
 }
 
-export function deriveAlignment(skew, weight) {
+export function deriveAlignment(skew, weight, isShort) {
   if (!skew) return { label: 'Not covered', cls: 'not-covered' };
-  if (skew === 'upside') return { label: 'Aligned with skew', cls: 'aligned' };
+  if (skew === 'upside') {
+    if (isShort) return { label: 'Contradicts skew', cls: 'contradicts' };
+    return { label: 'Aligned with skew', cls: 'aligned' };
+  }
   if (skew === 'downside') {
+    if (isShort) return { label: 'Aligned with skew', cls: 'aligned' };
     if (weight > 15) return { label: 'Exposure exceeds conviction', cls: 'exceeds' };
     return { label: 'Contradicts skew', cls: 'contradicts' };
   }
   if (skew === 'balanced') {
-    if (weight > 15) return { label: 'Exposure exceeds conviction', cls: 'exceeds' };
+    if (Math.abs(weight) > 15) return { label: 'Exposure exceeds conviction', cls: 'exceeds' };
     return { label: 'Balanced exposure', cls: 'neutral' };
   }
   return { label: 'N/A', cls: 'not-covered' };
@@ -881,7 +885,7 @@ export function initPortfolioPage() {
     var totalValue = positions.reduce(function(s, p) { return s + (p.marketValue || 0); }, 0);
     positions.forEach(function(p) {
       p.weight = totalValue > 0 && p.marketValue ? (p.marketValue / totalValue) * 100 : 0;
-      p.alignment = deriveAlignment(p.skew, p.weight);
+      p.alignment = deriveAlignment(p.skew, p.weight, p.units < 0);
     });
 
     savePortfolio(positions);
