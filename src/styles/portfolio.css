@@ -72,10 +72,18 @@
     margin-bottom: 2px;
 }
 .portfolio-summary-value {
-    font-size: 1.1rem;
+    font-size: 0.85rem;
     font-weight: 700;
     font-family: var(--font-data);
     color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.portfolio-summary-value .pnl-pct {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0.85;
 }
 .portfolio-summary-value.positive { color: var(--signal-green); }
 .portfolio-summary-value.negative { color: var(--signal-red); }

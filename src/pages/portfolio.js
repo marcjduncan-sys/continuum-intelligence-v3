@@ -240,7 +240,9 @@ export function renderPortfolio(positions, totalLong, expo) {
   document.getElementById('summaryNet').textContent = 'A$' + formatNum(expo.netExposure, 0);
   document.getElementById('summaryGross').textContent = 'A$' + formatNum(expo.grossExposure, 0);
   var pnlEl = document.getElementById('summaryPnL');
-  pnlEl.textContent = (totalPnL >= 0 ? '+' : '') + 'A$' + formatNum(totalPnL, 0) + ' (' + (totalPnLPct >= 0 ? '+' : '') + formatNum(totalPnLPct, 1) + '%)';
+  var pnlSign = totalPnL >= 0 ? '+' : '';
+  var pctSign = totalPnLPct >= 0 ? '+' : '';
+  pnlEl.innerHTML = pnlSign + 'A$' + formatNum(totalPnL, 0) + '<span class="pnl-pct">' + pctSign + formatNum(totalPnLPct, 1) + '%</span>';
   pnlEl.className = 'portfolio-summary-value ' + (totalPnL >= 0 ? 'positive' : 'negative');
   document.getElementById('summaryAligned').textContent = formatNum(alignedWeight, 1) + '%';
   document.getElementById('summaryContra').textContent = formatNum(contraWeight, 1) + '%';
