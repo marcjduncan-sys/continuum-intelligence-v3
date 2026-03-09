@@ -2,6 +2,7 @@
 Database connection module -- asyncpg connection pool.
 
 If DATABASE_URL is not set, all functions are no-ops (dev mode tolerance).
+Pool creation is bounded to 15s via asyncio.wait_for (Phase 2).
 """
 
 import asyncio
