@@ -51,20 +51,41 @@ async def get_pool():
 
 
 async def run_migrations(pool):
-    """Execute all schema migrations in filename order. Idempotent."""
+    """Execute each migration exactly once, tracked in _schema_migrations."""
     if pool is None:
         return
     migrations_dir = Path(__file__).parent / "migrations"
     sql_files = sorted(migrations_dir.glob("*.sql"))
+
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS _schema_migrations (
+                filename   TEXT PRIMARY KEY,
+                applied_at TIMESTAMPTZ NOT NULL DEFAULT now()
+            )
+        """)
+
     for migration_path in sql_files:
-        sql = migration_path.read_text()
-        try:
-            async with pool.acquire() as conn:
+        filename = migration_path.name
+        async with pool.acquire() as conn:
+            row = await conn.fetchrow(
+                "SELECT filename FROM _schema_migrations WHERE filename = $1",
+                filename,
+            )
+            if row:
+                logger.info("Skipping already-applied migration: %s", filename)
+                continue
+            sql = migration_path.read_text()
+            try:
                 await conn.execute(sql)
-            logger.info("Applied migration: %s", migration_path.name)
-        except Exception as exc:
-            logger.error("Migration failed (%s): %s", migration_path.name, exc)
-            raise
+                await conn.execute(
+                    "INSERT INTO _schema_migrations (filename) VALUES ($1)",
+                    filename,
+                )
+                logger.info("Applied migration: %s", filename)
+            except Exception as exc:
+                logger.error("Migration failed (%s): %s", filename, exc)
+                raise
 
 
 async def close_pool():
