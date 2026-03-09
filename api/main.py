@@ -38,6 +38,7 @@ from refresh import (
     run_batch_refresh,
 )
 from retriever import retrieve
+from gold_agent import run_gold_analysis
 
 
 # ---------------------------------------------------------------------------
@@ -432,6 +433,39 @@ async def list_tickers():
         "tickers": get_tickers(),
         "counts": get_passage_count(),
     }
+
+
+# ---------------------------------------------------------------------------
+# Gold agent endpoint
+# ---------------------------------------------------------------------------
+
+
+@app.get("/api/agents/gold/{ticker}", dependencies=[Depends(verify_api_key)])
+@limiter.limit("2/minute")
+async def gold_agent_endpoint(ticker: str, request: Request):
+    """
+    Run gold equities analysis for an ASX ticker.
+
+    Queries the NotebookLM research corpus across 7 analytical dimensions
+    (reserve quality, cost structure, production, balance sheet, gold price
+    sensitivity, jurisdiction risk, catalysts), then synthesises the responses
+    into CI v3 JSON via Claude.
+
+    Requires NOTEBOOKLM_GOLD_NOTEBOOK_ID and NOTEBOOKLM_AUTH_JSON env vars.
+    Expect 60-120 seconds latency. Rate-limited to 2 requests/minute.
+    """
+    ticker = ticker.upper()
+    if not TICKER_PATTERN.match(ticker):
+        raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{ticker}'")
+
+    try:
+        result = await run_gold_analysis(ticker)
+        return result
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except Exception as exc:
+        logger.error("Gold agent error for %s: %s", ticker, exc)
+        raise HTTPException(status_code=500, detail="Gold analysis failed")
 
 
 @app.get("/api/admin/llm-usage")
