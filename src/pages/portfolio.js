@@ -220,8 +220,8 @@ export function renderPortfolio(positions, totalLong, expo) {
 
   /* Summary */
   var totalPnL = positions.reduce(function(s, p) { return s + (p.pnlDollar || 0); }, 0);
-  var totalCost = positions.reduce(function(s, p) { return s + p.costBasis; }, 0);
-  var totalPnLPct = totalCost > 0 ? (totalPnL / totalCost) * 100 : 0;
+  var totalAbsCost = positions.reduce(function(s, p) { return s + Math.abs(p.costBasis); }, 0);
+  var totalPnLPct = totalAbsCost > 0 ? (totalPnL / totalAbsCost) * 100 : 0;
 
   var grossExp = expo.grossExposure || 1;
   var alignedDollar = 0, contraDollar = 0, neutralDollar = 0;

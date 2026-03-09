@@ -49,18 +49,19 @@
 /* Summary Bar */
 .portfolio-summary-bar {
     display: flex;
-    gap: var(--space-md);
-    flex-wrap: wrap;
+    gap: var(--space-sm);
+    flex-wrap: nowrap;
     background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: var(--space-md) var(--space-lg);
+    padding: var(--space-sm) var(--space-md);
     margin-bottom: var(--space-xl);
 }
 .portfolio-summary-item {
     flex: 1;
-    min-width: 140px;
-    padding: var(--space-sm) 0;
+    min-width: 0;
+    padding: var(--space-xs) 0;
+    white-space: nowrap;
 }
 .portfolio-summary-label {
     font-size: 0.55rem;
@@ -629,6 +630,6 @@
         gap: var(--space-sm);
     }
     .portfolio-table { display: block; overflow-x: auto; white-space: nowrap; }
-    .portfolio-summary-bar { gap: var(--space-sm); }
-    .portfolio-summary-item { min-width: 100px; }
+    .portfolio-summary-bar { flex-wrap: wrap; gap: var(--space-sm); }
+    .portfolio-summary-item { min-width: 90px; }
 }
