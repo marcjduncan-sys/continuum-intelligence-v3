@@ -478,21 +478,38 @@ export function renderReweighting(positions, totalValue) {
     s.suggestedWeight = totalScore > 0 ? (s.rawScore / totalScore) * 100 : 0;
   });
 
-  // Append covered shorts (outside the weight model)
+  // Short book weight model — mirrors longs but inverted conviction
+  var baseWeightShort = shorts.length > 0 ? 100 / shorts.length : 0;
+  var shortScores = [];
   shorts.forEach(function(p) {
     var cd = coverageData[p.ticker];
-    scores.push({
+    var tc = getTcData(p.ticker);
+    var multiplier = 1.0;
+    if (cd.skew === 'downside') multiplier = 1.3;
+    else if (cd.skew === 'upside') multiplier = 0.7;
+    if (tc) {
+      var probs = [tc.n1.prob, tc.n2.prob, tc.n3.prob, tc.n4.prob];
+      var maxProb = Math.max.apply(null, probs);
+      if (maxProb > 40) multiplier *= 1.05;
+      if (tc.primary === 'uphill') multiplier *= 0.9;
+    }
+    var entry = {
       ticker: p.ticker,
       company: p.company,
       units: p.units,
       currentPrice: p.currentPrice,
       currentWeight: p.weight,
       skew: cd.skew,
-      rawScore: 0,
-      suggestedWeight: 0,
+      rawScore: baseWeightShort * multiplier,
       stability: getSkewStability(p.ticker),
       covered: true
-    });
+    };
+    shortScores.push(entry);
+    scores.push(entry);
+  });
+  var totalShortScore = shortScores.reduce(function(s, x) { return s + x.rawScore; }, 0);
+  shortScores.forEach(function(s) {
+    s.suggestedWeight = totalShortScore > 0 ? (s.rawScore / totalShortScore) * 100 : 0;
   });
 
   // Append uncovered positions at the bottom
@@ -553,22 +570,30 @@ export function renderReweighting(positions, totalValue) {
     }
 
     if (isShort) {
-      // Short positions are outside the long-only weight model.
-      // Determine action from alignment instead of delta.
-      var shortAligned = (s.skew === 'downside' || s.skew === 'balanced');
-      sharesDisplay = '--';
-      if (shortAligned) {
+      delta = s.suggestedWeight - s.currentWeight;
+      // Skew-gated short action rules
+      if (s.skew === 'upside') {
+        // Short in an upside-skew stock: cover the position
+        action = 'Cover';
+        actionCls = 'sell';
+        deltaCls = 'reduce';
+      } else if (s.skew === 'balanced') {
         action = 'Hold';
         actionCls = 'hold';
         deltaCls = 'hold';
       } else {
-        // Short in an upside-skew stock: suggest covering
-        action = 'Cover';
-        actionCls = 'sell';
-        deltaCls = 'reduce';
-        if (s.currentPrice && s.currentPrice > 0) {
-          sharesDisplay = Math.abs(s.units).toLocaleString('en-AU');
-        }
+        // Downside skew: aligned with short — hold
+        action = 'Hold';
+        actionCls = 'hold';
+        deltaCls = 'hold';
+      }
+      // Share amount for actionable shorts
+      sharesDisplay = '--';
+      if (action === 'Cover' && s.currentPrice && s.currentPrice > 0) {
+        sharesDisplay = Math.abs(s.units).toLocaleString('en-AU');
+      } else if (action !== 'Hold' && s.currentPrice && s.currentPrice > 0) {
+        var shortDeltaValue = Math.abs(delta / 100) * totalValue;
+        sharesDisplay = Math.round(shortDeltaValue / s.currentPrice).toLocaleString('en-AU');
       }
     } else {
       delta = s.suggestedWeight - s.currentWeight;
@@ -620,17 +645,12 @@ export function renderReweighting(positions, totalValue) {
     var skewArrow = s.skew === 'upside' ? '&#9650; UPSIDE' :
                     s.skew === 'downside' ? '&#9660; DOWNSIDE' : '&#9670; BALANCED';
     var skewCls = s.skew;
-    // For short positions the long-only weight model doesn't apply
-    var suggestedCell = isShort
-      ? '<span style="color:var(--text-muted)">--</span>'
-      : '<span class="rw-pct">' + s.suggestedWeight.toFixed(1) + '%</span>';
-    var deltaCell = isShort
-      ? '<span class="rw-delta hold">SHORT</span>'
-      : '<span class="rw-delta ' + deltaCls + '">' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%</span>';
+    var suggestedCell = '<span class="rw-pct">' + s.suggestedWeight.toFixed(1) + '%</span>';
+    var deltaCell = '<span class="rw-delta ' + deltaCls + '">' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%</span>';
 
-    // Conviction (narrative stability) + skew momentum arrow
-    var stabLabel = s.stability || '--';
-    var stabCls = stabilityClass(s.stability);
+    // Conviction (narrative stability, falling back to skew direction)
+    var stabLabel = s.stability || (s.skew ? s.skew.charAt(0).toUpperCase() + s.skew.slice(1) : '--');
+    var stabCls = stabilityClass(s.stability || s.skew);
     var momentum = s.covered ? getSkewMomentum(s.ticker) : null;
     var momentumHtml = '';
     if (momentum && momentum !== 'stable') {
