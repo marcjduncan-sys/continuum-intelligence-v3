@@ -10,11 +10,18 @@ as context, keeping prompt size bounded without losing early analytical content.
 import logging
 
 import db
+import llm
 
 logger = logging.getLogger(__name__)
 
 SUMMARY_TRIGGER = 20  # messages since last summary before compressing
 SUMMARY_RETAIN = 10   # verbatim messages to keep after summarising
+
+_SUMMARISE_SYSTEM = (
+    "You are a concise summariser for investment research conversations. "
+    "Capture the key questions asked, analytical conclusions reached, and "
+    "any specific data points or views expressed."
+)
 
 _SUMMARISE_PROMPT = (
     "Summarise the following investment research conversation about {ticker} in 150 words or fewer. "
@@ -26,13 +33,16 @@ _HAIKU_MODEL = "claude-haiku-4-5"
 
 
 async def summarise_if_needed(
-    pool, conversation_id: str, ticker: str, client
+    pool, conversation_id: str, ticker: str, client=None
 ) -> tuple:
     """
     Return (summary_text_or_None, messages_to_use_in_context).
 
     Side effect: writes new summary to DB if SUMMARY_TRIGGER is exceeded.
     Falls back gracefully to returning all recent messages if anything fails.
+
+    The `client` parameter is retained for backwards compatibility but ignored;
+    all LLM calls now route through llm.complete().
     """
     ctx = await db.get_conversation_context(pool, conversation_id)
     recent = ctx["recent_messages"]
@@ -62,9 +72,9 @@ async def summarise_if_needed(
         full_text = transcript
 
     try:
-        response = client.messages.create(
+        result = await llm.complete(
             model=_HAIKU_MODEL,
-            max_tokens=300,
+            system=_SUMMARISE_SYSTEM,
             messages=[
                 {
                     "role": "user",
@@ -74,8 +84,11 @@ async def summarise_if_needed(
                     ),
                 }
             ],
+            max_tokens=300,
+            feature="summarise",
+            ticker=ticker,
         )
-        new_summary = response.content[0].text.strip()
+        new_summary = result.text.strip()
     except Exception as exc:
         logger.warning(
             "Summarisation failed for %s: %s -- returning unsummarised messages",

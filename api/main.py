@@ -27,6 +27,7 @@ from slowapi.util import get_remote_address
 
 import config
 import db
+import llm
 import summarise
 from auth import router as auth_router
 from conversations import router as conversations_router
@@ -371,29 +372,26 @@ async def research_chat(request: Request, body: ResearchChatRequest, _=Depends(v
 
     messages.append({"role": "user", "content": user_message})
 
-    # Call Claude
-    client = _get_client()
+    # Call LLM
     _csp = _sanitise_system_prompt(body.custom_system_prompt)
     _sp = _sanitise_system_prompt(body.system_prompt)
     if _csp or _sp:
         logger.warning("custom system prompt received", extra={"ticker": ticker, "length": len(_csp or _sp or "")})
     effective_system = _csp or _sp or SYSTEM_PROMPT
     try:
-        response = client.messages.create(
+        result = await llm.complete(
             model=config.ANTHROPIC_MODEL,
-            max_tokens=config.CHAT_MAX_TOKENS,
             system=effective_system,
             messages=messages,
+            max_tokens=config.CHAT_MAX_TOKENS,
+            feature="research-chat",
+            ticker=ticker,
         )
-    except anthropic.APIError as e:
-        logger.error(f"Anthropic API error: {e}")
+    except Exception as e:
+        logger.error(f"LLM API error: {e}")
         raise HTTPException(status_code=502, detail=f"LLM API error: {str(e)}")
 
-    # Extract response text
-    response_text = ""
-    for block in response.content:
-        if block.type == "text":
-            response_text += block.text
+    response_text = result.text
 
     # Build source passages for the response
     sources = [
@@ -433,6 +431,21 @@ async def list_tickers():
     return {
         "tickers": get_tickers(),
         "counts": get_passage_count(),
+    }
+
+
+@app.get("/api/admin/llm-usage")
+async def llm_usage(days: int = 7):
+    """LLM cost breakdown by feature, model, and provider."""
+    pool = await db.get_pool()
+    rows = await db.get_llm_usage(pool, days=days)
+    total_cost = sum(r.get("total_cost_usd", 0) or 0 for r in rows)
+    total_calls = sum(r.get("call_count", 0) or 0 for r in rows)
+    return {
+        "period_days": days,
+        "total_cost_usd": round(total_cost, 4),
+        "total_calls": total_calls,
+        "breakdown": rows,
     }
 
 

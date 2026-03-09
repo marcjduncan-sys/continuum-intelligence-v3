@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any
 
 import config
+import llm
 from gemini_client import gemini_completion
 from validate_research import fix as validate_fix, validate as validate_check
 from web_search import gather_all_data
@@ -1019,12 +1020,15 @@ async def _run_evidence_specialists(
 Please assess each evidence card against this new data and return the updated assessment as JSON."""
 
     try:
-        result = await gemini_completion(
-            system_prompt=EVIDENCE_UPDATE_SYSTEM,
-            user_prompt=user_prompt,
+        result = await llm.complete(
+            model=config.GEMINI_MODEL,
+            system=EVIDENCE_UPDATE_SYSTEM,
+            messages=[{"role": "user", "content": user_prompt}],
             json_mode=True,
+            feature="evidence-update",
+            ticker=ticker,
         )
-        return result if isinstance(result, dict) else {}
+        return result.json if isinstance(result.json, dict) else {}
     except Exception as e:
         logger.error(f"[{ticker}] Evidence specialist failed: {e}")
         return {"cards": [], "summary": f"Evidence update failed: {e}"}
@@ -1080,16 +1084,20 @@ async def _run_evidence_creation(
 Please create all 10 evidence domain cards for this stock based on the available data."""
 
     try:
-        result = await gemini_completion(
-            system_prompt=EVIDENCE_CREATION_SYSTEM,
-            user_prompt=user_prompt,
+        result = await llm.complete(
+            model=config.GEMINI_MODEL,
+            system=EVIDENCE_CREATION_SYSTEM,
+            messages=[{"role": "user", "content": user_prompt}],
             json_mode=True,
             max_tokens=6144,
             max_retries=4,
+            feature="evidence-creation",
+            ticker=ticker,
         )
-        cards = result.get("cards", []) if isinstance(result, dict) else []
+        parsed = result.json if isinstance(result.json, dict) else {}
+        cards = parsed.get("cards", [])
         logger.info(f"[{ticker}] Evidence creation returned {len(cards)} cards")
-        return result if isinstance(result, dict) else {"cards": []}
+        return parsed if parsed else {"cards": []}
     except Exception as e:
         logger.error(f"[{ticker}] Evidence creation failed: {e}")
         return {"cards": [], "summary": f"Evidence creation failed: {e}"}
@@ -1192,54 +1200,28 @@ async def _run_coverage_initiation(
 This is INITIAL COVERAGE. Create a complete research analysis with all hypotheses, narrative \
 sections, verdict, tripwires, discriminators, and gaps assessment. Be thorough and specific."""
 
-    # Try Claude first, fall back to Gemini on any failure
-    result = None
-
-    if config.ANTHROPIC_API_KEY:
-        try:
-            client = config.get_anthropic_client()
-            response = client.messages.create(
-                model=config.ANTHROPIC_MODEL,
-                max_tokens=8192,
-                temperature=0,
-                system=FULL_INITIATION_SYSTEM + "\n\nRespond with valid JSON only.",
-                messages=[{"role": "user", "content": user_prompt}],
-            )
-
-            text = ""
-            for block in response.content:
-                if block.type == "text":
-                    text += block.text
-
-            text = text.strip()
-            if text.startswith("```"):
-                text = text.split("\n", 1)[1] if "\n" in text else text[3:]
-                text = text.rsplit("```", 1)[0]
-
-            result = json.loads(text)
-        except Exception as e:
-            logger.warning(f"[{ticker}] Claude initiation failed, falling back to Gemini: {e}")
-
-    # Fallback: use Gemini if Claude unavailable or failed
-    if result is None:
-        try:
-            logger.info(f"[{ticker}] Using Gemini for coverage initiation")
-            result = await gemini_completion(
-                system_prompt=FULL_INITIATION_SYSTEM,
-                user_prompt=user_prompt,
-                json_mode=True,
-                max_tokens=8192,
-                max_retries=4,
-            )
-            if not isinstance(result, dict):
-                result = {}
-        except Exception as e:
-            logger.error(f"[{ticker}] Gemini initiation also failed: {e}", exc_info=True)
-            return {
-                "hypotheses": [],
-                "narrative_rewrite": f"Coverage initiation failed (both Claude and Gemini): {e}",
-                "verdict_update": None,
-            }
+    # Claude primary, Gemini fallback via llm.complete()
+    try:
+        resp = await llm.complete(
+            model=config.ANTHROPIC_MODEL,
+            system=FULL_INITIATION_SYSTEM,
+            messages=[{"role": "user", "content": user_prompt}],
+            max_tokens=8192,
+            temperature=0,
+            json_mode=True,
+            feature="coverage-init",
+            ticker=ticker,
+            fallback_model=config.GEMINI_MODEL,
+            max_retries=2,
+        )
+        result = resp.json if isinstance(resp.json, dict) else {}
+    except Exception as e:
+        logger.error(f"[{ticker}] Coverage initiation failed (all providers): {e}", exc_info=True)
+        return {
+            "hypotheses": [],
+            "narrative_rewrite": f"Coverage initiation failed (both Claude and Gemini): {e}",
+            "verdict_update": None,
+        }
 
     logger.info(
         f"[{ticker}] Coverage initiation: "
@@ -1501,55 +1483,29 @@ before today, set status to "resolved" in tripwire_updates.
 
 Please provide the FULL updated JSON with all narrative rewrites and tripwire updates."""
 
-    # Try Claude first, fall back to Gemini on any failure
-    result = None
-
-    if config.ANTHROPIC_API_KEY:
-        try:
-            client = config.get_anthropic_client()
-            response = client.messages.create(
-                model=config.ANTHROPIC_MODEL,
-                max_tokens=6144,
-                temperature=0,
-                system=HYPOTHESIS_UPDATE_SYSTEM + "\n\nRespond with valid JSON only.",
-                messages=[{"role": "user", "content": user_prompt}],
-            )
-
-            text = ""
-            for block in response.content:
-                if block.type == "text":
-                    text += block.text
-
-            text = text.strip()
-            if text.startswith("```"):
-                text = text.split("\n", 1)[1] if "\n" in text else text[3:]
-                text = text.rsplit("```", 1)[0]
-
-            result = json.loads(text)
-        except Exception as e:
-            logger.warning(f"[{ticker}] Claude synthesis failed, falling back to Gemini: {e}")
-
-    # Fallback: use Gemini if Claude unavailable or failed
-    if result is None:
-        try:
-            logger.info(f"[{ticker}] Using Gemini for hypothesis synthesis")
-            result = await gemini_completion(
-                system_prompt=HYPOTHESIS_UPDATE_SYSTEM,
-                user_prompt=user_prompt,
-                json_mode=True,
-                max_tokens=6144,
-                max_retries=4,
-            )
-            if not isinstance(result, dict):
-                result = {}
-        except Exception as e:
-            logger.error(f"[{ticker}] Gemini synthesis also failed: {e}")
-            return {
-                "hypotheses": [],
-                "narrative_update": f"Synthesis unavailable: {e}",
-                "verdict_update": None,
-                "key_catalyst": None,
-            }
+    # Claude primary, Gemini fallback via llm.complete()
+    try:
+        resp = await llm.complete(
+            model=config.ANTHROPIC_MODEL,
+            system=HYPOTHESIS_UPDATE_SYSTEM,
+            messages=[{"role": "user", "content": user_prompt}],
+            max_tokens=6144,
+            temperature=0,
+            json_mode=True,
+            feature="hypothesis-synthesis",
+            ticker=ticker,
+            fallback_model=config.GEMINI_MODEL,
+            max_retries=2,
+        )
+        result = resp.json if isinstance(resp.json, dict) else {}
+    except Exception as e:
+        logger.error(f"[{ticker}] Hypothesis synthesis failed (all providers): {e}")
+        return {
+            "hypotheses": [],
+            "narrative_update": f"Synthesis unavailable: {e}",
+            "verdict_update": None,
+            "key_catalyst": None,
+        }
 
     return result
 

@@ -365,3 +365,67 @@ async def update_conversation_summary(
             cursor_message_id,
             conversation_id,
         )
+
+
+# ---------------------------------------------------------------------------
+# LLM call logging (Phase 4)
+# ---------------------------------------------------------------------------
+
+async def log_llm_call(
+    pool,
+    *,
+    feature: str,
+    model: str,
+    provider: str,
+    input_tokens: int,
+    output_tokens: int,
+    cost_usd: float,
+    latency_ms: int,
+    ticker: str | None = None,
+    success: bool = True,
+    error_message: str | None = None,
+) -> None:
+    """Insert a row into llm_calls for cost tracking."""
+    if pool is None:
+        return
+    try:
+        async with pool.acquire() as conn:
+            await conn.execute(
+                """
+                INSERT INTO llm_calls
+                    (feature, model, provider, input_tokens, output_tokens,
+                     cost_usd, latency_ms, ticker, success, error_message)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                """,
+                feature, model, provider, input_tokens, output_tokens,
+                cost_usd, latency_ms, ticker, success, error_message,
+            )
+    except Exception as exc:
+        logger.debug("log_llm_call failed: %s", exc)
+
+
+async def get_llm_usage(pool, *, days: int = 7) -> list[dict]:
+    """Aggregate LLM usage by feature, model, and provider over the last N days."""
+    if pool is None:
+        return []
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT
+                feature,
+                model,
+                provider,
+                COUNT(*) AS call_count,
+                SUM(input_tokens) AS total_input_tokens,
+                SUM(output_tokens) AS total_output_tokens,
+                SUM(cost_usd)::FLOAT AS total_cost_usd,
+                AVG(latency_ms)::INT AS avg_latency_ms,
+                COUNT(*) FILTER (WHERE NOT success) AS error_count
+            FROM llm_calls
+            WHERE created_at >= now() - make_interval(days => $1)
+            GROUP BY feature, model, provider
+            ORDER BY total_cost_usd DESC
+            """,
+            days,
+        )
+        return [dict(r) for r in rows]
