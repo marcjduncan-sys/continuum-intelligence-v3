@@ -137,9 +137,8 @@ export function processPortfolioData(rows) {
   renderPortfolio(positions, expo.totalLong, expo);
 }
 
-export function deriveAlignment(skew, weight) {
+export function deriveAlignment(skew, weight, isShort) {
   if (!skew) return { label: 'Not covered', cls: 'not-covered' };
-  var isShort = weight < 0;
   if (skew === 'upside') {
     if (isShort) return { label: 'Contradicts skew', cls: 'contradicts' };
     return { label: 'Aligned with skew', cls: 'aligned' };
@@ -169,11 +168,11 @@ function calcWeights(positions) {
     } else if (p.marketValue >= 0) {
       p.weight = totalLong > 0 ? (p.marketValue / totalLong) * 100 : 0;
     } else {
-      p.weight = totalShortAbs > 0 ? -(Math.abs(p.marketValue) / totalShortAbs) * 100 : 0;
+      p.weight = totalShortAbs > 0 ? (Math.abs(p.marketValue) / totalShortAbs) * 100 : 0;
     }
     p.alignment = p.units === 0
       ? { label: 'No position', cls: 'no-position' }
-      : deriveAlignment(p.skew, p.weight);
+      : deriveAlignment(p.skew, p.weight, p.units < 0);
   });
   return {
     totalLong: totalLong,
@@ -310,23 +309,47 @@ export function renderPortfolioDiagnostics(positions, totalValue) {
   diagnosticsEl.style.display = '';
 
   var hypothesisValues = { n1: 0, n2: 0, n3: 0, n4: 0, unknown: 0 };
+  var tierHypothesisNames = { n1: [], n2: [], n3: [], n4: [] };
 
   positions.forEach(function(p) {
     var data = getTcData(p.ticker);
     if (!data) {
-      hypothesisValues.unknown += (p.marketValue || 0);
+      hypothesisValues.unknown += Math.abs(p.marketValue || 0);
       return;
     }
     var tier = data.primary === 'uphill' ? 'n2' : data.primary;
-    hypothesisValues[tier] += (p.marketValue || 0);
+    hypothesisValues[tier] += Math.abs(p.marketValue || 0);
+    // Collect per-stock hypothesis name for this tier
+    if (data[tier] && data[tier].name) {
+      var name = data[tier].name;
+      if (tierHypothesisNames[tier].indexOf(name) === -1) {
+        tierHypothesisNames[tier].push(name);
+      }
+    }
   });
 
   var tiers = ['n1', 'n2', 'n3', 'n4'];
+
+  // Build contextual tier labels from portfolio hypothesis names
+  var tierLabels = {};
+  tiers.forEach(function(tier) {
+    var names = tierHypothesisNames[tier];
+    var key = tier.toUpperCase();
+    if (names.length === 0) {
+      tierLabels[tier] = key;
+    } else if (names.length <= 2) {
+      tierLabels[tier] = key + ': ' + names.join(', ');
+    } else {
+      tierLabels[tier] = key + ': ' + names.slice(0, 2).join(', ') + ' +' + (names.length - 2);
+    }
+  });
+
   tiers.forEach(function(tier) {
     var pct = totalValue > 0 ? (hypothesisValues[tier] / totalValue) * 100 : 0;
     var segment = document.getElementById('dna' + tier.toUpperCase());
     var pctEl = document.getElementById('pct' + tier.toUpperCase());
     var valEl = document.getElementById('val' + tier.toUpperCase());
+    var lblEl = document.getElementById('lbl' + tier.toUpperCase());
 
     if (segment) {
       segment.style.width = Math.max(pct, 5) + '%';
@@ -334,6 +357,7 @@ export function renderPortfolioDiagnostics(positions, totalValue) {
     }
     if (pctEl) pctEl.textContent = formatNum(pct, 0) + '%';
     if (valEl) valEl.textContent = 'A$' + formatNum(hypothesisValues[tier], 0);
+    if (lblEl) lblEl.textContent = tierLabels[tier];
   });
 
   var maxTier = tiers.reduce(function(a, b) { return hypothesisValues[a] > hypothesisValues[b] ? a : b; });
@@ -366,8 +390,7 @@ export function renderPortfolioDiagnostics(positions, totalValue) {
   var missingTiers = tiers.filter(function(tier) { return hypothesisValues[tier] === 0; });
 
   if (missingTiers.length > 0) {
-    var tierNames = { n1: 'N1 (Growth/Recovery)', n2: 'N2 (Base Case)', n3: 'N3 (Downside)', n4: 'N4 (Disruption)' };
-    hedgeEl.innerHTML = 'You have <strong>zero exposure</strong> to: ' + missingTiers.map(function(t) { return tierNames[t]; }).join(', ') + '. Consider whether this creates blind spots if these scenarios play out.';
+    hedgeEl.innerHTML = 'You have <strong>zero exposure</strong> to: ' + missingTiers.map(function(t) { return tierLabels[t]; }).join(', ') + '. Consider whether this creates blind spots if these scenarios play out.';
   } else {
     hedgeEl.innerHTML = '<span class="success-highlight">Comprehensive coverage.</span> Your portfolio spans all four hypothesis types.';
   }
