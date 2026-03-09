@@ -9,7 +9,7 @@ as context, keeping prompt size bounded without losing early analytical content.
 
 import logging
 
-from . import db
+import db
 
 logger = logging.getLogger(__name__)
 
