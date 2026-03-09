@@ -109,6 +109,9 @@ function _getOrCreateModal() {
         .ci-auth-btn:disabled { opacity: 0.5; cursor: default; }
         .ci-auth-error { color: #e55; font-size: 0.85rem; margin: 0.5rem 0 0; min-height: 1.2em; }
         .ci-auth-link { background: none; border: none; color: var(--accent, #4f6ef7); cursor: pointer; font-size: 0.85rem; padding: 0; margin-top: 0.75rem; text-decoration: underline; }
+        .ci-signin-btn { background: none; border: 1px solid var(--border, #2e2e4a); border-radius: 6px; color: var(--text, #e0e0f0); font-size: 0.8rem; padding: 0.3rem 0.7rem; cursor: pointer; white-space: nowrap; }
+        .ci-signin-btn:hover { background: var(--bg-card, #1a1a2e); }
+        .ci-signin-btn.authenticated { color: var(--accent, #4f6ef7); }
     `;
     document.head.appendChild(style);
 
@@ -224,8 +227,33 @@ export function hideAuthModal() {
 // INIT
 // ============================================================
 
+function _bindSignInBtn() {
+    var btn = document.getElementById('ciSignInBtn');
+    if (!btn) return;
+    var user = getCurrentUser();
+    if (user) {
+        btn.textContent = user.email.split('@')[0];
+        btn.classList.add('authenticated');
+    }
+    btn.addEventListener('click', showAuthModal);
+}
+
 export function initAuth() {
     getGuestId(); // mint UUID on first visit
+
+    window.addEventListener('ci:auth:login', function(e) {
+        var btn = document.getElementById('ciSignInBtn');
+        if (btn) {
+            btn.textContent = e.detail.email.split('@')[0];
+            btn.classList.add('authenticated');
+        }
+    });
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', _bindSignInBtn);
+    } else {
+        _bindSignInBtn();
+    }
 
     window.CI_AUTH = {
         getGuestId,

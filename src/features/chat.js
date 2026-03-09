@@ -471,6 +471,7 @@ function sendMessage() {
             ticker: ticker,
             question: question,
             conversation_history: history,
+            conversation_id: dbConversationIds[ticker] || null,
             system_prompt: systemPrompt
         })
     })

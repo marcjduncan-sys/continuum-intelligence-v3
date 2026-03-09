@@ -27,6 +27,7 @@ from slowapi.util import get_remote_address
 
 import config
 import db
+import summarise
 from auth import router as auth_router
 from conversations import router as conversations_router
 from ingest import ingest, get_tickers, get_passage_count
@@ -216,6 +217,10 @@ class ResearchChatRequest(BaseModel):
         default_factory=list,
         description="Prior conversation messages for context",
     )
+    conversation_id: str | None = Field(
+        None,
+        description="DB conversation ID -- enables server-side context and rolling summarisation",
+    )
     custom_system_prompt: str | None = Field(
         None,
         description="Optional custom system prompt (overrides default for personalised chat)",
@@ -336,10 +341,21 @@ async def research_chat(request: Request, body: ResearchChatRequest, _=Depends(v
     # Build messages for Claude
     messages = []
 
-    # Add conversation history (truncated to limit)
-    history = body.conversation_history[-config.MAX_CONVERSATION_TURNS * 2:]
-    for msg in history:
-        messages.append({"role": msg.role, "content": msg.content})
+    # Add conversation history (with rolling summarisation if conversation_id provided)
+    if body.conversation_id:
+        pool = await db.get_pool()
+        summary, db_messages = await summarise.summarise_if_needed(
+            pool, body.conversation_id, ticker, config.get_anthropic_client()
+        )
+        history_msgs = db_messages[-(config.MAX_CONVERSATION_TURNS * 2):]
+        if summary:
+            messages.append({"role": "user", "content": "[PRIOR CONTEXT SUMMARY]\n" + summary})
+        for msg in history_msgs:
+            messages.append({"role": msg["role"], "content": msg["content"]})
+    else:
+        history = body.conversation_history[-config.MAX_CONVERSATION_TURNS * 2:]
+        for msg in history:
+            messages.append({"role": msg.role, "content": msg.content})
 
     # Add the current question with context
     if context:

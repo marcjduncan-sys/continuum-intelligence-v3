@@ -285,3 +285,83 @@ async def get_conversation_by_ticker(
             }
             for m in messages
         ]
+
+
+# ---------------------------------------------------------------------------
+# Summarisation helpers (Phase 3b)
+# ---------------------------------------------------------------------------
+
+async def get_conversation_context(pool, conversation_id: str) -> dict:
+    """
+    Return {summary, cursor_id, recent_messages} for building LLM context.
+    recent_messages = all messages after cursor_id (or all if no cursor).
+    """
+    if pool is None:
+        return {"summary": None, "cursor_id": None, "recent_messages": []}
+    async with pool.acquire() as conn:
+        conv = await conn.fetchrow(
+            """
+            SELECT summary, summary_cursor_message_id
+            FROM conversations
+            WHERE id = $1
+            """,
+            conversation_id,
+        )
+        if not conv:
+            return {"summary": None, "cursor_id": None, "recent_messages": []}
+
+        cursor_id = str(conv["summary_cursor_message_id"]) if conv["summary_cursor_message_id"] else None
+
+        if cursor_id:
+            # Messages strictly after the cursor (i.e. not yet summarised)
+            messages = await conn.fetch(
+                """
+                SELECT id, role, content, created_at
+                FROM messages
+                WHERE conversation_id = $1
+                  AND created_at > (
+                      SELECT created_at FROM messages WHERE id = $2
+                  )
+                ORDER BY created_at ASC
+                """,
+                conversation_id,
+                cursor_id,
+            )
+        else:
+            messages = await conn.fetch(
+                """
+                SELECT id, role, content, created_at
+                FROM messages
+                WHERE conversation_id = $1
+                ORDER BY created_at ASC
+                """,
+                conversation_id,
+            )
+
+        return {
+            "summary": conv["summary"],
+            "cursor_id": cursor_id,
+            "recent_messages": [
+                {"id": str(m["id"]), "role": m["role"], "content": m["content"]}
+                for m in messages
+            ],
+        }
+
+
+async def update_conversation_summary(
+    pool, conversation_id: str, summary: str, cursor_message_id: str
+) -> None:
+    """Store the new summary and advance the cursor."""
+    if pool is None:
+        return
+    async with pool.acquire() as conn:
+        await conn.execute(
+            """
+            UPDATE conversations
+            SET summary = $1, summary_cursor_message_id = $2
+            WHERE id = $3
+            """,
+            summary,
+            cursor_message_id,
+            conversation_id,
+        )
