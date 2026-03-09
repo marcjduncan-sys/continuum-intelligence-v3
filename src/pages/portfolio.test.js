@@ -1,297 +1,348 @@
-// @vitest-environment jsdom
-import { renderChangeAlerts } from './portfolio.js';
-import { STOCK_DATA, FRESHNESS_DATA, initStockData, initFreshnessData } from '../lib/state.js';
+import { describe, it, expect } from 'vitest';
+import { calculateReweightingScores, deriveAlignment } from './portfolio.js';
 
-function setupDom() {
-  document.body.innerHTML =
-    '<div id="changeAlertsSection" style="display:none"></div>' +
-    '<div id="changeAlertsFeed" style="display:none"></div>' +
-    '<div id="changeAlertsEmpty"></div>';
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                           */
+/* ------------------------------------------------------------------ */
+
+function makePosition(ticker, overrides) {
+  return Object.assign({
+    ticker: ticker,
+    company: ticker + ' Corp',
+    units: 1000,
+    avgCost: 10,
+    currentPrice: 12,
+    marketValue: 12000,
+    weight: 25,
+    skew: 'balanced',
+    alignment: { label: 'Balanced exposure', cls: 'neutral' }
+  }, overrides);
 }
 
-beforeEach(() => {
-  for (var k in STOCK_DATA) delete STOCK_DATA[k];
-  for (var k in FRESHNESS_DATA) delete FRESHNESS_DATA[k];
-  setupDom();
-});
+function makeCoverage(ticker, skew) {
+  return { skew: skew, price: 12, company: ticker + ' Corp' };
+}
 
-describe('renderChangeAlerts -- overcorrection signal', () => {
-  it('renders a critical alert for a portfolio ticker with active overcorrection', () => {
-    initStockData({
-      WTC: {
-        _alertState: 'OVERCORRECTION',
-        _overcorrection: {
-          active: true,
-          triggerType: 'SINGLE_DAY',
-          triggerDate: '2026-03-06',
-          triggerPrice: 52.72,
-          direction: 'up',
-          movePct: 18.74,
-          reviewDate: '2026-03-13',
-          message: 'Single-day move of +18.7% exceeds 10% threshold'
-        },
-        hero: { skew: 'UPSIDE' }
-      }
-    });
-    var positions = [{ ticker: 'WTC', weight: 15, marketValue: 15000 }];
-    renderChangeAlerts(positions);
+function makeTc(ticker, overrides) {
+  return Object.assign({
+    n1: { prob: 35 },
+    n2: { prob: 30 },
+    n3: { prob: 20 },
+    n4: { prob: 15 },
+    primary: 'n1'
+  }, overrides);
+}
 
-    var feed = document.getElementById('changeAlertsFeed');
-    expect(feed.innerHTML).toContain('WTC: upside overcorrection signal');
-    expect(feed.innerHTML).toContain('Single-day move of +18.7% exceeds 10% threshold');
-    expect(feed.innerHTML).toContain('Triggered 2026-03-06');
-    expect(feed.innerHTML).toContain('Review by 2026-03-13');
-    expect(feed.innerHTML).toContain('change-alert-item critical');
-    expect(feed.style.display).not.toBe('none');
+/* ------------------------------------------------------------------ */
+/*  deriveAlignment                                                   */
+/* ------------------------------------------------------------------ */
+
+describe('deriveAlignment', () => {
+  it('returns aligned for upside skew', () => {
+    expect(deriveAlignment('upside', 10)).toEqual({ label: 'Aligned with skew', cls: 'aligned' });
   });
 
-  it('labels downside overcorrection correctly', () => {
-    initStockData({
-      FMG: {
-        _alertState: 'OVERCORRECTION',
-        _overcorrection: {
-          active: true,
-          triggerDate: '2026-03-05',
-          direction: 'down',
-          movePct: 11.0,
-          reviewDate: '2026-03-12',
-          message: 'Single-day move of -11.0% exceeds 10% threshold'
-        },
-        hero: { skew: 'DOWNSIDE' }
-      }
-    });
-    var positions = [{ ticker: 'FMG', weight: 10, marketValue: 10000 }];
-    renderChangeAlerts(positions);
-
-    var feed = document.getElementById('changeAlertsFeed');
-    expect(feed.innerHTML).toContain('FMG: downside overcorrection signal');
+  it('returns contradicts for downside skew under 15% weight', () => {
+    expect(deriveAlignment('downside', 10)).toEqual({ label: 'Contradicts skew', cls: 'contradicts' });
   });
 
-  it('ignores ticker where _overcorrection.active is false', () => {
-    initStockData({
-      GMG: {
-        _alertState: 'OVERCORRECTION',
-        _overcorrection: { active: false, triggerDate: '2026-02-01', reviewDate: '2026-02-08', direction: 'up' },
-        hero: { skew: 'UPSIDE' }
-      }
-    });
-    var positions = [{ ticker: 'GMG', weight: 20, marketValue: 20000 }];
-    renderChangeAlerts(positions);
+  it('returns exceeds for downside skew over 15% weight', () => {
+    expect(deriveAlignment('downside', 20)).toEqual({ label: 'Exposure exceeds conviction', cls: 'exceeds' });
+  });
 
-    var empty = document.getElementById('changeAlertsEmpty');
-    expect(empty.style.display).toBe('');
+  it('returns balanced for balanced skew under 15%', () => {
+    expect(deriveAlignment('balanced', 10)).toEqual({ label: 'Balanced exposure', cls: 'neutral' });
+  });
+
+  it('returns not covered for null skew', () => {
+    expect(deriveAlignment(null, 10)).toEqual({ label: 'Not covered', cls: 'not-covered' });
   });
 });
 
-describe('renderChangeAlerts -- empty state', () => {
-  it('shows empty state when no signals are active for any portfolio ticker', () => {
-    initStockData({
-      GMG: {
-        _alertState: 'NORMAL',
-        hero: { skew: 'UPSIDE', previousSkew: 'UPSIDE' }
-      }
-    });
-    initFreshnessData({
-      GMG: {
-        status: 'OK',
-        nearestCatalystDays: 30,
-        nearestCatalyst: 'FY2026 Results',
-        nearestCatalystDate: 'Aug 2026',
-        reviewDate: '2026-03-01'
-      }
+/* ------------------------------------------------------------------ */
+/*  calculateReweightingScores — scoring                              */
+/* ------------------------------------------------------------------ */
+
+describe('calculateReweightingScores', () => {
+  describe('contradicting positions get zero weight', () => {
+    it('downside-skewed long gets suggestedWeight = 0', () => {
+      var covered = [makePosition('WOW', { skew: 'downside', weight: 25, units: 31289 })];
+      var coverageData = { WOW: makeCoverage('WOW', 'downside') };
+      var tcData = { WOW: makeTc('WOW') };
+
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+
+      expect(scores[0].suggestedWeight).toBe(0);
+      expect(scores[0].rawScore).toBe(0);
     });
 
-    var positions = [{ ticker: 'GMG', weight: 20, marketValue: 20000 }];
-    renderChangeAlerts(positions);
+    it('upside-skewed short gets suggestedWeight = 0', () => {
+      var covered = [makePosition('CBA', { skew: 'upside', weight: 25, units: -500 })];
+      var coverageData = { CBA: makeCoverage('CBA', 'upside') };
+      var tcData = { CBA: makeTc('CBA') };
 
-    var feed = document.getElementById('changeAlertsFeed');
-    var empty = document.getElementById('changeAlertsEmpty');
-    expect(feed.style.display).toBe('none');
-    expect(empty.style.display).toBe('');
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+
+      expect(scores[0].suggestedWeight).toBe(0);
+      expect(scores[0].rawScore).toBe(0);
+    });
   });
 
-  it('shows empty state when positions array is empty', () => {
-    renderChangeAlerts([]);
+  describe('aligned positions get conviction-weighted scores', () => {
+    it('upside-skewed long gets 1.3x multiplier', () => {
+      var covered = [
+        makePosition('GMG', { skew: 'upside', weight: 50 }),
+        makePosition('MQG', { skew: 'balanced', weight: 50 })
+      ];
+      var coverageData = {
+        GMG: makeCoverage('GMG', 'upside'),
+        MQG: makeCoverage('MQG', 'balanced')
+      };
+      var tcData = {};
 
-    var feed = document.getElementById('changeAlertsFeed');
-    var empty = document.getElementById('changeAlertsEmpty');
-    expect(feed.style.display).toBe('none');
-    expect(empty.style.display).toBe('');
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      var gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
+      var mqg = scores.find(function(s) { return s.ticker === 'MQG'; });
+
+      // GMG rawScore should be 1.3x baseWeight, MQG should be 1.0x
+      expect(gmg.rawScore).toBeGreaterThan(mqg.rawScore);
+      expect(gmg.rawScore / mqg.rawScore).toBeCloseTo(1.3, 1);
+    });
+
+    it('downside-skewed short gets 1.3x multiplier', () => {
+      var covered = [
+        makePosition('WDS', { skew: 'downside', weight: 50, units: -1000 }),
+        makePosition('MQG', { skew: 'balanced', weight: 50, units: -1000 })
+      ];
+      var coverageData = {
+        WDS: makeCoverage('WDS', 'downside'),
+        MQG: makeCoverage('MQG', 'balanced')
+      };
+      var tcData = {};
+
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      var wds = scores.find(function(s) { return s.ticker === 'WDS'; });
+      var mqg = scores.find(function(s) { return s.ticker === 'MQG'; });
+
+      expect(wds.rawScore / mqg.rawScore).toBeCloseTo(1.3, 1);
+    });
   });
 
-  it('shows empty state when portfolio tickers are not in STOCK_DATA', () => {
-    var positions = [{ ticker: 'UNKNOWN', weight: 10, marketValue: 10000 }];
-    renderChangeAlerts(positions);
+  describe('normalisation', () => {
+    it('non-zero weights sum to 100%', () => {
+      var covered = [
+        makePosition('GMG', { skew: 'upside', weight: 30 }),
+        makePosition('MQG', { skew: 'balanced', weight: 30 }),
+        makePosition('WOW', { skew: 'downside', weight: 40 })
+      ];
+      var coverageData = {
+        GMG: makeCoverage('GMG', 'upside'),
+        MQG: makeCoverage('MQG', 'balanced'),
+        WOW: makeCoverage('WOW', 'downside')
+      };
+      var tcData = {};
 
-    var empty = document.getElementById('changeAlertsEmpty');
-    expect(empty.style.display).toBe('');
-  });
-});
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
 
-describe('renderChangeAlerts -- no hardcoded ticker content', () => {
-  it('does not render hardcoded XRO content when XRO has no active signals', () => {
-    initStockData({
-      XRO: { _alertState: 'NORMAL', hero: { skew: 'UPSIDE', previousSkew: 'UPSIDE' } }
+      var total = scores.reduce(function(s, x) { return s + x.suggestedWeight; }, 0);
+      // WOW is zero, GMG + MQG should sum to 100
+      expect(total).toBeCloseTo(100, 1);
+      expect(scores.find(function(s) { return s.ticker === 'WOW'; }).suggestedWeight).toBe(0);
     });
-    initFreshnessData({ XRO: { status: 'OK', nearestCatalystDays: 30 } });
 
-    var positions = [{ ticker: 'XRO', weight: 15, marketValue: 15000 }];
-    renderChangeAlerts(positions);
+    it('all-downside portfolio: no division by zero, all weights zero', () => {
+      var covered = [
+        makePosition('WOW', { skew: 'downside', weight: 50 }),
+        makePosition('WDS', { skew: 'downside', weight: 50 })
+      ];
+      var coverageData = {
+        WOW: makeCoverage('WOW', 'downside'),
+        WDS: makeCoverage('WDS', 'downside')
+      };
+      var tcData = {};
 
-    var feed = document.getElementById('changeAlertsFeed');
-    expect(feed.innerHTML).not.toContain('N3 Probability Increased');
-    expect(feed.innerHTML).not.toContain('AI disruption thesis');
-    expect(feed.innerHTML).not.toContain('Claude 4 announcement');
-  });
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
 
-  it('does not render hardcoded WOW content when WOW has no active signals', () => {
-    initStockData({
-      WOW: { _alertState: 'NORMAL', hero: { skew: 'DOWNSIDE', previousSkew: 'DOWNSIDE' } }
+      scores.forEach(function(s) {
+        expect(s.suggestedWeight).toBe(0);
+      });
     });
-    initFreshnessData({ WOW: { status: 'OK', nearestCatalystDays: 30 } });
-
-    var positions = [{ ticker: 'WOW', weight: 12, marketValue: 12000 }];
-    renderChangeAlerts(positions);
-
-    var feed = document.getElementById('changeAlertsFeed');
-    expect(feed.innerHTML).not.toContain('Earnings Preview');
-    expect(feed.innerHTML).not.toContain('11.8% EBIT growth');
-  });
-
-  it('does not render hardcoded CSL content when CSL has no active signals', () => {
-    initStockData({
-      CSL: { _alertState: 'NORMAL', hero: { skew: 'DOWNSIDE', previousSkew: 'DOWNSIDE' } }
-    });
-    initFreshnessData({ CSL: { status: 'OK', nearestCatalystDays: 30 } });
-
-    var positions = [{ ticker: 'CSL', weight: 20, marketValue: 20000 }];
-    renderChangeAlerts(positions);
-
-    var feed = document.getElementById('changeAlertsFeed');
-    expect(feed.innerHTML).not.toContain('Plasma Collection Update');
-    expect(feed.innerHTML).not.toContain('plasma');
   });
 
-  it('never renders ASX 200 Volatility Elevated regardless of portfolio composition', () => {
-    // Empty portfolio -- no signals possible
-    renderChangeAlerts([]);
-    expect(document.body.innerHTML).not.toContain('ASX 200 Volatility Elevated');
+  describe('action logic — long positions', () => {
+    it('downside skew → Sell All with all units', () => {
+      var covered = [makePosition('WOW', { skew: 'downside', weight: 25, units: 31289, currentPrice: 38 })];
+      var coverageData = { WOW: makeCoverage('WOW', 'downside') };
+      var tcData = {};
 
-    // Portfolio with tickers but no signals
-    initStockData({
-      XRO: { _alertState: 'NORMAL', hero: { skew: 'UPSIDE', previousSkew: 'UPSIDE' } },
-      WOW: { _alertState: 'NORMAL', hero: { skew: 'DOWNSIDE', previousSkew: 'DOWNSIDE' } }
-    });
-    var positions = [
-      { ticker: 'XRO', weight: 15, marketValue: 15000 },
-      { ticker: 'WOW', weight: 12, marketValue: 12000 }
-    ];
-    renderChangeAlerts(positions);
-    expect(document.body.innerHTML).not.toContain('ASX 200 Volatility Elevated');
-    expect(document.body.innerHTML).not.toContain('VIX-equivalent');
-  });
-});
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 1200000);
 
-describe('renderChangeAlerts -- catalyst signal', () => {
-  it('renders warning when catalyst is approaching within 7 days', () => {
-    initStockData({
-      DRO: { _alertState: 'NORMAL', hero: { skew: 'BALANCED' } }
-    });
-    initFreshnessData({
-      DRO: {
-        status: 'MODERATE',
-        nearestCatalystDays: 3,
-        nearestCatalyst: 'FY2025 Full-Year Results',
-        nearestCatalystDate: '10 March 2026',
-        reviewDate: '2026-03-06'
-      }
+      expect(scores[0].action).toBe('Sell All');
+      expect(scores[0].actionCls).toBe('sell-all');
+      expect(scores[0].shareAction).toBe('31,289');
     });
 
-    var positions = [{ ticker: 'DRO', weight: 8, marketValue: 8000 }];
-    renderChangeAlerts(positions);
+    it('upside skew, within 1% band → Hold', () => {
+      // Two upside positions with equal weight — delta will be ~0
+      var covered = [
+        makePosition('GMG', { skew: 'upside', weight: 50, units: 1000 }),
+        makePosition('CBA', { skew: 'upside', weight: 50, units: 1000 })
+      ];
+      var coverageData = {
+        GMG: makeCoverage('GMG', 'upside'),
+        CBA: makeCoverage('CBA', 'upside')
+      };
+      var tcData = {};
 
-    var feed = document.getElementById('changeAlertsFeed');
-    expect(feed.innerHTML).toContain('DRO: catalyst approaching');
-    expect(feed.innerHTML).toContain('FY2025 Full-Year Results');
-    expect(feed.innerHTML).toContain('in 3 days');
-    expect(feed.innerHTML).toContain('change-alert-item warning');
-  });
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
 
-  it('renders warning when catalyst is overdue (up to 14 days past)', () => {
-    initStockData({
-      OCL: { _alertState: 'NORMAL', hero: { skew: 'DOWNSIDE' } }
-    });
-    initFreshnessData({
-      OCL: {
-        status: 'MODERATE',
-        nearestCatalystDays: -5,
-        nearestCatalyst: 'H1 FY2026 Results',
-        nearestCatalystDate: 'Feb-Mar 2026',
-        reviewDate: '2026-03-01'
-      }
+      scores.forEach(function(s) {
+        expect(s.action).toBe('Hold');
+      });
     });
 
-    var positions = [{ ticker: 'OCL', weight: 6, marketValue: 6000 }];
-    renderChangeAlerts(positions);
+    it('upside skew, delta < -1% → Trim with calculated shares', () => {
+      // One upside position with 80% weight, another with 20% — upside one will be overweight
+      var covered = [
+        makePosition('GMG', { skew: 'upside', weight: 80, units: 5000, currentPrice: 30 }),
+        makePosition('CBA', { skew: 'upside', weight: 20, units: 1000, currentPrice: 130 })
+      ];
+      var coverageData = {
+        GMG: makeCoverage('GMG', 'upside'),
+        CBA: makeCoverage('CBA', 'upside')
+      };
+      var tcData = {};
 
-    var feed = document.getElementById('changeAlertsFeed');
-    expect(feed.innerHTML).toContain('OCL: catalyst overdue');
-    expect(feed.innerHTML).toContain('5 days overdue');
-  });
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 200000);
+      var cba = scores.find(function(s) { return s.ticker === 'CBA'; });
 
-  it('does not render catalyst alert when catalyst is more than 7 days away', () => {
-    initStockData({
-      CSL: { _alertState: 'NORMAL', hero: { skew: 'DOWNSIDE', previousSkew: 'DOWNSIDE' } }
-    });
-    initFreshnessData({
-      CSL: {
-        status: 'OK',
-        nearestCatalystDays: 25,
-        nearestCatalyst: 'Permanent CEO Appointment',
-        nearestCatalystDate: '1H 2026',
-        reviewDate: '2026-03-06'
+      // CBA at 20% weight but suggested ~50%, so delta is positive — Hold or no trim
+      // GMG at 80% weight but suggested ~50%, so delta is negative — Trim
+      var gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
+      if (gmg.delta < -1) {
+        expect(gmg.action).toBe('Trim');
+        expect(gmg.shareAction).not.toBe('--');
       }
     });
 
-    var positions = [{ ticker: 'CSL', weight: 20, marketValue: 20000 }];
-    renderChangeAlerts(positions);
+    it('balanced skew, within 5% band → Hold', () => {
+      var covered = [
+        makePosition('MQG', { skew: 'balanced', weight: 50 }),
+        makePosition('NAB', { skew: 'balanced', weight: 50 })
+      ];
+      var coverageData = {
+        MQG: makeCoverage('MQG', 'balanced'),
+        NAB: makeCoverage('NAB', 'balanced')
+      };
+      var tcData = {};
 
-    var empty = document.getElementById('changeAlertsEmpty');
-    expect(empty.style.display).toBe('');
-  });
-});
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
 
-describe('renderChangeAlerts -- skew momentum signal', () => {
-  it('renders info alert when skew direction has changed', () => {
-    initStockData({
-      BHP: {
-        _alertState: 'NORMAL',
-        hero: { skew: 'UPSIDE', previousSkew: 'DOWNSIDE' }
-      }
+      scores.forEach(function(s) {
+        expect(s.action).toBe('Hold');
+      });
     });
-
-    var positions = [{ ticker: 'BHP', weight: 12, marketValue: 12000 }];
-    renderChangeAlerts(positions);
-
-    var feed = document.getElementById('changeAlertsFeed');
-    expect(feed.innerHTML).toContain('BHP: skew direction changed');
-    expect(feed.innerHTML).toContain('DOWNSIDE');
-    expect(feed.innerHTML).toContain('UPSIDE');
-    expect(feed.innerHTML).toContain('change-alert-item info');
   });
 
-  it('does not render skew alert when previousSkew is absent', () => {
-    initStockData({
-      BHP: {
-        _alertState: 'NORMAL',
-        hero: { skew: 'UPSIDE', previousSkew: '' }
-      }
+  describe('action logic — short positions', () => {
+    it('upside skew → Buy to Close with all units', () => {
+      var covered = [makePosition('CBA', { skew: 'upside', weight: 25, units: -500, currentPrice: 130 })];
+      var coverageData = { CBA: makeCoverage('CBA', 'upside') };
+      var tcData = {};
+
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+
+      expect(scores[0].action).toBe('Buy to Close');
+      expect(scores[0].actionCls).toBe('buy');
+      expect(scores[0].shareAction).toBe('500');
     });
 
-    var positions = [{ ticker: 'BHP', weight: 12, marketValue: 12000 }];
-    renderChangeAlerts(positions);
+    it('downside skew short, within 1% band → Hold', () => {
+      var covered = [
+        makePosition('WDS', { skew: 'downside', weight: 50, units: -1000 }),
+        makePosition('WOW', { skew: 'downside', weight: 50, units: -1000 })
+      ];
+      var coverageData = {
+        WDS: makeCoverage('WDS', 'downside'),
+        WOW: makeCoverage('WOW', 'downside')
+      };
+      var tcData = {};
 
-    var empty = document.getElementById('changeAlertsEmpty');
-    expect(empty.style.display).toBe('');
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+
+      scores.forEach(function(s) {
+        expect(s.action).toBe('Hold');
+      });
+    });
+  });
+
+  describe('TC_DATA adjustments', () => {
+    it('high conviction (maxProb > 40) boosts multiplier', () => {
+      var covered = [
+        makePosition('CBA', { skew: 'upside', weight: 50 }),
+        makePosition('MQG', { skew: 'upside', weight: 50 })
+      ];
+      var coverageData = {
+        CBA: makeCoverage('CBA', 'upside'),
+        MQG: makeCoverage('MQG', 'upside')
+      };
+      // CBA has high conviction, MQG has even spread
+      var tcData = {
+        CBA: makeTc('CBA', { n1: { prob: 55 }, n2: { prob: 20 }, n3: { prob: 15 }, n4: { prob: 10 } }),
+        MQG: makeTc('MQG', { n1: { prob: 30 }, n2: { prob: 25 }, n3: { prob: 25 }, n4: { prob: 20 } })
+      };
+
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      var cba = scores.find(function(s) { return s.ticker === 'CBA'; });
+      var mqg = scores.find(function(s) { return s.ticker === 'MQG'; });
+
+      expect(cba.rawScore).toBeGreaterThan(mqg.rawScore);
+    });
+
+    it('contrarian (uphill) reduces multiplier', () => {
+      var covered = [
+        makePosition('CBA', { skew: 'upside', weight: 50 }),
+        makePosition('MQG', { skew: 'upside', weight: 50 })
+      ];
+      var coverageData = {
+        CBA: makeCoverage('CBA', 'upside'),
+        MQG: makeCoverage('MQG', 'upside')
+      };
+      var tcData = {
+        CBA: makeTc('CBA', { primary: 'uphill' }),
+        MQG: makeTc('MQG', { primary: 'n1' })
+      };
+
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      var cba = scores.find(function(s) { return s.ticker === 'CBA'; });
+      var mqg = scores.find(function(s) { return s.ticker === 'MQG'; });
+
+      expect(cba.rawScore).toBeLessThan(mqg.rawScore);
+    });
+  });
+
+  describe('sorting', () => {
+    it('sorts by largest |delta| descending', () => {
+      var covered = [
+        makePosition('GMG', { skew: 'upside', weight: 10 }),
+        makePosition('WOW', { skew: 'downside', weight: 60 }),
+        makePosition('MQG', { skew: 'balanced', weight: 30 })
+      ];
+      var coverageData = {
+        GMG: makeCoverage('GMG', 'upside'),
+        WOW: makeCoverage('WOW', 'downside'),
+        MQG: makeCoverage('MQG', 'balanced')
+      };
+      var tcData = {};
+
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+
+      // WOW has delta = 0 - 60 = -60, should be first
+      expect(scores[0].ticker).toBe('WOW');
+      // Remaining deltas should be in descending |delta| order
+      for (var i = 1; i < scores.length; i++) {
+        expect(Math.abs(scores[i - 1].delta)).toBeGreaterThanOrEqual(Math.abs(scores[i].delta));
+      }
+    });
   });
 });

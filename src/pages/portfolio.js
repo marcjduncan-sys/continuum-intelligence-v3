@@ -1,7 +1,7 @@
 // portfolio.js — Portfolio engine
 // Extracted from index.html without logic changes
 
-import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA, getTcData } from '../lib/state.js';
+import { STOCK_DATA, REFERENCE_DATA } from '../lib/state.js';
 import { computeSkewScore, normaliseScores } from '../lib/dom.js';
 import { buildCoverageData } from './home.js';
 import { on } from '../lib/data-events.js';
@@ -14,6 +14,12 @@ function getCoverageData() {
   return COVERAGE_DATA;
 }
 
+// TC_DATA is imported from thesis.js but to avoid circular dependency,
+// we access it via the window global set by thesis.js
+function getTcData() {
+  // TC_DATA is defined in thesis.js and also remains on window from index.html
+  return window.TC_DATA || {};
+}
 
 export function setupUploadZone() {
   var zone = document.getElementById('uploadZone');
@@ -131,58 +137,31 @@ export function processPortfolioData(rows) {
   }
 
   /* Calculate weights */
-  var expo = calcWeights(positions);
+  var totalValue = positions.reduce(function(s, p) { return s + (p.marketValue || 0); }, 0);
+  positions.forEach(function(p) {
+    p.weight = totalValue > 0 && p.marketValue ? (p.marketValue / totalValue) * 100 : 0;
+    p.alignment = deriveAlignment(p.skew, p.weight);
+  });
 
   savePortfolio(positions);
-  renderPortfolio(positions, expo.totalLong, expo);
+  renderPortfolio(positions, totalValue);
 }
 
-export function deriveAlignment(skew, weight, isShort) {
+export function deriveAlignment(skew, weight) {
   if (!skew) return { label: 'Not covered', cls: 'not-covered' };
-  if (skew === 'upside') {
-    if (isShort) return { label: 'Contradicts skew', cls: 'contradicts' };
-    return { label: 'Aligned with skew', cls: 'aligned' };
-  }
+  if (skew === 'upside') return { label: 'Aligned with skew', cls: 'aligned' };
   if (skew === 'downside') {
-    if (isShort) return { label: 'Aligned with skew', cls: 'aligned' };
     if (weight > 15) return { label: 'Exposure exceeds conviction', cls: 'exceeds' };
     return { label: 'Contradicts skew', cls: 'contradicts' };
   }
   if (skew === 'balanced') {
-    if (Math.abs(weight) > 15) return { label: 'Exposure exceeds conviction', cls: 'exceeds' };
+    if (weight > 15) return { label: 'Exposure exceeds conviction', cls: 'exceeds' };
     return { label: 'Balanced exposure', cls: 'neutral' };
   }
   return { label: 'N/A', cls: 'not-covered' };
 }
 
-function calcWeights(positions) {
-  var totalLong = 0, totalShortAbs = 0;
-  positions.forEach(function(p) {
-    if (p.marketValue === null || p.marketValue === undefined) return;
-    if (p.marketValue >= 0) totalLong += p.marketValue;
-    else totalShortAbs += Math.abs(p.marketValue);
-  });
-  positions.forEach(function(p) {
-    if (p.marketValue === null || p.marketValue === undefined) {
-      p.weight = 0;
-    } else if (p.marketValue >= 0) {
-      p.weight = totalLong > 0 ? (p.marketValue / totalLong) * 100 : 0;
-    } else {
-      p.weight = totalShortAbs > 0 ? (Math.abs(p.marketValue) / totalShortAbs) * 100 : 0;
-    }
-    p.alignment = p.units === 0
-      ? { label: 'No position', cls: 'no-position' }
-      : deriveAlignment(p.skew, p.weight, p.units < 0);
-  });
-  return {
-    totalLong: totalLong,
-    totalShortAbs: totalShortAbs,
-    netExposure: totalLong - totalShortAbs,
-    grossExposure: totalLong + totalShortAbs
-  };
-}
-
-export function renderPortfolio(positions, totalLong, expo) {
+export function renderPortfolio(positions, totalValue) {
   var body = document.getElementById('portfolioBody');
   var table = document.getElementById('portfolioTable');
   var summary = document.getElementById('portfolioSummary');
@@ -221,29 +200,19 @@ export function renderPortfolio(positions, totalLong, expo) {
 
   /* Summary */
   var totalPnL = positions.reduce(function(s, p) { return s + (p.pnlDollar || 0); }, 0);
-  var totalAbsCost = positions.reduce(function(s, p) { return s + Math.abs(p.costBasis); }, 0);
-  var totalPnLPct = totalAbsCost > 0 ? (totalPnL / totalAbsCost) * 100 : 0;
+  var totalCost = positions.reduce(function(s, p) { return s + p.costBasis; }, 0);
+  var totalPnLPct = totalCost > 0 ? (totalPnL / totalCost) * 100 : 0;
 
-  var grossExp = expo.grossExposure || 1;
-  var alignedDollar = 0, contraDollar = 0, neutralDollar = 0;
+  var alignedWeight = 0, contraWeight = 0, neutralWeight = 0;
   positions.forEach(function(p) {
-    var absMV = Math.abs(p.marketValue || 0);
-    if (p.alignment.cls === 'aligned') alignedDollar += absMV;
-    else if (p.alignment.cls === 'contradicts' || p.alignment.cls === 'exceeds') contraDollar += absMV;
-    else neutralDollar += absMV;
+    if (p.alignment.cls === 'aligned') alignedWeight += p.weight;
+    else if (p.alignment.cls === 'contradicts' || p.alignment.cls === 'exceeds') contraWeight += p.weight;
+    else neutralWeight += p.weight;
   });
-  var alignedWeight = (alignedDollar / grossExp) * 100;
-  var contraWeight = (contraDollar / grossExp) * 100;
-  var neutralWeight = (neutralDollar / grossExp) * 100;
 
-  document.getElementById('summaryLong').textContent = 'A$' + formatNum(expo.totalLong, 0);
-  document.getElementById('summaryShort').textContent = 'A$' + formatNum(expo.totalShortAbs, 0);
-  document.getElementById('summaryNet').textContent = 'A$' + formatNum(expo.netExposure, 0);
-  document.getElementById('summaryGross').textContent = 'A$' + formatNum(expo.grossExposure, 0);
+  document.getElementById('summaryValue').textContent = 'A$' + formatNum(totalValue, 0);
   var pnlEl = document.getElementById('summaryPnL');
-  var pnlSign = totalPnL >= 0 ? '+' : '';
-  var pctSign = totalPnLPct >= 0 ? '+' : '';
-  pnlEl.innerHTML = pnlSign + 'A$' + formatNum(totalPnL, 0) + '<span class="pnl-pct">' + pctSign + formatNum(totalPnLPct, 1) + '%</span>';
+  pnlEl.textContent = (totalPnL >= 0 ? '+' : '') + 'A$' + formatNum(totalPnL, 0) + ' (' + (totalPnLPct >= 0 ? '+' : '') + formatNum(totalPnLPct, 1) + '%)';
   pnlEl.className = 'portfolio-summary-value ' + (totalPnL >= 0 ? 'positive' : 'negative');
   document.getElementById('summaryAligned').textContent = formatNum(alignedWeight, 1) + '%';
   document.getElementById('summaryContra').textContent = formatNum(contraWeight, 1) + '%';
@@ -255,18 +224,15 @@ export function renderPortfolio(positions, totalLong, expo) {
   summary.style.display = '';
   actions.style.display = '';
 
-  /* Strategy context bar */
-  renderStrategyBar();
-
   /* Render diagnostics, reweighting, and alerts */
-  renderPortfolioDiagnostics(positions, expo.grossExposure);
-  renderReweighting(positions, expo.totalLong);
+  renderPortfolioDiagnostics(positions, totalValue);
+  renderReweighting(positions, totalValue);
   renderChangeAlerts(positions);
 }
 
 export function renderPortfolioFromSaved(positions) {
-  var expo = calcWeights(positions);
-  renderPortfolio(positions, expo.totalLong, expo);
+  var totalValue = positions.reduce(function(s, p) { return s + (p.marketValue || 0); }, 0);
+  renderPortfolio(positions, totalValue);
 }
 
 export function formatNum(n, decimals) {
@@ -277,79 +243,30 @@ export function formatNum(n, decimals) {
   return n.toFixed(decimals);
 }
 
-function getPersonalisationFund() {
-  try {
-    var raw = localStorage.getItem('continuum_personalisation_profile');
-    if (!raw) return null;
-    var data = JSON.parse(raw);
-    if (!data || data.version !== 2) return null;
-    return (data.state && data.state.fund) ? data.state.fund : null;
-  } catch (e) { return null; }
-}
-
-function renderStrategyBar() {
-  var el = document.getElementById('portfolioStrategyBar');
-  if (!el) return;
-  var fund = getPersonalisationFund();
-  if (!fund || (!fund.strategy && !fund.geography && !fund.benchmark)) {
-    el.style.display = 'none';
-    return;
-  }
-  el.innerHTML =
-    (fund.strategy ? '<div class="port-sb-item"><span class="port-sb-label">Strategy</span><span class="port-sb-value">' + fund.strategy + '</span></div>' : '') +
-    (fund.geography ? '<div class="port-sb-item"><span class="port-sb-label">Geography</span><span class="port-sb-value">' + fund.geography + '</span></div>' : '') +
-    (fund.benchmark ? '<div class="port-sb-item"><span class="port-sb-label">Benchmark</span><span class="port-sb-value">' + fund.benchmark + '</span></div>' : '') +
-    '<div class="port-sb-item"><span class="port-sb-label">Risk Budget</span><span class="port-sb-value">' + (fund.riskBudget || 10) + '% TE</span></div>';
-  el.style.display = '';
-}
-
 export function renderPortfolioDiagnostics(positions, totalValue) {
   var diagnosticsEl = document.getElementById('portfolioDiagnostics');
   if (!diagnosticsEl) return;
   diagnosticsEl.style.display = '';
 
+  var TC_DATA = getTcData();
   var hypothesisValues = { n1: 0, n2: 0, n3: 0, n4: 0, unknown: 0 };
-  var tierHypothesisNames = { n1: [], n2: [], n3: [], n4: [] };
 
   positions.forEach(function(p) {
-    var data = getTcData(p.ticker);
+    var data = TC_DATA[p.ticker];
     if (!data) {
-      hypothesisValues.unknown += Math.abs(p.marketValue || 0);
+      hypothesisValues.unknown += (p.marketValue || 0);
       return;
     }
     var tier = data.primary === 'uphill' ? 'n2' : data.primary;
-    hypothesisValues[tier] += Math.abs(p.marketValue || 0);
-    // Collect per-stock hypothesis name for this tier
-    if (data[tier] && data[tier].name) {
-      var name = data[tier].name;
-      if (tierHypothesisNames[tier].indexOf(name) === -1) {
-        tierHypothesisNames[tier].push(name);
-      }
-    }
+    hypothesisValues[tier] += (p.marketValue || 0);
   });
 
   var tiers = ['n1', 'n2', 'n3', 'n4'];
-
-  // Build contextual tier labels from portfolio hypothesis names
-  var tierLabels = {};
-  tiers.forEach(function(tier) {
-    var names = tierHypothesisNames[tier];
-    var key = tier.toUpperCase();
-    if (names.length === 0) {
-      tierLabels[tier] = key;
-    } else if (names.length <= 2) {
-      tierLabels[tier] = key + ': ' + names.join(', ');
-    } else {
-      tierLabels[tier] = key + ': ' + names.slice(0, 2).join(', ') + ' +' + (names.length - 2);
-    }
-  });
-
   tiers.forEach(function(tier) {
     var pct = totalValue > 0 ? (hypothesisValues[tier] / totalValue) * 100 : 0;
     var segment = document.getElementById('dna' + tier.toUpperCase());
     var pctEl = document.getElementById('pct' + tier.toUpperCase());
     var valEl = document.getElementById('val' + tier.toUpperCase());
-    var lblEl = document.getElementById('lbl' + tier.toUpperCase());
 
     if (segment) {
       segment.style.width = Math.max(pct, 5) + '%';
@@ -357,7 +274,6 @@ export function renderPortfolioDiagnostics(positions, totalValue) {
     }
     if (pctEl) pctEl.textContent = formatNum(pct, 0) + '%';
     if (valEl) valEl.textContent = 'A$' + formatNum(hypothesisValues[tier], 0);
-    if (lblEl) lblEl.textContent = tierLabels[tier];
   });
 
   var maxTier = tiers.reduce(function(a, b) { return hypothesisValues[a] > hypothesisValues[b] ? a : b; });
@@ -374,7 +290,7 @@ export function renderPortfolioDiagnostics(positions, totalValue) {
 
   var contrarianEl = document.getElementById('portContrarianOpp');
   var contrarianPositions = positions.filter(function(p) {
-    var data = getTcData(p.ticker);
+    var data = TC_DATA[p.ticker];
     return data && data.primary === 'uphill';
   });
 
@@ -390,15 +306,14 @@ export function renderPortfolioDiagnostics(positions, totalValue) {
   var missingTiers = tiers.filter(function(tier) { return hypothesisValues[tier] === 0; });
 
   if (missingTiers.length > 0) {
-    hedgeEl.innerHTML = 'You have <strong>zero exposure</strong> to: ' + missingTiers.map(function(t) { return tierLabels[t]; }).join(', ') + '. Consider whether this creates blind spots if these scenarios play out.';
+    var tierNames = { n1: 'N1 (Growth/Recovery)', n2: 'N2 (Base Case)', n3: 'N3 (Downside)', n4: 'N4 (Disruption)' };
+    hedgeEl.innerHTML = 'You have <strong>zero exposure</strong> to: ' + missingTiers.map(function(t) { return tierNames[t]; }).join(', ') + '. Consider whether this creates blind spots if these scenarios play out.';
   } else {
     hedgeEl.innerHTML = '<span class="success-highlight">Comprehensive coverage.</span> Your portfolio spans all four hypothesis types.';
   }
 
   var alignmentEl = document.getElementById('portAlignmentScore');
-  var diagGross = positions.reduce(function(s, p) { return s + Math.abs(p.marketValue || 0); }, 0);
-  var alignedDollarDiag = positions.reduce(function(s, p) { return s + (p.alignment.cls === 'aligned' ? Math.abs(p.marketValue || 0) : 0); }, 0);
-  var alignedWeight = diagGross > 0 ? (alignedDollarDiag / diagGross) * 100 : 0;
+  var alignedWeight = positions.reduce(function(s, p) { return s + (p.alignment.cls === 'aligned' ? p.weight : 0); }, 0);
 
   if (alignedWeight > 50) {
     alignmentEl.innerHTML = '<span class="success-highlight">' + formatNum(alignedWeight, 0) + '% aligned</span> with Continuum. Your book largely reflects our evidence-based view.';
@@ -409,39 +324,159 @@ export function renderPortfolioDiagnostics(positions, totalValue) {
   }
 }
 
-// Extract the bolded stability label from narrativeStability prose
-function getSkewStability(ticker) {
-  var stock = STOCK_DATA[ticker];
-  if (!stock || !stock.narrative || !stock.narrative.narrativeStability) return null;
-  var raw = stock.narrative.narrativeStability;
-  var match = raw.match(/^<strong>(.*?)<\/strong>/i);
-  if (match) return match[1].replace(/\.$/, '').trim();
-  // Fallback: first clause before period
-  var first = raw.replace(/<[^>]+>/g, '').split(/\.\s/)[0];
-  return first.length > 35 ? first.slice(0, 35) + '\u2026' : first;
-}
+/**
+ * Calculate evidence-aligned reweighting scores for portfolio positions.
+ * Exported for testability. Pure function — no DOM access.
+ *
+ * @param {Array} covered - positions filtered to Continuum-covered tickers
+ * @param {Object} coverageData - { [ticker]: { skew, price, company } }
+ * @param {Object} tcData - TC_DATA object { [ticker]: { n1, n2, n3, n4, primary } }
+ * @param {number} totalValue - total portfolio market value
+ * @returns {Array} scored positions with suggestedWeight, action, shareAction
+ */
+export function calculateReweightingScores(covered, coverageData, tcData, totalValue) {
+  var baseWeight = 100 / covered.length;
+  var scores = [];
 
-function getSkewMomentum(ticker) {
-  var stock = STOCK_DATA[ticker];
-  if (!stock || !stock.hero) return null;
-  var prev = (stock.hero.previousSkew || '').toLowerCase();
-  var curr = (stock.hero.skew || '').toLowerCase();
-  if (!prev || !curr || prev === curr) return 'stable';
-  if (prev === 'downside' && curr === 'upside') return 'strongly-improving';
-  if ((prev === 'downside' && curr === 'balanced') ||
-      (prev === 'balanced' && curr === 'upside')) return 'improving';
-  if (prev === 'upside' && curr === 'downside') return 'strongly-weakening';
-  if ((prev === 'upside' && curr === 'balanced') ||
-      (prev === 'balanced' && curr === 'downside')) return 'weakening';
-  return 'stable';
-}
+  covered.forEach(function(p) {
+    var cd = coverageData[p.ticker];
+    var tc = tcData[p.ticker];
+    var isShort = p.units < 0;
+    var rawScore;
 
-function stabilityClass(label) {
-  if (!label) return 'rw-stab-none';
-  var l = label.toLowerCase();
-  if (l.includes('high') || l === 'stable' || l.includes('very stable')) return 'rw-stab-high';
-  if (l.includes('low') || l.includes('unstable') || l.includes('shift') || l.includes('weak')) return 'rw-stab-low';
-  return 'rw-stab-mid'; // moderate / fairly stable / etc.
+    // Alignment: contradicting positions get zero weight
+    var contradicting = (!isShort && cd.skew === 'downside') ||
+                        (isShort && cd.skew === 'upside');
+
+    if (contradicting) {
+      rawScore = 0;
+    } else {
+      var multiplier = 1.0;
+      // Aligned positions get conviction boost
+      var aligned = (!isShort && cd.skew === 'upside') ||
+                    (isShort && cd.skew === 'downside');
+      if (aligned) multiplier = 1.3;
+      // balanced stays 1.0
+
+      // TC_DATA conviction adjustments (only for non-zero positions)
+      if (tc) {
+        var probs = [tc.n1.prob, tc.n2.prob, tc.n3.prob, tc.n4.prob];
+        var maxProb = Math.max.apply(null, probs);
+        if (maxProb > 40) multiplier *= 1.05;
+        if (tc.primary === 'uphill') multiplier *= 0.9;
+      }
+
+      rawScore = baseWeight * multiplier;
+    }
+
+    scores.push({
+      ticker: p.ticker,
+      company: p.company,
+      units: p.units,
+      currentPrice: p.currentPrice,
+      currentWeight: p.weight,
+      skew: cd.skew,
+      isShort: isShort,
+      rawScore: rawScore
+    });
+  });
+
+  // Normalise: only non-zero scores participate in the denominator
+  var totalScore = scores.reduce(function(s, x) { return s + x.rawScore; }, 0);
+  scores.forEach(function(s) {
+    if (s.rawScore === 0) {
+      s.suggestedWeight = 0;
+    } else {
+      s.suggestedWeight = totalScore > 0 ? (s.rawScore / totalScore) * 100 : 0;
+    }
+  });
+
+  // Derive action + share amount
+  scores.forEach(function(s) {
+    var delta = s.suggestedWeight - s.currentWeight;
+    s.delta = delta;
+
+    if (!s.isShort) {
+      // Long positions
+      if (s.skew === 'downside') {
+        s.action = 'Sell All';
+        s.actionCls = 'sell-all';
+        s.deltaCls = 'reduce';
+        s.shareAction = formatNum(Math.abs(s.units), 0);
+      } else if (s.skew === 'upside') {
+        if (delta < -1) {
+          s.action = 'Trim';
+          s.actionCls = 'reduce';
+          s.deltaCls = 'reduce';
+          s.shareAction = s.currentPrice > 0
+            ? formatNum(Math.round(Math.abs(delta / 100) * totalValue / s.currentPrice), 0)
+            : '--';
+        } else {
+          s.action = 'Hold';
+          s.actionCls = 'hold';
+          s.deltaCls = 'hold';
+          s.shareAction = '--';
+        }
+      } else {
+        // balanced
+        if (delta < -5) {
+          s.action = 'Trim';
+          s.actionCls = 'reduce';
+          s.deltaCls = 'reduce';
+          s.shareAction = s.currentPrice > 0
+            ? formatNum(Math.round(Math.abs(delta / 100) * totalValue / s.currentPrice), 0)
+            : '--';
+        } else {
+          s.action = 'Hold';
+          s.actionCls = 'hold';
+          s.deltaCls = 'hold';
+          s.shareAction = '--';
+        }
+      }
+    } else {
+      // Short positions
+      if (s.skew === 'upside') {
+        s.action = 'Buy to Close';
+        s.actionCls = 'buy';
+        s.deltaCls = 'increase';
+        s.shareAction = formatNum(Math.abs(s.units), 0);
+      } else if (s.skew === 'downside') {
+        if (delta < -1) {
+          s.action = 'Trim Short';
+          s.actionCls = 'reduce';
+          s.deltaCls = 'reduce';
+          s.shareAction = s.currentPrice > 0
+            ? formatNum(Math.round(Math.abs(delta / 100) * totalValue / s.currentPrice), 0)
+            : '--';
+        } else {
+          s.action = 'Hold';
+          s.actionCls = 'hold';
+          s.deltaCls = 'hold';
+          s.shareAction = '--';
+        }
+      } else {
+        // balanced short
+        if (delta < -5) {
+          s.action = 'Trim Short';
+          s.actionCls = 'reduce';
+          s.deltaCls = 'reduce';
+          s.shareAction = s.currentPrice > 0
+            ? formatNum(Math.round(Math.abs(delta / 100) * totalValue / s.currentPrice), 0)
+            : '--';
+        } else {
+          s.action = 'Hold';
+          s.actionCls = 'hold';
+          s.deltaCls = 'hold';
+          s.shareAction = '--';
+        }
+      }
+    }
+  });
+
+  // Sort by largest |delta|
+  scores.sort(function(a, b) { return Math.abs(b.delta) - Math.abs(a.delta); });
+
+  return scores;
 }
 
 export function renderReweighting(positions, totalValue) {
@@ -449,234 +484,37 @@ export function renderReweighting(positions, totalValue) {
   var bodyEl = document.getElementById('reweightBody');
   if (!sectionEl || !bodyEl) return;
 
-  if (positions.length === 0) {
+  var coverageData = getCoverageData();
+  var tcData = getTcData();
+
+  var covered = positions.filter(function(p) { return coverageData[p.ticker]; });
+  if (covered.length === 0) {
     sectionEl.style.display = 'none';
     return;
   }
 
-  var coverageData = getCoverageData();
+  var scores = calculateReweightingScores(covered, coverageData, tcData, totalValue);
 
-  // Separate covered from uncovered
-  var covered = positions.filter(function(p) { return coverageData[p.ticker]; });
-  var uncovered = positions.filter(function(p) { return !coverageData[p.ticker]; });
-
-  // Exclude 0-unit positions (watchlist items with no actual position)
-  covered = covered.filter(function(p) { return p.units !== 0; });
-  uncovered = uncovered.filter(function(p) { return p.units !== 0; });
-
-  // Calculate evidence scores — long model and short model separately
-  var longs = covered.filter(function(p) { return p.units > 0; });
-  var shorts = covered.filter(function(p) { return p.units < 0; });
-  var baseWeight = longs.length > 0 ? 100 / longs.length : 0;
-
-  var scores = [];
-
-  longs.forEach(function(p) {
-    var cd = coverageData[p.ticker];
-    var tc = getTcData(p.ticker);
-
-    // Conviction multiplier based on skew direction
-    var multiplier = 1.0;
-    if (cd.skew === 'upside') multiplier = 1.3;
-    else if (cd.skew === 'downside') multiplier = 0.7;
-
-    // Adjust for hypothesis strength from TC_DATA
-    if (tc) {
-      var probs = [tc.n1.prob, tc.n2.prob, tc.n3.prob, tc.n4.prob];
-      var maxProb = Math.max.apply(null, probs);
-      if (maxProb > 40) multiplier *= 1.05;
-      if (tc.primary === 'uphill') multiplier *= 0.9;
-    }
-
-    scores.push({
-      ticker: p.ticker,
-      company: p.company,
-      units: p.units,
-      currentPrice: p.currentPrice,
-      currentWeight: p.weight,
-      skew: cd.skew,
-      rawScore: baseWeight * multiplier,
-      stability: getSkewStability(p.ticker),
-      covered: true
-    });
-  });
-
-  // Normalize suggested weights to 100% (longs only)
-  var totalScore = scores.reduce(function(s, x) { return s + x.rawScore; }, 0);
-  scores.forEach(function(s) {
-    s.suggestedWeight = totalScore > 0 ? (s.rawScore / totalScore) * 100 : 0;
-  });
-
-  // Short book weight model — mirrors longs but inverted conviction
-  var baseWeightShort = shorts.length > 0 ? 100 / shorts.length : 0;
-  var shortScores = [];
-  shorts.forEach(function(p) {
-    var cd = coverageData[p.ticker];
-    var tc = getTcData(p.ticker);
-    var multiplier = 1.0;
-    if (cd.skew === 'downside') multiplier = 1.3;
-    else if (cd.skew === 'upside') multiplier = 0.7;
-    if (tc) {
-      var probs = [tc.n1.prob, tc.n2.prob, tc.n3.prob, tc.n4.prob];
-      var maxProb = Math.max.apply(null, probs);
-      if (maxProb > 40) multiplier *= 1.05;
-      if (tc.primary === 'uphill') multiplier *= 0.9;
-    }
-    var entry = {
-      ticker: p.ticker,
-      company: p.company,
-      units: p.units,
-      currentPrice: p.currentPrice,
-      currentWeight: p.weight,
-      skew: cd.skew,
-      rawScore: baseWeightShort * multiplier,
-      stability: getSkewStability(p.ticker),
-      covered: true
-    };
-    shortScores.push(entry);
-    scores.push(entry);
-  });
-  var totalShortScore = shortScores.reduce(function(s, x) { return s + x.rawScore; }, 0);
-  shortScores.forEach(function(s) {
-    s.suggestedWeight = totalShortScore > 0 ? (s.rawScore / totalShortScore) * 100 : 0;
-  });
-
-  // Append uncovered positions at the bottom
-  uncovered.forEach(function(p) {
-    scores.push({
-      ticker: p.ticker,
-      company: p.company,
-      units: p.units,
-      currentPrice: p.currentPrice,
-      currentWeight: p.weight,
-      skew: null,
-      rawScore: 0,
-      suggestedWeight: 0,
-      stability: null,
-      covered: false
-    });
-  });
-
-  // Sort: covered longs (by delta desc), covered shorts, uncovered last
-  scores.sort(function(a, b) {
-    if (a.covered !== b.covered) return a.covered ? -1 : 1;
-    var aShort = a.units < 0, bShort = b.units < 0;
-    if (aShort !== bShort) return aShort ? 1 : -1;
-    return Math.abs(b.suggestedWeight - b.currentWeight) - Math.abs(a.suggestedWeight - a.currentWeight);
-  });
-
-  // Strategy context header
-  var fund = getPersonalisationFund();
-  var strategyHtml = '';
-  if (fund && (fund.strategy || fund.geography || fund.benchmark)) {
-    strategyHtml = '<div class="rw-strategy-context">' +
-      (fund.strategy ? '<span class="rw-sc-pill"><span class="rw-sc-label">Strategy</span><span class="rw-sc-value">' + fund.strategy + '</span></span>' : '') +
-      (fund.geography ? '<span class="rw-sc-pill"><span class="rw-sc-label">Geography</span><span class="rw-sc-value">' + fund.geography + '</span></span>' : '') +
-      (fund.benchmark ? '<span class="rw-sc-pill"><span class="rw-sc-label">Benchmark</span><span class="rw-sc-value">' + fund.benchmark + '</span></span>' : '') +
-      '<span class="rw-sc-pill"><span class="rw-sc-label">Risk Budget</span><span class="rw-sc-value">' + (fund.riskBudget || 10) + '% TE</span></span>' +
-    '</div>';
-  }
-
-  // Render table rows
   var rows = '';
   scores.forEach(function(s) {
-    var isShort = s.units < 0;
-    var action, actionCls, deltaCls, sharesDisplay, delta;
-
-    if (!s.covered) {
-      // Uncovered: no research data, show position details only
-      rows += '<tr class="rw-row-uncovered">' +
-        '<td><span class="rw-ticker">' + s.ticker + '</span></td>' +
-        '<td>' + s.company + '</td>' +
-        '<td><span style="color:var(--text-muted);font-size:0.72rem">No coverage</span></td>' +
-        '<td class="rw-units">' + formatNum(s.units, 0) + '</td>' +
-        '<td><span class="rw-pct">' + s.currentWeight.toFixed(1) + '%</span></td>' +
-        '<td colspan="3" style="color:var(--text-muted);font-size:0.72rem;text-align:center">Not in Continuum coverage</td>' +
-        '<td class="rw-shares">--</td>' +
-        '<td style="color:var(--text-muted)">--</td>' +
-      '</tr>';
-      return;
-    }
-
-    delta = s.suggestedWeight - s.currentWeight;
-    sharesDisplay = '--';
-
-    if (isShort) {
-      // Short action rules: skew determines whether position is aligned
-      if (s.skew === 'upside') {
-        // Evidence contradicts being short — buy to close
-        action = 'Buy'; actionCls = 'buy'; deltaCls = 'increase';
-      } else if (s.skew === 'downside') {
-        // Evidence supports short — delta logic for sizing
-        if (delta > 5) { action = 'Sell'; actionCls = 'sell'; deltaCls = 'reduce'; }
-        else if (delta < -5) { action = 'Buy'; actionCls = 'buy'; deltaCls = 'increase'; }
-        else { action = 'Hold'; actionCls = 'hold'; deltaCls = 'hold'; }
-      } else {
-        // Balanced — delta logic
-        if (delta > 5) { action = 'Sell'; actionCls = 'sell'; deltaCls = 'reduce'; }
-        else if (delta < -5) { action = 'Buy'; actionCls = 'buy'; deltaCls = 'increase'; }
-        else { action = 'Hold'; actionCls = 'hold'; deltaCls = 'hold'; }
-      }
-      if (action !== 'Hold' && s.currentPrice > 0) {
-        sharesDisplay = Math.round(Math.abs(delta / 100) * totalValue / s.currentPrice).toLocaleString('en-AU');
-      }
-    } else {
-      // Long action rules: skew determines whether position is aligned
-      if (s.skew === 'downside') {
-        // Evidence contradicts being long — always sell
-        action = 'Sell'; actionCls = 'sell'; deltaCls = 'reduce';
-      } else if (s.skew === 'upside') {
-        // Evidence supports long — full delta logic
-        if (delta > 5) { action = 'Buy'; actionCls = 'buy'; deltaCls = 'increase'; }
-        else if (delta < -5) { action = 'Sell'; actionCls = 'sell'; deltaCls = 'reduce'; }
-        else { action = 'Hold'; actionCls = 'hold'; deltaCls = 'hold'; }
-      } else {
-        // Balanced — delta logic
-        if (delta > 5) { action = 'Buy'; actionCls = 'buy'; deltaCls = 'increase'; }
-        else if (delta < -5) { action = 'Sell'; actionCls = 'sell'; deltaCls = 'reduce'; }
-        else { action = 'Hold'; actionCls = 'hold'; deltaCls = 'hold'; }
-      }
-      if (action !== 'Hold' && s.currentPrice > 0) {
-        sharesDisplay = Math.round(Math.abs(delta / 100) * totalValue / s.currentPrice).toLocaleString('en-AU');
-      }
-    }
-
     var skewArrow = s.skew === 'upside' ? '&#9650; UPSIDE' :
                     s.skew === 'downside' ? '&#9660; DOWNSIDE' : '&#9670; BALANCED';
     var skewCls = s.skew;
-    var suggestedCell = '<span class="rw-pct">' + s.suggestedWeight.toFixed(1) + '%</span>';
-    var deltaCell = '<span class="rw-delta ' + deltaCls + '">' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%</span>';
-
-    // Conviction (narrative stability, falling back to skew direction)
-    var stabLabel = s.stability || (s.skew ? s.skew.charAt(0).toUpperCase() + s.skew.slice(1) : '--');
-    var stabCls = stabilityClass(s.stability || s.skew);
-    var momentum = s.covered ? getSkewMomentum(s.ticker) : null;
-    var momentumHtml = '';
-    if (momentum && momentum !== 'stable') {
-      var mArrow = momentum === 'strongly-improving' ? '&#8648;' :
-                   momentum === 'improving'          ? '&#8593;' :
-                   momentum === 'strongly-weakening' ? '&#8650;' : '&#8595;';
-      var mCls = momentum.includes('improving') ? 'rw-mom-up' : 'rw-mom-down';
-      momentumHtml = ' <span class="' + mCls + '">' + mArrow + '</span>';
-    }
-    var convictionCell = '<span class="rw-stability ' + stabCls + '">' + stabLabel + '</span>' + momentumHtml;
 
     rows += '<tr>' +
       '<td><span class="rw-ticker">' + s.ticker + '</span></td>' +
       '<td>' + s.company + '</td>' +
       '<td><span class="skew-badge ' + skewCls + '">' + skewArrow + '</span></td>' +
-      '<td class="rw-units">' + formatNum(s.units, 0) + '</td>' +
+      '<td class="rw-units">' + formatNum(Math.abs(s.units), 0) + '</td>' +
       '<td><span class="rw-pct">' + s.currentWeight.toFixed(1) + '%</span></td>' +
-      '<td>' + suggestedCell + '</td>' +
-      '<td>' + deltaCell + '</td>' +
-      '<td><span class="rw-action ' + actionCls + '">' + action + '</span></td>' +
-      '<td class="rw-shares">' + sharesDisplay + '</td>' +
-      '<td>' + convictionCell + '</td>' +
+      '<td><span class="rw-pct">' + s.suggestedWeight.toFixed(1) + '%</span></td>' +
+      '<td><span class="rw-delta ' + s.deltaCls + '">' + (s.delta >= 0 ? '+' : '') + s.delta.toFixed(1) + '%</span></td>' +
+      '<td><span class="rw-action ' + s.actionCls + '">' + s.action + '</span></td>' +
+      '<td class="rw-shares">' + s.shareAction + '</td>' +
     '</tr>';
   });
 
   bodyEl.innerHTML =
-    strategyHtml +
     '<table class="rw-table">' +
       '<thead><tr>' +
         '<th>Ticker</th>' +
@@ -687,8 +525,7 @@ export function renderReweighting(positions, totalValue) {
         '<th>Suggested</th>' +
         '<th>Delta</th>' +
         '<th>Action</th>' +
-        '<th>Share Amount</th>' +
-        '<th>Conviction</th>' +
+        '<th>Shares</th>' +
       '</tr></thead>' +
       '<tbody>' + rows + '</tbody>' +
     '</table>';
@@ -705,82 +542,66 @@ export function renderChangeAlerts(positions) {
   sectionEl.style.display = '';
 
   var alerts = [];
+  var tickers = positions.map(function(p) { return p.ticker; });
 
-  for (var i = 0; i < positions.length; i++) {
-    var p = positions[i];
-    var ticker = p.ticker;
-    var sd = STOCK_DATA[ticker];
-    if (!sd) continue;
+  if (tickers.includes('XRO')) {
+    alerts.push({
+      type: 'critical',
+      icon: '\uD83D\uDD34',
+      title: 'XRO: N3 Probability Increased',
+      text: 'AI disruption thesis strengthened following Claude 4 announcement. N3 (Execution Failure) raised from 35% -> 42%.',
+      ticker: 'XRO',
+      time: '2 hours ago',
+      impact: 'Affects 15% of portfolio'
+    });
+  }
 
-    var fd = FRESHNESS_DATA[ticker];
-    var weightPct = Math.abs(Math.round(p.weight || 0));
-    var weightStr = 'Affects ' + weightPct + '% of portfolio';
+  if (tickers.includes('WOW')) {
+    alerts.push({
+      type: 'warning',
+      icon: '\uD83D\uDFE1',
+      title: 'WOW: Earnings Preview',
+      text: 'Q1 FY26 results due Feb 25. Consensus expects 11.8% EBIT growth vs management guidance of "mid-to-high single digits". Watch for N1/N2 inflection.',
+      ticker: 'WOW',
+      time: '1 day ago',
+      impact: 'Affects 12% of portfolio'
+    });
+  }
 
-    // 1. OVERCORRECTION (critical)
-    if (sd._alertState === 'OVERCORRECTION' && sd._overcorrection && sd._overcorrection.active) {
-      var oc = sd._overcorrection;
-      var dirLabel = oc.direction === 'up' ? 'upside' : 'downside';
-      alerts.push({
-        type: 'critical',
-        icon: '\uD83D\uDD34',
-        title: ticker + ': ' + dirLabel + ' overcorrection signal',
-        text: oc.message || '',
-        ticker: ticker,
-        time: 'Triggered ' + (oc.triggerDate || ''),
-        impact: weightStr + ' \u00B7 Review by ' + (oc.reviewDate || '')
-      });
-      continue;
-    }
+  if (tickers.includes('CSL')) {
+    alerts.push({
+      type: 'info',
+      icon: '\uD83D\uDD35',
+      title: 'CSL: Plasma Collection Update',
+      text: 'Weekly collection data shows continued normalization. N1 (Recovery) probability stable at 45%. No change to thesis.',
+      ticker: 'CSL',
+      time: '3 days ago',
+      impact: 'Affects 20% of portfolio'
+    });
+  }
 
-    // 2. CATALYST DUE/OVERDUE
-    if (fd && fd.nearestCatalystDays !== undefined &&
-        fd.nearestCatalystDays <= 7 && fd.nearestCatalystDays >= -14) {
-      var days = fd.nearestCatalystDays;
-      var dayStr = days < 0
-        ? Math.abs(days) + (Math.abs(days) === 1 ? ' day' : ' days') + ' overdue'
-        : days === 0 ? 'today'
-        : 'in ' + days + (days === 1 ? ' day' : ' days');
-      alerts.push({
-        type: 'warning',
-        icon: '\uD83D\uDFE1',
-        title: ticker + ': catalyst ' + (days < 0 ? 'overdue' : 'approaching'),
-        text: (fd.nearestCatalyst || '') + ' \u00B7 ' + (fd.nearestCatalystDate || ''),
-        ticker: ticker,
-        time: dayStr,
-        impact: weightStr
-      });
-      continue;
-    }
+  if (tickers.includes('WTC')) {
+    alerts.push({
+      type: 'critical',
+      icon: '\uD83D\uDD34',
+      title: 'WTC: Governance Concerns Escalate',
+      text: 'Additional board member resignation. N3 (Governance Risk) elevated from 30% -> 35%. Review position sizing.',
+      ticker: 'WTC',
+      time: '4 hours ago',
+      impact: 'Affects 8% of portfolio'
+    });
+  }
 
-    // 3. STALE THESIS
-    if (fd && fd.status === 'STALE') {
-      alerts.push({
-        type: 'warning',
-        icon: '\uD83D\uDFE1',
-        title: ticker + ': thesis stale',
-        text: 'Last reviewed ' + (fd.reviewDate || '') + '. ' + (fd.nearestCatalyst || '') + ' may have passed.',
-        ticker: ticker,
-        time: fd.reviewDate || '',
-        impact: weightStr
-      });
-      continue;
-    }
-
-    // 4. SKEW MOMENTUM
-    var hero = sd.hero || {};
-    var prevSkew = (hero.previousSkew || '').toLowerCase();
-    var currSkew = (hero.skew || '').toLowerCase();
-    if (prevSkew && currSkew && prevSkew !== currSkew) {
-      alerts.push({
-        type: 'info',
-        icon: '\uD83D\uDD35',
-        title: ticker + ': skew direction changed',
-        text: (hero.previousSkew || '') + ' \u2192 ' + (hero.skew || ''),
-        ticker: ticker,
-        time: '',
-        impact: weightStr
-      });
-    }
+  if (alerts.length < 2) {
+    alerts.push({
+      type: 'info',
+      icon: '\uD83D\uDCCA',
+      title: 'Market: ASX 200 Volatility Elevated',
+      text: 'VIX-equivalent at 18-month high. Consider position sizing across all hypotheses.',
+      ticker: 'MARKET',
+      time: '5 hours ago',
+      impact: 'Broad market'
+    });
   }
 
   if (alerts.length > 0 && feedEl) {
@@ -792,7 +613,7 @@ export function renderChangeAlerts(positions) {
           '<div class="change-alert-text">' + a.text + '</div>' +
           '<div class="change-alert-meta">' +
             '<span class="change-alert-ticker">' + a.ticker + '</span>' +
-            (a.time ? '<span>\u23F1 ' + a.time + '</span>' : '') +
+            '<span>\u23F1 ' + a.time + '</span>' +
             '<span>\uD83D\uDCBC ' + a.impact + '</span>' +
           '</div>' +
         '</div>' +
@@ -822,15 +643,13 @@ export function clearPortfolio() {
   document.getElementById('portfolioActions').style.display = 'none';
   document.getElementById('portfolioBody').innerHTML = '';
 
-  /* Hide diagnostics, reweighting, alerts, and strategy bar */
+  /* Hide diagnostics, reweighting, and alerts */
   var diag = document.getElementById('portfolioDiagnostics');
   var reweight = document.getElementById('portfolioReweighting');
   var alertsEl = document.getElementById('changeAlertsSection');
-  var strategyBar = document.getElementById('portfolioStrategyBar');
   if (diag) diag.style.display = 'none';
   if (reweight) reweight.style.display = 'none';
   if (alertsEl) alertsEl.style.display = 'none';
-  if (strategyBar) strategyBar.style.display = 'none';
 }
 
 export function populateSidebar(ticker) {
@@ -1059,9 +878,13 @@ export function initPortfolioPage() {
         p.skew = covered.skew;
       }
     }
-    var expo = calcWeights(positions);
+    var totalValue = positions.reduce(function(s, p) { return s + (p.marketValue || 0); }, 0);
+    positions.forEach(function(p) {
+      p.weight = totalValue > 0 && p.marketValue ? (p.marketValue / totalValue) * 100 : 0;
+      p.alignment = deriveAlignment(p.skew, p.weight);
+    });
 
     savePortfolio(positions);
-    renderPortfolio(positions, expo.totalLong, expo);
+    renderPortfolio(positions, totalValue);
   });
 }
