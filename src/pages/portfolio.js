@@ -171,7 +171,9 @@ function calcWeights(positions) {
     } else {
       p.weight = totalShortAbs > 0 ? -(Math.abs(p.marketValue) / totalShortAbs) * 100 : 0;
     }
-    p.alignment = deriveAlignment(p.skew, p.weight);
+    p.alignment = p.units === 0
+      ? { label: 'No position', cls: 'no-position' }
+      : deriveAlignment(p.skew, p.weight);
   });
   return {
     totalLong: totalLong,
@@ -435,8 +437,12 @@ export function renderReweighting(positions, totalValue) {
   var covered = positions.filter(function(p) { return coverageData[p.ticker]; });
   var uncovered = positions.filter(function(p) { return !coverageData[p.ticker]; });
 
-  // Calculate evidence scores — long-only model, shorts processed separately
-  var longs = covered.filter(function(p) { return p.units >= 0; });
+  // Exclude 0-unit positions (watchlist items with no actual position)
+  covered = covered.filter(function(p) { return p.units !== 0; });
+  uncovered = uncovered.filter(function(p) { return p.units !== 0; });
+
+  // Calculate evidence scores — long model and short model separately
+  var longs = covered.filter(function(p) { return p.units > 0; });
   var shorts = covered.filter(function(p) { return p.units < 0; });
   var baseWeight = longs.length > 0 ? 100 / longs.length : 0;
 
