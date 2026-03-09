@@ -57,7 +57,13 @@ npm run validate     # lint + test:all — run before any push
 - [x] Thesis Comparator rebuilt with LLM pipeline (commit `bebcb9c`): `tcAnalyze()` now POSTs to `/api/research-chat` with a structured ACH system prompt; `renderComparatorResult()` parses the ALIGNMENT line, populates hypothesis map from `tc.json`, and renders supporting/contradicting evidence. Loading animation, error state, and contrarian banner CSS added. Enter key wired. Verified end-to-end against WOW with real Railway responses on preview server.
 - [x] Analyst chat consistency and voice rules unified (commit `236bfee`): extracted `VOICE_RULES` constant from `src/features/chat.js` (16 rules, single source of truth); bridged to `window.CI_VOICE_RULES` in `src/main.js`; `pnBuildSystemPrompt()` now appends `window.CI_VOICE_RULES` instead of its own abbreviated copy; em-dash on line 700 of `public/js/personalisation.js` fixed; ~189 lines of dead Step 5 centre-panel chat code removed (`pnGetSharedConvo`, `renderChatMessages`, `showChatTyping`, `hideChatTyping`, `appendChatError`, `renderChatHeader`, `pnSendChat`); `bindStep5Inputs` and `pnOnRouteEnter` simplified; `window._continuumChat` fully eliminated. 185/185 tests passing.
 
-**Phase 2 ready to begin.** No Phase 2 tasks were started in these sessions.
+**Phase 2 in progress.** Auth + conversation persistence commit (`566e945`).
+
+**Session work (2026-03-09):**
+- [x] Session audit: scraped 78 Claude sessions across 6 projects, categorised usage patterns into skills/plugins/agents/CLAUDE.md recommendations
+- [x] Built 3 new CI skills: `ci:bug-repro` (autonomous bug reproducer), `ci:stock-integrity` (data integrity audit), `ci:add-ticker` (stock onboarding workflow)
+- [x] Confirmed 5 pre-existing CI skills functional: `ci:session-close`, `ci:session-debrief`, `ci:push-safe`, `ci:deploy-check`, `ci:verify-deploy`
+- [x] Railway monitor MCP evaluated and skipped (redundant; covered by existing skills)
 
 **Recent bug history (last six commits):**
 - `236bfee` Unified analyst chat voice rules; removed dead personalisation chat code. `VOICE_RULES` is now the single source of truth in `src/features/chat.js`, bridged to `window.CI_VOICE_RULES`. `pnBuildSystemPrompt()` appends it instead of its own abbreviated copy. Step 5 chat UI dead code (~189 lines) removed.
