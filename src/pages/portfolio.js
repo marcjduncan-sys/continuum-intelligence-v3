@@ -604,22 +604,20 @@ export function renderReweighting(positions, totalValue) {
     if (isShort) {
       // Short action rules: skew determines whether position is aligned
       if (s.skew === 'upside') {
-        // Evidence contradicts being short — always cover
-        action = 'Cover'; actionCls = 'sell'; deltaCls = 'reduce';
+        // Evidence contradicts being short — buy to close
+        action = 'Buy'; actionCls = 'buy'; deltaCls = 'increase';
       } else if (s.skew === 'downside') {
         // Evidence supports short — delta logic for sizing
-        if (delta > 5) { action = 'Increase'; actionCls = 'buy'; deltaCls = 'increase'; }
-        else if (delta < -5) { action = 'Reduce'; actionCls = 'sell'; deltaCls = 'reduce'; }
+        if (delta > 5) { action = 'Sell'; actionCls = 'sell'; deltaCls = 'reduce'; }
+        else if (delta < -5) { action = 'Buy'; actionCls = 'buy'; deltaCls = 'increase'; }
         else { action = 'Hold'; actionCls = 'hold'; deltaCls = 'hold'; }
       } else {
         // Balanced — delta logic
-        if (delta > 5) { action = 'Increase'; actionCls = 'buy'; deltaCls = 'increase'; }
-        else if (delta < -5) { action = 'Reduce'; actionCls = 'sell'; deltaCls = 'reduce'; }
+        if (delta > 5) { action = 'Sell'; actionCls = 'sell'; deltaCls = 'reduce'; }
+        else if (delta < -5) { action = 'Buy'; actionCls = 'buy'; deltaCls = 'increase'; }
         else { action = 'Hold'; actionCls = 'hold'; deltaCls = 'hold'; }
       }
-      if (action === 'Cover' && s.currentPrice > 0) {
-        sharesDisplay = Math.abs(s.units).toLocaleString('en-AU');
-      } else if (action !== 'Hold' && s.currentPrice > 0) {
+      if (action !== 'Hold' && s.currentPrice > 0) {
         sharesDisplay = Math.round(Math.abs(delta / 100) * totalValue / s.currentPrice).toLocaleString('en-AU');
       }
     } else {
