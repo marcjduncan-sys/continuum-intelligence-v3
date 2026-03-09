@@ -32,7 +32,7 @@ export function renderFeaturedCard(data) {
         '<div class="fc-sector">' + data.sector + (data.sectorSub ? ' &bull; ' + data.sectorSub : '') + '</div>' +
       '</div>' +
       '<div class="fc-price"' + priceStyle + '>' +
-        '<span style="font-size:0.8rem; color:var(--text-muted)">' + data.currency + '</span>' + data.price +
+        '<span style="font-size:0.8rem; color:var(--text-muted)">' + data.currency + '</span>' + (data._livePrice || data.price) +
       '</div>' +
     '</div>' +
     '<div class="fc-metrics">' + metricsHtml + '</div>' +
