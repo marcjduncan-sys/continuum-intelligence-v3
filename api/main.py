@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import anthropic
+import httpx
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
@@ -28,9 +29,11 @@ from slowapi.util import get_remote_address
 import config
 import db
 import llm
+import prompt_builder
 import summarise
-from auth import router as auth_router
+from auth import decode_token, router as auth_router
 from conversations import router as conversations_router
+from profiles import router as profiles_router
 from ingest import ingest, get_tickers, get_passage_count
 from refresh import (
     RefreshJob, refresh_jobs, get_job, is_running, run_refresh,
@@ -166,6 +169,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.include_router(auth_router)
 app.include_router(conversations_router)
+app.include_router(profiles_router)
 
 
 # ---------------------------------------------------------------------------
@@ -251,36 +255,10 @@ class ResearchChatResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# System prompt
+# System prompt (canonical copy lives in prompt_builder.py -- Phase 5)
 # ---------------------------------------------------------------------------
 
-SYSTEM_PROMPT = """\
-You are a senior equity research analyst at Continuum Intelligence. You speak in the first person plural ("we", "our analysis", "our framework"). You are direct, precise, and opinionated, like a fund manager talking to another fund manager.
-
-Ground every claim in the provided research passages. Cite specific evidence. Present competing hypotheses fairly. Never default to bullish or bearish bias. Distinguish between facts (statutory filings, audited data), motivated claims (company communications), consensus views (broker research), and noise (media/social). Highlight what discriminates between hypotheses. Be direct about what is unknown or uncertain. Flag research gaps explicitly.
-
-VOICE RULES:
-Never use markdown headers (#, ##, ###). Write in flowing paragraphs.
-Never use bullet point dashes or asterisks for lists. Weave points into natural sentences.
-Never begin a response with "Based on" or "Here is" or "Sure" or "Great question".
-Never say "I". Always "we" or speak in the declarative.
-Never use em-dashes. Use commas, colons, or full stops instead.
-Never use exclamation marks or rhetorical questions.
-Never use filler phrases: "It's important to note", "Notably", "Importantly", "Interestingly", "In terms of", "It is worth mentioning".
-Never use weak openings: "It is...", "There are...", "This is...".
-When presenting numbers, weave them into sentences naturally.
-Reference specific evidence items and hypothesis labels naturally: "The N2 erosion thesis is gaining weight here, margins are the tell."
-Be opinionated. Take positions. "We think the market is wrong about X" is better than "There are arguments on both sides."
-Use the vocabulary of an institutional investor: "the print", "the tape", "the multiple", "re-rate", "de-rate", "the street", "consensus", "buy-side", "the name".
-
-CONSTRAINTS:
-Never fabricate data, price targets, or financial metrics not in the provided research.
-Never provide personal investment advice or buy/sell recommendations.
-If asked about a topic not covered in the research passages, say so directly.
-If the research is stale or a catalyst has passed, note this.
-Be concise. Aim for 150-300 words unless the question demands more detail.
-End with the key question or catalyst that would update the analysis.
-"""
+SYSTEM_PROMPT = prompt_builder.DEFAULT_SYSTEM_PROMPT
 
 
 # ---------------------------------------------------------------------------
@@ -373,12 +351,38 @@ async def research_chat(request: Request, body: ResearchChatRequest, _=Depends(v
 
     messages.append({"role": "user", "content": user_message})
 
-    # Call LLM
+    # Build effective system prompt (Phase 5: server-side assembly)
+    # Priority: server-side profile > client system_prompt (deprecated) > default
+    effective_system = SYSTEM_PROMPT
     _csp = _sanitise_system_prompt(body.custom_system_prompt)
     _sp = _sanitise_system_prompt(body.system_prompt)
     if _csp or _sp:
-        logger.warning("custom system prompt received", extra={"ticker": ticker, "length": len(_csp or _sp or "")})
-    effective_system = _csp or _sp or SYSTEM_PROMPT
+        logger.warning(
+            "DEPRECATED: client-sent system_prompt received; will be removed in a future release",
+            extra={"ticker": ticker, "length": len(_csp or _sp or "")},
+        )
+
+    # Try loading the server-side profile for the authenticated user/guest
+    _auth_header = request.headers.get("Authorization", "")
+    _user_id = None
+    _guest_id = None
+    if _auth_header.startswith("Bearer "):
+        _payload = decode_token(_auth_header[7:])
+        if _payload:
+            _user_id = _payload.get("sub")
+    if not _user_id:
+        _guest_id = request.query_params.get("guest_id")
+
+    if _user_id or _guest_id:
+        _pool = await db.get_pool()
+        _profile_data = await db.get_profile(_pool, user_id=_user_id, guest_id=_guest_id)
+        if _profile_data and _profile_data.get("profile"):
+            effective_system = prompt_builder.build_personalised_prompt(_profile_data)
+            logger.info("Server-side personalised prompt built", extra={"ticker": ticker, "user_id": _user_id})
+        elif _csp or _sp:
+            effective_system = _csp or _sp
+    elif _csp or _sp:
+        effective_system = _csp or _sp
     try:
         result = await llm.complete(
             model=config.ANTHROPIC_MODEL,
@@ -433,6 +437,43 @@ async def list_tickers():
         "tickers": get_tickers(),
         "counts": get_passage_count(),
     }
+
+
+# ---------------------------------------------------------------------------
+# Chart proxy (Yahoo Finance OHLCV)
+# ---------------------------------------------------------------------------
+
+_YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}.AX"
+
+
+@app.get("/api/chart/{ticker}")
+@limiter.limit("10/minute")
+async def chart_proxy(ticker: str, request: Request):
+    """Proxy Yahoo Finance chart data for an ASX ticker.
+
+    Returns 3 years of daily OHLCV bars. No auth required.
+    """
+    ticker = ticker.upper()
+    if not TICKER_PATTERN.match(ticker):
+        raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{ticker}'")
+
+    url = _YAHOO_CHART_URL.format(ticker=ticker)
+    params = {"range": "3y", "interval": "1d", "includePrePost": "false"}
+
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        try:
+            resp = await client.get(url, params=params)
+        except httpx.RequestError as exc:
+            logger.error("Yahoo chart request failed for %s: %s", ticker, exc)
+            raise HTTPException(status_code=502, detail="Upstream request failed")
+
+    if resp.status_code != 200:
+        raise HTTPException(
+            status_code=resp.status_code,
+            detail=f"Yahoo Finance returned {resp.status_code}",
+        )
+
+    return resp.json()
 
 
 # ---------------------------------------------------------------------------

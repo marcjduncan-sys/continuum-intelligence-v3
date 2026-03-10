@@ -388,6 +388,35 @@ function pnSaveToLocalStorage() {
     } catch (e) { /* localStorage unavailable or full */ }
 }
 
+function pnSaveToServer() {
+    var isGH = window.location.hostname.indexOf('github.io') !== -1;
+    var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    var origin = isGH ? 'https://imaginative-vision-production-16cb.up.railway.app'
+                 : isLocal ? '' : null;
+    if (origin === null) return;
+
+    var headers = { 'Content-Type': 'application/json' };
+    var token = window.CI_AUTH && window.CI_AUTH.getToken();
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    var body = {
+        firm: pnState.firm || {},
+        fund: pnState.fund || {},
+        portfolio: pnState.portfolio || [],
+        profile: pnState.profile || {}
+    };
+    if (!token) {
+        var guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
+        if (guestId) body.guest_id = guestId;
+    }
+
+    fetch(origin + '/api/profile', {
+        method: 'PUT',
+        headers: headers,
+        body: JSON.stringify(body)
+    }).catch(function() { /* fire-and-forget */ });
+}
+
 function pnLoadFromLocalStorage() {
     try {
         var raw = localStorage.getItem(PN_STORAGE_KEY);
@@ -1079,6 +1108,7 @@ function renderStep5() {
     if (!pnState.profile) {
         pnState.profile = pnBuildProfile();
         pnSaveToLocalStorage();
+        pnSaveToServer();
     }
 
     return '<div class="pn-step pn-step-chat" data-step="5">' +
@@ -1228,6 +1258,7 @@ function bindNavigation() {
             if (!pnValidateStep(pnState.currentStep)) return;
             if (pnState.currentStep === 4) {
                 pnState.profile = pnBuildProfile();
+                pnSaveToServer();
             }
             pnState.currentStep++;
             if (pnState.currentStep > pnState.maxStepReached) {

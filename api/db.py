@@ -429,3 +429,71 @@ async def get_llm_usage(pool, *, days: int = 7) -> list[dict]:
             days,
         )
         return [dict(r) for r in rows]
+
+
+# ---------------------------------------------------------------------------
+# Profile helpers (Phase 5)
+# ---------------------------------------------------------------------------
+
+async def upsert_profile(
+    pool, *, data: dict, user_id: str | None = None, guest_id: str | None = None
+) -> str | None:
+    """Insert or update a personalisation profile. Returns profile id."""
+    if pool is None:
+        return None
+    if not user_id and not guest_id:
+        return None
+    async with pool.acquire() as conn:
+        if user_id:
+            row = await conn.fetchrow(
+                """
+                INSERT INTO profiles (user_id, data, updated_at)
+                VALUES ($1, $2::jsonb, now())
+                ON CONFLICT (user_id) WHERE user_id IS NOT NULL
+                DO UPDATE SET data = $2::jsonb, updated_at = now()
+                RETURNING id
+                """,
+                user_id,
+                json.dumps(data),
+            )
+        else:
+            # Guest: upsert by guest_id (delete old + insert)
+            await conn.execute(
+                "DELETE FROM profiles WHERE guest_id = $1 AND user_id IS NULL",
+                guest_id,
+            )
+            row = await conn.fetchrow(
+                """
+                INSERT INTO profiles (guest_id, data, updated_at)
+                VALUES ($1, $2::jsonb, now())
+                RETURNING id
+                """,
+                guest_id,
+                json.dumps(data),
+            )
+        return str(row["id"]) if row else None
+
+
+async def get_profile(
+    pool, *, user_id: str | None = None, guest_id: str | None = None
+) -> dict | None:
+    """Retrieve the personalisation profile data (JSONB) for a user or guest."""
+    if pool is None:
+        return None
+    if not user_id and not guest_id:
+        return None
+    async with pool.acquire() as conn:
+        if user_id:
+            row = await conn.fetchrow(
+                "SELECT data FROM profiles WHERE user_id = $1",
+                user_id,
+            )
+        else:
+            row = await conn.fetchrow(
+                "SELECT data FROM profiles WHERE guest_id = $1 AND user_id IS NULL ORDER BY updated_at DESC LIMIT 1",
+                guest_id,
+            )
+        if not row:
+            return None
+        raw = row["data"]
+        return json.loads(raw) if isinstance(raw, str) else raw
