@@ -203,6 +203,15 @@ export function renderPortfolio(positions, totalValue) {
   }
 
   /* Summary */
+  var totalLong = 0, totalShortAbs = 0;
+  positions.forEach(function(p) {
+    var mv = p.marketValue || 0;
+    if (p.units >= 0) totalLong += mv;
+    else totalShortAbs += Math.abs(mv);
+  });
+  var netExposure = totalLong - totalShortAbs;
+  var grossExposure = totalLong + totalShortAbs;
+
   var totalPnL = positions.reduce(function(s, p) { return s + (p.pnlDollar || 0); }, 0);
   var totalCost = positions.reduce(function(s, p) { return s + p.costBasis; }, 0);
   var totalPnLPct = totalCost > 0 ? (totalPnL / totalCost) * 100 : 0;
@@ -214,7 +223,10 @@ export function renderPortfolio(positions, totalValue) {
     else neutralWeight += p.weight;
   });
 
-  document.getElementById('summaryValue').textContent = 'A$' + formatNum(totalValue, 0);
+  document.getElementById('summaryLong').textContent = 'A$' + formatNum(totalLong, 0);
+  document.getElementById('summaryShort').textContent = 'A$' + formatNum(totalShortAbs, 0);
+  document.getElementById('summaryNet').textContent = 'A$' + formatNum(netExposure, 0);
+  document.getElementById('summaryGross').textContent = 'A$' + formatNum(grossExposure, 0);
   var pnlEl = document.getElementById('summaryPnL');
   pnlEl.textContent = (totalPnL >= 0 ? '+' : '') + 'A$' + formatNum(totalPnL, 0) + ' (' + (totalPnLPct >= 0 ? '+' : '') + formatNum(totalPnLPct, 1) + '%)';
   pnlEl.className = 'portfolio-summary-value ' + (totalPnL >= 0 ? 'positive' : 'negative');
