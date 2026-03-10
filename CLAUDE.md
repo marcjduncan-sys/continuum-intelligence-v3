@@ -42,7 +42,7 @@ npm run validate     # lint + test:all — run before any push
 
 ---
 
-## Current State — 2026-03-09
+## Current State — 2026-03-10
 
 **Phase 0 COMPLETE (2026-03-07).** The extraction of logic from `index.html` into `src/` modules is complete. `computeSkewScore` canonicalised to zero-contribution convention (commit `4493e8c`; see `docs/decisions/003-computeskewscore-neutral-convention.md`). `VALID_STATIC_PAGES` confirmed correct: `home`, `deep-research`, `portfolio`, `comparator`, `personalisation`, `about`.
 
@@ -82,13 +82,18 @@ npm run validate     # lint + test:all — run before any push
 - [x] Built 3 new CI skills: `ci:bug-repro` (autonomous bug reproducer), `ci:stock-integrity` (data integrity audit), `ci:add-ticker` (stock onboarding workflow).
 - [x] Confirmed 5 pre-existing CI skills functional: `ci:session-close`, `ci:session-debrief`, `ci:push-safe`, `ci:deploy-check`, `ci:verify-deploy`.
 
+**Session work (2026-03-10) -- Gold Agent pilot:**
+- [x] Phase 3 (gold analysis sessions) COMPLETE: NST (skew 60), EVN (skew 63), WAF (skew 40) -- all three pass schema validation and content standards (Phase 3G gate).
+- [x] Phase 4 COMPLETE -- commit `627f74d`: `api/gold_agent.py` (7-query NLM runner + Claude synthesis); `GET /api/agents/gold/{ticker}` endpoint in `api/main.py`; `notebooklm-py>=0.3.3` added to `requirements.txt`; `NOTEBOOKLM_GOLD_NOTEBOOK_ID` + `NOTEBOOKLM_AUTH_JSON` env vars added to `api/config.py`. 129/129 tests pass; Railway healthy.
+- [ ] **ACTION REQUIRED (user)**: Set `NOTEBOOKLM_GOLD_NOTEBOOK_ID` = `62589a28-c3a6-4b65-b737-266a6d4394e3` and `NOTEBOOKLM_AUTH_JSON` (cookie JSON from `~/.config/notebooklm-mcp/auth.json`) in Railway dashboard. Endpoint returns 503 until set.
+
 **Recent bug history (last six commits):**
+- `627f74d` Gold agent endpoint: `api/gold_agent.py` + `GET /api/agents/gold/{ticker}` in main.py + notebooklm-py in requirements.txt + env vars in config.py.
 - `208b2e3` Sign in button CSS injected eagerly in `initAuth()`. Was injected lazily inside `_getOrCreateModal()` -- button rendered with browser default styles until modal first opened.
 - `28694bd` Fixed Railway healthcheck failures: `from . import db` relative import in `summarise.py` crashes the app when loaded as a top-level module. Changed to bare `import db`.
 - `fbb7a35` Phase 3: rolling summarisation + auth entry point. `summarise.py` (new), `db.py` context helpers, `003_summaries.sql`, `ResearchChatRequest.conversation_id`, Sign in button in nav.
 - `9a8dad7` Fixed Railway 502: `asyncio.wait_for(asyncpg.create_pool(...), timeout=15.0)` in `db.py`. Removed pre-warm `await db.get_pool()` from `main.py` lifespan. Pool now initialises lazily on first DB request.
 - `566e945` Phase 2: auth + conversation persistence. OTP/JWT backend (`auth.py`, `email_service.py`), conversation CRUD (`conversations.py`, `db.py`), migration `002_auth.sql`, frontend `auth.js` and `chat.js` DB wiring.
-- `236bfee` Unified analyst chat voice rules; removed dead personalisation chat code. `VOICE_RULES` is now the single source of truth in `src/features/chat.js`, bridged to `window.CI_VOICE_RULES`.
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
