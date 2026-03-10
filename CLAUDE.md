@@ -85,7 +85,8 @@ npm run validate     # lint + test:all — run before any push
 **Session work (2026-03-10) -- Gold Agent pilot:**
 - [x] Phase 3 (gold analysis sessions) COMPLETE: NST (skew 60), EVN (skew 63), WAF (skew 40) -- all three pass schema validation and content standards (Phase 3G gate).
 - [x] Phase 4 COMPLETE -- commit `627f74d`: `api/gold_agent.py` (7-query NLM runner + Claude synthesis); `GET /api/agents/gold/{ticker}` endpoint in `api/main.py`; `notebooklm-py>=0.3.3` added to `requirements.txt`; `NOTEBOOKLM_GOLD_NOTEBOOK_ID` + `NOTEBOOKLM_AUTH_JSON` env vars added to `api/config.py`. 129/129 tests pass; Railway healthy.
-- [ ] **ACTION REQUIRED (user)**: Set `NOTEBOOKLM_GOLD_NOTEBOOK_ID` = `62589a28-c3a6-4b65-b737-266a6d4394e3` and `NOTEBOOKLM_AUTH_JSON` (cookie JSON from `~/.config/notebooklm-mcp/auth.json`) in Railway dashboard. Endpoint returns 503 until set.
+- [x] **Phase 4 LIVE (2026-03-10)**: Railway env vars set. Live test against NST returned full CI v3 JSON (skew 52, 10 evidence items, 6 gaps) in ~90 seconds. Endpoint confirmed operational.
+- **NOTE**: NOTEBOOKLM_AUTH_JSON credentials expire every 1-2 weeks. When the endpoint returns 503, re-run Get NotebookLM Auth.bat from Desktop, copy NOTEBOOKLM_AUTH_JSON.txt content, and update the Railway variable.
 
 **Recent bug history (last six commits):**
 - `627f74d` Gold agent endpoint: `api/gold_agent.py` + `GET /api/agents/gold/{ticker}` in main.py + notebooklm-py in requirements.txt + env vars in config.py.
