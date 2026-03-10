@@ -621,14 +621,14 @@ describe('calculateReweightingScores', () => {
   });
 
   describe('de minimis rule', () => {
-    it('position under 0.25% weight gets Hold / De minimis', () => {
-      // Tiny position: 1 unit at $10 = $10 exposure in a $100k portfolio
+    it('position with both current and suggested weight under 0.25% gets De minimis', () => {
+      // Tiny contradicting position: currentWeight 0.01%, suggestedWeight 0% (downside long)
       var covered = [
-        makePosition('GMG', { skew: 'upside', weight: 0.01, units: 1, currentPrice: 10 }),
+        makePosition('GMG', { skew: 'downside', weight: 0.01, units: 1, currentPrice: 10 }),
         makePosition('CBA', { skew: 'upside', weight: 99.99, units: 10000, currentPrice: 10 })
       ];
       var coverageData = {
-        GMG: makeCoverage('GMG', 'upside'),
+        GMG: makeCoverage('GMG', 'downside'),
         CBA: makeCoverage('CBA', 'upside')
       };
       var tcData = {};
@@ -636,6 +636,24 @@ describe('calculateReweightingScores', () => {
       var gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
       expect(gmg.action).toBe('Hold');
       expect(gmg.shareAction).toBe('De minimis');
+    });
+
+    it('zero-unit position with non-zero suggested weight is NOT de minimis', () => {
+      // BHP has 0 units (currentWeight=0) but model suggests ~50% => should show Buy
+      var covered = [
+        makePosition('BHP', { skew: 'upside', weight: 0, units: 0, currentPrice: 45 }),
+        makePosition('CBA', { skew: 'upside', weight: 100, units: 10000, currentPrice: 10 })
+      ];
+      var coverageData = {
+        BHP: makeCoverage('BHP', 'upside'),
+        CBA: makeCoverage('CBA', 'upside')
+      };
+      var tcData = {};
+      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      var bhp = scores.find(function(s) { return s.ticker === 'BHP'; });
+      expect(bhp.suggestedWeight).toBeGreaterThan(0.25);
+      expect(bhp.action).not.toBe('Hold');
+      expect(bhp.shareAction).not.toBe('De minimis');
     });
   });
 });

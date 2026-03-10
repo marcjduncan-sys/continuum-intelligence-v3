@@ -1,7 +1,7 @@
 // portfolio.js — Portfolio engine
 // Extracted from index.html without logic changes
 
-import { STOCK_DATA, REFERENCE_DATA } from '../lib/state.js';
+import { STOCK_DATA, REFERENCE_DATA, TC_DATA } from '../lib/state.js';
 import { computeSkewScore, normaliseScores } from '../lib/dom.js';
 import { buildCoverageData } from './home.js';
 import { on } from '../lib/data-events.js';
@@ -55,11 +55,8 @@ function getCoverageData() {
   return COVERAGE_DATA;
 }
 
-// TC_DATA is imported from thesis.js but to avoid circular dependency,
-// we access it via the window global set by thesis.js
 function getTcData() {
-  // TC_DATA is defined in thesis.js and also remains on window from index.html
-  return window.TC_DATA || {};
+  return TC_DATA;
 }
 
 export function setupUploadZone() {
@@ -526,7 +523,7 @@ export function calculateReweightingScores(covered, coverageData, tcData, grossE
   // De minimis: positions under 0.25% of gross get Hold to avoid noise
   var DE_MINIMIS_PCT = 0.25;
   scores.forEach(function(s) {
-    if (s.currentWeight < DE_MINIMIS_PCT) {
+    if (s.currentWeight < DE_MINIMIS_PCT && s.suggestedWeight < DE_MINIMIS_PCT) {
       s.action = 'Hold';
       s.actionCls = 'hold';
       s.deltaCls = 'hold';
@@ -566,7 +563,7 @@ export function renderReweighting(positions, grossExposure) {
       '<td><span class="rw-ticker">' + s.ticker + '</span></td>' +
       '<td>' + s.company + '</td>' +
       '<td><span class="skew-badge ' + skewCls + '">' + skewArrow + '</span></td>' +
-      '<td class="rw-units">' + formatNum(Math.abs(s.units), 0) + '</td>' +
+      '<td class="rw-units">' + formatNum(s.units, 0) + '</td>' +
       '<td><span class="rw-pct">' + s.currentWeight.toFixed(1) + '%</span></td>' +
       '<td><span class="rw-pct">' + s.suggestedWeight.toFixed(1) + '%</span></td>' +
       '<td><span class="rw-delta ' + s.deltaCls + '">' + (s.delta >= 0 ? '+' : '') + s.delta.toFixed(1) + '%</span></td>' +
