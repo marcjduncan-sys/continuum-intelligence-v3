@@ -25,7 +25,12 @@ def _ensure_client():
         from google import genai
         if not config.GEMINI_API_KEY:
             raise RuntimeError("GEMINI_API_KEY not configured")
-        _client = genai.Client(api_key=config.GEMINI_API_KEY)
+        # text-embedding-004:batchEmbedContents is only available on v1, not v1beta.
+        # The SDK defaults to v1beta, which returns 404 for this model.
+        _client = genai.Client(
+            api_key=config.GEMINI_API_KEY,
+            http_options={"api_version": "v1"},
+        )
 
 
 async def generate_embedding(text: str) -> list[float] | None:
