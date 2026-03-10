@@ -64,38 +64,6 @@ export var ANALYST_SYSTEM_PROMPT =
     'Highlight what discriminates between hypotheses. Be direct about what is unknown or uncertain. Flag research gaps explicitly.' +
     VOICE_RULES;
 
-// ============================================================
-// PERSONALISATION INTEGRATION
-// ============================================================
-
-function loadPersonalisationProfile() {
-    try {
-        var raw = localStorage.getItem('continuum_personalisation_profile');
-        if (!raw) return null;
-        var data = JSON.parse(raw);
-        return (data && data.state && data.state.profile) ? data.state : null;
-    } catch (e) {
-        return null;
-    }
-}
-
-function buildEffectiveSystemPrompt() {
-    var pnState = loadPersonalisationProfile();
-    if (pnState && typeof window.pnBuildSystemPrompt === 'function') {
-        try {
-            return window.pnBuildSystemPrompt(
-                pnState.profile,
-                pnState.firm,
-                pnState.fund,
-                pnState.portfolio || []
-            );
-        } catch (e) {
-            console.warn('[Analyst] pnBuildSystemPrompt threw:', e);
-        }
-    }
-    return ANALYST_SYSTEM_PROMPT;
-}
-
 
 // ============================================================
 // DOM REFS
@@ -458,21 +426,21 @@ function sendMessage() {
         return;
     }
 
-    // Always read personalisation fresh from localStorage on each send
-    var systemPrompt = buildEffectiveSystemPrompt();
-
     var _fetchHeaders = { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY };
     var _fetchToken = window.CI_AUTH && window.CI_AUTH.getToken();
     if (_fetchToken) _fetchHeaders['Authorization'] = 'Bearer ' + _fetchToken;
-    fetch(CHAT_API_BASE, {
+    var _chatUrl = CHAT_API_BASE;
+    if (!_fetchToken && window.CI_AUTH && window.CI_AUTH.getGuestId) {
+        _chatUrl += '?guest_id=' + encodeURIComponent(window.CI_AUTH.getGuestId());
+    }
+    fetch(_chatUrl, {
         method: 'POST',
         headers: _fetchHeaders,
         body: JSON.stringify({
             ticker: ticker,
             question: question,
             conversation_history: history,
-            conversation_id: dbConversationIds[ticker] || null,
-            system_prompt: systemPrompt
+            conversation_id: dbConversationIds[ticker] || null
         })
     })
     .then(function(res) {
