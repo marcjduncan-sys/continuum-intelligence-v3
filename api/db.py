@@ -497,3 +497,117 @@ async def get_profile(
             return None
         raw = row["data"]
         return json.loads(raw) if isinstance(raw, str) else raw
+
+
+# ---------------------------------------------------------------------------
+# Memory helpers (Phase 6)
+# ---------------------------------------------------------------------------
+
+async def insert_memory(
+    pool,
+    *,
+    user_id: str | None = None,
+    guest_id: str | None = None,
+    memory_type: str,
+    content: str,
+    ticker: str | None = None,
+    tags: list[str] | None = None,
+    confidence: float = 1.0,
+    source_conversation_id: str | None = None,
+) -> str | None:
+    """Insert a single memory observation. Returns memory id."""
+    if pool is None:
+        return None
+    if not user_id and not guest_id:
+        return None
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            """
+            INSERT INTO memories
+                (user_id, guest_id, memory_type, content, ticker, tags,
+                 confidence, source_conversation_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING id
+            """,
+            user_id,
+            guest_id,
+            memory_type,
+            content,
+            ticker.upper() if ticker else None,
+            tags or [],
+            confidence,
+            source_conversation_id,
+        )
+        return str(row["id"]) if row else None
+
+
+async def get_memories(
+    pool,
+    *,
+    user_id: str | None = None,
+    guest_id: str | None = None,
+    ticker: str | None = None,
+    memory_type: str | None = None,
+    active_only: bool = True,
+    limit: int = 100,
+) -> list[dict]:
+    """Retrieve memories for a user/guest, optionally filtered by ticker and type."""
+    if pool is None:
+        return []
+    if not user_id and not guest_id:
+        return []
+
+    conditions = []
+    params = []
+    idx = 1
+
+    if user_id:
+        conditions.append(f"user_id = ${idx}")
+        params.append(user_id)
+        idx += 1
+    else:
+        conditions.append(f"guest_id = ${idx}")
+        params.append(guest_id)
+        idx += 1
+
+    if ticker:
+        conditions.append(f"ticker = ${idx}")
+        params.append(ticker.upper())
+        idx += 1
+
+    if memory_type:
+        conditions.append(f"memory_type = ${idx}")
+        params.append(memory_type)
+        idx += 1
+
+    if active_only:
+        conditions.append("active = TRUE")
+
+    where = " AND ".join(conditions)
+    query = f"""
+        SELECT id, memory_type, content, ticker, tags, confidence,
+               source_conversation_id, created_at, updated_at, active
+        FROM memories
+        WHERE {where}
+        ORDER BY created_at DESC
+        LIMIT ${idx}
+    """
+    params.append(limit)
+
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(query, *params)
+        return [
+            {
+                "id": str(r["id"]),
+                "memory_type": r["memory_type"],
+                "content": r["content"],
+                "ticker": r["ticker"],
+                "tags": list(r["tags"]) if r["tags"] else [],
+                "confidence": r["confidence"],
+                "source_conversation_id": str(r["source_conversation_id"]) if r["source_conversation_id"] else None,
+                "created_at": r["created_at"].isoformat() if r["created_at"] else None,
+                "updated_at": r["updated_at"].isoformat() if r["updated_at"] else None,
+                "active": r["active"],
+            }
+            for r in rows
+        ]

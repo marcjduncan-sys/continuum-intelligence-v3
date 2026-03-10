@@ -29,6 +29,7 @@ from slowapi.util import get_remote_address
 import config
 import db
 import llm
+import memory_extractor
 import prompt_builder
 import summarise
 from auth import decode_token, router as auth_router
@@ -284,7 +285,7 @@ def _build_context(passages: list[dict], ticker: str) -> str:
 
 @app.post("/api/research-chat", response_model=ResearchChatResponse)
 @limiter.limit("30/minute")
-async def research_chat(request: Request, body: ResearchChatRequest, _=Depends(verify_api_key)):
+async def research_chat(request: Request, body: ResearchChatRequest, background_tasks: BackgroundTasks, _=Depends(verify_api_key)):
     """
     Research chat endpoint.
 
@@ -408,6 +409,18 @@ async def research_chat(request: Request, body: ResearchChatRequest, _=Depends(v
         )
         for p in passages[:6]  # Top 6 sources
     ]
+
+    # Fire memory extraction in the background (Phase 6)
+    if _user_id or _guest_id:
+        background_tasks.add_task(
+            memory_extractor.extract_memories,
+            user_id=_user_id,
+            guest_id=_guest_id,
+            ticker=ticker,
+            question=body.question,
+            response_text=response_text,
+            conversation_id=body.conversation_id,
+        )
 
     return ResearchChatResponse(
         response=response_text,
