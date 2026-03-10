@@ -182,14 +182,15 @@ async function triggerRefreshAll() {
     if (btn) { btn.disabled = true; btn.textContent = 'Refreshing...'; }
 
     try {
-        // On retry, send only tickers not already cached this session
+        // Always send the explicit ticker list so modal-added stocks (not in
+        // server-side data/research/*.json) are included in the batch.
+        // On retry, exclude tickers already cached this session.
+        var allTickers = Object.keys(STOCK_DATA).sort();
         var cachedKeys = Object.keys(_batchCachedTickers).filter(function(k) { return _batchCachedTickers[k]; });
-        var bodyPayload = {};
-        if (cachedKeys.length > 0) {
-            var allTickers = Object.keys(STOCK_DATA).sort();
-            var remaining = allTickers.filter(function(t) { return cachedKeys.indexOf(t) === -1; });
-            if (remaining.length > 0) bodyPayload.tickers = remaining;
-        }
+        var tickersToRefresh = cachedKeys.length > 0
+            ? allTickers.filter(function(t) { return cachedKeys.indexOf(t) === -1; })
+            : allTickers;
+        var bodyPayload = { tickers: tickersToRefresh };
 
         var resp = await fetch(REFRESH_API_BASE + '/api/refresh-all', {
             method: 'POST',
