@@ -27,16 +27,25 @@ const CACHE_KEY = 'continuum_market_data';
 const CACHE_TTL = 4 * 60 * 60 * 1000; // 4 hours
 var _status = {}; // Per-ticker status: 'loading', 'live', 'failed'
 
-// CORS proxies removed for security  --  third-party proxies can log/modify traffic.
 // Live prices come from data/live-prices.json (updated every 15 min via GitHub Actions).
-// Direct Yahoo Finance calls kept as best-effort fallback only.
+// OHLCV chart data routes through the Railway backend proxy to avoid CORS blocks.
+// Direct Yahoo Finance calls kept as best-effort fallback only (works in dev, blocked on GH Pages).
 
-// Yahoo Finance chart URLs (try multiple endpoints)
-function yahooUrls(ticker) {
-    return [
-      'https://query1.finance.yahoo.com/v8/finance/chart/' + ticker + '?range=3y&interval=1d&includePrePost=false&events=history',
-      'https://query2.finance.yahoo.com/v8/finance/chart/' + ticker + '?range=3y&interval=1d&includePrePost=false'
-    ];
+// Railway API base (same pattern as batch-refresh.js, chat.js, etc.)
+var _CHART_API_BASE = window.location.hostname.includes('github.io')
+    ? 'https://imaginative-vision-production-16cb.up.railway.app'
+    : '';
+
+// Chart data URLs: Railway proxy first, then direct Yahoo as fallback
+function chartUrls(ticker) {
+    var urls = [];
+    // Railway proxy (requires GET /api/chart/{ticker} endpoint on backend)
+    var proxyUrl = _CHART_API_BASE + '/api/chart/' + ticker;
+    urls.push(proxyUrl);
+    // Direct Yahoo fallback (CORS-blocked from GitHub Pages, works in dev)
+    urls.push('https://query1.finance.yahoo.com/v8/finance/chart/' + ticker + '?range=3y&interval=1d&includePrePost=false&events=history');
+    urls.push('https://query2.finance.yahoo.com/v8/finance/chart/' + ticker + '?range=3y&interval=1d&includePrePost=false');
+    return urls;
 }
 
 function getCache(ticker) {
@@ -104,7 +113,7 @@ async function fetchTicker(ticker) {
     }
 
     _status[ticker] = 'loading';
-    var urls = yahooUrls(ticker);
+    var urls = chartUrls(ticker);
 
     // Direct Yahoo Finance attempt (may work from some origins/browsers)
     for (var u = 0; u < urls.length; u++) {
