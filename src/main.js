@@ -126,7 +126,13 @@ window.initSectionToggles = function() {
     }
   });
   var allBtn = page.querySelector('.sections-float-toggle');
-  if (allBtn) { allBtn.dataset.state = 'expanded'; allBtn.querySelector('span').textContent = 'Collapse All'; allBtn.querySelector('svg polyline').setAttribute('points', '18 15 12 9 6 15'); }
+  if (allBtn) {
+    allBtn.dataset.state = 'expanded';
+    var _span = allBtn.querySelector('span');
+    if (_span) _span.textContent = 'Collapse All';
+    var _poly = allBtn.querySelector('svg polyline');
+    if (_poly) _poly.setAttribute('points', '18 15 12 9 6 15');
+  }
 };
 
 window.toggleAllSections = function(btn) {
@@ -152,10 +158,12 @@ window.toggleAllSections = function(btn) {
   });
   btn.dataset.state = newState;
   var label = isExpanded ? 'Expand All' : 'Collapse All';
-  btn.querySelector('span').textContent = label;
+  var _span2 = btn.querySelector('span');
+  if (_span2) _span2.textContent = label;
   btn.setAttribute('aria-label', label + ' sections');
   var points = isExpanded ? '6 9 12 15 18 9' : '18 15 12 9 6 15';
-  btn.querySelector('svg polyline').setAttribute('points', points);
+  var _poly2 = btn.querySelector('svg polyline');
+  if (_poly2) _poly2.setAttribute('points', points);
 };
 
 // Lazy-load SheetJS only when needed (portfolio upload interaction)

@@ -416,9 +416,14 @@ function applyNarrativeAnalysis(ticker) {
     if (narrativeSectionEl) {
       var subtitle = narrativeSectionEl.querySelector('.rs-subtitle');
       if (subtitle) {
-        narrativeSectionEl.insertBefore(narrativeSection, subtitle);
+        subtitle.parentNode.insertBefore(narrativeSection, subtitle);
       } else {
-        narrativeSectionEl.appendChild(narrativeSection);
+        var rsBody = narrativeSectionEl.querySelector('.rs-body');
+        if (rsBody) {
+          rsBody.prepend(narrativeSection);
+        } else {
+          narrativeSectionEl.appendChild(narrativeSection);
+        }
       }
     }
   }

@@ -553,24 +553,28 @@ export function renderDiscriminators(data) {
 export function renderTripwires(data) {
   var t = data.ticker.toLowerCase();
   var tw = data.tripwires;
+  if (!tw || !tw.cards) return '';
 
   var cardsHtml = '';
   for (var i = 0; i < tw.cards.length; i++) {
     var card = tw.cards[i];
+    if (!card) continue;
+    var cardName = card.name || '';
 
     var conditionsHtml = '';
-    for (var c = 0; c < card.conditions.length; c++) {
-      var cond = card.conditions[c];
+    var conditions = card.conditions || [];
+    for (var c = 0; c < conditions.length; c++) {
+      var cond = conditions[c];
       conditionsHtml += '<div class="tw-condition">' +
         '<div class="tw-cond-if ' + cond.valence + '">' + cond.if + '</div>' +
         '<div class="tw-cond-then">' + cond.then + '</div>' +
       '</div>';
     }
 
-    var resolvedCls = card.name.indexOf('RESOLVED') >= 0 ? ' tw-resolved' : '';
+    var resolvedCls = cardName.indexOf('RESOLVED') >= 0 ? ' tw-resolved' : '';
 
     cardsHtml += '<div class="tw-card' + resolvedCls + '">' +
-      '<div class="tw-header"><div class="tw-date">' + card.date + '</div><div class="tw-name">' + card.name + '</div></div>' +
+      '<div class="tw-header"><div class="tw-date">' + (card.date || '') + '</div><div class="tw-name">' + cardName + '</div></div>' +
       '<div class="tw-conditions">' + conditionsHtml + '</div>' +
       '<div class="tw-source">' + (card.source || '') + '</div>' +
     '</div>';
@@ -931,7 +935,7 @@ export function renderTechnicalAnalysis(data) {
   '</div>';
 
   var relHtml = '';
-  if (ta.relativePerformance) {
+  if (ta.relativePerformance && ta.relativePerformance.vsIndex && ta.relativePerformance.vsSector) {
     var rp = ta.relativePerformance;
     relHtml = '<div class="rs-subtitle">Relative Performance (' + rp.vsIndex.period + ')</div>' +
       '<table class="ta-rel-table"><thead><tr>' +
