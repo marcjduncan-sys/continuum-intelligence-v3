@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gold Agent -- Continuum Intelligence</title>
+  <link rel="stylesheet" href="/continuum-intelligence-v3/css/fonts.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #1B2A4A;
+      --navy-lt: #253761;
+      --green:  #00C853;
+      --blue:   #2979FF;
+      --amber:  #FF9100;
+      --red:    #D50000;
+      --bg:     #F5F7FA;
+      --surface:#FFFFFF;
+      --border: #DDE1E8;
+      --text:   #1B2A4A;
+      --muted:  #6B7A99;
+      --radius: 10px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--navy);
+      color: #fff;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      height: 56px;
+    }
+    header .logo { font-size: 13px; font-weight: 700; letter-spacing: .08em; opacity: .7; text-transform: uppercase; }
+    header h1 { font-size: 17px; font-weight: 600; }
+    header a { color: rgba(255,255,255,.5); text-decoration: none; font-size: 13px; margin-left: auto; }
+    header a:hover { color: #fff; }
+
+    /* ── Search bar ── */
+    .search-wrap {
+      background: var(--navy-lt);
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .search-wrap p {
+      color: rgba(255,255,255,.65);
+      font-size: 13px;
+      text-align: center;
+      max-width: 480px;
+      line-height: 1.5;
+    }
+    .search-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 400px;
+    }
+    .search-row input {
+      flex: 1;
+      padding: 11px 14px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.1);
+      color: #fff;
+      font-size: 15px;
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      outline: none;
+    }
+    .search-row input::placeholder { color: rgba(255,255,255,.35); text-transform: none; letter-spacing: 0; }
+    .search-row input:focus { border-color: rgba(255,255,255,.5); background: rgba(255,255,255,.15); }
+    .btn {
+      padding: 11px 22px;
+      background: var(--green);
+      color: #000;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+      transition: opacity .15s;
+    }
+    .btn:hover { opacity: .85; }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ── Main content ── */
+    main { max-width: 900px; margin: 0 auto; padding: 32px 20px 60px; }
+
+    /* Loading */
+    #loading {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 60px 20px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--navy);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading strong { color: var(--text); font-size: 15px; }
+    #loading span { font-size: 13px; }
+
+    /* Error */
+    #error {
+      display: none;
+      background: #FFF0F0;
+      border: 1px solid #FFCDD2;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      color: #B71C1C;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+
+    /* ── Result cards ── */
+    #result { display: none; }
+
+    .result-header {
+      background: var(--navy);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: start;
+    }
+    .result-header .company { font-size: 22px; font-weight: 700; }
+    .result-header .meta { font-size: 13px; opacity: .6; margin-top: 4px; }
+    .result-header .verdict {
+      font-size: 14px;
+      line-height: 1.6;
+      opacity: .88;
+      margin-top: 12px;
+      max-width: 680px;
+    }
+    .skew-box {
+      text-align: center;
+      min-width: 80px;
+    }
+    .skew-score {
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .skew-label {
+      font-size: 11px;
+      opacity: .6;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-top: 4px;
+    }
+    .skew-badge {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .skew-up   { background: rgba(0,200,83,.2); color: #00C853; }
+    .skew-down { background: rgba(213,0,0,.2); color: #FF5252; }
+    .skew-bal  { background: rgba(255,145,0,.2); color: #FF9100; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    /* Thesis grid */
+    .thesis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 620px) { .thesis-grid { grid-template-columns: 1fr; } }
+    .thesis-card {
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      border-left: 4px solid;
+    }
+    .thesis-bull { background: #F0FBF5; border-color: var(--green); }
+    .thesis-bear { background: #FFF5F5; border-color: var(--red); }
+    .thesis-card .thesis-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; margin-bottom: 8px;
+    }
+    .thesis-bull .thesis-label { color: #00875A; }
+    .thesis-bear .thesis-label { color: #C62828; }
+    .thesis-card p { font-size: 13.5px; line-height: 1.65; color: #374151; }
+
+    /* Key metrics */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    .metric {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .metric-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
+    .metric-value { font-size: 18px; font-weight: 700; color: var(--text); }
+    .metric-value.null-val { color: var(--muted); font-size: 15px; font-weight: 400; }
+
+    /* Evidence */
+    .evidence-list { display: flex; flex-direction: column; gap: 14px; }
+    .evidence-item { border-left: 3px solid var(--blue); padding-left: 14px; }
+    .evidence-label { font-size: 12px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
+    .evidence-finding { font-size: 13.5px; line-height: 1.65; color: var(--text); }
+    .evidence-source { font-size: 11.5px; color: var(--muted); margin-top: 4px; font-style: italic; }
+
+    /* Gaps */
+    .gaps-list { display: flex; flex-direction: column; gap: 10px; }
+    .gap-item {
+      display: flex; gap: 10px; align-items: baseline;
+      font-size: 13.5px; line-height: 1.55; color: #374151;
+    }
+    .gap-item::before {
+      content: attr(data-n);
+      background: var(--amber);
+      color: #000;
+      font-size: 10px;
+      font-weight: 800;
+      border-radius: 50%;
+      width: 18px; height: 18px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Monitoring trigger */
+    .trigger-box {
+      background: #F0F4FF;
+      border: 1px solid #C5D3FF;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 13.5px;
+      color: #1A3070;
+      line-height: 1.6;
+    }
+
+    /* Timestamp */
+    .analysis-footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="logo">Continuum</span>
+  <h1>Gold Agent</h1>
+  <a href="/continuum-intelligence-v3/">Back to platform</a>
+</header>
+
+<div class="search-wrap">
+  <p>Enter an ASX gold ticker to run a live NLM corpus analysis. Results take 60-120 seconds.</p>
+  <div class="search-row">
+    <input type="text" id="tickerInput" placeholder="e.g. NST, EVN, WAF" maxlength="10" autocomplete="off" />
+    <button class="btn" id="runBtn" onclick="runAnalysis()">Run</button>
+  </div>
+</div>
+
+<main>
+  <div id="loading">
+    <div class="spinner"></div>
+    <strong id="loadingTicker"></strong>
+    <span>Querying NotebookLM corpus and synthesising analysis...</span>
+    <span id="loadingTimer" style="font-size:12px; margin-top:4px;"></span>
+  </div>
+
+  <div id="error"></div>
+
+  <div id="result"></div>
+</main>
+
+<script>
+const API = 'https://imaginative-vision-production-16cb.up.railway.app';
+let timerInterval = null;
+
+document.getElementById('tickerInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') runAnalysis();
+});
+
+function fmt(val, suffix='') {
+  if (val === null || val === undefined) return null;
+  return val + suffix;
+}
+
+function skewClass(score) {
+  if (score > 55) return 'skew-up';
+  if (score < 45) return 'skew-down';
+  return 'skew-bal';
+}
+function skewLabel(score) {
+  if (score > 55) return 'Upside';
+  if (score < 45) return 'Downside';
+  return 'Balanced';
+}
+
+async function runAnalysis() {
+  const raw = document.getElementById('tickerInput').value.trim().toUpperCase();
+  if (!raw) return;
+
+  const loading = document.getElementById('loading');
+  const errBox  = document.getElementById('error');
+  const result  = document.getElementById('result');
+  const btn     = document.getElementById('runBtn');
+
+  // Reset
+  errBox.style.display = 'none';
+  result.style.display = 'none';
+  loading.style.display = 'flex';
+  btn.disabled = true;
+  document.getElementById('loadingTicker').textContent = raw;
+
+  // Timer
+  let elapsed = 0;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    elapsed++;
+    document.getElementById('loadingTimer').textContent = `${elapsed}s elapsed`;
+  }, 1000);
+
+  try {
+    const res = await fetch(`${API}/api/agents/gold/${raw}`);
+    clearInterval(timerInterval);
+
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`${res.status}: ${txt.slice(0, 200)}`);
+    }
+
+    const d = await res.json();
+    loading.style.display = 'none';
+    renderResult(d);
+
+  } catch (err) {
+    clearInterval(timerInterval);
+    loading.style.display = 'none';
+    errBox.style.display = 'block';
+    errBox.textContent = `Error: ${err.message}`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function renderResult(d) {
+  const skewCls = skewClass(d.skew_score);
+  const skewLbl = skewLabel(d.skew_score);
+  const m = d.key_metrics || {};
+
+  const metricsHtml = [
+    ['AISC (A$/oz)', m.aisc_per_oz ? `A$${m.aisc_per_oz.toLocaleString()}` : null],
+    ['Production (koz)', m.production_koz_annual ? `${m.production_koz_annual.toLocaleString()} koz` : null],
+    ['Mine Life', m.mine_life_years ? `${m.mine_life_years} yrs` : null],
+    ['Net Cash / (Debt)', m.net_cash_debt_aud_m !== null && m.net_cash_debt_aud_m !== undefined
+      ? `A$${m.net_cash_debt_aud_m >= 0 ? '' : '('}${Math.abs(m.net_cash_debt_aud_m).toLocaleString()}M${m.net_cash_debt_aud_m < 0 ? ')' : ''}` : null],
+    ['Reserve Grade', m.reserve_grade_gt ? `${m.reserve_grade_gt} g/t` : null],
+  ].map(([label, val]) => `
+    <div class="metric">
+      <div class="metric-label">${label}</div>
+      <div class="metric-value ${val ? '' : 'null-val'}">${val || 'n/a'}</div>
+    </div>`).join('');
+
+  const evidenceHtml = (d.evidence || []).map(e => `
+    <div class="evidence-item">
+      <div class="evidence-label">${e.label}</div>
+      <div class="evidence-finding">${e.finding}</div>
+      <div class="evidence-source">${e.source}</div>
+    </div>`).join('');
+
+  const gapsHtml = (d.information_gaps || []).map((g, i) =>
+    `<div class="gap-item" data-n="${i+1}">${g}</div>`
+  ).join('');
+
+  const html = `
+    <div class="result-header">
+      <div>
+        <div class="company">${d.company_name || d.ticker}</div>
+        <div class="meta">${d.ticker} &middot; ${d.sector} &middot; Analysis date: ${d.analysis_date}</div>
+        <div class="verdict">${d.verdict}</div>
+      </div>
+      <div class="skew-box">
+        <div class="skew-score">${d.skew_score}</div>
+        <div class="skew-label">Skew</div>
+        <span class="skew-badge ${skewCls}">${skewLbl}</span>
+      </div>
+    </div>
+
+    <div class="thesis-grid">
+      <div class="thesis-card thesis-bull">
+        <div class="thesis-label">Bull case</div>
+        <p>${d.hypothesis?.bull || ''}</p>
+      </div>
+      <div class="thesis-card thesis-bear">
+        <div class="thesis-label">Bear case</div>
+        <p>${d.hypothesis?.bear || ''}</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Key Metrics</div>
+      <div class="metrics-grid">${metricsHtml}</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Evidence (${(d.evidence || []).length} items)</div>
+      <div class="evidence-list">${evidenceHtml}</div>
+    </div>
+
+    ${gapsHtml ? `
+    <div class="card">
+      <div class="card-title">Information Gaps (${(d.information_gaps || []).length})</div>
+      <div class="gaps-list">${gapsHtml}</div>
+    </div>` : ''}
+
+    ${d.monitoring_trigger ? `
+    <div class="card">
+      <div class="card-title">Monitoring Trigger</div>
+      <div class="trigger-box">${d.monitoring_trigger}</div>
+    </div>` : ''}
+
+    <div class="analysis-footer">
+      Generated by Continuum Gold Agent &middot; Powered by NotebookLM + Claude
+    </div>
+  `;
+
+  const result = document.getElementById('result');
+  result.innerHTML = html;
+  result.style.display = 'block';
+  result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
