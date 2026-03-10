@@ -264,3 +264,34 @@ def build_personalised_prompt(data: dict) -> str:
     p += VOICE_RULES
 
     return p
+
+
+# ---------------------------------------------------------------------------
+# Memory injection (Phase 7)
+# ---------------------------------------------------------------------------
+
+def format_memories_section(memories: list[dict]) -> str:
+    """Format selected memories as a prompt section for injection.
+
+    Returns an empty string if no memories are provided, so callers
+    can unconditionally append the result.
+    """
+    if not memories:
+        return ""
+
+    lines = [
+        "\n\nPRIOR OBSERVATIONS ABOUT THIS MANAGER\n"
+        "The following observations were extracted from prior conversations. "
+        "Reference them when relevant to the current question:\n"
+    ]
+    for mem in memories:
+        age = mem.get("_age_days", 0)
+        age_str = f", {int(age)}d ago" if age > 0.5 else ""
+        conf = mem.get("confidence", 1.0)
+        mtype = mem.get("memory_type", "unknown")
+        ticker_str = f" ({mem['ticker']})" if mem.get("ticker") else ""
+        lines.append(
+            f"- {mem['content']}{ticker_str} [{mtype}, {conf:.1f}{age_str}]"
+        )
+
+    return "\n".join(lines) + "\n"

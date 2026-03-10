@@ -14,6 +14,7 @@ import json
 import logging
 
 import db
+import embeddings
 import llm
 
 logger = logging.getLogger(__name__)
@@ -123,6 +124,7 @@ async def extract_memories(
             continue
 
         try:
+            embedding = await embeddings.generate_embedding(content)
             await db.insert_memory(
                 pool,
                 user_id=user_id,
@@ -133,6 +135,7 @@ async def extract_memories(
                 tags=item.get("tags", []),
                 confidence=min(max(float(item.get("confidence", 0.8)), 0.0), 1.0),
                 source_conversation_id=conversation_id,
+                embedding=embedding,
             )
             inserted += 1
         except Exception as exc:

@@ -514,6 +514,7 @@ async def insert_memory(
     tags: list[str] | None = None,
     confidence: float = 1.0,
     source_conversation_id: str | None = None,
+    embedding: list[float] | None = None,
 ) -> str | None:
     """Insert a single memory observation. Returns memory id."""
     if pool is None:
@@ -525,8 +526,8 @@ async def insert_memory(
             """
             INSERT INTO memories
                 (user_id, guest_id, memory_type, content, ticker, tags,
-                 confidence, source_conversation_id)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                 confidence, source_conversation_id, embedding)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             RETURNING id
             """,
             user_id,
@@ -537,6 +538,7 @@ async def insert_memory(
             tags or [],
             confidence,
             source_conversation_id,
+            embedding,
         )
         return str(row["id"]) if row else None
 
@@ -608,6 +610,62 @@ async def get_memories(
                 "created_at": r["created_at"].isoformat() if r["created_at"] else None,
                 "updated_at": r["updated_at"].isoformat() if r["updated_at"] else None,
                 "active": r["active"],
+            }
+            for r in rows
+        ]
+
+
+# ---------------------------------------------------------------------------
+# Memory candidate retrieval with embeddings (Phase 7)
+# ---------------------------------------------------------------------------
+
+async def get_memory_candidates(
+    pool,
+    *,
+    user_id: str | None = None,
+    guest_id: str | None = None,
+    limit: int = 200,
+) -> list[dict]:
+    """Retrieve active memories with embeddings and timestamps for ranking.
+
+    Returns all active memories for the identity (not filtered by ticker),
+    so the selector can rank cross-portfolio observations alongside
+    ticker-specific ones.
+    """
+    if pool is None:
+        return []
+    if not user_id and not guest_id:
+        return []
+
+    if user_id:
+        where = "user_id = $1"
+        params = [user_id]
+    else:
+        where = "guest_id = $1"
+        params = [guest_id]
+
+    query = f"""
+        SELECT id, memory_type, content, ticker, tags, confidence,
+               embedding, created_at
+        FROM memories
+        WHERE {where} AND active = TRUE
+        ORDER BY created_at DESC
+        LIMIT $2
+    """
+    params.append(limit)
+
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(query, *params)
+        return [
+            {
+                "id": str(r["id"]),
+                "memory_type": r["memory_type"],
+                "content": r["content"],
+                "ticker": r["ticker"],
+                "tags": list(r["tags"]) if r["tags"] else [],
+                "confidence": float(r["confidence"]),
+                "embedding": list(r["embedding"]) if r["embedding"] else None,
+                "created_at": r["created_at"],
             }
             for r in rows
         ]

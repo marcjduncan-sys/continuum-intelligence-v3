@@ -30,6 +30,7 @@ import config
 import db
 import llm
 import memory_extractor
+import memory_selector
 import prompt_builder
 import summarise
 from auth import decode_token, router as auth_router
@@ -384,6 +385,14 @@ async def research_chat(request: Request, body: ResearchChatRequest, background_
             effective_system = _csp or _sp
     elif _csp or _sp:
         effective_system = _csp or _sp
+
+    # Inject relevant memories into the prompt (Phase 7)
+    if _user_id or _guest_id:
+        selected_memories = await memory_selector.select_memories(
+            user_id=_user_id, guest_id=_guest_id, ticker=ticker, question=body.question,
+        )
+        effective_system += prompt_builder.format_memories_section(selected_memories)
+
     try:
         result = await llm.complete(
             model=config.ANTHROPIC_MODEL,
