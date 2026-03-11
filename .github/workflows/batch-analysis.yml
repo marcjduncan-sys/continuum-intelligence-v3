@@ -1,0 +1,17 @@
+name: Memory Batch Analysis
+
+on:
+  schedule:
+    # 16:00 UTC = 02:00 AEDT (UTC+11 DST) / 02:00 AEST (UTC+10, adjust to 0 15 in winter)
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+
+jobs:
+  batch-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run memory batch analysis
+        run: |
+          curl -s -f -X POST \
+            -H "X-Batch-Secret: ${{ secrets.BATCH_SECRET }}" \
+            https://imaginative-vision-production-16cb.up.railway.app/api/batch/run

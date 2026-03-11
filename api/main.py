@@ -32,6 +32,7 @@ import llm
 import memory_extractor
 import memory_selector
 import prompt_builder
+import batch_analysis
 import summarise
 from auth import decode_token, router as auth_router
 from conversations import router as conversations_router
@@ -529,6 +530,33 @@ async def gold_agent_endpoint(ticker: str, request: Request):
     except Exception as exc:
         logger.error("Gold agent error for %s: %s", ticker, exc)
         raise HTTPException(status_code=500, detail="Gold analysis failed")
+
+
+# ---------------------------------------------------------------------------
+# Batch analysis endpoint
+# ---------------------------------------------------------------------------
+
+_batch_secret_header = APIKeyHeader(name="X-Batch-Secret", auto_error=False)
+
+
+@app.post("/api/batch/run")
+async def batch_run(request: Request, secret: str | None = Depends(_batch_secret_header)):
+    """
+    Run nightly memory consolidation.
+
+    Protected by X-Batch-Secret header. Triggered by the batch-analysis GitHub
+    Actions workflow at 16:00 UTC daily. Safe to run manually via workflow_dispatch.
+    Returns a summary of users processed and memories merged/retired.
+    """
+    if not config.BATCH_SECRET or secret != config.BATCH_SECRET:
+        raise HTTPException(status_code=401, detail="Invalid or missing batch secret")
+    pool = await db.get_pool()
+    try:
+        result = await batch_analysis.run_batch_analysis(pool)
+        return result
+    except Exception as exc:
+        logger.error("Batch run failed: %s", exc)
+        raise HTTPException(status_code=500, detail="Batch analysis failed")
 
 
 @app.get("/api/admin/llm-usage")
