@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.15,
-      "status": "VERY_LOW",
+      "survival_score": 0.25,
+      "status": "LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-10T23:48:59.101Z"
+      "last_updated": "2026-03-11T03:27:43.654Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.15,
-      "status": "VERY_LOW",
+      "survival_score": 0.25,
+      "status": "LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-10T23:48:59.101Z"
+      "last_updated": "2026-03-11T03:27:43.654Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Cost pressures, competitive threats, or macro headwinds.",
       "upside": null,
       "risk_plain": "Material downside if multiple risks crystallise simultaneously.",
-      "survival_score": 0.35,
+      "survival_score": 0.25,
       "status": "LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-10T23:48:59.101Z"
+      "last_updated": "2026-03-11T03:27:43.654Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -47,27 +47,37 @@
       "what_to_watch": "Industry disruption signals and regulatory changes.",
       "upside": null,
       "risk_plain": "If disruption materialises, prior assumptions become invalid.",
-      "survival_score": 0.35,
+      "survival_score": 0.25,
       "status": "LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-10T23:48:59.101Z"
+      "last_updated": "2026-03-11T03:27:43.654Z"
     }
   },
-  "dominant": "N3",
+  "dominant": "N1",
   "confidence": "LOW",
   "alert_state": "NORMAL",
-  "current_price": 58.84,
+  "current_price": 59.85,
   "big_picture": "Mineral Resources Limited (ASX: MIN) -- coverage initiated. Full analysis pending.",
   "last_flip": {
-    "date": "2026-03-03",
-    "from": "N2",
-    "to": "N3",
-    "trigger": "Automated: survival score shift (Base Case/Managed → Risk/Downside)",
-    "price_at_flip": 56.04,
-    "from_survival": 0.27,
-    "to_survival": 0.31
+    "date": "2026-03-11",
+    "from": "N3",
+    "to": "N1",
+    "trigger": "Automated: survival score shift (Risk/Downside → Growth/Recovery)",
+    "price_at_flip": 59.85,
+    "from_survival": 0.25,
+    "to_survival": 0.25
   },
-  "narrative_history": [],
+  "narrative_history": [
+    {
+      "date": "2026-03-03",
+      "from": "N2",
+      "to": "N3",
+      "trigger": "Automated: survival score shift (Base Case/Managed → Risk/Downside)",
+      "price_at_flip": 56.04,
+      "from_survival": 0.27,
+      "to_survival": 0.31
+    }
+  ],
   "evidence_items": [],
   "price_signals": [
     {
@@ -225,20 +235,21 @@
     57.12,
     57.18,
     57.45,
-    58.84
+    58.84,
+    59.85
   ],
   "freshness": {
-    "pricePctChange": 2.4,
+    "pricePctChange": 1.7,
     "urgency": 0,
     "status": "OK",
     "badge": "ok"
   },
-  "last_price_update": "2026-03-10T23:48:58.978Z",
+  "last_price_update": "2026-03-11T03:27:43.526Z",
   "price_evidence": {
-    "last_run": "2026-03-10T23:48:59.101Z",
-    "classification": "SIGNIFICANT"
+    "last_run": "2026-03-11T03:27:43.654Z",
+    "classification": "MATERIAL"
   },
-  "last_research_update": "2026-03-10T23:48:59.101Z",
+  "last_research_update": "2026-03-11T03:27:43.654Z",
   "technicalAnalysis": {
     "date": "02 March 2026",
     "period": "1 Year",
@@ -246,7 +257,7 @@
     "regime": "Uptrend",
     "clarity": "Clear",
     "price": {
-      "current": 58.84,
+      "current": 59.85,
       "currency": "A$"
     },
     "movingAverages": {
