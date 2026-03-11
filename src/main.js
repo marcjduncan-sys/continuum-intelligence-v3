@@ -30,6 +30,7 @@ import { setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineCha
 // Features
 import { initAuth, showAuthModal, hideAuthModal } from './features/auth.js';
 import { initChat, VOICE_RULES } from './features/chat.js';
+import { initNotifications } from './features/notifications.js';
 import { initBatchRefresh, closeBatchModal } from './features/batch-refresh.js';
 import { generatePDFReport } from './features/pdf.js';
 import { initAddStock, openAddStockModal, closeAddStockModal, submitAddStock } from './features/add-stock.js';
@@ -272,6 +273,7 @@ async function boot() {
     ['Portfolio', initPortfolioPage],
     ['Thesis', initThesisPage],
     ['Auth', initAuth],
+    ['Notifications', initNotifications],
     ['Chat', initChat],
     ['About', initAboutPage],
     ['AddStock', initAddStock],

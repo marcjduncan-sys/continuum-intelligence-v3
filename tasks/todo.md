@@ -4,10 +4,11 @@
 
 ## Current Task
 
-**Memory System: Infrastructure Activation + Phase 8 Batch Analysis**
+**Phase 9: Proactive Insights**
 
-Phases 0-7 are code-complete and deployed. The single blocking infrastructure step is PostgreSQL
-provisioning. Once unblocked: run the Wave 1 verification checklist, then implement Phase 8.
+Phase 8 complete (commit d70b6ae). Phase 9 adds a nightly insight scan that compares updated
+research data against stored user memories per ticker and surfaces confirmations/contradictions
+as in-app notifications. SMTP email delivery deferred until SMTP provider is configured.
 
 ---
 
@@ -127,22 +128,138 @@ BATCH_SECRET: str = os.environ.get("BATCH_SECRET", "")
 
 ---
 
-## Wave 3 -- Phase 9: Proactive Insights (after Phase 8)
+## Wave 3 -- Phase 9: Proactive Insights
 
-**Trigger:** Phase 8 stable + SMTP configured + memory store has real data.
+**Status:** Planning approved. Building now.
 
-Architecture:
-- After each 5x daily data refresh (GitHub Actions), compare updated research data against
-  stored user memories per ticker
-- Queue a notification when data materially confirms or contradicts a stored user view
-- Deliver via email (SMTP from Phase 2) and/or in-app notification surface
-- Apply user cognitive profile (CRT, Big Five) to calibrate notification framing
+**Architecture summary:**
+- Nightly GitHub Actions workflow fetches fresh research JSON from GitHub Pages
+- Calls POST /api/insights/scan on Railway with the list of tickers to check
+- Railway fetches each ticker's research JSON, compares against stored user memories using Haiku
+- When a stored view is materially CONFIRMED or CONTRADICTED by fresh data: insert notification row
+- Re-notification guard: skip if same memory notified within 7 days
+- Frontend: unread badge in nav + slide-out notification panel; dismiss action
+- Email delivery: deferred until SMTP configured (no blocking dependency)
 
-Files (planning only -- do not build until Phase 8 is stable):
-- api/insights.py (new)
-- api/migrations/009_notifications.sql (new)
-- Integration hook in .github/workflows/update-daily.yml
-- Frontend notification component (new)
+**Wave 9A -- Backend (3 files):**
+
+#### 9A-1: api/migrations/009_notifications.sql (new)
+
+Table: notifications
+- id UUID PK
+- user_id UUID FK users(id) ON DELETE CASCADE (nullable for guests)
+- guest_id TEXT (nullable for registered users)
+- memory_id UUID FK memories(id) ON DELETE CASCADE
+- ticker TEXT NOT NULL
+- signal TEXT NOT NULL CHECK (signal IN ('confirms', 'contradicts'))
+- summary TEXT NOT NULL (1-sentence human-readable insight, Haiku-generated)
+- dismissed BOOLEAN NOT NULL DEFAULT FALSE
+- seen BOOLEAN NOT NULL DEFAULT FALSE
+- created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+- last_notified_at TIMESTAMPTZ NOT NULL DEFAULT now() (for 7-day re-notification guard)
+
+Indices:
+- idx_notifications_user ON notifications(user_id) WHERE user_id IS NOT NULL
+- idx_notifications_guest ON notifications(guest_id) WHERE guest_id IS NOT NULL
+- idx_notifications_memory ON notifications(memory_id)
+
+#### 9A-2: api/insights.py (new, ~200 lines)
+
+Constants:
+- _HAIKU_MODEL = "claude-haiku-4-5"
+- _RENOTIFY_DAYS = 7
+- _GITHUB_PAGES_BASE = "https://marcjduncan-sys.github.io/continuum-intelligence-v3/data/research"
+
+Key functions:
+- _fetch_research(ticker) -> dict | None: GET _GITHUB_PAGES_BASE/{ticker}.json, return parsed JSON or None
+- _get_active_memories(pool, ticker) -> list[dict]: fetch positional + tactical memories with
+  user_id, guest_id, content, confidence for the given ticker
+- _already_notified(pool, memory_id) -> bool: check last_notified_at within _RENOTIFY_DAYS
+- _classify(memory_content, research_summary) -> tuple[str, str] | None:
+  Haiku call. System prompt: "You are an evidence analyst. Given a stored user view and current
+  research data, determine if the evidence CONFIRMS or CONTRADICTS the view, or is NEUTRAL.
+  Reply with exactly: SIGNAL: <CONFIRMS|CONTRADICTS|NEUTRAL>\nSUMMARY: <one sentence why>"
+  Returns (signal, summary) or None if NEUTRAL or Haiku fails.
+- _build_research_summary(research_data) -> str: extract hero skew, top 3 hypothesis scores,
+  narrative stability label into a compact text block for Haiku context
+- scan_ticker(pool, ticker) -> dict: orchestrates fetch + memory query + classify + insert
+  Returns {ticker, memories_checked, notifications_inserted}
+- run_insight_scan(pool, tickers: list[str]) -> dict: iterates tickers, calls scan_ticker,
+  returns aggregate {tickers_scanned, memories_checked, notifications_inserted, duration_seconds}
+
+Model: claude-haiku-4-5 only (same constraint as batch_analysis.py).
+
+#### 9A-3: api/main.py (surgical edits -- 3 additions)
+
+1. Add bare import: import insights
+
+2. Add endpoint: GET /api/notifications
+   - Auth: X-API-Key (guest_id or user JWT)
+   - Returns: list of active (not dismissed) notifications for the caller, newest first
+   - Fields: id, ticker, signal, summary, seen, created_at
+
+3. Add endpoint: PATCH /api/notifications/{notification_id}/dismiss
+   - Auth: X-API-Key
+   - Sets dismissed=true for the given notification (ownership check: user_id or guest_id must match)
+
+4. Add endpoint: POST /api/insights/scan
+   - Auth: X-Insights-Secret header (same pattern as batch)
+   - Body: {"tickers": ["WOW", "CBA", ...]} (optional -- if empty, scans all tickers with active memories)
+   - Calls insights.run_insight_scan(pool, tickers)
+   - Returns: {tickers_scanned, memories_checked, notifications_inserted, duration_seconds}
+
+---
+
+**Wave 9B -- Frontend (1 new feature module + index.html edits):**
+
+#### 9B-1: src/features/notifications.js (new)
+
+- initNotifications(): called from src/main.js after initAuth()
+- fetchNotifications(): GET /api/notifications, returns list
+- renderBadge(count): injects unread badge onto .ci-signin-btn area in nav
+- renderPanel(): slide-out panel anchored to top-right; lists notifications with ticker chip,
+  signal badge (green CONFIRMS / red CONTRADICTS), summary text, dismiss button
+- bindDismiss(id): PATCH /api/notifications/{id}/dismiss, removes from panel
+- Polling: re-fetch every 5 minutes while page is open (clearInterval on unload)
+- Events: dispatches ci:notifications:updated with unread count for badge
+
+#### 9B-2: index.html (surgical edit)
+
+- Add notification panel container div (empty, populated by JS)
+- CSS: .ci-notif-panel, .ci-notif-badge, .ci-notif-item, .ci-notif-confirms, .ci-notif-contradicts
+
+---
+
+**Wave 9C -- Trigger (2 files):**
+
+#### 9C-1: api/config.py (edit)
+
+Add after BATCH_SECRET:
+  INSIGHTS_SECRET = os.getenv("INSIGHTS_SECRET", "")
+
+#### 9C-2: .github/workflows/insights-scan.yml (new)
+
+Schedule: cron 0 17 * * 1-5 (17:00 UTC Mon-Fri = 03:00 AEDT, 30 mins after batch-analysis)
+workflow_dispatch: for manual trigger
+Step: curl POST /api/insights/scan with X-Insights-Secret from GitHub Secret
+Body: {} (scan all tickers with active memories)
+
+---
+
+**Phase 9 Checklist:**
+
+- [ ] **9A-1** -- Write api/migrations/009_notifications.sql
+- [ ] **9A-2** -- Write api/insights.py
+- [ ] **9A-3** -- Edit api/main.py (3 endpoints + 1 import)
+- [ ] **9A-4** -- Edit api/config.py (INSIGHTS_SECRET)
+- [ ] **9B-1** -- Write src/features/notifications.js
+- [ ] **9B-2** -- Edit index.html (panel container + CSS)
+- [ ] **9C-1** -- Write .github/workflows/insights-scan.yml
+- [ ] **9C-2** -- Run npm run test:all; verify green
+- [ ] **9C-3** -- Deploy; verify Railway healthy; test GET /api/notifications returns []
+- [ ] **9C-4** -- USER ACTION: Add INSIGHTS_SECRET to Railway env vars + GitHub Secrets
+- [ ] **9C-5** -- Manual workflow_dispatch on insights-scan.yml; verify 200 OK in Railway logs
+- [ ] **9C-6** -- Update CLAUDE.md Current State + commit docs
 
 ---
 

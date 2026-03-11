@@ -1,0 +1,19 @@
+name: Proactive Insights Scan
+
+on:
+  schedule:
+    # 17:00 UTC Mon-Fri = 03:00 AEDT (UTC+10/+11), 30 min after batch-analysis
+    - cron: '0 17 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  insights-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run proactive insights scan
+        run: |
+          curl -s -f -X POST \
+            -H "X-Insights-Secret: ${{ secrets.INSIGHTS_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            https://imaginative-vision-production-16cb.up.railway.app/api/insights/scan

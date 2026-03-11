@@ -33,6 +33,7 @@ import memory_extractor
 import memory_selector
 import prompt_builder
 import batch_analysis
+import insights
 import summarise
 from auth import decode_token, router as auth_router
 from conversations import router as conversations_router
@@ -557,6 +558,89 @@ async def batch_run(request: Request, secret: str | None = Depends(_batch_secret
     except Exception as exc:
         logger.error("Batch run failed: %s", exc)
         raise HTTPException(status_code=500, detail="Batch analysis failed")
+
+
+# ---------------------------------------------------------------------------
+# Notifications endpoints (Phase 9)
+# ---------------------------------------------------------------------------
+
+_insights_secret_header = APIKeyHeader(name="X-Insights-Secret", auto_error=False)
+
+
+@app.get("/api/notifications")
+async def get_notifications(request: Request):
+    """
+    Return active (not dismissed) notifications for the caller, newest first.
+
+    Authentication: Bearer JWT for registered users, or ?guest_id= for guests.
+    """
+    auth_header = request.headers.get("Authorization", "")
+    user_id = None
+    guest_id = None
+    if auth_header.startswith("Bearer "):
+        payload = decode_token(auth_header[7:])
+        if payload:
+            user_id = payload.get("sub")
+    if not user_id:
+        guest_id = request.query_params.get("guest_id")
+    pool = await db.get_pool()
+    return await insights.get_notifications(pool, user_id=user_id, guest_id=guest_id)
+
+
+@app.patch("/api/notifications/{notification_id}/dismiss")
+async def dismiss_notification(notification_id: str, request: Request):
+    """
+    Dismiss a notification. Ownership check: caller must own the notification.
+
+    Authentication: Bearer JWT for registered users, or ?guest_id= for guests.
+    """
+    auth_header = request.headers.get("Authorization", "")
+    user_id = None
+    guest_id = None
+    if auth_header.startswith("Bearer "):
+        payload = decode_token(auth_header[7:])
+        if payload:
+            user_id = payload.get("sub")
+    if not user_id:
+        guest_id = request.query_params.get("guest_id")
+    if not user_id and not guest_id:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    pool = await db.get_pool()
+    updated = await insights.dismiss_notification(
+        pool, notification_id=notification_id, user_id=user_id, guest_id=guest_id
+    )
+    if not updated:
+        raise HTTPException(status_code=404, detail="Notification not found or already dismissed")
+    return {"dismissed": True}
+
+
+@app.post("/api/insights/scan")
+async def insights_scan(
+    request: Request,
+    secret: str | None = Depends(_insights_secret_header),
+):
+    """
+    Run the proactive insight scan across all tickers with active memories.
+
+    Protected by X-Insights-Secret header. Triggered by the insights-scan
+    GitHub Actions workflow at 17:00 UTC daily (Mon-Fri).
+    Optionally accepts {"tickers": ["WOW", ...]} to limit scope.
+    """
+    if not config.INSIGHTS_SECRET or secret != config.INSIGHTS_SECRET:
+        raise HTTPException(status_code=401, detail="Invalid or missing insights secret")
+    body = {}
+    try:
+        body = await request.json()
+    except Exception:
+        pass
+    tickers = body.get("tickers", [])
+    pool = await db.get_pool()
+    try:
+        result = await insights.run_insight_scan(pool, tickers=tickers)
+        return result
+    except Exception as exc:
+        logger.error("Insight scan failed: %s", exc)
+        raise HTTPException(status_code=500, detail="Insight scan failed")
 
 
 @app.get("/api/admin/llm-usage")
