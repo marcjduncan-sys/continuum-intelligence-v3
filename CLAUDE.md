@@ -42,7 +42,7 @@ npm run validate     # lint + test:all — run before any push
 
 ---
 
-## Current State — 2026-03-10
+## Current State — 2026-03-12
 
 **Phase 0 COMPLETE (2026-03-07).** The extraction of logic from `index.html` into `src/` modules is complete. `computeSkewScore` canonicalised to zero-contribution convention (commit `4493e8c`; see `docs/decisions/003-computeskewscore-neutral-convention.md`). `VALID_STATIC_PAGES` confirmed correct: `home`, `deep-research`, `portfolio`, `comparator`, `personalisation`, `about`.
 
@@ -88,13 +88,19 @@ npm run validate     # lint + test:all — run before any push
 - [x] **Phase 4 LIVE (2026-03-10)**: Railway env vars set. Live test against NST returned full CI v3 JSON (skew 52, 10 evidence items, 6 gaps) in ~90 seconds. Endpoint confirmed operational.
 - **NOTE**: NOTEBOOKLM_AUTH_JSON credentials expire every 1-2 weeks. When the endpoint returns 503, re-run Get NotebookLM Auth.bat from Desktop, copy NOTEBOOKLM_AUTH_JSON.txt content, and update the Railway variable.
 
+**Session work (2026-03-12) -- Phase 8: Batch Analysis:**
+- [x] Phase 8 COMPLETE -- commit `d70b6ae`: `api/migrations/008_batch_analysis.sql` (two tables: `memory_batch_runs`, `memory_consolidation_events`); `api/batch_analysis.py` (union-find clustering, Haiku contradiction detection, per-user consolidation); `BATCH_SECRET` added to `api/config.py`; `POST /api/batch/run` endpoint added to `api/main.py` (X-Batch-Secret auth guard); `.github/workflows/batch-analysis.yml` (cron 0 16 * * * = 02:00 AEDT). 218/218 tests passing.
+- [x] Endpoint live and auth-guarded: returns 401 on wrong secret; returns batch summary on valid secret.
+- [ ] **ACTION REQUIRED (8E)**: Add `BATCH_SECRET` (run `openssl rand -hex 16`) to Railway env vars AND GitHub Secrets (same name). Without this, the nightly workflow cannot authenticate.
+- [ ] **ACTION REQUIRED (8G)**: After 8E, trigger `batch-analysis` workflow via `workflow_dispatch` and confirm Railway logs show run output.
+
 **Recent bug history (last six commits):**
+- `d70b6ae` Phase 8: batch analysis. `008_batch_analysis.sql`, `batch_analysis.py`, `POST /api/batch/run`, `BATCH_SECRET` in config.py, `batch-analysis.yml`. 218/218 tests.
 - `627f74d` Gold agent endpoint: `api/gold_agent.py` + `GET /api/agents/gold/{ticker}` in main.py + notebooklm-py in requirements.txt + env vars in config.py.
 - `208b2e3` Sign in button CSS injected eagerly in `initAuth()`. Was injected lazily inside `_getOrCreateModal()` -- button rendered with browser default styles until modal first opened.
 - `28694bd` Fixed Railway healthcheck failures: `from . import db` relative import in `summarise.py` crashes the app when loaded as a top-level module. Changed to bare `import db`.
 - `fbb7a35` Phase 3: rolling summarisation + auth entry point. `summarise.py` (new), `db.py` context helpers, `003_summaries.sql`, `ResearchChatRequest.conversation_id`, Sign in button in nav.
 - `9a8dad7` Fixed Railway 502: `asyncio.wait_for(asyncpg.create_pool(...), timeout=15.0)` in `db.py`. Removed pre-warm `await db.get_pool()` from `main.py` lifespan. Pool now initialises lazily on first DB request.
-- `566e945` Phase 2: auth + conversation persistence. OTP/JWT backend (`auth.py`, `email_service.py`), conversation CRUD (`conversations.py`, `db.py`), migration `002_auth.sql`, frontend `auth.js` and `chat.js` DB wiring.
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.

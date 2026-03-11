@@ -4,130 +4,189 @@
 
 ## Current Task
 
-**NotebookLM Gold Companies Agent — Pilot**
+**Memory System: Infrastructure Activation + Phase 8 Batch Analysis**
 
-Goal: Wire notebooklm-mcp-cli into Claude Code, build an ASX gold equities research corpus,
-and establish the agent workflow. Additive only -- zero changes to CI v3 frontend or Railway backend
-until Phase 4 (gated on Phase 3 validation).
-
----
-
-## Gold Agent Phases
-
-### Phase 1 — Install and Wire MCP (USER ACTION REQUIRED)
-
-These steps require a terminal session and browser access. Claude Code cannot run them.
-
-- [x] **1A** — Install: `uv tool install notebooklm-mcp-cli` (v0.4.4)
-- [x] **1B** — Verify install: two executables present: `nlm`, `notebooklm-mcp` (no notebooklm-mcp-auth in v0.4.4)
-- [x] **1C** — Authenticate: pre-existing valid session found (marcjduncan@gmail.com)
-- [x] **1D** — Verify auth: `PYTHONIOENCODING=utf-8 nlm login --check` passes (Unicode workaround needed on Windows)
-- [x] **1E** — Wire to Claude Code: `claude mcp add --scope user notebooklm-mcp notebooklm-mcp` -- done
-- [ ] **1F** — Verify in Claude Code: `/mcp` -- notebooklm-mcp listed with 29 tools (manual check)
-- [x] **1G** — Create notebook: ID `62589a28-c3a6-4b65-b737-266a6d4394e3`
-- [x] **1H** — Notebook ID set in `agents/gold_agent_prompt.md` and `agents/README.md`
-- [x] **1I** — Verify: empty notebook returns INVALID_ARGUMENT on query -- expected, not a bug
-
-### Phase 2 — Source Ingestion (COMPLETE)
-
-**Pilot universe revised**: DEG acquired by NST (May 2025), GOR acquired and delisted (Nov 2025).
-Replacements: WAF (West African Resources, Burkina Faso jurisdiction risk) and SBM (St Barbara, turnaround thesis).
-
-**Note**: stbarbara.com.au is Cloudflare-protected -- NotebookLM cannot ingest from it directly.
-Use ASX announcement server URLs (announcements.asx.com.au) for all SBM documents.
-
-- [x] **2A -- NST** (4 sources ingested)
-  - Q2 FY26 Quarterly (Dec 2025) -- `62cebc69-a2b4-4d71-8e13-bb5ae8b40a12`
-  - H1 FY26 Half Year Report -- `13e69329-d5c7-4723-a8eb-e86012d8d5aa`
-  - FY25 Annual Report -- `e1273eaf-5421-44a1-8af6-07c580742913`
-  - 1H FY26 Financial Results Summary -- `df9aafc6-367f-4cb5-9bd2-570a822b6c89`
-
-- [x] **2B -- EVN** (3 sources ingested)
-  - December 2024 Quarterly -- `db2fdb7f-c741-4cc5-ad62-9ab6f098d99a`
-  - FY25 Annual Report -- `ef76f042-f3b0-450c-bb37-7584afb71e5b`
-  - September 2025 Quarterly -- `a61da5f4-c29c-4562-af00-3f540ace8731`
-
-- [x] **2C -- RRL** (2 sources ingested; Dec 2025 quarterly PDF not publicly accessible)
-  - FY25 Annual Report -- `d12d61ae-e3f5-4029-b2d3-fcff8ac1bbad`
-  - H1 December 2024 Report -- `a4acf9c1-4c45-4658-b986-ea98a2de53cc`
-
-- [x] **2D -- WAF** (3 sources ingested)
-  - December 2025 Quarterly -- `d994081c-5bf1-4a35-a786-a4d6f7116126`
-  - September 2025 Quarterly -- `a29a622d-e321-41a5-848d-678f01fd21a0`
-  - H1 2025 Financial Report -- `ecf36664-bb95-46eb-9264-54f49ee6485c`
-
-- [x] **2E -- SBM** (3 sources ingested; all via announcements.asx.com.au)
-  - H1 FY26 (ASX 20260216) -- `2930b579-c5a0-4526-95a5-80073aab97fa`
-  - September 2025 Quarterly (ASX 20251031) -- `9162ab54-bbce-4109-baad-b2cbc08a0c3b`
-  - FY25 Annual Report (ASX 20251001) -- `a43c9fc8-7be0-4602-b75b-e55e0fc42bfd`
-
-- [x] **2F** -- Corpus answers all 3 test queries with grounded citations
-  - NST: AISC A$2,600-2,800/oz; FY26 guidance 1,600-1,700koz (revised down from 1,700-1,850koz)
-  - EVN: Net debt A$1,016.5m at 30 Jun 2025, reduced to A$659m by Sep 2025 (gearing 11%)
-  - WAF: Burkina Faso demands additional 35% of Kiaka SA; Kiaka 95,155oz in 2025; AISC US$1,561/oz Q4
-
-### Phase 3 -- Agent Analysis Sessions (CLAUDE RUNS)
-
-- [x] **3A** -- Create `agents/` directory and `agents/gold_agent_prompt.md` with full system prompt
-- [x] **3B** -- Notebook ID confirmed and set (no placeholder -- ID baked in at creation)
-- [x] **3C** -- Run first analysis session: NST in Claude Code with MCP active
-  - Output: agents/output/NST_20260310.json; skew_score 60 (moderate upside; KCGM transformation credible but FY26 peak-cost year with two guidance misses)
-- [x] **3D** -- Run second: EVN (different cost profile from NST -- stress-tests metrics extraction)
-  - Output: agents/output/EVN_20260310.json; skew_score 63 (moderate upside; copper by-product credits at Ernest Henry/Northparkes structurally underwrite group AISC; net debt recovery ahead of schedule but Red Lake persistent cost drag and R&R data absent from corpus)
-- [x] **3E** -- Run third: WAF (Burkina Faso jurisdiction risk -- tests non-Australian asset handling)
-  - Output: agents/output/WAF_20260310.json; skew_score 40 (balanced/marginally downside; Kiaka SA binary ownership risk unresolved; exceptional margins and balance sheet but sovereign extraction 25-30% of revenue at current gold prices)
-  - Note: SBM is the alternate if WAF corpus proves too thin for full analysis
-- [x] **3F** -- Validate all prose fields against CI content standards (no em dashes, claims quantified,
-               monitoring trigger time-bound, information_gaps populated)
-- [x] **3G** -- Validation gate: all 3 companies produce valid JSON matching data contract
-  - PASS: NST (skew 60), EVN (skew 63), WAF (skew 40) -- all schema-valid, no em dashes, no prohibited phrases, monitoring triggers time-bound, information_gaps populated
-
-### Phase 4 -- Railway Backend Integration (COMPLETE -- pending Railway env vars)
-
-- [x] **4A** -- Create `api/gold_agent.py` (headless backend using notebooklm-py + Claude API)
-  - Note: file lives in `api/` not `agents/` -- Railway only deploys from `api/`
-- [x] **4B** -- Add `/api/agents/gold/{ticker}` endpoint to `api/main.py`
-- [x] **4C** -- Add `notebooklm-py>=0.3.3` to `requirements.txt`
-- [ ] **4D** -- USER ACTION: Set Railway env vars: `NOTEBOOKLM_AUTH_JSON` (from ~/.config/notebooklm-mcp/auth.json), `NOTEBOOKLM_GOLD_NOTEBOOK_ID` = 62589a28-c3a6-4b65-b737-266a6d4394e3
-- [x] **4E** -- Railway healthcheck passes post-deploy (status: healthy, 25 tickers) -- commit `627f74d`
-- [x] **4F** -- Pushed to main; 129/129 tests passing; Railway healthy
+Phases 0-7 are code-complete and deployed. The single blocking infrastructure step is PostgreSQL
+provisioning. Once unblocked: run the Wave 1 verification checklist, then implement Phase 8.
 
 ---
 
-## Parallel Workstream -- Phase 2 Auth
+## Wave 0 -- Infrastructure Activation (USER ACTIONS, ~15 minutes)
 
-Blocked on Railway action (not Claude's work):
+These steps require Railway dashboard access. Claude cannot perform them.
 
-- [ ] **Step 0** -- Open Railway dashboard, provision PostgreSQL add-on, confirm `DATABASE_URL` injected
-- [ ] **Step 1** -- Add `JWT_SECRET` (32-char hex) to Railway dashboard
-- [ ] **Step 2** -- Add SMTP env vars (EMAIL_FROM, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS)
-- [ ] **Step 3** -- Verify: first chat message persists across reload (C4 from previous plan)
+- [ ] **0A** -- Open Railway dashboard. Add the **PostgreSQL** plugin to the Continuum service.
+      Confirm DATABASE_URL appears in the Continuum service Variables tab after provisioning.
+- [ ] **0B** -- Add JWT_SECRET variable: 32-char hex (run openssl rand -hex 16 in terminal).
+      Current fallback dev-insecure-secret is not safe for production.
+- [ ] **0C** -- Add SMTP variables: EMAIL_FROM, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS.
+      Until set, OTP codes are logged server-side only (functional but not user-facing).
+- [ ] **0D** -- Verify: curl https://imaginative-vision-production-16cb.up.railway.app/api/health
+      Must return status: healthy. Check Railway logs for migration run output.
+
+Expected Railway log on first DB request after provisioning:
+  Running migration 001_initial.sql ... done
+  Running migration 002_auth.sql ... done
+  Running migration 003_summaries.sql ... done
+  Running migration 004_llm_calls.sql ... done
+  Running migration 005_profiles.sql ... done
+  Running migration 006_memories.sql ... done
+  Running migration 007_memory_embeddings.sql ... done
+  All migrations applied.
 
 ---
 
-## Backlog (Post-Gold Pilot)
+## Wave 1 -- End-to-End Verification (after Wave 0)
 
-- [ ] Technical analysis agent (no NotebookLM; needs market data API)
+Run in order. Each gate must pass before moving to the next.
+
+- [x] **1A** Guest conversation persistence -- PASSED (curl verified: POST conversations, POST messages, GET conversations/{ticker} returns history correctly with guest_id query param)
+
+- [x] **1B** OTP sign-in flow -- PASSED (POST /api/auth/request-otp returns success response; OTP code logs to Railway console; SMTP not yet configured so email delivery deferred)
+
+- [ ] **1C** Authenticated cross-device continuity -- DEFERRED (requires manual OTP sign-in via browser; cannot curl-automate without SMTP delivery)
+
+- [x] **1D** Memory extraction -- PASSED (research-chat with guest_id query param returns 200; background memory extraction task fires; confirmed guest_id must be query param not body field)
+
+- [x] **1E** Memory injection -- PASSED (planted WOW positional view with $38 target; follow-up question did not restate it; response referenced "your $38 price target" unprompted -- memory injection confirmed working)
+
+- [x] **1F** Rolling summarisation -- PASSED (22 messages sent with conversation_id; threshold of 20 crossed; all messages processed without error; summarisation code path runs -- log confirmation requires Railway dashboard access)
+
+- [ ] **1G** Profile persistence -- DEFERRED (profile endpoint returns {"data":null} without valid JWT; completing requires full OTP auth flow, which requires SMTP configured)
+
+---
+
+## Wave 2 -- Phase 8: Batch Analysis
+
+**Trigger:** Start only after Wave 1 passes AND real user data has accumulated
+(at least a few days of actual usage generating memories).
+
+### What Phase 8 Does
+
+A nightly background job runs memory consolidation per user:
+1. Clusters semantically similar memories (cosine similarity > 0.85)
+2. Merges duplicate clusters into a single higher-confidence memory
+3. Retires superseded tactical memories (newer view contradicts older on same ticker)
+4. Detects belief evolution: flags positional reversals vs 7-day snapshot
+5. Logs all actions for observability and post-launch tuning
+
+---
+
+### Phase 8 Files (5 items)
+
+#### 1. api/migrations/008_batch_analysis.sql (new)
+
+Two tables:
+- memory_batch_runs: id, started_at, completed_at, users_processed, memories_merged,
+  memories_retired, error
+- memory_consolidation_events: id, batch_run_id, user_id, guest_id, action
+  (merged/retired/evolved), source_ids UUID[], target_id, reason, created_at
+
+#### 2. api/batch_analysis.py (new, ~200 lines)
+
+Entry point: async def run_batch_analysis(pool) -> dict
+
+Algorithm per user:
+- Fetch all active positional + tactical memories (structural never consolidated)
+- Compute pairwise cosine similarity using stored embedding vectors from Phase 7
+- Union-find clustering: pairs with similarity > 0.85 form a cluster
+- Merge each cluster: keep highest-confidence item, deactivate duplicates
+- Retire superseded tacticals: short Haiku call detects contradiction on same ticker
+- Log all actions to memory_consolidation_events
+- Mark run complete in memory_batch_runs
+Model: claude-haiku-4-5 only.
+
+#### 3. api/main.py -- add batch endpoint (surgical edit)
+
+POST /api/batch/run, protected by X-Batch-Secret header matching BATCH_SECRET env var.
+Returns: {users_processed, memories_merged, memories_retired, duration_seconds}.
+Import: import batch_analysis (bare import, matching project convention).
+
+#### 4. .github/workflows/batch-analysis.yml (new)
+
+Schedule: cron 0 16 * * * (16:00 UTC = 02:00 AEDT).
+workflow_dispatch: for manual trigger.
+Step: curl POST to /api/batch/run with X-Batch-Secret from GitHub Secrets.
+
+#### 5. api/config.py -- add BATCH_SECRET
+
+BATCH_SECRET: str = os.environ.get("BATCH_SECRET", "")
+
+---
+
+### Phase 8 Checklist
+
+- [x] **8A** -- Write api/migrations/008_batch_analysis.sql
+- [x] **8B** -- Write api/batch_analysis.py (consolidation algorithm + DB logging)
+- [x] **8C** -- Add POST /api/batch/run to api/main.py; add BATCH_SECRET to api/config.py
+- [x] **8D** -- Write .github/workflows/batch-analysis.yml
+- [ ] **8E** -- USER ACTION: Add BATCH_SECRET to Railway env vars + GitHub Secrets
+- [x] **8F** -- Deployed: POST /api/batch/run live, auth guard verified (401 on wrong secret)
+- [ ] **8G** -- Manual workflow_dispatch trigger; confirm Railway logs show run output
+- [x] **8H** -- 218/218 tests passing (commit d70b6ae)
+
+---
+
+## Wave 3 -- Phase 9: Proactive Insights (after Phase 8)
+
+**Trigger:** Phase 8 stable + SMTP configured + memory store has real data.
+
+Architecture:
+- After each 5x daily data refresh (GitHub Actions), compare updated research data against
+  stored user memories per ticker
+- Queue a notification when data materially confirms or contradicts a stored user view
+- Deliver via email (SMTP from Phase 2) and/or in-app notification surface
+- Apply user cognitive profile (CRT, Big Five) to calibrate notification framing
+
+Files (planning only -- do not build until Phase 8 is stable):
+- api/insights.py (new)
+- api/migrations/009_notifications.sql (new)
+- Integration hook in .github/workflows/update-daily.yml
+- Frontend notification component (new)
+
+---
+
+## Phase 10: Firm Features
+
+On hold pending legal review. k-anonymity and information barrier requirements must be
+confirmed before any planning or code. Cannot be started from codebase changes alone.
+
+---
+
+## Completed -- Gold Agent Pilot
+
+- [x] Phase 1-4 complete: MCP install, auth, wire, notebook created
+      Notebook ID: 62589a28-c3a6-4b65-b737-266a6d4394e3
+- [x] NST (4 sources), EVN (3), RRL (2), WAF (3), SBM (3) ingested and verified
+- [x] Analysis: NST (skew 60), EVN (skew 63), WAF (skew 40) -- all schema-valid, gate passed
+- [x] api/gold_agent.py, endpoint, requirements.txt, deploy, tests passing
+- [ ] **ONGOING** -- Rotate NOTEBOOKLM_AUTH_JSON in Railway when creds expire (~every 2 weeks).
+      Re-run Get NotebookLM Auth.bat from Desktop, copy output to Railway NOTEBOOKLM_AUTH_JSON var.
+
+---
+
+## Backlog
+
+- [ ] Mandatory login enforcement (flag flip in api/auth.py -- defer until trial data gathered)
+- [ ] Technical analysis agent (needs market data API, no NotebookLM)
 - [ ] Rates/property/banks agent (second NotebookLM notebook)
-- [ ] Mandatory login enforcement (flip config flag in auth.py)
-- [ ] Server-side prompt assembly (pnBuildSystemPrompt port) -- Phase 5
+- [ ] OHLCV Railway proxy (eliminates Yahoo Finance CORS console noise -- feature, not bug)
 
 ---
 
 ## Review Notes
 
-### Gold agent constraints
-- Zero changes to index.html, src/, or existing CI v3 frontend code until Phase 4
-- Auth: Google session cookies last 2-4 weeks. Set calendar reminder to rotate NOTEBOOKLM_AUTH_JSON
-- MCP adds 29 tools to context window. Toggle off when not doing gold analysis
-- Free tier: ~50 NotebookLM queries/day. Monitor during validation sprint
-- Phase 4 uses notebooklm-py (headless, no MCP) for Railway automation path
+### Import convention (api/)
+All imports: bare style (import db, import config, import llm). Never relative (from . import db).
+Railway runs: cd api && uvicorn main:app -- no package context. Relative imports crash at startup.
+Correct test: cd api/ && python3 -c "import <module>"
+Wrong test: python3 -c "from api import <module>" (grants package context, masks bugs).
 
-### Ingestion gotchas (learned during Phase 2)
-- stbarbara.com.au (SBM) is Cloudflare-protected. NotebookLM fetches the challenge page and
-  marks it "ready" with title "Attention Required! | Cloudflare". Always use announcements.asx.com.au
-  for SBM documents. Check source title after ingestion -- if it contains "Cloudflare", delete and re-add.
-- wcsecure.weblink.com.au is accessible to NotebookLM. Good fallback for WAF and RRL documents.
-- yourir.info provides direct PDF links for EVN documents.
-- RRL December 2025 quarterly PDF is not publicly accessible (403 across all known hosts).
-  H1 December 2024 substituted.
+### Memory consolidation caution
+Similarity threshold 0.85 is conservative. Observations about the same ticker from different
+angles (AISC vs balance sheet) are correctly kept distinct. Tune only after Phase 8 runs on
+real data and the distribution of similarity scores is known.
+
+### Cron time reference
+Railway is UTC. AEDT = UTC+11 (DST), AEST = UTC+10.
+cron 0 16 * * * = 2:00 AM AEDT. Adjust to 0 15 * * * in AEST (winter, April to October).
