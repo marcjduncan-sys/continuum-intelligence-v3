@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-10T07:10:42.254Z"
+      "last_updated": "2026-03-11T07:13:22.424Z"
     },
     "N2": {
       "label": "Valuation Mean-Reversion",
@@ -26,7 +26,7 @@
       "survival_score": 0.33,
       "status": "LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-10T07:10:42.254Z"
+      "last_updated": "2026-03-11T07:13:22.424Z"
     },
     "N3": {
       "label": "Competitive Disruption",
@@ -38,7 +38,7 @@
       "survival_score": 0.31,
       "status": "LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-10T07:10:42.254Z"
+      "last_updated": "2026-03-11T07:13:22.424Z"
     },
     "N4": {
       "label": "AI Amplifies the Moat",
@@ -50,7 +50,7 @@
       "survival_score": 0.31,
       "status": "LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-10T07:10:42.254Z"
+      "last_updated": "2026-03-11T07:13:22.424Z"
     }
   },
   "dominant": "N2",
@@ -80,6 +80,13 @@
       "type": "OVERCORRECTION_TRIGGER",
       "severity": "AMBER",
       "message": "Single-day move of +14.2% exceeds 10% threshold — possible overcorrection",
+      "auto_generated": true
+    },
+    {
+      "date": "2026-03-11",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "5-day cumulative move of +22.2% exceeds 15% threshold — possible overcorrection",
       "auto_generated": true
     }
   ],
@@ -173,11 +180,20 @@
       "cumulative_20d": -27.62,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-11",
+      "classification": "NOTABLE",
+      "daily_change_pct": 4.02,
+      "volume_multiplier": 1,
+      "cumulative_5d": 22.23,
+      "cumulative_20d": -24.13,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    259.92,
     254.33,
     251.83,
     249,
@@ -236,7 +252,8 @@
     121.49,
     132.7,
     131.5,
-    139.69
+    139.69,
+    136.79
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -474,12 +491,12 @@
   "date": "26 February 2026",
   "_overcorrection": {
     "active": true,
-    "triggerType": "SINGLE_DAY",
-    "triggerDate": "2026-03-06",
-    "triggerPrice": 132.7,
+    "triggerType": "FIVE_DAY_CUMULATIVE",
+    "triggerDate": "2026-03-11",
+    "triggerPrice": 136.79,
     "direction": "up",
-    "movePct": 14.21,
-    "reviewDate": "2026-03-13",
-    "message": "Single-day move of +14.2% exceeds 10% threshold — possible overcorrection"
+    "movePct": 4.02,
+    "reviewDate": "2026-03-18",
+    "message": "5-day cumulative move of +22.2% exceeds 15% threshold — possible overcorrection"
   }
 }

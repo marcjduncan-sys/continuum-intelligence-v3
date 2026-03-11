@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.45,
+      "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-11T06:52:16.975Z"
+      "last_updated": "2026-03-11T07:13:22.436Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.45,
+      "survival_score": 0.46,
       "status": "MODERATE",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-11T06:52:16.975Z"
+      "last_updated": "2026-03-11T07:13:22.436Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -38,7 +38,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-11T06:52:16.975Z"
+      "last_updated": "2026-03-11T07:13:22.436Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -50,12 +50,12 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-11T06:52:16.975Z"
+      "last_updated": "2026-03-11T07:13:22.436Z"
     }
   },
   "dominant": "N1",
   "confidence": "LOW",
-  "alert_state": "NORMAL",
+  "alert_state": "OVERCORRECTION",
   "current_price": 60.33,
   "big_picture": "Mineral Resources Limited (ASX: MIN) -- coverage initiated. Full analysis pending.",
   "last_flip": {
@@ -78,7 +78,15 @@
       "to_survival": 0.31
     }
   ],
-  "evidence_items": [],
+  "evidence_items": [
+    {
+      "date": "2026-03-11",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "Single-day move of +11.1% exceeds 10% threshold — possible overcorrection",
+      "auto_generated": true
+    }
+  ],
   "price_signals": [
     {
       "date": "2026-03-02",
@@ -149,11 +157,20 @@
       "cumulative_20d": 4.83,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-11",
+      "classification": "MATERIAL",
+      "daily_change_pct": 11.08,
+      "volume_multiplier": 1,
+      "cumulative_5d": -4.5,
+      "cumulative_20d": 10.16,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    51.63,
     51.66,
     52.03,
     51.84,
@@ -212,7 +229,8 @@
     56.04,
     55.71,
     54.31,
-    57.45
+    57.45,
+    60.33
   ],
   "weighting": null,
   "priceHistory": [
@@ -343,5 +361,15 @@
         "relativeReturn": 16.9
       }
     }
+  },
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-03-11",
+    "triggerPrice": 60.33,
+    "direction": "up",
+    "movePct": 11.08,
+    "reviewDate": "2026-03-18",
+    "message": "Single-day move of +11.1% exceeds 10% threshold — possible overcorrection"
   }
 }

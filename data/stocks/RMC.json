@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-11T04:58:43.277Z"
+      "last_updated": "2026-03-11T07:13:22.439Z"
     },
     "N2": {
       "label": "Structural Narrowing",
@@ -26,7 +26,7 @@
       "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-11T04:58:43.277Z"
+      "last_updated": "2026-03-11T07:13:22.439Z"
     },
     "N3": {
       "label": "Capital Extraction",
@@ -38,7 +38,7 @@
       "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 4.5,
-      "last_updated": "2026-03-11T04:58:43.277Z"
+      "last_updated": "2026-03-11T07:13:22.439Z"
     },
     "N4": {
       "label": "Strategic Renewal",
@@ -50,7 +50,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-11T04:58:43.277Z"
+      "last_updated": "2026-03-11T07:13:22.439Z"
     }
   },
   "dominant": "N2",
@@ -133,6 +133,13 @@
       "severity": "AMBER",
       "message": "5-day cumulative move of -17.2% exceeds 15% threshold — possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-03-11",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "5-day cumulative move of -19.0% exceeds 15% threshold — possible overcorrection",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -195,11 +202,20 @@
       "cumulative_20d": 1.05,
       "results_day": false,
       "overcorrection_active": true
+    },
+    {
+      "date": "2026-03-11",
+      "classification": "NOTABLE",
+      "daily_change_pct": -2.08,
+      "volume_multiplier": 1,
+      "cumulative_5d": -18.97,
+      "cumulative_20d": -4.08,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    0.95,
     0.98,
     0.99,
     0.96,
@@ -258,6 +274,7 @@
     1.2,
     0.99,
     0.96,
+    0.94,
     0.94
   ],
   "weighting": null,
@@ -475,11 +492,11 @@
   "_overcorrection": {
     "active": true,
     "triggerType": "FIVE_DAY_CUMULATIVE",
-    "triggerDate": "2026-03-10",
+    "triggerDate": "2026-03-11",
     "triggerPrice": 0.94,
     "direction": "down",
-    "movePct": -5.05,
-    "reviewDate": "2026-03-17",
-    "message": "5-day cumulative move of -17.2% exceeds 15% threshold — possible overcorrection"
+    "movePct": -2.08,
+    "reviewDate": "2026-03-18",
+    "message": "5-day cumulative move of -19.0% exceeds 15% threshold — possible overcorrection"
   }
 }
