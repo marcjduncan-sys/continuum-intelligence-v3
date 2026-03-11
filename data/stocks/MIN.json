@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.45,
+      "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-11T21:22:29.700Z"
+      "last_updated": "2026-03-11T23:47:29.540Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.45,
+      "survival_score": 0.46,
       "status": "MODERATE",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-11T21:22:29.700Z"
+      "last_updated": "2026-03-11T23:47:29.540Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -53,19 +53,19 @@
       "last_updated": "2026-03-11T07:13:22.436Z"
     }
   },
-  "dominant": "N1",
+  "dominant": "N2",
   "confidence": "LOW",
   "alert_state": "OVERCORRECTION",
-  "current_price": 60.33,
+  "current_price": 59.39,
   "big_picture": "Mineral Resources Limited (ASX: MIN) -- coverage initiated. Full analysis pending.",
   "last_flip": {
     "date": "2026-03-11",
-    "from": "N3",
-    "to": "N1",
-    "trigger": "Automated: survival score shift (Risk/Downside → Growth/Recovery)",
-    "price_at_flip": 59.85,
-    "from_survival": 0.25,
-    "to_survival": 0.25
+    "from": "N1",
+    "to": "N2",
+    "trigger": "Automated: survival score shift (Growth/Recovery → Base Case/Managed)",
+    "price_at_flip": 59.39,
+    "from_survival": 0.44,
+    "to_survival": 0.46
   },
   "narrative_history": [
     {
@@ -76,6 +76,15 @@
       "price_at_flip": 56.04,
       "from_survival": 0.27,
       "to_survival": 0.31
+    },
+    {
+      "date": "2026-03-11",
+      "from": "N3",
+      "to": "N1",
+      "trigger": "Automated: survival score shift (Risk/Downside → Growth/Recovery)",
+      "price_at_flip": 59.85,
+      "from_survival": 0.25,
+      "to_survival": 0.25
     }
   ],
   "evidence_items": [
@@ -256,20 +265,21 @@
     58.84,
     59.85,
     60.36,
-    60.33
+    60.33,
+    59.39
   ],
   "freshness": {
-    "pricePctChange": 0,
+    "pricePctChange": -1.6,
     "urgency": 0,
     "status": "OK",
     "badge": "ok"
   },
-  "last_price_update": "2026-03-11T06:52:16.851Z",
+  "last_price_update": "2026-03-11T23:47:29.418Z",
   "price_evidence": {
-    "last_run": "2026-03-11T21:22:29.700Z",
-    "classification": "SIGNIFICANT"
+    "last_run": "2026-03-11T23:47:29.540Z",
+    "classification": "NOTABLE"
   },
-  "last_research_update": "2026-03-11T21:22:29.700Z",
+  "last_research_update": "2026-03-11T23:47:29.540Z",
   "technicalAnalysis": {
     "date": "02 March 2026",
     "period": "1 Year",
@@ -277,7 +287,7 @@
     "regime": "Uptrend",
     "clarity": "Clear",
     "price": {
-      "current": 60.33,
+      "current": 59.39,
       "currency": "A$"
     },
     "movingAverages": {
