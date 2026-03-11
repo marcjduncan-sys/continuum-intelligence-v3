@@ -12,8 +12,8 @@ You are a senior engineer maintaining a production equity research platform used
 npm run dev          # Dev server on port 5000, proxies /api → localhost:8000
 npm run build        # Vite build → dist/; copies data/ → dist/data/
 npm run test         # Jest suite (tests/, src/**/*.test.js) — 61 tests
-npm run test:unit    # Vitest suite — what CI runs; must pass before pushing — 124 tests
-npm run test:all     # Jest + Vitest combined — 185 tests total
+npm run test:unit    # Vitest suite — what CI runs; must pass before pushing — 157 tests
+npm run test:all     # Jest + Vitest combined — 218 tests total
 npm run lint         # ESLint over scripts/ and src/ only (not js/)
 npm run validate     # lint + test:all — run before any push
 ```
@@ -42,7 +42,7 @@ npm run validate     # lint + test:all — run before any push
 
 ---
 
-## Current State — 2026-03-12
+## Current State — 2026-03-12 (updated)
 
 **Phase 0 COMPLETE (2026-03-07).** The extraction of logic from `index.html` into `src/` modules is complete. `computeSkewScore` canonicalised to zero-contribution convention (commit `4493e8c`; see `docs/decisions/003-computeskewscore-neutral-convention.md`). `VALID_STATIC_PAGES` confirmed correct: `home`, `deep-research`, `portfolio`, `comparator`, `personalisation`, `about`.
 
@@ -91,16 +91,21 @@ npm run validate     # lint + test:all — run before any push
 **Session work (2026-03-12) -- Phase 8: Batch Analysis:**
 - [x] Phase 8 COMPLETE -- commit `d70b6ae`: `api/migrations/008_batch_analysis.sql` (two tables: `memory_batch_runs`, `memory_consolidation_events`); `api/batch_analysis.py` (union-find clustering, Haiku contradiction detection, per-user consolidation); `BATCH_SECRET` added to `api/config.py`; `POST /api/batch/run` endpoint added to `api/main.py` (X-Batch-Secret auth guard); `.github/workflows/batch-analysis.yml` (cron 0 16 * * * = 02:00 AEDT). 218/218 tests passing.
 - [x] Endpoint live and auth-guarded: returns 401 on wrong secret; returns batch summary on valid secret.
-- [ ] **ACTION REQUIRED (8E)**: Add `BATCH_SECRET` (run `openssl rand -hex 16`) to Railway env vars AND GitHub Secrets (same name). Without this, the nightly workflow cannot authenticate.
-- [ ] **ACTION REQUIRED (8G)**: After 8E, trigger `batch-analysis` workflow via `workflow_dispatch` and confirm Railway logs show run output.
+- [x] **8E DONE (user)**: `BATCH_SECRET` added to Railway env vars and GitHub Secrets.
+- [x] **8G DONE**: `batch-analysis` workflow_dispatch triggered; Railway logs confirmed `POST /api/batch/run HTTP/1.1' 200 OK`.
+
+**Session work (2026-03-12) -- Phase 9: Proactive Insights:**
+- [x] Phase 9 COMPLETE -- commit `7ec36e1`: `api/migrations/009_notifications.sql` (notifications table + 3 indices); `api/insights.py` (Haiku classifier, 7-day re-notification guard, `scan_ticker`, `run_insight_scan`, `get_notifications`, `dismiss_notification`); `api/main.py` (`GET /api/notifications`, `PATCH /api/notifications/{id}/dismiss`, `POST /api/insights/scan` with X-Insights-Secret auth); `api/config.py` (`INSIGHTS_SECRET`); `src/features/notifications.js` (badge + panel surface, 5-min poll, dynamic CSS injection); `src/main.js` (`initNotifications` wired between Auth and Chat); `.github/workflows/insights-scan.yml` (cron `0 17 * * 1-5` = 03:00 AEDT Mon-Fri). 157/157 Vitest tests passing. Railway healthy; `GET /api/notifications?guest_id=test` returns `[]`.
+- [ ] **ACTION REQUIRED (9D)**: Add `INSIGHTS_SECRET` to Railway env vars AND GitHub Secrets. Generate with: `-join ((1..16) | ForEach-Object { '{0:x2}' -f (Get-Random -Max 256) })` in PowerShell. Use the same value in both.
+- [ ] **ACTION REQUIRED (9E)**: After 9D, trigger `insights-scan` workflow via `workflow_dispatch` in GitHub Actions and confirm Railway logs show `POST /api/insights/scan HTTP/1.1' 200 OK`.
 
 **Recent bug history (last six commits):**
+- `7ec36e1` Phase 9: proactive insights scan + notification surface. `009_notifications.sql`, `insights.py`, `notifications.js`, `insights-scan.yml`, 3 endpoints in main.py, `INSIGHTS_SECRET` in config.py.
+- `5c3af67` Docs: CLAUDE.md updated to 2026-03-12; Phase 8 completion recorded.
 - `d70b6ae` Phase 8: batch analysis. `008_batch_analysis.sql`, `batch_analysis.py`, `POST /api/batch/run`, `BATCH_SECRET` in config.py, `batch-analysis.yml`. 218/218 tests.
 - `627f74d` Gold agent endpoint: `api/gold_agent.py` + `GET /api/agents/gold/{ticker}` in main.py + notebooklm-py in requirements.txt + env vars in config.py.
 - `208b2e3` Sign in button CSS injected eagerly in `initAuth()`. Was injected lazily inside `_getOrCreateModal()` -- button rendered with browser default styles until modal first opened.
 - `28694bd` Fixed Railway healthcheck failures: `from . import db` relative import in `summarise.py` crashes the app when loaded as a top-level module. Changed to bare `import db`.
-- `fbb7a35` Phase 3: rolling summarisation + auth entry point. `summarise.py` (new), `db.py` context helpers, `003_summaries.sql`, `ResearchChatRequest.conversation_id`, Sign in button in nav.
-- `9a8dad7` Fixed Railway 502: `asyncio.wait_for(asyncpg.create_pool(...), timeout=15.0)` in `db.py`. Removed pre-warm `await db.get_pool()` from `main.py` lifespan. Pool now initialises lazily on first DB request.
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
