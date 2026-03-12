@@ -315,10 +315,12 @@ No markdown fences.
 
 
 async def run_gold_analysis(ticker: str) -> dict:
-    """Run 20 NotebookLM corpus queries for ticker, then synthesise to CI v3 JSON."""
+    """Run NotebookLM corpus queries for ticker, then synthesise to CI v3 JSON."""
     notebook_id = config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
     if not notebook_id:
         raise RuntimeError("NOTEBOOKLM_GOLD_NOTEBOOK_ID not configured")
+    if not config.NOTEBOOKLM_AUTH_JSON:
+        raise RuntimeError("NOTEBOOKLM_AUTH_JSON not configured")
 
     corpus = await _query_corpus(ticker, notebook_id)
     return await _synthesise(ticker, corpus)
