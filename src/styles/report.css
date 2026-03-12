@@ -125,7 +125,7 @@
     border-top: 1px solid var(--border);
 }
 .rh-spec-label {
-    font-size: 0.55rem;
+    font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -147,70 +147,70 @@
 }
 
 /* 1.3 Position in Range */
-.rh-position-range { padding-bottom: var(--space-lg); }
+.rh-position-range { padding-bottom: var(--space-xl); }
 .pir-bar-wrap {
     position: relative;
     margin-top: var(--space-md);
-    padding: 25px 0 45px !important; /* Force reduced padding */
-    overflow: hidden;
+    padding: 32px 0 52px;
+    overflow: visible;
 }
 .pir-bar {
     position: relative;
-    height: 12px !important; /* Force compact height */
+    height: 20px;
     background: linear-gradient(to right, var(--signal-red), var(--signal-amber), var(--signal-green));
-    border-radius: 6px;
-    margin: 0 16px;
+    border-radius: 10px;
+    margin: 0 8px;
 }
 .pir-world {
     position: absolute;
     transform: translateX(-50%);
     text-align: center;
-    top: 14px !important; /* Adjusted for compact bar */
+    top: 22px;
 }
 .pir-world-tick {
     position: absolute;
-    top: -14px !important; /* Adjusted for compact bar */
+    top: -22px;
     left: 50%;
     transform: translateX(-50%);
-    width: 1px;
-    height: 14px !important;
-    background: rgba(138,154,184,0.4);
+    width: 1.5px;
+    height: 22px;
+    background: rgba(138,154,184,0.45);
     margin: 0;
 }
 .pir-world-price {
     font-family: var(--font-data);
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-secondary);
     white-space: nowrap;
 }
 .pir-world-label {
-    font-size: 0.58rem;
+    font-size: 0.68rem;
     color: var(--text-muted);
     white-space: nowrap;
-    margin-top: 2px;
+    margin-top: 3px;
 }
 .pir-current {
     position: absolute;
     transform: translateX(-50%);
-    top: -24px !important; /* Adjusted for compact bar */
+    top: -30px;
     text-align: center;
     display: flex;
     flex-direction: column-reverse;
     align-items: center;
 }
 .pir-current-dot {
-    font-size: 0.7rem;
+    font-size: 0.85rem;
     color: var(--accent-teal);
     line-height: 1;
 }
 .pir-current-label {
     font-family: var(--font-data);
-    font-size: 0.72rem;
+    font-size: 0.85rem;
     font-weight: 700;
     color: var(--accent-teal);
     white-space: nowrap;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
 }
 .pir-note {
     display: none !important; /* Force hide the indicative text */
