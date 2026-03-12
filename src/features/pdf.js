@@ -5,7 +5,7 @@
  *   - Institutional: Comprehensive, all sections from STOCK_DATA, dense layout,
  *     no running page headers/footers, includes price sparkline.
  *   - Investor Briefing: Exactly 2 pages. Page 1: hero, metrics, skew,
- *     Position in Range, Valuation Range, hypothesis bars.
+ *     Position in Range, hypothesis bars.
  *     Page 2: identity, narrative, technical, evidence (3 cards),
  *     discriminators, tripwires.
  *
@@ -807,59 +807,7 @@ function buildInvestorBriefingHTML(stock) {
     '</div>';
   }
 
-  // Valuation Range
-  var vrHtml = '';
-  if (pirWorlds && pirWorlds.length >= 4) {
-    var vrCurrent = parseFloat(stock._livePrice || stock.price || (stock.hero.position_in_range && stock.hero.position_in_range.current_price) || 0);
-    var vrMin    = parseFloat(pirWorlds[0].price) || 0;
-    var vrBear   = parseFloat(pirWorlds[1].price) || 0;
-    var vrFairLow= (parseFloat(pirWorlds[1].price) + parseFloat(pirWorlds[2].price)) / 2;
-    var vrFairHigh=(parseFloat(pirWorlds[2].price) + parseFloat(pirWorlds[3].price)) / 2;
-    var vrBull   = parseFloat(pirWorlds[3].price) || 0;
-    var vrRange  = vrBull - vrMin || 1;
-
-    var vrBearPct    = ((vrBear     - vrMin) / vrRange * 100).toFixed(1);
-    var vrFairLowPct = ((vrFairLow  - vrMin) / vrRange * 100).toFixed(1);
-    var vrFairHighPct= ((vrFairHigh - vrMin) / vrRange * 100).toFixed(1);
-    var vrCurrPct    = Math.min(100, Math.max(0, ((vrCurrent - vrMin) / vrRange * 100))).toFixed(1);
-    var vrToFairH    = ((vrFairHigh / vrCurrent - 1) * 100).toFixed(1);
-    var vrToBull     = ((vrBull / vrCurrent - 1) * 100).toFixed(1);
-    var vrToBear     = ((vrBear / vrCurrent - 1) * 100).toFixed(1);
-
-    var vrBadgeCls   = vrCurrent < vrBear ? 'vr-amber' : vrCurrent > vrFairHigh ? 'vr-pos' : 'vr-neu';
-    var vrBadgeLabel = vrCurrent < vrBear ? 'BELOW BEAR' : vrCurrent > vrFairHigh ? 'ABOVE FAIR' : 'WITHIN FAIR';
-
-    vrHtml = '<div class="ib-block">' +
-      '<div class="ib-block-label-row">' +
-        '<div class="ib-block-label">VALUATION RANGE</div>' +
-        '<span class="vr-badge ' + vrBadgeCls + '">' + vrBadgeLabel + '</span>' +
-      '</div>' +
-      '<div class="vr-wrap">' +
-        '<div class="vr-bar">' +
-          '<div class="vr-zone bear-zone" style="left:0%;width:' + vrBearPct + '%"></div>' +
-          '<div class="vr-zone fair-zone" style="left:' + vrFairLowPct + '%;width:' + (parseFloat(vrFairHighPct) - parseFloat(vrFairLowPct)).toFixed(1) + '%"></div>' +
-          '<div class="vr-current" style="left:' + vrCurrPct + '%">' + e(stock.currency || '') + vrCurrent.toFixed(2) + '</div>' +
-          '<div class="vr-marker" style="left:' + vrBearPct + '%">' +
-            '<div class="vr-m-price">' + e(stock.currency || '') + vrBear.toFixed(0) + '</div>' +
-            '<div class="vr-m-lbl">Bear</div>' +
-          '</div>' +
-          '<div class="vr-marker" style="left:' + vrFairLowPct + '%">' +
-            '<div class="vr-m-price" style="color:#0d9488">' + e(stock.currency || '') + vrFairLow.toFixed(0) + '&ndash;' + e(stock.currency || '') + vrFairHigh.toFixed(0) + '</div>' +
-            '<div class="vr-m-lbl">Fair</div>' +
-          '</div>' +
-          '<div class="vr-marker" style="left:100%">' +
-            '<div class="vr-m-price">' + e(stock.currency || '') + vrBull.toFixed(0) + '</div>' +
-            '<div class="vr-m-lbl">Bull</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="vr-stats">' +
-        '<span class="pos">+' + vrToFairH + '% to fair high</span>' +
-        '<span class="pos">+' + vrToBull + '% to bull</span>' +
-        '<span>' + vrToBear + '% to bear</span>' +
-      '</div>' +
-    '</div>';
-  }
+  var vrHtml = ''; // Valuation Range removed (superfluous -- duplicates Position in Range)
 
   // Price Sparkline for Page 1
   var sparkHtml2 = '';
@@ -1109,23 +1057,6 @@ function buildInvestorBriefingHTML(stock) {
     '.pir-dot{font-size:8pt;color:#0f2e57;line-height:1;}' +
     '.pir-cur-lbl{font-size:5.5pt;font-weight:700;color:#0f2e57;white-space:nowrap;}' +
     '.pir-note{font-size:5.5pt;color:#94a3b8;margin-top:3px;font-style:italic;}' +
-    /* Valuation Range */
-    '.vr-wrap{position:relative;margin:16px 0 4px 0;}' +
-    '.vr-bar{position:relative;height:10px;background:#f1f5f9;border-radius:4px;margin:0 6px;}' +
-    '.vr-zone{position:absolute;top:0;bottom:0;border-radius:2px;}' +
-    '.bear-zone{background:#fee2e2;opacity:0.5;}' +
-    '.fair-zone{background:#dcfce7;opacity:0.5;}' +
-    '.vr-current{position:absolute;transform:translateX(-50%);top:-13px;font-size:6pt;font-weight:700;color:#0f2e57;white-space:nowrap;}' +
-    '.vr-marker{position:absolute;transform:translateX(-50%);top:13px;text-align:center;}' +
-    '.vr-m-price{font-size:5.5pt;font-weight:700;color:#334155;white-space:nowrap;}' +
-    '.vr-m-lbl{font-size:5pt;color:#94a3b8;}' +
-    '.vr-badge{font-size:6pt;font-weight:700;padding:1px 5px;border-radius:2px;}' +
-    '.vr-pos{background:#dcfce7;color:#166534;}' +
-    '.vr-amber{background:#fef3c7;color:#92400e;}' +
-    '.vr-neu{background:#f0f4fa;color:#334155;}' +
-    '.vr-stats{display:flex;gap:10px;font-size:6pt;margin-top:22px;flex-wrap:wrap;}' +
-    '.pos{color:#16a34a;font-weight:600;}' +
-    '.neg{color:#dc2626;}' +
     /* Hypothesis bars */
     '.hyp-bar{margin-bottom:5px;}' +
     '.hyp-bar-hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;}' +
@@ -1201,7 +1132,6 @@ function buildInvestorBriefingHTML(stock) {
       metricsHtml +
       skewHtml +
       pirHtml +
-      vrHtml +
       sparkHtml2 +
       hypBarsHtml +
     '</div>' +

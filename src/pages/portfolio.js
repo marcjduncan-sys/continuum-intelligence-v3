@@ -788,34 +788,6 @@ export function populateSidebar(ticker) {
     changePct = stock.freshness.pricePctChange;
   }
 
-  // Valuation Range
-  var vr = null;
-  var vrBear = 0, vrFair = 0, vrBull = 0, vrZone = '', vrZoneCls = '';
-  var vrToBull = '', vrToBear = '';
-  // Prefer hero.position_in_range.worlds (full data)
-  if (stock.hero && stock.hero.position_in_range && stock.hero.position_in_range.worlds &&
-      stock.hero.position_in_range.worlds.length >= 4) {
-    var w = stock.hero.position_in_range.worlds;
-    vrBear = parseFloat(w[1].price) || 0;
-    vrFair = (parseFloat(w[1].price) + parseFloat(w[2].price)) / 2;
-    vrBull = parseFloat(w[3].price) || 0;
-    vr = { low: vrBear, mid: vrFair, high: vrBull };
-  } else if (stock.valuation_range) {
-    vr = stock.valuation_range;
-    vrBear = vr.low;
-    vrFair = vr.mid;
-    vrBull = vr.high;
-  }
-
-  if (vr && livePrice > 0) {
-    if (livePrice < vrBear)      { vrZone = 'RED';   vrZoneCls = 'red'; }
-    else if (livePrice > vrFair) { vrZone = 'GREEN'; vrZoneCls = 'green'; }
-    else                         { vrZone = 'AMBER'; vrZoneCls = 'amber'; }
-
-    vrToBull = ((vrBull / livePrice - 1) * 100).toFixed(1);
-    vrToBear = ((vrBear / livePrice - 1) * 100).toFixed(1);
-  }
-
   // Build HTML
   var html = '';
 
@@ -877,31 +849,6 @@ export function populateSidebar(ticker) {
       '<span class="hs-company-label">Rev Growth</span>' +
       '<span class="hs-company-value">' + revGrowthValue + '</span>' +
     '</div>';
-
-  // 7. VALUATION RANGE
-  if (vr && livePrice > 0) {
-    var vrRange = vrBull - vrBear || 1;
-    var vrCurrPct = Math.min(100, Math.max(0, ((livePrice - vrBear) / vrRange * 100))).toFixed(1);
-
-    html += '<div class="hs-section-head">Valuation Range</div>' +
-      '<div class="hs-val-section">' +
-        '<div class="hs-val-header">' +
-          '<span class="hs-val-zone ' + vrZoneCls + '">' + vrZone + '</span>' +
-        '</div>' +
-        '<div class="hs-val-levels">' +
-          '<span>Bear<br>A$' + vrBear.toFixed(2) + '</span>' +
-          '<span>Fair<br>A$' + vrFair.toFixed(2) + '</span>' +
-          '<span>Bull<br>A$' + vrBull.toFixed(2) + '</span>' +
-        '</div>' +
-        '<div class="hs-val-bar">' +
-          '<div class="hs-val-marker" style="left:' + vrCurrPct + '%"></div>' +
-        '</div>' +
-        '<div class="hs-val-distances">' +
-          '<span class="neg">' + vrToBear + '% to bear</span>' +
-          '<span class="pos">+' + vrToBull + '% to bull</span>' +
-        '</div>' +
-      '</div>';
-  }
 
   sidebar.innerHTML = html;
 }

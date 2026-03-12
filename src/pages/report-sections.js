@@ -74,71 +74,6 @@ export function renderReportHero(data) {
       '</div>';
   }
 
-  // Spec Section 1.4 -- Valuation Range
-  var valuationRangeHtml = '';
-  if (data.hero && data.hero.position_in_range && data.hero.position_in_range.worlds &&
-      data.hero.position_in_range.worlds.length >= 4) {
-    var vrWorlds = data.hero.position_in_range.worlds;
-    var vrCurrent = data._livePrice || data.price || data.hero.position_in_range.current_price;
-    vrCurrent = parseFloat(vrCurrent);
-    var vrBear    = parseFloat(vrWorlds[1].price) || 0;
-    var vrFairLow = (parseFloat(vrWorlds[1].price) + parseFloat(vrWorlds[2].price)) / 2;
-    var vrFairHigh= (parseFloat(vrWorlds[2].price) + parseFloat(vrWorlds[3].price)) / 2;
-    var vrBull    = parseFloat(vrWorlds[3].price) || 0;
-    var vrMin     = parseFloat(vrWorlds[0].price) || 0;
-    var vrRange   = vrBull - vrMin || 1;
-
-    var vrBadgeCls   = vrCurrent < vrBear ? 'amber' : vrCurrent > vrFairHigh ? 'positive' : 'neutral';
-    var vrBadgeLabel = vrCurrent < vrBear ? 'AMBER'  : vrCurrent > vrFairHigh ? 'POSITIVE' : 'NEUTRAL';
-
-    var vrBearPct    = ((vrBear     - vrMin) / vrRange * 100).toFixed(1);
-    var vrFairLowPct = ((vrFairLow  - vrMin) / vrRange * 100).toFixed(1);
-    var vrFairHighPct= ((vrFairHigh - vrMin) / vrRange * 100).toFixed(1);
-    var vrCurrPct    = Math.min(100, Math.max(0, ((vrCurrent - vrMin) / vrRange * 100))).toFixed(1);
-
-    var vrToFairH = ((vrFairHigh / vrCurrent - 1) * 100).toFixed(1);
-    var vrToBull  = ((vrBull     / vrCurrent - 1) * 100).toFixed(1);
-    var vrToBear  = ((vrBear     / vrCurrent - 1) * 100).toFixed(1);
-
-    var vrPE = '';
-    if (data.heroMetrics) {
-      for (var mi = 0; mi < data.heroMetrics.length; mi++) {
-        if (data.heroMetrics[mi].label === 'FWD P/E') { vrPE = data.heroMetrics[mi].value; break; }
-      }
-    }
-
-    valuationRangeHtml =
-      '<div class="rh-spec-block vr-block">' +
-        '<div class="vr-title-row">' +
-          '<span class="rh-spec-label">VALUATION RANGE</span>' +
-          '<span class="vr-badge ' + vrBadgeCls + '">' + vrBadgeLabel + '</span>' +
-        '</div>' +
-        '<div class="vr-bar-wrap">' +
-          '<div class="vr-bar">' +
-            '<div class="vr-current" style="left:' + vrCurrPct + '%">A$' + vrCurrent.toFixed(2) + '</div>' +
-            '<div class="vr-marker" style="left:' + vrBearPct + '%">' +
-              '<div class="vr-marker-price">A$' + vrBear.toFixed(2) + '</div>' +
-              '<div class="vr-marker-label">Bear</div>' +
-            '</div>' +
-            '<div class="vr-marker" style="left:' + vrFairLowPct + '%;color:var(--accent-teal)">' +
-              '<div class="vr-marker-price" style="color:var(--accent-teal)">A$' + vrFairLow.toFixed(2) + ' &ndash; A$' + vrFairHigh.toFixed(2) + '</div>' +
-              '<div class="vr-marker-label">Fair</div>' +
-            '</div>' +
-            '<div class="vr-marker" style="left:100%">' +
-              '<div class="vr-marker-price">A$' + vrBull.toFixed(2) + '</div>' +
-              '<div class="vr-marker-label">Bull</div>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="vr-stats">' +
-          '<span class="pos">+' + vrToFairH + '% to fair high</span>' +
-          '<span class="pos">+' + vrToBull + '% to bull case</span>' +
-          '<span>' + vrToBear + '% to bear case</span>' +
-          (vrPE ? '<span>PE FORWARD: ' + vrPE + '</span>' : '') +
-        '</div>' +
-      '</div>';
-  }
-
   // Spec Section 1.5 -- Skew Indicator
   var skewIndicatorHtml = '';
   if (data.hero && data.hero.skew) {
@@ -207,11 +142,10 @@ export function renderReportHero(data) {
       '</div>' +
     '</div>' +
   '</div>' +
-  (embeddedThesisHtml || positionInRangeHtml || valuationRangeHtml || skewIndicatorHtml || nextDecisionHtml
+  (embeddedThesisHtml || positionInRangeHtml || skewIndicatorHtml || nextDecisionHtml
     ? '<div class="rh-spec-section"><div class="report-hero-inner">' +
         embeddedThesisHtml +
         positionInRangeHtml +
-        valuationRangeHtml +
         skewIndicatorHtml +
         nextDecisionHtml +
       '</div></div>'
