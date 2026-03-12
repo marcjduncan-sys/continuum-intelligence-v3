@@ -57,14 +57,14 @@ npm run validate     # lint + test:all — run before any push
 - [x] Thesis Comparator rebuilt with LLM pipeline (commit `bebcb9c`): `tcAnalyze()` now POSTs to `/api/research-chat` with a structured ACH system prompt; `renderComparatorResult()` parses the ALIGNMENT line, populates hypothesis map from `tc.json`, and renders supporting/contradicting evidence. Loading animation, error state, and contrarian banner CSS added. Enter key wired. Verified end-to-end against WOW with real Railway responses on preview server.
 - [x] Analyst chat consistency and voice rules unified (commit `236bfee`): extracted `VOICE_RULES` constant from `src/features/chat.js` (16 rules, single source of truth); bridged to `window.CI_VOICE_RULES` in `src/main.js`; `pnBuildSystemPrompt()` now appends `window.CI_VOICE_RULES` instead of its own abbreviated copy; em-dash on line 700 of `public/js/personalisation.js` fixed; ~189 lines of dead Step 5 centre-panel chat code removed (`pnGetSharedConvo`, `renderChatMessages`, `showChatTyping`, `hideChatTyping`, `appendChatError`, `renderChatHeader`, `pnSendChat`); `bindStep5Inputs` and `pnOnRouteEnter` simplified; `window._continuumChat` fully eliminated. 185/185 tests passing.
 
-**Phase 2 CODE COMPLETE (2026-03-09). Pending: DATABASE_URL in Railway.**
+**Phase 2 COMPLETE (2026-03-09).**
 - [x] Track A (auth backend): OTP email flow, JWT HS256, `api/auth.py`, `api/email_service.py`, `api/config.py`, `api/migrations/002_auth.sql` -- commit `566e945`.
 - [x] Track B (conversation persistence): `api/conversations.py`, `api/db.py` helpers, `POST /api/conversations`, `GET /api/conversations/{ticker}` -- commit `566e945`.
 - [x] Track C (frontend): `src/features/auth.js` (guest UUID, JWT storage, two-step OTP modal), surgical edits to `src/features/chat.js` (`_ensureConversation`, `_persistMessage`, `_restoreFromDB`), `initAuth()` wired in `src/main.js` before `initChat()` -- commit `566e945`.
 - [x] Railway 502 fix: `asyncio.wait_for(asyncpg.create_pool(...), timeout=15.0)` in `api/db.py`; removed lifespan pre-warm from `api/main.py` -- commit `9a8dad7`.
-- [ ] **ACTION REQUIRED**: Provision PostgreSQL in Railway dashboard and confirm `DATABASE_URL` is injected into the Continuum service. After provisioning, `run_migrations()` runs automatically on first DB request and applies `001_initial.sql` + `002_auth.sql`.
-- [ ] **ACTION REQUIRED**: Add SMTP env vars (`EMAIL_FROM`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`) to Railway dashboard for live OTP email delivery. Until set, OTP codes are logged server-side only.
-- [ ] **ACTION REQUIRED**: Add `JWT_SECRET` (32-char hex) to Railway dashboard. Current fallback `dev-insecure-secret` is not safe for production.
+- [x] PostgreSQL provisioned in Railway; `DATABASE_URL` injected; migrations applied automatically.
+- [x] `JWT_SECRET` added to Railway dashboard.
+- [ ] **ACTION REQUIRED**: Add SMTP env vars (`EMAIL_FROM`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`) to Railway dashboard for live OTP email delivery. Until set, OTP codes are logged server-side only. (Deferred -- no SMTP provider yet.)
 
 **Phase 3 COMPLETE (2026-03-09).**
 - [x] Wave 1A: Sign in button added to `.nav-actions` in `index.html`; `initAuth()` wires click handler, updates button text on `ci:auth:login` event -- commit `fbb7a35`.
@@ -96,8 +96,8 @@ npm run validate     # lint + test:all — run before any push
 
 **Session work (2026-03-12) -- Phase 9: Proactive Insights:**
 - [x] Phase 9 COMPLETE -- commit `7ec36e1`: `api/migrations/009_notifications.sql` (notifications table + 3 indices); `api/insights.py` (Haiku classifier, 7-day re-notification guard, `scan_ticker`, `run_insight_scan`, `get_notifications`, `dismiss_notification`); `api/main.py` (`GET /api/notifications`, `PATCH /api/notifications/{id}/dismiss`, `POST /api/insights/scan` with X-Insights-Secret auth); `api/config.py` (`INSIGHTS_SECRET`); `src/features/notifications.js` (badge + panel surface, 5-min poll, dynamic CSS injection); `src/main.js` (`initNotifications` wired between Auth and Chat); `.github/workflows/insights-scan.yml` (cron `0 17 * * 1-5` = 03:00 AEDT Mon-Fri). 157/157 Vitest tests passing. Railway healthy; `GET /api/notifications?guest_id=test` returns `[]`.
-- [ ] **ACTION REQUIRED (9D)**: Add `INSIGHTS_SECRET` to Railway env vars AND GitHub Secrets. Generate with: `-join ((1..16) | ForEach-Object { '{0:x2}' -f (Get-Random -Max 256) })` in PowerShell. Use the same value in both.
-- [ ] **ACTION REQUIRED (9E)**: After 9D, trigger `insights-scan` workflow via `workflow_dispatch` in GitHub Actions and confirm Railway logs show `POST /api/insights/scan HTTP/1.1' 200 OK`.
+- [x] **9D DONE (user)**: `INSIGHTS_SECRET` added to Railway env vars and GitHub Secrets.
+- [x] **9E DONE**: `insights-scan` workflow_dispatch triggered; Railway logs confirmed `POST /api/insights/scan HTTP/1.1' 200 OK`. 9 tickers scanned (tickers with active memories in DB), 97 memories checked -- expected behaviour; scan discovers tickers dynamically from memory table.
 
 **Recent bug history (last six commits):**
 - `7ec36e1` Phase 9: proactive insights scan + notification surface. `009_notifications.sql`, `insights.py`, `notifications.js`, `insights-scan.yml`, 3 endpoints in main.py, `INSIGHTS_SECRET` in config.py.
