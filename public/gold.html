@@ -9,276 +9,207 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --navy:   #1B2A4A;
+      --navy:    #1B2A4A;
       --navy-lt: #253761;
-      --green:  #00C853;
-      --blue:   #2979FF;
-      --amber:  #FF9100;
-      --red:    #D50000;
-      --bg:     #F5F7FA;
-      --surface:#FFFFFF;
-      --border: #DDE1E8;
-      --text:   #1B2A4A;
-      --muted:  #6B7A99;
-      --radius: 10px;
+      --green:   #00C853;
+      --blue:    #2979FF;
+      --amber:   #FF9100;
+      --red:     #D50000;
+      --gold:    #C9A84C;
+      --bg:      #F5F7FA;
+      --surface: #FFFFFF;
+      --border:  #DDE1E8;
+      --text:    #1B2A4A;
+      --muted:   #6B7A99;
+      --radius:  10px;
     }
 
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
     /* ── Header ── */
-    header {
-      background: var(--navy);
-      color: #fff;
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      height: 56px;
-    }
+    header { background: var(--navy); color: #fff; padding: 0 24px; display: flex; align-items: center; gap: 16px; height: 56px; }
     header .logo { font-size: 13px; font-weight: 700; letter-spacing: .08em; opacity: .7; text-transform: uppercase; }
     header h1 { font-size: 17px; font-weight: 600; }
     header a { color: rgba(255,255,255,.5); text-decoration: none; font-size: 13px; margin-left: auto; }
     header a:hover { color: #fff; }
 
-    /* ── Search bar ── */
-    .search-wrap {
-      background: var(--navy-lt);
-      padding: 28px 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    .search-wrap p {
-      color: rgba(255,255,255,.65);
-      font-size: 13px;
-      text-align: center;
-      max-width: 480px;
-      line-height: 1.5;
-    }
-    .search-row {
-      display: flex;
-      gap: 10px;
-      width: 100%;
-      max-width: 400px;
-    }
-    .search-row input {
-      flex: 1;
-      padding: 11px 14px;
-      border-radius: var(--radius);
-      border: 1px solid rgba(255,255,255,.2);
-      background: rgba(255,255,255,.1);
-      color: #fff;
-      font-size: 15px;
-      font-family: inherit;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      outline: none;
-    }
+    /* ── Search ── */
+    .search-wrap { background: var(--navy-lt); padding: 28px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .search-wrap p { color: rgba(255,255,255,.65); font-size: 13px; text-align: center; max-width: 500px; line-height: 1.5; }
+    .search-row { display: flex; gap: 10px; width: 100%; max-width: 420px; }
+    .search-row input { flex: 1; padding: 11px 14px; border-radius: var(--radius); border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.1); color: #fff; font-size: 15px; font-family: inherit; text-transform: uppercase; letter-spacing: .05em; outline: none; }
     .search-row input::placeholder { color: rgba(255,255,255,.35); text-transform: none; letter-spacing: 0; }
     .search-row input:focus { border-color: rgba(255,255,255,.5); background: rgba(255,255,255,.15); }
-    .btn {
-      padding: 11px 22px;
-      background: var(--green);
-      color: #000;
-      font-weight: 700;
-      font-size: 14px;
-      border: none;
-      border-radius: var(--radius);
-      cursor: pointer;
-      white-space: nowrap;
-      font-family: inherit;
-      transition: opacity .15s;
-    }
+    .btn { padding: 11px 22px; background: var(--green); color: #000; font-weight: 700; font-size: 14px; border: none; border-radius: var(--radius); cursor: pointer; white-space: nowrap; font-family: inherit; transition: opacity .15s; }
     .btn:hover { opacity: .85; }
     .btn:disabled { opacity: .4; cursor: not-allowed; }
 
-    /* ── Main content ── */
-    main { max-width: 900px; margin: 0 auto; padding: 32px 20px 60px; }
+    /* ── Main ── */
+    main { max-width: 960px; margin: 0 auto; padding: 32px 20px 80px; }
 
     /* Loading */
-    #loading {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      padding: 60px 20px;
-      color: var(--muted);
-      text-align: center;
-    }
-    .spinner {
-      width: 40px; height: 40px;
-      border: 3px solid var(--border);
-      border-top-color: var(--navy);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
+    #loading { display: none; flex-direction: column; align-items: center; gap: 16px; padding: 60px 20px; color: var(--muted); text-align: center; }
+    .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--navy); border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     #loading strong { color: var(--text); font-size: 15px; }
     #loading span { font-size: 13px; }
 
     /* Error */
-    #error {
-      display: none;
-      background: #FFF0F0;
-      border: 1px solid #FFCDD2;
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      color: #B71C1C;
-      font-size: 14px;
-      margin-top: 20px;
-    }
+    #error { display: none; background: #FFF0F0; border: 1px solid #FFCDD2; border-radius: var(--radius); padding: 16px 20px; color: #B71C1C; font-size: 14px; margin-top: 20px; }
 
-    /* ── Result cards ── */
+    /* ── Result ── */
     #result { display: none; }
 
+    /* Hero header */
     .result-header {
       background: var(--navy);
       color: #fff;
       border-radius: var(--radius);
-      padding: 24px;
+      padding: 28px;
       margin-bottom: 20px;
       display: grid;
       grid-template-columns: 1fr auto;
-      gap: 16px;
+      gap: 20px;
       align-items: start;
     }
-    .result-header .company { font-size: 22px; font-weight: 700; }
-    .result-header .meta { font-size: 13px; opacity: .6; margin-top: 4px; }
-    .result-header .verdict {
-      font-size: 14px;
-      line-height: 1.6;
-      opacity: .88;
-      margin-top: 12px;
-      max-width: 680px;
-    }
-    .skew-box {
-      text-align: center;
-      min-width: 80px;
-    }
-    .skew-score {
-      font-size: 36px;
-      font-weight: 800;
-      line-height: 1;
-    }
-    .skew-label {
-      font-size: 11px;
-      opacity: .6;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      margin-top: 4px;
-    }
-    .skew-badge {
-      display: inline-block;
-      margin-top: 6px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-    }
+    .result-header .company { font-size: 24px; font-weight: 700; }
+    .result-header .meta { font-size: 13px; opacity: .6; margin-top: 4px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .stage-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; background: rgba(201,168,76,.25); color: var(--gold); border: 1px solid rgba(201,168,76,.4); }
+    .result-header .verdict { font-size: 14px; line-height: 1.65; opacity: .88; margin-top: 14px; max-width: 700px; }
+
+    /* Composite score */
+    .score-box { text-align: center; min-width: 90px; }
+    .composite-num { font-size: 42px; font-weight: 800; line-height: 1; }
+    .composite-label { font-size: 11px; opacity: .55; text-transform: uppercase; letter-spacing: .08em; margin-top: 3px; }
+    .skew-badge { display: inline-block; margin-top: 6px; padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
     .skew-up   { background: rgba(0,200,83,.2); color: #00C853; }
     .skew-down { background: rgba(213,0,0,.2); color: #FF5252; }
     .skew-bal  { background: rgba(255,145,0,.2); color: #FF9100; }
 
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      margin-bottom: 16px;
+    /* Sub-score bars */
+    .sub-scores {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
     }
-    .card-title {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
+    @media (max-width: 640px) { .sub-scores { grid-template-columns: repeat(2, 1fr); } }
+    .sub-score-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+    .sub-score-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+    .sub-score-bar-wrap { height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 6px; overflow: hidden; }
+    .sub-score-bar { height: 100%; border-radius: 3px; transition: width .6s ease; }
+    .bar-high  { background: var(--green); }
+    .bar-mid   { background: var(--amber); }
+    .bar-low   { background: var(--red); }
+    .sub-score-num { font-size: 18px; font-weight: 700; }
 
-    /* Thesis grid */
-    .thesis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    @media (max-width: 620px) { .thesis-grid { grid-template-columns: 1fr; } }
-    .thesis-card {
-      border-radius: var(--radius);
-      padding: 18px 20px;
-      border-left: 4px solid;
-    }
+    /* Cards */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px; }
+    .card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 14px; }
+
+    /* 2-col grid */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 620px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* Hypothesis */
+    .thesis-card { border-radius: var(--radius); padding: 18px 20px; border-left: 4px solid; }
     .thesis-bull { background: #F0FBF5; border-color: var(--green); }
     .thesis-bear { background: #FFF5F5; border-color: var(--red); }
-    .thesis-card .thesis-label {
-      font-size: 11px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .1em; margin-bottom: 8px;
-    }
+    .thesis-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px; }
     .thesis-bull .thesis-label { color: #00875A; }
     .thesis-bear .thesis-label { color: #C62828; }
     .thesis-card p { font-size: 13.5px; line-height: 1.65; color: #374151; }
 
+    /* Asset table */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding: 0 10px 8px 0; border-bottom: 1px solid var(--border); }
+    td { padding: 10px 10px 10px 0; border-bottom: 1px solid #F0F2F7; vertical-align: top; line-height: 1.5; }
+    tr:last-child td { border-bottom: none; }
+
     /* Key metrics */
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 12px;
-    }
-    .metric {
-      background: var(--bg);
-      border-radius: 8px;
-      padding: 12px 14px;
-    }
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .metric { background: var(--bg); border-radius: 8px; padding: 12px 14px; }
     .metric-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
-    .metric-value { font-size: 18px; font-weight: 700; color: var(--text); }
-    .metric-value.null-val { color: var(--muted); font-size: 15px; font-weight: 400; }
+    .metric-value { font-size: 17px; font-weight: 700; }
+    .metric-value.null-val { color: var(--muted); font-size: 14px; font-weight: 400; }
+
+    /* Technical */
+    .tech-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+    .tech-item { display: flex; flex-direction: column; gap: 3px; }
+    .tech-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+    .tech-value { font-size: 13.5px; font-weight: 600; }
+    .tech-notes { font-size: 13px; color: #374151; line-height: 1.6; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+    /* Valuation */
+    .val-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-bottom: 12px; }
+    .val-item { background: var(--bg); border-radius: 8px; padding: 12px 14px; }
+    .val-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
+    .val-value { font-size: 17px; font-weight: 700; }
+    .val-value.null-val { color: var(--muted); font-size: 14px; font-weight: 400; }
+    .peer-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+    .peer-premium { background: #E8F5E9; color: #2E7D32; }
+    .peer-discount { background: #FFF3E0; color: #E65100; }
+    .peer-inline  { background: #E3F2FD; color: #1565C0; }
+    .peer-unknown { background: #F5F5F5; color: #757575; }
+    .val-notes { font-size: 13px; color: #374151; line-height: 1.6; }
+
+    /* Sensitivity table */
+    .sens-table { width: 100%; }
+    .sens-table th, .sens-table td { padding: 8px 12px 8px 0; }
+    .sens-scenario { font-size: 12px; color: var(--muted); }
+
+    /* List cards */
+    .flag-list { display: flex; flex-direction: column; gap: 10px; }
+    .flag-item { display: flex; gap: 10px; align-items: baseline; font-size: 13.5px; line-height: 1.55; color: #374151; }
+    .flag-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .dot-red    { background: var(--red); }
+    .dot-amber  { background: var(--amber); }
+    .dot-blue   { background: var(--blue); }
+    .dot-green  { background: var(--green); }
+
+    .numbered-list { display: flex; flex-direction: column; gap: 10px; }
+    .numbered-item { display: flex; gap: 10px; align-items: baseline; font-size: 13.5px; line-height: 1.55; color: #374151; }
+    .num-badge { background: var(--navy); color: #fff; font-size: 10px; font-weight: 800; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    /* Management */
+    .mgmt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
+    @media (max-width: 580px) { .mgmt-grid { grid-template-columns: 1fr; } }
+    .mgmt-item { background: var(--bg); border-radius: 8px; padding: 12px 14px; }
+    .mgmt-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
+    .mgmt-value { font-size: 13px; font-weight: 700; }
+    .mgmt-strong   { color: #2E7D32; }
+    .mgmt-adequate { color: #E65100; }
+    .mgmt-weak     { color: var(--red); }
+    .mgmt-unknown  { color: var(--muted); }
+    .mgmt-notes { font-size: 13px; color: #374151; line-height: 1.6; }
 
     /* Evidence */
     .evidence-list { display: flex; flex-direction: column; gap: 14px; }
     .evidence-item { border-left: 3px solid var(--blue); padding-left: 14px; }
     .evidence-label { font-size: 12px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
-    .evidence-finding { font-size: 13.5px; line-height: 1.65; color: var(--text); }
+    .evidence-finding { font-size: 13.5px; line-height: 1.65; }
     .evidence-source { font-size: 11.5px; color: var(--muted); margin-top: 4px; font-style: italic; }
+
+    /* Trigger */
+    .trigger-box { background: #F0F4FF; border: 1px solid #C5D3FF; border-radius: 8px; padding: 14px 16px; font-size: 13.5px; color: #1A3070; line-height: 1.6; }
+
+    /* What must be true */
+    .wmbt-list { display: flex; flex-direction: column; gap: 8px; }
+    .wmbt-item { display: flex; gap: 10px; align-items: baseline; font-size: 13.5px; line-height: 1.55; color: #374151; }
+    .wmbt-item::before { content: "✓"; color: var(--green); font-weight: 700; flex-shrink: 0; }
 
     /* Gaps */
     .gaps-list { display: flex; flex-direction: column; gap: 10px; }
-    .gap-item {
-      display: flex; gap: 10px; align-items: baseline;
-      font-size: 13.5px; line-height: 1.55; color: #374151;
-    }
-    .gap-item::before {
-      content: attr(data-n);
-      background: var(--amber);
-      color: #000;
-      font-size: 10px;
-      font-weight: 800;
-      border-radius: 50%;
-      width: 18px; height: 18px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
+    .gap-item { display: flex; gap: 10px; align-items: baseline; font-size: 13.5px; line-height: 1.55; color: #374151; }
+    .gap-item::before { content: attr(data-n); background: var(--amber); color: #000; font-size: 10px; font-weight: 800; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
-    /* Monitoring trigger */
-    .trigger-box {
-      background: #F0F4FF;
-      border: 1px solid #C5D3FF;
-      border-radius: 8px;
-      padding: 14px 16px;
-      font-size: 13.5px;
-      color: #1A3070;
-      line-height: 1.6;
-    }
+    .analysis-footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 28px; }
 
-    /* Timestamp */
-    .analysis-footer {
-      text-align: center;
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 24px;
-    }
+    /* Risk badges inline */
+    .risk-low    { color: #2E7D32; font-weight: 600; }
+    .risk-medium { color: #E65100; font-weight: 600; }
+    .risk-high   { color: var(--red); font-weight: 600; }
+    .risk-unknown { color: var(--muted); }
   </style>
 </head>
 <body>
@@ -290,7 +221,7 @@
 </header>
 
 <div class="search-wrap">
-  <p>Enter an ASX gold ticker to run a live NLM corpus analysis. Results take 60-120 seconds.</p>
+  <p>Enter an ASX gold ticker to run a full 20-dimension mining IC analysis. Queries the NotebookLM corpus and synthesises via Claude. Allow 90-120 seconds.</p>
   <div class="search-row">
     <input type="text" id="tickerInput" placeholder="e.g. NST, EVN, WAF" maxlength="10" autocomplete="off" />
     <button class="btn" id="runBtn" onclick="runAnalysis()">Run</button>
@@ -301,12 +232,10 @@
   <div id="loading">
     <div class="spinner"></div>
     <strong id="loadingTicker"></strong>
-    <span>Querying NotebookLM corpus and synthesising analysis...</span>
+    <span>Running 20 corpus queries and synthesising analysis...</span>
     <span id="loadingTimer" style="font-size:12px; margin-top:4px;"></span>
   </div>
-
   <div id="error"></div>
-
   <div id="result"></div>
 </main>
 
@@ -318,63 +247,43 @@ document.getElementById('tickerInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') runAnalysis();
 });
 
-function fmt(val, suffix='') {
-  if (val === null || val === undefined) return null;
-  return val + suffix;
-}
-
-function skewClass(score) {
-  if (score > 55) return 'skew-up';
-  if (score < 45) return 'skew-down';
-  return 'skew-bal';
-}
-function skewLabel(score) {
-  if (score > 55) return 'Upside';
-  if (score < 45) return 'Downside';
-  return 'Balanced';
-}
+function skewClass(s) { return s > 55 ? 'skew-up' : s < 45 ? 'skew-down' : 'skew-bal'; }
+function skewLabel(s) { return s > 55 ? 'Upside' : s < 45 ? 'Downside' : 'Balanced'; }
+function barClass(v) { return v >= 18 ? 'bar-high' : v >= 12 ? 'bar-mid' : 'bar-low'; }
+function riskClass(r) { return r === 'low' ? 'risk-low' : r === 'medium' ? 'risk-medium' : r === 'high' ? 'risk-high' : 'risk-unknown'; }
+function mgmtClass(v) { return v === 'strong' || v === 'accurate' || v === 'disciplined' ? 'mgmt-strong' : v === 'adequate' || v === 'mixed' ? 'mgmt-adequate' : v === 'weak' || v === 'poor' ? 'mgmt-weak' : 'mgmt-unknown'; }
+function peerClass(v) { return v === 'premium' ? 'peer-premium' : v === 'discount' ? 'peer-discount' : v === 'in-line' ? 'peer-inline' : 'peer-unknown'; }
+function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : 'n/a'; }
+function fmtNum(v, prefix='', suffix='') { return (v !== null && v !== undefined) ? `${prefix}${v.toLocaleString()}${suffix}` : null; }
+function nullVal(v) { return v ? `<span class="val-value">${v}</span>` : `<span class="val-value null-val">n/a</span>`; }
 
 async function runAnalysis() {
   const raw = document.getElementById('tickerInput').value.trim().toUpperCase();
   if (!raw) return;
-
   const loading = document.getElementById('loading');
   const errBox  = document.getElementById('error');
   const result  = document.getElementById('result');
   const btn     = document.getElementById('runBtn');
-
-  // Reset
-  errBox.style.display = 'none';
-  result.style.display = 'none';
+  errBox.style.display  = 'none';
+  result.style.display  = 'none';
   loading.style.display = 'flex';
   btn.disabled = true;
   document.getElementById('loadingTicker').textContent = raw;
-
-  // Timer
   let elapsed = 0;
   clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    elapsed++;
-    document.getElementById('loadingTimer').textContent = `${elapsed}s elapsed`;
-  }, 1000);
+  timerInterval = setInterval(() => { elapsed++; document.getElementById('loadingTimer').textContent = `${elapsed}s elapsed`; }, 1000);
 
   try {
     const res = await fetch(`${API}/api/agents/gold/${raw}`);
     clearInterval(timerInterval);
-
-    if (!res.ok) {
-      const txt = await res.text();
-      throw new Error(`${res.status}: ${txt.slice(0, 200)}`);
-    }
-
+    if (!res.ok) { const t = await res.text(); throw new Error(`${res.status}: ${t.slice(0,200)}`); }
     const d = await res.json();
     loading.style.display = 'none';
     renderResult(d);
-
-  } catch (err) {
+  } catch(err) {
     clearInterval(timerInterval);
     loading.style.display = 'none';
-    errBox.style.display = 'block';
+    errBox.style.display  = 'block';
     errBox.textContent = `Error: ${err.message}`;
   } finally {
     btn.disabled = false;
@@ -382,83 +291,220 @@ async function runAnalysis() {
 }
 
 function renderResult(d) {
-  const skewCls = skewClass(d.skew_score);
-  const skewLbl = skewLabel(d.skew_score);
-  const m = d.key_metrics || {};
+  const ss = d.sub_scores || {};
+  const m  = d.key_metrics || {};
+  const v  = d.valuation || {};
+  const t  = d.technical || {};
+  const ma = d.management_assessment || {};
 
+  // Sub-score bars
+  const subScoreHtml = ['geology','engineering','financial','management'].map(k => {
+    const val = ss[k] || 0;
+    const pct = (val / 25) * 100;
+    return `<div class="sub-score-item">
+      <div class="sub-score-label">${k}</div>
+      <div class="sub-score-bar-wrap"><div class="sub-score-bar ${barClass(val)}" style="width:${pct}%"></div></div>
+      <div class="sub-score-num">${val}<span style="font-size:12px;font-weight:400;color:var(--muted)">/25</span></div>
+    </div>`;
+  }).join('');
+
+  // Asset summary table
+  const assets = d.asset_summary || [];
+  const assetRows = assets.map(a => `<tr>
+    <td><strong>${a.name || ''}</strong></td>
+    <td>${a.jurisdiction || ''}</td>
+    <td>${cap(a.stage)}</td>
+    <td>${a.ownership_pct !== null && a.ownership_pct !== undefined ? a.ownership_pct + '%' : 'n/a'}</td>
+    <td>${a.deposit_type || 'n/a'}</td>
+    <td>${a.mining_method || 'n/a'}</td>
+  </tr>`).join('');
+
+  // Key metrics
   const metricsHtml = [
-    ['AISC (A$/oz)', m.aisc_per_oz ? `A$${m.aisc_per_oz.toLocaleString()}` : null],
-    ['Production (koz)', m.production_koz_annual ? `${m.production_koz_annual.toLocaleString()} koz` : null],
-    ['Mine Life', m.mine_life_years ? `${m.mine_life_years} yrs` : null],
-    ['Net Cash / (Debt)', m.net_cash_debt_aud_m !== null && m.net_cash_debt_aud_m !== undefined
-      ? `A$${m.net_cash_debt_aud_m >= 0 ? '' : '('}${Math.abs(m.net_cash_debt_aud_m).toLocaleString()}M${m.net_cash_debt_aud_m < 0 ? ')' : ''}` : null],
-    ['Reserve Grade', m.reserve_grade_gt ? `${m.reserve_grade_gt} g/t` : null],
-  ].map(([label, val]) => `
-    <div class="metric">
-      <div class="metric-label">${label}</div>
-      <div class="metric-value ${val ? '' : 'null-val'}">${val || 'n/a'}</div>
-    </div>`).join('');
+    ['AISC (' + (m.aisc_currency || 'AUD') + '/oz)', m.aisc_per_oz ? (m.aisc_currency === 'USD' ? 'US$' : 'A$') + m.aisc_per_oz.toLocaleString() : null],
+    ['Production (koz)', m.production_koz_annual ? m.production_koz_annual.toLocaleString() + ' koz' : null],
+    ['Mine Life', m.mine_life_years ? m.mine_life_years + ' yrs' : null],
+    ['Resource', m.resource_moz ? m.resource_moz + ' Moz' : null],
+    ['Reserve', m.reserve_moz ? m.reserve_moz + ' Moz' : null],
+    ['Reserve Grade', m.reserve_grade_gt ? m.reserve_grade_gt + ' g/t' : null],
+    ['Net Cash/(Debt)', m.net_cash_debt_aud_m !== null && m.net_cash_debt_aud_m !== undefined
+      ? 'A$' + (m.net_cash_debt_aud_m >= 0 ? '' : '(') + Math.abs(m.net_cash_debt_aud_m).toLocaleString() + 'M' + (m.net_cash_debt_aud_m < 0 ? ')' : '') : null],
+    ['Sustaining Capex', m.capex_sustaining_aud_m ? 'A$' + m.capex_sustaining_aud_m.toLocaleString() + 'M' : null],
+    ['FCF Yield (spot)', m.fcf_yield_spot_pct !== null && m.fcf_yield_spot_pct !== undefined ? m.fcf_yield_spot_pct + '%' : null],
+  ].map(([label, val]) => `<div class="metric"><div class="metric-label">${label}</div><div class="metric-value ${val ? '' : 'null-val'}">${val || 'n/a'}</div></div>`).join('');
 
-  const evidenceHtml = (d.evidence || []).map(e => `
-    <div class="evidence-item">
-      <div class="evidence-label">${e.label}</div>
-      <div class="evidence-finding">${e.finding}</div>
-      <div class="evidence-source">${e.source}</div>
-    </div>`).join('');
+  // Technical
+  const techHtml = [
+    ['Deposit Type', t.deposit_type],
+    ['Mining Method', t.mining_method],
+    ['Metallurgy', t.metallurgy],
+    ['Plant Recovery', t.plant_recovery_pct !== null && t.plant_recovery_pct !== undefined ? t.plant_recovery_pct + '%' : null],
+    ['Reserve Conversion Risk', t.reserve_conversion_risk ? `<span class="${riskClass(t.reserve_conversion_risk)}">${cap(t.reserve_conversion_risk)}</span>` : null],
+    ['Reconciliation', t.reconciliation_quality ? cap(t.reconciliation_quality) : null],
+  ].map(([label, val]) => `<div class="tech-item"><div class="tech-label">${label}</div><div class="tech-value">${val || '<span style="color:var(--muted);font-weight:400">n/a</span>'}</div></div>`).join('');
 
+  // Valuation
+  const valMetrics = [
+    ['EV/Reserve oz', v.ev_per_reserve_oz_usd ? 'US$' + v.ev_per_reserve_oz_usd.toLocaleString() : null],
+    ['EV/Production oz', v.ev_per_production_oz_usd ? 'US$' + v.ev_per_production_oz_usd.toLocaleString() : null],
+    ['P/NAV', v.p_nav !== null && v.p_nav !== undefined ? v.p_nav + 'x' : null],
+    ['FCF Yield (spot)', v.fcf_yield_spot_pct !== null && v.fcf_yield_spot_pct !== undefined ? v.fcf_yield_spot_pct + '%' : null],
+  ].map(([label, val]) => `<div class="val-item"><div class="val-label">${label}</div><div class="val-value ${val ? '' : 'null-val'}">${val || 'n/a'}</div></div>`).join('');
+
+  // Sensitivities
+  const sensRows = (d.sensitivities || []).map(s => `<tr>
+    <td><strong>${s.variable || ''}</strong></td>
+    <td class="sens-scenario">${s.scenario || ''}</td>
+    <td>${s.impact || ''}</td>
+  </tr>`).join('');
+
+  // Failure modes
+  const failureHtml = (d.failure_modes || []).map(f =>
+    `<div class="flag-item"><div class="flag-dot dot-red"></div><span>${f}</span></div>`
+  ).join('');
+
+  // Red flags
+  const redFlagHtml = (d.technical_red_flags || []).map(f =>
+    `<div class="flag-item"><div class="flag-dot dot-amber"></div><span>${f}</span></div>`
+  ).join('');
+
+  // What must be true
+  const wmbtHtml = (d.what_must_be_true || []).map(w =>
+    `<div class="wmbt-item">${w}</div>`
+  ).join('');
+
+  // Evidence
+  const evidenceHtml = (d.evidence || []).map(e => `<div class="evidence-item">
+    <div class="evidence-label">${e.label}</div>
+    <div class="evidence-finding">${e.finding}</div>
+    <div class="evidence-source">${e.source}</div>
+  </div>`).join('');
+
+  // Gaps
   const gapsHtml = (d.information_gaps || []).map((g, i) =>
     `<div class="gap-item" data-n="${i+1}">${g}</div>`
   ).join('');
 
   const html = `
+    <!-- Hero -->
     <div class="result-header">
       <div>
         <div class="company">${d.company_name || d.ticker}</div>
-        <div class="meta">${d.ticker} &middot; ${d.sector} &middot; Analysis date: ${d.analysis_date}</div>
+        <div class="meta">
+          <span>${d.ticker}</span>
+          <span class="stage-badge">${cap(d.company_stage)}</span>
+          <span>Gold</span>
+          <span>Analysis: ${d.analysis_date}</span>
+        </div>
         <div class="verdict">${d.verdict}</div>
       </div>
-      <div class="skew-box">
-        <div class="skew-score">${d.skew_score}</div>
-        <div class="skew-label">Skew</div>
-        <span class="skew-badge ${skewCls}">${skewLbl}</span>
+      <div class="score-box">
+        <div class="composite-num">${d.composite_score}</div>
+        <div class="composite-label">Score /100</div>
+        <span class="skew-badge ${skewClass(d.skew_score)}">${skewLabel(d.skew_score)}</span>
+        <div style="font-size:11px;opacity:.5;margin-top:4px;">Skew ${d.skew_score}</div>
       </div>
     </div>
 
-    <div class="thesis-grid">
-      <div class="thesis-card thesis-bull">
-        <div class="thesis-label">Bull case</div>
-        <p>${d.hypothesis?.bull || ''}</p>
+    <!-- Sub-scores -->
+    <div class="sub-scores">${subScoreHtml}</div>
+
+    <!-- Hypothesis -->
+    <div class="two-col">
+      <div class="thesis-card thesis-bull"><div class="thesis-label">Bull case</div><p>${d.hypothesis?.bull || ''}</p></div>
+      <div class="thesis-card thesis-bear"><div class="thesis-label">Bear case</div><p>${d.hypothesis?.bear || ''}</p></div>
+    </div>
+
+    <!-- Asset portfolio -->
+    ${assets.length ? `<div class="card">
+      <div class="card-title">Asset Portfolio (${assets.length} asset${assets.length > 1 ? 's' : ''})</div>
+      <table>
+        <thead><tr><th>Asset</th><th>Jurisdiction</th><th>Stage</th><th>Ownership</th><th>Deposit type</th><th>Mining method</th></tr></thead>
+        <tbody>${assetRows}</tbody>
+      </table>
+    </div>` : ''}
+
+    <!-- Key metrics + Technical -->
+    <div class="two-col" style="align-items:start">
+      <div class="card">
+        <div class="card-title">Key Metrics</div>
+        <div class="metrics-grid">${metricsHtml}</div>
       </div>
-      <div class="thesis-card thesis-bear">
-        <div class="thesis-label">Bear case</div>
-        <p>${d.hypothesis?.bear || ''}</p>
+      <div class="card">
+        <div class="card-title">Technical Profile</div>
+        <div class="tech-grid">${techHtml}</div>
+        ${t.geotechnical_notes ? `<div class="tech-notes">${t.geotechnical_notes}</div>` : ''}
       </div>
     </div>
 
+    <!-- Valuation -->
     <div class="card">
-      <div class="card-title">Key Metrics</div>
-      <div class="metrics-grid">${metricsHtml}</div>
+      <div class="card-title">Valuation</div>
+      <div style="margin-bottom:10px">
+        <span class="peer-badge ${peerClass(v.peer_premium_discount)}">${cap(v.peer_premium_discount || 'unknown')} to peers</span>
+      </div>
+      <div class="val-grid">${valMetrics}</div>
+      ${v.notes ? `<div class="val-notes">${v.notes}</div>` : ''}
     </div>
 
+    <!-- Sensitivities -->
+    ${sensRows ? `<div class="card">
+      <div class="card-title">Sensitivities</div>
+      <table class="sens-table">
+        <thead><tr><th>Variable</th><th>Scenario</th><th>Impact</th></tr></thead>
+        <tbody>${sensRows}</tbody>
+      </table>
+    </div>` : ''}
+
+    <!-- Failure modes + Red flags -->
+    <div class="two-col" style="align-items:start">
+      ${failureHtml ? `<div class="card">
+        <div class="card-title">Failure Modes</div>
+        <div class="flag-list">${failureHtml}</div>
+      </div>` : ''}
+      ${redFlagHtml ? `<div class="card">
+        <div class="card-title">Technical Red Flags</div>
+        <div class="flag-list">${redFlagHtml}</div>
+      </div>` : ''}
+    </div>
+
+    <!-- What must be true -->
+    ${wmbtHtml ? `<div class="card">
+      <div class="card-title">What Must Be True (Bull Case)</div>
+      <div class="wmbt-list">${wmbtHtml}</div>
+    </div>` : ''}
+
+    <!-- Management -->
+    <div class="card">
+      <div class="card-title">Management Assessment</div>
+      <div class="mgmt-grid">
+        <div class="mgmt-item"><div class="mgmt-label">Track Record</div><div class="mgmt-value ${mgmtClass(ma.track_record)}">${cap(ma.track_record || 'insufficient data')}</div></div>
+        <div class="mgmt-item"><div class="mgmt-label">Guidance Accuracy</div><div class="mgmt-value ${mgmtClass(ma.guidance_accuracy)}">${cap(ma.guidance_accuracy || 'insufficient data')}</div></div>
+        <div class="mgmt-item"><div class="mgmt-label">Capital Allocation</div><div class="mgmt-value ${mgmtClass(ma.capital_allocation)}">${cap(ma.capital_allocation || 'insufficient data')}</div></div>
+      </div>
+      ${ma.notes ? `<div class="mgmt-notes">${ma.notes}</div>` : ''}
+    </div>
+
+    <!-- Evidence -->
     <div class="card">
       <div class="card-title">Evidence (${(d.evidence || []).length} items)</div>
       <div class="evidence-list">${evidenceHtml}</div>
     </div>
 
-    ${gapsHtml ? `
-    <div class="card">
-      <div class="card-title">Information Gaps (${(d.information_gaps || []).length})</div>
+    <!-- Information gaps -->
+    ${gapsHtml ? `<div class="card">
+      <div class="card-title">Information Gaps</div>
       <div class="gaps-list">${gapsHtml}</div>
     </div>` : ''}
 
-    ${d.monitoring_trigger ? `
-    <div class="card">
+    <!-- Monitoring trigger -->
+    ${d.monitoring_trigger ? `<div class="card">
       <div class="card-title">Monitoring Trigger</div>
       <div class="trigger-box">${d.monitoring_trigger}</div>
     </div>` : ''}
 
     <div class="analysis-footer">
-      Generated by Continuum Gold Agent &middot; Powered by NotebookLM + Claude
+      Generated by Continuum Gold Agent &middot; 20-dimension mining IC framework &middot; Powered by NotebookLM + Claude
     </div>
   `;
 
