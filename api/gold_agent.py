@@ -376,24 +376,31 @@ async def run_gold_analysis(ticker: str) -> dict:
 # ---------------------------------------------------------------------------
 
 
+_NLM_BATCH_SIZE = 7  # concurrent queries per batch -- matches original implementation limit
+
+
 async def _query_corpus(ticker: str, notebook_id: str) -> dict:
-    """Open a NotebookLM client and run all queries concurrently."""
+    """Open a NotebookLM client and run queries in batches to avoid session overload."""
     all_queries = [("stage_detection", _STAGE_QUERY)] + list(_QUERIES)
 
-    async with await NotebookLMClient.from_storage() as client:
-        tasks = [
-            client.chat.ask(notebook_id, query.format(ticker=ticker))
-            for _, query in all_queries
-        ]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-
     corpus = {}
-    for (key, _), result in zip(all_queries, results):
-        if isinstance(result, Exception):
-            logger.warning("NLM query '%s' failed for %s: %s", key, ticker, result)
-            corpus[key] = f"(query failed: {result})"
-        else:
-            corpus[key] = result.answer
+    async with await NotebookLMClient.from_storage() as client:
+        for batch_start in range(0, len(all_queries), _NLM_BATCH_SIZE):
+            batch = all_queries[batch_start : batch_start + _NLM_BATCH_SIZE]
+            tasks = [
+                client.chat.ask(notebook_id, query.format(ticker=ticker))
+                for _, query in batch
+            ]
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            for (key, _), result in zip(batch, results):
+                if isinstance(result, Exception):
+                    logger.warning("NLM query '%s' failed for %s: %s", key, ticker, result)
+                    corpus[key] = f"(query failed: {result})"
+                else:
+                    corpus[key] = result.answer
+            # Brief pause between batches to avoid NotebookLM rate limiting
+            if batch_start + _NLM_BATCH_SIZE < len(all_queries):
+                await asyncio.sleep(2)
 
     return corpus
 
