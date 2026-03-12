@@ -65,13 +65,6 @@ _QUERIES = [
         "owner-operator vs contractor status, and fleet composition.",
     ),
     (
-        "geotech_hydrology_infrastructure",
-        "What are {ticker}'s geotechnical, hydrological, and infrastructure constraints? "
-        "Include pit wall stability issues, ground conditions underground, water inflow "
-        "rates, dewatering requirements, power source and cost, road and port access, "
-        "tailings storage facility status, and any permitting or environmental offsets.",
-    ),
-    (
         "operating_reconciliation",
         "How does {ticker}'s mine production reconcile against the geological model? "
         "Include any disclosed reconciliation data (mined grade vs model grade vs plant "
@@ -88,14 +81,6 @@ _QUERIES = [
         "and any contractor vs owner-operator cost differential.",
     ),
     (
-        "sustaining_growth_capex",
-        "What is {ticker}'s capital expenditure profile? "
-        "Distinguish sustaining capex from growth capex. Include initial capex for "
-        "development projects (total and per annual ounce), capex per reserve ounce, "
-        "build schedule and commissioning risk, infrastructure dependencies, "
-        "study stage (scoping / PFS / DFS / operating), and historical capex accuracy.",
-    ),
-    (
         "development_schedule_permitting",
         "What is the development and permitting status for {ticker}'s key projects? "
         "Include critical path items, permitting jurisdiction and stage, "
@@ -109,14 +94,6 @@ _QUERIES = [
         "debt maturity profile, covenant headroom, funding gap analysis at "
         "US$2,200/oz gold, any streaming or royalty obligations, and planned "
         "equity or debt raises.",
-    ),
-    (
-        "royalty_streaming_encumbrances",
-        "What royalties, streams, or other production encumbrances apply to {ticker}? "
-        "Include royalty rate and basis (NSR, NPI, gross revenue), any streaming "
-        "agreements (gold stream volume and delivery price), government royalties, "
-        "native title royalties, and the aggregate encumbrance as a percentage of "
-        "revenue or production.",
     ),
     (
         "reserve_replacement_exploration",
@@ -159,14 +136,6 @@ _QUERIES = [
         "primary reason for that differential.",
     ),
     (
-        "asset_level_nav",
-        "What is the stated or implied asset-level NAV for {ticker}? "
-        "Include any broker or company NAV estimates, the gold price and discount rate "
-        "assumptions used, P/NAV ratio at current market cap, sum-of-parts breakdown "
-        "for multi-asset companies, and any dilution from options, convertible notes, "
-        "or streaming agreements.",
-    ),
-    (
         "downside_failure_modes",
         "What are the primary ways the investment thesis for {ticker} could fail? "
         "Include: (1) the condition under which the reserve becomes uneconomic, "
@@ -174,22 +143,6 @@ _QUERIES = [
         "(3) the balance sheet scenario that forces dilutive equity, "
         "(4) the geological or metallurgical outcome that would reset the thesis, "
         "and (5) any management or governance failure mode.",
-    ),
-    (
-        "catalysts_value_inflection",
-        "What are the key upcoming catalysts for {ticker} in the next 6-12 months? "
-        "Include exploration results, reserve updates, feasibility studies, "
-        "production reports, permitting decisions, M&A activity, and any specific "
-        "value inflection points tied to project milestones or gold price levels.",
-    ),
-    (
-        "accounting_quality",
-        "What accounting or financial reporting quality issues exist for {ticker}? "
-        "Include treatment of capitalised stripping and development, sustaining vs "
-        "growth capex classification, inventory and stockpile accounting, hedge book "
-        "treatment and mark-to-market, by-product credit quality, any one-off "
-        "normalisation adjustments, and whether technical study assumptions align "
-        "with quarterly reporting.",
     ),
 ]
 
@@ -376,7 +329,7 @@ async def run_gold_analysis(ticker: str) -> dict:
 # ---------------------------------------------------------------------------
 
 
-_NLM_BATCH_SIZE = 7  # concurrent queries per batch -- matches original implementation limit
+_NLM_BATCH_SIZE = 8  # concurrent queries per batch -- 15 total queries fits in 2 batches (8+7)
 
 
 async def _query_corpus(ticker: str, notebook_id: str) -> dict:
