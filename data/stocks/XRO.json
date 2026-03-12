@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.12,
+      "survival_score": 0.13,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-12T06:53:42.665Z"
+      "last_updated": "2026-03-12T07:15:17.033Z"
     },
     "N2": {
       "label": "Valuation Compression",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.36,
+      "survival_score": 0.33,
       "status": "LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-12T06:53:42.665Z"
+      "last_updated": "2026-03-12T07:15:17.033Z"
     },
     "N3": {
       "label": "AI Disruption Risk",
@@ -35,10 +35,10 @@
       "what_to_watch": "Cost pressures, competitive threats, or macro headwinds.",
       "upside": null,
       "risk_plain": "Material downside if multiple risks crystallise simultaneously.",
-      "survival_score": 0.26,
+      "survival_score": 0.27,
       "status": "LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-12T06:53:42.665Z"
+      "last_updated": "2026-03-12T07:15:17.033Z"
     },
     "N4": {
       "label": "Competitive Pressure",
@@ -47,10 +47,10 @@
       "what_to_watch": "Industry disruption signals and regulatory changes.",
       "upside": null,
       "risk_plain": "If disruption materialises, prior assumptions become invalid.",
-      "survival_score": 0.26,
+      "survival_score": 0.27,
       "status": "LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-12T06:53:42.665Z"
+      "last_updated": "2026-03-12T07:15:17.033Z"
     }
   },
   "dominant": "N2",
@@ -84,6 +84,13 @@
       "type": "OVERCORRECTION_TRIGGER",
       "severity": "AMBER",
       "message": "Single-day move of +11.1% exceeds 10% threshold — possible overcorrection",
+      "auto_generated": true
+    },
+    {
+      "date": "2026-03-12",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "Single-day move of -10.4% exceeds 10% threshold — possible overcorrection",
       "auto_generated": true
     }
   ],
@@ -187,11 +194,20 @@
       "cumulative_20d": -7.66,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-12",
+      "classification": "MATERIAL",
+      "daily_change_pct": -10.44,
+      "volume_multiplier": 1,
+      "cumulative_5d": -1.55,
+      "cumulative_20d": -12.69,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    121.44,
     121.2,
     120.9,
     118.88,
@@ -250,7 +266,8 @@
     78.86,
     83.89,
     87.63,
-    81.85
+    81.85,
+    78.48
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -503,11 +520,11 @@
   "_overcorrection": {
     "active": true,
     "triggerType": "SINGLE_DAY",
-    "triggerDate": "2026-03-06",
-    "triggerPrice": 87.63,
-    "direction": "up",
-    "movePct": 11.12,
-    "reviewDate": "2026-03-13",
-    "message": "Single-day move of +11.1% exceeds 10% threshold — possible overcorrection"
+    "triggerDate": "2026-03-12",
+    "triggerPrice": 78.48,
+    "direction": "down",
+    "movePct": -10.44,
+    "reviewDate": "2026-03-19",
+    "message": "Single-day move of -10.4% exceeds 10% threshold — possible overcorrection"
   }
 }

@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-11T07:13:22.435Z"
+      "last_updated": "2026-03-12T07:15:17.055Z"
     },
     "N2": {
       "label": "Traditional Energy Cash Cow",
@@ -26,7 +26,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-11T07:13:22.435Z"
+      "last_updated": "2026-03-12T07:15:17.055Z"
     },
     "N3": {
       "label": "Margin Pressure",
@@ -35,10 +35,10 @@
       "what_to_watch": "Quarterly EBITA margin, fixed-price contract run-off, sustainability vs traditional margin gap.",
       "upside": null,
       "risk_plain": "If margins cannot reach 8%+ by FY26, the market will question management execution credibility.",
-      "survival_score": 0.44,
+      "survival_score": 0.46,
       "status": "MODERATE",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-12T06:53:42.665Z"
+      "last_updated": "2026-03-12T07:15:17.055Z"
     },
     "N4": {
       "label": "Cyclical Downturn",
@@ -47,15 +47,15 @@
       "what_to_watch": "Global recession indicators, oil price, government clean energy subsidy policies, backlog cancellations.",
       "upside": null,
       "risk_plain": "In past downturns revenue fell 20-30% and margins compressed to near-zero; elevated leverage amplifies risk.",
-      "survival_score": 0.46,
+      "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-12T06:53:42.665Z"
+      "last_updated": "2026-03-12T07:15:17.055Z"
     }
   },
   "dominant": "N4",
   "confidence": "LOW",
-  "alert_state": "OVERCORRECTION",
+  "alert_state": "OVERCORRECTION_CONFIRMED",
   "current_price": 9.95,
   "big_picture": "Worley Limited (ASX: WOR) — coverage initiated. Full analysis pending.",
   "last_flip": {
@@ -245,6 +245,13 @@
       "severity": "AMBER",
       "message": "5-day cumulative move of -16.6% exceeds 15% threshold — possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-03-12",
+      "type": "OVERCORRECTION_REVIEW",
+      "severity": "GREEN",
+      "message": "Overcorrection CONFIRMED — 410% reversal since trigger",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -357,11 +364,20 @@
       "cumulative_20d": -13.33,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-12",
+      "classification": "NOTABLE",
+      "daily_change_pct": -4.33,
+      "volume_multiplier": 1,
+      "cumulative_5d": -5.04,
+      "cumulative_20d": -16.56,
+      "results_day": false,
+      "overcorrection_active": false
     }
   ],
   "editorial_override": null,
   "price_history": [
-    10.5,
     10.8,
     11,
     11.2,
@@ -420,7 +436,8 @@
     10.96,
     10.52,
     10.4,
-    10.18
+    10.18,
+    9.95
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -650,13 +667,18 @@
   "price": 11.71,
   "date": "26 February 2026",
   "_overcorrection": {
-    "active": true,
+    "active": false,
     "triggerType": "FIVE_DAY_CUMULATIVE",
     "triggerDate": "2026-03-05",
     "triggerPrice": 11.03,
     "direction": "down",
     "movePct": -2.39,
     "reviewDate": "2026-03-12",
-    "message": "5-day cumulative move of -16.6% exceeds 15% threshold — possible overcorrection"
+    "message": "5-day cumulative move of -16.6% exceeds 15% threshold — possible overcorrection",
+    "reviewResult": {
+      "reversal_pct": 409.7,
+      "confirmed": true,
+      "message": "Overcorrection CONFIRMED — 410% reversal since trigger"
+    }
   }
 }
