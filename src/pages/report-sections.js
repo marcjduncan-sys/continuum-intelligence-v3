@@ -834,7 +834,7 @@ export function renderTechnicalAnalysis(data) {
   if (ta.volume.priorSpikes) {
     for (var v = 0; v < ta.volume.priorSpikes.length; v++) {
       var sp = ta.volume.priorSpikes[v];
-      volHtml += '<div class="ta-metric-row"><div class="ta-metric-name">' + sp.period + '</div><div class="ta-metric-val">' + sp.ratio.toFixed(1) + 'x &mdash; ' + sp.context + '</div></div>';
+      volHtml += '<div class="ta-metric-row"><div class="ta-metric-name">' + sp.period + '</div><div class="ta-metric-val">' + sp.ratio.toFixed(1) + 'x <span class="ta-metric-desc">&mdash; ' + sp.context + '</span></div></div>';
     }
   }
   volHtml += '</div>' +

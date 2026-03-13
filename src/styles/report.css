@@ -809,6 +809,59 @@
     color: var(--text-primary);
 }
 
+/* ── Sidebar: Valuation Range ── */
+.hs-val-section { margin-top: var(--space-xs); }
+.hs-val-header { margin-bottom: var(--space-xs); }
+.hs-val-zone {
+    font-family: var(--font-data);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+.hs-val-zone.red    { color: var(--signal-red); }
+.hs-val-zone.amber  { color: var(--signal-amber); }
+.hs-val-zone.green  { color: var(--signal-green); }
+.hs-val-levels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.62rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin-bottom: var(--space-xs);
+}
+.hs-val-levels span {
+    font-family: var(--font-data);
+    text-align: center;
+}
+.hs-val-levels span:first-child { text-align: left; }
+.hs-val-levels span:last-child  { text-align: right; }
+.hs-val-bar {
+    position: relative;
+    height: 6px;
+    background: var(--bg-elevated);
+    border-radius: 3px;
+    margin-bottom: var(--space-xs);
+}
+.hs-val-marker {
+    position: absolute;
+    top: -3px;
+    width: 12px; height: 12px;
+    background: var(--text-primary);
+    border: 2px solid var(--bg-card);
+    border-radius: 50%;
+    transform: translateX(-50%);
+}
+.hs-val-distances {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.6rem;
+    font-family: var(--font-data);
+    font-weight: 500;
+}
+.hs-val-distances .neg { color: var(--signal-red); }
+.hs-val-distances .pos { color: var(--signal-green); }
+
 /* --- Evidence Domain Cards --- */
 .evidence-card {
     background: var(--bg-card);
@@ -1541,7 +1594,7 @@
     font-size: 0.75rem; color: var(--text-secondary);
 }
 .ta-inflection-table tr:last-child td { border-bottom: none; }
-.ta-inflection-table .ta-date-cell { font-family: var(--font-data); font-weight: 500; white-space: nowrap; color: var(--text-primary); }
+.ta-inflection-table .ta-date-cell { font-family: var(--font-ui); font-weight: 500; white-space: nowrap; color: var(--text-primary); }
 .ta-inflection-table .ta-price-cell { font-family: var(--font-data); font-weight: 600; }
 .ta-inflection-table .ta-event-cell { font-family: var(--font-ui); color: var(--text-secondary); }
 
@@ -1570,6 +1623,7 @@
 }
 .ta-metric-val.ta-neg { color: var(--signal-red); }
 .ta-metric-val.ta-pos { color: var(--signal-green); }
+.ta-metric-desc { font-family: var(--font-ui); font-weight: 400; }
 
 /* Mean Reversion positioning bar */
 .ta-mr-container {
