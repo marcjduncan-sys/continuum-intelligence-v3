@@ -1122,10 +1122,9 @@ export function prepareHypotheses(data) {
 
   var hyps = data.hypotheses;
 
-  for (var i = 0; i < hyps.length; i++) {
-    hyps[i]._origTierNum = hyps[i].tier.replace(/^n/, '');
-  }
-
+  // Sort for visual ordering: fewer contradictions first, then higher score.
+  // N-labels (tier, title) are preserved exactly as in the JSON so the UI
+  // and the LLM context (ingest.py) always agree on what N2 means.
   hyps.sort(function(a, b) {
     var aContra = a.contradicting ? a.contradicting.length : 0;
     var bContra = b.contradicting ? b.contradicting.length : 0;
@@ -1133,155 +1132,35 @@ export function prepareHypotheses(data) {
     return parseFloat(b.score) - parseFloat(a.score);
   });
 
-  var tierMap = {};
-  var needsRemap = false;
+  // Enrich direction class -- do not rename tiers or titles.
   for (var i = 0; i < hyps.length; i++) {
-    var newNum = String(i + 1);
-    var oldNum = hyps[i]._origTierNum;
-    tierMap[oldNum] = newNum;
-    if (oldNum !== newNum) needsRemap = true;
+    hyps[i].dirClass = dirMap[hyps[i].direction] || 'dir-neutral';
   }
 
-  for (var i = 0; i < hyps.length; i++) {
-    var h = hyps[i];
-    var oldPrefix = /^N\d+:\s*/;
-    h.tier = 'n' + (i + 1);
-    h.dirClass = dirMap[h.direction] || 'dir-neutral';
-    h.title = 'N' + (i + 1) + ': ' + h.title.replace(oldPrefix, '');
-  }
-
+  // Apply direction colours to verdict scores without renaming labels.
   if (data.verdict && data.verdict.scores) {
-    var oldScores = data.verdict.scores.slice();
-    var newScores = [];
     for (var i = 0; i < hyps.length; i++) {
       var rawScore = hyps[i].score;
-      var matched = null;
-      for (var j = 0; j < oldScores.length; j++) {
-        if (oldScores[j] && oldScores[j].score === rawScore) {
-          matched = oldScores[j];
-          oldScores[j] = null;
+      for (var j = 0; j < data.verdict.scores.length; j++) {
+        if (data.verdict.scores[j] && data.verdict.scores[j].score === rawScore) {
+          data.verdict.scores[j].scoreColor = colorMap[hyps[i].dirClass] || data.verdict.scores[j].scoreColor;
           break;
         }
       }
-      if (matched) {
-        matched.label = 'N' + (i + 1) + ' ' + matched.label.replace(/^N\d+\s*/, '');
-        matched.scoreColor = colorMap[hyps[i].dirClass] || matched.scoreColor;
-        newScores.push(matched);
-      }
     }
-    data.verdict.scores = newScores;
   }
 
+  // Rebuild alignmentSummary column headers to match sorted display order.
   if (data.evidence && data.evidence.alignmentSummary) {
     var as = data.evidence.alignmentSummary;
     if (as.headers && as.headers.length >= 5 && as.rows) {
       var nonNCount = as.headers.length - hyps.length;
       var newHeaders = as.headers.slice(0, nonNCount);
       for (var i = 0; i < hyps.length; i++) {
-        newHeaders.push('N' + (i + 1) + ' ' + hyps[i].title.replace(/^N\d+:\s*/, '').substring(0, 15));
+        newHeaders.push(hyps[i].title.substring(0, 18));
       }
       as.headers = newHeaders;
-
-      if (needsRemap) {
-        var inverseTierMap = {};
-        for (var old in tierMap) {
-          if (tierMap.hasOwnProperty(old)) inverseTierMap[tierMap[old]] = old;
-        }
-        for (var r = 0; r < as.rows.length; r++) {
-          var row = as.rows[r];
-          var orig = { n1: row.n1, n2: row.n2, n3: row.n3, n4: row.n4 };
-          for (var n = 1; n <= 4; n++) {
-            var fromOld = inverseTierMap[String(n)] || String(n);
-            row['n' + n] = orig['n' + fromOld];
-          }
-        }
-        if (as.summary) {
-          var sum = as.summary;
-          var origSum = {};
-          for (var n = 1; n <= 4; n++) {
-            origSum['n' + n] = sum['n' + n];
-            origSum['n' + n + 'Color'] = sum['n' + n + 'Color'];
-          }
-          for (var n = 1; n <= 4; n++) {
-            var fromOld = inverseTierMap[String(n)] || String(n);
-            sum['n' + n] = origSum['n' + fromOld];
-            sum['n' + n + 'Color'] = origSum['n' + fromOld + 'Color'];
-          }
-        }
-      }
     }
-  }
-
-  if (data.gaps && data.gaps.analyticalLimitations) {
-    var lim = data.gaps.analyticalLimitations;
-    var norm = normaliseScores(hyps);
-    var scoreStr = '';
-    for (var i = 0; i < hyps.length; i++) {
-      if (i > 0) scoreStr += ', ';
-      scoreStr += 'N' + (i + 1) + ': ' + norm[i] + '%';
-    }
-    lim = lim.replace(/\(N1:.*?\)/, '(' + scoreStr + ')');
-    data.gaps.analyticalLimitations = lim;
-  }
-
-  if (needsRemap) {
-    var remapN = function(text) {
-      if (!text || typeof text !== 'string') return text;
-      return text.replace(/\bN([1-4])\b/g, function(m, n) {
-        return 'N' + (tierMap[n] || n);
-      });
-    };
-
-    if (data.discriminators) {
-      if (data.discriminators.intro) data.discriminators.intro = remapN(data.discriminators.intro);
-      if (data.discriminators.nonDiscriminating) data.discriminators.nonDiscriminating = remapN(data.discriminators.nonDiscriminating);
-      if (data.discriminators.rows) {
-        for (var i = 0; i < data.discriminators.rows.length; i++) {
-          var dRow = data.discriminators.rows[i];
-          if (dRow.discriminatesBetween) dRow.discriminatesBetween = remapN(dRow.discriminatesBetween);
-          if (dRow.currentReading) dRow.currentReading = remapN(dRow.currentReading);
-          if (dRow.evidence) dRow.evidence = remapN(dRow.evidence);
-        }
-      }
-    }
-
-    if (data.tripwires) {
-      if (data.tripwires.intro) data.tripwires.intro = remapN(data.tripwires.intro);
-      if (data.tripwires.cards) {
-        for (var i = 0; i < data.tripwires.cards.length; i++) {
-          var twCard = data.tripwires.cards[i];
-          if (twCard.conditions) {
-            for (var c = 0; c < twCard.conditions.length; c++) {
-              var cond = twCard.conditions[c];
-              if (cond.if) cond.if = remapN(cond.if);
-              if (cond.then) cond.then = remapN(cond.then);
-            }
-          }
-        }
-      }
-    }
-
-    if (data.evidence && data.evidence.cards) {
-      for (var i = 0; i < data.evidence.cards.length; i++) {
-        var evCard = data.evidence.cards[i];
-        if (evCard.tags) {
-          for (var t = 0; t < evCard.tags.length; t++) {
-            if (evCard.tags[t].text) evCard.tags[t].text = remapN(evCard.tags[t].text);
-          }
-        }
-        if (evCard.finding) evCard.finding = remapN(evCard.finding);
-        if (evCard.tension) evCard.tension = remapN(evCard.tension);
-      }
-    }
-
-    if (data.gaps && data.gaps.couldntAssess) {
-      for (var i = 0; i < data.gaps.couldntAssess.length; i++) {
-        data.gaps.couldntAssess[i] = remapN(data.gaps.couldntAssess[i]);
-      }
-    }
-
-    if (data.verdict && data.verdict.text) data.verdict.text = remapN(data.verdict.text);
-    if (data.skew && data.skew.rationale) data.skew.rationale = remapN(data.skew.rationale);
   }
 }
 
