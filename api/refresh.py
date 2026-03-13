@@ -906,12 +906,12 @@ async def run_refresh(ticker: str) -> dict:
                 ticker, research, gathered
             )
 
-        # Track Stage 2 failures (evidence creation returns empty cards on error)
+        # Track Stage 2 failures
         ev_cards = evidence_update.get("cards", [])
-        ev_summary = evidence_update.get("summary", "")
-        if not ev_cards and "failed" in str(ev_summary).lower():
-            job.stage_errors.append(f"Stage 2 (evidence): {ev_summary}")
-            logger.warning(f"[{ticker}] Stage 2 produced 0 cards: {ev_summary}")
+        if not ev_cards:
+            ev_summary = evidence_update.get("summary", "no summary")
+            job.stage_errors.append(f"Stage 2 (evidence): 0 cards returned. {ev_summary}")
+            logger.error(f"[{ticker}] Stage 2 produced 0 evidence cards: {ev_summary}")
 
         # ---- Stage 3: Hypothesis Synthesis (Claude) ----
         job.status = "hypothesis_synthesis"
@@ -929,10 +929,10 @@ async def run_refresh(ticker: str) -> dict:
 
         # Track Stage 3 failures
         hyp_list = hypothesis_update.get("hypotheses", [])
-        narr = hypothesis_update.get("narrative_rewrite", "")
-        if not hyp_list and "failed" in str(narr).lower():
-            job.stage_errors.append(f"Stage 3 (hypothesis): {narr}")
-            logger.warning(f"[{ticker}] Stage 3 produced 0 hypotheses: {narr}")
+        if not hyp_list:
+            narr = hypothesis_update.get("narrative_rewrite", "no narrative")
+            job.stage_errors.append(f"Stage 3 (hypothesis): 0 hypotheses returned. keys={list(hypothesis_update.keys())}")
+            logger.error(f"[{ticker}] Stage 3 produced 0 hypotheses: {narr[:200]}")
 
         # ---- Stage 4: Write Results ----
         job.status = "writing_results"
@@ -1110,9 +1110,21 @@ Please create all 10 evidence domain cards for this stock based on the available
             feature="evidence-creation",
             ticker=ticker,
         )
-        parsed = result.json if isinstance(result.json, dict) else {}
+        raw_json = result.json
+        logger.info(
+            f"[{ticker}] Evidence creation raw response: "
+            f"type={type(raw_json).__name__}, "
+            f"keys={list(raw_json.keys()) if isinstance(raw_json, dict) else 'N/A'}, "
+            f"text_preview={result.text[:200] if result.text else 'empty'}"
+        )
+        parsed = raw_json if isinstance(raw_json, dict) else {}
         cards = parsed.get("cards", [])
         logger.info(f"[{ticker}] Evidence creation returned {len(cards)} cards")
+        if not cards:
+            logger.error(
+                f"[{ticker}] Evidence creation returned 0 cards! "
+                f"Full parsed keys: {list(parsed.keys()) if parsed else 'empty dict'}"
+            )
         return parsed if parsed else {"cards": []}
     except Exception as e:
         logger.error(f"[{ticker}] Evidence creation failed: {e}", exc_info=True)
@@ -1230,7 +1242,14 @@ sections, verdict, tripwires, discriminators, and gaps assessment. Be thorough a
             fallback_model=config.GEMINI_MODEL,
             max_retries=2,
         )
-        result = resp.json if isinstance(resp.json, dict) else {}
+        raw_json = resp.json
+        logger.info(
+            f"[{ticker}] Coverage initiation raw response: "
+            f"type={type(raw_json).__name__}, "
+            f"keys={list(raw_json.keys()) if isinstance(raw_json, dict) else 'N/A'}, "
+            f"text_preview={resp.text[:300] if resp.text else 'empty'}"
+        )
+        result = raw_json if isinstance(raw_json, dict) else {}
     except Exception as e:
         logger.error(f"[{ticker}] Coverage initiation failed (all providers): {e}", exc_info=True)
         return {
@@ -1239,12 +1258,18 @@ sections, verdict, tripwires, discriminators, and gaps assessment. Be thorough a
             "verdict_update": None,
         }
 
+    hyp_count = len(result.get("hypotheses", []))
+    trip_count = len(result.get("tripwires", []))
+    disc_count = len(result.get("discriminators", []))
     logger.info(
         f"[{ticker}] Coverage initiation: "
-        f"{len(result.get('hypotheses', []))} hypotheses, "
-        f"{len(result.get('tripwires', []))} tripwires, "
-        f"{len(result.get('discriminators', []))} discriminators"
+        f"{hyp_count} hypotheses, {trip_count} tripwires, {disc_count} discriminators"
     )
+    if not hyp_count:
+        logger.error(
+            f"[{ticker}] Coverage initiation returned 0 hypotheses! "
+            f"Full result keys: {list(result.keys()) if result else 'empty dict'}"
+        )
     return result
 
 
@@ -1760,6 +1785,14 @@ def _merge_initiation(
     hypothesis_update: dict,
 ) -> dict:
     """Merge coverage initiation results into the scaffold, replacing placeholders."""
+    ev_cards = evidence_update.get("cards", [])
+    hyp_list = hypothesis_update.get("hypotheses", [])
+    logger.info(
+        f"_merge_initiation: evidence_cards={len(ev_cards)}, "
+        f"hypotheses={len(hyp_list)}, "
+        f"evidence_keys={list(evidence_update.keys())}, "
+        f"hypothesis_keys={list(hypothesis_update.keys())}"
+    )
     updated = deepcopy(research)
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     price_data = gathered.get("price_data", {})
