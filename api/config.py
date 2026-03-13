@@ -49,9 +49,10 @@ EMBEDDING_MODEL = "text-embedding-004"
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 
 # ---------------------------------------------------------------------------
-# Gold agent -- uses Gemini for document processing (GEMINI_API_KEY above)
-# NotebookLM vars below are deprecated; kept to avoid startup errors
-# on Railway until env vars are cleaned up.
+# Gold agent -- hybrid: NotebookLM primary, Gemini local corpus fallback.
+# NotebookLM requires NOTEBOOKLM_AUTH_JSON (browser cookies, expire ~2 weeks)
+# and NOTEBOOKLM_GOLD_NOTEBOOK_ID. When auth expires, the agent falls back
+# to Gemini processing of local files in data/gold-corpus/{TICKER}/.
 # ---------------------------------------------------------------------------
 
 NOTEBOOKLM_GOLD_NOTEBOOK_ID = os.getenv("NOTEBOOKLM_GOLD_NOTEBOOK_ID", "")
@@ -64,6 +65,7 @@ NOTEBOOKLM_AUTH_JSON = os.getenv("NOTEBOOKLM_AUTH_JSON", "")
 JWT_SECRET = os.getenv("JWT_SECRET", "dev-insecure-secret")
 BATCH_SECRET = os.getenv("BATCH_SECRET", "")
 INSIGHTS_SECRET = os.getenv("INSIGHTS_SECRET", "")
+PRICE_DRIVERS_SECRET = os.getenv("PRICE_DRIVERS_SECRET", "")
 
 # GitHub PAT with repo write scope -- used by add_stock() to commit new
 # ticker scaffolds so data persists across Railway redeployments.

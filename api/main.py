@@ -47,6 +47,11 @@ from refresh import (
 from retriever import retrieve
 from gold_agent import run_gold_analysis, check_gold_health, get_cached_result
 from github_commit import commit_files_to_github
+from price_drivers import (
+    run_price_driver_analysis, run_price_driver_scan,
+    get_latest_report as get_latest_driver_report,
+    check_drivers_health,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -508,8 +513,20 @@ async def chart_proxy(ticker: str, request: Request):
 
 @app.get("/api/agents/gold/health")
 async def gold_agent_health():
-    """Check Gemini connectivity and gold corpus availability."""
+    """Check NotebookLM and Gemini connectivity, corpus availability."""
     return await check_gold_health()
+
+
+@app.post("/api/agents/gold/reset-auth", dependencies=[Depends(verify_api_key)])
+async def gold_agent_reset_auth():
+    """Reset NotebookLM auth flag after updating NOTEBOOKLM_AUTH_JSON in Railway.
+
+    Call this after refreshing cookies to avoid needing a full redeploy.
+    """
+    import gold_agent
+    gold_agent._nlm_auth_ok = True
+    gold_agent._nlm_last_error = None
+    return {"status": "ok", "nlm_auth_ok": True}
 
 
 @app.get("/api/agents/gold/{ticker}", dependencies=[Depends(verify_api_key)])
@@ -518,12 +535,8 @@ async def gold_agent_endpoint(ticker: str, request: Request, force: bool = False
     """
     Run gold equities analysis for an ASX ticker.
 
-    Queries the NotebookLM research corpus across 20 analytical dimensions,
-    then synthesises the responses into CI v3 JSON via Claude.
-
+    Hybrid corpus: NotebookLM (primary) with Gemini local fallback.
     Returns cached result if available (24h TTL). Pass ?force=true to bypass cache.
-
-    Requires NOTEBOOKLM_GOLD_NOTEBOOK_ID and NOTEBOOKLM_AUTH_JSON env vars.
     Expect 60-120 seconds latency. Rate-limited to 2 requests/minute.
     """
     ticker = ticker.upper()
@@ -538,6 +551,83 @@ async def gold_agent_endpoint(ticker: str, request: Request, force: bool = False
     except Exception as exc:
         logger.error("Gold agent error for %s: %s", ticker, exc)
         raise HTTPException(status_code=500, detail=f"Gold analysis failed: {exc}")
+
+
+# ---------------------------------------------------------------------------
+# Price driver agent endpoints
+# ---------------------------------------------------------------------------
+
+_drivers_secret_header = APIKeyHeader(name="X-Drivers-Secret", auto_error=False)
+
+
+@app.get("/api/agents/drivers/health")
+async def drivers_health():
+    """Check price driver agent availability."""
+    return await check_drivers_health()
+
+
+@app.get("/api/agents/drivers/{ticker}/latest", dependencies=[Depends(verify_api_key)])
+@limiter.limit("10/minute")
+async def drivers_latest(ticker: str, request: Request):
+    """Fetch the most recent cached price driver report for a ticker."""
+    ticker = ticker.upper()
+    if not TICKER_PATTERN.match(ticker):
+        raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{ticker}'")
+    result = await get_latest_driver_report(ticker)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"No price driver report for {ticker}")
+    return result
+
+
+@app.get("/api/agents/drivers/{ticker}", dependencies=[Depends(verify_api_key)])
+@limiter.limit("1/minute")
+async def drivers_analyse(ticker: str, request: Request, force: bool = False):
+    """
+    Run on-demand price driver analysis for a ticker.
+
+    Expect 30-60 seconds latency. Rate-limited to 1 request/minute.
+    Pass ?force=true to bypass cache.
+    """
+    ticker = ticker.upper()
+    if not TICKER_PATTERN.match(ticker):
+        raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{ticker}'")
+
+    # Resolve company name from research data
+    import os as _os
+    research_path = _os.path.join(config.PROJECT_ROOT, "data", "research", f"{ticker}.json")
+    company_name = ticker
+    if _os.path.exists(research_path):
+        import json as _json
+        with open(research_path, "r") as f:
+            rdata = _json.load(f)
+            company_name = rdata.get("company", ticker)
+
+    try:
+        result = await run_price_driver_analysis(ticker, company_name, force=force)
+        return result
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except Exception as exc:
+        logger.error("Price driver error for %s: %s", ticker, exc)
+        raise HTTPException(status_code=500, detail=f"Price driver analysis failed: {exc}")
+
+
+@app.post("/api/agents/drivers/scan")
+async def drivers_scan(request: Request, secret: str | None = Depends(_drivers_secret_header)):
+    """
+    Run daily price driver scan for all tickers.
+
+    Protected by X-Drivers-Secret header. Triggered by price-drivers GitHub
+    Actions workflow at 22:00 UTC daily.
+    """
+    if not config.PRICE_DRIVERS_SECRET or secret != config.PRICE_DRIVERS_SECRET:
+        raise HTTPException(status_code=401, detail="Invalid or missing drivers secret")
+    try:
+        result = await run_price_driver_scan()
+        return result
+    except Exception as exc:
+        logger.error("Price driver scan failed: %s", exc)
+        raise HTTPException(status_code=500, detail="Price driver scan failed")
 
 
 # ---------------------------------------------------------------------------

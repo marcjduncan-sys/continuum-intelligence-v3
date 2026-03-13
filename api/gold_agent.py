@@ -2,11 +2,18 @@
 Elite gold equities agent v10.
 
 Architecture:
-1. Query NotebookLM corpus across technical, operational, financial and valuation dimensions.
+1. Query corpus: NotebookLM (primary, RAG over uploaded documents) with automatic
+   fallback to Gemini processing of local files in data/gold-corpus/{TICKER}/.
 2. Ask Claude to extract a rich structured JSON payload.
 3. Apply deterministic overlays for stage normalisation, evidence weighting, risk flags,
    proxy valuation, asset-level scenario NAVs, underwriting tests, reconciliation flags,
    study schedule backfill and recommendation logic.
+
+NotebookLM auth (browser cookies) expires every 1-2 weeks. When it does, the agent
+falls back to Gemini local corpus automatically. To restore NotebookLM:
+  1. Run Get NotebookLM Auth.bat from Desktop
+  2. Copy NOTEBOOKLM_AUTH_JSON.txt content
+  3. Update NOTEBOOKLM_AUTH_JSON in Railway dashboard
 
 This module is designed as a screening / underwriting agent for listed gold equities.
 It is intentionally conservative when data is missing.
@@ -27,6 +34,12 @@ from typing import Any, Dict, List, Optional
 
 from google import genai
 from google.genai import types
+
+try:
+    from notebooklm import NotebookLMClient
+    _HAS_NOTEBOOKLM = True
+except ImportError:
+    _HAS_NOTEBOOKLM = False
 
 import config
 
@@ -58,7 +71,14 @@ def cache_result(ticker: str, result: Dict[str, Any]) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Corpus directory -- local document storage replaces NotebookLM
+# NotebookLM state -- tracks whether NLM auth is working this session
+# ---------------------------------------------------------------------------
+
+_nlm_auth_ok: bool = True  # optimistic; flipped on first auth failure
+_nlm_last_error: Optional[str] = None
+
+# ---------------------------------------------------------------------------
+# Corpus directory -- local document fallback when NotebookLM is unavailable
 # ---------------------------------------------------------------------------
 
 _CORPUS_DIR = os.path.join(config.PROJECT_ROOT, "data", "gold-corpus")
@@ -89,13 +109,13 @@ _last_successful_check: Optional[float] = None
 
 
 async def check_gold_health() -> Dict[str, Any]:
-    """Check Gemini connectivity and corpus document availability."""
+    """Check NotebookLM and Gemini connectivity, corpus document availability."""
     global _last_successful_check
 
     if not config.GEMINI_API_KEY:
         return {"status": "not_configured", "detail": "GEMINI_API_KEY not set"}
 
-    # Check which tickers have corpus documents
+    # Check which tickers have local corpus documents
     corpus_status: Dict[str, int] = {}
     if os.path.isdir(_CORPUS_DIR):
         for d in sorted(os.listdir(_CORPUS_DIR)):
@@ -104,6 +124,23 @@ async def check_gold_health() -> Dict[str, Any]:
                 files = _list_corpus_files(d)
                 if files:
                     corpus_status[d] = len(files)
+
+    # NotebookLM status
+    nlm_status = "unavailable"
+    nlm_detail = None
+    if not _HAS_NOTEBOOKLM:
+        nlm_detail = "notebooklm-py not installed"
+    elif not config.NOTEBOOKLM_AUTH_JSON:
+        nlm_status = "not_configured"
+        nlm_detail = "NOTEBOOKLM_AUTH_JSON not set"
+    elif not config.NOTEBOOKLM_GOLD_NOTEBOOK_ID:
+        nlm_status = "not_configured"
+        nlm_detail = "NOTEBOOKLM_GOLD_NOTEBOOK_ID not set"
+    elif not _nlm_auth_ok:
+        nlm_status = "auth_expired"
+        nlm_detail = _nlm_last_error or "Cookies expired. Run Get NotebookLM Auth.bat and update NOTEBOOKLM_AUTH_JSON in Railway."
+    else:
+        nlm_status = "configured"
 
     # Quick Gemini connectivity test
     try:
@@ -118,7 +155,10 @@ async def check_gold_health() -> Dict[str, Any]:
         return {
             "status": "healthy",
             "gemini_model": config.GEMINI_MODEL,
-            "corpus_tickers": corpus_status,
+            "notebooklm": nlm_status,
+            "notebooklm_detail": nlm_detail,
+            "corpus_source": "notebooklm" if nlm_status == "configured" else "gemini_local",
+            "local_corpus_tickers": corpus_status,
             "cached_tickers": list(_result_cache.keys()),
             "last_successful": _last_successful_check,
         }
@@ -126,7 +166,8 @@ async def check_gold_health() -> Dict[str, Any]:
         return {
             "status": "error",
             "detail": str(exc),
-            "corpus_tickers": corpus_status,
+            "notebooklm": nlm_status,
+            "local_corpus_tickers": corpus_status,
             "last_successful": _last_successful_check,
         }
 
@@ -427,8 +468,14 @@ _JURISDICTION_PREMIUM = {
 async def run_gold_analysis(ticker: str, force: bool = False) -> dict:
     ticker = ticker.upper()
 
-    if not config.GEMINI_API_KEY:
-        raise RuntimeError("GEMINI_API_KEY not configured")
+    has_nlm = (
+        _HAS_NOTEBOOKLM
+        and _nlm_auth_ok
+        and config.NOTEBOOKLM_AUTH_JSON
+        and config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
+    )
+    if not config.GEMINI_API_KEY and not has_nlm:
+        raise RuntimeError("Neither GEMINI_API_KEY nor NotebookLM configured")
 
     if not force:
         cached = get_cached_result(ticker)
@@ -483,7 +530,62 @@ def _load_corpus_parts(ticker: str) -> List[Any]:
 
 
 async def _query_corpus(ticker: str) -> Dict[str, str]:
-    """Query research documents using Gemini instead of NotebookLM."""
+    """Query corpus: try NotebookLM first, fall back to Gemini local files."""
+    global _nlm_auth_ok, _nlm_last_error
+
+    # --- Attempt 1: NotebookLM (primary when configured) ---
+    if (
+        _HAS_NOTEBOOKLM
+        and _nlm_auth_ok
+        and config.NOTEBOOKLM_AUTH_JSON
+        and config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
+    ):
+        try:
+            return await _query_notebooklm(ticker)
+        except Exception as exc:
+            err_str = str(exc).lower()
+            if "auth" in err_str or "401" in err_str or "cookie" in err_str or "login" in err_str or "forbidden" in err_str or "403" in err_str:
+                _nlm_auth_ok = False
+                _nlm_last_error = (
+                    f"NotebookLM auth expired: {exc}. "
+                    "Run Get NotebookLM Auth.bat, copy NOTEBOOKLM_AUTH_JSON.txt content, "
+                    "and update the Railway variable."
+                )
+                logger.warning("NotebookLM auth failed for %s, falling back to Gemini local: %s", ticker, exc)
+            else:
+                logger.warning("NotebookLM query failed for %s, falling back to Gemini local: %s", ticker, exc)
+
+    # --- Attempt 2: Gemini local corpus (fallback) ---
+    return await _query_gemini_local(ticker)
+
+
+async def _query_notebooklm(ticker: str) -> Dict[str, str]:
+    """Query NotebookLM for corpus answers.
+
+    Uses NOTEBOOKLM_AUTH_JSON env var for auth (loaded by from_storage()).
+    """
+    notebook_id = config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
+
+    async with await NotebookLMClient.from_storage() as client:
+        results: Dict[str, str] = {}
+        for key, query in _QUERIES:
+            formatted = query.format(ticker=ticker)
+            response = await client.chat.ask(
+                notebook_id=notebook_id,
+                message=formatted,
+            )
+            text = response.text if hasattr(response, "text") else str(response)
+            results[key] = text
+
+    logger.info(
+        "Gold corpus (NotebookLM): answered %d/%d questions for %s",
+        len(results), len(_QUERIES), ticker,
+    )
+    return results
+
+
+async def _query_gemini_local(ticker: str) -> Dict[str, str]:
+    """Query local corpus documents using Gemini (fallback)."""
     doc_parts = _load_corpus_parts(ticker)
 
     # Build all 20 questions into a single prompt
