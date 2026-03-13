@@ -62,6 +62,10 @@ NOTEBOOKLM_AUTH_JSON = os.getenv("NOTEBOOKLM_AUTH_JSON", "")
 JWT_SECRET = os.getenv("JWT_SECRET", "dev-insecure-secret")
 BATCH_SECRET = os.getenv("BATCH_SECRET", "")
 INSIGHTS_SECRET = os.getenv("INSIGHTS_SECRET", "")
+
+# GitHub PAT with repo write scope -- used by add_stock() to commit new
+# ticker scaffolds so data persists across Railway redeployments.
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
 JWT_EXPIRY_DAYS = int(os.getenv("JWT_EXPIRY_DAYS", "30"))
 
 # Email (SMTP) -- for OTP delivery. Optional: falls back to log-only if unset.

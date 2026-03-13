@@ -46,6 +46,7 @@ from refresh import (
 )
 from retriever import retrieve
 from gold_agent import run_gold_analysis
+from github_commit import commit_files_to_github
 
 
 # ---------------------------------------------------------------------------
@@ -662,6 +663,26 @@ async def llm_usage(days: int = 7):
 # Add Stock endpoint
 # ---------------------------------------------------------------------------
 
+async def _run_gold_agent_background(ticker: str, research_path: Path, token: str) -> None:
+    """
+    Background task: run the gold agent for a newly added gold miner and
+    commit the result to GitHub, replacing the generic scaffold.
+    """
+    try:
+        logger.info("[GoldAgent] Background analysis starting for %s", ticker)
+        result = await run_gold_analysis(ticker)
+        with open(research_path, "w") as f:
+            json.dump(result, f, indent=2, ensure_ascii=False)
+        await commit_files_to_github(
+            {f"data/research/{ticker}.json": research_path},
+            f"Add {ticker}: gold agent analysis",
+            token,
+        )
+        logger.info("[GoldAgent] Background analysis committed for %s", ticker)
+    except Exception as e:
+        logger.warning("[GoldAgent] Background run failed for %s: %s", ticker, e)
+
+
 class AddStockRequest(BaseModel):
     ticker: str = Field(..., description="ASX ticker code, e.g. 'MIN'")
 
@@ -824,6 +845,31 @@ async def add_stock(
     except Exception as e:
         logger.warning(f"[AddStock] Re-ingest failed (non-fatal): {e}")
 
+    # ---- Commit scaffold files to GitHub (persists across Railway redeployments) ----
+    _scaffold_files = {
+        f"data/research/{ticker}.json": research_dir / f"{ticker}.json",
+        "data/research/_index.json": index_path,
+        "data/reference.json": reference_path,
+        "data/freshness.json": freshness_path,
+        "data/config/tickers.json": tickers_path,
+    }
+    try:
+        await commit_files_to_github(
+            _scaffold_files,
+            f"Add {ticker}: scaffold ({company})",
+            config.GITHUB_TOKEN,
+        )
+    except Exception as e:
+        logger.warning(f"[AddStock] GitHub commit failed (non-fatal): {e}")
+
+    # ---- Gold miner: queue gold agent analysis as background task ----
+    _is_gold = "gold" in industry.lower()
+    if _is_gold and config.NOTEBOOKLM_GOLD_NOTEBOOK_ID and config.NOTEBOOKLM_AUTH_JSON:
+        asyncio.create_task(
+            _run_gold_agent_background(ticker, research_dir / f"{ticker}.json", config.GITHUB_TOKEN)
+        )
+        logger.info(f"[AddStock] Gold agent queued as background task for {ticker}")
+
     return {
         "status": "added",
         "ticker": ticker,
@@ -832,6 +878,7 @@ async def add_stock(
         "industry": industry,
         "price": price_data.get("price"),
         "currency": price_data.get("currency", "A$"),
+        "gold_agent_queued": _is_gold and bool(config.NOTEBOOKLM_GOLD_NOTEBOOK_ID),
     }
 
 
