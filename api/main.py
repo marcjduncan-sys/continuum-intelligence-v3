@@ -888,12 +888,57 @@ async def add_stock(
     except Exception as e:
         logger.warning(f"[AddStock] GitHub commit failed (non-fatal): {e}")
 
-    # ---- Queue CI v3 coverage initiation as background task ----
-    _research_path = research_dir / f"{ticker}.json"
-    asyncio.create_task(
-        _run_coverage_background(ticker, _research_path, config.GITHUB_TOKEN)
-    )
-    logger.info(f"[AddStock] Coverage initiation queued as background task for {ticker}")
+    # ---- Run coverage initiation synchronously ----
+    coverage_status = "pending"
+    coverage_error = None
+
+    try:
+        populated = await asyncio.wait_for(run_refresh(ticker), timeout=150.0)
+
+        # Quality gate: verify the LLM actually produced content
+        evidence_cards = populated.get("evidence", {}).get("cards", [])
+        hypotheses = populated.get("hypotheses", [])
+        has_narrative = bool(populated.get("narrative", {}).get("theNarrative"))
+        has_real_scores = any(
+            isinstance(h.get("score"), str) and h["score"].endswith("%")
+            for h in hypotheses
+        )
+
+        if len(evidence_cards) >= 5 and has_real_scores and has_narrative:
+            coverage_status = "completed"
+        else:
+            coverage_status = "degraded"
+            coverage_error = (
+                f"Partial content: {len(evidence_cards)} evidence cards, "
+                f"scores={'yes' if has_real_scores else 'no'}, "
+                f"narrative={'yes' if has_narrative else 'no'}"
+            )
+
+        # Re-ingest so chat API sees the populated content
+        try:
+            ingest()
+        except Exception:
+            pass
+
+        # Commit populated research to GitHub
+        dist_research_path = _data_dir() / f"{ticker}.json"
+        try:
+            await commit_files_to_github(
+                {f"data/research/{ticker}.json": dist_research_path},
+                f"Add {ticker}: coverage initiation",
+                config.GITHUB_TOKEN,
+            )
+        except Exception as commit_err:
+            logger.warning(f"[AddStock] GitHub commit of populated research failed (non-fatal): {commit_err}")
+
+    except asyncio.TimeoutError:
+        coverage_status = "timeout"
+        coverage_error = "Coverage initiation timed out after 150s"
+    except Exception as e:
+        coverage_status = "failed"
+        coverage_error = str(e)
+
+    logger.info(f"[AddStock] Coverage initiation for {ticker}: {coverage_status}")
 
     return {
         "status": "added",
@@ -903,7 +948,8 @@ async def add_stock(
         "industry": industry,
         "price": price_data.get("price"),
         "currency": price_data.get("currency", "A$"),
-        "coverage_initiation_queued": True,
+        "coverage_status": coverage_status,
+        "coverage_error": coverage_error,
     }
 
 
