@@ -297,9 +297,15 @@ export function renderHypotheses(data) {
       contradictHtml += '</ul>';
     }
 
+    var tierMatch = (h.tier || '').toUpperCase().match(/^[NT]\d+/);
+    var displayTitle = (h.title || '');
+    if (tierMatch && !/^[NT]\d+[:\s]/i.test(displayTitle)) {
+      displayTitle = tierMatch[0] + ': ' + displayTitle;
+    }
+
     var dominantCls = (i === 0) ? ' dominant' : '';
     cardsHtml += '<div class="hyp-card ' + h.dirClass + dominantCls + '">' +
-      '<div class="hc-header"><div class="hc-title">' + h.title + '</div><div class="hc-status ' + h.statusClass + '">' + h.statusText + '</div></div>' +
+      '<div class="hc-header"><div class="hc-title">' + displayTitle + '</div><div class="hc-status ' + h.statusClass + '">' + h.statusText + '</div></div>' +
       '<div class="hc-score-row"><div class="hc-score-number">' + normScore + '</div><div class="hc-score-bar"><div class="hc-score-fill" style="width:' + normWidth + '"></div></div><div class="hc-score-meta">' + h.scoreMeta + '</div></div>' +
       '<p class="hc-desc">' + h.description + '</p>' +
       requiresHtml +
@@ -1667,7 +1673,7 @@ export function renderSignalBars(data) {
     var sh = sorted[ci];
     var chipCls  = sh.direction === 'downside' ? 'downside' : sh.direction === 'upside' ? 'upside' : '';
     var nMatch   = sh.title ? sh.title.match(/^([NT]\d+)/i) : null;
-    var nCode    = nMatch ? nMatch[1].toUpperCase() : '';
+    var nCode    = nMatch ? nMatch[1].toUpperCase() : ((sh.tier || '').toUpperCase().match(/^[NT]\d+/) || [''])[0];
     var descParts= (sh.title || '').replace(/^[NT]\d+[:\s]*/i,'').split(' ');
     var keyWord  = (descParts[0] || '').toLowerCase() === 'structural' && descParts[1]
                    ? descParts[1] : (descParts[0] || '');
