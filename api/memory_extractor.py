@@ -87,6 +87,8 @@ async def extract_memories(
     if pool is None:
         return
 
+    # Truncate response to 2,000 chars to control Haiku token cost.
+    # Late-response insights beyond this limit are not extracted; accepted tradeoff.
     prompt = _EXTRACTION_PROMPT.format(
         ticker=ticker or "general",
         question=question,
@@ -131,9 +133,9 @@ async def extract_memories(
                 guest_id=guest_id,
                 memory_type=mem_type,
                 content=content,
-                ticker=item.get("ticker"),
+                ticker=(item.get("ticker") or "").upper() or None,
                 tags=item.get("tags", []),
-                confidence=min(max(float(item.get("confidence", 0.8)), 0.0), 1.0),
+                confidence=min(max(float(item.get("confidence", 0.5)), 0.0), 1.0),
                 source_conversation_id=conversation_id,
                 embedding=embedding,
             )

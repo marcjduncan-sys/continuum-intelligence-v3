@@ -11,6 +11,7 @@ Architecture constraint: this model must not be changed without a full
 re-embedding migration of all stored memory vectors.
 """
 
+import asyncio
 import logging
 
 import httpx
@@ -42,16 +43,28 @@ async def generate_embedding(text: str) -> list[float] | None:
         "content": {"parts": [{"text": text.strip()}]},
     }
 
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(
-                _EMBED_URL,
-                params={"key": config.GEMINI_API_KEY},
-                json=payload,
-            )
-            response.raise_for_status()
-            data = response.json()
-            return data["embedding"]["values"]
-    except Exception as exc:
-        logger.warning("Embedding generation failed: %s", exc)
-        return None
+    for attempt in range(2):
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(
+                    _EMBED_URL,
+                    params={"key": config.GEMINI_API_KEY},
+                    json=payload,
+                )
+                response.raise_for_status()
+                data = response.json()
+                values = data["embedding"]["values"]
+                if len(values) != 768:
+                    logger.warning(
+                        "Unexpected embedding dimension %d (expected 768) -- discarding",
+                        len(values),
+                    )
+                    return None
+                return values
+        except Exception as exc:
+            if attempt == 0:
+                logger.warning("Embedding generation failed (attempt 1): %s -- retrying", exc)
+                await asyncio.sleep(1)
+            else:
+                logger.warning("Embedding generation failed (attempt 2): %s -- giving up", exc)
+    return None
