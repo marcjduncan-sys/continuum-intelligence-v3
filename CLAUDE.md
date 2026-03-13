@@ -123,13 +123,18 @@ npm run validate     # lint + test:all — run before any push
 - [x] `src/features/add-stock.js` rewritten: `AbortController` (180s client timeout), progress poller (2.5s interval on `/api/refresh/{ticker}/status`), handles all coverage outcomes, extracted `_loadResearchIntoApp()` and `_loadScaffold()` helpers, fixed `$` sign corruption via Unicode escapes, removed fragile `triggerRefresh` polling.
 - [x] 157/157 Vitest passing. Build succeeds. Railway healthy (29 tickers). Pre-existing Jest data-integrity failures (EVN scaffold missing hypotheses in `_index.json`) unrelated.
 
+**Session work (2026-03-13 session 3) -- Home page tile data audit:**
+- [x] Commit `f362d11`: Populated `reference.json` for ASB, WAF, NST, EVN (sharesOutstanding, EPS, divPerShare, analyst targets). Fixed RMC `sharesOutstanding` from 396000000 (raw) to 396 (millions convention) -- was producing nonsensical "A$372,240B" market cap. Replaced "Div Yield: N/A" with "Analyst Target" for ASB/WAF (non-dividend payers).
+- [x] Commit `3ae5b9c`: Patched `_index.json` for EVN and NST -- missing `featuredMetrics`, `featuredRationale`, `hypotheses`, `skew` fields caused literal "undefined" text on home page cards. Root cause: scaffold process wrote full research JSON but did not copy card fields to `_index.json`.
+- [x] 157/157 Vitest passing. Railway healthy (29 tickers).
+
 **Recent bug history (last six commits):**
-- `e1bbb19` add-stock: synchronous coverage initiation with quality gate. Backend runs refresh inline; frontend polls progress and handles all outcomes.
-- `4768a84` Fix hypothesis score divergence: verdict.scores synced from hypotheses across all 25 tickers. Four-layer fix (frontend, ingest, refresh, validation). Rule 19 added.
+- `3ae5b9c` _index.json: add missing card fields for EVN and NST (fixes "undefined" on tiles).
+- `f362d11` reference: populate ASB/WAF/NST/EVN market data, fix RMC shares units.
+- `40ca1b9` Backfill ASB and WAF scaffold research with coverage initiation.
+- `e1bbb19` add-stock: synchronous coverage initiation with quality gate.
+- `4768a84` Fix hypothesis score divergence: verdict.scores synced from hypotheses across all 25 tickers.
 - `ab0b1bb` memory_extractor: sharpen extraction system prompt.
-- `e7613e3` prompt_builder: unify voice rules, improve memory injection format.
-- `2968acc` Docs: memory audit findings recorded; CLAUDE.md updated to 2026-03-13.
-- `f4585a7` Memory pipeline audit fixes: confidence default, ticker normalisation, embedding dimension validation, retry.
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.

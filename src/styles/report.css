@@ -1769,3 +1769,154 @@
 .report-section.collapsed .rs-toggle svg { transform: rotate(-90deg); }
 .rs-body { overflow: hidden; }
 .report-section.collapsed .rs-body { display: none; }
+
+/* Section 09: Gold Agent Discovery */
+.ga-scorecard {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+    flex-wrap: wrap;
+}
+.ga-score-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: var(--space-sm) var(--space-md);
+    text-align: center;
+    min-width: 80px;
+}
+.ga-score-card.ga-score-skew {
+    border-width: 2px;
+}
+.ga-score-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+.ga-score-value {
+    font-size: 28px;
+    font-weight: 700;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+}
+.ga-verdict {
+    margin-bottom: var(--space-md);
+}
+.ga-view-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+@media (max-width: 768px) {
+    .ga-view-grid { grid-template-columns: 1fr; }
+}
+.ga-view-col {
+    background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: var(--space-md);
+}
+.ga-view-bull { border-left: 3px solid var(--signal-green); }
+.ga-view-bear { border-left: 3px solid var(--signal-red); }
+.ga-view-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-xs);
+    color: var(--text-muted);
+}
+.ga-metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--space-md);
+}
+.ga-metrics-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+.ga-metric-name {
+    color: var(--text-muted);
+    font-size: 13px;
+    width: 40%;
+}
+.ga-metric-val {
+    font-weight: 600;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+}
+.ga-evidence-scroll {
+    overflow-x: auto;
+    margin-bottom: var(--space-md);
+}
+.ga-evidence-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.ga-evidence-table th {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 2px solid var(--border-subtle);
+    color: var(--text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.ga-evidence-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: top;
+}
+.ga-ev-label {
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 180px;
+}
+.ga-ev-finding {
+    line-height: 1.5;
+}
+.ga-ev-source {
+    color: var(--text-muted);
+    font-size: 12px;
+    min-width: 140px;
+}
+.ga-trigger {
+    background: var(--card-bg);
+    border: 1px solid var(--signal-amber);
+    border-radius: 8px;
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+.ga-gaps {
+    margin-bottom: var(--space-md);
+}
+.ga-gap-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.ga-gap-item {
+    padding: 8px 0 8px 20px;
+    border-bottom: 1px solid var(--border-subtle);
+    position: relative;
+    line-height: 1.5;
+    font-size: 13px;
+}
+.ga-gap-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--signal-amber);
+}
+.ga-date {
+    text-align: right;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: var(--space-md);
+}

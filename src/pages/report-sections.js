@@ -214,11 +214,15 @@ export function renderSectionNav(data) {
     ['tripwires', 'Tripwires'],
     ['gaps', 'Gaps'],
     ['technical', 'Technical'],
+    ['gold-discovery', 'Gold Discovery'],
     ['chat', 'Research Chat']
   ];
 
   if (!data.technicalAnalysis) {
-    sections.splice(sections.length - 2, 1);
+    sections = sections.filter(function(s) { return s[0] !== 'technical'; });
+  }
+  if (!data.goldAgent) {
+    sections = sections.filter(function(s) { return s[0] !== 'gold-discovery'; });
   }
 
   var linksHtml = '';
@@ -1711,6 +1715,118 @@ export function renderSignalBars(data) {
     '<div class="report-hero-inner">' + rows + '</div>' +
   '</div>';
 }
+
+// ---------------------------------------------------------------------------
+// Section 09: Gold Agent Discovery (conditional -- gold stocks only)
+// ---------------------------------------------------------------------------
+
+export function renderGoldDiscovery(data) {
+  if (!data.goldAgent) return '';
+  var t = data.ticker.toLowerCase();
+  var ga = data.goldAgent;
+
+  // ---- Scorecard ----
+  var skewColor = ga.skew_score >= 55 ? 'var(--signal-green)' : ga.skew_score <= 45 ? 'var(--signal-red)' : 'var(--signal-amber)';
+  var scorecardHtml =
+    '<div class="ga-scorecard">' +
+      '<div class="ga-score-card ga-score-skew" style="border-color:' + skewColor + '">' +
+        '<div class="ga-score-label">Skew</div>' +
+        '<div class="ga-score-value" style="color:' + skewColor + '">' + ga.skew_score + '</div>' +
+      '</div>' +
+    '</div>';
+
+  // ---- Verdict ----
+  var verdictHtml = '<div class="ga-verdict">' +
+    '<div class="rs-subtitle">Verdict</div>' +
+    '<div class="rs-text">' + ga.verdict + '</div>' +
+  '</div>';
+
+  // ---- Investment View (Bull / Bear) ----
+  var viewHtml = '<div class="ga-view-grid">' +
+    '<div class="ga-view-col ga-view-bull">' +
+      '<div class="ga-view-label">Bull Case</div>' +
+      '<div class="rs-text">' + ga.hypothesis.bull + '</div>' +
+    '</div>' +
+    '<div class="ga-view-col ga-view-bear">' +
+      '<div class="ga-view-label">Bear Case</div>' +
+      '<div class="rs-text">' + ga.hypothesis.bear + '</div>' +
+    '</div>' +
+  '</div>';
+
+  // ---- Key Metrics ----
+  var km = ga.key_metrics;
+  var metricsRows = '';
+  var metricsList = [
+    ['AISC (per oz)', km.aisc_per_oz ? ('A$' + km.aisc_per_oz.toLocaleString()) : 'N/A'],
+    ['Production (koz/yr)', km.production_koz_annual ? (km.production_koz_annual.toLocaleString() + ' koz') : 'N/A'],
+    ['Mine Life', km.mine_life_years ? (km.mine_life_years + ' years') : 'N/A'],
+    ['Net Cash / (Debt)', km.net_cash_debt_aud_m != null ? ('A$' + km.net_cash_debt_aud_m.toLocaleString() + 'm') : 'N/A'],
+    ['Reserve Grade', km.reserve_grade_gt ? (km.reserve_grade_gt + ' g/t') : 'N/A']
+  ];
+  for (var i = 0; i < metricsList.length; i++) {
+    metricsRows += '<tr><td class="ga-metric-name">' + metricsList[i][0] + '</td><td class="ga-metric-val">' + metricsList[i][1] + '</td></tr>';
+  }
+  var metricsHtml = '<div class="rs-subtitle">Key Metrics</div>' +
+    '<table class="ga-metrics-table"><tbody>' + metricsRows + '</tbody></table>';
+
+  // ---- Evidence ----
+  var evidenceRows = '';
+  var ev = ga.evidence || [];
+  for (var e = 0; e < ev.length; e++) {
+    var item = ev[e];
+    evidenceRows += '<tr>' +
+      '<td class="ga-ev-label">' + item.label + '</td>' +
+      '<td class="ga-ev-finding">' + item.finding + '</td>' +
+      '<td class="ga-ev-source">' + item.source + '</td>' +
+    '</tr>';
+  }
+  var evidenceHtml = '<div class="rs-subtitle">Evidence Base</div>' +
+    '<div class="ga-evidence-scroll">' +
+    '<table class="ga-evidence-table"><thead><tr>' +
+      '<th>Label</th><th>Finding</th><th>Source</th>' +
+    '</tr></thead><tbody>' + evidenceRows + '</tbody></table>' +
+    '</div>';
+
+  // ---- Monitoring Trigger ----
+  var triggerHtml = '';
+  if (ga.monitoring_trigger) {
+    triggerHtml = '<div class="ga-trigger">' +
+      '<div class="rs-subtitle">Monitoring Trigger</div>' +
+      '<div class="rs-text">' + ga.monitoring_trigger + '</div>' +
+    '</div>';
+  }
+
+  // ---- Information Gaps ----
+  var gapsHtml = '';
+  var gaps = ga.information_gaps || [];
+  if (gaps.length > 0) {
+    var gapItems = '';
+    for (var g = 0; g < gaps.length; g++) {
+      gapItems += '<li class="ga-gap-item">' + gaps[g] + '</li>';
+    }
+    gapsHtml = '<div class="ga-gaps">' +
+      '<div class="rs-subtitle">Information Gaps</div>' +
+      '<ul class="ga-gap-list">' + gapItems + '</ul>' +
+    '</div>';
+  }
+
+  // ---- Analysis date ----
+  var dateHtml = '<div class="ga-date">Analysis date: ' + ga.analysis_date + '</div>';
+
+  return '<div class="report-section" id="' + t + '-gold-discovery">' +
+    RS_HDR('Section 09', 'Gold Agent Discovery') +
+    '<div class="rs-body">' +
+      scorecardHtml +
+      verdictHtml +
+      viewHtml +
+      metricsHtml +
+      evidenceHtml +
+      triggerHtml +
+      gapsHtml +
+      dateHtml +
+    '</div></div>';
+}
+
 
 export function setupScrollSpy(pageId) {
   const page = document.getElementById(pageId);

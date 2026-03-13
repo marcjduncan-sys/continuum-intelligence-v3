@@ -16,6 +16,7 @@ import {
   renderTripwires,
   renderGaps,
   renderTechnicalAnalysis,
+  renderGoldDiscovery,
   renderReportFooter,
   renderPDFDownload,
   renderHypSidebar,
@@ -39,7 +40,8 @@ export function renderReport(data) {
     renderDiscriminators(data) +
     renderTripwires(data) +
     renderGaps(data) +
-    renderTechnicalAnalysis(data);
+    renderTechnicalAnalysis(data) +
+    renderGoldDiscovery(data);
 
   var floatingToggle =
     '<button class="sections-float-toggle" onclick="window.toggleAllSections(this)" data-state="expanded" aria-label="Collapse all sections">' +
