@@ -1969,6 +1969,12 @@ def _merge_initiation(
             "thresholds": ndp.get("thresholds", ""),
         }
 
+    # -- Compute hero.skew from hypothesis scores (mirrors _merge_updates) --
+    updated["hero"]["previousSkew"] = ""
+    updated["hero"]["skew"] = _compute_skew_from_hypotheses(
+        updated.get("hypotheses", [])
+    ).upper()
+
     # -- Full narrative --
     if "narrative" not in updated:
         updated["narrative"] = {}
