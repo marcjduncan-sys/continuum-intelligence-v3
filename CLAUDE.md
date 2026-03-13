@@ -42,7 +42,7 @@ npm run validate     # lint + test:all — run before any push
 
 ---
 
-## Current State — 2026-03-13 (updated)
+## Current State — 2026-03-13 (updated session 2)
 
 **Phase 0 COMPLETE (2026-03-07).** The extraction of logic from `index.html` into `src/` modules is complete. `computeSkewScore` canonicalised to zero-contribution convention (commit `4493e8c`; see `docs/decisions/003-computeskewscore-neutral-convention.md`). `VALID_STATIC_PAGES` confirmed correct: `home`, `deep-research`, `portfolio`, `comparator`, `personalisation`, `about`.
 
@@ -118,13 +118,18 @@ npm run validate     # lint + test:all — run before any push
   - All 25 research JSONs repaired via `scripts/repair_verdict_scores.py`
 - [x] 218/218 tests passing.
 
+**Session work (2026-03-13 session 2) -- Add Stock synchronous coverage:**
+- [x] Commit `e1bbb19`: `api/main.py` `add_stock()` now runs `run_refresh()` synchronously (150s timeout) instead of fire-and-forget background task. Quality gate checks evidence cards >= 5, hypothesis scores ending in "%", and `theNarrative` present. Returns `coverage_status` (completed/degraded/failed/timeout) and `coverage_error`.
+- [x] `src/features/add-stock.js` rewritten: `AbortController` (180s client timeout), progress poller (2.5s interval on `/api/refresh/{ticker}/status`), handles all coverage outcomes, extracted `_loadResearchIntoApp()` and `_loadScaffold()` helpers, fixed `$` sign corruption via Unicode escapes, removed fragile `triggerRefresh` polling.
+- [x] 157/157 Vitest passing. Build succeeds. Railway healthy (29 tickers). Pre-existing Jest data-integrity failures (EVN scaffold missing hypotheses in `_index.json`) unrelated.
+
 **Recent bug history (last six commits):**
+- `e1bbb19` add-stock: synchronous coverage initiation with quality gate. Backend runs refresh inline; frontend polls progress and handles all outcomes.
 - `4768a84` Fix hypothesis score divergence: verdict.scores synced from hypotheses across all 25 tickers. Four-layer fix (frontend, ingest, refresh, validation). Rule 19 added.
 - `ab0b1bb` memory_extractor: sharpen extraction system prompt.
 - `e7613e3` prompt_builder: unify voice rules, improve memory injection format.
 - `2968acc` Docs: memory audit findings recorded; CLAUDE.md updated to 2026-03-13.
 - `f4585a7` Memory pipeline audit fixes: confidence default, ticker normalisation, embedding dimension validation, retry.
-- `7ec36e1` Phase 9: proactive insights scan + notification surface. `009_notifications.sql`, `insights.py`, `notifications.js`, `insights-scan.yml`, 3 endpoints in main.py, `INSIGHTS_SECRET` in config.py.
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
