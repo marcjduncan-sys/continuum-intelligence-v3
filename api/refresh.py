@@ -77,6 +77,7 @@ class RefreshJob:
     completed_at: float | None = None
     error: str | None = None
     result: dict | None = None
+    stage_errors: list = field(default_factory=list)
 
     @property
     def progress_pct(self) -> int:
@@ -108,6 +109,7 @@ class RefreshJob:
             "started_at": self.started_at,
             "completed_at": self.completed_at,
             "error": self.error,
+            "stage_errors": self.stage_errors,
         }
 
 
@@ -904,6 +906,13 @@ async def run_refresh(ticker: str) -> dict:
                 ticker, research, gathered
             )
 
+        # Track Stage 2 failures (evidence creation returns empty cards on error)
+        ev_cards = evidence_update.get("cards", [])
+        ev_summary = evidence_update.get("summary", "")
+        if not ev_cards and "failed" in str(ev_summary).lower():
+            job.stage_errors.append(f"Stage 2 (evidence): {ev_summary}")
+            logger.warning(f"[{ticker}] Stage 2 produced 0 cards: {ev_summary}")
+
         # ---- Stage 3: Hypothesis Synthesis (Claude) ----
         job.status = "hypothesis_synthesis"
         job.stage_index = 3
@@ -917,6 +926,13 @@ async def run_refresh(ticker: str) -> dict:
             hypothesis_update = await _run_hypothesis_synthesis(
                 ticker, research, evidence_update, gathered
             )
+
+        # Track Stage 3 failures
+        hyp_list = hypothesis_update.get("hypotheses", [])
+        narr = hypothesis_update.get("narrative_rewrite", "")
+        if not hyp_list and "failed" in str(narr).lower():
+            job.stage_errors.append(f"Stage 3 (hypothesis): {narr}")
+            logger.warning(f"[{ticker}] Stage 3 produced 0 hypotheses: {narr}")
 
         # ---- Stage 4: Write Results ----
         job.status = "writing_results"
@@ -1099,7 +1115,7 @@ Please create all 10 evidence domain cards for this stock based on the available
         logger.info(f"[{ticker}] Evidence creation returned {len(cards)} cards")
         return parsed if parsed else {"cards": []}
     except Exception as e:
-        logger.error(f"[{ticker}] Evidence creation failed: {e}")
+        logger.error(f"[{ticker}] Evidence creation failed: {e}", exc_info=True)
         return {"cards": [], "summary": f"Evidence creation failed: {e}"}
 
 
