@@ -7,6 +7,11 @@
 import { STOCK_DATA, SNAPSHOT_DATA } from '../lib/state.js';
 import { computeSkewScore, normaliseScores } from '../lib/dom.js';
 
+// Bump this when the research JSON schema or score pipeline changes.
+// Any cached entry without a matching _cacheVersion is discarded so the
+// fresh static JSON is fetched instead, keeping the UI in sync with ingest.py.
+export var CACHE_VERSION = 'v2';
+
 /**
  * Async loader for full research data (called before rendering a report page).
  * Fetches full research JSON for a ticker, merges into STOCK_DATA,
@@ -26,8 +31,9 @@ export function loadFullResearchData(ticker, callback) {
     var cached = localStorage.getItem('ci_research_' + ticker);
     if (cached) {
       var cachedData = JSON.parse(cached);
-      // Use cached data if it has a _lastRefreshed timestamp (written by refresh pipeline)
-      if (cachedData._lastRefreshed) {
+      // Use cached data only if it has the current cache version (prevents stale
+      // Railway-refreshed scores diverging from the deployed static JSON and ingest.py).
+      if (cachedData._lastRefreshed && cachedData._cacheVersion === CACHE_VERSION) {
         var prev = STOCK_DATA[ticker] || {};
         var livePrice = prev._livePrice;
         var livePriceHistory = prev.priceHistory;

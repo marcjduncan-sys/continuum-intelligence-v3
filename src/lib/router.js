@@ -7,6 +7,7 @@
 import { STOCK_DATA, SNAPSHOT_DATA } from './state.js';
 import { VALID_STATIC_PAGES } from './state.js';
 import { announcePageChange } from './dom.js';
+import { CACHE_VERSION } from '../data/loader.js';
 
 // --- Router state ---
 const renderedPages = new Set();
@@ -86,6 +87,7 @@ function renderStockReport(hash, ticker) {
         if (!scaffoldResp.ok) throw new Error('HTTP ' + scaffoldResp.status);
         var scaffoldData = await scaffoldResp.json();
         scaffoldData._lastRefreshed = scaffoldData._lastRefreshed || new Date().toISOString();
+        scaffoldData._cacheVersion = CACHE_VERSION;
         try { localStorage.setItem('ci_research_' + ticker, JSON.stringify(scaffoldData)); } catch(e) {}
         var currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00a3','EUR':'\u20ac'};
         STOCK_DATA[ticker] = scaffoldData;

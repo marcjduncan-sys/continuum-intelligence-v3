@@ -12,6 +12,7 @@
  */
 
 import { STOCK_DATA } from '../lib/state.js';
+import { CACHE_VERSION } from '../data/loader.js';
 
 // ============================================================
 // REFRESH API BASE (localhost detection pattern)
@@ -110,6 +111,7 @@ function _pollRefreshStatus(ticker) {
                         }
                         // Cache in localStorage so refresh survives page reload
                         try {
+                            updatedData._cacheVersion = CACHE_VERSION;
                             localStorage.setItem('ci_research_' + ticker.toUpperCase(), JSON.stringify(updatedData));
                             console.log('[RefreshCache] Cached refresh result for ' + ticker);
                         } catch (lsErr) {
@@ -391,6 +393,7 @@ async function _fetchAndCacheSingleTicker(ticker) {
 
         // Cache in localStorage
         try {
+            updatedData._cacheVersion = CACHE_VERSION;
             localStorage.setItem('ci_research_' + ticker, JSON.stringify(updatedData));
         } catch (lsErr) { /* ignore */ }
 
@@ -457,6 +460,7 @@ async function _fetchAndMergeBatchResults() {
 
             // Cache in localStorage
             try {
+                updatedData._cacheVersion = CACHE_VERSION;
                 localStorage.setItem('ci_research_' + ticker, JSON.stringify(updatedData));
             } catch (lsErr) { /* ignore */ }
 

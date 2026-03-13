@@ -12,6 +12,7 @@
  */
 
 import { STOCK_DATA } from '../lib/state.js';
+import { CACHE_VERSION } from '../data/loader.js';
 
 // Railway API base (same pattern as batch-refresh.js)
 var REFRESH_API_BASE = window.location.hostname.includes('github.io')
@@ -102,6 +103,7 @@ export async function submitAddStock(event) {
             if (scaffoldResp.ok) {
                 var scaffoldData = await scaffoldResp.json();
                 scaffoldData._lastRefreshed = new Date().toISOString();
+                scaffoldData._cacheVersion = CACHE_VERSION;
                 try {
                     localStorage.setItem('ci_research_' + ticker, JSON.stringify(scaffoldData));
                     console.log('[AddStock] Cached scaffold for ' + ticker);
@@ -141,7 +143,8 @@ export async function submitAddStock(event) {
                     featuredRationale: 'Research being generated.',
                     _indexOnly: false,
                     _stub: true,
-                    _lastRefreshed: new Date().toISOString()
+                    _lastRefreshed: new Date().toISOString(),
+                    _cacheVersion: CACHE_VERSION
                 };
                 try { localStorage.setItem('ci_research_' + ticker, JSON.stringify(stub)); } catch(e) {}
                 STOCK_DATA[ticker] = stub;
