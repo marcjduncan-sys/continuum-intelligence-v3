@@ -42,7 +42,7 @@ from ingest import ingest, get_tickers, get_passage_count
 from refresh import (
     RefreshJob, refresh_jobs, get_job, is_running, run_refresh,
     batch_jobs, get_batch_job, get_latest_batch_job, is_batch_running,
-    run_batch_refresh,
+    run_batch_refresh, _data_dir,
 )
 from retriever import retrieve
 from gold_agent import run_gold_analysis
@@ -686,7 +686,9 @@ async def _run_gold_agent_background(ticker: str, research_path: Path, token: st
 async def _run_coverage_background(ticker: str, research_path: Path, token: str) -> None:
     """
     Background task: run the full coverage initiation pipeline for a newly
-    scaffolded non-gold stock, then commit the populated research to GitHub.
+    scaffolded stock, then commit the populated research to GitHub.
+    run_refresh() writes to dist/data/research/TICKER.json, so we commit
+    from there (not from research_path, which is the scaffold).
     """
     try:
         logger.info("[Coverage] Background initiation starting for %s", ticker)
@@ -695,8 +697,9 @@ async def _run_coverage_background(ticker: str, research_path: Path, token: str)
             ingest()
         except Exception as ingest_err:
             logger.warning("[Coverage] Re-ingest after initiation failed (non-fatal): %s", ingest_err)
+        dist_research_path = _data_dir() / f"{ticker}.json"
         await commit_files_to_github(
-            {f"data/research/{ticker}.json": research_path},
+            {f"data/research/{ticker}.json": dist_research_path},
             f"Add {ticker}: coverage initiation",
             token,
         )
@@ -885,19 +888,12 @@ async def add_stock(
     except Exception as e:
         logger.warning(f"[AddStock] GitHub commit failed (non-fatal): {e}")
 
-    # ---- Queue research pipeline as background task ----
-    _is_gold = "gold" in industry.lower() or "gold" in description.lower()
+    # ---- Queue CI v3 coverage initiation as background task ----
     _research_path = research_dir / f"{ticker}.json"
-    if _is_gold and config.NOTEBOOKLM_GOLD_NOTEBOOK_ID and config.NOTEBOOKLM_AUTH_JSON:
-        asyncio.create_task(
-            _run_gold_agent_background(ticker, _research_path, config.GITHUB_TOKEN)
-        )
-        logger.info(f"[AddStock] Gold agent queued as background task for {ticker}")
-    else:
-        asyncio.create_task(
-            _run_coverage_background(ticker, _research_path, config.GITHUB_TOKEN)
-        )
-        logger.info(f"[AddStock] Coverage initiation queued as background task for {ticker}")
+    asyncio.create_task(
+        _run_coverage_background(ticker, _research_path, config.GITHUB_TOKEN)
+    )
+    logger.info(f"[AddStock] Coverage initiation queued as background task for {ticker}")
 
     return {
         "status": "added",
@@ -907,8 +903,7 @@ async def add_stock(
         "industry": industry,
         "price": price_data.get("price"),
         "currency": price_data.get("currency", "A$"),
-        "gold_agent_queued": _is_gold and bool(config.NOTEBOOKLM_GOLD_NOTEBOOK_ID),
-        "coverage_initiation_queued": not (_is_gold and bool(config.NOTEBOOKLM_GOLD_NOTEBOOK_ID)),
+        "coverage_initiation_queued": True,
     }
 
 
