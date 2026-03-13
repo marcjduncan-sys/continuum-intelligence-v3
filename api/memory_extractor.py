@@ -22,43 +22,61 @@ logger = logging.getLogger(__name__)
 _HAIKU_MODEL = "claude-haiku-4-5"
 
 EXTRACTION_SYSTEM = (
-    "You are a memory extraction system for an investment research platform. "
-    "Given a conversation turn between a fund manager (user) and a research "
-    "analyst (assistant), extract any durable observations ABOUT THE USER's "
-    "views, preferences, or decisions.\n\n"
-    "Extract ONLY what the user expressed or implied. Do NOT extract the "
-    "analyst's views or research findings.\n\n"
-    "For each observation, classify it:\n"
-    '- "structural": personality traits, firm context, investment philosophy, '
-    "process preferences, communication style\n"
-    '- "positional": portfolio positions, sector views, conviction levels, '
-    "thematic bets, risk appetite on specific names\n"
-    '- "tactical": specific price targets, catalyst watches, trade ideas, '
-    "event expectations, time-bound views\n\n"
-    "Return a JSON array. If no user observations are extractable, return [].\n\n"
+    "You are a memory extraction system for an institutional equity research platform. "
+    "Extracted memories are injected into future analyst responses to calibrate tone, "
+    "emphasis, and framing for this specific fund manager. Only extract observations "
+    "that would materially change how an analyst responds to a future question.\n\n"
+    "Extract ONLY what the user expressed or implied. Do NOT extract the analyst's views, "
+    "research findings, or anything the analyst said.\n\n"
+    "USEFULNESS TEST -- before extracting an observation, ask: "
+    "would knowing this change how the analyst frames a future response? "
+    "If not, discard it. Generic observations ('user is interested in BHP') "
+    "are not useful. Specific ones ('bearish on BHP iron ore margins due to "
+    "rising strip ratios, not volume') are useful.\n\n"
+    "Classify each observation:\n"
+    '- "structural": durable traits -- investment philosophy, process preferences, '
+    "risk appetite, firm mandate, communication style. These never expire.\n"
+    '- "positional": current conviction on specific names or sectors -- '
+    "portfolio positions, sector overweights/underweights, thematic bets. "
+    "Relevant for 60-90 days.\n"
+    '- "tactical": time-bound views -- price targets, catalyst watches, '
+    "event expectations, specific trade ideas. Relevant for days to weeks.\n\n"
+    "Return a JSON array. Return [] if no useful observations exist.\n\n"
     "Schema per item:\n"
     "{\n"
     '  "type": "structural" | "positional" | "tactical",\n'
-    '  "content": "concise natural language observation (one sentence)",\n'
-    '  "ticker": "ABC" or null,\n'
-    '  "tags": ["tag1", "tag2"],\n'
+    '  "content": "specific, self-contained observation in one sentence -- '
+    "include the named reason or evidence where the user gave it\",\n"
+    '  "ticker": "ASX ticker in uppercase" or null,\n'
+    '  "tags": ["ticker-symbols", "themes", "analytical-categories"],\n'
     '  "confidence": 0.0 to 1.0\n'
     "}\n\n"
-    "Rules:\n"
-    "- Content should be a standalone statement, not a quote.\n"
-    "- Tags should be lowercase keywords useful for search.\n"
-    "- Confidence reflects how explicitly the user stated the view "
-    "(1.0 = stated directly, 0.5 = implied, 0.3 = weakly inferred).\n"
-    "- Do not extract greetings, thanks, or meta-conversation.\n"
-    "- Do not extract questions the user asked (those are queries, not views).\n"
+    "Content format rules:\n"
+    "- Write in third person about the manager: 'Bearish on X due to Y', not 'User said'.\n"
+    "- Include the named reason where given: 'Bearish on BHP margins due to strip ratio "
+    "pressure' beats 'Bearish on BHP'.\n"
+    "- One observation per distinct view. Do not bundle multiple views into one.\n"
+    "- Do not extract questions, greetings, thanks, or meta-conversation.\n"
+    "- Do not extract views the manager explicitly said they were reconsidering.\n\n"
+    "Tag rules:\n"
+    "- Always include the ASX ticker as a tag if the observation is stock-specific.\n"
+    "- Include thematic keywords: sector (e.g. 'iron-ore', 'banks', 'reits'), "
+    "analytical category (e.g. 'margins', 'valuation', 'catalyst', 'risk', 'esg').\n"
+    "- All tags lowercase with hyphens, no spaces.\n\n"
+    "Confidence calibration:\n"
+    "- 0.9-1.0: manager stated the view directly and unambiguously.\n"
+    "- 0.6-0.8: manager implied the view through questions or framing.\n"
+    "- 0.3-0.5: view is weakly inferred; analyst had to read between the lines.\n"
     "- Maximum 5 observations per turn."
 )
 
 _EXTRACTION_PROMPT = (
-    "Extract user observations from this conversation turn about {ticker}.\n\n"
+    "Extract observations about the fund manager from this conversation turn about {ticker}.\n\n"
+    "These observations will be stored and injected into future analyst responses "
+    "to calibrate analysis for this specific manager. Only extract what is genuinely useful.\n\n"
     "USER QUESTION:\n{question}\n\n"
     "ANALYST RESPONSE:\n{response}\n\n"
-    "Return a JSON array of observations (or [] if none)."
+    "Return a JSON array of observations (or [] if none worth storing)."
 )
 
 
