@@ -446,48 +446,76 @@ async def run_batch_refresh(batch_id: str, tickers: list[str]) -> dict:
 # ---------------------------------------------------------------------------
 
 def _data_dir() -> Path:
-    """Get the data/research directory relative to index.html."""
+    """Get the data/research directory relative to index.html (dist build)."""
     index_dir = Path(config.INDEX_HTML_PATH).parent
     return index_dir / "data" / "research"
 
 
+def _live_data_dir() -> Path:
+    """Get the data/research directory served by /data/ endpoint (project root)."""
+    return Path(config.PROJECT_ROOT) / "data" / "research"
+
+
 def _load_research(ticker: str) -> dict:
-    """Load existing research JSON for a ticker."""
-    path = _data_dir() / f"{ticker}.json"
-    if not path.exists():
-        raise FileNotFoundError(f"No research file for {ticker}")
-    with open(path) as f:
-        return json.load(f)
+    """Load existing research JSON for a ticker.
+
+    Prefers the live data directory (served by /data/ endpoint) over
+    the dist build directory to ensure we read what the frontend sees.
+    """
+    live_path = _live_data_dir() / f"{ticker}.json"
+    if live_path.exists():
+        with open(live_path) as f:
+            return json.load(f)
+    # Fallback to dist path (e.g. during build or if live dir is missing)
+    dist_path = _data_dir() / f"{ticker}.json"
+    if dist_path.exists():
+        with open(dist_path) as f:
+            return json.load(f)
+    raise FileNotFoundError(f"No research file for {ticker}")
 
 
 def _save_research(ticker: str, data: dict) -> None:
-    """Save updated research JSON (with auto-fix pass)."""
+    """Save updated research JSON to both live data dir and dist dir.
+
+    The /data/ endpoint serves from PROJECT_ROOT/data/ (live dir),
+    while the catch-all frontend route serves from dist/. Both must
+    be updated so the refresh result is immediately visible.
+    """
     # Auto-fix common data quality issues before persisting
     data = validate_fix(data)
     errors = validate_check(data)
     if errors:
         logger.warning(f"[{ticker}] Validation warnings after fix: {errors}")
-    path = _data_dir() / f"{ticker}.json"
-    with open(path, "w") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-    logger.info(f"Saved updated research for {ticker}")
+
+    content = json.dumps(data, indent=2, ensure_ascii=False)
+
+    # Write to live data dir (served by /data/ endpoint)
+    live_path = _live_data_dir() / f"{ticker}.json"
+    if live_path.parent.exists():
+        with open(live_path, "w") as f:
+            f.write(content)
+        logger.info(f"Saved research for {ticker} to live data dir")
+
+    # Write to dist dir (served by catch-all frontend route)
+    dist_path = _data_dir() / f"{ticker}.json"
+    if dist_path.parent.exists():
+        with open(dist_path, "w") as f:
+            f.write(content)
+        logger.info(f"Saved research for {ticker} to dist dir")
 
 
 def _update_index(ticker: str, data: dict) -> None:
     """Update the _index.json summary entry for this ticker."""
-    index_path = _data_dir() / "_index.json"
-    if not index_path.exists():
-        return
 
-    try:
+    def _apply_update(index_path: Path) -> None:
+        if not index_path.exists():
+            return
         with open(index_path) as f:
             index = json.load(f)
 
-        # Find and update the entry for this ticker
         if isinstance(index, list):
             for i, entry in enumerate(index):
                 if entry.get("ticker", "").upper() == ticker:
-                    # Update key fields in the index entry
                     index[i]["price"] = data.get("price", entry.get("price"))
                     index[i]["date"] = data.get("date", entry.get("date"))
                     if "verdict" in data and isinstance(data["verdict"], dict):
@@ -501,8 +529,15 @@ def _update_index(ticker: str, data: dict) -> None:
         with open(index_path, "w") as f:
             json.dump(index, f, indent=2, ensure_ascii=False)
 
+    try:
+        _apply_update(_live_data_dir() / "_index.json")
     except Exception as e:
-        logger.warning(f"Failed to update _index.json: {e}")
+        logger.warning(f"Failed to update live _index.json: {e}")
+
+    try:
+        _apply_update(_data_dir() / "_index.json")
+    except Exception as e:
+        logger.warning(f"Failed to update dist _index.json: {e}")
 
 
 # ---------------------------------------------------------------------------
