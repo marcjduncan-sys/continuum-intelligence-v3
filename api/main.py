@@ -683,6 +683,28 @@ async def _run_gold_agent_background(ticker: str, research_path: Path, token: st
         logger.warning("[GoldAgent] Background run failed for %s: %s", ticker, e)
 
 
+async def _run_coverage_background(ticker: str, research_path: Path, token: str) -> None:
+    """
+    Background task: run the full coverage initiation pipeline for a newly
+    scaffolded non-gold stock, then commit the populated research to GitHub.
+    """
+    try:
+        logger.info("[Coverage] Background initiation starting for %s", ticker)
+        await run_refresh(ticker)
+        try:
+            ingest()
+        except Exception as ingest_err:
+            logger.warning("[Coverage] Re-ingest after initiation failed (non-fatal): %s", ingest_err)
+        await commit_files_to_github(
+            {f"data/research/{ticker}.json": research_path},
+            f"Add {ticker}: coverage initiation",
+            token,
+        )
+        logger.info("[Coverage] Background initiation committed for %s", ticker)
+    except Exception as e:
+        logger.warning("[Coverage] Background run failed for %s: %s", ticker, e)
+
+
 class AddStockRequest(BaseModel):
     ticker: str = Field(..., description="ASX ticker code, e.g. 'MIN'")
 
@@ -862,13 +884,19 @@ async def add_stock(
     except Exception as e:
         logger.warning(f"[AddStock] GitHub commit failed (non-fatal): {e}")
 
-    # ---- Gold miner: queue gold agent analysis as background task ----
+    # ---- Queue research pipeline as background task ----
     _is_gold = "gold" in industry.lower()
+    _research_path = research_dir / f"{ticker}.json"
     if _is_gold and config.NOTEBOOKLM_GOLD_NOTEBOOK_ID and config.NOTEBOOKLM_AUTH_JSON:
         asyncio.create_task(
-            _run_gold_agent_background(ticker, research_dir / f"{ticker}.json", config.GITHUB_TOKEN)
+            _run_gold_agent_background(ticker, _research_path, config.GITHUB_TOKEN)
         )
         logger.info(f"[AddStock] Gold agent queued as background task for {ticker}")
+    else:
+        asyncio.create_task(
+            _run_coverage_background(ticker, _research_path, config.GITHUB_TOKEN)
+        )
+        logger.info(f"[AddStock] Coverage initiation queued as background task for {ticker}")
 
     return {
         "status": "added",
@@ -879,6 +907,7 @@ async def add_stock(
         "price": price_data.get("price"),
         "currency": price_data.get("currency", "A$"),
         "gold_agent_queued": _is_gold and bool(config.NOTEBOOKLM_GOLD_NOTEBOOK_ID),
+        "coverage_initiation_queued": not (_is_gold and bool(config.NOTEBOOKLM_GOLD_NOTEBOOK_ID)),
     }
 
 
