@@ -778,7 +778,8 @@ async def add_stock(
     # Resolve fields
     company = company_name or ticker
     sector = metadata.get("sector", "Unknown")
-    industry = metadata.get("industry", "")
+    industry = metadata.get("industry") or ""
+    description = metadata.get("description") or ""
 
     logger.info(f"[AddStock] {ticker}: company={company}, sector={sector}, industry={industry}")
 
@@ -885,7 +886,7 @@ async def add_stock(
         logger.warning(f"[AddStock] GitHub commit failed (non-fatal): {e}")
 
     # ---- Queue research pipeline as background task ----
-    _is_gold = "gold" in industry.lower()
+    _is_gold = "gold" in industry.lower() or "gold" in description.lower()
     _research_path = research_dir / f"{ticker}.json"
     if _is_gold and config.NOTEBOOKLM_GOLD_NOTEBOOK_ID and config.NOTEBOOKLM_AUTH_JSON:
         asyncio.create_task(

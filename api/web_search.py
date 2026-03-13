@@ -382,6 +382,7 @@ async def _fetch_yahoo_financials(yahoo_ticker: str, client: httpx.AsyncClient) 
         "employees": None,
         "sector": None,
         "industry": None,
+        "description": "",
     }
 
     try:
@@ -419,6 +420,7 @@ async def _fetch_yahoo_financials(yahoo_ticker: str, client: httpx.AsyncClient) 
         financials["employees"] = ap.get("fullTimeEmployees")
         financials["sector"] = ap.get("sector")
         financials["industry"] = ap.get("industry")
+        financials["description"] = ap.get("longBusinessSummary", "") or ""
 
     except Exception as e:
         logger.warning(f"Yahoo quoteSummary error for {yahoo_ticker}: {e}")
