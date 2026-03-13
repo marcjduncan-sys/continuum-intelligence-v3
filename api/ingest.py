@@ -88,6 +88,79 @@ def _clean_html(text: str) -> str:
     return text
 
 
+def _normalise_scores(hypotheses: list[dict]) -> list[int]:
+    """Mirror JS normaliseScores(): floor=5, ceiling=80, scale to 100, iterative re-clamp.
+
+    Ensures the LLM context shows the same probability figures as the UI display.
+    """
+    FLOOR = 5
+    CEILING = 80
+
+    raw = []
+    for hyp in hypotheses:
+        s = hyp.get("score", "0")
+        try:
+            val = int(str(s).replace("%", "").strip())
+        except (ValueError, TypeError):
+            val = 0
+        raw.append(val)
+
+    if not raw:
+        return raw
+
+    clamped = [max(FLOOR, min(CEILING, v)) for v in raw]
+    total = sum(clamped)
+    if total == 0:
+        eq = round(100 / len(clamped))
+        return [eq] * len(clamped)
+
+    result = [round(v / total * 100) for v in clamped]
+
+    for _ in range(20):
+        overflow = 0
+        underflow = 0
+        free: list[int] = []
+        for i in range(len(result)):
+            if result[i] > CEILING:
+                overflow += result[i] - CEILING
+                result[i] = CEILING
+            elif result[i] < FLOOR:
+                underflow += FLOOR - result[i]
+                result[i] = FLOOR
+            else:
+                free.append(i)
+
+        if overflow == 0 and underflow == 0:
+            break
+
+        net = overflow - underflow
+        if net == 0 or not free:
+            break
+
+        if net > 0:
+            free.sort(key=lambda i: result[i])
+            remaining = net
+            for i in free:
+                if remaining <= 0:
+                    break
+                room = CEILING - result[i]
+                give = min(remaining, room)
+                result[i] += give
+                remaining -= give
+        else:
+            free.sort(key=lambda i: result[i], reverse=True)
+            remaining = -net
+            for i in free:
+                if remaining <= 0:
+                    break
+                room = result[i] - FLOOR
+                take = min(remaining, room)
+                result[i] -= take
+                remaining -= take
+
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Resolve data directory
 # ---------------------------------------------------------------------------
@@ -180,10 +253,16 @@ def _chunk_stock(ticker: str, data: dict, ref: dict | None = None, fresh: dict |
     # --- Verdict ---
     verdict = data.get("verdict", {})
     hypotheses_list = data.get("hypotheses", [])
+    norm_scores = _normalise_scores(hypotheses_list)
     if verdict:
         verdict_parts = [f"Verdict for {ticker}: {_clean_html(verdict.get('text', ''))}"]
         for idx, score in enumerate(verdict.get("scores", [])):
-            hyp_score = hypotheses_list[idx].get("score", "") if idx < len(hypotheses_list) else score.get("score", "")
+            if idx < len(norm_scores):
+                hyp_score = f"{norm_scores[idx]}%"
+            elif idx < len(hypotheses_list):
+                hyp_score = hypotheses_list[idx].get("score", "")
+            else:
+                hyp_score = score.get("score", "")
             verdict_parts.append(
                 f"  {score.get('label','')}: {hyp_score} ({_clean_html(score.get('dirText',''))})"
             )
@@ -197,11 +276,12 @@ def _chunk_stock(ticker: str, data: dict, ref: dict | None = None, fresh: dict |
         ))
 
     # --- Hypotheses (one passage per hypothesis) ---
-    for hyp in data.get("hypotheses", []):
+    for idx, hyp in enumerate(hypotheses_list):
+        prob_str = f"{norm_scores[idx]}%" if idx < len(norm_scores) else hyp.get("score", "")
         parts = [
             f"Hypothesis: {_clean_html(hyp.get('title', ''))}",
             f"Direction: {hyp.get('direction', '')}",
-            f"Probability: {hyp.get('score', '')}",
+            f"Probability: {prob_str}",
             f"Status: {_clean_html(hyp.get('statusText', ''))}",
             f"Description: {_clean_html(hyp.get('description', ''))}",
         ]

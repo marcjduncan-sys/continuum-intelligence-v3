@@ -1122,14 +1122,15 @@ export function prepareHypotheses(data) {
 
   var hyps = data.hypotheses;
 
-  // Sort for visual ordering: fewer contradictions first, then higher score.
+  // Sort by tier label (n1, n2, n3, n4) so N1 always appears first.
   // N-labels (tier, title) are preserved exactly as in the JSON so the UI
   // and the LLM context (ingest.py) always agree on what N2 means.
   hyps.sort(function(a, b) {
-    var aContra = a.contradicting ? a.contradicting.length : 0;
-    var bContra = b.contradicting ? b.contradicting.length : 0;
-    if (aContra !== bContra) return aContra - bContra;
-    return parseFloat(b.score) - parseFloat(a.score);
+    var ta = (a.tier || '').toLowerCase();
+    var tb = (b.tier || '').toLowerCase();
+    if (ta < tb) return -1;
+    if (ta > tb) return 1;
+    return 0;
   });
 
   // Enrich direction class -- do not rename tiers or titles.
