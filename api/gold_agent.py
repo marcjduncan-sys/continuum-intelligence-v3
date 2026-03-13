@@ -19,6 +19,7 @@ import json
 import logging
 import math
 import re
+import time
 from copy import deepcopy
 from datetime import date
 from typing import Any, Dict, List, Optional
@@ -28,6 +29,78 @@ from notebooklm import NotebookLMClient
 import config
 
 logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Result cache -- avoids re-running the full pipeline for the same ticker
+# ---------------------------------------------------------------------------
+
+_result_cache: Dict[str, Dict[str, Any]] = {}
+_cache_timestamps: Dict[str, float] = {}
+_CACHE_TTL_SECONDS = 3600 * 24  # 24 hours
+
+
+def get_cached_result(ticker: str) -> Optional[Dict[str, Any]]:
+    """Return cached gold analysis if available and fresh."""
+    ticker = ticker.upper()
+    ts = _cache_timestamps.get(ticker)
+    if ts is not None and (time.time() - ts) < _CACHE_TTL_SECONDS:
+        return _result_cache.get(ticker)
+    return None
+
+
+def cache_result(ticker: str, result: Dict[str, Any]) -> None:
+    """Cache a gold analysis result."""
+    ticker = ticker.upper()
+    _result_cache[ticker] = result
+    _cache_timestamps[ticker] = time.time()
+
+
+# ---------------------------------------------------------------------------
+# Health check -- test NotebookLM connectivity without running full analysis
+# ---------------------------------------------------------------------------
+
+_last_successful_check: Optional[float] = None
+
+
+async def check_notebooklm_health() -> Dict[str, Any]:
+    """Test NotebookLM connectivity with a lightweight query."""
+    global _last_successful_check
+    notebook_id = config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
+    if not notebook_id:
+        return {"status": "not_configured", "detail": "NOTEBOOKLM_GOLD_NOTEBOOK_ID not set"}
+
+    try:
+        async with await NotebookLMClient.from_storage() as client:
+            result = await asyncio.wait_for(
+                client.chat.ask(notebook_id, "What gold companies are covered in this notebook?"),
+                timeout=30.0,
+            )
+        _last_successful_check = time.time()
+        return {
+            "status": "healthy",
+            "last_successful": _last_successful_check,
+            "cached_tickers": list(_result_cache.keys()),
+        }
+    except asyncio.TimeoutError:
+        return {
+            "status": "timeout",
+            "detail": "NotebookLM query timed out after 30s",
+            "last_successful": _last_successful_check,
+        }
+    except Exception as exc:
+        exc_str = str(exc)
+        if "accounts.google.com" in exc_str or "auth" in exc_str.lower() or "login" in exc_str.lower():
+            return {
+                "status": "auth_expired",
+                "detail": "Google session cookies expired. Run Get NotebookLM Auth.bat and update NOTEBOOKLM_AUTH_JSON in Railway.",
+                "last_successful": _last_successful_check,
+            }
+        return {
+            "status": "error",
+            "detail": exc_str,
+            "last_successful": _last_successful_check,
+        }
+
 
 # ---------------------------------------------------------------------------
 # Corpus query set
@@ -322,14 +395,23 @@ _JURISDICTION_PREMIUM = {
 # ---------------------------------------------------------------------------
 
 
-async def run_gold_analysis(ticker: str) -> dict:
+async def run_gold_analysis(ticker: str, force: bool = False) -> dict:
+    ticker = ticker.upper()
     notebook_id = config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
     if not notebook_id:
         raise RuntimeError("NOTEBOOKLM_GOLD_NOTEBOOK_ID not configured")
 
+    if not force:
+        cached = get_cached_result(ticker)
+        if cached:
+            logger.info("Gold agent: returning cached result for %s", ticker)
+            return cached
+
     corpus = await _query_corpus(ticker, notebook_id)
     extracted = await _synthesise(ticker, corpus)
-    return _post_process(extracted, corpus)
+    result = _post_process(extracted, corpus)
+    cache_result(ticker, result)
+    return result
 
 
 # ---------------------------------------------------------------------------

@@ -45,7 +45,7 @@ from refresh import (
     run_batch_refresh, _data_dir,
 )
 from retriever import retrieve
-from gold_agent import run_gold_analysis
+from gold_agent import run_gold_analysis, check_notebooklm_health, get_cached_result
 from github_commit import commit_files_to_github
 
 
@@ -506,16 +506,22 @@ async def chart_proxy(ticker: str, request: Request):
 # ---------------------------------------------------------------------------
 
 
+@app.get("/api/agents/gold/health")
+async def gold_agent_health():
+    """Check NotebookLM connectivity and gold agent readiness."""
+    return await check_notebooklm_health()
+
+
 @app.get("/api/agents/gold/{ticker}", dependencies=[Depends(verify_api_key)])
 @limiter.limit("2/minute")
-async def gold_agent_endpoint(ticker: str, request: Request):
+async def gold_agent_endpoint(ticker: str, request: Request, force: bool = False):
     """
     Run gold equities analysis for an ASX ticker.
 
-    Queries the NotebookLM research corpus across 7 analytical dimensions
-    (reserve quality, cost structure, production, balance sheet, gold price
-    sensitivity, jurisdiction risk, catalysts), then synthesises the responses
-    into CI v3 JSON via Claude.
+    Queries the NotebookLM research corpus across 20 analytical dimensions,
+    then synthesises the responses into CI v3 JSON via Claude.
+
+    Returns cached result if available (24h TTL). Pass ?force=true to bypass cache.
 
     Requires NOTEBOOKLM_GOLD_NOTEBOOK_ID and NOTEBOOKLM_AUTH_JSON env vars.
     Expect 60-120 seconds latency. Rate-limited to 2 requests/minute.
@@ -525,13 +531,20 @@ async def gold_agent_endpoint(ticker: str, request: Request):
         raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{ticker}'")
 
     try:
-        result = await run_gold_analysis(ticker)
+        result = await run_gold_analysis(ticker, force=force)
         return result
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
     except Exception as exc:
+        exc_str = str(exc)
+        if "accounts.google.com" in exc_str or "auth" in exc_str.lower():
+            logger.error("Gold agent auth expired for %s: %s", ticker, exc)
+            raise HTTPException(
+                status_code=503,
+                detail="NotebookLM auth expired. Run Get NotebookLM Auth.bat and update NOTEBOOKLM_AUTH_JSON in Railway.",
+            )
         logger.error("Gold agent error for %s: %s", ticker, exc)
-        raise HTTPException(status_code=500, detail="Gold analysis failed")
+        raise HTTPException(status_code=500, detail=f"Gold analysis failed: {exc_str}")
 
 
 # ---------------------------------------------------------------------------
