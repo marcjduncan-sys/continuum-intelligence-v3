@@ -18,13 +18,15 @@ import asyncio
 import json
 import logging
 import math
+import os
 import re
 import time
 from copy import deepcopy
 from datetime import date
 from typing import Any, Dict, List, Optional
 
-from notebooklm import NotebookLMClient
+from google import genai
+from google.genai import types
 
 import config
 
@@ -56,48 +58,75 @@ def cache_result(ticker: str, result: Dict[str, Any]) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Health check -- test NotebookLM connectivity without running full analysis
+# Corpus directory -- local document storage replaces NotebookLM
+# ---------------------------------------------------------------------------
+
+_CORPUS_DIR = os.path.join(config.PROJECT_ROOT, "data", "gold-corpus")
+_SUPPORTED_EXTENSIONS = {".pdf", ".txt", ".md"}
+
+
+def _get_corpus_path(ticker: str) -> str:
+    """Return the corpus directory path for a ticker."""
+    return os.path.join(_CORPUS_DIR, ticker.upper())
+
+
+def _list_corpus_files(ticker: str) -> List[str]:
+    """List document files in a ticker's corpus directory."""
+    corpus_path = _get_corpus_path(ticker)
+    if not os.path.isdir(corpus_path):
+        return []
+    return sorted(
+        f for f in os.listdir(corpus_path)
+        if os.path.splitext(f)[1].lower() in _SUPPORTED_EXTENSIONS
+    )
+
+
+# ---------------------------------------------------------------------------
+# Health check -- verify Gemini API and corpus availability
 # ---------------------------------------------------------------------------
 
 _last_successful_check: Optional[float] = None
 
 
-async def check_notebooklm_health() -> Dict[str, Any]:
-    """Test NotebookLM connectivity with a lightweight query."""
+async def check_gold_health() -> Dict[str, Any]:
+    """Check Gemini connectivity and corpus document availability."""
     global _last_successful_check
-    notebook_id = config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
-    if not notebook_id:
-        return {"status": "not_configured", "detail": "NOTEBOOKLM_GOLD_NOTEBOOK_ID not set"}
 
+    if not config.GEMINI_API_KEY:
+        return {"status": "not_configured", "detail": "GEMINI_API_KEY not set"}
+
+    # Check which tickers have corpus documents
+    corpus_status: Dict[str, int] = {}
+    if os.path.isdir(_CORPUS_DIR):
+        for d in sorted(os.listdir(_CORPUS_DIR)):
+            dpath = os.path.join(_CORPUS_DIR, d)
+            if os.path.isdir(dpath):
+                files = _list_corpus_files(d)
+                if files:
+                    corpus_status[d] = len(files)
+
+    # Quick Gemini connectivity test
     try:
-        async with await NotebookLMClient.from_storage() as client:
-            result = await asyncio.wait_for(
-                client.chat.ask(notebook_id, "What gold companies are covered in this notebook?"),
-                timeout=30.0,
-            )
+        client = genai.Client(api_key=config.GEMINI_API_KEY)
+        response = await asyncio.to_thread(
+            client.models.generate_content,
+            model=config.GEMINI_MODEL,
+            contents="Reply with exactly: OK",
+            config={"max_output_tokens": 10},
+        )
         _last_successful_check = time.time()
         return {
             "status": "healthy",
-            "last_successful": _last_successful_check,
+            "gemini_model": config.GEMINI_MODEL,
+            "corpus_tickers": corpus_status,
             "cached_tickers": list(_result_cache.keys()),
-        }
-    except asyncio.TimeoutError:
-        return {
-            "status": "timeout",
-            "detail": "NotebookLM query timed out after 30s",
             "last_successful": _last_successful_check,
         }
     except Exception as exc:
-        exc_str = str(exc)
-        if "accounts.google.com" in exc_str or "auth" in exc_str.lower() or "login" in exc_str.lower():
-            return {
-                "status": "auth_expired",
-                "detail": "Google session cookies expired. Run Get NotebookLM Auth.bat and update NOTEBOOKLM_AUTH_JSON in Railway.",
-                "last_successful": _last_successful_check,
-            }
         return {
             "status": "error",
-            "detail": exc_str,
+            "detail": str(exc),
+            "corpus_tickers": corpus_status,
             "last_successful": _last_successful_check,
         }
 
@@ -397,9 +426,9 @@ _JURISDICTION_PREMIUM = {
 
 async def run_gold_analysis(ticker: str, force: bool = False) -> dict:
     ticker = ticker.upper()
-    notebook_id = config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
-    if not notebook_id:
-        raise RuntimeError("NOTEBOOKLM_GOLD_NOTEBOOK_ID not configured")
+
+    if not config.GEMINI_API_KEY:
+        raise RuntimeError("GEMINI_API_KEY not configured")
 
     if not force:
         cached = get_cached_result(ticker)
@@ -407,7 +436,7 @@ async def run_gold_analysis(ticker: str, force: bool = False) -> dict:
             logger.info("Gold agent: returning cached result for %s", ticker)
             return cached
 
-    corpus = await _query_corpus(ticker, notebook_id)
+    corpus = await _query_corpus(ticker)
     extracted = await _synthesise(ticker, corpus)
     result = _post_process(extracted, corpus)
     cache_result(ticker, result)
@@ -415,22 +444,108 @@ async def run_gold_analysis(ticker: str, force: bool = False) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Corpus helpers
+# Corpus helpers -- Gemini document processing
 # ---------------------------------------------------------------------------
 
 
-async def _query_corpus(ticker: str, notebook_id: str) -> Dict[str, str]:
-    async with await NotebookLMClient.from_storage() as client:
-        tasks = [client.chat.ask(notebook_id, q.format(ticker=ticker)) for _, q in _QUERIES]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+def _load_corpus_parts(ticker: str) -> List[Any]:
+    """Load all documents from the ticker's corpus directory as Gemini parts."""
+    corpus_path = _get_corpus_path(ticker)
+    if not os.path.isdir(corpus_path):
+        raise RuntimeError(
+            f"No gold corpus directory for {ticker}. "
+            f"Create {corpus_path}/ and add PDF/TXT/MD research documents."
+        )
 
-    corpus: Dict[str, str] = {}
-    for (key, _), result in zip(_QUERIES, results):
-        if isinstance(result, Exception):
-            logger.warning("NotebookLM query failed: %s %s", key, result)
-            corpus[key] = f"(query failed: {result})"
+    files = _list_corpus_files(ticker)
+    if not files:
+        raise RuntimeError(
+            f"No documents in {corpus_path}/. "
+            f"Add PDF, TXT, or MD files containing research for {ticker}."
+        )
+
+    parts: List[Any] = []
+    for fname in files:
+        fpath = os.path.join(corpus_path, fname)
+        ext = os.path.splitext(fname)[1].lower()
+
+        if ext == ".pdf":
+            with open(fpath, "rb") as fh:
+                parts.append(types.Part.from_bytes(data=fh.read(), mime_type="application/pdf"))
+            logger.info("Gold corpus: loaded PDF %s (%d bytes)", fname, os.path.getsize(fpath))
         else:
-            corpus[key] = result.answer
+            with open(fpath, "r", encoding="utf-8", errors="replace") as fh:
+                text = fh.read()
+            parts.append(f"=== Document: {fname} ===\n{text}")
+            logger.info("Gold corpus: loaded text %s (%d chars)", fname, len(text))
+
+    return parts
+
+
+async def _query_corpus(ticker: str) -> Dict[str, str]:
+    """Query research documents using Gemini instead of NotebookLM."""
+    doc_parts = _load_corpus_parts(ticker)
+
+    # Build all 20 questions into a single prompt
+    questions_block = "\n\n".join(
+        f"### QUESTION: {key}\n{query.format(ticker=ticker)}"
+        for key, query in _QUERIES
+    )
+
+    prompt = (
+        f"Analyse the uploaded documents for {ticker}. "
+        f"Answer each question below based ONLY on the document content. "
+        f"If a question cannot be answered from the documents, state that explicitly "
+        f"and note what information is missing.\n\n"
+        f"{questions_block}\n\n"
+        f"Return a JSON object where each key is the QUESTION key (e.g. "
+        f"\"company_stage_and_asset_base\") and the value is your detailed answer "
+        f"as a string. Include specific numbers, grades, costs, dates, and source "
+        f"references where available."
+    )
+
+    system_instruction = (
+        "You are a senior mining investment analyst. "
+        "Answer questions about gold mining companies based strictly on the provided documents. "
+        "Be thorough, specific, and quantitative. "
+        "Prefer technical reports, quarterly reports, and annual reports over presentations. "
+        "Include numbers, grades, costs, dates, and direct quotes where available. "
+        "Use Australian English."
+    )
+
+    client = genai.Client(api_key=config.GEMINI_API_KEY)
+
+    # Send documents + questions as a single Gemini call
+    response = await asyncio.to_thread(
+        client.models.generate_content,
+        model=config.GEMINI_MODEL,
+        contents=[*doc_parts, prompt],
+        config={
+            "max_output_tokens": 16384,
+            "temperature": 0.2,
+            "system_instruction": system_instruction,
+            "response_mime_type": "application/json",
+        },
+    )
+
+    raw = (response.text or "").strip()
+    if raw.startswith("```"):
+        raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
+        raw = raw.rsplit("```", 1)[0]
+
+    corpus: Dict[str, str] = json.loads(raw)
+
+    # Ensure all query keys exist
+    for key, _ in _QUERIES:
+        if key not in corpus:
+            corpus[key] = "(not answered by Gemini -- document may lack this information)"
+
+    logger.info(
+        "Gold corpus: Gemini answered %d/%d questions for %s",
+        sum(1 for k, _ in _QUERIES if k in corpus and not corpus[k].startswith("(not answered")),
+        len(_QUERIES),
+        ticker,
+    )
     return corpus
 
 
@@ -440,7 +555,7 @@ async def _synthesise(ticker: str, corpus: Dict[str, str]) -> Dict[str, Any]:
     user_message = (
         f"Ticker: {ticker}\n"
         f"Analysis date: {date.today().isoformat()}\n\n"
-        "Below is raw corpus output from NotebookLM. Extract the structured mining underwriting JSON. "
+        "Below is raw corpus output from document analysis. Extract the structured mining underwriting JSON. "
         "Prefer direct facts from technical reports, quarterlies and annual reports.\n\n"
         f"{corpus_block}\n\n"
         "Return only valid JSON."

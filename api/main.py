@@ -45,7 +45,7 @@ from refresh import (
     run_batch_refresh, _data_dir,
 )
 from retriever import retrieve
-from gold_agent import run_gold_analysis, check_notebooklm_health, get_cached_result
+from gold_agent import run_gold_analysis, check_gold_health, get_cached_result
 from github_commit import commit_files_to_github
 
 
@@ -508,8 +508,8 @@ async def chart_proxy(ticker: str, request: Request):
 
 @app.get("/api/agents/gold/health")
 async def gold_agent_health():
-    """Check NotebookLM connectivity and gold agent readiness."""
-    return await check_notebooklm_health()
+    """Check Gemini connectivity and gold corpus availability."""
+    return await check_gold_health()
 
 
 @app.get("/api/agents/gold/{ticker}", dependencies=[Depends(verify_api_key)])
@@ -536,15 +536,8 @@ async def gold_agent_endpoint(ticker: str, request: Request, force: bool = False
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
     except Exception as exc:
-        exc_str = str(exc)
-        if "accounts.google.com" in exc_str or "auth" in exc_str.lower():
-            logger.error("Gold agent auth expired for %s: %s", ticker, exc)
-            raise HTTPException(
-                status_code=503,
-                detail="NotebookLM auth expired. Run Get NotebookLM Auth.bat and update NOTEBOOKLM_AUTH_JSON in Railway.",
-            )
         logger.error("Gold agent error for %s: %s", ticker, exc)
-        raise HTTPException(status_code=500, detail=f"Gold analysis failed: {exc_str}")
+        raise HTTPException(status_code=500, detail=f"Gold analysis failed: {exc}")
 
 
 # ---------------------------------------------------------------------------

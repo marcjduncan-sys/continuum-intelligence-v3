@@ -49,7 +49,9 @@ EMBEDDING_MODEL = "text-embedding-004"
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 
 # ---------------------------------------------------------------------------
-# Gold agent (NotebookLM headless)
+# Gold agent -- uses Gemini for document processing (GEMINI_API_KEY above)
+# NotebookLM vars below are deprecated; kept to avoid startup errors
+# on Railway until env vars are cleaned up.
 # ---------------------------------------------------------------------------
 
 NOTEBOOKLM_GOLD_NOTEBOOK_ID = os.getenv("NOTEBOOKLM_GOLD_NOTEBOOK_ID", "")
