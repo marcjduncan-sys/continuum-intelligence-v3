@@ -42,7 +42,7 @@ npm run validate     # lint + test:all — run before any push
 
 ---
 
-## Current State — 2026-03-12 (updated)
+## Current State — 2026-03-13 (updated)
 
 **Phase 0 COMPLETE (2026-03-07).** The extraction of logic from `index.html` into `src/` modules is complete. `computeSkewScore` canonicalised to zero-contribution convention (commit `4493e8c`; see `docs/decisions/003-computeskewscore-neutral-convention.md`). `VALID_STATIC_PAGES` confirmed correct: `home`, `deep-research`, `portfolio`, `comparator`, `personalisation`, `about`.
 
@@ -99,7 +99,17 @@ npm run validate     # lint + test:all — run before any push
 - [x] **9D DONE (user)**: `INSIGHTS_SECRET` added to Railway env vars and GitHub Secrets.
 - [x] **9E DONE**: `insights-scan` workflow_dispatch triggered; Railway logs confirmed `POST /api/insights/scan HTTP/1.1' 200 OK`. 9 tickers scanned (tickers with active memories in DB), 97 memories checked -- expected behaviour; scan discovers tickers dynamically from memory table.
 
+**Session work (2026-03-13) -- Memory pipeline audit fixes:**
+- [x] Independent audit commissioned and completed. Verdict: architecture correct, no critical issues, 4 medium + 5 low severity findings.
+- [x] Commit `f4585a7`: 4 medium severity fixes applied:
+  - `memory_extractor.py`: confidence default 0.8 → 0.5 (weakly-inferred memories were over-weighted)
+  - `memory_extractor.py`: ticker normalised to `.upper()` at insertion (ticker boost in `memory_selector.py` was not firing on case mismatch)
+  - `memory_extractor.py`: 2,000-char truncation documented
+  - `embeddings.py`: 768-dim validation added; one retry with 1s delay on transient Gemini failure
+- [ ] **Next**: Phase 10 (firm features) -- user confirmed each user has own login; info barrier concern deferred. Or pivot to chat output quality (system prompt, memory extraction prompt, injection format, research retrieval). Awaiting direction.
+
 **Recent bug history (last six commits):**
+- `f4585a7` Memory pipeline audit fixes: confidence default, ticker normalisation, embedding dimension validation, retry.
 - `7ec36e1` Phase 9: proactive insights scan + notification surface. `009_notifications.sql`, `insights.py`, `notifications.js`, `insights-scan.yml`, 3 endpoints in main.py, `INSIGHTS_SECRET` in config.py.
 - `5c3af67` Docs: CLAUDE.md updated to 2026-03-12; Phase 8 completion recorded.
 - `d70b6ae` Phase 8: batch analysis. `008_batch_analysis.sql`, `batch_analysis.py`, `POST /api/batch/run`, `BATCH_SECRET` in config.py, `batch-analysis.yml`. 218/218 tests.
