@@ -108,14 +108,23 @@ npm run validate     # lint + test:all — run before any push
   - `embeddings.py`: 768-dim validation added; one retry with 1s delay on transient Gemini failure
 - [ ] **Next**: Phase 10 (firm features) -- user confirmed each user has own login; info barrier concern deferred. Or pivot to chat output quality (system prompt, memory extraction prompt, injection format, research retrieval). Awaiting direction.
 
+**Session work (2026-03-13) -- Hypothesis score divergence fix:**
+- [x] Root cause: `verdict.scores` carried stale copies of hypothesis probabilities; all 25 tickers diverged. The analyst chat received both arrays as separate passages and blended contradictory data.
+- [x] Commit `4768a84`: four-layer fix:
+  - `report-sections.js`: `renderVerdict()` normalises from `data.hypotheses` (canonical), fallback to `v.scores`
+  - `ingest.py`: verdict passage uses hypothesis scores, not stale verdict copy
+  - `refresh.py`: both update paths sync `verdict.scores` from canonical hypothesis score (no stale fallback)
+  - `validate_research.py`: Rule 19 catches and auto-fixes divergence; rule count 18 -> 19, fix count 12 -> 13
+  - All 25 research JSONs repaired via `scripts/repair_verdict_scores.py`
+- [x] 218/218 tests passing.
+
 **Recent bug history (last six commits):**
+- `4768a84` Fix hypothesis score divergence: verdict.scores synced from hypotheses across all 25 tickers. Four-layer fix (frontend, ingest, refresh, validation). Rule 19 added.
+- `ab0b1bb` memory_extractor: sharpen extraction system prompt.
+- `e7613e3` prompt_builder: unify voice rules, improve memory injection format.
+- `2968acc` Docs: memory audit findings recorded; CLAUDE.md updated to 2026-03-13.
 - `f4585a7` Memory pipeline audit fixes: confidence default, ticker normalisation, embedding dimension validation, retry.
 - `7ec36e1` Phase 9: proactive insights scan + notification surface. `009_notifications.sql`, `insights.py`, `notifications.js`, `insights-scan.yml`, 3 endpoints in main.py, `INSIGHTS_SECRET` in config.py.
-- `5c3af67` Docs: CLAUDE.md updated to 2026-03-12; Phase 8 completion recorded.
-- `d70b6ae` Phase 8: batch analysis. `008_batch_analysis.sql`, `batch_analysis.py`, `POST /api/batch/run`, `BATCH_SECRET` in config.py, `batch-analysis.yml`. 218/218 tests.
-- `627f74d` Gold agent endpoint: `api/gold_agent.py` + `GET /api/agents/gold/{ticker}` in main.py + notebooklm-py in requirements.txt + env vars in config.py.
-- `208b2e3` Sign in button CSS injected eagerly in `initAuth()`. Was injected lazily inside `_getOrCreateModal()` -- button rendered with browser default styles until modal first opened.
-- `28694bd` Fixed Railway healthcheck failures: `from . import db` relative import in `summarise.py` crashes the app when loaded as a top-level module. Changed to bare `import db`.
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
