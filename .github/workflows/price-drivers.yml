@@ -1,0 +1,21 @@
+name: Price Driver Analysis
+
+on:
+  schedule:
+    # 22:00 UTC daily = 08:00 AEDT (UTC+10/+11), 1 hour before ASX open
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+
+jobs:
+  price-drivers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Run price driver scan
+        run: |
+          curl -s -f -X POST \
+            -H "X-Drivers-Secret: ${{ secrets.PRICE_DRIVERS_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            --max-time 2400 \
+            https://imaginative-vision-production-16cb.up.railway.app/api/agents/drivers/scan

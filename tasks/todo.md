@@ -4,126 +4,99 @@
 
 ## Current Task
 
-**Gold Agent Integration -- Section 09: Gold Discovery**
+**Price Driver Agent -- Phase 10: Short-term Price Attribution**
 
-Integrate the gold agent's specialised analysis (scorecard, asset-level metrics, valuation,
-sensitivities, risks, evidence) into the report page for gold stocks. Presented within the
-existing section framework as Section 09, conditionally rendered only for tickers with
-`goldAgent` data.
-
-Target tickers: EVN, NST, WAF, HRZ.
+Build a daily-scheduled agent that discovers what drove each stock's share price movement over the last 5-10 trading days. Three-pass LLM pipeline (research, red-team, synthesis) with programmatic data gathering. Output renders in the report page just above "WHAT THE PRICE EMBEDS".
 
 ---
 
-## Architecture Decision
+## Architecture
 
-**Data storage:** Store gold agent output in the research JSON under a `goldAgent` key.
-This avoids a live API call (60-120s latency) on every page load. The data is fetched once
-via the gold agent API and baked into the research file.
+### Data Flow
+1. **Cron** (08:00 AEDT / 22:00 UTC) triggers `POST /api/agents/drivers/scan`
+2. **Scan** iterates all tickers with active research data
+3. **Per ticker**: programmatic data gathering → 3 LLM passes → store in PostgreSQL
+4. **Frontend**: fetches `GET /api/agents/drivers/{ticker}/latest` on report page load
+5. **Render**: new block in report hero, just above "WHAT THE PRICE EMBEDS"
 
-**Rendering:** Conditional Section 09 in `report-sections.js`. Only renders when
-`data.goldAgent` exists. Nav link added dynamically. No changes to non-gold stocks.
+### Pipeline (per ticker, ~60s)
+- **Layer 0 -- Data Gathering** (parallel, ~15s)
+  - Yahoo Finance: 10-day OHLCV + 30-day volume baseline + ASX200 index
+  - ASX announcements (14 days, existing `fetch_asx_announcements`)
+  - DuckDuckGo: company news, earnings, macro, broker research, HotCopper snippets, Reddit
+  - Commodity/FX prices for sector-relevant pairs (existing `fetch_commodity_price`)
+- **Layer 1 -- Research Pass** (Claude Sonnet, ~15s)
+  - Scores and classifies candidate drivers using the 5-factor grid
+  - Produces evidence pack JSON
+- **Layer 2 -- Red-Team Pass** (Claude Sonnet, ~10s)
+  - Challenges conclusions, proposes alternatives, adjusts confidence
+- **Layer 3 -- Final Synthesis** (Claude Sonnet, ~10s)
+  - Merges research + red-team into final output JSON
+  - Produces `report_text` prose paragraphs
 
-**Subsections within Section 09 (derived from gold agent output):**
-
-1. **Scorecard** -- 6 dimension scores (geology, engineering, financial, management,
-   jurisdiction, composite) + skew. Rendered as a horizontal bar/card strip.
-2. **Investment View** -- bull/base/bear cases, what-must-be-true list, monitoring trigger.
-3. **Assets** -- per-asset cards with resources, reserves, grade, recovery, AISC, mine life.
-   Expandable detail for study schedules where available.
-4. **Valuation** -- NAV variants (screening, IC, downside, upside), P/NAV, EV per oz metrics.
-5. **Sensitivities** -- gold price, FX, recovery, capex, delay impact on NAV.
-6. **Risks** -- top failure modes, technical red flags, hard risk flags, information gaps.
-7. **Evidence** -- sourced findings with quality scores (table format).
-
----
-
-## Wave 1 -- Data Population (populate goldAgent field for 4 tickers)
-
-- [ ] **1A** -- Write `scripts/populate-gold-agent.js` (or Python): for each of EVN, NST,
-  WAF, HRZ, call `GET /api/agents/gold/{ticker}` on Railway, merge result into
-  `data/research/{ticker}.json` under `goldAgent` key, save.
-- [ ] **1B** -- Run the script. Verify each file has `goldAgent` with scorecard, assets,
-  valuation, evidence populated.
-- [ ] **1C** -- Re-ingest is not needed for this (frontend reads research JSON directly).
-
-**Risk:** Gold agent needs valid `NOTEBOOKLM_AUTH_JSON` creds. If expired, must rotate
-first (Get NotebookLM Auth.bat from Desktop). Check Railway health + gold endpoint before
-running.
-
-**Alternative if creds expired:** Manually populate from previous gold agent runs if
-available, or defer until creds are refreshed.
+### LLM Model
+All 3 passes: `claude-sonnet-4-6` (existing `config.ANTHROPIC_MODEL`)
 
 ---
 
-## Wave 2 -- Frontend Rendering (Section 09)
+## Wave 1: Backend Core
 
-- [ ] **2A** -- Add `renderGoldDiscovery(data)` to `src/pages/report-sections.js`.
-  Returns empty string if `!data.goldAgent`. Otherwise renders all 7 subsections.
-  Pattern: RS_HDR('Section 09', 'Gold Agent Discovery') + rs-body content.
+- [ ] **1A** -- `api/migrations/010_price_drivers.sql`
+- [ ] **1B** -- `api/config.py` -- add `PRICE_DRIVERS_SECRET`
+- [ ] **1C** -- `api/price_drivers.py` -- data gathering layer (reuse `web_search.py`)
+- [ ] **1D** -- `api/price_drivers.py` -- 3 LLM passes (research, red-team, synthesis)
+- [ ] **1E** -- `api/price_drivers.py` -- cache, entry point, health check, DB storage
 
-- [ ] **2B** -- Add CSS classes for gold section to `index.html`:
-  - `.ga-scorecard` -- horizontal score strip
-  - `.ga-score-card` -- individual score card with dimension label + score
-  - `.ga-score-bar` -- visual bar (width = score%)
-  - `.ga-view-grid` -- bull/base/bear column layout
-  - `.ga-asset-card` -- per-asset expandable card
-  - `.ga-metric-row` -- key-value metric row (reuse `.ta-metric-row` pattern where sensible)
-  - `.ga-sensitivity-table` -- sensitivity table
-  - `.ga-risk-item` -- risk/gap item with severity indicator
-  - `.ga-evidence-table` -- evidence findings table
-  - Score colour: green >= 70, amber 40-69, red < 40
+## Wave 2: API Endpoints
 
-- [ ] **2C** -- Edit `report.js`: import `renderGoldDiscovery`, add it after
-  `renderTechnicalAnalysis(data)` in the mainContent chain.
+- [ ] **2A** -- `GET /api/agents/drivers/{ticker}` (on-demand, API key, 1/min rate limit)
+- [ ] **2B** -- `POST /api/agents/drivers/scan` (batch, X-Drivers-Secret header)
+- [ ] **2C** -- `GET /api/agents/drivers/{ticker}/latest` (fetch cached, API key)
 
-- [ ] **2D** -- Edit `renderSectionNav()` in `report-sections.js`: conditionally add
-  `['gold-discovery', 'Gold Discovery']` to the sections array when `data.goldAgent` exists.
+## Wave 3: Frontend Rendering
 
----
+- [ ] **3A** -- `renderPriceDrivers()` in `report-sections.js`
+- [ ] **3B** -- Insert block into `renderReportHero()` above "WHAT THE PRICE EMBEDS"
+- [ ] **3C** -- Async fetch on report page load in `report.js`
 
-## Wave 3 -- Validation & Deploy
+## Wave 4: Scheduling + Deployment
 
-- [ ] **3A** -- `npm run test:unit` must pass (157+ tests)
-- [ ] **3B** -- `npm run build` must succeed
-- [ ] **3C** -- Local preview: verify gold section renders for NST, does NOT render for WOW
-- [ ] **3D** -- `/ci:push-safe` to deploy
-- [ ] **3E** -- Verify on live site: open NST report page, Section 09 visible with real data
+- [ ] **4A** -- `.github/workflows/price-drivers.yml` (cron `0 22 * * *`)
+- [ ] **4B** -- Add `PRICE_DRIVERS_SECRET` to Railway + GitHub Secrets
+- [ ] **4C** -- Push, verify Railway health, trigger workflow_dispatch test
 
 ---
 
-## Design Notes
+## Database Schema
 
-### Scorecard rendering
-Six cards in a row, each showing:
-- Dimension label (Geology, Engineering, Financial, Management, Jurisdiction, Composite)
-- Score (0-100 integer)
-- Colour-coded bar: green >= 70, amber 40-69, red < 40
-- Skew score shown separately with directional indicator
+```sql
+CREATE TABLE IF NOT EXISTS price_driver_reports (
+    id SERIAL PRIMARY KEY,
+    ticker VARCHAR(10) NOT NULL,
+    report_json JSONB NOT NULL,
+    analysis_date DATE NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    expires_at TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '48 hours',
+    UNIQUE(ticker, analysis_date)
+);
+CREATE INDEX idx_pdr_ticker_date ON price_driver_reports(ticker, analysis_date DESC);
+CREATE INDEX idx_pdr_expires ON price_driver_reports(expires_at);
+```
 
-### Asset cards
-Each asset is a collapsible card showing:
-- Header: asset name, stage, country, ownership %
-- Key metrics grid: resources, reserves, grade, recovery, AISC, mine life
-- Red flags and info gaps as tagged chips
-- Study schedule as a small table if data exists
+## Endpoint Signatures
 
-### Investment view
-Three-column layout: Bull | Base | Bear
-Below: what-must-be-true as a checklist, monitoring trigger as a callout box
-
-### Sensitivities
-Compact table: scenario in left column, NAV impact in right column.
-Colour: green for upside scenarios, red for downside.
-
-### Evidence table
-Columns: Finding | Source | Type | Quality (star rating 1-5)
+```
+GET  /api/agents/drivers/{ticker}         — run now (API key, 1/min)
+POST /api/agents/drivers/scan             — batch (X-Drivers-Secret)
+GET  /api/agents/drivers/{ticker}/latest   — cached result (API key)
+```
 
 ---
 
 ## Backlog (unchanged)
 
 - [ ] Mandatory login enforcement
+- [ ] Gold agent section rendering (Wave 1-3 from previous plan)
 - [ ] Technical analysis agent
 - [ ] Rates/property/banks agent
 - [ ] OHLCV Railway proxy

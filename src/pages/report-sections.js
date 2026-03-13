@@ -110,6 +110,9 @@ export function renderReportHero(data) {
     '</div>' +
   '</div>';
 
+  // Price drivers placeholder (populated async from API)
+  var priceDriversHtml = '<div id="price-drivers-' + data.ticker + '" class="pd-container" data-ticker="' + data.ticker + '"></div>';
+
   return stockNavHtml +
   '<div class="report-hero">' +
     '<div class="report-hero-inner">' +
@@ -142,14 +145,13 @@ export function renderReportHero(data) {
       '</div>' +
     '</div>' +
   '</div>' +
-  (embeddedThesisHtml || positionInRangeHtml || skewIndicatorHtml || nextDecisionHtml
-    ? '<div class="rh-spec-section"><div class="report-hero-inner">' +
-        embeddedThesisHtml +
-        positionInRangeHtml +
-        skewIndicatorHtml +
-        nextDecisionHtml +
-      '</div></div>'
-    : '');
+  '<div class="rh-spec-section"><div class="report-hero-inner">' +
+    priceDriversHtml +
+    embeddedThesisHtml +
+    positionInRangeHtml +
+    skewIndicatorHtml +
+    nextDecisionHtml +
+  '</div></div>';
 }
 
 export function renderSkewBar(data) {
@@ -1857,4 +1859,137 @@ export function setupScrollSpy(pageId) {
   });
 
   sections.forEach(s => observer.observe(s.section));
+}
+
+
+// ---------------------------------------------------------------------------
+// Price Drivers -- async content renderer
+// ---------------------------------------------------------------------------
+
+export function renderPriceDriversContent(container, driverData) {
+  if (!driverData || driverData.error) {
+    container.style.display = 'none';
+    return;
+  }
+
+  var rt = driverData.report_text || {};
+  var rc = driverData.ranked_conclusion || {};
+  var pa = driverData.price_action_summary || {};
+  var meta = driverData.agent_metadata || {};
+
+  // Price move summary line
+  var movePct = pa.price_change_5d_pct;
+  var moveDir = movePct > 0 ? '+' : '';
+  var moveCls = movePct > 1 ? 'pd-move-up' : movePct < -1 ? 'pd-move-down' : 'pd-move-flat';
+
+  // Confidence badge
+  var conf = rc.overall_confidence || 'moderate';
+  var confCls = conf === 'very_high' || conf === 'high' ? 'pd-conf-high' : conf === 'moderate' ? 'pd-conf-mod' : 'pd-conf-low';
+
+  // Primary driver
+  var primaryTitle = rc.most_likely_primary_driver || 'No clear primary driver identified';
+
+  // Build candidate driver cards
+  var driversHtml = '';
+  var candidates = driverData.candidate_drivers || [];
+  for (var i = 0; i < candidates.length && i < 5; i++) {
+    var d = candidates[i];
+    var dCls = d.classification === 'primary_driver' ? 'pd-driver-primary' :
+               d.classification === 'secondary_driver' ? 'pd-driver-secondary' :
+               d.classification === 'amplifier' ? 'pd-driver-amplifier' : 'pd-driver-bg';
+    var catLabel = (d.category || '').replace(/_/g, ' ');
+    driversHtml +=
+      '<div class="pd-driver ' + dCls + '">' +
+        '<div class="pd-driver-header">' +
+          '<span class="pd-driver-id">' + (d.driver_id || '') + '</span>' +
+          '<span class="pd-driver-title">' + (d.title || '') + '</span>' +
+          '<span class="pd-driver-class">' + (d.classification || '').replace(/_/g, ' ') + '</span>' +
+        '</div>' +
+        '<div class="pd-driver-cat">' + catLabel + '</div>' +
+        (d.description ? '<div class="pd-driver-desc">' + d.description + '</div>' : '') +
+        '<div class="pd-driver-scores">' +
+          '<span>Timing: ' + (d.timing_fit_score || 0) + '/5</span>' +
+          '<span>Magnitude: ' + (d.magnitude_fit_score || 0) + '/5</span>' +
+          '<span>Direct: ' + (d.directness_score || 0) + '/5</span>' +
+          '<span>Corroboration: ' + (d.corroboration_score || 0) + '/5</span>' +
+          '<span>Total: ' + (d.total_score || 0) + '/25</span>' +
+        '</div>' +
+      '</div>';
+  }
+
+  // Report text paragraphs
+  var proseHtml = '';
+  var sections = [
+    rt.primary_driver_paragraph,
+    rt.secondary_drivers_paragraph,
+    rt.flow_technical_paragraph,
+    rt.sentiment_paragraph,
+    rt.final_judgement_paragraph,
+  ];
+  for (var j = 0; j < sections.length; j++) {
+    if (sections[j]) {
+      proseHtml += '<p class="pd-prose">' + sections[j] + '</p>';
+    }
+  }
+
+  // Change my mind section
+  var cmm = driverData.change_my_mind || {};
+  var cmmHtml = '';
+  var cmmItems = (cmm.what_would_change_the_view || []);
+  if (cmmItems.length > 0) {
+    cmmHtml = '<div class="pd-cmm"><div class="pd-cmm-label">What would change this view</div><ul>';
+    for (var k = 0; k < cmmItems.length; k++) {
+      cmmHtml += '<li>' + cmmItems[k] + '</li>';
+    }
+    cmmHtml += '</ul></div>';
+  }
+
+  container.innerHTML =
+    '<div class="rh-spec-block pd-block">' +
+      '<div class="pd-header">' +
+        '<div class="rh-spec-label">WHAT DROVE THE PRICE</div>' +
+        '<div class="pd-meta">' +
+          '<span class="pd-move ' + moveCls + '">' + moveDir + (movePct || 0).toFixed(1) + '% (5d)</span>' +
+          '<span class="pd-conf ' + confCls + '">' + conf.replace(/_/g, ' ') + ' confidence</span>' +
+          (meta.analysis_date ? '<span class="pd-date">' + meta.analysis_date + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="pd-primary">' +
+        '<div class="pd-primary-label">Primary driver</div>' +
+        '<div class="pd-primary-title">' + primaryTitle + '</div>' +
+      '</div>' +
+      (proseHtml ? '<div class="pd-prose-section">' + proseHtml + '</div>' : '') +
+      (driversHtml ? '<details class="pd-details"><summary>Ranked driver assessment (' + candidates.length + ' candidates)</summary><div class="pd-drivers">' + driversHtml + '</div></details>' : '') +
+      cmmHtml +
+    '</div>';
+}
+
+
+export function fetchPriceDrivers(ticker) {
+  var container = document.getElementById('price-drivers-' + ticker);
+  if (!container) return;
+
+  var isGHPages = window.location.hostname.includes('github.io');
+  var baseUrl = isGHPages
+    ? 'https://imaginative-vision-production-16cb.up.railway.app'
+    : '';
+  var apiKey = window.CI_API_KEY || '';
+
+  var headers = { 'Accept': 'application/json' };
+  if (apiKey) headers['X-API-Key'] = apiKey;
+
+  fetch(baseUrl + '/api/agents/drivers/' + ticker + '/latest', { headers: headers })
+    .then(function(resp) {
+      if (!resp.ok) {
+        container.style.display = 'none';
+        return null;
+      }
+      return resp.json();
+    })
+    .then(function(data) {
+      if (data) renderPriceDriversContent(container, data);
+    })
+    .catch(function() {
+      container.style.display = 'none';
+    });
 }

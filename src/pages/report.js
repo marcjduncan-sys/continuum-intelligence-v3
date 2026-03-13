@@ -24,7 +24,8 @@ import {
   renderOvercorrectionBanner,
   renderNarrativeTimeline,
   renderSignalBars,
-  setupScrollSpy
+  setupScrollSpy,
+  fetchPriceDrivers
 } from './report-sections.js';
 
 export function renderReport(data) {
@@ -48,6 +49,9 @@ export function renderReport(data) {
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="18 15 12 9 6 15"/></svg>' +
       '<span>Collapse All</span>' +
     '</button>';
+
+  // Trigger async price drivers fetch after render
+  requestAnimationFrame(function() { fetchPriceDrivers(data.ticker); });
 
   return renderReportHero(data) +
     renderSignalBars(data) +
