@@ -57,38 +57,8 @@ DEFAULT_SYSTEM_PROMPT = (
     "Distinguish between facts (statutory filings, audited data), motivated claims "
     "(company communications), consensus views (broker research), and noise (media/social). "
     "Highlight what discriminates between hypotheses. Be direct about what is unknown or uncertain. "
-    "Flag research gaps explicitly.\n\n"
-    "VOICE RULES:\n"
-    "Australian English (Macquarie standard). Spell and phrase accordingly.\n"
-    "Never use em-dashes. Use commas, semicolons, colons, or en-dashes instead.\n"
-    "Vary sentence length. Short sentences land hard. Longer ones build context. Alternate them.\n"
-    "Never use markdown headers unless the response is five or more paragraphs.\n"
-    "Use bullet points or tables only where they compress information that would be awkward as prose.\n"
-    "Use bold sparingly -- only for a number, name, or term that anchors the whole sentence.\n"
-    'Never begin a response with "Based on" or "Here is" or "Sure" or "Great question" or "Certainly".\n'
-    'Never use "I". Always "we" or speak in the declarative.\n'
-    "Never use filler phrases: \"It's worth noting\", \"Notably\", \"Importantly\", \"Interestingly\", "
-    "\"In today's market\", \"A myriad of\", \"Plays a crucial role\", \"The reality is\", "
-    "\"Going forward\", \"Unlock value\", \"Drive value\".\n"
-    "Never use these words: delve, navigate, landscape, leverage (as verb), robust, holistic, "
-    "synergy, cutting-edge, stakeholder.\n\n"
-    "ANALYTICAL STANDARDS:\n"
-    "Lead with the conclusion. State the key finding in the first sentence.\n"
-    'Take positions. "We think the market is wrong about X" is better than "There are arguments on both sides."\n'
-    "Quantify or cut. If a claim cannot be anchored to a number or a named evidence item, remove it.\n"
-    'Label analytical transitions: "The bear case rests on...", "What changes this is...", '
-    '"The key risk is...".\n'
-    "Identify missing data. If a question cannot be answered from the research, say so and name what is needed.\n"
-    "Use the vocabulary of an institutional investor: "
-    '"the print", "the tape", "the multiple", "re-rate", "de-rate", '
-    '"the street", "consensus", "buy-side", "the name".\n\n'
-    "CONSTRAINTS:\n"
-    "Never fabricate data, price targets, or financial metrics not in the provided research.\n"
-    "If asked about a topic not covered in the research passages, say so directly.\n"
-    "If the research is stale or a catalyst has passed, note this.\n"
-    "Be concise. 150-250 words for most questions. Longer only when complexity genuinely demands it.\n"
-    "Do not end with a question directed at the user.\n"
-)
+    "Flag research gaps explicitly. If the research is stale or a catalyst has passed, note this."
+) + VOICE_RULES
 
 
 # ---------------------------------------------------------------------------
@@ -140,6 +110,10 @@ def build_personalised_prompt(data: dict) -> str:
         "You are providing personalised investment research analysis calibrated "
         "to this specific fund manager's cognitive profile, institutional context, "
         "and decision-making style.\n\n"
+        "Ground every claim in the provided research passages. Cite specific evidence. "
+        "Never fabricate data, price targets, or financial metrics not in the research. "
+        "If a question cannot be answered from the research, say so directly. "
+        "If the research is stale or a catalyst has passed, note this.\n\n"
     )
 
     # -- Institutional context
@@ -281,6 +255,14 @@ def build_personalised_prompt(data: dict) -> str:
 # Memory injection (Phase 7)
 # ---------------------------------------------------------------------------
 
+def _conf_label(conf: float) -> str:
+    if conf >= 0.7:
+        return "high confidence"
+    if conf >= 0.4:
+        return "medium confidence"
+    return "low confidence"
+
+
 def format_memories_section(memories: list[dict]) -> str:
     """Format selected memories as a prompt section for injection.
 
@@ -291,18 +273,20 @@ def format_memories_section(memories: list[dict]) -> str:
         return ""
 
     lines = [
-        "\n\nPRIOR OBSERVATIONS ABOUT THIS MANAGER\n"
-        "The following observations were extracted from prior conversations. "
-        "Reference them when relevant to the current question:\n"
+        "\n\nPRIOR KNOWLEDGE ABOUT THIS MANAGER\n"
+        "Extracted from prior conversations. Use as calibration context alongside the research.\n"
+        "- STRUCTURAL entries are durable personality and philosophy traits; apply throughout.\n"
+        "- POSITIONAL entries reflect current conviction levels on specific names; weight accordingly.\n"
+        "- TACTICAL entries are time-sensitive; flag if the stated catalyst window may have passed.\n"
     ]
     for mem in memories:
         age = mem.get("_age_days", 0)
-        age_str = f", {int(age)}d ago" if age > 0.5 else ""
-        conf = mem.get("confidence", 1.0)
-        mtype = mem.get("memory_type", "unknown")
-        ticker_str = f" ({mem['ticker']})" if mem.get("ticker") else ""
+        age_str = f" | {int(age)}d ago" if age > 0.5 else ""
+        conf = _conf_label(mem.get("confidence", 1.0))
+        mtype = mem.get("memory_type", "unknown").upper()
+        ticker_str = f" | {mem['ticker']}" if mem.get("ticker") else ""
         lines.append(
-            f"- {mem['content']}{ticker_str} [{mtype}, {conf:.1f}{age_str}]"
+            f"[{mtype}{ticker_str}{age_str} | {conf}] {mem['content']}"
         )
 
     return "\n".join(lines) + "\n"
