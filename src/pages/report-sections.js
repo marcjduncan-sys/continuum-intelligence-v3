@@ -178,7 +178,9 @@ export function renderVerdict(data) {
   var borderStyle = v.borderColor ? ' style="border-color: ' + v.borderColor + '"' : '';
   var skewDir = (data.skew && data.skew.direction) || '';
   var vtCls = skewDir === 'upside' ? ' vt-positive' : skewDir === 'downside' ? ' vt-negative' : '';
-  var norm = normaliseScores(v.scores);
+  var norm = (data.hypotheses && data.hypotheses.length)
+    ? normaliseScores(data.hypotheses)
+    : normaliseScores(v.scores);
 
   var scoresHtml = '';
   for (var i = 0; i < v.scores.length; i++) {

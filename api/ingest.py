@@ -179,11 +179,13 @@ def _chunk_stock(ticker: str, data: dict, ref: dict | None = None, fresh: dict |
 
     # --- Verdict ---
     verdict = data.get("verdict", {})
+    hypotheses_list = data.get("hypotheses", [])
     if verdict:
         verdict_parts = [f"Verdict for {ticker}: {_clean_html(verdict.get('text', ''))}"]
-        for score in verdict.get("scores", []):
+        for idx, score in enumerate(verdict.get("scores", [])):
+            hyp_score = hypotheses_list[idx].get("score", "") if idx < len(hypotheses_list) else score.get("score", "")
             verdict_parts.append(
-                f"  {score.get('label','')}: {score.get('score','')} ({_clean_html(score.get('dirText',''))})"
+                f"  {score.get('label','')}: {hyp_score} ({_clean_html(score.get('dirText',''))})"
             )
         passages.append(Passage(
             ticker=ticker,

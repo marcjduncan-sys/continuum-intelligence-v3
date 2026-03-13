@@ -2,14 +2,14 @@
 Research Data Validation & Auto-Fix Module
 
 Two functions:
-  fix(data)      — auto-corrects 12 known drift patterns, returns corrected data
-  validate(data) — checks 18 rules, returns list of error strings (empty = pass)
+  fix(data)      — auto-corrects 13 known drift patterns, returns corrected data
+  validate(data) — checks 19 rules, returns list of error strings (empty = pass)
 
 Usage:
   from validate_research import fix, validate
 
   data = fix(data)          # auto-correct known issues
-  errors = validate(data)   # check 18 rules
+  errors = validate(data)   # check 19 rules
   if errors:
       for e in errors:
           print(f"  FAIL: {e}")
@@ -249,16 +249,23 @@ def fix(data: dict) -> dict:
             # "42%" → "42"  (frontend does parseInt which handles both)
             vs["score"] = score_val.replace("%", "").strip() + "%"
 
+    # --- 13 (fix): Sync verdict.scores from hypotheses (canonical source) ---
+    if len(hypotheses) == len(verdict_scores) == 4:
+        for vs, hyp in zip(verdict_scores, hypotheses):
+            hyp_score = hyp.get("score", "")
+            if hyp_score:
+                vs["score"] = hyp_score
+
     return data
 
 
 # ---------------------------------------------------------------------------
-# validate() — 18 rule checks
+# validate() — 19 rule checks
 # ---------------------------------------------------------------------------
 
 def validate(data: dict) -> list[str]:
     """
-    Validate a research JSON against the 18 schema rules.
+    Validate a research JSON against the 19 schema rules.
     Returns a list of error strings. Empty list = all checks passed.
 
     Only checks initiated stocks (where hypotheses have real scores).
@@ -431,5 +438,16 @@ def validate(data: dict) -> list[str]:
     # --- Rule 18: No emoji ---
     if _EMOJI_PATTERN.search(json_str):
         errors.append("Rule 18: Emoji characters detected in data")
+
+    # --- Rule 19: verdict.scores must match hypotheses (canonical source) ---
+    if len(hypotheses) == len(scores) == 4:
+        for i, (h, vs) in enumerate(zip(hypotheses, scores)):
+            h_score = str(h.get("score", "")).replace("%", "").strip()
+            v_score = str(vs.get("score", "")).replace("%", "").strip()
+            if h_score and v_score and h_score != v_score:
+                errors.append(
+                    f"Rule 19: verdict.scores[{i}] ({v_score}%) diverges from "
+                    f"hypotheses[{i}] ({h_score}%); hypotheses are the source of truth"
+                )
 
     return errors

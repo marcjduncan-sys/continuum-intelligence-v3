@@ -1622,7 +1622,7 @@ def _merge_updates(
                 if "verdict" in updated and "scores" in updated["verdict"]:
                     for vs in updated["verdict"]["scores"]:
                         if vs.get("label", "").lower().startswith(tier[:2]):
-                            vs["score"] = hu.get("updated_score", vs.get("score"))
+                            vs["score"] = h["score"]
                             vs["dirArrow"] = arrow
                             vs["dirText"] = text
                 break
@@ -1824,7 +1824,12 @@ def _merge_initiation(
                 score_color = color_map.get(direction, "var(--text-muted)")
                 for vs in updated["verdict"]["scores"]:
                     if vs.get("label", "").lower().startswith(tier[:2]):
-                        vs["score"] = hu.get("updated_score", vs.get("score"))
+                        canonical = next(
+                            (h["score"] for h in updated.get("hypotheses", [])
+                             if h.get("tier", "").lower() == tier),
+                            hu.get("updated_score", vs.get("score"))
+                        )
+                        vs["score"] = canonical
                         vs["scoreColor"] = score_color
                         vs["dirArrow"] = arrow
                         vs["dirText"] = text
