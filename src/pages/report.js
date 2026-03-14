@@ -33,6 +33,7 @@ export function renderReport(data) {
   prepareHypotheses(data);
 
   var mainContent =
+    renderPriceDriversPlaceholder(data.ticker) +
     renderOvercorrectionBanner(data) +
     renderIdentity(data) +
     renderHypotheses(data) +
@@ -56,7 +57,6 @@ export function renderReport(data) {
 
   return renderReportHero(data) +
     renderSignalBars(data) +
-    renderPriceDriversPlaceholder(data.ticker) +
     renderSkewBar(data) +
     renderVerdict(data) +
     renderSectionNav(data) +

@@ -140,9 +140,8 @@
     margin-top: var(--space-xs);
 }
 
-/* Price Drivers section (condensed bullet format, matches rh-spec-block style) */
+/* Price Drivers section (inside report-main, inherits container width) */
 .pd-container:empty { display: none; }
-.pd-container { max-width: var(--report-width, 960px); margin: 0 auto; padding: 0 var(--space-md); }
 .pd-block { padding: var(--space-md) 0; border-top: 1px solid var(--border); }
 .pd-header { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; margin-bottom: var(--space-xs); }
 .pd-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }

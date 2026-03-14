@@ -1878,7 +1878,7 @@ export function setupScrollSpy(pageId) {
 // ---------------------------------------------------------------------------
 
 export function renderPriceDriversPlaceholder(ticker) {
-  return '<div id="price-drivers-' + ticker + '" class="pd-container" data-ticker="' + ticker + '"></div>';
+  return '<div id="price-drivers-' + ticker + '" class="pd-container"></div>';
 }
 
 
@@ -1889,15 +1889,21 @@ function _formatDriverDate(isoDate) {
   return d.getDate() + '-' + months[d.getMonth()] + '-' + String(d.getFullYear()).slice(2);
 }
 
+function _cleanDriverText(text) {
+  if (!text) return '';
+  return String(text).replace(/\(?\d{4}-\d{2}-\d{2}\)?/g, '').replace(/\s{2,}/g, ' ').trim();
+}
+
 function _truncate(text, maxLen) {
   if (!text) return '';
-  var s = String(text);
+  var s = _cleanDriverText(text);
   if (s.length <= maxLen) return s;
-  // Cut at last sentence boundary before maxLen
   var cut = s.substring(0, maxLen);
   var lastDot = cut.lastIndexOf('. ');
-  if (lastDot > maxLen * 0.4) return cut.substring(0, lastDot + 1);
-  return cut.replace(/\s+\S*$/, '') + '...';
+  if (lastDot > maxLen * 0.5) return cut.substring(0, lastDot + 1);
+  var lastSpace = cut.lastIndexOf(' ');
+  if (lastSpace > maxLen * 0.6) return cut.substring(0, lastSpace) + '.';
+  return cut + '.';
 }
 
 
