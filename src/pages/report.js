@@ -25,6 +25,7 @@ import {
   renderNarrativeTimeline,
   renderSignalBars,
   setupScrollSpy,
+  renderPriceDriversPlaceholder,
   fetchPriceDrivers
 } from './report-sections.js';
 
@@ -55,6 +56,7 @@ export function renderReport(data) {
 
   return renderReportHero(data) +
     renderSignalBars(data) +
+    renderPriceDriversPlaceholder(data.ticker) +
     renderSkewBar(data) +
     renderVerdict(data) +
     renderSectionNav(data) +

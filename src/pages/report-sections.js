@@ -110,9 +110,6 @@ export function renderReportHero(data) {
     '</div>' +
   '</div>';
 
-  // Price drivers placeholder (populated async from API)
-  var priceDriversHtml = '<div id="price-drivers-' + data.ticker + '" class="pd-container" data-ticker="' + data.ticker + '"></div>';
-
   return stockNavHtml +
   '<div class="report-hero">' +
     '<div class="report-hero-inner">' +
@@ -146,7 +143,6 @@ export function renderReportHero(data) {
     '</div>' +
   '</div>' +
   '<div class="rh-spec-section"><div class="report-hero-inner">' +
-    priceDriversHtml +
     embeddedThesisHtml +
     positionInRangeHtml +
     skewIndicatorHtml +
@@ -1881,101 +1877,107 @@ export function setupScrollSpy(pageId) {
 // Price Drivers -- async content renderer
 // ---------------------------------------------------------------------------
 
+export function renderPriceDriversPlaceholder(ticker) {
+  return '<div id="price-drivers-' + ticker + '" class="pd-container" data-ticker="' + ticker + '"></div>';
+}
+
+
+function _formatDriverDate(isoDate) {
+  if (!isoDate) return '';
+  var d = new Date(isoDate + 'T00:00:00');
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate() + '-' + months[d.getMonth()] + '-' + String(d.getFullYear()).slice(2);
+}
+
+
 export function renderPriceDriversContent(container, driverData) {
   if (!driverData || driverData.error) {
     container.style.display = 'none';
     return;
   }
 
-  var rt = driverData.report_text || {};
   var rc = driverData.ranked_conclusion || {};
   var pa = driverData.price_action_summary || {};
   var meta = driverData.agent_metadata || {};
+  var fto = driverData.flow_and_technical_overlay || {};
 
-  // Price move summary line
+  // Header metrics
   var movePct = pa.price_change_5d_pct;
   var moveDir = movePct > 0 ? '+' : '';
   var moveCls = movePct > 1 ? 'pd-move-up' : movePct < -1 ? 'pd-move-down' : 'pd-move-flat';
-
-  // Confidence badge
   var conf = rc.overall_confidence || 'moderate';
   var confCls = conf === 'very_high' || conf === 'high' ? 'pd-conf-high' : conf === 'moderate' ? 'pd-conf-mod' : 'pd-conf-low';
+  var dateStr = _formatDriverDate(meta.analysis_date);
 
-  // Primary driver
-  var primaryTitle = rc.most_likely_primary_driver || 'No clear primary driver identified';
+  // Build condensed bullet list (max 8 lines)
+  var bullets = [];
 
-  // Build candidate driver cards
-  var driversHtml = '';
-  var candidates = driverData.candidate_drivers || [];
-  for (var i = 0; i < candidates.length && i < 5; i++) {
-    var d = candidates[i];
-    var dCls = d.classification === 'primary_driver' ? 'pd-driver-primary' :
-               d.classification === 'secondary_driver' ? 'pd-driver-secondary' :
-               d.classification === 'amplifier' ? 'pd-driver-amplifier' : 'pd-driver-bg';
-    var catLabel = (d.category || '').replace(/_/g, ' ');
-    driversHtml +=
-      '<div class="pd-driver ' + dCls + '">' +
-        '<div class="pd-driver-header">' +
-          '<span class="pd-driver-id">' + (d.driver_id || '') + '</span>' +
-          '<span class="pd-driver-title">' + (d.title || '') + '</span>' +
-          '<span class="pd-driver-class">' + (d.classification || '').replace(/_/g, ' ') + '</span>' +
-        '</div>' +
-        '<div class="pd-driver-cat">' + catLabel + '</div>' +
-        (d.description ? '<div class="pd-driver-desc">' + d.description + '</div>' : '') +
-        '<div class="pd-driver-scores">' +
-          '<span>Timing: ' + (d.timing_fit_score || 0) + '/5</span>' +
-          '<span>Magnitude: ' + (d.magnitude_fit_score || 0) + '/5</span>' +
-          '<span>Direct: ' + (d.directness_score || 0) + '/5</span>' +
-          '<span>Corroboration: ' + (d.corroboration_score || 0) + '/5</span>' +
-          '<span>Total: ' + (d.total_score || 0) + '/25</span>' +
-        '</div>' +
-      '</div>';
+  // 1. Primary driver
+  if (rc.most_likely_primary_driver) {
+    bullets.push('<b>Primary driver:</b> ' + rc.most_likely_primary_driver);
   }
 
-  // Report text paragraphs
-  var proseHtml = '';
-  var sections = [
-    rt.primary_driver_paragraph,
-    rt.secondary_drivers_paragraph,
-    rt.flow_technical_paragraph,
-    rt.sentiment_paragraph,
-    rt.final_judgement_paragraph,
-  ];
-  for (var j = 0; j < sections.length; j++) {
-    if (sections[j]) {
-      proseHtml += '<p class="pd-prose">' + sections[j] + '</p>';
-    }
+  // 2. Secondary drivers (collapsed into one line)
+  var secondaries = rc.secondary_drivers || [];
+  if (secondaries.length > 0) {
+    bullets.push('<b>Secondary:</b> ' + secondaries.join('; '));
   }
 
-  // Change my mind section
-  var cmm = driverData.change_my_mind || {};
-  var cmmHtml = '';
-  var cmmItems = (cmm.what_would_change_the_view || []);
-  if (cmmItems.length > 0) {
-    cmmHtml = '<div class="pd-cmm"><div class="pd-cmm-label">What would change this view</div><ul>';
-    for (var k = 0; k < cmmItems.length; k++) {
-      cmmHtml += '<li>' + cmmItems[k] + '</li>';
-    }
-    cmmHtml += '</ul></div>';
+  // 3. Amplifiers (one line)
+  var amps = rc.amplifiers || [];
+  if (amps.length > 0) {
+    bullets.push('<b>Amplifiers:</b> ' + amps.join('; '));
   }
+
+  // 4. Flow/technical (condensed)
+  var flowNotes = [];
+  if (fto.abnormal_volume) flowNotes.push('abnormal volume detected');
+  if (fto.short_covering_status && fto.short_covering_status !== 'none' && fto.short_covering_status !== 'no evidence')
+    flowNotes.push('short covering: ' + fto.short_covering_status);
+  if (fto.technical_breaks && fto.technical_breaks.length > 0)
+    flowNotes.push(fto.technical_breaks.join('; '));
+  if (fto.flow_notes && flowNotes.length === 0) flowNotes.push(fto.flow_notes);
+  if (flowNotes.length > 0) {
+    bullets.push('<b>Flow/technical:</b> ' + flowNotes.join('; '));
+  }
+
+  // 5. Macro/sector context
+  var msc = driverData.macro_sector_context || {};
+  if (msc.peer_moves_summary) {
+    bullets.push('<b>Peer context:</b> ' + msc.peer_moves_summary);
+  } else if (msc.commodity_or_rate_context) {
+    bullets.push('<b>Macro:</b> ' + msc.commodity_or_rate_context);
+  }
+
+  // 6. Confidence rationale
+  if (rc.confidence_rationale) {
+    bullets.push('<b>Confidence:</b> ' + rc.confidence_rationale);
+  }
+
+  // 7. Rejected (if notable)
+  var rejected = rc.rejected_explanations || [];
+  if (rejected.length > 0) {
+    bullets.push('<b>Ruled out:</b> ' + rejected.slice(0, 3).join('; '));
+  }
+
+  // Cap at 8 bullets
+  if (bullets.length > 8) bullets.length = 8;
+
+  var bulletsHtml = '<ul class="pd-bullets">';
+  for (var i = 0; i < bullets.length; i++) {
+    bulletsHtml += '<li>' + bullets[i] + '</li>';
+  }
+  bulletsHtml += '</ul>';
 
   container.innerHTML =
-    '<div class="rh-spec-block pd-block">' +
+    '<div class="pd-block">' +
       '<div class="pd-header">' +
-        '<div class="rh-spec-label">WHAT DROVE THE PRICE</div>' +
-        '<div class="pd-meta">' +
-          '<span class="pd-move ' + moveCls + '">' + moveDir + (movePct || 0).toFixed(1) + '% (5d)</span>' +
-          '<span class="pd-conf ' + confCls + '">' + conf.replace(/_/g, ' ') + ' confidence</span>' +
-          (meta.analysis_date ? '<span class="pd-date">' + meta.analysis_date + '</span>' : '') +
-        '</div>' +
+        '<span class="pd-label">WHAT DROVE THE PRICE</span>' +
+        '<span class="pd-move ' + moveCls + '">' + moveDir + (movePct || 0).toFixed(1) + '% (5d)</span>' +
+        '<span class="pd-conf ' + confCls + '">' + conf.replace(/_/g, ' ') + '</span>' +
+        (dateStr ? '<span class="pd-date">' + dateStr + '</span>' : '') +
       '</div>' +
-      '<div class="pd-primary">' +
-        '<div class="pd-primary-label">Primary driver</div>' +
-        '<div class="pd-primary-title">' + primaryTitle + '</div>' +
-      '</div>' +
-      (proseHtml ? '<div class="pd-prose-section">' + proseHtml + '</div>' : '') +
-      (driversHtml ? '<details class="pd-details"><summary>Ranked driver assessment (' + candidates.length + ' candidates)</summary><div class="pd-drivers">' + driversHtml + '</div></details>' : '') +
-      cmmHtml +
+      bulletsHtml +
     '</div>';
 }
 
