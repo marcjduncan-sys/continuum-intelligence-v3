@@ -1724,45 +1724,61 @@ export function renderSignalBars(data) {
 
 export function renderGoldDiscovery(data) {
   if (!data.goldAgent) return '';
+  try { return _renderGoldDiscoveryInner(data); } catch (err) {
+    console.error('[GoldDiscovery] Render error for ' + data.ticker + ':', err);
+    return '';
+  }
+}
+
+function _renderGoldDiscoveryInner(data) {
   var t = data.ticker.toLowerCase();
   var ga = data.goldAgent;
 
+  // Normalise both raw (gold_agent.py) and flattened schemas
+  var skew = ga.skew_score != null ? ga.skew_score : (ga.scorecard ? ga.scorecard.skew_score : 0);
+  var verdict = ga.verdict || ga.executive_summary || '';
+  var bull = (ga.hypothesis && ga.hypothesis.bull) || (ga.investment_view && ga.investment_view.bull_case) || '';
+  var bear = (ga.hypothesis && ga.hypothesis.bear) || (ga.investment_view && ga.investment_view.bear_case) || '';
+  var trigger = ga.monitoring_trigger || (ga.investment_view && ga.investment_view.monitoring_trigger) || '';
+  var km = ga.key_metrics || {};
+  var aisc = km.aisc_per_oz != null ? km.aisc_per_oz : km.aisc_per_oz_usd;
+  var netCash = km.net_cash_debt_aud_m != null ? km.net_cash_debt_aud_m : km.net_cash_debt_usd_m;
+
   // ---- Scorecard ----
-  var skewColor = ga.skew_score >= 55 ? 'var(--signal-green)' : ga.skew_score <= 45 ? 'var(--signal-red)' : 'var(--signal-amber)';
+  var skewColor = skew >= 55 ? 'var(--signal-green)' : skew <= 45 ? 'var(--signal-red)' : 'var(--signal-amber)';
   var scorecardHtml =
     '<div class="ga-scorecard">' +
       '<div class="ga-score-card ga-score-skew" style="border-color:' + skewColor + '">' +
         '<div class="ga-score-label">Skew</div>' +
-        '<div class="ga-score-value" style="color:' + skewColor + '">' + ga.skew_score + '</div>' +
+        '<div class="ga-score-value" style="color:' + skewColor + '">' + skew + '</div>' +
       '</div>' +
     '</div>';
 
   // ---- Verdict ----
   var verdictHtml = '<div class="ga-verdict">' +
     '<div class="rs-subtitle">Verdict</div>' +
-    '<div class="rs-text">' + ga.verdict + '</div>' +
+    '<div class="rs-text">' + verdict + '</div>' +
   '</div>';
 
   // ---- Investment View (Bull / Bear) ----
   var viewHtml = '<div class="ga-view-grid">' +
     '<div class="ga-view-col ga-view-bull">' +
       '<div class="ga-view-label">Bull Case</div>' +
-      '<div class="rs-text">' + ga.hypothesis.bull + '</div>' +
+      '<div class="rs-text">' + bull + '</div>' +
     '</div>' +
     '<div class="ga-view-col ga-view-bear">' +
       '<div class="ga-view-label">Bear Case</div>' +
-      '<div class="rs-text">' + ga.hypothesis.bear + '</div>' +
+      '<div class="rs-text">' + bear + '</div>' +
     '</div>' +
   '</div>';
 
   // ---- Key Metrics ----
-  var km = ga.key_metrics;
   var metricsRows = '';
   var metricsList = [
-    ['AISC (per oz)', km.aisc_per_oz ? ('A$' + km.aisc_per_oz.toLocaleString()) : 'N/A'],
+    ['AISC (per oz)', aisc ? ('A$' + aisc.toLocaleString()) : 'N/A'],
     ['Production (koz/yr)', km.production_koz_annual ? (km.production_koz_annual.toLocaleString() + ' koz') : 'N/A'],
     ['Mine Life', km.mine_life_years ? (km.mine_life_years + ' years') : 'N/A'],
-    ['Net Cash / (Debt)', km.net_cash_debt_aud_m != null ? ('A$' + km.net_cash_debt_aud_m.toLocaleString() + 'm') : 'N/A'],
+    ['Net Cash / (Debt)', netCash != null ? ('A$' + netCash.toLocaleString() + 'm') : 'N/A'],
     ['Reserve Grade', km.reserve_grade_gt ? (km.reserve_grade_gt + ' g/t') : 'N/A']
   ];
   for (var i = 0; i < metricsList.length; i++) {
@@ -1791,10 +1807,10 @@ export function renderGoldDiscovery(data) {
 
   // ---- Monitoring Trigger ----
   var triggerHtml = '';
-  if (ga.monitoring_trigger) {
+  if (trigger) {
     triggerHtml = '<div class="ga-trigger">' +
       '<div class="rs-subtitle">Monitoring Trigger</div>' +
-      '<div class="rs-text">' + ga.monitoring_trigger + '</div>' +
+      '<div class="rs-text">' + trigger + '</div>' +
     '</div>';
   }
 

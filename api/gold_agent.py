@@ -703,6 +703,7 @@ def _post_process(data: Dict[str, Any], corpus: Dict[str, str]) -> Dict[str, Any
     _apply_hard_risk_flags(data, corpus)
     _finalise_recommendation(data)
     _attach_metadata(data)
+    _flatten_for_frontend(data)
     return data
 
 
@@ -1444,6 +1445,32 @@ def _attach_metadata(data: Dict[str, Any]) -> None:
             ],
         }
     )
+
+
+def _flatten_for_frontend(data: Dict[str, Any]) -> None:
+    """Flatten raw gold agent output to the schema renderGoldDiscovery expects."""
+    sc = data.get("scorecard") or {}
+    iv = data.get("investment_view") or {}
+    km = data.get("key_metrics") or {}
+
+    # Top-level fields the frontend reads directly
+    if "skew_score" not in data and "skew_score" in sc:
+        data["skew_score"] = sc["skew_score"]
+    if "verdict" not in data and data.get("executive_summary"):
+        data["verdict"] = data["executive_summary"]
+    if "hypothesis" not in data and (iv.get("bull_case") or iv.get("bear_case")):
+        data["hypothesis"] = {
+            "bull": iv.get("bull_case", ""),
+            "bear": iv.get("bear_case", ""),
+        }
+    if "monitoring_trigger" not in data and iv.get("monitoring_trigger"):
+        data["monitoring_trigger"] = iv["monitoring_trigger"]
+
+    # Key metrics: frontend expects aisc_per_oz / net_cash_debt_aud_m
+    if km.get("aisc_per_oz") is None and km.get("aisc_per_oz_usd") is not None:
+        km["aisc_per_oz"] = km["aisc_per_oz_usd"]
+    if km.get("net_cash_debt_aud_m") is None and km.get("net_cash_debt_usd_m") is not None:
+        km["net_cash_debt_aud_m"] = km["net_cash_debt_usd_m"]
 
 
 def _num(value: Any, as_int: bool = False) -> Optional[float]:
