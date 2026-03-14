@@ -140,16 +140,16 @@
     margin-top: var(--space-xs);
 }
 
-/* Price Drivers section (condensed bullet format) */
+/* Price Drivers section (condensed bullet format, matches rh-spec-block style) */
 .pd-container:empty { display: none; }
 .pd-container { max-width: var(--report-width, 960px); margin: 0 auto; padding: 0 var(--space-md); }
-.pd-block { padding: var(--space-sm) var(--space-md); background: var(--bg-surface); border-radius: 6px; border: 1px solid var(--border); }
+.pd-block { padding: var(--space-md) 0; border-top: 1px solid var(--border); }
 .pd-header { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; margin-bottom: var(--space-xs); }
-.pd-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+.pd-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
 .pd-move { font-size: 0.75rem; font-weight: 600; padding: 1px 5px; border-radius: 3px; }
 .pd-move-up { color: var(--signal-green); background: rgba(34,197,94,0.1); }
 .pd-move-down { color: var(--signal-red); background: rgba(239,68,68,0.1); }
-.pd-move-flat { color: var(--text-muted); background: var(--bg-surface-alt, rgba(128,128,128,0.08)); }
+.pd-move-flat { color: var(--text-muted); background: rgba(128,128,128,0.08); }
 .pd-conf { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 1px 5px; border-radius: 3px; }
 .pd-conf-high { color: var(--signal-green); background: rgba(34,197,94,0.1); }
 .pd-conf-mod { color: var(--signal-amber); background: rgba(234,179,8,0.1); }

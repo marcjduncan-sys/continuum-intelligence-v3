@@ -1889,6 +1889,17 @@ function _formatDriverDate(isoDate) {
   return d.getDate() + '-' + months[d.getMonth()] + '-' + String(d.getFullYear()).slice(2);
 }
 
+function _truncate(text, maxLen) {
+  if (!text) return '';
+  var s = String(text);
+  if (s.length <= maxLen) return s;
+  // Cut at last sentence boundary before maxLen
+  var cut = s.substring(0, maxLen);
+  var lastDot = cut.lastIndexOf('. ');
+  if (lastDot > maxLen * 0.4) return cut.substring(0, lastDot + 1);
+  return cut.replace(/\s+\S*$/, '') + '...';
+}
+
 
 export function renderPriceDriversContent(container, driverData) {
   if (!driverData || driverData.error) {
@@ -1899,9 +1910,7 @@ export function renderPriceDriversContent(container, driverData) {
   var rc = driverData.ranked_conclusion || {};
   var pa = driverData.price_action_summary || {};
   var meta = driverData.agent_metadata || {};
-  var fto = driverData.flow_and_technical_overlay || {};
 
-  // Header metrics
   var movePct = pa.price_change_5d_pct;
   var moveDir = movePct > 0 ? '+' : '';
   var moveCls = movePct > 1 ? 'pd-move-up' : movePct < -1 ? 'pd-move-down' : 'pd-move-flat';
@@ -1909,59 +1918,40 @@ export function renderPriceDriversContent(container, driverData) {
   var confCls = conf === 'very_high' || conf === 'high' ? 'pd-conf-high' : conf === 'moderate' ? 'pd-conf-mod' : 'pd-conf-low';
   var dateStr = _formatDriverDate(meta.analysis_date);
 
-  // Build condensed bullet list (max 8 lines)
   var bullets = [];
+  var MAX = 150;
 
-  // 1. Primary driver
   if (rc.most_likely_primary_driver) {
-    bullets.push('<b>Primary driver:</b> ' + rc.most_likely_primary_driver);
+    bullets.push('<b>Primary driver:</b> ' + _truncate(rc.most_likely_primary_driver, MAX));
   }
 
-  // 2. Secondary drivers (collapsed into one line)
   var secondaries = rc.secondary_drivers || [];
   if (secondaries.length > 0) {
-    bullets.push('<b>Secondary:</b> ' + secondaries.join('; '));
+    bullets.push('<b>Secondary:</b> ' + _truncate(secondaries.join('; '), MAX));
   }
 
-  // 3. Amplifiers (one line)
   var amps = rc.amplifiers || [];
   if (amps.length > 0) {
-    bullets.push('<b>Amplifiers:</b> ' + amps.join('; '));
+    bullets.push('<b>Amplifiers:</b> ' + _truncate(amps.join('; '), MAX));
   }
 
-  // 4. Flow/technical (condensed)
-  var flowNotes = [];
-  if (fto.abnormal_volume) flowNotes.push('abnormal volume detected');
-  if (fto.short_covering_status && fto.short_covering_status !== 'none' && fto.short_covering_status !== 'no evidence')
-    flowNotes.push('short covering: ' + fto.short_covering_status);
-  if (fto.technical_breaks && fto.technical_breaks.length > 0)
-    flowNotes.push(fto.technical_breaks.join('; '));
-  if (fto.flow_notes && flowNotes.length === 0) flowNotes.push(fto.flow_notes);
-  if (flowNotes.length > 0) {
-    bullets.push('<b>Flow/technical:</b> ' + flowNotes.join('; '));
-  }
-
-  // 5. Macro/sector context
   var msc = driverData.macro_sector_context || {};
   if (msc.peer_moves_summary) {
-    bullets.push('<b>Peer context:</b> ' + msc.peer_moves_summary);
+    bullets.push('<b>Peer context:</b> ' + _truncate(msc.peer_moves_summary, MAX));
   } else if (msc.commodity_or_rate_context) {
-    bullets.push('<b>Macro:</b> ' + msc.commodity_or_rate_context);
+    bullets.push('<b>Macro:</b> ' + _truncate(msc.commodity_or_rate_context, MAX));
   }
 
-  // 6. Confidence rationale
   if (rc.confidence_rationale) {
-    bullets.push('<b>Confidence:</b> ' + rc.confidence_rationale);
+    bullets.push('<b>Confidence:</b> ' + _truncate(rc.confidence_rationale, MAX));
   }
 
-  // 7. Rejected (if notable)
   var rejected = rc.rejected_explanations || [];
   if (rejected.length > 0) {
-    bullets.push('<b>Ruled out:</b> ' + rejected.slice(0, 3).join('; '));
+    bullets.push('<b>Ruled out:</b> ' + _truncate(rejected.slice(0, 3).join('; '), MAX));
   }
 
-  // Cap at 8 bullets
-  if (bullets.length > 8) bullets.length = 8;
+  if (bullets.length > 7) bullets.length = 7;
 
   var bulletsHtml = '<ul class="pd-bullets">';
   for (var i = 0; i < bullets.length; i++) {
