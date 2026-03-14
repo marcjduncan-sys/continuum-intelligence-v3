@@ -569,7 +569,21 @@ The report_text paragraphs must be:
 - Suitable for an investor or portfolio manager
 - Reading like an event-driven hedge fund analyst explaining the move to an investment committee
 - Using Australian English
-- Never using em-dashes (use commas, semicolons, colons, or en-dashes instead)"""
+- Never using em-dashes (use commas, semicolons, colons, or en-dashes instead)
+
+RANKED_CONCLUSION FIELD RULES (these are rendered as short bullet points on the report page):
+- "most_likely_primary_driver": ONE sentence, max 120 characters. State the driver and its causal mechanism. No dates.
+- "secondary_drivers": array of strings, each max 80 characters. One phrase per driver.
+- "amplifiers": array of strings, each max 80 characters. One phrase per amplifier.
+- "rejected_explanations": array of strings, each max 80 characters. State what was ruled out and why in one phrase.
+- "confidence_rationale": ONE sentence, max 120 characters. State the basis for the confidence level.
+- "overall_confidence": one of "very_high", "high", "moderate", "low", "very_low".
+
+MACRO_SECTOR_CONTEXT FIELD RULES:
+- "peer_moves_summary": ONE sentence, max 120 characters. Name specific peers and their moves.
+- "commodity_or_rate_context": ONE sentence, max 120 characters.
+
+DATE FORMAT: When dates appear in any text field, use d-Mon-yy format (e.g. 14-Mar-26). Never use ISO 8601 (YYYY-MM-DD) in text fields. ISO dates are only permitted in structured date fields like analysis_date."""
 
 
 # ---------------------------------------------------------------------------

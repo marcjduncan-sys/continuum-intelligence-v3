@@ -1889,14 +1889,9 @@ function _formatDriverDate(isoDate) {
   return d.getDate() + '-' + months[d.getMonth()] + '-' + String(d.getFullYear()).slice(2);
 }
 
-function _cleanDriverText(text) {
-  if (!text) return '';
-  return String(text).replace(/\(?\d{4}-\d{2}-\d{2}\)?/g, '').replace(/\s{2,}/g, ' ').trim();
-}
-
 function _truncate(text, maxLen) {
   if (!text) return '';
-  var s = _cleanDriverText(text);
+  var s = String(text).trim();
   if (s.length <= maxLen) return s;
   var cut = s.substring(0, maxLen);
   var lastDot = cut.lastIndexOf('. ');
