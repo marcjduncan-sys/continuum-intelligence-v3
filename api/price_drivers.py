@@ -577,7 +577,7 @@ The report_text paragraphs must be:
 # ---------------------------------------------------------------------------
 
 
-def _call_llm(system_prompt: str, user_content: str, max_tokens: int = 8192) -> str:
+def _call_llm_sync(system_prompt: str, user_content: str, max_tokens: int = 8192) -> str:
     """Synchronous Claude call using the shared Anthropic client."""
     client = config.get_anthropic_client()
     response = client.messages.create(
@@ -587,6 +587,11 @@ def _call_llm(system_prompt: str, user_content: str, max_tokens: int = 8192) -> 
         messages=[{"role": "user", "content": user_content}],
     )
     return response.content[0].text
+
+
+async def _call_llm(system_prompt: str, user_content: str, max_tokens: int = 8192) -> str:
+    """Async wrapper: runs the sync Anthropic call in a thread pool."""
+    return await asyncio.to_thread(_call_llm_sync, system_prompt, user_content, max_tokens)
 
 
 def _extract_json(text: str) -> dict:
@@ -643,7 +648,7 @@ async def run_price_driver_analysis(
 
     # Layer 1: Research pass
     logger.info("[%s] Running research pass", ticker)
-    research_raw = _call_llm(_RESEARCH_SYSTEM_PROMPT, user_data, max_tokens=8192)
+    research_raw = await _call_llm(_RESEARCH_SYSTEM_PROMPT, user_data, max_tokens=8192)
     try:
         research_result = _extract_json(research_raw)
     except json.JSONDecodeError:
@@ -665,7 +670,7 @@ async def run_price_driver_analysis(
             "announcements": gathered.get("announcements", []),
         },
     }, default=str)
-    red_team_raw = _call_llm(_RED_TEAM_SYSTEM_PROMPT, red_team_input, max_tokens=4096)
+    red_team_raw = await _call_llm(_RED_TEAM_SYSTEM_PROMPT, red_team_input, max_tokens=4096)
     try:
         red_team_result = _extract_json(red_team_raw)
     except json.JSONDecodeError:
@@ -684,7 +689,7 @@ async def run_price_driver_analysis(
         "research_pass": research_result,
         "red_team_pass": red_team_result,
     }, default=str)
-    synthesis_raw = _call_llm(_SYNTHESIS_SYSTEM_PROMPT, synthesis_input, max_tokens=8192)
+    synthesis_raw = await _call_llm(_SYNTHESIS_SYSTEM_PROMPT, synthesis_input, max_tokens=8192)
     try:
         final_result = _extract_json(synthesis_raw)
     except json.JSONDecodeError:
