@@ -235,9 +235,6 @@ function buildInstitutionalHTML(stock) {
   // ── SECTION 01: IDENTITY & SNAPSHOT ─────────────────────
   var identHtml = secHdr(1, 'Identity & Snapshot');
   if (stock.identity) {
-    if (stock.identity.overview) {
-      identHtml += bodyP(stock.identity.overview);
-    }
     if (stock.identity.rows && stock.identity.rows.length) {
       identHtml += '<table class="dt compact"><tbody>';
       for (var ir = 0; ir < stock.identity.rows.length; ir++) {

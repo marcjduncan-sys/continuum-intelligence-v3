@@ -427,9 +427,6 @@ export function hydrate(ticker) {
   if (stock.narrative) hydrateTextFields(stock.narrative, ref, computed);
   if (stock.evidence) hydrateTextFields(stock.evidence, ref, computed);
   if (stock.hypotheses) hydrateTextFields({ h: stock.hypotheses }, ref, computed);
-  if (stock.identity && stock.identity.overview) {
-    stock.identity.overview = hydrateText(stock.identity.overview, ref, computed);
-  }
 
   // 4. Update the FRESHNESS_DATA for this ticker
   if (typeof FRESHNESS_DATA !== 'undefined' && FRESHNESS_DATA[ticker]) {

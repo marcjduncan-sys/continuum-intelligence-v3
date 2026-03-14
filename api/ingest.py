@@ -192,8 +192,6 @@ def _chunk_stock(ticker: str, data: dict, ref: dict | None = None, fresh: dict |
         overview_parts.append(_clean_html(data["heroDescription"]))
     if data.get("heroCompanyDescription"):
         overview_parts.append(_clean_html(data["heroCompanyDescription"]))
-    if data.get("identity", {}).get("overview"):
-        overview_parts.append(_clean_html(data["identity"]["overview"]))
     if overview_parts:
         passages.append(Passage(
             ticker=ticker,

@@ -262,7 +262,6 @@ export function renderIdentity(data) {
       '<thead><tr><th>Metric</th><th>Value</th><th>Metric</th><th>Value</th></tr></thead>' +
       '<tbody>' + rowsHtml + '</tbody>' +
     '</table>' +
-    '<p class="rs-text"><strong>Business overview:</strong> ' + id.overview + '</p>' +
   '</div></div>';
 }
 
