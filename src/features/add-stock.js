@@ -2,8 +2,15 @@
  * add-stock.js -- Add Stock modal
  *
  * Handles the "+ Add Stock" modal: input validation, Railway API call,
- * synchronous coverage initiation with progress polling, and post-add
- * navigation to the new report page.
+ * progress polling during background coverage initiation, result caching,
+ * and post-add navigation to the new report page.
+ *
+ * Flow:
+ *   1. POST /api/stocks/add  -- returns in ~10s with scaffold
+ *   2. Poll /api/refresh/{ticker}/status every 3s for progress
+ *   3. On "completed": fetch /api/refresh/{ticker}/result, load, navigate
+ *   4. On "failed": load scaffold, navigate, tell user to Refresh
+ *   5. On timeout (120s polling): load scaffold, navigate
  *
  * Depends on:
  *   - window.ContinuumDynamics (global)
@@ -69,174 +76,6 @@ function _loadResearchIntoApp(ticker, data) {
     if (typeof window.renderFeaturedGrid === 'function') window.renderFeaturedGrid();
 }
 
-export async function submitAddStock(event) {
-    event.preventDefault();
-    var input = document.getElementById('add-stock-input');
-    var status = document.getElementById('add-stock-status');
-    var submitBtn = document.getElementById('add-stock-submit');
-    if (!input || !status || !submitBtn) return;
-
-    var ticker = input.value.trim().toUpperCase();
-    if (!ticker || !/^[A-Z0-9]{1,6}$/.test(ticker)) {
-        status.className = 'add-modal-status error';
-        status.textContent = 'Enter a valid ASX ticker (1-6 characters).';
-        return;
-    }
-
-    if (STOCK_DATA[ticker]) {
-        status.className = 'add-modal-status error';
-        status.textContent = ticker + ' is already in coverage.';
-        return;
-    }
-
-    submitBtn.disabled = true;
-    input.disabled = true;
-    submitBtn.innerHTML = '<span class="add-modal-spinner"></span> Adding...';
-    status.className = 'add-modal-status info';
-    status.textContent = 'Adding ' + ticker + ' to coverage...';
-
-    // AbortController with 180s client-side timeout
-    var controller = new AbortController();
-    var clientTimeout = setTimeout(function() { controller.abort(); }, 180000);
-
-    // Start polling refresh status for progress updates
-    var pollInterval = setInterval(function() {
-        fetch(REFRESH_API_BASE + '/api/refresh/' + ticker + '/status', {
-            headers: { 'X-API-Key': CI_API_KEY }
-        }).then(function(r) {
-            if (!r.ok) return;
-            return r.json();
-        }).then(function(job) {
-            if (!job) return;
-            var label = job.stage_label || job.status;
-            var pct = job.progress_pct || 0;
-            status.textContent = ticker + ': ' + label + (pct > 0 ? ' (' + pct + '%)' : '');
-        }).catch(function() {
-            // Polling failures are non-fatal; the main request drives completion
-        });
-    }, 2500);
-
-    try {
-        var resp = await fetch(REFRESH_API_BASE + '/api/stocks/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY },
-            body: JSON.stringify({ ticker: ticker }),
-            signal: controller.signal
-        });
-
-        clearTimeout(clientTimeout);
-        clearInterval(pollInterval);
-
-        var data = await resp.json().catch(function() { return {}; });
-
-        if (resp.status === 409) {
-            status.className = 'add-modal-status error';
-            status.textContent = ticker + ' is already in coverage.';
-            submitBtn.disabled = false;
-            input.disabled = false;
-            submitBtn.textContent = 'Add';
-            return;
-        }
-
-        if (!resp.ok) {
-            throw new Error(data.detail || 'Failed to add stock (' + resp.status + ')');
-        }
-
-        var company = data.company || ticker;
-        var coverageStatus = data.coverage_status || 'pending';
-
-        if (coverageStatus === 'completed') {
-            // Full content generated; fetch the result
-            status.className = 'add-modal-status success';
-            status.textContent = company + ' (' + ticker + ') added with full research.';
-
-            try {
-                var resultResp = await fetch(
-                    REFRESH_API_BASE + '/api/refresh/' + ticker + '/result',
-                    { headers: { 'X-API-Key': CI_API_KEY } }
-                );
-                if (resultResp.ok) {
-                    var resultData = await resultResp.json();
-                    _loadResearchIntoApp(ticker, resultData);
-                    console.log('[AddStock] Full research loaded for ' + ticker);
-                } else {
-                    // Result endpoint failed; fall back to scaffold fetch
-                    await _loadScaffold(ticker, company, data);
-                }
-            } catch (resultErr) {
-                console.warn('[AddStock] Result fetch failed, loading scaffold:', resultErr);
-                await _loadScaffold(ticker, company, data);
-            }
-
-            setTimeout(function() {
-                closeAddStockModal();
-                window.location.hash = '#report-' + ticker;
-            }, 800);
-
-        } else if (coverageStatus === 'degraded') {
-            // Partial content; load what was produced and warn
-            status.className = 'add-modal-status warning';
-            status.textContent = company + ' added with partial research. Use Refresh to complete.';
-
-            try {
-                var degradedResp = await fetch(
-                    REFRESH_API_BASE + '/api/refresh/' + ticker + '/result',
-                    { headers: { 'X-API-Key': CI_API_KEY } }
-                );
-                if (degradedResp.ok) {
-                    var degradedData = await degradedResp.json();
-                    _loadResearchIntoApp(ticker, degradedData);
-                } else {
-                    await _loadScaffold(ticker, company, data);
-                }
-            } catch (e) {
-                await _loadScaffold(ticker, company, data);
-            }
-
-            setTimeout(function() {
-                closeAddStockModal();
-                window.location.hash = '#report-' + ticker;
-            }, 2000);
-
-        } else {
-            // failed, timeout, or unknown; load scaffold and navigate
-            status.className = 'add-modal-status error';
-            var errMsg = data.coverage_error || 'Coverage initiation did not complete.';
-            status.textContent = company + ' added (scaffold only). ' + errMsg + ' Use Refresh to retry.';
-
-            await _loadScaffold(ticker, company, data);
-
-            setTimeout(function() {
-                closeAddStockModal();
-                window.location.hash = '#report-' + ticker;
-            }, 3000);
-        }
-
-    } catch (err) {
-        clearTimeout(clientTimeout);
-        clearInterval(pollInterval);
-
-        if (err.name === 'AbortError') {
-            // Client-side timeout; the server may still be working
-            status.className = 'add-modal-status error';
-            status.textContent = 'Request timed out. Loading scaffold; use Refresh to retry.';
-
-            await _loadScaffold(ticker, ticker, {});
-
-            setTimeout(function() {
-                closeAddStockModal();
-                window.location.hash = '#report-' + ticker;
-            }, 3000);
-        } else {
-            status.className = 'add-modal-status error';
-            status.textContent = err.message || 'Server unavailable. Try again.';
-            submitBtn.disabled = false;
-            input.disabled = false;
-            submitBtn.textContent = 'Add';
-        }
-    }
-}
-
 /**
  * Fetch scaffold JSON from Railway and load into app state.
  * Falls back to a minimal stub if the scaffold file is not yet available.
@@ -275,6 +114,166 @@ async function _loadScaffold(ticker, company, apiData) {
     };
     _loadResearchIntoApp(ticker, stub);
     console.log('[AddStock] Using minimal stub for ' + ticker);
+}
+
+/**
+ * Poll /api/refresh/{ticker}/status until completed, failed, or timeout.
+ * Returns a promise that resolves with {status, result} or rejects on timeout.
+ */
+function _pollUntilDone(ticker, statusEl, timeoutMs) {
+    return new Promise(function(resolve, reject) {
+        var elapsed = 0;
+        var interval = 3000;
+
+        var poller = setInterval(async function() {
+            elapsed += interval;
+
+            if (elapsed > timeoutMs) {
+                clearInterval(poller);
+                reject(new Error('timeout'));
+                return;
+            }
+
+            try {
+                var resp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker + '/status', {
+                    headers: { 'X-API-Key': CI_API_KEY }
+                });
+                if (!resp.ok) return; // job not created yet, keep waiting
+
+                var job = resp.json ? await resp.json() : {};
+
+                // Update status display
+                if (job.stage_label) {
+                    var pct = job.progress_pct || 0;
+                    statusEl.textContent = ticker + ': ' + job.stage_label + (pct > 0 ? ' (' + pct + '%)' : '');
+                }
+
+                if (job.status === 'completed') {
+                    clearInterval(poller);
+                    // Fetch the full result
+                    try {
+                        var resultResp = await fetch(
+                            REFRESH_API_BASE + '/api/refresh/' + ticker + '/result',
+                            { headers: { 'X-API-Key': CI_API_KEY } }
+                        );
+                        if (resultResp.ok) {
+                            var resultData = await resultResp.json();
+                            resolve({ status: 'completed', result: resultData });
+                        } else {
+                            resolve({ status: 'completed', result: null });
+                        }
+                    } catch (e) {
+                        resolve({ status: 'completed', result: null });
+                    }
+                    return;
+                }
+
+                if (job.status === 'failed') {
+                    clearInterval(poller);
+                    resolve({ status: 'failed', error: job.error || 'Coverage initiation failed' });
+                    return;
+                }
+            } catch (e) {
+                // Network error on poll -- keep trying
+            }
+        }, interval);
+    });
+}
+
+export async function submitAddStock(event) {
+    event.preventDefault();
+    var input = document.getElementById('add-stock-input');
+    var status = document.getElementById('add-stock-status');
+    var submitBtn = document.getElementById('add-stock-submit');
+    if (!input || !status || !submitBtn) return;
+
+    var ticker = input.value.trim().toUpperCase();
+    if (!ticker || !/^[A-Z0-9]{1,6}$/.test(ticker)) {
+        status.className = 'add-modal-status error';
+        status.textContent = 'Enter a valid ASX ticker (1-6 characters).';
+        return;
+    }
+
+    if (STOCK_DATA[ticker]) {
+        status.className = 'add-modal-status error';
+        status.textContent = ticker + ' is already in coverage.';
+        return;
+    }
+
+    submitBtn.disabled = true;
+    input.disabled = true;
+    submitBtn.innerHTML = '<span class="add-modal-spinner"></span> Adding...';
+    status.className = 'add-modal-status info';
+    status.textContent = 'Adding ' + ticker + ' to coverage...';
+
+    try {
+        // Step 1: POST to create scaffold and kick off coverage initiation.
+        // This returns in ~10s, well within Railway's 60s proxy timeout.
+        var resp = await fetch(REFRESH_API_BASE + '/api/stocks/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY },
+            body: JSON.stringify({ ticker: ticker })
+        });
+
+        var data = await resp.json().catch(function() { return {}; });
+
+        if (resp.status === 409) {
+            status.className = 'add-modal-status error';
+            status.textContent = ticker + ' is already in coverage.';
+            submitBtn.disabled = false;
+            input.disabled = false;
+            submitBtn.textContent = 'Add';
+            return;
+        }
+
+        if (!resp.ok) {
+            throw new Error(data.detail || 'Failed to add stock (' + resp.status + ')');
+        }
+
+        var company = data.company || ticker;
+        status.className = 'add-modal-status info';
+        status.textContent = company + ' added. Generating research report...';
+
+        // Load the scaffold immediately so the stock is visible
+        await _loadScaffold(ticker, company, data);
+
+        // Step 2: Poll for coverage initiation progress (120s timeout)
+        try {
+            var outcome = await _pollUntilDone(ticker, status, 120000);
+
+            if (outcome.status === 'completed' && outcome.result) {
+                _loadResearchIntoApp(ticker, outcome.result);
+                status.className = 'add-modal-status success';
+                status.textContent = company + ' (' + ticker + ') research complete.';
+                console.log('[AddStock] Full research loaded for ' + ticker);
+            } else if (outcome.status === 'completed') {
+                // Completed but could not fetch result -- scaffold is loaded
+                status.className = 'add-modal-status success';
+                status.textContent = company + ' research generated. Loading page...';
+            } else {
+                // Failed
+                status.className = 'add-modal-status error';
+                status.textContent = company + ' added but research failed: ' + (outcome.error || 'unknown') + '. Use Refresh to retry.';
+            }
+        } catch (pollErr) {
+            // Timeout -- scaffold is already loaded
+            status.className = 'add-modal-status info';
+            status.textContent = company + ' added. Research still generating. Navigate to report and Refresh when ready.';
+        }
+
+        // Step 3: Navigate to the report page
+        setTimeout(function() {
+            closeAddStockModal();
+            window.location.hash = '#report-' + ticker;
+        }, 1000);
+
+    } catch (err) {
+        status.className = 'add-modal-status error';
+        status.textContent = err.message || 'Server unavailable. Try again.';
+        submitBtn.disabled = false;
+        input.disabled = false;
+        submitBtn.textContent = 'Add';
+    }
 }
 
 /**

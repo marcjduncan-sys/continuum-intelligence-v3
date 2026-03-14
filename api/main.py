@@ -783,30 +783,6 @@ async def _run_gold_agent_background(ticker: str, research_path: Path, token: st
         logger.warning("[GoldAgent] Background run failed for %s: %s", ticker, e)
 
 
-async def _run_coverage_background(ticker: str, research_path: Path, token: str) -> None:
-    """
-    Background task: run the full coverage initiation pipeline for a newly
-    scaffolded stock, then commit the populated research to GitHub.
-    run_refresh() writes to dist/data/research/TICKER.json, so we commit
-    from there (not from research_path, which is the scaffold).
-    """
-    try:
-        logger.info("[Coverage] Background initiation starting for %s", ticker)
-        await run_refresh(ticker)
-        try:
-            ingest()
-        except Exception as ingest_err:
-            logger.warning("[Coverage] Re-ingest after initiation failed (non-fatal): %s", ingest_err)
-        dist_research_path = _data_dir() / f"{ticker}.json"
-        await commit_files_to_github(
-            {f"data/research/{ticker}.json": dist_research_path},
-            f"Add {ticker}: coverage initiation",
-            token,
-        )
-        logger.info("[Coverage] Background initiation committed for %s", ticker)
-    except Exception as e:
-        logger.warning("[Coverage] Background run failed for %s: %s", ticker, e)
-
 
 class AddStockRequest(BaseModel):
     ticker: str = Field(..., description="ASX ticker code, e.g. 'MIN'")
@@ -988,57 +964,47 @@ async def add_stock(
     except Exception as e:
         logger.warning(f"[AddStock] GitHub commit failed (non-fatal): {e}")
 
-    # ---- Run coverage initiation synchronously ----
-    coverage_status = "pending"
-    coverage_error = None
+    # ---- Kick off coverage initiation as a tracked background task ----
+    # IMPORTANT: Railway's proxy timeout is ~60s. The coverage initiation
+    # pipeline takes 60-90s. We CANNOT block the HTTP response -- we must
+    # return the scaffold immediately and let the frontend poll for progress.
+    # The old fire-and-forget asyncio.create_task swallowed all errors.
+    # This version uses the existing RefreshJob tracking so the frontend
+    # can poll /api/refresh/{ticker}/status and /api/refresh/{ticker}/result.
 
-    try:
-        populated = await asyncio.wait_for(run_refresh(ticker), timeout=150.0)
-
-        # Quality gate: verify the LLM actually produced content
-        evidence_cards = populated.get("evidence", {}).get("cards", [])
-        hypotheses = populated.get("hypotheses", [])
-        has_narrative = bool(populated.get("narrative", {}).get("theNarrative"))
-        has_real_scores = any(
-            isinstance(h.get("score"), str) and h["score"].endswith("%")
-            for h in hypotheses
-        )
-
-        if len(evidence_cards) >= 5 and has_real_scores and has_narrative:
-            coverage_status = "completed"
-        else:
-            coverage_status = "degraded"
-            coverage_error = (
-                f"Partial content: {len(evidence_cards)} evidence cards, "
-                f"scores={'yes' if has_real_scores else 'no'}, "
-                f"narrative={'yes' if has_narrative else 'no'}"
-            )
-
-        # Re-ingest so chat API sees the populated content
+    async def _tracked_coverage_initiation():
+        """Run coverage initiation with full error visibility."""
         try:
-            ingest()
-        except Exception:
-            pass
+            logger.info("[AddStock] Background coverage initiation starting for %s", ticker)
+            await run_refresh(ticker)
+            logger.info("[AddStock] Coverage initiation completed for %s", ticker)
 
-        # Commit populated research to GitHub
-        dist_research_path = _data_dir() / f"{ticker}.json"
-        try:
-            await commit_files_to_github(
-                {f"data/research/{ticker}.json": dist_research_path},
-                f"Add {ticker}: coverage initiation",
-                config.GITHUB_TOKEN,
-            )
-        except Exception as commit_err:
-            logger.warning(f"[AddStock] GitHub commit of populated research failed (non-fatal): {commit_err}")
+            # Re-ingest so chat API sees populated content
+            try:
+                ingest()
+            except Exception as ingest_err:
+                logger.warning("[AddStock] Re-ingest failed (non-fatal): %s", ingest_err)
 
-    except asyncio.TimeoutError:
-        coverage_status = "timeout"
-        coverage_error = "Coverage initiation timed out after 150s"
-    except Exception as e:
-        coverage_status = "failed"
-        coverage_error = str(e)
+            # Commit the POPULATED research to GitHub
+            dist_research_path = _data_dir() / f"{ticker}.json"
+            commit_path = dist_research_path if dist_research_path.exists() else (research_dir / f"{ticker}.json")
+            try:
+                await commit_files_to_github(
+                    {f"data/research/{ticker}.json": commit_path},
+                    f"Add {ticker}: coverage initiation ({company})",
+                    config.GITHUB_TOKEN,
+                )
+                logger.info("[AddStock] Populated research committed for %s", ticker)
+            except Exception as commit_err:
+                logger.warning("[AddStock] GitHub commit of populated research failed: %s", commit_err)
 
-    logger.info(f"[AddStock] Coverage initiation for {ticker}: {coverage_status}")
+        except Exception as e:
+            logger.error("[AddStock] Coverage initiation FAILED for %s: %s", ticker, e, exc_info=True)
+            # RefreshJob.status is already set to "failed" by run_refresh().
+            # The frontend will see this when polling /api/refresh/{ticker}/status.
+
+    asyncio.create_task(_tracked_coverage_initiation())
+    logger.info(f"[AddStock] Coverage initiation task launched for {ticker}")
 
     return {
         "status": "added",
@@ -1048,8 +1014,6 @@ async def add_stock(
         "industry": industry,
         "price": price_data.get("price"),
         "currency": price_data.get("currency", "A$"),
-        "coverage_status": coverage_status,
-        "coverage_error": coverage_error,
     }
 
 
