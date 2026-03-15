@@ -534,7 +534,11 @@ async def _query_corpus(ticker: str, notebook_id: str = "") -> Dict[str, str]:
     global _nlm_auth_ok, _nlm_last_error
 
     # --- Attempt 1: NotebookLM (primary when configured) ---
-    effective_notebook = notebook_id or config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
+    effective_notebook = (
+        notebook_id
+        or config.NOTEBOOKLM_TICKER_NOTEBOOKS.get(ticker, "")
+        or config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
+    )
     if (
         _HAS_NOTEBOOKLM
         and _nlm_auth_ok
@@ -554,7 +558,12 @@ async def _query_corpus(ticker: str, notebook_id: str = "") -> Dict[str, str]:
                 )
                 logger.warning("NotebookLM auth failed for %s, falling back to Gemini local: %s", ticker, exc)
             else:
-                logger.warning("NotebookLM query failed for %s, falling back to Gemini local: %s", ticker, exc)
+                logger.warning("NotebookLM query failed for %s (notebook=%s): %s", ticker, effective_notebook, exc)
+                # If using a per-ticker notebook, do not fall through to Gemini local
+                if notebook_id:
+                    raise RuntimeError(
+                        f"NotebookLM query failed for {ticker} with notebook {effective_notebook}: {exc}"
+                    )
 
     # --- Attempt 2: Gemini local corpus (fallback) ---
     # Skip Gemini fallback if no local corpus exists for this ticker

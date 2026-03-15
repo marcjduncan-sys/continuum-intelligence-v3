@@ -1,3 +1,4 @@
+import json
 import os
 
 import anthropic
@@ -57,6 +58,14 @@ DATABASE_URL = os.getenv("DATABASE_URL", "")
 
 NOTEBOOKLM_GOLD_NOTEBOOK_ID = os.getenv("NOTEBOOKLM_GOLD_NOTEBOOK_ID", "")
 NOTEBOOKLM_AUTH_JSON = os.getenv("NOTEBOOKLM_AUTH_JSON", "")
+
+# Per-ticker notebook IDs (JSON dict, e.g. {"OBM":"abc-123","WIA":"def-456"})
+# Falls back to NOTEBOOKLM_GOLD_NOTEBOOK_ID when ticker not in mapping.
+_nlm_ticker_map_raw = os.getenv("NOTEBOOKLM_TICKER_NOTEBOOKS", "{}")
+try:
+    NOTEBOOKLM_TICKER_NOTEBOOKS = json.loads(_nlm_ticker_map_raw)
+except Exception:
+    NOTEBOOKLM_TICKER_NOTEBOOKS = {}
 
 # ---------------------------------------------------------------------------
 # Auth
