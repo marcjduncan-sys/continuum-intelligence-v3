@@ -13,6 +13,7 @@
 
 import { STOCK_DATA } from '../lib/state.js';
 import { CACHE_VERSION } from '../data/loader.js';
+import { fetchPriceDrivers } from '../pages/report-sections.js';
 
 // ============================================================
 // REFRESH API BASE (localhost detection pattern)
@@ -134,6 +135,8 @@ function _pollRefreshStatus(ticker) {
                             if (typeof window.setupScrollSpy === 'function') window.setupScrollSpy('page-report-' + ticker);
                             if (typeof window.initNarrativeTimelineChart === 'function') window.initNarrativeTimelineChart(ticker);
                             if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
+                            // Trigger fresh price driver analysis after re-render
+                            requestAnimationFrame(function() { fetchPriceDrivers(ticker, true); });
                         }
                     }
                 } catch (e) {
