@@ -1908,18 +1908,37 @@ export function renderPriceDriversContent(container, driverData) {
     return;
   }
 
+  // Support both new schema (report.title/executive_summary) and old (ranked_conclusion/report_text)
   var report = driverData.report || {};
+  var rc = driverData.ranked_conclusion || {};
+  var rt = driverData.report_text || {};
   var pa = driverData.price_action_summary || {};
-  var conf = driverData.confidence || 'moderate';
+  var meta = driverData.agent_metadata || {};
+  var conf = driverData.confidence || rc.overall_confidence || 'moderate';
 
   var movePct = pa.price_change_5d_pct;
   var moveDir = movePct > 0 ? '+' : '';
   var moveCls = movePct > 1 ? 'pd-move-up' : movePct < -1 ? 'pd-move-down' : 'pd-move-flat';
   var confCls = conf === 'very_high' || conf === 'high' ? 'pd-conf-high' : conf === 'moderate' ? 'pd-conf-mod' : 'pd-conf-low';
-  var dateStr = _formatDriverDate(driverData.analysis_date);
+  var dateStr = _formatDriverDate(driverData.analysis_date || meta.analysis_date);
 
   var titleText = report.title || '';
   var summaryText = report.executive_summary || '';
+
+  // Fallback: build summary from old-format fields
+  if (!summaryText && rc.most_likely_primary_driver) {
+    var parts = [rc.most_likely_primary_driver];
+    if (rc.secondary_drivers && rc.secondary_drivers.length > 0) {
+      parts.push(rc.secondary_drivers.join('; '));
+    }
+    if (rc.confidence_rationale) {
+      parts.push(rc.confidence_rationale);
+    }
+    summaryText = parts.join('. ');
+  }
+  if (!summaryText && rt.primary_driver_paragraph) {
+    summaryText = _truncate(rt.primary_driver_paragraph, 400);
+  }
 
   if (!summaryText && !titleText) {
     container.style.display = 'none';
