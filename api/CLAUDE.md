@@ -27,6 +27,7 @@ This directory is a FastAPI application deployed to Railway. It is **not** part 
 | `ALLOWED_ORIGINS` | No | GitHub Pages + localhost |
 | `PORT` | Railway-injected | 8000 |
 | `INDEX_HTML_PATH` | No | `../dist/index.html` |
+| `NOTEBOOKLM_TICKER_NOTEBOOKS` | No (merged) | Reads `data/config/notebooklm-notebooks.json` |
 
 ---
 

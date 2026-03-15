@@ -123,6 +123,10 @@ npm run validate     # lint + test:all — run before any push
 - [x] `src/features/add-stock.js` rewritten: `AbortController` (180s client timeout), progress poller (2.5s interval on `/api/refresh/{ticker}/status`), handles all coverage outcomes, extracted `_loadResearchIntoApp()` and `_loadScaffold()` helpers, fixed `$` sign corruption via Unicode escapes, removed fragile `triggerRefresh` polling.
 - [x] 157/157 Vitest passing. Build succeeds. Railway healthy (29 tickers). Pre-existing Jest data-integrity failures (EVN scaffold missing hypotheses in `_index.json`) unrelated.
 
+**Session work (2026-03-16) -- Gold Agent Mapping Persistency:**
+- [x] Commit `749e46c`: Persisted `NOTEBOOKLM_TICKER_NOTEBOOKS` mapping in the repo. Created `data/config/notebooklm-notebooks.json` as primary source; `config.py` now merges this with env var overrides. This removes the need for manual Railway env var edits when adding new gold stocks.
+- [x] Verified syntax and mapping integrity locally.
+
 **Session work (2026-03-13 session 3) -- Home page tile data audit:**
 - [x] Commit `f362d11`: Populated `reference.json` for ASB, WAF, NST, EVN (sharesOutstanding, EPS, divPerShare, analyst targets). Fixed RMC `sharesOutstanding` from 396000000 (raw) to 396 (millions convention) -- was producing nonsensical "A$372,240B" market cap. Replaced "Div Yield: N/A" with "Analyst Target" for ASB/WAF (non-dividend payers).
 - [x] Commit `3ae5b9c`: Patched `_index.json` for EVN and NST -- missing `featuredMetrics`, `featuredRationale`, `hypotheses`, `skew` fields caused literal "undefined" text on home page cards. Root cause: scaffold process wrote full research JSON but did not copy card fields to `_index.json`.
