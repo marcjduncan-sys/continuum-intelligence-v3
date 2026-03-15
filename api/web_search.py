@@ -506,32 +506,32 @@ async def fetch_asx_announcements(ticker: str, days: int = 30) -> list[dict[str,
     """
     Fetch recent ASX announcements for a ticker.
 
-    Uses the ASX company announcements page. Falls back to empty list
-    if the feed is unavailable.
+    Uses the MarkitDigital ASX Research API (the current live endpoint).
+    Falls back to empty list if the feed is unavailable.
     """
-    # ASX announcements page (HTML scrape of recent announcements)
-    url = f"https://www.asx.com.au/asx/1/company/{ticker}/announcements"
+    url = f"https://asx.api.markitdigital.com/asx-research/1.0/companies/{ticker}/announcements"
     params = {"count": 20, "market_sensitive": "false"}
 
     client = _get_http_client()
     try:
         resp = await client.get(url, params=params, headers={
-            "User-Agent": "Mozilla/5.0",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             "Accept": "application/json",
         })
 
         if resp.status_code != 200:
-            logger.warning(f"ASX announcements returned {resp.status_code} for {ticker}")
+            logger.warning("ASX announcements returned %d for %s", resp.status_code, ticker)
             return []
 
-        data = resp.json()
+        body = resp.json()
+        items = body.get("data", {}).get("items", [])
         announcements = []
         cutoff = datetime.now(timezone.utc) - timedelta(days=days)
 
-        for item in data.get("data", []):
+        for item in items:
             try:
                 ann_date = datetime.fromisoformat(
-                    item.get("document_date", "").replace("Z", "+00:00")
+                    item.get("date", "").replace("Z", "+00:00")
                 )
             except (ValueError, TypeError):
                 continue
@@ -539,18 +539,24 @@ async def fetch_asx_announcements(ticker: str, days: int = 30) -> list[dict[str,
             if ann_date < cutoff:
                 continue
 
+            doc_key = item.get("documentKey", "")
+            doc_url = item.get("url", "")
+            if not doc_url and doc_key:
+                doc_url = f"https://www.asx.com.au/asxpdf/{doc_key}.pdf"
+
             announcements.append({
                 "date": ann_date.strftime("%Y-%m-%d"),
-                "title": item.get("header", ""),
-                "url": item.get("url", ""),
-                "market_sensitive": item.get("market_sensitive", False),
-                "pages": item.get("number_of_pages", 0),
+                "title": item.get("headline", ""),
+                "url": doc_url,
+                "market_sensitive": item.get("isPriceSensitive", False),
+                "type": item.get("announcementType", ""),
+                "size": item.get("fileSize", ""),
             })
 
         return announcements
 
     except Exception as e:
-        logger.error(f"ASX announcements error for {ticker}: {e}")
+        logger.error("ASX announcements error for %s: %s", ticker, e)
         return []
 
 
