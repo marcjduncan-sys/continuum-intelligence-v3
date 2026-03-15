@@ -204,24 +204,27 @@ export function renderSectionNav(data) {
   var t = data.ticker.toLowerCase();
   var sections = [
     ['identity', 'Identity'],
-    ['hypotheses', 'Hypotheses'],
+    ['hypotheses', 'Hypotheses']
+  ];
+
+  if (data.goldAgent) {
+    sections.push(['gold-analysis', 'Gold Analysis']);
+  }
+
+  sections.push(
     ['narrative-timeline', 'Timeline'],
     ['narrative', 'Narrative'],
     ['evidence', 'Evidence'],
     ['discriminates', 'Discriminates'],
     ['tripwires', 'Tripwires'],
-    ['gaps', 'Gaps'],
-    ['technical', 'Technical'],
-    ['gold-discovery', 'Gold Discovery'],
-    ['chat', 'Research Chat']
-  ];
+    ['gaps', 'Gaps']
+  );
 
-  if (!data.technicalAnalysis) {
-    sections = sections.filter(function(s) { return s[0] !== 'technical'; });
+  if (data.technicalAnalysis) {
+    sections.push(['technical', 'Technical']);
   }
-  if (!data.goldAgent) {
-    sections = sections.filter(function(s) { return s[0] !== 'gold-discovery'; });
-  }
+
+  sections.push(['chat', 'Research Chat']);
 
   var linksHtml = '';
   for (var i = 0; i < sections.length; i++) {
@@ -1741,12 +1744,18 @@ function _renderGoldDiscoveryInner(data) {
 
   // ---- Scorecard ----
   var skewColor = skew >= 55 ? 'var(--signal-green)' : skew <= 45 ? 'var(--signal-red)' : 'var(--signal-amber)';
+  var stageBadge = ga.company_stage
+    ? '<div class="ga-score-card"><div class="ga-score-label">Stage</div>' +
+        '<div class="ga-score-value" style="font-size:13px">' + ga.company_stage.replace(/_/g, ' ') + '</div></div>'
+    : '';
+
   var scorecardHtml =
     '<div class="ga-scorecard">' +
       '<div class="ga-score-card ga-score-skew" style="border-color:' + skewColor + '">' +
         '<div class="ga-score-label">Skew</div>' +
         '<div class="ga-score-value" style="color:' + skewColor + '">' + skew + '</div>' +
       '</div>' +
+      stageBadge +
     '</div>';
 
   // ---- Verdict ----
@@ -1826,8 +1835,8 @@ function _renderGoldDiscoveryInner(data) {
   // ---- Analysis date ----
   var dateHtml = '<div class="ga-date">Analysis date: ' + ga.analysis_date + '</div>';
 
-  return '<div class="report-section" id="' + t + '-gold-discovery">' +
-    RS_HDR('Section 09', 'Gold Agent Discovery') +
+  return '<div class="report-section" id="' + t + '-gold-analysis">' +
+    RS_HDR('Section 09', 'Gold Analysis') +
     '<div class="rs-body">' +
       scorecardHtml +
       verdictHtml +
