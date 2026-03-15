@@ -557,6 +557,13 @@ async def _query_corpus(ticker: str, notebook_id: str = "") -> Dict[str, str]:
                 logger.warning("NotebookLM query failed for %s, falling back to Gemini local: %s", ticker, exc)
 
     # --- Attempt 2: Gemini local corpus (fallback) ---
+    # Skip Gemini fallback if no local corpus exists for this ticker
+    corpus_path = _get_corpus_path(ticker)
+    if not os.path.isdir(corpus_path):
+        raise RuntimeError(
+            f"NotebookLM query failed for {ticker} and no local corpus exists at {corpus_path}. "
+            f"Either fix NotebookLM auth or create the corpus directory with research documents."
+        )
     return await _query_gemini_local(ticker)
 
 
