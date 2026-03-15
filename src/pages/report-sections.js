@@ -1728,6 +1728,160 @@ export function renderGoldDiscovery(data) {
   }
 }
 
+function _renderGoldAssets(ga) {
+  var assets = ga.assets;
+  if (!assets || !assets.length) return '';
+
+  var rows = '';
+  for (var i = 0; i < assets.length; i++) {
+    var a = assets[i];
+    rows += '<tr>' +
+      '<td>' + (a.name || 'N/A') + '</td>' +
+      '<td>' + (a.country || 'N/A') + '</td>' +
+      '<td>' + (a.ownership_pct != null ? a.ownership_pct + '%' : '100%') + '</td>' +
+      '<td>' + (a.stage || 'N/A') + '</td>' +
+      '<td>' + (a.deposit_type || 'N/A') + '</td>' +
+      '<td>' + (a.mining_method || 'N/A') + '</td>' +
+      '<td>' + (a.annual_production_koz != null ? a.annual_production_koz + ' koz' : 'N/A') + '</td>' +
+      '<td>' + (a.reserve_grade_gt != null ? a.reserve_grade_gt + ' g/t' : 'N/A') + '</td>' +
+      '<td>' + (a.mine_life_years != null ? a.mine_life_years + ' yr' : 'N/A') + '</td>' +
+      '<td>' + (a.aisc_per_oz_usd != null ? 'US$' + a.aisc_per_oz_usd.toLocaleString() : 'N/A') + '</td>' +
+    '</tr>';
+  }
+
+  return '<div class="ga-sub-panel">' +
+    '<div class="rs-subtitle">Asset Portfolio</div>' +
+    '<div class="ga-evidence-scroll">' +
+    '<table class="ga-metrics-table ga-assets-table"><thead><tr>' +
+      '<th>Asset</th><th>Country</th><th>Own%</th><th>Stage</th>' +
+      '<th>Deposit</th><th>Method</th>' +
+      '<th>Production</th><th>Grade</th><th>Mine Life</th><th>AISC</th>' +
+    '</tr></thead><tbody>' + rows + '</tbody></table>' +
+    '</div></div>';
+}
+
+function _renderGoldValuation(ga) {
+  var v = ga.valuation;
+  if (!v) return '';
+  var base = v.screening_nav_usd_m;
+  var up = v.upside_nav_usd_m;
+  var down = v.downside_nav_usd_m;
+  if (base == null && up == null && down == null) return '';
+
+  var fmt = function(n) { return n != null ? 'US$' + n.toLocaleString() + 'm' : 'N/A'; };
+
+  var navCards =
+    '<div class="ga-val-grid">' +
+      '<div class="ga-val-card ga-val-down"><div class="ga-val-label">Downside NAV</div><div class="ga-val-num">' + fmt(down) + '</div></div>' +
+      '<div class="ga-val-card ga-val-base"><div class="ga-val-label">Base NAV</div><div class="ga-val-num">' + fmt(base) + '</div></div>' +
+      '<div class="ga-val-card ga-val-up"><div class="ga-val-label">Upside NAV</div><div class="ga-val-num">' + fmt(up) + '</div></div>' +
+    '</div>';
+
+  var multiples = [];
+  if (v.p_nav != null) multiples.push(['P/NAV', v.p_nav + 'x']);
+  if (v.ev_per_reserve_oz_usd != null) multiples.push(['EV/Reserve oz', 'US$' + v.ev_per_reserve_oz_usd.toLocaleString()]);
+  if (v.ev_per_resource_oz_usd != null) multiples.push(['EV/Resource oz', 'US$' + v.ev_per_resource_oz_usd.toLocaleString()]);
+  if (v.ev_per_production_oz_usd != null) multiples.push(['EV/Production oz', 'US$' + v.ev_per_production_oz_usd.toLocaleString()]);
+  if (v.fcf_yield_spot_pct != null) multiples.push(['FCF Yield (spot)', v.fcf_yield_spot_pct + '%']);
+
+  var multiplesHtml = '';
+  if (multiples.length > 0) {
+    var mRows = '';
+    for (var i = 0; i < multiples.length; i++) {
+      mRows += '<tr><td class="ga-metric-name">' + multiples[i][0] + '</td><td class="ga-metric-val">' + multiples[i][1] + '</td></tr>';
+    }
+    multiplesHtml = '<table class="ga-metrics-table"><tbody>' + mRows + '</tbody></table>';
+  }
+
+  return '<div class="ga-sub-panel">' +
+    '<div class="rs-subtitle">Valuation Scenarios</div>' +
+    navCards + multiplesHtml +
+  '</div>';
+}
+
+function _renderGoldPeers(ga) {
+  var pf = ga.peer_frame;
+  if (!pf) return '';
+
+  var v = ga.valuation || {};
+  var pNav = v.p_nav;
+  var medianPNav = pf.peer_median_p_nav;
+  var discount = pf.p_nav_discount_premium_pct;
+  var comment = pf.relative_valuation_comment || '';
+  var peers = pf.peer_group || [];
+
+  if (!medianPNav && !comment) return '';
+
+  var discountColor = discount != null
+    ? (discount < 0 ? 'var(--signal-green)' : discount > 0 ? 'var(--signal-red)' : 'var(--text-primary)')
+    : '';
+  var discountText = discount != null
+    ? (discount > 0 ? '+' : '') + discount + '% vs peers'
+    : '';
+
+  var metricsHtml = '<div class="ga-peer-metrics">';
+  if (pNav != null) metricsHtml += '<div class="ga-cost-cell"><div class="ga-cost-label">Company P/NAV</div><div class="ga-cost-value">' + pNav + 'x</div></div>';
+  if (medianPNav != null) metricsHtml += '<div class="ga-cost-cell"><div class="ga-cost-label">Peer Median P/NAV</div><div class="ga-cost-value">' + medianPNav + 'x</div></div>';
+  if (discount != null) metricsHtml += '<div class="ga-cost-cell"><div class="ga-cost-label">Discount / Premium</div><div class="ga-cost-value" style="color:' + discountColor + '">' + discountText + '</div></div>';
+  metricsHtml += '</div>';
+
+  var peersHtml = peers.length > 0
+    ? '<div class="ga-peer-group"><span class="ga-cost-label">Peer group:</span> ' + peers.join(', ') + '</div>'
+    : '';
+
+  var commentHtml = comment
+    ? '<div class="rs-text" style="margin-top:8px">' + comment + '</div>'
+    : '';
+
+  return '<div class="ga-sub-panel">' +
+    '<div class="rs-subtitle">Peer Comparison</div>' +
+    metricsHtml + peersHtml + commentHtml +
+  '</div>';
+}
+
+function _renderGoldSensitivities(ga) {
+  var sens = ga.sensitivities;
+  if (!sens) return '';
+
+  var v = ga.valuation || {};
+  var baseNav = v.ic_nav_usd_m || v.screening_nav_usd_m;
+  if (!baseNav) return '';
+
+  var scenarios = [
+    ['Gold price +15%', sens.gold_price_up_15_nav_usd_m],
+    ['Gold price -15%', sens.gold_price_down_15_nav_usd_m],
+    ['FX +5%', sens.fx_plus_5pct_nav_usd_m],
+    ['Recovery -2pt', sens.recovery_minus_2pt_nav_usd_m],
+    ['Capex +15%', sens.capex_plus_15pct_nav_usd_m],
+    ['6-month delay', sens.delay_6m_nav_usd_m]
+  ];
+
+  var hasAny = false;
+  var rows = '';
+  for (var i = 0; i < scenarios.length; i++) {
+    var nav = scenarios[i][1];
+    if (nav == null) continue;
+    hasAny = true;
+    var pctChange = Math.round((nav - baseNav) / baseNav * 100);
+    var color = pctChange >= 0 ? 'var(--signal-green)' : 'var(--signal-red)';
+    var sign = pctChange >= 0 ? '+' : '';
+    rows += '<tr>' +
+      '<td>' + scenarios[i][0] + '</td>' +
+      '<td>US$' + nav.toLocaleString() + 'm</td>' +
+      '<td style="color:' + color + '">' + sign + pctChange + '%</td>' +
+    '</tr>';
+  }
+
+  if (!hasAny) return '';
+
+  return '<div class="ga-sub-panel">' +
+    '<div class="rs-subtitle">Sensitivity Analysis</div>' +
+    '<table class="ga-metrics-table"><thead><tr>' +
+      '<th>Scenario</th><th>NAV</th><th>Change</th>' +
+    '</tr></thead><tbody>' + rows + '</tbody></table>' +
+  '</div>';
+}
+
 function _renderGoldDiscoveryInner(data) {
   var t = data.ticker.toLowerCase();
   var ga = data.goldAgent;
@@ -1776,20 +1930,40 @@ function _renderGoldDiscoveryInner(data) {
     '</div>' +
   '</div>';
 
-  // ---- Key Metrics ----
-  var metricsRows = '';
-  var metricsList = [
-    ['AISC (per oz)', aisc ? ('A$' + aisc.toLocaleString()) : 'N/A'],
-    ['Production (koz/yr)', km.production_koz_annual ? (km.production_koz_annual.toLocaleString() + ' koz') : 'N/A'],
+  // ---- Cost Structure (3x2 grid) ----
+  var goldPrice = (km.gold_price_assumption_usd_per_oz || 2900);
+  var aiscUsd = km.aisc_per_oz_usd || aisc;
+  var margin = (aiscUsd && goldPrice) ? Math.round((goldPrice - aiscUsd) / goldPrice * 100) : null;
+
+  var costItems = [
+    ['AISC (per oz)', aisc != null ? ('A$' + aisc.toLocaleString()) : 'N/A'],
+    ['Cash Cost (per oz)', km.cash_cost_per_oz_usd != null ? ('US$' + km.cash_cost_per_oz_usd.toLocaleString()) : 'N/A'],
+    ['Production', km.production_koz_annual ? (km.production_koz_annual.toLocaleString() + ' koz/yr') : 'N/A'],
     ['Mine Life', km.mine_life_years ? (km.mine_life_years + ' years') : 'N/A'],
-    ['Net Cash / (Debt)', netCash != null ? ('A$' + netCash.toLocaleString() + 'm') : 'N/A'],
-    ['Reserve Grade', km.reserve_grade_gt ? (km.reserve_grade_gt + ' g/t') : 'N/A']
+    ['Reserve Grade', km.reserve_grade_gt ? (km.reserve_grade_gt + ' g/t') : 'N/A'],
+    ['Net Cash / (Debt)', netCash != null ? ('A$' + netCash.toLocaleString() + 'm') : 'N/A']
   ];
-  for (var i = 0; i < metricsList.length; i++) {
-    metricsRows += '<tr><td class="ga-metric-name">' + metricsList[i][0] + '</td><td class="ga-metric-val">' + metricsList[i][1] + '</td></tr>';
+
+  var costGrid = '';
+  for (var c = 0; c < costItems.length; c++) {
+    costGrid += '<div class="ga-cost-cell">' +
+      '<div class="ga-cost-label">' + costItems[c][0] + '</div>' +
+      '<div class="ga-cost-value">' + costItems[c][1] + '</div>' +
+    '</div>';
   }
-  var metricsHtml = '<div class="rs-subtitle">Key Metrics</div>' +
-    '<table class="ga-metrics-table"><tbody>' + metricsRows + '</tbody></table>';
+
+  var marginHtml = margin != null
+    ? '<div class="ga-margin-bar">' +
+        '<span class="ga-margin-label">Margin at spot:</span> ' +
+        '<span class="ga-margin-value" style="color:' + (margin > 30 ? 'var(--signal-green)' : margin > 15 ? 'var(--signal-amber)' : 'var(--signal-red)') + '">' + margin + '%</span>' +
+      '</div>'
+    : '';
+
+  var metricsHtml = '<div class="ga-sub-panel">' +
+    '<div class="rs-subtitle">Cost Structure</div>' +
+    marginHtml +
+    '<div class="ga-cost-grid">' + costGrid + '</div>' +
+  '</div>';
 
   // ---- Evidence ----
   var evidenceRows = '';
@@ -1841,7 +2015,11 @@ function _renderGoldDiscoveryInner(data) {
       scorecardHtml +
       verdictHtml +
       viewHtml +
+      _renderGoldAssets(ga) +
       metricsHtml +
+      _renderGoldValuation(ga) +
+      _renderGoldPeers(ga) +
+      _renderGoldSensitivities(ga) +
       evidenceHtml +
       triggerHtml +
       gapsHtml +

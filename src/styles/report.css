@@ -1938,3 +1938,28 @@
     color: var(--text-muted);
     margin-top: var(--space-md);
 }
+
+/* Gold Analysis: Sub-panels */
+.ga-sub-panel { margin-top: 20px; }
+
+/* Gold Analysis: Cost Structure */
+.ga-cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+.ga-cost-cell { padding: 8px 12px; background: var(--bg-card, #1a1a2e); border-radius: 6px; }
+.ga-cost-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.ga-cost-value { font-size: 16px; font-weight: 600; margin-top: 2px; }
+.ga-margin-bar { padding: 8px 12px; margin-bottom: 8px; font-size: 13px; }
+.ga-margin-label { color: var(--text-muted); }
+.ga-margin-value { font-weight: 600; }
+
+/* Gold Analysis: Valuation Scenarios */
+.ga-val-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 8px 0; }
+.ga-val-card { padding: 12px; text-align: center; border-radius: 6px; background: var(--bg-card, #1a1a2e); }
+.ga-val-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+.ga-val-num { font-size: 18px; font-weight: 700; margin-top: 4px; }
+.ga-val-down { border-left: 3px solid var(--signal-red); }
+.ga-val-base { border-left: 3px solid var(--signal-amber); }
+.ga-val-up { border-left: 3px solid var(--signal-green); }
+
+/* Gold Analysis: Peer Comparison */
+.ga-peer-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 8px 0; }
+.ga-peer-group { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
