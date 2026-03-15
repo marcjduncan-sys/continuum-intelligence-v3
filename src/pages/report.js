@@ -37,14 +37,14 @@ export function renderReport(data) {
     renderOvercorrectionBanner(data) +
     renderIdentity(data) +
     renderHypotheses(data) +
+    renderGoldDiscovery(data) +
     renderNarrativeTimeline(data) +
     renderNarrative(data) +
     renderEvidence(data) +
     renderDiscriminators(data) +
     renderTripwires(data) +
     renderGaps(data) +
-    renderTechnicalAnalysis(data) +
-    renderGoldDiscovery(data);
+    renderTechnicalAnalysis(data);
 
   var floatingToggle =
     '<button class="sections-float-toggle" onclick="window.toggleAllSections(this)" data-state="expanded" aria-label="Collapse all sections">' +
