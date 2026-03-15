@@ -1908,57 +1908,23 @@ export function renderPriceDriversContent(container, driverData) {
     return;
   }
 
-  var rc = driverData.ranked_conclusion || {};
+  var report = driverData.report || {};
   var pa = driverData.price_action_summary || {};
-  var meta = driverData.agent_metadata || {};
+  var conf = driverData.confidence || 'moderate';
 
   var movePct = pa.price_change_5d_pct;
   var moveDir = movePct > 0 ? '+' : '';
   var moveCls = movePct > 1 ? 'pd-move-up' : movePct < -1 ? 'pd-move-down' : 'pd-move-flat';
-  var conf = rc.overall_confidence || 'moderate';
   var confCls = conf === 'very_high' || conf === 'high' ? 'pd-conf-high' : conf === 'moderate' ? 'pd-conf-mod' : 'pd-conf-low';
-  var dateStr = _formatDriverDate(meta.analysis_date);
+  var dateStr = _formatDriverDate(driverData.analysis_date);
 
-  var bullets = [];
-  var MAX = 150;
+  var titleText = report.title || '';
+  var summaryText = report.executive_summary || '';
 
-  if (rc.most_likely_primary_driver) {
-    bullets.push('<b>Primary driver:</b> ' + _truncate(rc.most_likely_primary_driver, MAX));
+  if (!summaryText && !titleText) {
+    container.style.display = 'none';
+    return;
   }
-
-  var secondaries = rc.secondary_drivers || [];
-  if (secondaries.length > 0) {
-    bullets.push('<b>Secondary:</b> ' + _truncate(secondaries.join('; '), MAX));
-  }
-
-  var amps = rc.amplifiers || [];
-  if (amps.length > 0) {
-    bullets.push('<b>Amplifiers:</b> ' + _truncate(amps.join('; '), MAX));
-  }
-
-  var msc = driverData.macro_sector_context || {};
-  if (msc.peer_moves_summary) {
-    bullets.push('<b>Peer context:</b> ' + _truncate(msc.peer_moves_summary, MAX));
-  } else if (msc.commodity_or_rate_context) {
-    bullets.push('<b>Macro:</b> ' + _truncate(msc.commodity_or_rate_context, MAX));
-  }
-
-  if (rc.confidence_rationale) {
-    bullets.push('<b>Confidence:</b> ' + _truncate(rc.confidence_rationale, MAX));
-  }
-
-  var rejected = rc.rejected_explanations || [];
-  if (rejected.length > 0) {
-    bullets.push('<b>Ruled out:</b> ' + _truncate(rejected.slice(0, 3).join('; '), MAX));
-  }
-
-  if (bullets.length > 7) bullets.length = 7;
-
-  var bulletsHtml = '<ul class="pd-bullets">';
-  for (var i = 0; i < bullets.length; i++) {
-    bulletsHtml += '<li>' + bullets[i] + '</li>';
-  }
-  bulletsHtml += '</ul>';
 
   container.innerHTML =
     '<div class="pd-block">' +
@@ -1968,7 +1934,8 @@ export function renderPriceDriversContent(container, driverData) {
         '<span class="pd-conf ' + confCls + '">' + conf.replace(/_/g, ' ') + '</span>' +
         (dateStr ? '<span class="pd-date">' + dateStr + '</span>' : '') +
       '</div>' +
-      bulletsHtml +
+      (titleText ? '<div class="pd-title">' + titleText + '</div>' : '') +
+      '<div class="pd-summary">' + summaryText + '</div>' +
     '</div>';
 }
 
