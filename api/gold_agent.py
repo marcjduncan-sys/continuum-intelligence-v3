@@ -559,8 +559,9 @@ async def _query_corpus(ticker: str, notebook_id: str = "") -> Dict[str, str]:
                 logger.warning("NotebookLM auth failed for %s, falling back to Gemini local: %s", ticker, exc)
             else:
                 logger.warning("NotebookLM query failed for %s (notebook=%s): %s", ticker, effective_notebook, exc)
-                # If using a per-ticker notebook, do not fall through to Gemini local
-                if notebook_id:
+                # If using a per-ticker or mapped notebook, do not fall through to Gemini local
+                is_per_ticker = notebook_id or config.NOTEBOOKLM_TICKER_NOTEBOOKS.get(ticker, "")
+                if is_per_ticker:
                     raise RuntimeError(
                         f"NotebookLM query failed for {ticker} with notebook {effective_notebook}: {exc}"
                     )
