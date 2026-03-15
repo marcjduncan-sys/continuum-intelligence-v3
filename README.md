@@ -1,4 +1,4 @@
-# Continuum Intelligence V2
+# Continuum Intelligence V3
 
 Independent cross-domain equity research platform covering ASX-listed stocks.
 Uses the **Analysis of Competing Hypotheses (ACH)** framework with four-tier
