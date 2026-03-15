@@ -2194,7 +2194,7 @@ export function renderPriceDriversContent(container, driverData) {
 }
 
 
-export function fetchPriceDrivers(ticker) {
+export function fetchPriceDrivers(ticker, force) {
   var container = document.getElementById('price-drivers-' + ticker);
   if (!container) return;
 
@@ -2207,7 +2207,12 @@ export function fetchPriceDrivers(ticker) {
   var headers = { 'Accept': 'application/json' };
   if (apiKey) headers['X-API-Key'] = apiKey;
 
-  fetch(baseUrl + '/api/agents/drivers/' + ticker + '/latest', { headers: headers })
+  // /latest serves cache only; /{ticker} runs fresh analysis
+  var endpoint = force
+    ? '/api/agents/drivers/' + ticker
+    : '/api/agents/drivers/' + ticker + '/latest';
+
+  fetch(baseUrl + endpoint, { headers: headers })
     .then(function(resp) {
       if (!resp.ok) {
         container.style.display = 'none';
