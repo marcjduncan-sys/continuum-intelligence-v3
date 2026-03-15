@@ -59,13 +59,32 @@ DATABASE_URL = os.getenv("DATABASE_URL", "")
 NOTEBOOKLM_GOLD_NOTEBOOK_ID = os.getenv("NOTEBOOKLM_GOLD_NOTEBOOK_ID", "")
 NOTEBOOKLM_AUTH_JSON = os.getenv("NOTEBOOKLM_AUTH_JSON", "")
 
-# Per-ticker notebook IDs (JSON dict, e.g. {"OBM":"abc-123","WIA":"def-456"})
-# Falls back to NOTEBOOKLM_GOLD_NOTEBOOK_ID when ticker not in mapping.
+# Per-ticker notebook IDs.
+# Primary source: data/config/notebooklm-notebooks.json committed to the repo.
+# Optional override: NOTEBOOKLM_TICKER_NOTEBOOKS env var (JSON dict) — any key
+# present in the env var takes precedence over the file (useful for secrets or
+# temporary overrides without committing).
+# When a new gold stock is added, just add a line to the JSON file and push.
+_nlm_notebooks_file = os.path.realpath(
+    os.path.join(os.path.dirname(__file__), "..", "data", "config", "notebooklm-notebooks.json")
+)
+try:
+    with open(_nlm_notebooks_file, "r", encoding="utf-8") as _fh:
+        _nlm_file_map: dict = {
+            k: v for k, v in json.load(_fh).items()
+            if not k.startswith("_")  # skip _comment / _format metadata keys
+        }
+except Exception:
+    _nlm_file_map = {}
+
 _nlm_ticker_map_raw = os.getenv("NOTEBOOKLM_TICKER_NOTEBOOKS", "{}")
 try:
-    NOTEBOOKLM_TICKER_NOTEBOOKS = json.loads(_nlm_ticker_map_raw)
+    _nlm_env_map: dict = json.loads(_nlm_ticker_map_raw)
 except Exception:
-    NOTEBOOKLM_TICKER_NOTEBOOKS = {}
+    _nlm_env_map = {}
+
+# Merge: file is the base, env var takes precedence (allows Railway overrides).
+NOTEBOOKLM_TICKER_NOTEBOOKS: dict = {**_nlm_file_map, **_nlm_env_map}
 
 # ---------------------------------------------------------------------------
 # Auth
