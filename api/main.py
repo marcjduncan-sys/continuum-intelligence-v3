@@ -531,12 +531,13 @@ async def gold_agent_reset_auth():
 
 @app.get("/api/agents/gold/{ticker}", dependencies=[Depends(verify_api_key)])
 @limiter.limit("2/minute")
-async def gold_agent_endpoint(ticker: str, request: Request, force: bool = False):
+async def gold_agent_endpoint(ticker: str, request: Request, force: bool = False, notebook_id: str = ""):
     """
     Run gold equities analysis for an ASX ticker.
 
     Hybrid corpus: NotebookLM (primary) with Gemini local fallback.
     Returns cached result if available (24h TTL). Pass ?force=true to bypass cache.
+    Pass ?notebook_id=<id> to use a per-ticker NotebookLM notebook.
     Expect 60-120 seconds latency. Rate-limited to 2 requests/minute.
     """
     ticker = ticker.upper()
@@ -544,7 +545,7 @@ async def gold_agent_endpoint(ticker: str, request: Request, force: bool = False
         raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{ticker}'")
 
     try:
-        result = await run_gold_analysis(ticker, force=force)
+        result = await run_gold_analysis(ticker, force=force, notebook_id=notebook_id)
         return result
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
