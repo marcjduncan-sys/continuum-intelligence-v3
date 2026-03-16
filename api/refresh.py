@@ -1087,6 +1087,8 @@ async def run_refresh(ticker: str) -> dict:
                 )
             except Exception as e:
                 logger.warning(f"[{ticker}] Track 4 price drivers failed (non-fatal): {e}")
+                if hasattr(job, "stage_errors"):
+                    job.stage_errors.append(f"Track 4 (drivers): {e}")
                 return None
 
         # ---- Track 5: Gold overlay (parallel, only for gold stocks) ----
