@@ -18,22 +18,22 @@ import time
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
+import anthropic
 import httpx
 
 import config
-import db
 from web_search import (
     fetch_yahoo_price,
     fetch_asx_announcements,
     web_search_news,
     fetch_earnings_news,
-    web_search_macro,
-    fetch_commodity_price,
-    SECTOR_COMMODITY_MAP,
     _get_http_client,
     _parse_ddg_html,
     YAHOO_HEADERS,
 )
+
+# Stub: SECTOR_COMMODITY_MAP not yet ported to v3
+SECTOR_COMMODITY_MAP: dict[str, dict] = {}
 
 logger = logging.getLogger(__name__)
 
@@ -720,8 +720,8 @@ Return valid JSON only. No markdown fences. No prefatory text."""
 
 
 def _call_llm_sync(system_prompt: str, user_content: str, max_tokens: int = 8192) -> str:
-    """Synchronous Claude call using the shared Anthropic client."""
-    client = config.get_anthropic_client()
+    """Synchronous Claude call."""
+    client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
     response = client.messages.create(
         model=config.ANTHROPIC_MODEL,
         max_tokens=max_tokens,
@@ -899,81 +899,15 @@ async def run_price_driver_scan() -> dict:
 
 
 async def _save_to_db(ticker: str, report: dict) -> None:
-    """Save a price driver report to PostgreSQL."""
-    pool = await db.get_pool()
-    if not pool:
-        return
-    try:
-        await pool.execute(
-            """
-            INSERT INTO price_driver_reports (ticker, report_json, analysis_date)
-            VALUES ($1, $2::jsonb, $3)
-            ON CONFLICT (ticker, analysis_date)
-            DO UPDATE SET report_json = $2::jsonb, created_at = NOW(),
-                          expires_at = NOW() + INTERVAL '48 hours'
-            """,
-            ticker,
-            json.dumps(report, default=str),
-            datetime.now(timezone.utc).date(),
-        )
-    except Exception as e:
-        logger.error("Failed to save price driver report for %s: %s", ticker, e)
+    """Stub: no persistent DB in v3 Railway deployment."""
+    pass
 
 
 async def _load_from_db(ticker: str) -> dict | None:
-    """Load the most recent non-expired price driver report from PostgreSQL."""
-    pool = await db.get_pool()
-    if not pool:
-        return None
-    try:
-        row = await pool.fetchrow(
-            """
-            SELECT report_json FROM price_driver_reports
-            WHERE ticker = $1 AND expires_at > NOW()
-            ORDER BY analysis_date DESC
-            LIMIT 1
-            """,
-            ticker,
-        )
-        if row:
-            return json.loads(row["report_json"])
-    except Exception as e:
-        logger.error("Failed to load price driver report for %s: %s", ticker, e)
+    """Stub: no persistent DB in v3 Railway deployment."""
     return None
 
 
 async def get_latest_report(ticker: str) -> dict | None:
-    """Get the most recent price driver report (cache or DB)."""
-    cached = get_cached_result(ticker)
-    if cached:
-        return cached
-    db_result = await _load_from_db(ticker)
-    if db_result:
-        cache_result(ticker, db_result)
-    return db_result
-
-
-# ---------------------------------------------------------------------------
-# Health check
-# ---------------------------------------------------------------------------
-
-
-async def check_drivers_health() -> dict:
-    """Check price driver agent availability."""
-    health = {
-        "status": "healthy",
-        "anthropic_configured": bool(config.ANTHROPIC_API_KEY),
-        "database_available": False,
-    }
-    pool = await db.get_pool()
-    if pool:
-        try:
-            count = await pool.fetchval("SELECT COUNT(*) FROM price_driver_reports")
-            health["database_available"] = True
-            health["reports_stored"] = count
-        except Exception:
-            health["database_available"] = False
-    if not config.ANTHROPIC_API_KEY:
-        health["status"] = "error"
-        health["error"] = "ANTHROPIC_API_KEY not configured"
-    return health
+    """Get the most recent price driver report (in-memory cache only)."""
+    return get_cached_result(ticker)
