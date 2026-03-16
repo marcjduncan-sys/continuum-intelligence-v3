@@ -208,7 +208,7 @@ export function renderSectionNav(data) {
   ];
 
   if (data.goldAgent) {
-    sections.push(['gold-analysis', 'Gold Analysis']);
+    sections.push(['gold-analysis', 'Gold']);
   }
 
   sections.push(
@@ -2018,7 +2018,7 @@ function _renderGoldDiscoveryInner(data) {
   var dateHtml = '<div class="ga-date">Analysis date: ' + ga.analysis_date + '</div>';
 
   return '<div class="report-section" id="' + t + '-gold-analysis">' +
-    RS_HDR('Section 09', 'Gold Analysis') +
+    RS_HDR('Section 02 / Gold', 'Gold Analysis') +
     '<div class="rs-body">' +
       scorecardHtml +
       verdictHtml +

@@ -1788,44 +1788,44 @@
 .rs-body { overflow: hidden; }
 .report-section.collapsed .rs-body { display: none; }
 
-/* Section 09: Gold Agent Discovery */
+/* Section 02/Gold: Gold Agent Discovery */
 .ga-scorecard {
     display: flex;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-md);
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
     flex-wrap: wrap;
 }
 .ga-score-card {
     background: var(--card-bg);
     border: 1px solid var(--border-subtle);
-    border-radius: 8px;
-    padding: var(--space-sm) var(--space-md);
+    border-radius: 4px;
+    padding: var(--space-xs) var(--space-sm);
     text-align: center;
-    min-width: 80px;
+    min-width: 64px;
 }
 .ga-score-card.ga-score-skew {
     border-width: 2px;
 }
 .ga-score-label {
-    font-size: 11px;
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--text-muted);
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 .ga-score-value {
-    font-size: 28px;
+    font-size: 20px;
     font-weight: 700;
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
 }
 .ga-verdict {
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-sm);
 }
 .ga-view-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-md);
-    margin-bottom: var(--space-md);
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
 }
 @media (max-width: 768px) {
     .ga-view-grid { grid-template-columns: 1fr; }
@@ -1833,82 +1833,93 @@
 .ga-view-col {
     background: var(--card-bg);
     border: 1px solid var(--border-subtle);
-    border-radius: 8px;
-    padding: var(--space-md);
+    border-radius: 4px;
+    padding: var(--space-sm);
 }
 .ga-view-bull { border-left: 3px solid var(--signal-green); }
 .ga-view-bear { border-left: 3px solid var(--signal-red); }
 .ga-view-label {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: var(--space-xs);
+    margin-bottom: 2px;
     color: var(--text-muted);
 }
 .ga-metrics-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-sm);
+    font-size: 13px;
+}
+.ga-metrics-table th {
+    text-align: left;
+    padding: 4px 8px;
+    border-bottom: 2px solid var(--border-subtle);
+    color: var(--text-muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 .ga-metrics-table td {
-    padding: 8px 12px;
+    padding: 4px 8px;
     border-bottom: 1px solid var(--border-subtle);
 }
 .ga-metric-name {
     color: var(--text-muted);
-    font-size: 13px;
+    font-size: 12px;
     width: 40%;
 }
 .ga-metric-val {
+    font-size: 12px;
     font-weight: 600;
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
 }
 .ga-evidence-scroll {
     overflow-x: auto;
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-sm);
 }
 .ga-evidence-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 12px;
 }
 .ga-evidence-table th {
     text-align: left;
-    padding: 8px 12px;
+    padding: 4px 8px;
     border-bottom: 2px solid var(--border-subtle);
     color: var(--text-muted);
-    font-size: 11px;
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 .ga-evidence-table td {
-    padding: 10px 12px;
+    padding: 4px 8px;
     border-bottom: 1px solid var(--border-subtle);
     vertical-align: top;
 }
 .ga-ev-label {
     font-weight: 600;
     white-space: nowrap;
-    min-width: 180px;
+    min-width: 140px;
 }
 .ga-ev-finding {
-    line-height: 1.5;
+    line-height: 1.4;
 }
 .ga-ev-source {
     color: var(--text-muted);
-    font-size: 12px;
-    min-width: 140px;
+    font-size: 11px;
+    min-width: 100px;
 }
 .ga-trigger {
     background: var(--card-bg);
     border: 1px solid var(--signal-amber);
-    border-radius: 8px;
-    padding: var(--space-md);
-    margin-bottom: var(--space-md);
+    border-radius: 4px;
+    padding: var(--space-sm);
+    margin-bottom: var(--space-sm);
 }
 .ga-gaps {
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-sm);
 }
 .ga-gap-list {
     list-style: none;
@@ -1916,50 +1927,50 @@
     margin: 0;
 }
 .ga-gap-item {
-    padding: 8px 0 8px 20px;
+    padding: 4px 0 4px 16px;
     border-bottom: 1px solid var(--border-subtle);
     position: relative;
-    line-height: 1.5;
-    font-size: 13px;
+    line-height: 1.4;
+    font-size: 12px;
 }
 .ga-gap-item::before {
     content: '';
     position: absolute;
     left: 0;
-    top: 14px;
-    width: 8px;
-    height: 8px;
+    top: 10px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: var(--signal-amber);
 }
 .ga-date {
     text-align: right;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-muted);
-    margin-top: var(--space-md);
+    margin-top: var(--space-sm);
 }
 
 /* Gold Analysis: Sub-panels */
-.ga-sub-panel { margin-top: 20px; }
+.ga-sub-panel { margin-top: 12px; }
 
 /* Gold Analysis: Cost Structure */
-.ga-cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
-.ga-cost-cell { padding: 8px 12px; background: var(--bg-card, #1a1a2e); border-radius: 6px; }
-.ga-cost-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.ga-cost-value { font-size: 16px; font-weight: 600; margin-top: 2px; }
-.ga-margin-bar { padding: 8px 12px; margin-bottom: 8px; font-size: 13px; }
+.ga-cost-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 4px; }
+.ga-cost-cell { padding: 4px 8px; background: var(--bg-card, #1a1a2e); border-radius: 4px; }
+.ga-cost-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.ga-cost-value { font-size: 14px; font-weight: 600; margin-top: 1px; }
+.ga-margin-bar { padding: 4px 8px; margin-bottom: 4px; font-size: 12px; }
 .ga-margin-label { color: var(--text-muted); }
 .ga-margin-value { font-weight: 600; }
 
 /* Gold Analysis: Valuation Scenarios */
-.ga-val-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 8px 0; }
-.ga-val-card { padding: 12px; text-align: center; border-radius: 6px; background: var(--bg-card, #1a1a2e); }
-.ga-val-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
-.ga-val-num { font-size: 18px; font-weight: 700; margin-top: 4px; }
+.ga-val-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 4px 0; }
+.ga-val-card { padding: 6px 8px; text-align: center; border-radius: 4px; background: var(--bg-card, #1a1a2e); }
+.ga-val-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+.ga-val-num { font-size: 14px; font-weight: 700; margin-top: 2px; }
 .ga-val-down { border-left: 3px solid var(--signal-red); }
 .ga-val-base { border-left: 3px solid var(--signal-amber); }
 .ga-val-up { border-left: 3px solid var(--signal-green); }
 
 /* Gold Analysis: Peer Comparison */
-.ga-peer-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 8px 0; }
-.ga-peer-group { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+.ga-peer-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 4px 0; }
+.ga-peer-group { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
