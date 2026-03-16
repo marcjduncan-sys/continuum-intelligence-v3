@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.4,
+      "survival_score": 0.55,
       "status": "MODERATE",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-16T05:29:24.964Z"
+      "last_updated": "2026-03-16T07:50:34.841Z"
     },
     "N2": {
       "label": "Speculative Premium Unwind",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.48,
+      "survival_score": 0.33,
       "status": "MODERATE",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-16T05:29:24.964Z"
+      "last_updated": "2026-03-16T07:50:34.841Z"
     },
     "N3": {
       "label": "Execution Risk",
@@ -38,7 +38,7 @@
       "survival_score": 0.06,
       "status": "VERY_LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-15T21:18:44.752Z"
+      "last_updated": "2026-03-16T07:50:34.841Z"
     },
     "N4": {
       "label": "Autonomous Systems Moat",
@@ -50,22 +50,22 @@
       "survival_score": 0.06,
       "status": "VERY_LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-15T21:18:44.752Z"
+      "last_updated": "2026-03-16T07:50:34.841Z"
     }
   },
-  "dominant": "N2",
+  "dominant": "N1",
   "confidence": "LOW",
-  "alert_state": "NORMAL",
+  "alert_state": "OVERCORRECTION",
   "current_price": 4.12,
   "big_picture": "DroneShield (ASX: DRO) — coverage initiated. Full analysis pending.",
   "last_flip": {
-    "date": "2026-03-04",
-    "from": "N1",
-    "to": "N2",
-    "trigger": "Automated: survival score shift (Defence Contract Pipeline → Speculative Premium Unwind)",
-    "price_at_flip": 3.37,
-    "from_survival": 0.31,
-    "to_survival": 0.35
+    "date": "2026-03-16",
+    "from": "N2",
+    "to": "N1",
+    "trigger": "Automated: survival score shift (Speculative Premium Unwind → Defence Contract Pipeline)",
+    "price_at_flip": 4.12,
+    "from_survival": 0.41,
+    "to_survival": 0.47
   },
   "narrative_history": [
     {
@@ -76,6 +76,15 @@
       "price_at_flip": 3.62,
       "from_survival": 0.44,
       "to_survival": 0.44
+    },
+    {
+      "date": "2026-03-04",
+      "from": "N1",
+      "to": "N2",
+      "trigger": "Automated: survival score shift (Defence Contract Pipeline → Speculative Premium Unwind)",
+      "price_at_flip": 3.37,
+      "from_survival": 0.31,
+      "to_survival": 0.35
     }
   ],
   "evidence_items": [
@@ -105,6 +114,13 @@
       "type": "OVERCORRECTION_REVIEW",
       "severity": "AMBER",
       "message": "Overcorrection NOT confirmed — price only partially reversed",
+      "auto_generated": true
+    },
+    {
+      "date": "2026-03-16",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "5-day cumulative move of +24.1% exceeds 15% threshold — possible overcorrection",
       "auto_generated": true
     }
   ],
@@ -228,11 +244,20 @@
       "cumulative_20d": 18.07,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-16",
+      "classification": "SIGNIFICANT",
+      "daily_change_pct": 5.1,
+      "volume_multiplier": 1,
+      "cumulative_5d": 24.11,
+      "cumulative_20d": 20.87,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    1.84,
     1.89,
     1.9,
     1.89,
@@ -291,7 +316,8 @@
     4.07,
     4.02,
     3.92,
-    4.17
+    4.17,
+    4.12
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -535,25 +561,20 @@
     }
   },
   "price_evidence": {
-    "last_run": "2026-03-16T05:29:24.964Z",
+    "last_run": "2026-03-16T07:14:41.223Z",
     "classification": "SIGNIFICANT"
   },
-  "last_research_update": "2026-03-16T05:29:24.964Z",
+  "last_research_update": "2026-03-16T07:14:41.223Z",
   "price": 3.69,
   "date": "26 February 2026",
   "_overcorrection": {
-    "active": false,
-    "triggerType": "SINGLE_DAY",
-    "triggerDate": "2026-03-06",
-    "triggerPrice": 4.07,
+    "active": true,
+    "triggerType": "FIVE_DAY_CUMULATIVE",
+    "triggerDate": "2026-03-16",
+    "triggerPrice": 4.12,
     "direction": "up",
-    "movePct": 21.13,
-    "reviewDate": "2026-03-13",
-    "message": "Single-day move of +21.1% exceeds 10% threshold — possible overcorrection",
-    "reviewResult": {
-      "reversal_pct": -11.6,
-      "confirmed": false,
-      "message": "Overcorrection NOT confirmed — price only partially reversed"
-    }
+    "movePct": 5.1,
+    "reviewDate": "2026-03-23",
+    "message": "5-day cumulative move of +24.1% exceeds 15% threshold — possible overcorrection"
   }
 }

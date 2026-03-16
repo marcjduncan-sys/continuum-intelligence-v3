@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-12T07:15:17.051Z"
+      "last_updated": "2026-03-16T07:50:34.853Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -26,7 +26,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-12T07:15:17.051Z"
+      "last_updated": "2026-03-16T07:50:34.853Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -38,7 +38,7 @@
       "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-16T05:29:24.964Z"
+      "last_updated": "2026-03-16T07:50:34.853Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -50,22 +50,22 @@
       "survival_score": 0.46,
       "status": "MODERATE",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-16T05:29:24.964Z"
+      "last_updated": "2026-03-16T07:50:34.853Z"
     }
   },
-  "dominant": "N4",
+  "dominant": "N3",
   "confidence": "LOW",
   "alert_state": "NORMAL",
-  "current_price": 0.93,
+  "current_price": 0.92,
   "big_picture": "Horizon Minerals Limited (ASX: HRZ) — coverage initiated. Full analysis pending.",
   "last_flip": {
     "date": "2026-03-16",
-    "from": "N3",
-    "to": "N4",
-    "trigger": "Automated: survival score shift (Risk/Downside → Disruption/Catalyst)",
-    "price_at_flip": 0.93,
-    "from_survival": 0.44,
-    "to_survival": 0.46
+    "from": "N4",
+    "to": "N3",
+    "trigger": "Automated: survival score shift (Disruption/Catalyst → Risk/Downside)",
+    "price_at_flip": 0.92,
+    "from_survival": 0.45,
+    "to_survival": 0.45
   },
   "narrative_history": [
     {
@@ -328,6 +328,15 @@
       "price_at_flip": 0.93,
       "from_survival": 0.45,
       "to_survival": 0.45
+    },
+    {
+      "date": "2026-03-16",
+      "from": "N3",
+      "to": "N4",
+      "trigger": "Automated: survival score shift (Risk/Downside → Disruption/Catalyst)",
+      "price_at_flip": 0.93,
+      "from_survival": 0.44,
+      "to_survival": 0.46
     }
   ],
   "evidence_items": [
@@ -476,11 +485,20 @@
       "cumulative_20d": -24.44,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-16",
+      "classification": "SIGNIFICANT",
+      "daily_change_pct": -9.8,
+      "volume_multiplier": 1,
+      "cumulative_5d": -9.73,
+      "cumulative_20d": -24.44,
+      "results_day": false,
+      "overcorrection_active": false
     }
   ],
   "editorial_override": null,
   "price_history": [
-    0.97,
     0.955,
     0.95,
     0.965,
@@ -539,7 +557,8 @@
     1.08,
     1.08,
     1.02,
-    1.02
+    1.02,
+    0.92
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -631,15 +650,16 @@
     1.02,
     1,
     0.95,
-    0.93
+    0.93,
+    0.92
   ],
   "freshness": {
-    "pricePctChange": -2.1,
+    "pricePctChange": -1.1,
     "urgency": 0,
     "status": "OK",
     "badge": "ok"
   },
-  "last_price_update": "2026-03-16T03:56:04.788Z",
+  "last_price_update": "2026-03-16T07:14:41.096Z",
   "technicalAnalysis": {
     "date": "16 February 2026",
     "period": "1 Year",
@@ -647,7 +667,7 @@
     "regime": "Consolidation",
     "clarity": "Moderate",
     "price": {
-      "current": 0.93,
+      "current": 0.92,
       "currency": "A$"
     },
     "movingAverages": {
@@ -792,10 +812,10 @@
     }
   },
   "price_evidence": {
-    "last_run": "2026-03-16T05:29:24.964Z",
+    "last_run": "2026-03-16T07:14:41.223Z",
     "classification": "SIGNIFICANT"
   },
-  "last_research_update": "2026-03-16T05:29:24.964Z",
+  "last_research_update": "2026-03-16T07:14:41.223Z",
   "price": 1.09,
   "date": "26 February 2026"
 }
