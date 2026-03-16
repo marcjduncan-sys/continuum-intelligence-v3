@@ -59,30 +59,30 @@ function fetchURL(url) {
 }
 
 async function fetchASXAnnouncements(ticker) {
-  // ASX public announcements API — no market_sensitive filter so we get all
-  // announcements (both sensitive and non-sensitive). Previously filtering to
-  // market_sensitive=false excluded most significant announcements (results,
-  // guidance, etc.) which are market_sensitive=true.
-  const url = `https://www.asx.com.au/asx/1/company/${ticker}/announcements?count=${ANNOUNCEMENTS_PER_TICKER}`;
+  // Markit Digital API (powers the current asx.com.au website).
+  // The legacy /asx/1/ endpoint was deprecated and returns 404 as of early 2026.
+  const url = `https://asx.api.markitdigital.com/asx-research/1.0/companies/${ticker}/announcements?count=${ANNOUNCEMENTS_PER_TICKER}&market=ASX`;
 
   try {
     const raw = await fetchURL(url);
     const data = JSON.parse(raw);
 
-    // API may return { data: [...] } or an array directly
-    const items = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : null);
+    const items = data && data.data && Array.isArray(data.data.items) ? data.data.items : null;
     if (!items) {
       return [];
     }
 
     return items.map(ann => ({
-      id: ann.id || null,
-      date: ann.document_date || ann.document_release_date || null,
-      headline: ann.header || ann.title || '',
-      type: categoriseAnnouncement(ann.header || ''),
-      sensitive: ann.market_sensitive || false,
-      pages: ann.number_of_pages || null,
-      url: ann.url ? `https://www.asx.com.au${ann.url}` : null
+      id: ann.documentKey || null,
+      date: ann.date || null,
+      headline: ann.headline || '',
+      type: categoriseAnnouncement(ann.headline || ''),
+      sensitive: ann.isPriceSensitive || false,
+      pages: null,
+      size: ann.fileSize || null,
+      url: ann.documentKey
+        ? `https://www.asx.com.au/announcements/pdf/${ann.documentKey}`
+        : null
     }));
   } catch (e) {
     console.error(`  [WARN] Failed to fetch ${ticker}: ${e.message}`);
