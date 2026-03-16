@@ -14,7 +14,7 @@
       "survival_score": 0.8,
       "status": "HIGH",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-09T08:04:50.535Z"
+      "last_updated": "2026-03-16T07:50:34.847Z"
     },
     "N2": {
       "label": "Commodity Price Risk",
@@ -26,7 +26,7 @@
       "survival_score": 0.1,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-09T08:04:50.535Z"
+      "last_updated": "2026-03-16T07:50:34.847Z"
     },
     "N3": {
       "label": "Energy Transition Risk",
@@ -38,7 +38,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-09T08:04:50.535Z"
+      "last_updated": "2026-03-16T07:50:34.847Z"
     },
     "N4": {
       "label": "Scarborough Delivery",
@@ -50,12 +50,12 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-09T08:04:50.535Z"
+      "last_updated": "2026-03-16T07:50:34.847Z"
     }
   },
   "dominant": "N1",
   "confidence": "HIGH",
-  "alert_state": "OVERCORRECTION",
+  "alert_state": "NORMAL",
   "current_price": 31.63,
   "big_picture": "Woodside Energy Group (ASX: WDS) — coverage initiated. Full analysis pending.",
   "last_flip": {
@@ -81,6 +81,20 @@
       "type": "OVERCORRECTION_TRIGGER",
       "severity": "AMBER",
       "message": "5-day cumulative move of +18.0% exceeds 15% threshold — possible overcorrection",
+      "auto_generated": true
+    },
+    {
+      "date": "2026-03-16",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "5-day cumulative move of +21.4% exceeds 15% threshold — possible overcorrection",
+      "auto_generated": true
+    },
+    {
+      "date": "2026-03-16",
+      "type": "OVERCORRECTION_REVIEW",
+      "severity": "AMBER",
+      "message": "Overcorrection NOT confirmed — price only partially reversed",
       "auto_generated": true
     }
   ],
@@ -204,11 +218,20 @@
       "cumulative_20d": 28.95,
       "results_day": false,
       "overcorrection_active": true
+    },
+    {
+      "date": "2026-03-16",
+      "classification": "NOTABLE",
+      "daily_change_pct": 3.77,
+      "volume_multiplier": 1,
+      "cumulative_5d": 21.41,
+      "cumulative_20d": 28.95,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    25.02,
     24.93,
     25.16,
     25.4,
@@ -267,7 +290,8 @@
     28.31,
     30.24,
     30.48,
-    31.36
+    31.36,
+    31.63
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -522,13 +546,18 @@
   "price": 27.94,
   "date": "26 February 2026",
   "_overcorrection": {
-    "active": true,
+    "active": false,
     "triggerType": "FIVE_DAY_CUMULATIVE",
-    "triggerDate": "2026-03-09",
-    "triggerPrice": 31.36,
+    "triggerDate": "2026-03-16",
+    "triggerPrice": 31.63,
     "direction": "up",
-    "movePct": 3.7,
-    "reviewDate": "2026-03-16",
-    "message": "5-day cumulative move of +18.0% exceeds 15% threshold — possible overcorrection"
+    "movePct": 3.77,
+    "reviewDate": "2026-03-23",
+    "message": "5-day cumulative move of +21.4% exceeds 15% threshold — possible overcorrection",
+    "reviewResult": {
+      "reversal_pct": -23.3,
+      "confirmed": false,
+      "message": "Overcorrection NOT confirmed — price only partially reversed"
+    }
   }
 }
