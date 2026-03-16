@@ -31,6 +31,7 @@ from validate_research import fix as validate_fix, validate as validate_check
 from web_search import gather_all_data
 from price_drivers import run_price_driver_analysis
 from gold_agent import run_gold_analysis
+from github_commit import commit_files_to_github
 
 logger = logging.getLogger(__name__)
 
@@ -427,6 +428,9 @@ async def _run_single_in_batch(
         _save_research(ticker, updated_research)
         _update_index(ticker, updated_research)
 
+        # Persist to GitHub so data survives Railway redeploys
+        await _commit_refresh_to_github(ticker)
+
         # Mark complete
         job.status = "completed"
         job.stage_index = 5
@@ -608,6 +612,35 @@ def _update_index(ticker: str, data: dict) -> None:
         _apply_update(_data_dir() / "_index.json")
     except Exception as e:
         logger.warning(f"Failed to update dist _index.json: {e}")
+
+
+async def _commit_refresh_to_github(ticker: str) -> None:
+    """Commit refreshed research JSON and index to GitHub so data survives redeploys."""
+    token = config.GITHUB_TOKEN
+    if not token:
+        logger.debug(f"[{ticker}] GITHUB_TOKEN not set, skipping commit")
+        return
+
+    files = {}
+    research_path = _live_data_dir() / f"{ticker}.json"
+    if research_path.exists():
+        files[f"data/research/{ticker}.json"] = research_path
+
+    index_path = _live_data_dir() / "_index.json"
+    if index_path.exists():
+        files["data/research/_index.json"] = index_path
+
+    if not files:
+        return
+
+    try:
+        await commit_files_to_github(
+            files,
+            f"Refresh {ticker}: {datetime.now(ZoneInfo('Australia/Sydney')).strftime('%d-%b-%y %H:%M AEST')}",
+            token,
+        )
+    except Exception as e:
+        logger.warning(f"[{ticker}] GitHub commit after refresh failed (non-fatal): {e}")
 
 
 # ---------------------------------------------------------------------------
@@ -1127,6 +1160,9 @@ async def run_refresh(ticker: str) -> dict:
 
         _save_research(ticker, updated_research)
         _update_index(ticker, updated_research)
+
+        # Persist to GitHub so data survives Railway redeploys
+        await _commit_refresh_to_github(ticker)
 
         # Mark complete
         job.status = "completed"
