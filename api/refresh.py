@@ -420,7 +420,7 @@ async def _run_single_in_batch(
 
         # Generate technical analysis if missing
         price_data = gathered.get("price_data", {})
-        if "error" not in price_data and not updated_research.get("technicalAnalysis"):
+        if "error" not in price_data:
             ta = _generate_technical_analysis(ticker, price_data, research.get("priceHistory", []))
             if ta:
                 updated_research["technicalAnalysis"] = ta
@@ -885,6 +885,22 @@ how external market conditions affect the company's evidence cards — particula
 Data domain. For example, commodity price moves are material for miners and energy producers, \
 interest rate expectations matter for banks and REITs, and FX moves affect offshore earners."""
 
+REQUIRED_REFRESH_FIELDS = [
+    "hypotheses", "embedded_thesis", "skew_description",
+    "narrative_rewrite", "price_implication", "evidence_check",
+    "narrative_stability", "verdict_update", "next_decision_point",
+    "position_in_range", "company_description",
+]
+
+
+def _validate_synthesis_response(result: dict, ticker: str) -> tuple[bool, list[str]]:
+    """Check that the LLM returned all required fields. Returns (is_complete, missing_fields)."""
+    missing = [f for f in REQUIRED_REFRESH_FIELDS if not result.get(f)]
+    if missing:
+        logger.warning(f"[{ticker}] Synthesis response missing {len(missing)} fields: {missing}")
+    return len(missing) == 0, missing
+
+
 HYPOTHESIS_UPDATE_SYSTEM = """\
 You are a senior equity research analyst at Continuum Intelligence. You assess competing \
 hypotheses for ASX-listed companies using structured evidence.
@@ -946,7 +962,19 @@ at the current price). Must reference current price and recent events.",
       {"if": "If [negative scenario]", "valence": "negative", "then": "Then [implication]"}
     ],
     "source": "Source citation"
-  }
+  },
+  "position_in_range": {
+    "current_price": 42.50,
+    "worlds": [
+      {"label": "Bear Case", "price": 35.00},
+      {"label": "Base Case", "price": 42.00},
+      {"label": "Bull Case", "price": 55.00},
+      {"label": "Catalyst", "price": 65.00}
+    ]
+  },
+  "company_description": "Updated 4-6 sentence company overview using HTML. Describe what the \
+company does, its market position, key assets, and current state. Reference the CURRENT price. \
+Use <strong> for company name and key facts. End with ASX ticker reference."
 }
 
 MACRO & COMMODITY CONTEXT:
@@ -977,7 +1005,12 @@ reference current prices and dates correctly.
 - For tripwire_updates: any tripwire with a date BEFORE today MUST have status "resolved". \
 Describe what actually happened in the resolution field. If you lack specific outcome details, \
 say "Event occurred [date]; outcome details pending data update."
-- new_tripwire MUST reference a FUTURE event (date after today). Provide the next material catalyst."""
+- new_tripwire MUST reference a FUTURE event (date after today). Provide the next material catalyst.
+- position_in_range.worlds prices MUST be plain numbers (e.g. 35.00), NOT dollar-sign strings.
+- position_in_range.worlds labels must be descriptive (e.g. "Bear Case", "Bull Case"), NOT "N1 Bull" or "N2 Base".
+- position_in_range MUST reflect the current price and updated hypothesis weights. Recalculate world prices based on current evidence.
+- company_description MUST reference the CURRENT price and any material recent events. Do not leave stale price references.
+- You MUST return ALL fields listed in the schema above. Omitting fields causes stale content on the platform."""
 
 
 # ---------------------------------------------------------------------------
@@ -1154,11 +1187,11 @@ async def run_refresh(ticker: str) -> dict:
 
         # Generate technical analysis from price data (both modes)
         price_data = gathered.get("price_data", {})
-        if "error" not in price_data and not updated_research.get("technicalAnalysis"):
+        if "error" not in price_data:
             ta = _generate_technical_analysis(ticker, price_data, research.get("priceHistory", []))
             if ta:
                 updated_research["technicalAnalysis"] = ta
-                logger.info(f"[{ticker}] Generated technical analysis section")
+                logger.info(f"[{ticker}] Regenerated technical analysis section")
 
         _save_research(ticker, updated_research)
         _update_index(ticker, updated_research)
@@ -1707,6 +1740,12 @@ async def _run_hypothesis_synthesis(
 ## Current Next Decision Point:
 {json.dumps(hero.get('next_decision_point', {}), indent=2)}
 
+## Current Position In Range:
+{json.dumps(hero.get('position_in_range', {}), indent=2)}
+
+## Current Company Description (heroCompanyDescription):
+{research.get('heroCompanyDescription', 'N/A')[:600]}
+
 ## Evidence Update Summary:
 {evidence_changes}
 
@@ -1738,7 +1777,7 @@ Please provide the FULL updated JSON with all narrative rewrites and tripwire up
             model=config.ANTHROPIC_MODEL,
             system=HYPOTHESIS_UPDATE_SYSTEM,
             messages=[{"role": "user", "content": user_prompt}],
-            max_tokens=6144,
+            max_tokens=8192,
             temperature=0,
             json_mode=True,
             feature="hypothesis-synthesis",
@@ -1755,6 +1794,44 @@ Please provide the FULL updated JSON with all narrative rewrites and tripwire up
             "verdict_update": None,
             "key_catalyst": None,
         }
+
+    # -- Completeness check with single retry for missing fields --
+    is_complete, missing = _validate_synthesis_response(result, ticker)
+    if not is_complete and len(missing) > 2:
+        logger.info(
+            f"[{ticker}] Retrying synthesis - {len(missing)} required fields missing: {missing}"
+        )
+        retry_prompt = (
+            user_prompt
+            + f"\n\nCRITICAL: Your previous response was missing these required fields: "
+            + f"{missing}. You MUST include ALL fields listed in the schema. "
+            + f"Return the COMPLETE JSON object."
+        )
+        try:
+            resp2 = await llm.complete(
+                model=config.ANTHROPIC_MODEL,
+                system=HYPOTHESIS_UPDATE_SYSTEM,
+                messages=[{"role": "user", "content": retry_prompt}],
+                max_tokens=8192,
+                temperature=0,
+                json_mode=True,
+                feature="hypothesis-synthesis-retry",
+                ticker=ticker,
+                max_retries=1,
+            )
+            result2 = resp2.json if isinstance(resp2.json, dict) else {}
+            # Backfill only the missing fields from retry response
+            for fld in missing:
+                if result2.get(fld):
+                    result[fld] = result2[fld]
+                    logger.info(f"[{ticker}] Recovered field '{fld}' from retry")
+            _, still_missing = _validate_synthesis_response(result, ticker)
+            if still_missing:
+                logger.warning(
+                    f"[{ticker}] Still missing after retry: {still_missing}"
+                )
+        except Exception as e:
+            logger.warning(f"[{ticker}] Synthesis retry failed (non-fatal): {e}")
 
     return result
 
@@ -1997,6 +2074,41 @@ def _merge_updates(
         updated["hero"]["skew"] = _compute_skew_from_hypotheses(
             updated.get("hypotheses", [])
         ).upper()
+
+        # -- Position in range (refresh) --
+        if hypothesis_update.get("position_in_range"):
+            pir = hypothesis_update["position_in_range"]
+            current_price_num = float(
+                str(price_data.get("price", 0)).replace("$", "").replace(",", "")
+            ) if "error" not in price_data else 0
+            if "current_price" not in pir or pir["current_price"] is None:
+                pir["current_price"] = current_price_num
+            else:
+                try:
+                    pir["current_price"] = float(
+                        str(pir["current_price"]).replace("$", "").replace(",", "")
+                    )
+                except (ValueError, TypeError):
+                    pir["current_price"] = current_price_num
+            for w in pir.get("worlds", []):
+                if isinstance(w.get("price"), str):
+                    try:
+                        w["price"] = float(w["price"].replace("$", "").replace(",", ""))
+                    except (ValueError, TypeError):
+                        pass
+                w.pop("gapPct", None)
+            updated["hero"]["position_in_range"] = pir
+        elif "position_in_range" in updated.get("hero", {}):
+            # Even if LLM didn't return new worlds, at least update current_price
+            current_price_num = float(
+                str(price_data.get("price", 0)).replace("$", "").replace(",", "")
+            ) if "error" not in price_data else None
+            if current_price_num:
+                updated["hero"]["position_in_range"]["current_price"] = current_price_num
+
+    # -- Company description (refresh) --
+    if hypothesis_update.get("company_description"):
+        updated["heroCompanyDescription"] = hypothesis_update["company_description"]
 
     # -- Full narrative rewrite --
     if "narrative" in updated and isinstance(updated["narrative"], dict):
