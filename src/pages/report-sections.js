@@ -2,7 +2,7 @@
 // Extracted from index.html without logic changes
 
 import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA, FEATURED_ORDER } from '../lib/state.js';
-import { renderSparkline } from '../lib/format.js';
+import { renderSparkline, formatDateAEST } from '../lib/format.js';
 import { normaliseScores, computeSkewScore } from '../lib/dom.js';
 
 const RS_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
@@ -126,7 +126,7 @@ export function renderReportHero(data) {
               '<span class="refresh-icon">&#8635;</span> Update' +
             '</button>' +
             '<span class="refresh-timestamp" id="refresh-ts-' + data.ticker + '">' +
-              (data.date ? 'Last updated: ' + data.date : '') +
+              (data.date ? 'Last updated: ' + formatDateAEST(data.date) : '') +
             '</span>' +
             '<div class="refresh-progress" id="refresh-progress-' + data.ticker + '" style="display:none">' +
               '<div class="progress-bar"><div class="progress-fill" id="refresh-fill-' + data.ticker + '"></div></div>' +
@@ -940,7 +940,7 @@ export function renderReportFooter(data) {
         '<div class="rf-meta-item">Mode: Narrative Intelligence</div>' +
         '<div class="rf-meta-item">Domains: ' + data.footer.domainCount + '</div>' +
         '<div class="rf-meta-item">Hypotheses: ' + data.footer.hypothesesCount + '</div>' +
-        '<div class="rf-meta-item">' + data.date + '</div>' +
+        '<div class="rf-meta-item">' + formatDateAEST(data.date) + '</div>' +
       '</div>' +
     '</div>' +
   '</div>';
@@ -951,7 +951,7 @@ export function renderPDFDownload(data) {
   return '<div class="report-download-section">' +
     '<div class="report-download-inner">' +
       '<div class="report-download-title">Download Research Report</div>' +
-      '<div class="report-download-subtitle">' + data.company + ' (' + data.ticker + '.AX) &mdash; ' + data.date + '</div>' +
+      '<div class="report-download-subtitle">' + data.company + ' (' + data.ticker + '.AX) &mdash; ' + formatDateAEST(data.date) + '</div>' +
       '<div class="report-download-buttons">' +
         '<button class="btn-pdf-download institutional" onclick="generatePDFReport(\'' + t + '\', \'institutional\')">' +
           '<span class="btn-pdf-label">Institutional Report <span class="btn-pdf-spinner"></span></span>' +

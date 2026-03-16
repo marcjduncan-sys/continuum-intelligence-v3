@@ -8,6 +8,7 @@ Used by the POST /api/stocks/add endpoint.
 import json
 import logging
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from typing import Any
 
 from web_search import _get_http_client, YAHOO_HEADERS, SECTOR_COMMODITY_MAP
@@ -473,7 +474,7 @@ def build_research_scaffold(
     high_52w = market_data.get("high_52w", price)
     low_52w = market_data.get("low_52w", price)
     market_cap = market_data.get("market_cap")
-    today = datetime.now(timezone.utc).strftime("%d %B %Y").lstrip("0")
+    today = datetime.now(ZoneInfo("Australia/Sydney")).strftime("%d-%b-%y")
 
     # Format market cap
     if market_cap and market_cap > 0:
@@ -558,7 +559,7 @@ def build_research_scaffold(
         "price": price,
         "currency": currency,
         "date": today,
-        "reportId": f"{ticker}-{datetime.now(timezone.utc).year}-001",
+        "reportId": f"{ticker}-{datetime.now(ZoneInfo('Australia/Sydney')).year}-001",
         "priceHistory": price_history,
 
         # Hero
@@ -827,7 +828,7 @@ def build_tickers_entry(
         "sectorSub": sector_sub or sector,
         "exchange": "ASX",
         "currency": market_data.get("currency", "A$"),
-        "added": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "added": datetime.now(ZoneInfo("Australia/Sydney")).strftime("%Y-%m-%d"),
         "status": "active",
         "featured": True,
         "analysisConfig": {
@@ -876,8 +877,8 @@ def build_index_entry(
         "sectorSub": sector_sub or sector,
         "price": price,
         "currency": market_data.get("currency", "A$"),
-        "date": datetime.now(timezone.utc).strftime("%d %B %Y").lstrip("0"),
-        "reportId": f"{ticker}-{datetime.now(timezone.utc).year}-001",
+        "date": datetime.now(ZoneInfo("Australia/Sydney")).strftime("%d-%b-%y"),
+        "reportId": f"{ticker}-{datetime.now(ZoneInfo('Australia/Sydney')).year}-001",
         "priceHistory": price_history,
     }
 
@@ -916,7 +917,7 @@ def build_reference_entry(ticker: str, market_data: dict) -> dict:
 def build_freshness_entry(ticker: str, price: float) -> dict:
     """Build an entry for data/freshness.json."""
     return {
-        "reviewDate": datetime.now(timezone.utc).isoformat(),
+        "reviewDate": datetime.now(ZoneInfo("Australia/Sydney")).isoformat(),
         "daysSinceReview": 0,
         "priceAtReview": price,
         "pricePctChange": 0,

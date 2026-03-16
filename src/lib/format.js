@@ -79,6 +79,58 @@ export function formatNum(n, decimals) {
  * @param {number[]} prices
  * @returns {string} HTML string with SVG sparkline
  */
+/**
+ * Convert a UTC date string to AEST/AEDT formatted string.
+ * Input formats: "2026-03-15 22:40 UTC", "2026-03-15 22:40", "2026-03-15",
+ *                "15 March 2026", "15 Mar 2026"
+ * Output: "16-Mar-26 09:40 AEST" (with time) or "16-Mar-26" (date-only inputs)
+ */
+export function formatDateAEST(utcDateStr) {
+  if (!utcDateStr) return '';
+  var str = String(utcDateStr).replace(/\s*UTC\s*$/i, '').trim();
+  var date;
+  var hasTime = false;
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var longMonths = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  // "2026-03-15 22:40"
+  var m = str.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})$/);
+  if (m) {
+    date = new Date(Date.UTC(+m[1], +m[2]-1, +m[3], +m[4], +m[5]));
+    hasTime = true;
+  }
+  // "2026-03-15"
+  if (!date) {
+    m = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) date = new Date(Date.UTC(+m[1], +m[2]-1, +m[3], 0, 0));
+  }
+  // "15 March 2026" or "15 Mar 2026" (case-insensitive)
+  if (!date) {
+    m = str.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})$/);
+    if (m) {
+      var monName = m[2].charAt(0).toUpperCase() + m[2].slice(1).toLowerCase();
+      var monIdx = longMonths.indexOf(monName);
+      if (monIdx < 0) {
+        for (var i = 0; i < months.length; i++) {
+          if (months[i].toLowerCase() === monName.toLowerCase().substring(0, 3)) { monIdx = i; break; }
+        }
+      }
+      if (monIdx >= 0) date = new Date(Date.UTC(+m[3], monIdx, +m[1], 0, 0));
+    }
+  }
+  if (!date || isNaN(date.getTime())) return utcDateStr;
+  // Use Intl to get correct AEST/AEDT offset for any date
+  var aest = new Date(date.toLocaleString('en-US', { timeZone: 'Australia/Sydney' }));
+  var day = String(aest.getDate()).padStart(2, '0');
+  var mon = months[aest.getMonth()];
+  var year = String(aest.getFullYear()).slice(-2);
+  if (hasTime) {
+    var hours = String(aest.getHours()).padStart(2, '0');
+    var mins = String(aest.getMinutes()).padStart(2, '0');
+    return day + '-' + mon + '-' + year + ' ' + hours + ':' + mins + ' AEST';
+  }
+  return day + '-' + mon + '-' + year;
+}
+
 export function renderSparkline(prices) {
   if (!prices || prices.length < 2) return '';
   var w = 280, h = 88, pad = 4;

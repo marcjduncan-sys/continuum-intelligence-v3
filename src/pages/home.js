@@ -4,6 +4,7 @@
 import { STOCK_DATA, FRESHNESS_DATA, FEATURED_ORDER, COMING_SOON } from '../lib/state.js';
 import { computeSkewScore } from '../lib/dom.js';
 import { on } from '../lib/data-events.js';
+import { formatDateAEST } from '../lib/format.js';
 
 var coverageSortDir = 0; // 0 = unsorted (default), 1 = desc (bearish first), -1 = asc (bullish first)
 
@@ -44,7 +45,7 @@ export function renderFeaturedCard(data) {
       '<span class="skew-score ' + scoreCls + '" style="font-size:0.7rem">' + scoreLabel + '</span>' +
       '<span class="fc-skew-rationale">' + data.featuredRationale + '</span>' +
     '</div>' +
-    '<div class="fc-date">' + data.date + renderFreshnessBadge(data.ticker) + renderCatalystTag(data.ticker) + '</div>' +
+    '<div class="fc-date">' + formatDateAEST(data.date) + renderFreshnessBadge(data.ticker) + renderCatalystTag(data.ticker) + '</div>' +
   '</div>';
 }
 
@@ -91,9 +92,7 @@ export function renderCoverageRow(data) {
     (_rationale ? '<div class="skew-tooltip-rationale">' + _rationale.substring(0, 160) + (_rationale.length > 160 ? '&hellip;' : '') + '</div>' : '') +
   '</div>';
 
-  // Format date as short form: "10 Feb 2026"
-  var dateParts = (data.date || '').split(' ');
-  var shortDate = dateParts[0] + ' ' + (dateParts[1] ? dateParts[1].substring(0, 3) : '') + ' ' + (dateParts[2] || '');
+  var shortDate = formatDateAEST(data.date);
 
   return '<tr data-skew-score="' + skew.score + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
     '<td class="td-ticker">' + data.ticker + '</td>' +

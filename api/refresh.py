@@ -18,6 +18,7 @@ import time
 from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from typing import Any
 
@@ -1629,7 +1630,7 @@ def _merge_updates(
 ) -> dict:
     """Merge all updates into a copy of the research JSON."""
     updated = deepcopy(research)
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    now = datetime.now(ZoneInfo("Australia/Sydney")).strftime("%d-%b-%y %H:%M AEST")
 
     # Capture existing skew before any hypothesis updates — used for momentum signal
     old_skew = (updated.get("hero") or {}).get("skew", "")
@@ -1829,7 +1830,7 @@ def _merge_initiation(
         f"hypothesis_keys={list(hypothesis_update.keys())}"
     )
     updated = deepcopy(research)
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    now = datetime.now(ZoneInfo("Australia/Sydney")).strftime("%d-%b-%y %H:%M AEST")
     price_data = gathered.get("price_data", {})
 
     # -- Price update --

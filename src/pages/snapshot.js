@@ -7,6 +7,7 @@ import { renderPDFDownload } from './report-sections.js';
 import { prepareHypotheses } from './report-sections.js';
 import { on } from '../lib/data-events.js';
 import { renderedSnapshots } from '../lib/router.js';
+import { formatDateAEST } from '../lib/format.js';
 
 export function buildSnapshotFromStock(ticker) {
   var stock = STOCK_DATA[ticker];
@@ -212,9 +213,7 @@ export function buildSnapshotFromStock(ticker) {
                   skewComputed.direction === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
 
   // 13. Date formatting
-  var dateStr = stock.date;
-  var dateMatch = dateStr.match(/(\d+)\s+(\w+)\s+(\d+)/);
-  if (dateMatch) dateStr = dateMatch[1] + ' ' + dateMatch[2].toUpperCase().substring(0, 3) + ' ' + dateMatch[3];
+  var dateStr = formatDateAEST(stock.date);
 
   return {
     ticker: stock.ticker,
