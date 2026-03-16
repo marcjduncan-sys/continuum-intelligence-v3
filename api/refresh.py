@@ -1210,6 +1210,7 @@ Please assess each evidence card against this new data and return the updated as
             system=EVIDENCE_UPDATE_SYSTEM,
             messages=[{"role": "user", "content": user_prompt}],
             json_mode=True,
+            max_tokens=8192,
             feature="evidence-update",
             ticker=ticker,
         )
@@ -1805,6 +1806,7 @@ Please provide updated structural sections as JSON."""
                 system=STRUCTURE_UPDATE_SYSTEM,
                 messages=[{"role": "user", "content": user_prompt}],
                 json_mode=True,
+                max_tokens=8192,
                 feature="structure-update",
                 ticker=ticker,
             )

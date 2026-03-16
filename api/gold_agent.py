@@ -636,25 +636,38 @@ async def _query_gemini_local(ticker: str) -> Dict[str, str]:
 
     client = genai.Client(api_key=config.GEMINI_API_KEY)
 
-    # Send documents + questions as a single Gemini call
-    response = await asyncio.to_thread(
-        client.models.generate_content,
-        model=config.GEMINI_MODEL,
-        contents=[*doc_parts, prompt],
-        config={
-            "max_output_tokens": 16384,
-            "temperature": 0.2,
-            "system_instruction": system_instruction,
-            "response_mime_type": "application/json",
-        },
-    )
+    # Send documents + questions as a single Gemini call (retry on JSON parse errors)
+    corpus: Dict[str, str] = {}
+    last_err = None
+    for _attempt in range(3):
+        response = await asyncio.to_thread(
+            client.models.generate_content,
+            model=config.GEMINI_MODEL,
+            contents=[*doc_parts, prompt],
+            config={
+                "max_output_tokens": 16384,
+                "temperature": 0.2,
+                "system_instruction": system_instruction,
+                "response_mime_type": "application/json",
+            },
+        )
 
-    raw = (response.text or "").strip()
-    if raw.startswith("```"):
-        raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
-        raw = raw.rsplit("```", 1)[0]
+        raw = (response.text or "").strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
+            raw = raw.rsplit("```", 1)[0]
 
-    corpus: Dict[str, str] = json.loads(raw)
+        try:
+            corpus = json.loads(raw)
+            last_err = None
+            break
+        except json.JSONDecodeError as e:
+            last_err = e
+            logger.warning(f"Gold corpus JSON parse attempt {_attempt + 1}/3 failed: {e}")
+            await asyncio.sleep(2)
+
+    if last_err:
+        raise last_err
 
     # Ensure all query keys exist
     for key, _ in _QUERIES:

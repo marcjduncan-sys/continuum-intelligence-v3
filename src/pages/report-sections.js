@@ -2042,56 +2042,77 @@ function _renderGoldDiscoveryInner(data) {
 
 export function renderPriceDrivers(data) {
   if (!data.priceDrivers) return '';
-  var t = data.ticker.toLowerCase();
   var pd = data.priceDrivers;
-  var drivers = pd.drivers || [];
-  if (drivers.length === 0) return '';
+  if (pd.error) return '';
 
-  var driversHtml = '';
-  for (var i = 0; i < drivers.length; i++) {
-    var d = drivers[i];
-    var category = d.category || 'Unknown';
-    var impact = d.impact || 'neutral';
-    var impactCls = impact === 'positive' ? 'pd-impact-pos' : impact === 'negative' ? 'pd-impact-neg' : 'pd-impact-neutral';
-    var magnitude = d.magnitude || '';
-    var summary = d.summary || '';
-    var citations = d.citations || d.evidence || [];
+  var ds = pd.driver_stack || {};
+  var pa = pd.price_action_summary || {};
+  var msc = pd.macro_sector_context || {};
+  var eq = pd.evidence_quality || {};
+  var conf = pd.confidence || 'moderate';
+  var primary = pd.primary_driver || '';
 
-    var citationsHtml = '';
-    if (citations.length > 0) {
-      citationsHtml = '<div class="pd-citations">';
-      for (var c = 0; c < citations.length; c++) {
-        citationsHtml += '<span class="pd-citation">' + citations[c] + '</span>';
-      }
-      citationsHtml += '</div>';
+  if (!primary && ds.primary && ds.primary.length > 0) primary = ds.primary[0];
+  if (!primary) return '';
+
+  var movePct = pa.price_change_5d_pct || 0;
+  var moveDir = movePct > 0 ? '+' : '';
+  var moveCls = movePct > 1 ? 'pd-move-up' : movePct < -1 ? 'pd-move-down' : 'pd-move-flat';
+  var confCls = conf === 'very_high' || conf === 'high' ? 'pd-conf-high' : conf === 'moderate' ? 'pd-conf-mod' : 'pd-conf-low';
+  var dateStr = _formatDriverDate(pd.analysis_date);
+
+  var MAX = 250;
+  var bullets = [];
+  bullets.push('<b>Primary driver:</b> ' + _truncate(primary, MAX));
+
+  var secondaries = ds.secondary || [];
+  if (secondaries.length > 0) {
+    bullets.push('<b>Secondary:</b> ' + _truncate(secondaries.join('; '), MAX));
+  }
+
+  var peerText = msc.peer_moves_summary || '';
+  var macroText = msc.commodity_or_rate_context || '';
+  if (peerText && macroText) {
+    bullets.push('<b>Peer and macro context:</b> ' + _truncate(peerText + '. ' + macroText, MAX));
+  } else if (peerText) {
+    bullets.push('<b>Peer context:</b> ' + _truncate(peerText, MAX));
+  } else if (macroText) {
+    bullets.push('<b>Macro context:</b> ' + _truncate(macroText, MAX));
+  } else {
+    var amps = ds.amplifiers || [];
+    if (amps.length > 0) {
+      bullets.push('<b>Amplifiers:</b> ' + _truncate(amps.join('; '), MAX));
     }
-
-    driversHtml +=
-      '<div class="pd-driver-card">' +
-        '<div class="pd-driver-header">' +
-          '<span class="pd-category-badge">' + category + '</span>' +
-          '<span class="pd-impact-indicator ' + impactCls + '">' + impact.toUpperCase() + '</span>' +
-          (magnitude ? '<span class="pd-magnitude">' + magnitude + '</span>' : '') +
-        '</div>' +
-        '<div class="pd-driver-summary">' + summary + '</div>' +
-        citationsHtml +
-      '</div>';
   }
 
-  var contextHtml = '';
-  if (pd.market_context) {
-    contextHtml =
-      '<div class="pd-market-context">' +
-        '<div class="rs-subtitle">Market Context</div>' +
-        '<p class="rs-text">' + pd.market_context + '</p>' +
-      '</div>';
+  var rejected = ds.rejected || [];
+  if (rejected.length > 0) {
+    bullets.push('<b>Ruled out:</b> ' + _truncate(rejected.slice(0, 3).join('; '), MAX));
   }
 
-  return '<div class="report-section" id="' + t + '-price-drivers">' +
+  if (eq.key_gap) {
+    bullets.push('<b>Confidence (' + conf.replace(/_/g, ' ') + '):</b> ' + _truncate(eq.key_gap, MAX));
+  }
+
+  var bulletsHtml = '<ul class="pd-bullets">';
+  for (var i = 0; i < bullets.length; i++) {
+    bulletsHtml += '<li>' + bullets[i] + '</li>';
+  }
+  bulletsHtml += '</ul>';
+
+  var t = data.ticker.toLowerCase();
+  return '<div class="report-section" id="' + t + '-price-drivers-embedded">' +
     RS_HDR('Section 10', 'Price Drivers') +
     '<div class="rs-body">' +
-      driversHtml +
-      contextHtml +
+      '<div class="pd-block">' +
+        '<div class="pd-header">' +
+          '<span class="pd-label">WHAT DROVE THE PRICE</span>' +
+          '<span class="pd-move ' + moveCls + '">' + moveDir + movePct.toFixed(1) + '% (5d)</span>' +
+          '<span class="pd-conf ' + confCls + '">' + conf.replace(/_/g, ' ') + '</span>' +
+          (dateStr ? '<span class="pd-date">' + dateStr + '</span>' : '') +
+        '</div>' +
+        bulletsHtml +
+      '</div>' +
     '</div></div>';
 }
 

@@ -212,6 +212,8 @@ _RETRYABLE_STRINGS = ("429", "quota", "rate", "500", "503", "overloaded")
 
 
 def _is_retryable(exc: Exception) -> bool:
+    if isinstance(exc, json.JSONDecodeError):
+        return True
     error_str = str(exc).lower()
     return any(s in error_str for s in _RETRYABLE_STRINGS)
 
