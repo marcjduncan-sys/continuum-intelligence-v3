@@ -371,6 +371,8 @@ async def _run_single_in_batch(
                 return await run_gold_analysis(ticker)
             except Exception as e:
                 logger.warning(f"[BATCH][{ticker}] Track 5 gold overlay failed (non-fatal): {e}")
+                if hasattr(job, "stage_errors"):
+                    job.stage_errors.append(f"Track 5 (gold): {e}")
                 return None
 
         # Run all tracks in parallel
@@ -1065,6 +1067,8 @@ async def run_refresh(ticker: str) -> dict:
                 return await run_gold_analysis(ticker)
             except Exception as e:
                 logger.warning(f"[{ticker}] Track 5 gold overlay failed (non-fatal): {e}")
+                if hasattr(job, "stage_errors"):
+                    job.stage_errors.append(f"Track 5 (gold): {e}")
                 return None
 
         # ---- Run all tracks in parallel ----
