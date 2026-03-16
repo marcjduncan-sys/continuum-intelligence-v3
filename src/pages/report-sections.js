@@ -1,7 +1,7 @@
 // report-sections.js — Individual report section renderers
 // Extracted from index.html without logic changes
 
-import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA, FEATURED_ORDER } from '../lib/state.js';
+import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA, FEATURED_ORDER, ANNOUNCEMENTS_DATA } from '../lib/state.js';
 import { renderSparkline, formatDateAEST } from '../lib/format.js';
 import { normaliseScores, computeSkewScore } from '../lib/dom.js';
 
@@ -22,6 +22,41 @@ export function renderReportHero(data) {
   }
 
   var sparklineHtml = data.priceHistory ? renderSparkline(data.priceHistory) : '';
+
+  // Hero announcements -- latest 4 ASX announcements for this ticker
+  var heroAnnouncementsHtml = '';
+  var tickerAnns = ANNOUNCEMENTS_DATA[data.ticker];
+  if (tickerAnns && tickerAnns.length > 0) {
+    var annItems = '';
+    var count = Math.min(tickerAnns.length, 4);
+    for (var a = 0; a < count; a++) {
+      var ann = tickerAnns[a];
+      var annDate = '';
+      if (ann.date) {
+        var d = new Date(ann.date);
+        annDate = d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+      }
+      var headlineText = ann.headline || '';
+      var annLink = ann.url
+        ? '<a href="' + ann.url + '" target="_blank" rel="noopener">' + headlineText + '</a>'
+        : headlineText;
+      var sensitiveIcon = ann.sensitive ? '<span class="rh-ann-sensitive" title="Price sensitive">&#9679;</span>' : '';
+      annItems +=
+        '<div class="rh-ann-item">' +
+          '<span class="rh-ann-date">' + annDate + '</span>' +
+          sensitiveIcon +
+          '<span class="rh-ann-headline">' + annLink + '</span>' +
+          (ann.size ? '<span class="rh-ann-size">' + ann.size + '</span>' : '') +
+        '</div>';
+    }
+    heroAnnouncementsHtml =
+      '<div class="rh-announcements">' +
+        '<div class="rh-ann-header">ASX Announcements' +
+          '<a href="https://www.asx.com.au/markets/company/' + data.ticker + '" target="_blank" rel="noopener" class="rh-ann-more">See all &#8599;</a>' +
+        '</div>' +
+        annItems +
+      '</div>';
+  }
 
   // Spec Section 1.2 -- What the Price Embeds
   var embeddedThesisHtml = '';
@@ -135,9 +170,12 @@ export function renderReportHero(data) {
           '</div>' +
         '</div>' +
         '<div class="rh-right">' +
-          sparklineHtml +
-          '<div class="rh-price"><span class="rh-price-currency">' + data.currency + '</span>' + data.price + '</div>' +
-          '<div class="rh-metrics">' + metricsHtml + '</div>' +
+          heroAnnouncementsHtml +
+          '<div class="rh-right-bottom">' +
+            sparklineHtml +
+            '<div class="rh-price"><span class="rh-price-currency">' + data.currency + '</span>' + data.price + '</div>' +
+            '<div class="rh-metrics">' + metricsHtml + '</div>' +
+          '</div>' +
         '</div>' +
       '</div>' +
     '</div>' +

@@ -43,11 +43,11 @@
 .rh-main {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: stretch;
     gap: var(--space-xl);
     flex-wrap: wrap;
 }
-.rh-left { flex: 1; min-width: 280px; max-width: 540px; }
+.rh-left { flex: 1; min-width: 280px; max-width: 540px; display: flex; flex-direction: column; }
 .rh-type {
     font-size: 0.6rem; font-weight: 600;
     letter-spacing: 0.1em; text-transform: uppercase;
@@ -84,7 +84,15 @@
     max-width: 640px;
     margin-top: var(--space-sm);
 }
-.rh-right { text-align: right; flex: 1; min-width: 320px; }
+.rh-right {
+    text-align: right;
+    flex: 1;
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.rh-right-bottom { text-align: right; }
 .rh-price {
     font-family: var(--font-data);
     font-size: 2rem; font-weight: 700;
@@ -268,7 +276,82 @@
 }
 .rh-sparkline svg {
     width: 100%;
-    height: 120px;
+    height: 150px;
+}
+
+/* --- Report Page: Hero Announcements --- */
+.rh-announcements {
+    text-align: left;
+    margin-bottom: var(--space-md);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    overflow: hidden;
+}
+.rh-ann-header {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 8px 12px 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+}
+.rh-ann-more {
+    font-size: 0.55rem;
+    font-weight: 500;
+    color: var(--accent-teal);
+    text-transform: none;
+    letter-spacing: normal;
+}
+.rh-ann-more:hover { color: var(--text-primary); }
+.rh-ann-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 6px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    font-size: 0.72rem;
+    line-height: 1.35;
+}
+.rh-ann-item:last-child { border-bottom: none; }
+.rh-ann-date {
+    font-family: var(--font-data);
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    min-width: 72px;
+    flex-shrink: 0;
+}
+.rh-ann-sensitive {
+    color: var(--signal-amber);
+    font-size: 0.45rem;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+.rh-ann-headline {
+    flex: 1;
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.rh-ann-headline a {
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+.rh-ann-headline a:hover {
+    color: var(--accent-teal);
+    text-decoration: underline;
+}
+.rh-ann-size {
+    font-family: var(--font-data);
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
 }
 
 /* --- Report Page: Risk Skew Bar --- */

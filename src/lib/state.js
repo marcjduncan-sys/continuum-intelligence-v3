@@ -17,6 +17,8 @@ const SNAPSHOT_DATA = {};
 const COVERAGE_DATA = {};
 /** @type {{ [ticker: string]: object }} */
 const TC_DATA = {};
+/** @type {{ [ticker: string]: Array }} */
+const ANNOUNCEMENTS_DATA = {};
 
 // --- Config constants ---
 
@@ -148,6 +150,11 @@ export function initTcData(data) {
   Object.assign(TC_DATA, data);
 }
 
+/** Merge per-ticker announcement arrays into ANNOUNCEMENTS_DATA */
+export function initAnnouncementsData(data) {
+  Object.assign(ANNOUNCEMENTS_DATA, data);
+}
+
 // --- Export raw objects for backward compatibility ---
 export {
   STOCK_DATA,
@@ -155,6 +162,7 @@ export {
   REFERENCE_DATA,
   SNAPSHOT_DATA,
   COVERAGE_DATA,
-  TC_DATA
+  TC_DATA,
+  ANNOUNCEMENTS_DATA
 };
 // Note: FEATURED_ORDER, SNAPSHOT_ORDER, and COMING_SOON are exported inline above.
