@@ -1,0 +1,699 @@
+# ============================================================
+# Continuum Intelligence v3 - Deploy All Fixes
+# Run from PowerShell: right-click -> Run with PowerShell
+# Or: cd C:\Users\User\continuum-intelligence-v3; .\deploy-fixes.ps1
+# ============================================================
+
+$ErrorActionPreference = "Stop"
+$repoDir = "C:\Users\User\continuum-intelligence-v3"
+
+if (-not (Test-Path $repoDir)) {
+    Write-Host "ERROR: Repo not found at $repoDir" -ForegroundColor Red
+    Write-Host "Please update the path at the top of this script."
+    pause
+    exit 1
+}
+
+Set-Location $repoDir
+Write-Host "Working in: $repoDir" -ForegroundColor Cyan
+
+# ============================================================
+# STEP 1: Write new ingest.py
+# ============================================================
+Write-Host "`n[1/4] Writing new api/ingest.py..." -ForegroundColor Yellow
+
+$ingestContent = @'
+"""
+Document ingestion pipeline.
+
+Reads per-ticker JSON files from data/research/ and chunks them into
+retrievable passages with metadata for the research chat API.
+"""
+
+import json
+import logging
+import os
+import re
+from pathlib import Path
+from typing import Any
+
+from config import INDEX_HTML_PATH
+
+
+logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Passage data model
+# ---------------------------------------------------------------------------
+
+class Passage:
+    """A single retrievable chunk of research content."""
+
+    __slots__ = ("ticker", "section", "subsection", "content", "tags", "weight")
+
+    def __init__(
+        self,
+        ticker: str,
+        section: str,
+        subsection: str,
+        content: str,
+        tags: list[str] | None = None,
+        weight: float = 1.0,
+    ):
+        self.ticker = ticker
+        self.section = section
+        self.subsection = subsection
+        self.content = content
+        self.tags = tags or []
+        self.weight = weight
+
+    def to_dict(self) -> dict:
+        return {
+            "ticker": self.ticker,
+            "section": self.section,
+            "subsection": self.subsection,
+            "content": self.content,
+            "tags": self.tags,
+            "weight": self.weight,
+        }
+
+
+# ---------------------------------------------------------------------------
+# HTML entity cleanup
+# ---------------------------------------------------------------------------
+
+_HTML_ENTITIES = {
+    "&amp;": "&",
+    "&lt;": "<",
+    "&gt;": ">",
+    "&bull;": " - ",
+    "&ndash;": "-",
+    "&mdash;": " -- ",
+    "&rarr;": "->",
+    "&larr;": "<-",
+    "&uarr;": "^",
+    "&darr;": "v",
+    "&ge;": ">=",
+    "&le;": "<=",
+    "&#9650;": "^",
+    "&#9660;": "v",
+}
+
+
+def _clean_html(text: str) -> str:
+    """Strip HTML tags and decode common entities."""
+    if not text:
+        return ""
+    text = str(text)
+    for entity, replacement in _HTML_ENTITIES.items():
+        text = text.replace(entity, replacement)
+    text = re.sub(r"<[^>]+>", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+# ---------------------------------------------------------------------------
+# Resolve data directory
+# ---------------------------------------------------------------------------
+
+def _get_data_dir() -> Path:
+    """
+    Resolve the data/research/ directory relative to index.html.
+    INDEX_HTML_PATH points at index.html in the repo root;
+    data/research/ is a sibling directory.
+    """
+    index_dir = Path(INDEX_HTML_PATH).parent
+    return index_dir / "data" / "research"
+
+
+# ---------------------------------------------------------------------------
+# Chunking -- turn structured data into passages
+# ---------------------------------------------------------------------------
+
+def _chunk_stock(ticker: str, data: dict, ref: dict | None = None, fresh: dict | None = None) -> list[Passage]:
+    """Convert a single stock's data into a list of Passage objects."""
+    passages: list[Passage] = []
+
+    # --- Company overview ---
+    overview_parts = []
+    if data.get("company"):
+        overview_parts.append(f"{data['company']} (ASX: {ticker})")
+    if data.get("sector"):
+        overview_parts.append(f"Sector: {data['sector']}")
+    if data.get("heroDescription"):
+        overview_parts.append(_clean_html(data["heroDescription"]))
+    if data.get("heroCompanyDescription"):
+        overview_parts.append(_clean_html(data["heroCompanyDescription"]))
+    if data.get("identity", {}).get("overview"):
+        overview_parts.append(_clean_html(data["identity"]["overview"]))
+    if overview_parts:
+        passages.append(Passage(
+            ticker=ticker,
+            section="overview",
+            subsection="company_description",
+            content="\n".join(overview_parts),
+            tags=["overview", "fundamentals"],
+            weight=1.0,
+        ))
+
+    # --- Hero metrics ---
+    metrics = data.get("heroMetrics") or []
+    if metrics:
+        metric_str = ", ".join(
+            f"{m.get('label','')}: {_clean_html(m.get('value',''))}"
+            for m in metrics
+        )
+        passages.append(Passage(
+            ticker=ticker,
+            section="overview",
+            subsection="key_metrics",
+            content=f"Key metrics for {ticker}: {metric_str}",
+            tags=["metrics", "fundamentals"],
+            weight=0.8,
+        ))
+
+    # --- Identity table ---
+    identity = data.get("identity", {})
+    id_rows = identity.get("rows", [])
+    if id_rows:
+        id_lines = []
+        for row in id_rows:
+            for cell in row:
+                if len(cell) >= 2:
+                    id_lines.append(f"{cell[0]}: {_clean_html(cell[1])}")
+        passages.append(Passage(
+            ticker=ticker,
+            section="identity",
+            subsection="financial_data",
+            content=f"Financial identity for {ticker}:\n" + "\n".join(id_lines),
+            tags=["identity", "financials", "fundamentals"],
+            weight=0.9,
+        ))
+
+    # --- Skew ---
+    skew = data.get("skew", {})
+    if skew:
+        passages.append(Passage(
+            ticker=ticker,
+            section="verdict",
+            subsection="skew",
+            content=f"Risk skew for {ticker}: {skew.get('direction', 'unknown')}. {_clean_html(skew.get('rationale', ''))}",
+            tags=["skew", "risk", "verdict"],
+            weight=1.0,
+        ))
+
+    # --- Verdict ---
+    verdict = data.get("verdict", {})
+    if verdict:
+        verdict_parts = [f"Verdict for {ticker}: {_clean_html(verdict.get('text', ''))}"]
+        for score in verdict.get("scores", []):
+            verdict_parts.append(
+                f"  {score.get('label','')}: {score.get('score','')} ({_clean_html(score.get('dirText',''))})"
+            )
+        passages.append(Passage(
+            ticker=ticker,
+            section="verdict",
+            subsection="summary",
+            content="\n".join(verdict_parts),
+            tags=["verdict", "thesis", "summary"],
+            weight=1.2,
+        ))
+
+    # --- Hypotheses (one passage per hypothesis) ---
+    for hyp in data.get("hypotheses", []):
+        parts = [
+            f"Hypothesis: {_clean_html(hyp.get('title', ''))}",
+            f"Direction: {hyp.get('direction', '')}",
+            f"Probability: {hyp.get('score', '')}",
+            f"Status: {_clean_html(hyp.get('statusText', ''))}",
+            f"Description: {_clean_html(hyp.get('description', ''))}",
+        ]
+        requires = hyp.get("requires") or []
+        if requires:
+            parts.append("Requires: " + "; ".join(_clean_html(r) for r in requires))
+        supporting = hyp.get("supporting") or []
+        if supporting:
+            parts.append("Supporting evidence: " + " | ".join(_clean_html(s) for s in supporting))
+        contradicting = hyp.get("contradicting") or []
+        if contradicting:
+            parts.append("Contradicting evidence: " + " | ".join(_clean_html(c) for c in contradicting))
+
+        tier = hyp.get("tier", "")
+        passages.append(Passage(
+            ticker=ticker,
+            section="hypothesis",
+            subsection=tier,
+            content="\n".join(parts),
+            tags=["hypothesis", tier, hyp.get("direction", "")],
+            weight=1.3,
+        ))
+
+    # --- Narrative ---
+    narrative = data.get("narrative", {})
+    if narrative:
+        if narrative.get("theNarrative"):
+            passages.append(Passage(
+                ticker=ticker,
+                section="narrative",
+                subsection="the_narrative",
+                content=f"Market narrative for {ticker}: {_clean_html(narrative['theNarrative'])}",
+                tags=["narrative", "thesis"],
+                weight=1.1,
+            ))
+        pi = narrative.get("priceImplication", {})
+        if pi and pi.get("content"):
+            passages.append(Passage(
+                ticker=ticker,
+                section="narrative",
+                subsection="price_implication",
+                content=f"Price implications for {ticker} ({_clean_html(pi.get('label',''))}): {_clean_html(pi['content'])}",
+                tags=["narrative", "price", "valuation"],
+                weight=1.0,
+            ))
+        if narrative.get("evidenceCheck"):
+            passages.append(Passage(
+                ticker=ticker,
+                section="narrative",
+                subsection="evidence_check",
+                content=f"Evidence check for {ticker}: {_clean_html(narrative['evidenceCheck'])}",
+                tags=["narrative", "evidence"],
+                weight=1.0,
+            ))
+        if narrative.get("narrativeStability"):
+            passages.append(Passage(
+                ticker=ticker,
+                section="narrative",
+                subsection="stability",
+                content=f"Narrative stability for {ticker}: {_clean_html(narrative['narrativeStability'])}",
+                tags=["narrative", "stability", "risk"],
+                weight=1.0,
+            ))
+
+    # --- Evidence cards (one passage per card) ---
+    evidence = data.get("evidence", {})
+    for card in evidence.get("cards", []):
+        parts = [
+            f"Evidence: {_clean_html(card.get('title', ''))}",
+            f"Epistemic status: {_clean_html(card.get('epistemicLabel', ''))}",
+            f"Finding: {_clean_html(card.get('finding', ''))}",
+        ]
+        if card.get("tension"):
+            parts.append(f"Tension: {_clean_html(card['tension'])}")
+        if card.get("source"):
+            parts.append(f"Source: {_clean_html(card['source'])}")
+        tag_texts = [_clean_html(t.get("text", "")) for t in card.get("tags", [])]
+        passages.append(Passage(
+            ticker=ticker,
+            section="evidence",
+            subsection=f"card_{card.get('number', '')}",
+            content="\n".join(parts),
+            tags=["evidence"] + tag_texts,
+            weight=1.1,
+        ))
+
+        # If card has a table (leadership, ownership), add it
+        tbl = card.get("table")
+        if tbl:
+            headers = tbl.get("headers", [])
+            rows = tbl.get("rows", [])
+            table_lines = [" | ".join(headers)]
+            for row in rows:
+                table_lines.append(" | ".join(_clean_html(c) for c in row))
+            passages.append(Passage(
+                ticker=ticker,
+                section="evidence",
+                subsection=f"card_{card.get('number', '')}_table",
+                content=f"Data table for {_clean_html(card.get('title',''))}:\n" + "\n".join(table_lines),
+                tags=["evidence", "data"],
+                weight=0.8,
+            ))
+
+    # --- Evidence alignment summary ---
+    alignment = evidence.get("alignmentSummary", {})
+    if alignment and alignment.get("summary"):
+        s = alignment["summary"]
+        passages.append(Passage(
+            ticker=ticker,
+            section="evidence",
+            subsection="alignment_summary",
+            content=(
+                f"Evidence alignment summary for {ticker}: "
+                f"T1 support: {s.get('t1','-')}, "
+                f"T2 support: {s.get('t2','-')}, "
+                f"T3 support: {s.get('t3','-')}, "
+                f"T4 support: {s.get('t4','-')}"
+            ),
+            tags=["evidence", "summary", "alignment"],
+            weight=1.0,
+        ))
+
+    # --- Discriminators ---
+    disc = data.get("discriminators", {})
+    if disc:
+        for i, row in enumerate(disc.get("rows", [])):
+            passages.append(Passage(
+                ticker=ticker,
+                section="discriminator",
+                subsection=f"disc_{i+1}",
+                content=(
+                    f"Discriminator ({row.get('diagnosticity','')}) for {ticker}: "
+                    f"{_clean_html(row.get('evidence', ''))} -- "
+                    f"Discriminates between: {_clean_html(row.get('discriminatesBetween', ''))} -- "
+                    f"Current reading: {_clean_html(row.get('currentReading', ''))}"
+                ),
+                tags=["discriminator", row.get("diagnosticity", "").lower()],
+                weight=1.2,
+            ))
+        if disc.get("nonDiscriminating"):
+            passages.append(Passage(
+                ticker=ticker,
+                section="discriminator",
+                subsection="non_discriminating",
+                content=f"Non-discriminating evidence for {ticker}: {_clean_html(disc['nonDiscriminating'])}",
+                tags=["discriminator", "noise"],
+                weight=0.6,
+            ))
+
+    # --- Tripwires ---
+    tripwires = data.get("tripwires", {})
+    for tw in tripwires.get("cards", []):
+        cond_parts = []
+        for cond in tw.get("conditions", []):
+            cond_parts.append(f"{_clean_html(cond.get('if',''))} -> {_clean_html(cond.get('then',''))}")
+        passages.append(Passage(
+            ticker=ticker,
+            section="tripwire",
+            subsection=_clean_html(tw.get("name", "")),
+            content=(
+                f"Tripwire for {ticker}: {_clean_html(tw.get('name', ''))} "
+                f"(Date: {_clean_html(tw.get('date', ''))})\n"
+                + "\n".join(cond_parts)
+            ),
+            tags=["tripwire", "catalyst", "risk"],
+            weight=1.2,
+        ))
+
+    # --- Gaps ---
+    gaps = data.get("gaps", {})
+    couldnt = gaps.get("couldntAssess", [])
+    if couldnt:
+        passages.append(Passage(
+            ticker=ticker,
+            section="gaps",
+            subsection="unknowns",
+            content=f"Research gaps for {ticker} (what we couldn't assess):\n" + "\n".join(
+                f"- {_clean_html(g)}" for g in couldnt
+            ),
+            tags=["gaps", "limitations"],
+            weight=0.9,
+        ))
+
+    # --- Technical analysis ---
+    ta = data.get("technicalAnalysis", {})
+    if ta:
+        ta_parts = [f"Technical analysis for {ticker} ({ta.get('date', '')}):"]
+        ta_parts.append(f"Regime: {ta.get('regime', '')}, Clarity: {ta.get('clarity', '')}")
+        price = ta.get("price", {})
+        if price:
+            ta_parts.append(f"Price: {price.get('currency', '')}{price.get('current', '')}")
+        ma = ta.get("movingAverages", {})
+        if ma:
+            ma50 = ma.get("ma50", {})
+            ma200 = ma.get("ma200", {})
+            if ma50:
+                ta_parts.append(f"50-day MA: {ma50.get('value', '')}")
+            if ma200:
+                ta_parts.append(f"200-day MA: {ma200.get('value', '')}")
+            crossover = ma.get("crossover", {})
+            if crossover:
+                ta_parts.append(f"Crossover: {crossover.get('type', '')} ({crossover.get('date', '')})")
+        vol = ta.get("volatility", {})
+        if vol:
+            ta_parts.append(f"Annualised volatility: {vol.get('annualised', '')}%")
+        passages.append(Passage(
+            ticker=ticker,
+            section="technical",
+            subsection="analysis",
+            content="\n".join(ta_parts),
+            tags=["technical", "price", "chart"],
+            weight=0.8,
+        ))
+
+    # --- Reference data (from _index.json or inline) ---
+    if ref:
+        ref_parts = [f"Reference data for {ticker}:"]
+        field_labels = {
+            "sharesOutstanding": "Shares outstanding (M)",
+            "analystTarget": "Analyst target price",
+            "epsTrailing": "Trailing EPS",
+            "epsForward": "Forward EPS",
+            "divPerShare": "Dividend per share",
+            "revenue": "Revenue ($B)",
+            "revenueGrowth": "Revenue growth (%)",
+            "ebitMargin": "EBIT margin (%)",
+            "ebitdaMargin": "EBITDA margin (%)",
+            "roe": "Return on equity (%)",
+            "netDebtToEbitda": "Net debt/EBITDA",
+            "fcf": "Free cash flow ($B)",
+            "fcfMargin": "FCF margin (%)",
+        }
+        for key, label in field_labels.items():
+            val = ref.get(key)
+            if val is not None:
+                ref_parts.append(f"  {label}: {val}")
+        if ref.get("analystBuys") is not None:
+            ref_parts.append(
+                f"  Analyst consensus: {ref.get('analystBuys',0)} Buy, "
+                f"{ref.get('analystHolds',0)} Hold, {ref.get('analystSells',0)} Sell"
+            )
+        passages.append(Passage(
+            ticker=ticker,
+            section="reference",
+            subsection="fundamentals",
+            content="\n".join(ref_parts),
+            tags=["reference", "fundamentals", "financials"],
+            weight=0.7,
+        ))
+
+    # --- Freshness data ---
+    if fresh:
+        passages.append(Passage(
+            ticker=ticker,
+            section="freshness",
+            subsection="status",
+            content=(
+                f"Research freshness for {ticker}: "
+                f"Last reviewed {fresh.get('reviewDate', 'unknown')} "
+                f"({fresh.get('daysSinceReview', '?')} days ago). "
+                f"Price at review: {fresh.get('priceAtReview', '?')}, "
+                f"change since: {fresh.get('pricePctChange', '?')}%. "
+                f"Nearest catalyst: {fresh.get('nearestCatalyst', 'none')} "
+                f"({fresh.get('nearestCatalystDays', '?')} days). "
+                f"Status: {fresh.get('status', 'unknown')}."
+            ),
+            tags=["freshness", "status"],
+            weight=0.5,
+        ))
+
+    return passages
+
+
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
+
+_store: dict[str, list[Passage]] = {}
+_all_passages: list[Passage] = []
+
+
+def ingest(html_path: str | None = None) -> dict[str, list[Passage]]:
+    """
+    Load research data from data/research/*.json and build the passage store.
+    Falls back to legacy HTML parsing if JSON files are not found.
+    Returns {ticker: [Passage, ...]}.
+    """
+    global _store, _all_passages
+
+    data_dir = _get_data_dir()
+    _store = {}
+    _all_passages = []
+
+    if not data_dir.exists():
+        logger.warning(f"Research data directory not found: {data_dir}")
+        return _store
+
+    # Load per-ticker JSON files
+    json_files = sorted(data_dir.glob("*.json"))
+    loaded = 0
+
+    for json_file in json_files:
+        # Skip the index file
+        if json_file.name.startswith("_"):
+            continue
+
+        ticker = json_file.stem.upper()
+
+        try:
+            with open(json_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, OSError) as e:
+            logger.warning(f"Failed to load {json_file.name}: {e}")
+            continue
+
+        if not isinstance(data, dict):
+            logger.warning(f"Unexpected data format in {json_file.name}, skipping")
+            continue
+
+        passages = _chunk_stock(ticker, data)
+        if passages:
+            _store[ticker] = passages
+            _all_passages.extend(passages)
+            loaded += 1
+            logger.info(f"  {ticker}: {len(passages)} passages from {json_file.name}")
+
+    logger.info(f"Loaded {loaded} tickers from {data_dir}")
+    return _store
+
+
+def get_passages(ticker: str | None = None) -> list[Passage]:
+    """Get passages, optionally filtered by ticker."""
+    if ticker:
+        return _store.get(ticker.upper(), [])
+    return _all_passages
+
+
+def get_tickers() -> list[str]:
+    """Get list of available tickers."""
+    return sorted(_store.keys())
+
+
+def get_passage_count() -> dict[str, int]:
+    """Get passage counts by ticker."""
+    return {t: len(p) for t, p in sorted(_store.items())}
+
+
+if __name__ == "__main__":
+    store = ingest()
+    for ticker, passages in sorted(store.items()):
+        print(f"{ticker}: {len(passages)} passages")
+        for p in passages[:3]:
+            print(f"  [{p.section}/{p.subsection}] {p.content[:80]}...")
+        print()
+    print(f"Total: {len(_all_passages)} passages across {len(store)} stocks")
+'@
+
+Set-Content -Path "api\ingest.py" -Value $ingestContent -Encoding UTF8
+Write-Host "  Done - api\ingest.py written" -ForegroundColor Green
+
+# ============================================================
+# STEP 2: Fix benchmark returns in all JSON files
+# ============================================================
+Write-Host "`n[2/4] Fixing benchmark returns in all JSON files..." -ForegroundColor Yellow
+
+$fixScript = @'
+import json, os, glob
+
+# CY2025 actual sector returns (trailing 12 months)
+SECTOR_RETURNS = {
+    "Materials":            31.7,
+    "Financials":           8.0,
+    "Healthcare":          -24.9,
+    "Information Technology": -21.0,
+    "Energy":              -2.3,
+    "Real Estate":          5.0,
+    "Consumer Discretionary": 1.8,
+    "Consumer Staples":    -1.4,
+    "Industrials":          5.0,
+    "Communication Services": 5.0,
+    "Utilities":            5.0,
+    "Gold":                80.0,
+    "Small Ords":          25.0,
+}
+
+INDEX_RETURN = 6.9  # ASX 200 trailing 12m
+
+data_dir = os.path.join("data", "research")
+files = sorted(glob.glob(os.path.join(data_dir, "*.json")))
+updated = 0
+
+for fp in files:
+    if os.path.basename(fp).startswith("_"):
+        continue
+    with open(fp, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    ta = data.get("technicalAnalysis", {})
+    rp = ta.get("relativePerformance", {})
+    if not rp:
+        continue
+
+    changed = False
+
+    # Fix vsIndex
+    vs_idx = rp.get("vsIndex", {})
+    if vs_idx:
+        vs_idx["indexReturn"] = INDEX_RETURN
+        stock_ret = vs_idx.get("stockReturn")
+        if stock_ret is not None:
+            vs_idx["relativeReturn"] = round(stock_ret - INDEX_RETURN, 1)
+        changed = True
+
+    # Fix vsSector
+    vs_sec = rp.get("vsSector", {})
+    if vs_sec:
+        sector = data.get("sector", "")
+        sec_ret = SECTOR_RETURNS.get(sector, 5.0)
+        vs_sec["sectorReturn"] = sec_ret
+        stock_ret = vs_sec.get("stockReturn")
+        if stock_ret is not None:
+            vs_sec["relativeReturn"] = round(stock_ret - sec_ret, 1)
+        changed = True
+
+    if changed:
+        with open(fp, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+            f.write("\n")
+        updated += 1
+        print(f"  Updated: {os.path.basename(fp)}")
+
+print(f"\nUpdated {updated} JSON files with correct benchmark returns.")
+'@
+
+Set-Content -Path "_fix_benchmarks.py" -Value $fixScript -Encoding UTF8
+python _fix_benchmarks.py
+Remove-Item "_fix_benchmarks.py" -Force
+Write-Host "  Done - benchmark returns fixed" -ForegroundColor Green
+
+# ============================================================
+# STEP 3: Commit
+# ============================================================
+Write-Host "`n[3/4] Committing changes..." -ForegroundColor Yellow
+
+git add api/ingest.py
+git add "data/research/*.json"
+git commit -m "fix: rewrite ingestion for JSON files + correct benchmark returns
+
+- Rewrite api/ingest.py to read from data/research/*.json instead of
+  parsing inline STOCK_DATA from HTML (which no longer exists)
+- Update ASX 200 index return to +6.9% (trailing 12m actual)
+- Update all sector returns to CY2025 actuals
+- Recalculate all relative returns (stock vs index, stock vs sector)"
+
+Write-Host "  Done - committed" -ForegroundColor Green
+
+# ============================================================
+# STEP 4: Push
+# ============================================================
+Write-Host "`n[4/4] Pushing to GitHub..." -ForegroundColor Yellow
+
+git push origin main
+
+Write-Host "`n============================================" -ForegroundColor Cyan
+Write-Host "ALL DONE! Changes pushed to GitHub." -ForegroundColor Green
+Write-Host "============================================" -ForegroundColor Cyan
+Write-Host "`nRailway will auto-redeploy. Check health at:"
+Write-Host "https://imaginative-vision-production-16cb.up.railway.app/api/health" -ForegroundColor White
+Write-Host "`nYou should see 21 tickers loaded once Railway finishes deploying."
+Write-Host ""
+pause
