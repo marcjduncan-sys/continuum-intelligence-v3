@@ -32,7 +32,6 @@ from copy import deepcopy
 from datetime import date
 from typing import Any, Dict, List, Optional
 
-import anthropic
 from google import genai
 from google.genai import types
 
@@ -466,14 +465,14 @@ _JURISDICTION_PREMIUM = {
 # ---------------------------------------------------------------------------
 
 
-async def run_gold_analysis(ticker: str, force: bool = False) -> dict:
+async def run_gold_analysis(ticker: str, force: bool = False, notebook_id: str = "") -> dict:
     ticker = ticker.upper()
 
     has_nlm = (
         _HAS_NOTEBOOKLM
         and _nlm_auth_ok
         and config.NOTEBOOKLM_AUTH_JSON
-        and config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
+        and (config.NOTEBOOKLM_GOLD_NOTEBOOK_ID or notebook_id)
     )
     if not config.GEMINI_API_KEY and not has_nlm:
         raise RuntimeError("Neither GEMINI_API_KEY nor NotebookLM configured")
@@ -484,7 +483,7 @@ async def run_gold_analysis(ticker: str, force: bool = False) -> dict:
             logger.info("Gold agent: returning cached result for %s", ticker)
             return cached
 
-    corpus = await _query_corpus(ticker)
+    corpus = await _query_corpus(ticker, notebook_id=notebook_id)
     extracted = await _synthesise(ticker, corpus)
     result = _post_process(extracted, corpus)
     cache_result(ticker, result)
@@ -530,19 +529,24 @@ def _load_corpus_parts(ticker: str) -> List[Any]:
     return parts
 
 
-async def _query_corpus(ticker: str) -> Dict[str, str]:
+async def _query_corpus(ticker: str, notebook_id: str = "") -> Dict[str, str]:
     """Query corpus: try NotebookLM first, fall back to Gemini local files."""
     global _nlm_auth_ok, _nlm_last_error
 
     # --- Attempt 1: NotebookLM (primary when configured) ---
+    effective_notebook = (
+        notebook_id
+        or config.NOTEBOOKLM_TICKER_NOTEBOOKS.get(ticker, "")
+        or config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
+    )
     if (
         _HAS_NOTEBOOKLM
         and _nlm_auth_ok
         and config.NOTEBOOKLM_AUTH_JSON
-        and config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
+        and effective_notebook
     ):
         try:
-            return await _query_notebooklm(ticker)
+            return await _query_notebooklm(ticker, notebook_id=effective_notebook)
         except Exception as exc:
             err_str = str(exc).lower()
             if "auth" in err_str or "401" in err_str or "cookie" in err_str or "login" in err_str or "forbidden" in err_str or "403" in err_str:
@@ -554,18 +558,32 @@ async def _query_corpus(ticker: str) -> Dict[str, str]:
                 )
                 logger.warning("NotebookLM auth failed for %s, falling back to Gemini local: %s", ticker, exc)
             else:
-                logger.warning("NotebookLM query failed for %s, falling back to Gemini local: %s", ticker, exc)
+                logger.warning("NotebookLM query failed for %s (notebook=%s): %s", ticker, effective_notebook, exc)
+                # If using a per-ticker or mapped notebook, do not fall through to Gemini local
+                is_per_ticker = notebook_id or config.NOTEBOOKLM_TICKER_NOTEBOOKS.get(ticker, "")
+                if is_per_ticker:
+                    raise RuntimeError(
+                        f"NotebookLM query failed for {ticker} with notebook {effective_notebook}: {exc}"
+                    )
 
     # --- Attempt 2: Gemini local corpus (fallback) ---
+    # Skip Gemini fallback if no local corpus exists for this ticker
+    corpus_path = _get_corpus_path(ticker)
+    if not os.path.isdir(corpus_path):
+        raise RuntimeError(
+            f"NotebookLM query failed for {ticker} and no local corpus exists at {corpus_path}. "
+            f"Either fix NotebookLM auth or create the corpus directory with research documents."
+        )
     return await _query_gemini_local(ticker)
 
 
-async def _query_notebooklm(ticker: str) -> Dict[str, str]:
+async def _query_notebooklm(ticker: str, notebook_id: str = "") -> Dict[str, str]:
     """Query NotebookLM for corpus answers.
 
     Uses NOTEBOOKLM_AUTH_JSON env var for auth (loaded by from_storage()).
+    Accepts optional per-ticker notebook_id override.
     """
-    notebook_id = config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
+    notebook_id = notebook_id or config.NOTEBOOKLM_GOLD_NOTEBOOK_ID
 
     async with await NotebookLMClient.from_storage() as client:
         results: Dict[str, str] = {}
@@ -653,7 +671,7 @@ async def _query_gemini_local(ticker: str) -> Dict[str, str]:
 
 
 async def _synthesise(ticker: str, corpus: Dict[str, str]) -> Dict[str, Any]:
-    client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
+    client = config.get_anthropic_client()
     corpus_block = "\n\n".join(f"### {k.upper()}\n{v}" for k, v in corpus.items())
     user_message = (
         f"Ticker: {ticker}\n"
@@ -1525,3 +1543,4 @@ def _unique_preserve(items: List[str]) -> List[str]:
 def _push_unique(items: List[str], value: str) -> None:
     if value not in items:
         items.append(value)
+# NLM auth refresh Sun, Mar 15, 2026  7:30:22 PM
