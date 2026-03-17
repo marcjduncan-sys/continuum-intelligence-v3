@@ -781,50 +781,67 @@ function buildBriefing(stock) {
   }
   techHTML += '</div>';
 
-  // Evidence 3-col
+  // Evidence -- all cards, 2-column grid
   var evCards = stock.evidence && stock.evidence.cards ? stock.evidence.cards : [];
-  function pick(keywords) { for (var ki = 0; ki < keywords.length; ki++) { for (var eci = 0; eci < evCards.length; eci++) { if (String(evCards[eci].title || '').toLowerCase().indexOf(keywords[ki].toLowerCase()) !== -1) return evCards[eci]; } } return null; }
-  function miniCard(card, fb) {
-    if (!card) return '<div class="ib-ev"><div class="ib-ev-t">' + esc(fb) + '</div><div class="ib-ev-b">No data available</div></div>';
-    return '<div class="ib-ev"><div class="ib-ev-t">' + esc(strip(card.title || fb)) + (card.epistemicLabel ? ' <span class="ev-ep">' + esc(card.epistemicLabel) + '</span>' : '') + '</div>' +
-      (card.finding ? '<div class="ib-ev-b">' + trunc(card.finding, 200) + '</div>' : '') +
-      (card.tension ? '<div class="ib-ev-ten">' + trunc(card.tension, 120) + '</div>' : '') + '</div>';
+  function miniCard(card) {
+    return '<div class="ib-ev"><div class="ib-ev-t">' + esc(strip(card.title || '')) + (card.epistemicLabel ? ' <span class="ev-ep">' + esc(card.epistemicLabel) + '</span>' : '') + '</div>' +
+      (card.finding ? '<div class="ib-ev-b">' + trunc(card.finding, 400) + '</div>' : '') +
+      (card.tension ? '<div class="ib-ev-ten">' + trunc(card.tension, 250) + '</div>' : '') + '</div>';
   }
-  var evHTML = '<div class="ib-block"><div class="lbl ib-blbl">EVIDENCE: COMPANY &bull; SECTOR &bull; MACRO</div><div class="grid3">' +
-    miniCard(pick(['corporate', 'company']), 'Corporate') +
-    miniCard(pick(['broker', 'consensus', 'analyst', 'sector']), 'Broker Research') +
-    miniCard(pick(['economic', 'macro', 'alternative']), 'Economic Data') +
-    '</div></div>';
+  var evHTML = '<div class="ib-block"><div class="lbl ib-blbl">CROSS-DOMAIN EVIDENCE</div><div class="grid2">';
+  for (var evi = 0; evi < evCards.length; evi++) evHTML += miniCard(evCards[evi]);
+  evHTML += '</div></div>';
 
-  // Discriminators
+  // Discriminators -- all rows with currentReading
   var discHTML = '<div class="ib-block"><div class="lbl ib-blbl">WHAT DISCRIMINATES</div>';
   var dRows = stock.discriminators && stock.discriminators.rows ? stock.discriminators.rows : [];
   if (dRows.length) {
-    discHTML += '<table class="dt"><thead><tr><th style="width:55px">Diag.</th><th>Evidence</th><th style="width:130px">Between</th></tr></thead><tbody>';
-    for (var dri = 0; dri < Math.min(dRows.length, 3); dri++) {
+    discHTML += '<table class="dt"><thead><tr><th style="width:50px">Diag.</th><th>Evidence</th><th style="width:110px">Between</th><th style="width:100px">Reading</th></tr></thead><tbody>';
+    for (var dri = 0; dri < dRows.length; dri++) {
       var dr = dRows[dri], dCls = String(dr.diagnosticity || '').toLowerCase() === 'high' ? 'diag-high' : String(dr.diagnosticity || '').toLowerCase() === 'critical' ? 'diag-crit' : '';
-      discHTML += '<tr><td><span class="diag ' + dCls + '">' + esc(dr.diagnosticity || '') + '</span></td><td>' + trunc(dr.evidence || '', 140) + '</td><td>' + esc(trunc(dr.discriminatesBetween || '', 80)) + '</td></tr>';
+      discHTML += '<tr><td><span class="diag ' + dCls + '">' + esc(dr.diagnosticity || '') + '</span></td><td>' + trunc(dr.evidence || '', 140) + '</td><td>' + esc(trunc(dr.discriminatesBetween || '', 80)) + '</td><td>' + esc(trunc(dr.currentReading || '', 80)) + '</td></tr>';
     }
     discHTML += '</tbody></table>';
   }
   discHTML += '</div>';
 
-  // Tripwires
+  // Verdict callout
+  var verdictHTML = '';
+  if (stock.verdict && stock.verdict.text) {
+    var vtDir = (stock.skew && stock.skew.direction) || '';
+    var vtBorder = vtDir === 'upside' ? 'var(--green)' : vtDir === 'downside' ? 'var(--red)' : 'var(--amber)';
+    var vtBg = vtDir === 'upside' ? '#f0fdf4' : vtDir === 'downside' ? '#fef2f2' : '#fffbeb';
+    verdictHTML = '<div class="ib-block"><div class="callout" style="border-left:3px solid ' + vtBorder + ';background:' + vtBg + ';padding:4px 8px;font-size:6.5pt;line-height:1.4">' + esc(strip(stock.verdict.text)) + '</div></div>';
+  }
+
+  // Tripwires -- all cards, all conditions
   var tripHTML = '<div class="ib-block"><div class="lbl ib-blbl">WHAT WE\'RE WATCHING</div>';
   var tCards = stock.tripwires && stock.tripwires.cards ? stock.tripwires.cards : [];
-  for (var tci = 0; tci < Math.min(tCards.length, 4); tci++) {
+  for (var tci = 0; tci < tCards.length; tci++) {
     var tc = tCards[tci];
     tripHTML += '<div class="ib-tw">' +
       '<div class="ib-tw-name">' + (tc.date ? '<span class="ib-tw-date">' + esc(tc.date) + '</span> ' : '') + esc(strip(tc.name || '')) + '</div>';
     var conds = tc.conditions || [];
-    for (var cci = 0; cci < Math.min(conds.length, 2); cci++) {
+    for (var cci = 0; cci < conds.length; cci++) {
       var cond = conds[cci];
-      tripHTML += '<div class="ib-tw-cond"><span class="tw-if ' + (String(cond.valence) === 'positive' ? 'tw-pos' : 'tw-neg') + '">' + esc(trunc(cond.if || '', 100)) + '</span>' +
-        ' <span class="tw-arr">&rarr;</span> <span class="tw-then">' + esc(trunc(cond.then || '', 110)) + '</span></div>';
+      tripHTML += '<div class="ib-tw-cond"><span class="tw-if ' + (String(cond.valence) === 'positive' ? 'tw-pos' : 'tw-neg') + '">' + esc(trunc(cond.if || '', 200)) + '</span>' +
+        ' <span class="tw-arr">&rarr;</span> <span class="tw-then">' + esc(trunc(cond.then || '', 200)) + '</span></div>';
     }
     tripHTML += '</div>';
   }
   tripHTML += '</div>';
+
+  // Evidence Gaps coverage table
+  var gapsHTML = '';
+  if (stock.gaps && stock.gaps.coverageRows && stock.gaps.coverageRows.length) {
+    gapsHTML = '<div class="ib-block"><div class="lbl ib-blbl">EVIDENCE COVERAGE</div>';
+    gapsHTML += '<table class="dt"><thead><tr><th>Domain</th><th>Status</th><th>Detail</th></tr></thead><tbody>';
+    for (var gi = 0; gi < stock.gaps.coverageRows.length; gi++) {
+      var gr = stock.gaps.coverageRows[gi];
+      gapsHTML += '<tr><td>' + esc(gr.domain || gr[0] || '') + '</td><td>' + esc(gr.status || gr[1] || '') + '</td><td>' + esc(trunc(gr.detail || gr[2] || '', 120)) + '</td></tr>';
+    }
+    gapsHTML += '</tbody></table></div>';
+  }
 
   var footerHTML = '<div class="ib-footer">Generated ' + esc(ts) + ' AEST &bull; ' + esc(stock.ticker) + ' &bull; Continuum Intelligence &bull; Not personal financial advice.</div>';
 
@@ -882,6 +899,7 @@ function buildBriefing(stock) {
 '@media print{',
 '  .ib-page-1{page-break-after:auto;}',
 '  .ib-ev,.ib-tw{page-break-inside:avoid;}',
+'  .grid2{grid-template-columns:1fr 1fr;}',
 '  .grid3{grid-template-columns:1fr 1fr 1fr;}',
 '}'
   ].join('\n');
@@ -890,6 +908,6 @@ function buildBriefing(stock) {
     '<title>' + esc(stock.ticker) + ' Investor Briefing | Continuum Intelligence</title>' +
     '<style>' + baseCSS() + '\n' + css + '</style></head><body>' +
     '<div class="ib-page ib-page-1">' + p1Hdr + metricsHTML + skewHTML + pirHTML + sparkHTML + hypHTML + identHTML + narrHTML + techHTML + '</div>' +
-    '<div class="ib-page ib-page-2">' + p2Hdr + evHTML + discHTML + tripHTML + footerHTML + '</div>' +
+    '<div class="ib-page ib-page-2">' + p2Hdr + evHTML + discHTML + verdictHTML + tripHTML + gapsHTML + footerHTML + '</div>' +
     '</body></html>';
 }
