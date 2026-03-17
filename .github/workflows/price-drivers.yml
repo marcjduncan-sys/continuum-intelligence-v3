@@ -5,6 +5,20 @@ on:
     # 22:00 UTC daily = 08:00 AEDT (UTC+10/+11), 1 hour before ASX open
     - cron: '0 22 * * *'
   workflow_dispatch:
+    inputs:
+      force_all:
+        description: 'Force refresh all tickers (skip freshness check)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+      tickers:
+        description: 'Space-separated ticker list (blank = all)'
+        required: false
+        default: ''
+        type: string
 
 jobs:
   price-drivers:
@@ -15,36 +29,119 @@ jobs:
         env:
           API_BASE: https://imaginative-vision-production-16cb.up.railway.app
           API_KEY: ${{ secrets.CI_API_KEY }}
+          FORCE_ALL: ${{ github.event.inputs.force_all || 'false' }}
+          CUSTOM_TICKERS: ${{ github.event.inputs.tickers || '' }}
         run: |
-          TICKERS="ASB BHP CBA CSL DRO DXS EVN FMG GMG GYG HRZ MIN MQG NAB NST OBM OCL PME REA RFG RIO RMC SIG SNX STO WAF WDS WIA WOR WOW WTC XRO"
+          # --- Ticker list ---
+          if [ -n "$CUSTOM_TICKERS" ]; then
+            TICKERS="$CUSTOM_TICKERS"
+            echo "Using custom ticker list: $TICKERS"
+          else
+            TICKERS="ASB BHP CBA CSL DRO DXS EVN FMG GMG GYG HRZ MIN MQG NAB NST OBM OCL PME REA RFG RIO RMC SIG SNX STO WAF WDS WIA WOR WOW WTC XRO"
+          fi
+
           SUCCEEDED=0
           FAILED=0
+          SKIPPED=0
           ERRORS=""
+          CREDIT_EXHAUSTED=0
+
           for t in $TICKERS; do
             echo "--- Processing $t ---"
+
+            # --- Fail-fast: abort if credits already exhausted ---
+            if [ "$CREDIT_EXHAUSTED" = "1" ]; then
+              echo "$t: SKIPPED (API credits exhausted)"
+              SKIPPED=$((SKIPPED + 1))
+              continue
+            fi
+
+            # --- Freshness check: skip if recent result exists ---
+            if [ "$FORCE_ALL" != "true" ]; then
+              FRESH_CODE=$(curl -s -o /tmp/pd_fresh.json -w "%{http_code}" \
+                -H "X-API-Key: $API_KEY" \
+                --max-time 15 \
+                "$API_BASE/api/agents/drivers/$t/latest")
+              if [ "$FRESH_CODE" = "200" ]; then
+                # Check if analysis_date is today (UTC)
+                TODAY=$(date -u +%Y-%m-%d)
+                REPORT_DATE=$(cat /tmp/pd_fresh.json | grep -o '"analysis_date":"[^"]*"' | head -1 | cut -d'"' -f4)
+                if [ "$REPORT_DATE" = "$TODAY" ]; then
+                  echo "$t: SKIPPED (fresh result from today)"
+                  SKIPPED=$((SKIPPED + 1))
+                  SUCCEEDED=$((SUCCEEDED + 1))
+                  continue
+                fi
+              fi
+            fi
+
+            # --- Run analysis ---
             HTTP_CODE=$(curl -s -o /tmp/pd_response.json -w "%{http_code}" \
               -H "X-API-Key: $API_KEY" \
               --max-time 480 \
               "$API_BASE/api/agents/drivers/$t?force=true")
+
             if [ "$HTTP_CODE" = "200" ]; then
               SUCCEEDED=$((SUCCEEDED + 1))
               echo "$t: OK"
+            elif [ "$HTTP_CODE" = "500" ]; then
+              # Check if credit exhaustion
+              if grep -q "credit balance" /tmp/pd_response.json 2>/dev/null; then
+                echo "$t: FAILED (API credits exhausted)"
+                echo "!!! ABORTING RUN: Anthropic API credit balance too low !!!"
+                CREDIT_EXHAUSTED=1
+                FAILED=$((FAILED + 1))
+                ERRORS="$ERRORS $t(CREDITS)"
+              else
+                FAILED=$((FAILED + 1))
+                ERRORS="$ERRORS $t($HTTP_CODE)"
+                echo "$t: FAILED (HTTP $HTTP_CODE)"
+                cat /tmp/pd_response.json 2>/dev/null || true
+              fi
+            elif [ "$HTTP_CODE" = "502" ] || [ "$HTTP_CODE" = "504" ] || [ "$HTTP_CODE" = "000" ]; then
+              # Timeout or gateway error -- retry once with longer timeout
+              echo "$t: Timeout (HTTP $HTTP_CODE), retrying with 600s..."
+              sleep 10
+              RETRY_CODE=$(curl -s -o /tmp/pd_response.json -w "%{http_code}" \
+                -H "X-API-Key: $API_KEY" \
+                --max-time 600 \
+                "$API_BASE/api/agents/drivers/$t?force=true")
+              if [ "$RETRY_CODE" = "200" ]; then
+                SUCCEEDED=$((SUCCEEDED + 1))
+                echo "$t: OK (on retry)"
+              else
+                FAILED=$((FAILED + 1))
+                ERRORS="$ERRORS $t($HTTP_CODE>$RETRY_CODE)"
+                echo "$t: FAILED after retry (HTTP $RETRY_CODE)"
+                cat /tmp/pd_response.json 2>/dev/null || true
+              fi
             else
               FAILED=$((FAILED + 1))
               ERRORS="$ERRORS $t($HTTP_CODE)"
               echo "$t: FAILED (HTTP $HTTP_CODE)"
               cat /tmp/pd_response.json 2>/dev/null || true
             fi
+
             echo ""
             sleep 3
           done
+
           echo "=== SCAN COMPLETE ==="
           echo "Succeeded: $SUCCEEDED"
           echo "Failed: $FAILED"
+          echo "Skipped (fresh): $SKIPPED"
+          if [ "$CREDIT_EXHAUSTED" = "1" ]; then
+            echo "WARNING: Run aborted due to Anthropic API credit exhaustion"
+          fi
           if [ -n "$ERRORS" ]; then
             echo "Errors: $ERRORS"
           fi
-          if [ "$FAILED" -gt 10 ]; then
-            echo "ERROR: More than 10 tickers failed"
+          # Fail the workflow only if more than 10 failed AND it wasn't a credit issue
+          if [ "$FAILED" -gt 10 ] && [ "$CREDIT_EXHAUSTED" = "0" ]; then
+            echo "ERROR: More than 10 tickers failed (not credit-related)"
+            exit 1
+          fi
+          if [ "$CREDIT_EXHAUSTED" = "1" ]; then
+            echo "ERROR: Run aborted due to credit exhaustion"
             exit 1
           fi
