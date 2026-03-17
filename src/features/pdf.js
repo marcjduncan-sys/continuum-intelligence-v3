@@ -752,11 +752,16 @@ function buildBriefing(stock) {
   identHTML += '</div>';
 
   // Narrative
+  function narrText(v) {
+    if (!v) return '';
+    if (typeof v === 'object') return esc(strip(v.text || v.summary || JSON.stringify(v)));
+    return esc(strip(v));
+  }
   var narrHTML = '<div class="ib-block"><div class="lbl ib-blbl">DOMINANT NARRATIVE</div>';
   if (stock.narrative) {
-    if (stock.narrative.theNarrative) narrHTML += '<p class="bt" style="font-size:6.8pt">' + strip(stock.narrative.theNarrative) + '</p>';
-    if (stock.narrative.priceImplication) narrHTML += '<p class="bt" style="font-size:6.8pt"><strong>Price Implication:</strong> ' + esc(strip(stock.narrative.priceImplication)) + '</p>';
-    if (stock.narrative.evidenceCheck) narrHTML += '<p class="bt" style="font-size:6.8pt"><strong>Evidence Check:</strong> ' + esc(strip(stock.narrative.evidenceCheck)) + '</p>';
+    if (stock.narrative.theNarrative) narrHTML += '<p class="bt" style="font-size:6.8pt">' + narrText(stock.narrative.theNarrative) + '</p>';
+    if (stock.narrative.priceImplication) narrHTML += '<p class="bt" style="font-size:6.8pt"><strong>Price Implication:</strong> ' + narrText(stock.narrative.priceImplication) + '</p>';
+    if (stock.narrative.evidenceCheck) narrHTML += '<p class="bt" style="font-size:6.8pt"><strong>Evidence Check:</strong> ' + narrText(stock.narrative.evidenceCheck) + '</p>';
   }
   narrHTML += '</div>';
 
@@ -875,7 +880,7 @@ function buildBriefing(stock) {
 '.ib-footer{font-size:5.5pt;color:var(--tx3);border-top:1px solid var(--rule);padding-top:3px;margin-top:5px;text-align:center;}',
 
 '@media print{',
-'  .ib-page-1{page-break-after:always;}',
+'  .ib-page-1{page-break-after:auto;}',
 '  .ib-ev,.ib-tw{page-break-inside:avoid;}',
 '  .grid3{grid-template-columns:1fr 1fr 1fr;}',
 '}'
@@ -884,7 +889,7 @@ function buildBriefing(stock) {
   return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
     '<title>' + esc(stock.ticker) + ' Investor Briefing | Continuum Intelligence</title>' +
     '<style>' + baseCSS() + '\n' + css + '</style></head><body>' +
-    '<div class="ib-page ib-page-1">' + p1Hdr + metricsHTML + skewHTML + pirHTML + sparkHTML + hypHTML + identHTML + narrHTML + '</div>' +
-    '<div class="ib-page ib-page-2">' + p2Hdr + techHTML + evHTML + discHTML + tripHTML + footerHTML + '</div>' +
+    '<div class="ib-page ib-page-1">' + p1Hdr + metricsHTML + skewHTML + pirHTML + sparkHTML + hypHTML + identHTML + narrHTML + techHTML + '</div>' +
+    '<div class="ib-page ib-page-2">' + p2Hdr + evHTML + discHTML + tripHTML + footerHTML + '</div>' +
     '</body></html>';
 }
