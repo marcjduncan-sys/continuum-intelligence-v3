@@ -332,6 +332,9 @@ async function _pollBatchStatus() {
             // Final re-render (individual caches already done incrementally)
             if (typeof window.renderCoverageTable === 'function') window.renderCoverageTable();
             if (typeof window.renderFeaturedGrid === 'function') window.renderFeaturedGrid();
+
+            // Notify listeners that batch data has been refreshed
+            document.dispatchEvent(new CustomEvent('ci:data:refreshed', { detail: { status: data.status } }));
         }
 
     } catch (e) {
