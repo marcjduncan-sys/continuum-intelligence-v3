@@ -466,7 +466,7 @@ async def gather_driver_data(
             sector_results.extend(r)
 
     # Compute period returns from OHLCV data
-    _stock_hist = _safe(0, {}).get("history", []) if isinstance(_safe(0, {}), dict) else []
+    _stock_hist = _safe(0, {}).get("price_history", []) if isinstance(_safe(0, {}), dict) else []
     _index_hist = _safe(1, {}).get("history", []) if isinstance(_safe(1, {}), dict) else []
     computed_returns = _compute_period_returns(_stock_hist, _index_hist)
 
