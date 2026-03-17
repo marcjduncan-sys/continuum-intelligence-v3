@@ -184,25 +184,10 @@ async function _dismissNotification(id) {
 // Badge
 // ---------------------------------------------------------------------------
 
-function _renderBadge(count) {
-    let badge = document.getElementById('ci-notif-badge');
-    if (!badge) {
-        badge = document.createElement('span');
-        badge.id = 'ci-notif-badge';
-        badge.className = 'ci-notif-badge';
-        badge.setAttribute('aria-label', 'Notifications');
-        badge.title = 'New insights from Continuum';
-        const navActions = document.querySelector('.nav-actions');
-        if (navActions) {
-            navActions.prepend(badge);
-        }
-    }
-    if (count > 0) {
-        badge.textContent = count > 9 ? '9+' : String(count);
-        badge.style.display = 'inline-flex';
-    } else {
-        badge.style.display = 'none';
-    }
+function _renderBadge(_count) {
+    // Badge rendering disabled: replaced by thesis monitor badges (.tm-badge-group)
+    // in the analyst panel header. Phase 9 notification data still polls and
+    // dispatches ci:notifications:updated events for downstream consumers.
 }
 
 // ---------------------------------------------------------------------------
