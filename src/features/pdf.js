@@ -731,7 +731,7 @@ function buildBriefing(stock) {
       '<div class="ib-hyp-hdr"><span class="ib-hyp-title">' + esc(strip(h.title || '')) + '</span>' +
         '<span class="ib-hyp-score" style="color:' + dc + '">' + sc + '%</span></div>' +
       '<div class="ib-hyp-track"><div class="ib-hyp-fill" style="width:' + sc + '%;background:' + dc + '"></div></div>' +
-      '<div class="ib-hyp-desc">' + esc(trunc(h.description || '', 200)) + '</div></div>';
+      '<div class="ib-hyp-desc">' + esc(trunc(h.description || '', 350)) + '</div></div>';
   }
   hypHTML += '</div>';
 
@@ -884,7 +884,7 @@ function buildBriefing(stock) {
   return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
     '<title>' + esc(stock.ticker) + ' Investor Briefing | Continuum Intelligence</title>' +
     '<style>' + baseCSS() + '\n' + css + '</style></head><body>' +
-    '<div class="ib-page ib-page-1">' + p1Hdr + metricsHTML + skewHTML + pirHTML + sparkHTML + hypHTML + '</div>' +
-    '<div class="ib-page ib-page-2">' + p2Hdr + identHTML + narrHTML + techHTML + evHTML + discHTML + tripHTML + footerHTML + '</div>' +
+    '<div class="ib-page ib-page-1">' + p1Hdr + metricsHTML + skewHTML + pirHTML + sparkHTML + hypHTML + identHTML + narrHTML + '</div>' +
+    '<div class="ib-page ib-page-2">' + p2Hdr + techHTML + evHTML + discHTML + tripHTML + footerHTML + '</div>' +
     '</body></html>';
 }
