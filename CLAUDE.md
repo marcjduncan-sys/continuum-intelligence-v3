@@ -42,7 +42,7 @@ npm run validate     # lint + test:all — run before any push
 
 ---
 
-## Current State — 2026-03-13 (updated session 2)
+## Current State — 2026-03-17
 
 **Phase 0 COMPLETE (2026-03-07).** The extraction of logic from `index.html` into `src/` modules is complete. `computeSkewScore` canonicalised to zero-contribution convention (commit `4493e8c`; see `docs/decisions/003-computeskewscore-neutral-convention.md`). `VALID_STATIC_PAGES` confirmed correct: `home`, `deep-research`, `portfolio`, `comparator`, `personalisation`, `about`.
 
@@ -132,13 +132,27 @@ npm run validate     # lint + test:all — run before any push
 - [x] Commit `3ae5b9c`: Patched `_index.json` for EVN and NST -- missing `featuredMetrics`, `featuredRationale`, `hypotheses`, `skew` fields caused literal "undefined" text on home page cards. Root cause: scaffold process wrote full research JSON but did not copy card fields to `_index.json`.
 - [x] 157/157 Vitest passing. Railway healthy (29 tickers).
 
+**Session work (2026-03-17) -- Price Driver Agent Upgrade:**
+- [x] Backend: DB TTL 48h → 7 days, scan endpoint synchronous, `_compute_period_returns()` helper (2D/5D/10D stock vs ASX200), broker queries split (upgrades/downgrades/notes), social queries split (HotCopper/Reddit/X-via-media), Layer 3 synthesis prompt expanded. Rate limit relaxed to 2/min.
+- [x] Frontend: both renderers updated with 4x3 performance grid, broker alert banners, HotCopper social badge. 16 new CSS rules.
+- [x] Workflow: per-ticker sequential curl replacing monolithic scan. 180 min timeout, 480s per ticker. Fails only if >10 tickers fail.
+- [x] Coverage: 48% → 81% (26/32 tickers). 6 tickers timed out at 120 min; re-triggered at 180 min.
+
+**Session work (2026-03-17) -- PDF Report Goldman Sachs-standard Rewrite:**
+- [x] Commit `7781dd6`: Full rewrite of `src/features/pdf.js`. `baseCSS()` shared foundation, `buildSidebar()` cover page, two-column evidence grids, rule-based hierarchy, Source Serif 4 / Inter typography, print CSS with `page-break-inside: avoid`.
+- [x] Commit `6226032`: Briefing layout -- moved identity and narrative from page 2 to page 1 after hypothesis bars. Hypothesis description truncation 200 → 350 chars.
+- [x] Commit `4ce17e1`: Fixed `[object Object]` bug in narrative fields (added `narrText()` helper for object-typed fields). Moved technical structure to page 1. Removed forced page break.
+- [x] Commit `386f2c0`: Page 2 density -- all evidence cards in 2-col grid (truncation 400/250), all discriminator rows with currentReading column, all tripwires (no caps), verdict callout between discriminators and tripwires.
+- [x] Commit `a68ec06`: Removed evidence gaps section from briefing to keep 2-page constraint.
+- [x] 157/157 Vitest passing. Build succeeds. Railway healthy (32 tickers).
+
 **Recent bug history (last six commits):**
-- `3ae5b9c` _index.json: add missing card fields for EVN and NST (fixes "undefined" on tiles).
-- `f362d11` reference: populate ASB/WAF/NST/EVN market data, fix RMC shares units.
-- `40ca1b9` Backfill ASB and WAF scaffold research with coverage initiation.
-- `e1bbb19` add-stock: synchronous coverage initiation with quality gate.
-- `4768a84` Fix hypothesis score divergence: verdict.scores synced from hypotheses across all 25 tickers.
-- `ab0b1bb` memory_extractor: sharpen extraction system prompt.
+- `a68ec06` pdf briefing: remove evidence gaps section to keep 2 pages.
+- `386f2c0` pdf briefing: fill page 2 with full evidence, discriminators, tripwires.
+- `4ce17e1` pdf briefing: fix [object Object] in narrative, move tech to page 1.
+- `6226032` pdf briefing: move identity and narrative to page 1, increase hyp trunc.
+- `7781dd6` PDF reports: Goldman Sachs-standard layout rewrite.
+- `0e8465d` price-drivers workflow: increase timeouts (180min job, 480s per ticker).
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
@@ -220,3 +234,51 @@ When given a bug report, just fix it. Point at logs, errors, failing tests, then
 - Simplicity first. Make every change as simple as possible. Minimal code impact.
 - No laziness. Find root causes. No temporary fixes. Senior developer standards.
 - Minimal blast radius. Changes touch only what is necessary. Avoid introducing bugs.
+
+## Session Log: 17 Mar 2026 -- PDF Report Redesign + Price Drivers Workflow Fix
+
+### PDF Reports (`src/features/pdf.js`)
+
+Complete rewrite targeting Goldman Sachs equity research layout standards. Both Institutional (long-form) and Investor Briefing (2-page) reports rebuilt from scratch.
+
+**Architecture:** `baseCSS()` shared foundation with colour tokens (`--navy`, `--grn`, `--red`, `--amb`), `buildInstitutional()` and `buildBriefing()` as separate builders. `buildSidebar()` generates the cover key-data panel. All CSS is inlined in the print window -- no external dependencies.
+
+**Key design patterns:**
+- Cover page: CSS grid (`1fr 170px`) with right-column sidebar (price, mkt cap, P/E, yield, 52w range, sector, date)
+- Evidence: 2-column grid (institutional), 3-column grid (briefing) via `.grid2` / `.grid3`
+- Technical analysis: side-by-side columns for MAs and key levels
+- Typography: Source Serif 4 for company headers, Inter for data/labels, ALL CAPS labels at 5-6pt
+- Colour system: navy `#003A70` primary, rule-based hierarchy (left border-lines, background tints, no card borders/shadows/border-radius)
+- Print CSS: `page-break-inside: avoid` on all logical blocks, `page-break-after: avoid` on section headers, `@page` margins 8mm/10mm
+
+**Investor Briefing page layout (after iteration):**
+- Page 1: header, metrics, skew, position in range, sparkline, hypothesis bars (expanded to 350 chars), identity table, dominant narrative, technical structure
+- Page 2: evidence (all cards, 2-col grid), discriminators (all rows with currentReading), tripwires (all cards, expanded to 200 chars), verdict callout, footer
+- No forced page break -- content flows naturally. Evidence coverage table removed to prevent third-page overflow.
+
+**Bugs fixed during session:**
+- `&mdash;` replaced with `&ndash;` throughout (8 instances)
+- `[object Object]` rendering for `stock.narrative.priceImplication` -- added `narrText()` helper that checks for object types (tries `.text`, `.summary`, then `JSON.stringify` fallback)
+- HTML entity `&#9650;` / `&#9660;` rendering as literal text in hypothesis scores -- fixed by ensuring `dirIcon()` output is injected as innerHTML not escaped text
+
+**Known limitations:**
+- Fonts not embedded as base64 in print HTML -- falls back to system fonts on machines without Inter/Source Serif 4
+- No running page headers on institutional report (CSS cannot repeat elements per printed page without fixed positioning hacks)
+- Briefing 2-page fit depends on truncation limits calibrated for BHP-density data; untested across all 24 tickers
+
+### Price Drivers Workflow (`.github/workflows/price-drivers.yml`)
+
+Rewritten to prevent wasted API spend and improve operational resilience.
+
+**Three safeguards added:**
+1. **Fail-fast on credit exhaustion:** Checks response body for "credit balance" on any 500. Sets `CREDIT_EXHAUSTED=1` and skips all remaining tickers. Proved out: 8-second run vs 1h 25m.
+2. **Freshness skip:** Hits `/api/agents/drivers/{ticker}/latest` before each ticker. If `analysis_date` matches today's UTC date, skips. Prevents redundant re-processing on re-runs.
+3. **502 retry:** Gateway timeouts get one retry at 600s (up from 480s) after 10s cooldown. Handles Railway timeout flakiness.
+
+**Manual dispatch inputs added:**
+- `tickers`: space-separated custom list (blank = all 33)
+- `force_all`: boolean to bypass freshness check
+
+**Operational note:** The workflow exit-codes `1` on credit exhaustion (so the GitHub Actions UI shows failure, alerting the operator) but distinguishes it from general failures in the log output.
+
+**Outstanding:** 7 tickers (WAF, WDS, WIA, WOR, WOW, WTC, XRO) awaiting re-run after API credit refresh resolves. Auto-reload should be enabled on Anthropic billing to prevent future mid-run exhaustion.

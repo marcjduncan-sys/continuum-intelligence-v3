@@ -1,0 +1,149 @@
+# Session Log
+
+## 2026-03-17 -- Price Driver Agent Upgrade
+
+**Duration**: ~3 hours (02:00-05:30 AEDT)
+**Branch**: main (direct commits)
+**Commits**: `e1e880d` through `0e8465d` (6 session commits)
+
+### What was done
+
+Price Driver Agent upgraded from a fragile fire-and-forget pipeline with 48% ticker coverage to a robust per-ticker workflow with 81% coverage (26/32) and climbing.
+
+**Backend (`api/price_drivers.py`, `api/main.py`)**:
+- DB TTL extended from 48 hours to 7 days (in-memory cache also 7 days)
+- Scan endpoint made synchronous (removed `asyncio.ensure_future` fire-and-forget)
+- Added `_compute_period_returns()` helper: programmatic 2D/5D/10D returns for stock, ASX200, and relative performance from Yahoo Finance OHLCV
+- Broker queries split into upgrades, downgrades, and notes (3 separate DDG searches)
+- Social queries split into HotCopper, Reddit, and X-via-media (3 separate DDG searches)
+- Layer 3 synthesis prompt updated: expanded `price_action_summary` schema (2D/5D/10D with ASX200 and relative), added `broker_activity` and `social_signal` output blocks, instruction to copy pre-computed returns exactly
+- Rate limit on per-ticker endpoint relaxed from 1/min to 2/min
+
+**Frontend (`src/pages/report-sections.js`, `src/styles/report.css`)**:
+- Both renderers (`renderPriceDrivers` embedded + `renderPriceDriversContent` async) updated: 4x3 performance comparison grid (ticker/ASX200/relative x 2D/5D/10D), broker upgrade/downgrade alert banners, HotCopper social activity badge
+- CSS: 16 new rules for `.pd-perf-grid`, `.pd-broker-alert`, `.pd-social` classes with green/red/muted colour coding via CSS variables
+
+**Workflow (`.github/workflows/price-drivers.yml`)**:
+- Replaced monolithic `POST /scan` curl with sequential per-ticker `GET /drivers/{ticker}?force=true` loop
+- Per-ticker success/failure reporting in Actions log
+- Workflow only fails if >10 tickers fail
+- Timeouts: 180 min job, 480s per ticker
+
+**Migration (`api/migrations/010_price_drivers.sql`)**:
+- Default `expires_at` updated to `INTERVAL '7 days'`
+
+### Coverage results
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Tickers with cached reports | 12/25 (48%) | 26/32 (81%) |
+| Schema fields | 10 keys, old `price_change_1d_pct` | 12 keys, new 2D/5D/10D + ASX200 + relative + broker + social |
+| Workflow runtime | 9 seconds (fire-and-forget) | ~100 min (synchronous per-ticker) |
+| Workflow visibility | No failure detection | Per-ticker pass/fail in Actions log |
+
+### What remains
+
+- **6 tickers still 404** (WAF, WDS, WOR, WOW, WTC, XRO): workflow timed out at 120 min before reaching them. Re-triggered with 180 min timeout (run `23178485049`, in progress)
+- **2 tickers hit 502** during scan (ASB, NST): transient Railway errors, both have cached reports from prior runs
+- **Visual verification**: performance grid, broker alerts, and social badges are code-complete but need browser verification once new-schema reports are cached
+- **`tasks/todo.md`**: still shows original wave plan with unchecked items; should be updated to reflect completion
+
+### Commits this session
+
+```
+0e8465d price-drivers workflow: increase timeouts (180min job, 480s per ticker)
+b38f604 price-drivers: increase timeout to 180 min
+a7a72fc price-drivers: per-ticker workflow, fix Railway timeout
+5a210ea Frontend: add perf grid, broker alerts, social badges to embedded price drivers
+b202bfb fix: use price_history key for stock OHLCV in computed returns
+3724b9d Frontend: price driver perf grid vs ASX200, broker alerts, social indicators
+e1e880d price_drivers: 7-day TTL, peer map, computed returns, broker/social queries, prompt upgrades
+```
+
+### Handoff notes for next session
+
+1. Check run `23178485049` completed successfully. Run the 32-ticker coverage check to confirm all return 200.
+2. Open 3 stock reports in browser and verify the performance grid renders correctly (green up, red down, muted flat).
+3. Update `tasks/todo.md` to mark waves 1-4 complete and add review section.
+4. The `_compute_period_returns()` function uses `price_history` key (not `history`) for stock OHLCV -- this was a mid-session fix (`b202bfb`). If returns show as N/A, check the key name in `fetch_yahoo_price()` response.
+5. ASB and NST returned 502 during the scan. If they persistently fail, check Railway memory pressure or add a retry loop in the workflow.
+
+---
+
+## 2026-03-17 -- PDF Report Redesign Review
+
+**Duration**: ~30 min
+**Branch**: main (direct commit)
+**Commit**: `5de4610`
+
+### What was done
+
+Reviewed and fixed the `src/features/pdf.js` rewrite (Goldman Sachs-standard layout for Institutional and Investor Briefing reports). The rewrite was code-complete but had two categories of issue.
+
+**Fixes applied (commit `5de4610`)**:
+- Replaced 8 `&mdash;` HTML entities with `&ndash;` across both report builders (Australian English compliance)
+- Added Section 09 (Verdict): colour-coded callout box with direction-aware border/background (green upside, red downside, amber balanced), verdict text, and normalised hypothesis scores with labels and direction indicators
+- Added Section 10 (Price Drivers): executive summary, primary driver, period returns table (2D/5D/10D for stock vs ASX 200 vs relative), broker upgrade/downgrade alerts (max 3 each), HotCopper social signal, and confidence indicator
+
+**Review findings (no issues)**:
+- `pdfEsc()` correctly escapes `&`, `<`, `>`, `"` entities
+- All data sections from STOCK_DATA rendered: identity rows, hypotheses (with requires/supporting/contradicting), all evidence cards (institutional), discriminators (all 4 columns), tripwires (green/red conditions), gaps (all sub-keys), technical analysis (all 6 sub-sections)
+- No CSS class collisions (isolated `window.open()` context)
+- Public API unchanged: `generatePDFReport(ticker, type)` same signature and export
+
+**Test results**: 157/157 Vitest pass; 1 pre-existing Jest failure (EVN scaffold evidence cards) unrelated. Build succeeds.
+
+### What remains
+
+- **Browser visual verification**: print layout, page breaks, colour printing, Position in Range bar rendering, Investor Briefing 2-page fit -- all require manual browser check
+- **Font embedding**: Inter and Source Serif 4 referenced by name but not embedded as woff2 in the print HTML; falls back to system fonts on machines without them installed
+- **Investor Briefing overflow**: truncation limits calibrated for typical data but not stress-tested across all 32 tickers
+
+### Handoff notes for next session
+
+1. Open 2-3 stock reports in dev mode, click both PDF download buttons, verify layout in print preview
+2. Test with a data-sparse ticker (e.g. OBM, WIA) to confirm no crash on missing fields
+3. Test with a data-dense ticker (e.g. BHP, CBA) to confirm Investor Briefing fits 2 pages
+4. The `pdf.js.bak` file referenced in the original brief does not exist -- the old version was overwritten in place, not backed up
+
+---
+
+## 2026-03-17 Session 3 -- PDF Briefing Polish + Price Drivers Workflow Hardening
+
+**Duration**: ~3 hours
+**Branch**: main (direct commits)
+**Commits**: `7781dd6` through `a68ec06` (PDF), plus workflow fixes
+
+### What was done
+
+**PDF Briefing iteration (6 commits):**
+- Full Goldman Sachs-standard rewrite of `src/features/pdf.js` with `baseCSS()` shared foundation, `buildInstitutional()` and `buildBriefing()` builders
+- Cover page CSS grid (`1fr 170px`) with right-column sidebar
+- Evidence grids: 2-col (institutional), 3-col (briefing)
+- Typography: Source Serif 4 headers, Inter data/labels, ALL CAPS at 5-6pt
+- Colour system: navy `#003A70` primary, rule-based hierarchy
+- Print CSS: `page-break-inside: avoid`, `@page` margins 8mm/10mm
+- Fixed `[object Object]` in narrative fields via `narrText()` helper
+- Fixed `&mdash;` → `&ndash;` (8 instances)
+- Moved identity/narrative from page 2 to page 1; removed evidence gaps to keep 2-page constraint
+- Hypothesis description truncation 200 → 350 chars
+
+**Price Drivers workflow hardening:**
+- Fail-fast on API credit exhaustion (checks response body for "credit balance")
+- Freshness skip: checks `/api/agents/drivers/{ticker}/latest` before processing
+- 502 retry with 600s timeout after 10s cooldown
+- Manual dispatch inputs: `tickers` (custom list) and `force_all` (bypass freshness)
+- Exit code 1 on credit exhaustion for GitHub Actions visibility
+
+### Coverage results
+
+- PDF: both report types rendering end-to-end; 157/157 Vitest passing
+- Price drivers: 26/32 tickers cached (81%); 7 awaiting API credit refresh
+
+### Handoff notes for next session
+
+1. 7 tickers (WAF, WDS, WIA, WOR, WOW, WTC, XRO) need price driver re-run after API credit refresh
+2. Browser visual verification needed: open 2-3 reports, test both PDF buttons in print preview
+3. Test briefing with data-sparse (OBM, WIA) and data-dense (BHP, CBA) tickers
+4. Fonts not embedded as base64 -- falls back to system fonts without Inter/Source Serif 4
+5. Enable auto-reload on Anthropic billing to prevent future mid-run credit exhaustion
