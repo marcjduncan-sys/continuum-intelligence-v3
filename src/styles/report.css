@@ -167,8 +167,9 @@
 .pd-bullets li b { color: var(--text-primary); font-weight: 600; }
 .pd-perf-grid { display: grid; grid-template-columns: auto repeat(3, 1fr); gap: 0; margin: 8px 0 12px 0; font-size: 0.72rem; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; max-width: 420px; }
 .pd-perf-grid .pd-perf-cell { padding: 4px 10px; text-align: right; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); white-space: nowrap; }
-.pd-perf-grid .pd-perf-cell:last-child { border-right: none; }
-.pd-perf-grid .pd-perf-row:last-child .pd-perf-cell { border-bottom: none; }
+.pd-perf-grid .pd-perf-row { display: contents; }
+.pd-perf-grid .pd-perf-cell:nth-child(4n) { border-right: none; }
+.pd-perf-grid .pd-perf-cell:nth-last-child(-n+4) { border-bottom: none; }
 .pd-perf-grid .pd-perf-label { text-align: left; font-weight: 600; color: var(--text-primary); background: rgba(128,128,128,0.04); }
 .pd-perf-grid .pd-perf-header { font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); background: rgba(128,128,128,0.06); text-align: center; font-size: 0.65rem; }
 .pd-perf-up { color: var(--signal-green); }
