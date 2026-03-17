@@ -316,7 +316,7 @@ def _chunk_stock(ticker: str, data: dict, ref: dict | None = None, fresh: dict |
                 weight=1.1,
             ))
         pi = narrative.get("priceImplication", {})
-        if pi and pi.get("content"):
+        if pi and isinstance(pi, dict) and pi.get("content"):
             passages.append(Passage(
                 ticker=ticker,
                 section="narrative",
@@ -385,7 +385,7 @@ def _chunk_stock(ticker: str, data: dict, ref: dict | None = None, fresh: dict |
 
     # --- Evidence alignment summary ---
     alignment = evidence.get("alignmentSummary", {})
-    if alignment and alignment.get("summary"):
+    if alignment and isinstance(alignment, dict) and alignment.get("summary"):
         s = alignment["summary"]
         passages.append(Passage(
             ticker=ticker,
