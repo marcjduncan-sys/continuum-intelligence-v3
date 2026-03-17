@@ -581,7 +581,7 @@ async def drivers_latest(ticker: str, request: Request):
 
 
 @app.get("/api/agents/drivers/{ticker}", dependencies=[Depends(verify_api_key)])
-@limiter.limit("1/minute")
+@limiter.limit("2/minute")
 async def drivers_analyse(ticker: str, request: Request, force: bool = True):
     """
     Run on-demand price driver analysis for a ticker.

@@ -9,13 +9,42 @@ on:
 jobs:
   price-drivers:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 120
     steps:
-      - name: Run price driver scan
+      - name: Run price driver scan (per-ticker)
+        env:
+          API_BASE: https://imaginative-vision-production-16cb.up.railway.app
+          API_KEY: ${{ secrets.CI_API_KEY }}
         run: |
-          curl -s -f -X POST \
-            -H "X-Drivers-Secret: ${{ secrets.PRICE_DRIVERS_SECRET }}" \
-            -H "Content-Type: application/json" \
-            -d '{}' \
-            --max-time 2400 \
-            https://imaginative-vision-production-16cb.up.railway.app/api/agents/drivers/scan
+          TICKERS="ASB BHP CBA CSL DRO DXS EVN FMG GMG GYG HRZ MIN MQG NAB NST OBM OCL PME REA RFG RIO RMC SIG SNX STO WAF WDS WIA WOR WOW WTC XRO"
+          SUCCEEDED=0
+          FAILED=0
+          ERRORS=""
+          for t in $TICKERS; do
+            echo "--- Processing $t ---"
+            HTTP_CODE=$(curl -s -o /tmp/pd_response.json -w "%{http_code}" \
+              -H "X-API-Key: $API_KEY" \
+              --max-time 300 \
+              "$API_BASE/api/agents/drivers/$t?force=true")
+            if [ "$HTTP_CODE" = "200" ]; then
+              SUCCEEDED=$((SUCCEEDED + 1))
+              echo "$t: OK"
+            else
+              FAILED=$((FAILED + 1))
+              ERRORS="$ERRORS $t($HTTP_CODE)"
+              echo "$t: FAILED (HTTP $HTTP_CODE)"
+              cat /tmp/pd_response.json 2>/dev/null || true
+            fi
+            echo ""
+            sleep 3
+          done
+          echo "=== SCAN COMPLETE ==="
+          echo "Succeeded: $SUCCEEDED"
+          echo "Failed: $FAILED"
+          if [ -n "$ERRORS" ]; then
+            echo "Errors: $ERRORS"
+          fi
+          if [ "$FAILED" -gt 10 ]; then
+            echo "ERROR: More than 10 tickers failed"
+            exit 1
+          fi
