@@ -831,17 +831,6 @@ function buildBriefing(stock) {
   }
   tripHTML += '</div>';
 
-  // Evidence Gaps coverage table
-  var gapsHTML = '';
-  if (stock.gaps && stock.gaps.coverageRows && stock.gaps.coverageRows.length) {
-    gapsHTML = '<div class="ib-block"><div class="lbl ib-blbl">EVIDENCE COVERAGE</div>';
-    gapsHTML += '<table class="dt"><thead><tr><th>Domain</th><th>Status</th><th>Detail</th></tr></thead><tbody>';
-    for (var gi = 0; gi < stock.gaps.coverageRows.length; gi++) {
-      var gr = stock.gaps.coverageRows[gi];
-      gapsHTML += '<tr><td>' + esc(gr.domain || gr[0] || '') + '</td><td>' + esc(gr.status || gr[1] || '') + '</td><td>' + esc(trunc(gr.detail || gr[2] || '', 120)) + '</td></tr>';
-    }
-    gapsHTML += '</tbody></table></div>';
-  }
 
   var footerHTML = '<div class="ib-footer">Generated ' + esc(ts) + ' AEST &bull; ' + esc(stock.ticker) + ' &bull; Continuum Intelligence &bull; Not personal financial advice.</div>';
 
@@ -908,6 +897,6 @@ function buildBriefing(stock) {
     '<title>' + esc(stock.ticker) + ' Investor Briefing | Continuum Intelligence</title>' +
     '<style>' + baseCSS() + '\n' + css + '</style></head><body>' +
     '<div class="ib-page ib-page-1">' + p1Hdr + metricsHTML + skewHTML + pirHTML + sparkHTML + hypHTML + identHTML + narrHTML + techHTML + '</div>' +
-    '<div class="ib-page ib-page-2">' + p2Hdr + evHTML + discHTML + verdictHTML + tripHTML + gapsHTML + footerHTML + '</div>' +
+    '<div class="ib-page ib-page-2">' + p2Hdr + evHTML + discHTML + verdictHTML + tripHTML + footerHTML + '</div>' +
     '</body></html>';
 }
