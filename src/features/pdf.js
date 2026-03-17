@@ -195,7 +195,7 @@ function buildInstitutionalHTML(stock) {
 
   var coverHtml =
     '<div class="cover">' +
-      '<div class="cover-brand">CONTINUUM INTELLIGENCE &mdash; INDEPENDENT EQUITY RESEARCH</div>' +
+      '<div class="cover-brand">CONTINUUM INTELLIGENCE &ndash; INDEPENDENT EQUITY RESEARCH</div>' +
       '<div class="cover-title">' + e(stock.company) + '</div>' +
       '<div class="cover-sub">' + e(stock.tickerFull || stock.ticker + '.AX') +
         ' &bull; ' + e(stock.sector || '') + (stock.sectorSub ? ' &bull; ' + e(stock.sectorSub) : '') +
@@ -204,8 +204,8 @@ function buildInstitutionalHTML(stock) {
       (stock.heroDescription ? '<div class="cover-tagline">' + e(stripHtml(stock.heroDescription)) + '</div>' : '') +
       heroMetricsHtml +
       (skewDir ? '<div class="cover-skew ' + skewCls + '">RISK SKEW: ' + e(skewDir) +
-        (skewRat ? ' &mdash; ' + e(stripHtml(skewRat)) : '') + '</div>' : '') +
-      (embeddedThesis ? '<div class="cover-thesis"><strong>WHAT THE PRICE EMBEDS &mdash; </strong>' + e(stripHtml(embeddedThesis)) + '</div>' : '') +
+        (skewRat ? ' &ndash; ' + e(stripHtml(skewRat)) : '') + '</div>' : '') +
+      (embeddedThesis ? '<div class="cover-thesis"><strong>WHAT THE PRICE EMBEDS &ndash; </strong>' + e(stripHtml(embeddedThesis)) + '</div>' : '') +
     '</div>';
 
   // ── PRICE SPARKLINE ──────────────────────────────────────
@@ -442,7 +442,7 @@ function buildInstitutionalHTML(stock) {
 
     // Regime + trend summary row
     techHtml += '<div class="ta-summary">' +
-      (ta.regime ? '<span class="ta-badge">' + e(ta.regime) + (ta.clarity ? ' &mdash; ' + e(ta.clarity) : '') + '</span>' : '') +
+      (ta.regime ? '<span class="ta-badge">' + e(ta.regime) + (ta.clarity ? ' &ndash; ' + e(ta.clarity) : '') + '</span>' : '') +
       (ta.trend ? '<span class="ta-val">Trend: ' + e(ta.trend.direction || '') +
         (ta.trend.duration ? ', ' + e(ta.trend.duration) : '') + '</span>' : '') +
       (ta.price ? '<span class="ta-val">Price: ' + e(ta.price.currency || '') + e(String(ta.price.current || '')) + '</span>' : '') +
@@ -484,7 +484,7 @@ function buildInstitutionalHTML(stock) {
         if (kv && typeof kv === 'object') {
           techHtml += '<tr><td class="dt-lbl">' + e(klKeys[ki]) + '</td>' +
             '<td class="dt-val">' + e(String(kv.value || kv.price || '')) +
-            (kv.description ? ' &mdash; ' + e(kv.description) : '') + '</td></tr>';
+            (kv.description ? ' &ndash; ' + e(kv.description) : '') + '</td></tr>';
         } else if (kv) {
           techHtml += '<tr><td class="dt-lbl">' + e(klKeys[ki]) + '</td>' +
             '<td class="dt-val">' + e(String(kv)) + '</td></tr>';
@@ -506,7 +506,7 @@ function buildInstitutionalHTML(stock) {
             techHtml += '<tr><td class="dt-lbl">' + e(volKeys[vi]) + '</td><td class="dt-val">' + e(String(vv)) + '</td></tr>';
           } else if (vv && typeof vv === 'object' && vv.value) {
             techHtml += '<tr><td class="dt-lbl">' + e(volKeys[vi]) + '</td><td class="dt-val">' + e(String(vv.value)) +
-              (vv.description ? ' &mdash; ' + e(vv.description) : '') + '</td></tr>';
+              (vv.description ? ' &ndash; ' + e(vv.description) : '') + '</td></tr>';
           }
         }
         techHtml += '</tbody></table>';
@@ -561,12 +561,112 @@ function buildInstitutionalHTML(stock) {
         for (var mri = 0; mri < mrKeys.length; mri++) {
           var mrv = mr[mrKeys[mri]];
           if (mrv !== null && mrv !== undefined) {
-            var mrvStr = typeof mrv === 'object' ? (mrv.value !== undefined ? String(mrv.value) + (mrv.description ? ' &mdash; ' + mrv.description : '') : JSON.stringify(mrv)) : String(mrv);
+            var mrvStr = typeof mrv === 'object' ? (mrv.value !== undefined ? String(mrv.value) + (mrv.description ? ' &ndash; ' + mrv.description : '') : JSON.stringify(mrv)) : String(mrv);
             techHtml += '<tr><td class="dt-lbl">' + e(mrKeys[mri]) + '</td><td class="dt-val">' + e(mrvStr) + '</td></tr>';
           }
         }
         techHtml += '</tbody></table>';
       }
+    }
+  }
+
+  // ── SECTION 09: VERDICT ─────────────────────────────────
+  var verdictHtml = '';
+  if (stock.verdict) {
+    var vt = stock.verdict;
+    verdictHtml = secHdr(9, 'Verdict');
+    var vtDir = (stock.skew && stock.skew.direction) || '';
+    var vtBg = vtDir === 'upside' ? '#f0fdf4' : vtDir === 'downside' ? '#fef2f2' : '#fffbeb';
+    var vtBorder = vtDir === 'upside' ? '#16a34a' : vtDir === 'downside' ? '#dc2626' : '#d97706';
+    if (vt.text) {
+      verdictHtml += '<div class="callout" style="border-left:4px solid ' + vtBorder + ';background:' + vtBg + '">' +
+        e(stripHtml(vt.text)) + '</div>';
+    }
+    if (vt.scores && vt.scores.length) {
+      var vtNorm = normaliseHypScores(stock.hypotheses || []);
+      verdictHtml += '<div style="display:flex;gap:14px;flex-wrap:wrap;margin:4px 0 8px 0">';
+      for (var vsi = 0; vsi < vt.scores.length; vsi++) {
+        var vs = vt.scores[vsi];
+        var vsScore = vtNorm[vsi] ? vtNorm[vsi] + '%' : e(vs.score || '');
+        var vsColor = vs.scoreColor || '#475569';
+        verdictHtml += '<div style="text-align:center;min-width:60px">' +
+          '<div style="font-size:6pt;color:#94a3b8;text-transform:uppercase;letter-spacing:0.3px">' + e(vs.label || '') + '</div>' +
+          '<div style="font-size:9pt;font-weight:800;color:' + vsColor + '">' + vsScore + '</div>' +
+          (vs.dirText ? '<div style="font-size:6pt;color:#64748b">' + e(vs.dirText || '') + '</div>' : '') +
+        '</div>';
+      }
+      verdictHtml += '</div>';
+    }
+  }
+
+  // ── SECTION 10: PRICE DRIVERS ─────────────────────────
+  var pdHtml = '';
+  if (stock.priceDrivers && !stock.priceDrivers.error) {
+    var pd = stock.priceDrivers;
+    var pdPrimary = pd.primary_driver || '';
+    var pdDs = pd.driver_stack || {};
+    if (!pdPrimary && pdDs.primary && pdDs.primary.length > 0) pdPrimary = pdDs.primary[0];
+    if (pdPrimary) {
+      pdHtml = secHdr(10, 'Price Drivers');
+      var pdPa = pd.price_action_summary || {};
+      var pdBa = pd.broker_activity || {};
+      var pdSs = pd.social_signal || {};
+      var pdConf = pd.confidence || 'moderate';
+
+      // Executive summary
+      if (pd.executive_summary) {
+        pdHtml += bodyP(pd.executive_summary);
+      }
+
+      // Primary driver
+      pdHtml += subHdr('Primary Driver') + bodyP(pdPrimary);
+
+      // Performance grid
+      function _pdFmt(val) {
+        if (val == null) return 'N/A';
+        return (val > 0 ? '+' : '') + val.toFixed(1) + '%';
+      }
+      if (pdPa.price_change_2d_pct != null || pdPa.price_change_5d_pct != null) {
+        pdHtml += subHdr('Period Returns') +
+          '<table class="dt compact"><thead><tr><th></th><th>2D</th><th>5D</th><th>10D</th></tr></thead><tbody>' +
+          '<tr><td class="dt-lbl">' + e(stock.ticker) + '</td>' +
+            '<td class="dt-val">' + _pdFmt(pdPa.price_change_2d_pct) + '</td>' +
+            '<td class="dt-val">' + _pdFmt(pdPa.price_change_5d_pct) + '</td>' +
+            '<td class="dt-val">' + _pdFmt(pdPa.price_change_10d_pct) + '</td></tr>' +
+          '<tr><td class="dt-lbl">ASX 200</td>' +
+            '<td class="dt-val">' + _pdFmt(pdPa.asx200_change_2d_pct) + '</td>' +
+            '<td class="dt-val">' + _pdFmt(pdPa.asx200_change_5d_pct) + '</td>' +
+            '<td class="dt-val">' + _pdFmt(pdPa.asx200_change_10d_pct) + '</td></tr>' +
+          '<tr><td class="dt-lbl">Relative</td>' +
+            '<td class="dt-val">' + _pdFmt(pdPa.relative_2d_pct) + '</td>' +
+            '<td class="dt-val">' + _pdFmt(pdPa.relative_5d_pct) + '</td>' +
+            '<td class="dt-val">' + _pdFmt(pdPa.relative_10d_pct) + '</td></tr>' +
+          '</tbody></table>';
+      }
+
+      // Broker alerts
+      var pdUpgrades = pdBa.recent_upgrades || [];
+      var pdDowngrades = pdBa.recent_downgrades || [];
+      if (pdUpgrades.length || pdDowngrades.length) {
+        pdHtml += subHdr('Broker Activity');
+        for (var pdu = 0; pdu < pdUpgrades.length && pdu < 3; pdu++) {
+          pdHtml += '<div class="callout" style="border-left:3px solid #16a34a;background:#f0fdf4">' +
+            '\u2191 UPGRADE: ' + e(stripHtml(String(pdUpgrades[pdu]))) + '</div>';
+        }
+        for (var pdd = 0; pdd < pdDowngrades.length && pdd < 3; pdd++) {
+          pdHtml += '<div class="callout" style="border-left:3px solid #dc2626;background:#fef2f2">' +
+            '\u2193 DOWNGRADE: ' + e(stripHtml(String(pdDowngrades[pdd]))) + '</div>';
+        }
+      }
+
+      // Social signal
+      var pdHc = pdSs.hotcopper_activity || '';
+      if (pdHc) {
+        pdHtml += '<div style="font-size:6.8pt;color:#64748b;margin:4px 0">Social: HotCopper ' + e(pdHc) + '</div>';
+      }
+
+      // Confidence
+      pdHtml += '<div style="font-size:6.5pt;color:#94a3b8;margin-top:4px">Confidence: ' + e(pdConf) + '</div>';
     }
   }
 
@@ -699,6 +799,8 @@ function buildInstitutionalHTML(stock) {
       tripHtml +
       gapsHtml +
       techHtml +
+      verdictHtml +
+      pdHtml +
       disclaimerHtml +
     '</body></html>';
 }
@@ -1115,7 +1217,7 @@ function buildInvestorBriefingHTML(stock) {
   // ── ASSEMBLY ──────────────────────────────────────────────
   var p2Header = '<div class="p2-hdr">' +
     '<span class="p2-hdr-co">' + e(stock.company) + ' &bull; ' + e(stock.tickerFull || stock.ticker + '.AX') + '</span>' +
-    '<span class="p2-hdr-label">INVESTOR BRIEFING &mdash; PAGE 2</span>' +
+    '<span class="p2-hdr-label">INVESTOR BRIEFING &ndash; PAGE 2</span>' +
   '</div>';
 
   return '<!DOCTYPE html>' +
