@@ -23,6 +23,7 @@ import { renderSnapshot, renderSnapshotPage, buildSnapshotFromStock } from './pa
 import { initPortfolioPage, clearPortfolio, populateSidebar } from './pages/portfolio.js';
 import { initThesisPage, tcAnalyze } from './pages/thesis.js';
 import { initAboutPage } from './pages/about.js';
+import { renderMemoryPage } from './pages/memory.js';
 
 // Report sections (needed for router callbacks)
 import { setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineChart } from './pages/report-sections.js';
@@ -34,6 +35,7 @@ import { initNotifications } from './features/notifications.js';
 import { initBatchRefresh, closeBatchModal } from './features/batch-refresh.js';
 import { generatePDFReport } from './features/pdf.js';
 import { initAddStock, openAddStockModal, closeAddStockModal, submitAddStock } from './features/add-stock.js';
+import { checkForAlerts, updateAlertBadge, initAlertPanel } from './features/thesis-monitor.js';
 
 // Deep Research page
 import { initDeepResearch } from './pages/deep-research.js';
@@ -260,11 +262,24 @@ async function boot() {
   // Hydrate computed fields (market cap, P/E, etc.)
   ContinuumDynamics.hydrateAll();
 
+  // Thesis integrity monitor -- non-blocking check after data is ready
+  setTimeout(function () {
+    try {
+      var newAlerts = checkForAlerts(STOCK_DATA);
+      updateAlertBadge();
+      if (newAlerts > 0) {
+        console.log('[ThesisMonitor] ' + newAlerts + ' new alert(s) detected');
+        document.dispatchEvent(new CustomEvent('ci:thesis:alerts', { detail: { count: newAlerts } }));
+      }
+    } catch (e) { console.warn('[ThesisMonitor] check failed:', e); }
+  }, 0);
+
   // Initialize router with page renderer callbacks
   initRouter({
     renderReportPage: renderReport,
     renderSnapshotPage: renderSnapshotPage,
     renderPersonalisationPage: window.renderPersonalisationPage,
+    renderMemoryPage: renderMemoryPage,
     loadFullResearchData: loadFullResearchData,
     buildSnapshotFromStock: buildSnapshotFromStock,
     setupScrollSpy: setupScrollSpy,
@@ -285,12 +300,27 @@ async function boot() {
     ['Chat', initChat],
     ['About', initAboutPage],
     ['AddStock', initAddStock],
-    ['DeepResearch', function() { initDeepResearch('deep-research-container'); }]
+    ['DeepResearch', function() { initDeepResearch('deep-research-container'); }],
+    ['AlertPanel', initAlertPanel]
   ];
   for (var _i = 0; _i < _inits.length; _i++) {
     try { _inits[_i][1](); }
     catch (e) { console.error('[Boot] init' + _inits[_i][0] + ' failed:', e); }
   }
+
+  // Re-check thesis alerts after batch refresh completes
+  document.addEventListener('ci:data:refreshed', function () {
+    setTimeout(function () {
+      try {
+        var newAlerts = checkForAlerts(STOCK_DATA);
+        updateAlertBadge();
+        if (newAlerts > 0) {
+          console.log('[ThesisMonitor] ' + newAlerts + ' new alert(s) after refresh');
+          document.dispatchEvent(new CustomEvent('ci:thesis:alerts', { detail: { count: newAlerts } }));
+        }
+      } catch (e) { console.warn('[ThesisMonitor] post-refresh check failed:', e); }
+    }, 0);
+  });
 
   // --- Theme toggle ---
   var themeToggle = document.getElementById('themeToggle');

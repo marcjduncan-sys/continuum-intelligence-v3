@@ -77,6 +77,7 @@ var panel        = document.getElementById('analyst-panel');
 var fab          = document.getElementById('apFab');
 var collapseBtn  = document.getElementById('apCollapseBtn');
 var clearBtn     = document.getElementById('apClearBtn');
+var historyBtn   = document.getElementById('apHistoryBtn');
 var messages     = document.getElementById('apMessages');
 var input        = document.getElementById('apInput');
 var sendBtn      = document.getElementById('apSend');
@@ -557,6 +558,122 @@ function clearConversation() {
 }
 
 // ============================================================
+// CONVERSATION HISTORY
+// ============================================================
+
+var historyOverlay = null;
+
+function _injectHistoryCSS() {
+    if (document.getElementById('ap-history-css')) return;
+    var style = document.createElement('style');
+    style.id = 'ap-history-css';
+    style.textContent =
+        '.ap-history-btn{background:none;border:none;cursor:pointer;color:var(--text-secondary,#666);padding:4px;border-radius:4px;display:flex;align-items:center;justify-content:center;width:28px;height:28px}' +
+        '.ap-history-btn:hover{color:var(--text-primary,#222);background:var(--bg-hover,rgba(0,0,0,.06))}' +
+        '.ap-history-btn svg{width:16px;height:16px}' +
+        '.ap-history-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--bg-primary,#fff);z-index:10;display:flex;flex-direction:column;overflow:hidden}' +
+        '.ap-history-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border,#e5e5e5)}' +
+        '.ap-history-head h3{margin:0;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-primary,#222)}' +
+        '.ap-history-close{background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-secondary,#666);padding:2px 6px;border-radius:4px}' +
+        '.ap-history-close:hover{background:var(--bg-hover,rgba(0,0,0,.06))}' +
+        '.ap-history-list{flex:1;overflow-y:auto;padding:8px 0}' +
+        '.ap-history-item{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--border-light,#f0f0f0)}' +
+        '.ap-history-item:hover{background:var(--bg-hover,rgba(0,0,0,.04))}' +
+        '.ap-history-ticker{font-weight:600;font-size:13px;color:var(--text-primary,#222);min-width:50px}' +
+        '.ap-history-meta{font-size:11px;color:var(--text-secondary,#888);text-align:right}' +
+        '.ap-history-meta span{display:block}' +
+        '.ap-history-empty{text-align:center;padding:40px 16px;color:var(--text-secondary,#888);font-size:13px}';
+    document.head.appendChild(style);
+}
+
+function _formatHistoryDate(isoStr) {
+    if (!isoStr) return '';
+    var d = new Date(isoStr);
+    var now = new Date();
+    var diff = now - d;
+    if (diff < 86400000) {
+        return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+    }
+    if (diff < 604800000) {
+        return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+    }
+    return d.getDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+}
+
+async function _fetchConversationList() {
+    if (isFile) return [];
+    var token = window.CI_AUTH && window.CI_AUTH.getToken();
+    var guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
+    if (!token && !guestId) return [];
+
+    var headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    var url = apiOrigin + '/api/conversations' + (token ? '' : '?guest_id=' + encodeURIComponent(guestId));
+    try {
+        var res = await fetch(url, { headers: headers });
+        if (!res.ok) return [];
+        var data = await res.json();
+        return data.conversations || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function _closeHistory() {
+    if (historyOverlay && historyOverlay.parentNode) {
+        historyOverlay.parentNode.removeChild(historyOverlay);
+    }
+    historyOverlay = null;
+}
+
+async function openHistory() {
+    _injectHistoryCSS();
+    _closeHistory();
+
+    historyOverlay = document.createElement('div');
+    historyOverlay.className = 'ap-history-overlay';
+
+    var head = document.createElement('div');
+    head.className = 'ap-history-head';
+    head.innerHTML = '<h3>History</h3><button class="ap-history-close" aria-label="Close history">&times;</button>';
+    head.querySelector('.ap-history-close').addEventListener('click', _closeHistory);
+    historyOverlay.appendChild(head);
+
+    var listEl = document.createElement('div');
+    listEl.className = 'ap-history-list';
+    listEl.innerHTML = '<div class="ap-history-empty">Loading...</div>';
+    historyOverlay.appendChild(listEl);
+
+    panel.appendChild(historyOverlay);
+
+    var convos = await _fetchConversationList();
+    if (convos.length === 0) {
+        listEl.innerHTML = '<div class="ap-history-empty">No conversation history yet</div>';
+        return;
+    }
+
+    listEl.innerHTML = '';
+    convos.forEach(function(c) {
+        var item = document.createElement('div');
+        item.className = 'ap-history-item';
+        item.innerHTML =
+            '<span class="ap-history-ticker">' + escapeHtml(c.ticker) + '</span>' +
+            '<div class="ap-history-meta">' +
+                '<span>' + c.message_count + ' message' + (c.message_count === 1 ? '' : 's') + '</span>' +
+                '<span>' + _formatHistoryDate(c.updated_at || c.created_at) + '</span>' +
+            '</div>';
+        item.addEventListener('click', function() {
+            _closeHistory();
+            currentTicker = c.ticker;
+            if (tickerSelect) tickerSelect.value = c.ticker;
+            updateTickerBadge();
+            _restoreFromDB(c.ticker).then(renderConversation);
+        });
+        listEl.appendChild(item);
+    });
+}
+
+// ============================================================
 // EVENT LISTENERS
 // ============================================================
 
@@ -569,6 +686,11 @@ if (panel) {
     // Collapse/close button
     if (collapseBtn) {
         collapseBtn.addEventListener('click', closePanel);
+    }
+
+    // History panel
+    if (historyBtn) {
+        historyBtn.addEventListener('click', openHistory);
     }
 
     // Clear conversation

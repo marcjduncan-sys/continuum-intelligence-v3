@@ -56,7 +56,7 @@ export function initRouter(pageRenderers) {
     } else if (hash.startsWith('snapshot-')) {
       pageName = hash.replace('snapshot-', '') + ' Snapshot';
     } else {
-      var names = { home: 'Research Home', 'deep-research': 'Deep Research', portfolio: 'Portfolio Intelligence', comparator: 'Investment Thesis Comparator', personalisation: 'Personalisation', about: 'About' };
+      var names = { home: 'Research Home', 'deep-research': 'Deep Research', portfolio: 'Portfolio Intelligence', comparator: 'Investment Thesis Comparator', personalisation: 'Personalisation', memory: 'Memory Dashboard', about: 'About' };
       pageName = names[hash] || hash;
     }
     announcePageChange('Navigated to ' + pageName);
@@ -233,6 +233,11 @@ export function route() {
   }
   if (hash === 'personalisation' && renderedPages.has('_personalisation')) {
     if (typeof window.pnOnRouteEnter === 'function') window.pnOnRouteEnter();
+  }
+
+  // Lazy render memory dashboard on each visit (always refresh)
+  if (hash === 'memory' && _pageRenderers.renderMemoryPage) {
+    _pageRenderers.renderMemoryPage();
   }
 
   // Lazy render snapshot pages on first visit

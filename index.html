@@ -51,6 +51,7 @@
             <a href="#comparator" data-nav="comparator">Comparator</a>
             <a href="#portfolio" data-nav="portfolio">Portfolio</a>
             <a href="#personalisation" data-nav="personalisation">Personalisation</a>
+            <a href="#memory" data-nav="memory">Memory</a>
             <a href="#about" data-nav="about">About</a>
         </div>
         <div class="nav-actions">
@@ -632,6 +633,11 @@
      ============================================================ -->
 <div class="page" id="page-personalisation"></div>
 
+<!-- ============================================================
+     PAGE: MEMORY DASHBOARD
+     ============================================================ -->
+<div class="page" id="page-memory"></div>
+
 <!-- Report Pages (dynamically rendered) -->
 <div class="page" id="page-report-WOW"></div>
 <div class="page" id="page-report-XRO"></div>
@@ -721,10 +727,19 @@
                 <div class="ap-header-title">ANALYST</div>
                 <div class="ap-context-bar">
                     <span class="ap-ticker-badge" id="apTickerBadge">ALL COVERAGE</span>
+                    <div class="tm-badge-group" aria-label="Thesis alerts">
+                        <span class="tm-badge tm-badge-conflict" data-count="0" style="display:none" role="status">0 conflicts</span>
+                        <span class="tm-badge tm-badge-signal" data-count="0" style="display:none" role="status">0 signals</span>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="ap-header-actions">
+            <button class="ap-history-btn" id="apHistoryBtn" title="Conversation history" aria-label="Conversation history">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+            </button>
             <button class="ap-clear-btn" id="apClearBtn" title="Clear conversation" aria-label="Clear conversation">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
@@ -736,6 +751,14 @@
                 </svg>
             </button>
         </div>
+    </div>
+
+    <div class="tm-panel" style="display:none" role="dialog" aria-label="Thesis monitor alerts">
+        <div class="tm-panel-header">
+            <span class="tm-panel-title">Thesis monitor</span>
+            <button class="tm-panel-close" aria-label="Close thesis monitor">&times;</button>
+        </div>
+        <div class="tm-panel-body"></div>
     </div>
 
     <div class="ap-ticker-bar">
