@@ -61,6 +61,53 @@ class AppendMessageRequest(BaseModel):
 # Endpoints
 # ---------------------------------------------------------------------------
 
+@router.get("")
+async def list_conversations(request: Request, guest_id: str | None = None):
+    """List all conversations for the current user or guest, newest first."""
+    user_id, resolved_guest_id = _get_identity(request, guest_id)
+    if not user_id and not resolved_guest_id:
+        return {"conversations": []}
+
+    pool = await db.get_pool()
+    if not pool:
+        return {"conversations": []}
+
+    try:
+        async with pool.acquire() as conn:
+            if user_id:
+                rows = await conn.fetch(
+                    "SELECT c.id, c.ticker, c.started_at, c.last_message_at, "
+                    "(SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id) as message_count "
+                    "FROM conversations c WHERE c.user_id = $1 "
+                    "ORDER BY c.last_message_at DESC NULLS LAST LIMIT 50",
+                    user_id,
+                )
+            else:
+                rows = await conn.fetch(
+                    "SELECT c.id, c.ticker, c.started_at, c.last_message_at, "
+                    "(SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id) as message_count "
+                    "FROM conversations c WHERE c.guest_id = $1 "
+                    "ORDER BY c.last_message_at DESC NULLS LAST LIMIT 50",
+                    resolved_guest_id,
+                )
+
+        return {
+            "conversations": [
+                {
+                    "id": str(row["id"]),
+                    "ticker": row["ticker"],
+                    "message_count": row["message_count"],
+                    "created_at": row["started_at"].isoformat() if row["started_at"] else None,
+                    "updated_at": row["last_message_at"].isoformat() if row["last_message_at"] else None,
+                }
+                for row in rows
+            ]
+        }
+    except Exception as exc:
+        logger.error("Failed to list conversations: %s", exc)
+        return {"conversations": []}
+
+
 @router.post("")
 async def create_conversation(body: CreateConversationRequest, request: Request):
     """Create a new conversation for a ticker. Requires user JWT or guest_id."""

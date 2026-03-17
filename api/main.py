@@ -784,6 +784,77 @@ async def insights_scan(
         raise HTTPException(status_code=500, detail="Insight scan failed")
 
 
+# ---------------------------------------------------------------------------
+# Memory endpoints
+# ---------------------------------------------------------------------------
+
+
+@app.get("/api/memories")
+async def list_memories(request: Request, guest_id: str | None = None):
+    """List all active memories for the current user or guest."""
+    auth_header = request.headers.get("Authorization", "")
+    user_id = None
+    if auth_header.startswith("Bearer "):
+        payload = decode_token(auth_header[7:])
+        if payload:
+            user_id = payload.get("sub")
+    resolved_guest_id = guest_id if not user_id else None
+
+    if not user_id and not resolved_guest_id:
+        return {"memories": [], "count": 0}
+
+    pool = await db.get_pool()
+    if not pool:
+        return {"memories": [], "count": 0}
+
+    try:
+        rows = await db.get_memories(
+            pool, user_id=user_id, guest_id=resolved_guest_id, active_only=True
+        )
+        return {"memories": rows, "count": len(rows)}
+    except Exception as exc:
+        logger.error("Failed to list memories: %s", exc)
+        return {"memories": [], "count": 0}
+
+
+@app.delete("/api/memories/{memory_id}")
+async def delete_memory(memory_id: str, request: Request, guest_id: str | None = None):
+    """Delete (deactivate) a specific memory."""
+    auth_header = request.headers.get("Authorization", "")
+    user_id = None
+    if auth_header.startswith("Bearer "):
+        payload = decode_token(auth_header[7:])
+        if payload:
+            user_id = payload.get("sub")
+    resolved_guest_id = guest_id if not user_id else None
+
+    if not user_id and not resolved_guest_id:
+        raise HTTPException(status_code=400, detail="Authentication required")
+
+    pool = await db.get_pool()
+    if not pool:
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    try:
+        async with pool.acquire() as conn:
+            if user_id:
+                result = await conn.execute(
+                    "UPDATE memories SET active = FALSE, updated_at = NOW() "
+                    "WHERE id = $1::uuid AND user_id = $2",
+                    memory_id, user_id,
+                )
+            else:
+                result = await conn.execute(
+                    "UPDATE memories SET active = FALSE, updated_at = NOW() "
+                    "WHERE id = $1::uuid AND guest_id = $2",
+                    memory_id, resolved_guest_id,
+                )
+        return {"deleted": True, "id": memory_id}
+    except Exception as exc:
+        logger.error("Failed to delete memory %s: %s", memory_id, exc)
+        raise HTTPException(status_code=500, detail="Failed to delete memory")
+
+
 @app.get("/api/admin/llm-usage")
 async def llm_usage(days: int = 7):
     """LLM cost breakdown by feature, model, and provider."""
