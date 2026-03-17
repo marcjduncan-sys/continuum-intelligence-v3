@@ -2364,21 +2364,52 @@ export function renderPriceDriversContent(container, driverData) {
     return;
   }
 
-  // Support both new schema (driver_stack/report) and old (ranked_conclusion/report_text)
   var ds = driverData.driver_stack || {};
   var rc = driverData.ranked_conclusion || {};
   var rt = driverData.report_text || {};
   var pa = driverData.price_action_summary || {};
-  var msc = driverData.macro_sector_context || {};
   var eq = driverData.evidence_quality || {};
+  var ba = driverData.broker_activity || {};
+  var ss = driverData.social_signal || {};
   var meta = driverData.agent_metadata || {};
   var conf = driverData.confidence || rc.overall_confidence || 'moderate';
-
-  var movePct = pa.price_change_5d_pct;
-  var moveDir = movePct > 0 ? '+' : '';
-  var moveCls = movePct > 1 ? 'pd-move-up' : movePct < -1 ? 'pd-move-down' : 'pd-move-flat';
   var confCls = conf === 'very_high' || conf === 'high' ? 'pd-conf-high' : conf === 'moderate' ? 'pd-conf-mod' : 'pd-conf-low';
   var dateStr = _formatDriverDate(driverData.analysis_date || meta.analysis_date);
+  var ticker = driverData.ticker || '';
+
+  // Performance grid helper
+  function _fmtCell(val) {
+    if (val == null) return '<span class="pd-perf-cell pd-perf-flat">N/A</span>';
+    var dir = val > 0 ? '+' : '';
+    var cls = val > 0.1 ? 'pd-perf-up' : val < -0.1 ? 'pd-perf-down' : 'pd-perf-flat';
+    return '<span class="pd-perf-cell ' + cls + '">' + dir + val.toFixed(1) + '%</span>';
+  }
+
+  // Performance grid
+  var gridHtml =
+    '<div class="pd-perf-grid">' +
+      '<div class="pd-perf-row"><span class="pd-perf-cell pd-perf-header"></span><span class="pd-perf-cell pd-perf-header">2D</span><span class="pd-perf-cell pd-perf-header">5D</span><span class="pd-perf-cell pd-perf-header">10D</span></div>' +
+      '<div class="pd-perf-row"><span class="pd-perf-cell pd-perf-label">' + ticker + '</span>' + _fmtCell(pa.price_change_2d_pct) + _fmtCell(pa.price_change_5d_pct) + _fmtCell(pa.price_change_10d_pct) + '</div>' +
+      '<div class="pd-perf-row"><span class="pd-perf-cell pd-perf-label">ASX 200</span>' + _fmtCell(pa.asx200_change_2d_pct) + _fmtCell(pa.asx200_change_5d_pct) + _fmtCell(pa.asx200_change_10d_pct) + '</div>' +
+      '<div class="pd-perf-row"><span class="pd-perf-cell pd-perf-label">Relative</span>' + _fmtCell(pa.relative_2d_pct) + _fmtCell(pa.relative_5d_pct) + _fmtCell(pa.relative_10d_pct) + '</div>' +
+    '</div>';
+
+  // Broker alerts
+  var brokerHtml = '';
+  var upgrades = ba.recent_upgrades || [];
+  var downgrades = ba.recent_downgrades || [];
+  for (var u = 0; u < upgrades.length && u < 2; u++) {
+    brokerHtml += '<div class="pd-broker-alert pd-broker-upgrade">\u2191 UPGRADE: ' + _truncate(upgrades[u], 200) + '</div>';
+  }
+  for (var dg = 0; dg < downgrades.length && dg < 2; dg++) {
+    brokerHtml += '<div class="pd-broker-alert pd-broker-downgrade">\u2193 DOWNGRADE: ' + _truncate(downgrades[dg], 200) + '</div>';
+  }
+
+  // Social badge
+  var socialHtml = '';
+  var hcAct = ss.hotcopper_activity || '';
+  if (hcAct === 'elevated') socialHtml = '<span class="pd-social pd-social-elevated">HC: Elevated</span>';
+  else if (hcAct === 'quiet') socialHtml = '<span class="pd-social pd-social-quiet">HC: Quiet</span>';
 
   // Build 5 bullets from available data (new or old schema)
   var MAX = 250;
@@ -2400,7 +2431,8 @@ export function renderPriceDriversContent(container, driverData) {
     bullets.push('<b>Secondary:</b> ' + _truncate(rt.secondary_drivers_paragraph, MAX));
   }
 
-  // Bullet 3: Peer and macro context
+  // Bullet 3: Peer and macro context or amplifiers
+  var msc = driverData.macro_sector_context || {};
   var peerText = msc.peer_moves_summary || '';
   var macroText = msc.commodity_or_rate_context || '';
   if (peerText && macroText) {
@@ -2410,7 +2442,6 @@ export function renderPriceDriversContent(container, driverData) {
   } else if (macroText) {
     bullets.push('<b>Macro context:</b> ' + _truncate(macroText, MAX));
   }
-  // Fallback: amplifiers if no macro/peer
   if (!peerText && !macroText) {
     var amps = ds.amplifiers || rc.amplifiers || [];
     if (amps.length > 0) {
@@ -2454,10 +2485,12 @@ export function renderPriceDriversContent(container, driverData) {
     '<div class="pd-block">' +
       '<div class="pd-header">' +
         '<span class="pd-label">WHAT DROVE THE PRICE</span>' +
-        '<span class="pd-move ' + moveCls + '">' + moveDir + (movePct || 0).toFixed(1) + '% (5d)</span>' +
         '<span class="pd-conf ' + confCls + '">' + conf.replace(/_/g, ' ') + '</span>' +
+        socialHtml +
         (dateStr ? '<span class="pd-date">' + dateStr + '</span>' : '') +
       '</div>' +
+      gridHtml +
+      brokerHtml +
       bulletsHtml +
     '</div>';
 }
