@@ -2087,17 +2087,51 @@ export function renderPriceDrivers(data) {
   var pa = pd.price_action_summary || {};
   var msc = pd.macro_sector_context || {};
   var eq = pd.evidence_quality || {};
+  var ba = pd.broker_activity || {};
+  var ss = pd.social_signal || {};
   var conf = pd.confidence || 'moderate';
   var primary = pd.primary_driver || '';
+  var ticker = data.ticker || '';
 
   if (!primary && ds.primary && ds.primary.length > 0) primary = ds.primary[0];
   if (!primary) return '';
 
-  var movePct = pa.price_change_5d_pct || 0;
-  var moveDir = movePct > 0 ? '+' : '';
-  var moveCls = movePct > 1 ? 'pd-move-up' : movePct < -1 ? 'pd-move-down' : 'pd-move-flat';
   var confCls = conf === 'very_high' || conf === 'high' ? 'pd-conf-high' : conf === 'moderate' ? 'pd-conf-mod' : 'pd-conf-low';
   var dateStr = _formatDriverDate(pd.analysis_date);
+
+  // Performance grid helper
+  function _fmtCell(val) {
+    if (val == null) return '<span class="pd-perf-cell pd-perf-flat">N/A</span>';
+    var dir = val > 0 ? '+' : '';
+    var cls = val > 0.1 ? 'pd-perf-up' : val < -0.1 ? 'pd-perf-down' : 'pd-perf-flat';
+    return '<span class="pd-perf-cell ' + cls + '">' + dir + val.toFixed(1) + '%</span>';
+  }
+
+  // Performance grid
+  var gridHtml =
+    '<div class="pd-perf-grid">' +
+      '<div class="pd-perf-row"><span class="pd-perf-cell pd-perf-header"></span><span class="pd-perf-cell pd-perf-header">2D</span><span class="pd-perf-cell pd-perf-header">5D</span><span class="pd-perf-cell pd-perf-header">10D</span></div>' +
+      '<div class="pd-perf-row"><span class="pd-perf-cell pd-perf-label">' + ticker + '</span>' + _fmtCell(pa.price_change_2d_pct) + _fmtCell(pa.price_change_5d_pct) + _fmtCell(pa.price_change_10d_pct) + '</div>' +
+      '<div class="pd-perf-row"><span class="pd-perf-cell pd-perf-label">ASX 200</span>' + _fmtCell(pa.asx200_change_2d_pct) + _fmtCell(pa.asx200_change_5d_pct) + _fmtCell(pa.asx200_change_10d_pct) + '</div>' +
+      '<div class="pd-perf-row"><span class="pd-perf-cell pd-perf-label">Relative</span>' + _fmtCell(pa.relative_2d_pct) + _fmtCell(pa.relative_5d_pct) + _fmtCell(pa.relative_10d_pct) + '</div>' +
+    '</div>';
+
+  // Broker alerts
+  var brokerHtml = '';
+  var upgrades = ba.recent_upgrades || [];
+  var downgrades = ba.recent_downgrades || [];
+  for (var u = 0; u < upgrades.length && u < 2; u++) {
+    brokerHtml += '<div class="pd-broker-alert pd-broker-upgrade">\u2191 UPGRADE: ' + _truncate(upgrades[u], 200) + '</div>';
+  }
+  for (var dg = 0; dg < downgrades.length && dg < 2; dg++) {
+    brokerHtml += '<div class="pd-broker-alert pd-broker-downgrade">\u2193 DOWNGRADE: ' + _truncate(downgrades[dg], 200) + '</div>';
+  }
+
+  // Social badge
+  var socialHtml = '';
+  var hcAct = ss.hotcopper_activity || '';
+  if (hcAct === 'elevated') socialHtml = '<span class="pd-social pd-social-elevated">HC: Elevated</span>';
+  else if (hcAct === 'quiet') socialHtml = '<span class="pd-social pd-social-quiet">HC: Quiet</span>';
 
   var MAX = 250;
   var bullets = [];
@@ -2145,10 +2179,12 @@ export function renderPriceDrivers(data) {
       '<div class="pd-block">' +
         '<div class="pd-header">' +
           '<span class="pd-label">WHAT DROVE THE PRICE</span>' +
-          '<span class="pd-move ' + moveCls + '">' + moveDir + movePct.toFixed(1) + '% (5d)</span>' +
           '<span class="pd-conf ' + confCls + '">' + conf.replace(/_/g, ' ') + '</span>' +
+          socialHtml +
           (dateStr ? '<span class="pd-date">' + dateStr + '</span>' : '') +
         '</div>' +
+        gridHtml +
+        brokerHtml +
         bulletsHtml +
       '</div>' +
     '</div></div>';
