@@ -67,7 +67,10 @@ EXTRACTION_SYSTEM = (
     "- 0.9-1.0: manager stated the view directly and unambiguously.\n"
     "- 0.6-0.8: manager implied the view through questions or framing.\n"
     "- 0.3-0.5: view is weakly inferred; analyst had to read between the lines.\n"
-    "- Maximum 5 observations per turn."
+    "- Maximum 5 observations per turn.\n\n"
+    "When the user expresses views on broker upgrades/downgrades, price targets, or recent price moves, "
+    "extract these as 'positional' type memories with the relevant ticker. "
+    "These are positional-decay memories (90-day half-life) as broker views evolve."
 )
 
 _EXTRACTION_PROMPT = (

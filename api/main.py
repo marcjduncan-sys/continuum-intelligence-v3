@@ -288,6 +288,42 @@ def _build_context(passages: list[dict], ticker: str) -> str:
     return "\n".join(lines)
 
 
+def _get_price_snapshot(ticker: str) -> str:
+    """Build a brief price context string from the research data."""
+    try:
+        path = os.path.join(config.PROJECT_ROOT, "data", "research", f"{ticker}.json")
+        if not os.path.exists(path):
+            return ""
+        with open(path, "r") as f:
+            data = json.load(f)
+
+        parts = []
+
+        price = data.get("currentPrice")
+        if price:
+            parts.append(f"Current price: A${price:.2f}")
+
+        pd = data.get("priceDrivers", {})
+        pa = pd.get("price_action_summary", {})
+        if pa:
+            for period in ["2d", "5d", "10d"]:
+                sv = pa.get(f"price_change_{period}_pct")
+                rv = pa.get(f"relative_{period}_pct")
+                if sv is not None:
+                    rel_str = f" (relative to ASX200: {rv:+.1f}%)" if rv is not None else ""
+                    parts.append(f"{period.upper()} move: {sv:+.1f}%{rel_str}")
+
+        skew = data.get("_skew")
+        if skew is not None:
+            parts.append(f"Continuum Skew: {skew}")
+
+        if not parts:
+            return ""
+        return "\n**Live context:** " + " | ".join(parts) + "\n"
+    except Exception:
+        return ""
+
+
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
@@ -358,6 +394,11 @@ async def research_chat(request: Request, body: ResearchChatRequest, background_
     if body.thesis_alignment:
         user_message += f"**Thesis alignment:** {body.thesis_alignment}\n"
     user_message += f"**Question:** {body.question}"
+
+    # Inject price snapshot into user message
+    price_ctx = _get_price_snapshot(ticker)
+    if price_ctx:
+        user_message += price_ctx
 
     messages.append({"role": "user", "content": user_message})
 

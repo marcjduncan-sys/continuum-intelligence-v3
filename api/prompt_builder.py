@@ -57,7 +57,16 @@ DEFAULT_SYSTEM_PROMPT = (
     "Distinguish between facts (statutory filings, audited data), motivated claims "
     "(company communications), consensus views (broker research), and noise (media/social). "
     "Highlight what discriminates between hypotheses. Be direct about what is unknown or uncertain. "
-    "Flag research gaps explicitly. If the research is stale or a catalyst has passed, note this."
+    "Flag research gaps explicitly. If the research is stale or a catalyst has passed, note this.\n\n"
+    "You now have access to price driver analysis passages in the research context. "
+    "These contain: recent 2D/5D/10D price performance vs the ASX200, "
+    "broker upgrade/downgrade activity, social media signal levels (HotCopper, Reddit), "
+    "and attribution analysis explaining what drove recent price moves. "
+    "When answering questions about recent price action, short-term catalysts, "
+    "or broker views, reference these passages. "
+    "Broker upgrades and downgrades are high-priority signals -- always mention them when present. "
+    "When discussing a stock's recent move, state the relative performance vs ASX200 "
+    "to distinguish stock-specific moves from broad market moves."
 ) + VOICE_RULES
 
 
@@ -244,6 +253,19 @@ def build_personalised_prompt(data: dict) -> str:
     p += f"Format preference: {prefs.get('format', '')}\n"
     p += f"Update frequency: {prefs.get('updateFrequency', '')}\n"
     p += f"Under stress: {prefs.get('stressResponse', '')}\n\n"
+
+    # -- Price driver awareness
+    p += (
+        "\nYou now have access to price driver analysis passages in the research context. "
+        "These contain: recent 2D/5D/10D price performance vs the ASX200, "
+        "broker upgrade/downgrade activity, social media signal levels (HotCopper, Reddit), "
+        "and attribution analysis explaining what drove recent price moves. "
+        "When answering questions about recent price action, short-term catalysts, "
+        "or broker views, reference these passages. "
+        "Broker upgrades and downgrades are high-priority signals -- always mention them when present. "
+        "When discussing a stock's recent move, state the relative performance vs ASX200 "
+        "to distinguish stock-specific moves from broad market moves.\n"
+    )
 
     # -- Append voice rules
     p += VOICE_RULES

@@ -550,6 +550,178 @@ def _chunk_stock(ticker: str, data: dict, ref: dict | None = None, fresh: dict |
             weight=0.5,
         ))
 
+    # -- Price Drivers (What Drove the Price)
+    pd = data.get("priceDrivers")
+    if pd and isinstance(pd, dict) and not pd.get("error"):
+        primary = pd.get("primary_driver", "")
+        conf = pd.get("confidence", "")
+        ds = pd.get("driver_stack", {})
+        pa = pd.get("price_action_summary", {})
+        ba = pd.get("broker_activity", {})
+        ss = pd.get("social_signal", {})
+        report = pd.get("report", {})
+        date = pd.get("analysis_date", "")
+
+        # Build a summary passage
+        summary_parts = []
+        if date:
+            summary_parts.append(f"Price driver analysis date: {date}.")
+        if primary:
+            summary_parts.append(f"Primary driver: {primary}")
+        if conf:
+            summary_parts.append(f"Confidence: {conf}.")
+
+        # Price action vs ASX200
+        moves = []
+        for period in ["2d", "5d", "10d"]:
+            sk = f"price_change_{period}_pct"
+            ik = f"asx200_change_{period}_pct"
+            rk = f"relative_{period}_pct"
+            sv = pa.get(sk)
+            iv = pa.get(ik)
+            rv = pa.get(rk)
+            if sv is not None:
+                move = f"{period.upper()}: stock {sv:+.1f}%"
+                if iv is not None:
+                    move += f", ASX200 {iv:+.1f}%"
+                if rv is not None:
+                    move += f", relative {rv:+.1f}%"
+                moves.append(move)
+        if moves:
+            summary_parts.append("Recent performance: " + "; ".join(moves) + ".")
+
+        if summary_parts:
+            passages.append(Passage(
+                ticker=ticker,
+                section="price_drivers",
+                subsection="summary",
+                content=" ".join(summary_parts),
+                tags=["price_driver", "short_term", "attribution"],
+                weight=1.2,
+            ))
+
+        # Driver stack detail
+        stack_parts = []
+        for key, label in [("primary", "Primary"), ("secondary", "Secondary"), ("amplifiers", "Amplifiers"), ("rejected", "Ruled out")]:
+            items = ds.get(key, [])
+            if items:
+                stack_parts.append(f"{label}: {'; '.join(items[:3])}")
+        if stack_parts:
+            passages.append(Passage(
+                ticker=ticker,
+                section="price_drivers",
+                subsection="driver_stack",
+                content=". ".join(stack_parts),
+                tags=["price_driver", "attribution"],
+                weight=1.0,
+            ))
+
+        # Broker activity
+        upgrades = ba.get("recent_upgrades", [])
+        downgrades = ba.get("recent_downgrades", [])
+        consensus = ba.get("consensus_change")
+        if upgrades or downgrades or consensus:
+            broker_parts = []
+            for u in upgrades[:3]:
+                broker_parts.append(f"UPGRADE: {u}")
+            for d in downgrades[:3]:
+                broker_parts.append(f"DOWNGRADE: {d}")
+            if consensus:
+                broker_parts.append(f"Consensus: {consensus}")
+            passages.append(Passage(
+                ticker=ticker,
+                section="price_drivers",
+                subsection="broker_activity",
+                content=". ".join(broker_parts),
+                tags=["price_driver", "broker", "upgrade", "downgrade"],
+                weight=1.5,
+            ))
+
+        # Social signal
+        hc = ss.get("hotcopper_activity", "")
+        reddit = ss.get("reddit_activity", "")
+        led_lagged = ss.get("social_led_or_lagged", "")
+        if hc or reddit or led_lagged:
+            social_parts = []
+            if hc:
+                social_parts.append(f"HotCopper activity: {hc}")
+            if reddit:
+                social_parts.append(f"Reddit activity: {reddit}")
+            if led_lagged:
+                social_parts.append(f"Social signal timing: {led_lagged}")
+            passages.append(Passage(
+                ticker=ticker,
+                section="price_drivers",
+                subsection="social_signal",
+                content=". ".join(social_parts),
+                tags=["price_driver", "social", "sentiment"],
+                weight=0.8,
+            ))
+
+        # Full note (if available, truncated)
+        full_note = report.get("full_note", "")
+        if full_note and len(full_note) > 100:
+            passages.append(Passage(
+                ticker=ticker,
+                section="price_drivers",
+                subsection="full_note",
+                content=full_note[:1500],
+                tags=["price_driver", "analysis", "note"],
+                weight=1.0,
+            ))
+
+    # -- Gold Analysis (for gold/mining stocks)
+    ga = data.get("goldAnalysis")
+    if ga and isinstance(ga, dict):
+        exec_summary = ga.get("executive_summary", "")
+        if exec_summary:
+            passages.append(Passage(
+                ticker=ticker,
+                section="gold_analysis",
+                subsection="executive_summary",
+                content=exec_summary,
+                tags=["gold", "sector", "mining"],
+                weight=1.1,
+            ))
+
+        iv = ga.get("investment_view", {})
+        if iv:
+            view_parts = []
+            if iv.get("bull_case"):
+                view_parts.append(f"Bull case: {iv['bull_case']}")
+            if iv.get("base_case"):
+                view_parts.append(f"Base case: {iv['base_case']}")
+            if iv.get("bear_case"):
+                view_parts.append(f"Bear case: {iv['bear_case']}")
+            if view_parts:
+                passages.append(Passage(
+                    ticker=ticker,
+                    section="gold_analysis",
+                    subsection="investment_view",
+                    content=". ".join(view_parts),
+                    tags=["gold", "sector", "thesis"],
+                    weight=1.0,
+                ))
+
+        km = ga.get("key_metrics", {})
+        if km:
+            metric_parts = []
+            if km.get("aisc_per_oz") is not None:
+                metric_parts.append(f"AISC: A${km['aisc_per_oz']}/oz")
+            if km.get("production_koz_annual") is not None:
+                metric_parts.append(f"Production: {km['production_koz_annual']}koz/yr")
+            if km.get("reserve_life_years") is not None:
+                metric_parts.append(f"Reserve life: {km['reserve_life_years']}yr")
+            if metric_parts:
+                passages.append(Passage(
+                    ticker=ticker,
+                    section="gold_analysis",
+                    subsection="key_metrics",
+                    content=". ".join(metric_parts),
+                    tags=["gold", "metrics", "production"],
+                    weight=1.0,
+                ))
+
     return passages
 
 
