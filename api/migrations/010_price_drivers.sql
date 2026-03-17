@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS price_driver_reports (
     report_json JSONB NOT NULL,
     analysis_date DATE NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    expires_at TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '48 hours',
+    expires_at TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '7 days',
     UNIQUE(ticker, analysis_date)
 );
 

@@ -248,6 +248,125 @@ SECTOR_COMMODITY_MAP: dict[str, dict] = {
             "counter drone UAS military technology conflict",
         ],
     },
+    # === Gold Miners ===
+    "NST": {
+        "label": "Gold Miner",
+        "commodities": [
+            {"ticker": "GC=F", "name": "Gold"},
+            {"ticker": "SI=F", "name": "Silver"},
+        ],
+        "macro_queries": [
+            "gold price outlook safe haven",
+            "gold mining costs production Australia",
+        ],
+    },
+    "EVN": {
+        "label": "Gold Miner",
+        "commodities": [
+            {"ticker": "GC=F", "name": "Gold"},
+        ],
+        "macro_queries": [
+            "gold price outlook safe haven",
+            "gold mining production costs Australia",
+        ],
+    },
+    "WAF": {
+        "label": "Gold Miner (West Africa)",
+        "commodities": [
+            {"ticker": "GC=F", "name": "Gold"},
+        ],
+        "macro_queries": [
+            "gold price outlook safe haven",
+            "West Africa gold mining geopolitical risk",
+        ],
+    },
+    "ASB": {
+        "label": "Gold Miner",
+        "commodities": [
+            {"ticker": "GC=F", "name": "Gold"},
+        ],
+        "macro_queries": [
+            "gold price outlook safe haven",
+            "Australian gold mining production",
+        ],
+    },
+    "OBM": {
+        "label": "Gold Miner",
+        "commodities": [
+            {"ticker": "GC=F", "name": "Gold"},
+        ],
+        "macro_queries": [
+            "gold price outlook safe haven",
+            "gold exploration development Australia",
+        ],
+    },
+    "WIA": {
+        "label": "Gold Miner",
+        "commodities": [
+            {"ticker": "GC=F", "name": "Gold"},
+        ],
+        "macro_queries": [
+            "gold price outlook safe haven",
+            "Australian gold mining exploration",
+        ],
+    },
+    # === Materials / Mining (cont.) ===
+    "MIN": {
+        "label": "Iron Ore & Lithium Miner",
+        "commodities": [
+            {"ticker": "HG=F", "name": "Copper"},
+            {"ticker": "GC=F", "name": "Gold"},
+        ],
+        "macro_queries": [
+            "iron ore price China steel demand",
+            "lithium price EV battery demand outlook",
+        ],
+    },
+    "RMC": {
+        "label": "Oil & Gas Explorer",
+        "commodities": [
+            {"ticker": "BZ=F", "name": "Brent Crude"},
+            {"ticker": "NG=F", "name": "Natural Gas"},
+        ],
+        "macro_queries": [
+            "oil price OPEC supply outlook",
+            "Australia oil gas exploration permits",
+        ],
+    },
+    # === Energy (cont.) ===
+    "STO": {
+        "label": "Oil & Gas / LNG Producer",
+        "commodities": [
+            {"ticker": "BZ=F", "name": "Brent Crude"},
+            {"ticker": "NG=F", "name": "Natural Gas"},
+        ],
+        "macro_queries": [
+            "oil price OPEC geopolitical supply",
+            "LNG demand Asia energy markets",
+        ],
+    },
+    # === Technology / Software (cont.) ===
+    "SNX": {
+        "label": "Cloud Security SaaS",
+        "commodities": [
+            {"ticker": "AUDUSD=X", "name": "AUD/USD"},
+        ],
+        "macro_queries": [
+            "cloud security cybersecurity spending enterprise",
+            "SaaS ARR growth technology outlook",
+        ],
+    },
+    # === Real Estate / Property (cont.) ===
+    "REA": {
+        "label": "Online Property Portal",
+        "commodities": [
+            {"ticker": "AUDUSD=X", "name": "AUD/USD"},
+        ],
+        "macro_queries": [
+            "Australia property market housing listings",
+            "RBA interest rate housing affordability",
+        ],
+    },
 }
 
 

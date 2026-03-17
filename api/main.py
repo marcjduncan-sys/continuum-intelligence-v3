@@ -614,25 +614,23 @@ async def drivers_analyse(ticker: str, request: Request, force: bool = True):
 
 
 @app.post("/api/agents/drivers/scan")
-async def drivers_scan(request: Request, background_tasks: BackgroundTasks, secret: str | None = Depends(_drivers_secret_header)):
+async def drivers_scan(request: Request, secret: str | None = Depends(_drivers_secret_header)):
     """
     Run daily price driver scan for all tickers.
 
     Protected by X-Drivers-Secret header. Triggered by price-drivers GitHub
-    Actions workflow at 22:00 UTC daily. Returns immediately; scan runs in background.
+    Actions workflow at 22:00 UTC daily. Runs synchronously -- the response
+    is returned only after the scan completes (30-45 minutes for ~30 tickers).
     """
     if not config.PRICE_DRIVERS_SECRET or secret != config.PRICE_DRIVERS_SECRET:
         raise HTTPException(status_code=401, detail="Invalid or missing drivers secret")
 
-    async def _run_scan():
-        try:
-            result = await run_price_driver_scan()
-            logger.info("Price driver scan complete: %s", result)
-        except Exception as exc:
-            logger.error("Price driver scan failed: %s", exc)
-
-    asyncio.ensure_future(_run_scan())
-    return {"status": "started", "message": "Price driver scan initiated in background"}
+    try:
+        result = await run_price_driver_scan()
+        return {"status": "complete", "result": result}
+    except Exception as exc:
+        logger.error("Price driver scan failed: %s", exc)
+        raise HTTPException(status_code=500, detail=f"Scan failed: {str(exc)}")
 
 
 # ---------------------------------------------------------------------------

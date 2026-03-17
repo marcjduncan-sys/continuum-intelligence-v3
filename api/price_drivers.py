@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 _result_cache: dict[str, dict] = {}
 _cache_timestamps: dict[str, float] = {}
-_CACHE_TTL = 86400  # 24 hours
+_CACHE_TTL = 604800  # 7 days
 
 
 def get_cached_result(ticker: str) -> dict | None:
@@ -107,6 +107,12 @@ PEER_MAP: dict[str, list[str]] = {
     "DRO": ["EOS.AX", "CEA.AX", "BRN.AX"],
     "ASB": ["RMS.AX", "CMM.AX", "AIS.AX"],
     "RMC": ["MYS.AX", "PTR.AX", "KAR.AX"],
+    "MIN": ["BHP", "FMG", "PLS.AX"],
+    "OBM": ["NST", "EVN", "WAF"],
+    "REA": ["DHG.AX", "CAR.AX", "SEK.AX"],
+    "SNX": ["XRO", "WTC", "OCL"],
+    "STO": ["WDS", "BPT.AX", "KAR.AX"],
+    "WIA": ["NST", "EVN", "ASB"],
 }
 
 # Sector-specific DDG site queries
@@ -312,6 +318,30 @@ async def _ddg_search(query: str, timeframe: str = "m", max_results: int = 5) ->
         return []
 
 
+def _compute_period_returns(stock_history: list[dict], index_history: list[dict]) -> dict:
+    """Compute 2D, 5D, 10D percentage returns for stock vs ASX200 from OHLCV."""
+    def _pct(history, days):
+        if not history or len(history) < days + 1:
+            return None
+        latest = history[-1].get("close")
+        prior = history[-(days + 1)].get("close")
+        if latest is None or prior is None or prior == 0:
+            return None
+        return round((latest - prior) / prior * 100, 2)
+
+    s2, s5, s10 = _pct(stock_history, 2), _pct(stock_history, 5), _pct(stock_history, 10)
+    i2, i5, i10 = _pct(index_history, 2), _pct(index_history, 5), _pct(index_history, 10)
+
+    def _rel(a, b):
+        return round(a - b, 2) if a is not None and b is not None else None
+
+    return {
+        "price_change_2d_pct": s2, "price_change_5d_pct": s5, "price_change_10d_pct": s10,
+        "asx200_change_2d_pct": i2, "asx200_change_5d_pct": i5, "asx200_change_10d_pct": i10,
+        "relative_2d_pct": _rel(s2, i2), "relative_5d_pct": _rel(s5, i5), "relative_10d_pct": _rel(s10, i10),
+    }
+
+
 async def gather_driver_data(
     ticker: str,
     company_name: str,
@@ -330,9 +360,17 @@ async def gather_driver_data(
     year = datetime.now(timezone.utc).year
 
     # Tier 1: always-run queries
-    ddg_broker = _ddg_search(
-        f'"{ticker}" broker upgrade downgrade target price site:sharecafe.com.au OR site:fnarena.com OR site:marketindex.com.au',
-        timeframe="m", max_results=8,
+    ddg_broker_upgrades = _ddg_search(
+        f'"{ticker}" upgrade overweight outperform buy "price target" site:fnarena.com OR site:sharecafe.com.au OR site:marketindex.com.au',
+        timeframe="w", max_results=5,
+    )
+    ddg_broker_downgrades = _ddg_search(
+        f'"{ticker}" downgrade underweight underperform sell "price target" site:fnarena.com OR site:sharecafe.com.au OR site:marketindex.com.au',
+        timeframe="w", max_results=5,
+    )
+    ddg_broker_notes = _ddg_search(
+        f'"{ticker}" broker note initiation coverage "price target" site:livewiremarkets.com OR site:marketindex.com.au',
+        timeframe="w", max_results=5,
     )
     ddg_insider = _ddg_search(
         f'"{ticker}" ASX director interest "Appendix 3Y" OR "short interest" OR "ASIC short"',
@@ -342,9 +380,17 @@ async def gather_driver_data(
         f'"{ticker}" site:afr.com.au OR site:themarketherald.com.au OR site:stockhead.com.au',
         timeframe="m", max_results=8,
     )
-    ddg_social = _ddg_search(
-        f'"{ticker}" site:hotcopper.com.au OR site:reddit.com',
-        timeframe="m", max_results=8,
+    ddg_hotcopper = _ddg_search(
+        f'"{ticker}" site:hotcopper.com.au',
+        timeframe="w", max_results=5,
+    )
+    ddg_reddit = _ddg_search(
+        f'"{ticker}" site:reddit.com/r/ASX_Bets OR site:reddit.com/r/ausstocks',
+        timeframe="w", max_results=5,
+    )
+    ddg_x_via_media = _ddg_search(
+        f'"{ticker}" twitter OR "on X" site:stockhead.com.au OR site:themarketherald.com.au OR site:smallcaps.com.au',
+        timeframe="w", max_results=5,
     )
     ddg_placement = _ddg_search(
         f'"{ticker}" ASX placement "capital raising" OR "block trade" OR SPP {year}',
@@ -375,17 +421,21 @@ async def gather_driver_data(
         fetch_asx_announcements(ticker, days=14),           # 4: ASX announcements
         web_search_news(company_name, ticker, num_results=10),  # 5: general news
         fetch_earnings_news(company_name, ticker, num_results=5),  # 6: earnings
-        ddg_broker,                                         # 7: broker research
-        ddg_insider,                                        # 8: insider/short
-        ddg_aus_media,                                      # 9: Australian media
-        ddg_social,                                         # 10: HotCopper/Reddit
-        ddg_placement,                                      # 11: capital raising
-        ddg_conference,                                     # 12: conferences
+        ddg_broker_upgrades,                                # 7: broker upgrades
+        ddg_broker_downgrades,                              # 8: broker downgrades
+        ddg_broker_notes,                                   # 9: broker notes
+        ddg_insider,                                        # 10: insider/short
+        ddg_aus_media,                                      # 11: Australian media
+        ddg_hotcopper,                                      # 12: HotCopper
+        ddg_reddit,                                         # 13: Reddit
+        ddg_x_via_media,                                    # 14: X via media
+        ddg_placement,                                      # 15: capital raising
+        ddg_conference,                                     # 16: conferences
     ]
     # Add commodity tasks
     for c in commodity_specs:
         tasks.append(fetch_commodity_price(c["ticker"], c["name"]))
-    commodity_offset = 13
+    commodity_offset = 17
     # Add macro task
     macro_task_idx = None
     if macro_queries:
@@ -415,6 +465,11 @@ async def gather_driver_data(
         if isinstance(r, list):
             sector_results.extend(r)
 
+    # Compute period returns from OHLCV data
+    _stock_hist = _safe(0, {}).get("history", []) if isinstance(_safe(0, {}), dict) else []
+    _index_hist = _safe(1, {}).get("history", []) if isinstance(_safe(1, {}), dict) else []
+    computed_returns = _compute_period_returns(_stock_hist, _index_hist)
+
     return {
         "price_data": _safe(0, {"error": "failed"}),
         "index_data": _safe(1, {"error": "failed"}),
@@ -423,15 +478,20 @@ async def gather_driver_data(
         "announcements": _safe(4, []),
         "news": _safe(5, []),
         "earnings_news": _safe(6, []),
-        "broker_research": _safe(7, []),
-        "insider_short": _safe(8, []),
-        "australian_media": _safe(9, []),
-        "social_sentiment": _safe(10, []),
-        "capital_raising": _safe(11, []),
-        "conferences": _safe(12, []),
+        "broker_upgrades": _safe(7, []),
+        "broker_downgrades": _safe(8, []),
+        "broker_notes": _safe(9, []),
+        "insider_short": _safe(10, []),
+        "australian_media": _safe(11, []),
+        "hotcopper": _safe(12, []),
+        "reddit": _safe(13, []),
+        "x_via_media": _safe(14, []),
+        "capital_raising": _safe(15, []),
+        "conferences": _safe(16, []),
         "commodity_prices": commodity_prices,
         "macro_news": _safe(macro_task_idx, []) if macro_task_idx else [],
         "sector_specific": sector_results,
+        "computed_returns": computed_returns,
         "gathered_at": datetime.now(timezone.utc).isoformat(),
         "resolved_sector": resolved_sector,
         "peers": peers,
@@ -449,7 +509,7 @@ Your goal is to build the strongest possible evidence pack explaining what most 
 Do not write the final client note. Your job here is to gather, sort, challenge and rank candidate explanations.
 
 Focus on six buckets:
-1. company-specific catalysts
+1. company-specific catalysts (broker upgrades/downgrades are the HIGHEST PRIORITY signal -- a single broker action can move a mid-cap stock 5-10% in a session)
 2. sector and peer sympathy
 3. macro drivers
 4. flow and microstructure
@@ -469,11 +529,19 @@ Source hierarchy matters:
 - reputable financial news and market data rank next
 - forums and social media rank lowest unless clearly leading a microcap move
 
+Broker rating changes are the single most actionable near-term catalyst for ASX stocks. If the data contains any broker upgrade, downgrade, target price change, or initiation of coverage within the last 10 trading days, this MUST be assessed as a candidate primary driver regardless of other factors. Do not relegate it to secondary unless evidence clearly shows the price moved before the broker note was published.
+
 Flow discipline matters:
 - distinguish confirmed, probable, possible and speculative flow explanations
 
 Sentiment discipline matters:
 - decide whether social/media chatter led, followed, amplified, or was irrelevant
+
+For each social channel (HotCopper, Reddit, X), determine:
+- Did social activity spike BEFORE or AFTER the price move?
+- Is discussion volume materially above normal for this stock?
+- Is sentiment directionally aligned with the move?
+Label each channel as: leading, lagging, amplifying, or irrelevant.
 
 Return valid JSON only with:
 - price action summary
@@ -647,6 +715,8 @@ For material points, clearly indicate whether the point is:
 - Inference
 - Speculation
 
+PRICE ACTION DATA: The price_action_summary percentage values (2D, 5D, 10D for both stock and ASX200) have been pre-computed from Yahoo Finance data and are provided in gathered_data.computed_returns. Copy these values EXACTLY into your price_action_summary output. Do not estimate or recalculate them.
+
 FINAL OUTPUT FORMAT
 
 Return valid JSON only, with this structure:
@@ -670,9 +740,15 @@ Return valid JSON only, with this structure:
     "full_note": "client-ready prose note of roughly 350-700 words"
   },
   "price_action_summary": {
-    "price_change_1d_pct": 0,
-    "price_change_5d_pct": 0,
-    "price_change_10d_pct": 0
+    "price_change_2d_pct": 0.0,
+    "price_change_5d_pct": 0.0,
+    "price_change_10d_pct": 0.0,
+    "asx200_change_2d_pct": 0.0,
+    "asx200_change_5d_pct": 0.0,
+    "asx200_change_10d_pct": 0.0,
+    "relative_2d_pct": 0.0,
+    "relative_5d_pct": 0.0,
+    "relative_10d_pct": 0.0
   },
   "evidence_quality": {
     "primary_evidence": "string",
@@ -681,6 +757,16 @@ Return valid JSON only, with this structure:
   },
   "change_my_mind": {
     "what_would_change_the_view": ["list of 2-4 concrete items"]
+  },
+  "broker_activity": {
+    "recent_upgrades": ["Broker: OldRating -> NewRating, target $X -> $Y, date"],
+    "recent_downgrades": ["same format as above"],
+    "consensus_change": "string or null"
+  },
+  "social_signal": {
+    "hotcopper_activity": "elevated | normal | quiet",
+    "reddit_activity": "elevated | normal | quiet",
+    "social_led_or_lagged": "led | lagged | amplified | irrelevant"
   }
 }
 
@@ -841,6 +927,12 @@ async def run_price_driver_analysis(
             "report": {"executive_summary": "Analysis could not be completed due to a synthesis error.", "full_note": "", "title": ""},
         }
 
+    # Inject programmatic returns -- overrides LLM estimates
+    if "computed_returns" in gathered:
+        if "price_action_summary" not in final_result:
+            final_result["price_action_summary"] = {}
+        final_result["price_action_summary"].update(gathered["computed_returns"])
+
     # Store in cache and DB
     cache_result(ticker, final_result)
     await _save_to_db(ticker, final_result)
@@ -910,7 +1002,7 @@ async def _save_to_db(ticker: str, report: dict) -> None:
             VALUES ($1, $2::jsonb, $3)
             ON CONFLICT (ticker, analysis_date)
             DO UPDATE SET report_json = $2::jsonb, created_at = NOW(),
-                          expires_at = NOW() + INTERVAL '48 hours'
+                          expires_at = NOW() + INTERVAL '7 days'
             """,
             ticker,
             json.dumps(report, default=str),
