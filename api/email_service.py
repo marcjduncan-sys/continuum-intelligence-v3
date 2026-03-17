@@ -49,6 +49,7 @@ async def send_otp_email(to_email: str, code: str) -> bool:
             username=config.SMTP_USER or None,
             password=config.SMTP_PASS or None,
             start_tls=True,
+            timeout=10,
         )
         logger.info("OTP email sent to %s", to_email)
         return True
