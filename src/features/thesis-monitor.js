@@ -565,26 +565,48 @@ function _inferThesisFromPortfolio(ticker, weight, stockData) {
 export function checkForAlerts(stockDataMap) {
   if (!stockDataMap) return 0;
 
+  // Collect all tickers with a thesis: from stored ci_thesis_* keys + portfolio
+  var tickerTheses = {};
+
+  // 1. Scan stored theses (from comparator, chat, portfolio captures)
+  try {
+    for (var si = 0; si < localStorage.length; si++) {
+      var sKey = localStorage.key(si);
+      if (sKey && sKey.indexOf('ci_thesis_') === 0 &&
+          sKey.indexOf('ci_thesis_alerts') !== 0 &&
+          sKey.indexOf('ci_thesis_signals') !== 0 &&
+          sKey.indexOf('ci_thesis_evidence') !== 0) {
+        var storedThesis = _lsGet(sKey);
+        if (storedThesis && storedThesis.ticker) {
+          tickerTheses[storedThesis.ticker.toUpperCase()] = storedThesis;
+        }
+      }
+    }
+  } catch (_e) {}
+
+  // 2. For portfolio tickers without a stored thesis, infer from weight
   var profile = _readProfile();
-  if (!profile) return 0;
+  if (profile && profile.portfolio && Array.isArray(profile.portfolio)) {
+    for (var pi = 0; pi < profile.portfolio.length; pi++) {
+      var entry = profile.portfolio[pi];
+      var pTicker = (entry.ticker || '').toUpperCase();
+      if (pTicker && !tickerTheses[pTicker] && stockDataMap[pTicker]) {
+        var inferred = _inferThesisFromPortfolio(pTicker, entry.weight, stockDataMap[pTicker]);
+        if (inferred) tickerTheses[pTicker] = inferred;
+      }
+    }
+  }
 
-  var portfolio = profile.portfolio;
-  if (!portfolio || !Array.isArray(portfolio) || portfolio.length === 0) return 0;
+  var tickers = Object.keys(tickerTheses);
+  if (tickers.length === 0) return 0;
 
-  // Also check for explicit theses stored by thesis comparator
   var newAlertCount = 0;
 
-  for (var i = 0; i < portfolio.length; i++) {
-    var entry = portfolio[i];
-    var ticker = (entry.ticker || '').toUpperCase();
-    if (!ticker || !stockDataMap[ticker]) continue;
+  for (var i = 0; i < tickers.length; i++) {
+    var ticker = tickers[i];
+    if (!stockDataMap[ticker]) continue;
 
-    // Check for explicit thesis first (stored by thesis comparator)
-    var explicitThesis = _lsGet('ci_thesis_' + ticker);
-    var thesis = explicitThesis || _inferThesisFromPortfolio(ticker, entry.weight, stockDataMap[ticker]);
-    if (!thesis) continue;
-
-    // Build last-reviewed evidence counts from stored alerts
+    var thesis = tickerTheses[ticker];
     var lastReviewed = _lsGet('ci_thesis_evidence_' + ticker) || {};
 
     var alerts = generateAlerts(thesis, stockDataMap[ticker], lastReviewed);
@@ -603,7 +625,6 @@ export function checkForAlerts(stockDataMap) {
 
     if (newAlerts.length > 0) {
       saveAlerts(ticker, alerts);
-      // Count only actionable (non-confirmation) new alerts
       for (var k = 0; k < newAlerts.length; k++) {
         if (newAlerts[k].type !== 'confirmation') {
           newAlertCount++;

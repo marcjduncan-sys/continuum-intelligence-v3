@@ -3,6 +3,7 @@
 
 import { STOCK_DATA, getTcData } from '../lib/state.js';
 import { ANALYST_SYSTEM_PROMPT } from '../features/chat.js';
+import { saveThesis, inferBiasFromSplit } from '../features/thesis-capture.js';
 
 
 var tcSelectedTicker = null;
@@ -151,6 +152,33 @@ function renderComparatorResult(text, ticker) {
   }
 
   tcCurrentAlignment = alignment;
+
+  // Capture thesis from comparator result (explicit, high confidence)
+  if (alignment !== 'contrarian') {
+    var _stockData = STOCK_DATA[ticker];
+    var _tierIdx = parseInt(alignment.replace('n', ''), 10) - 1;
+    var _hypDirection = (_stockData && _stockData.hypotheses && _stockData.hypotheses[_tierIdx])
+      ? _stockData.hypotheses[_tierIdx].direction : '';
+    var _bias = _hypDirection === 'upside' ? 'bullish' : _hypDirection === 'downside' ? 'bearish' : 'neutral';
+
+    // Build probability split from tcData if available
+    var _split = null;
+    if (tcData) {
+      _split = ['n1','n2','n3','n4'].map(function(t) { return tcData[t] ? (parseFloat(tcData[t].prob) || 0) : 0; });
+    }
+
+    saveThesis({
+      ticker: ticker,
+      dominantHypothesis: alignment.toUpperCase(),
+      probabilitySplit: _split,
+      biasDirection: _bias,
+      keyAssumption: null,
+      source: 'explicit',
+      confidence: 'high',
+      capturedAt: new Date().toISOString(),
+      capturedFrom: 'comparator'
+    });
+  }
 
   // Banner
   var banner = document.getElementById('tc-banner');

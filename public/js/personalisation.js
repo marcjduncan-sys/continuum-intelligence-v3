@@ -385,6 +385,36 @@ function pnSaveToLocalStorage() {
             }
         };
         localStorage.setItem(PN_STORAGE_KEY, JSON.stringify(data));
+
+        // Thesis capture: infer thesis from portfolio weights
+        if (window.ThesisCapture && pnState.portfolio && pnState.portfolio.length > 0) {
+            var totalWeight = 0;
+            for (var ti = 0; ti < pnState.portfolio.length; ti++) {
+                totalWeight += (parseFloat(pnState.portfolio[ti].weight) || 0);
+            }
+            if (totalWeight > 0) {
+                for (var tj = 0; tj < pnState.portfolio.length; tj++) {
+                    var holding = pnState.portfolio[tj];
+                    var hTicker = (holding.ticker || '').toUpperCase();
+                    if (!hTicker) continue;
+                    var hWeight = parseFloat(holding.weight) || 0;
+                    var relWeight = hWeight / totalWeight;
+                    var hBias = relWeight > 0.05 ? 'bullish' : 'neutral';
+
+                    window.ThesisCapture.saveThesis({
+                        ticker: hTicker,
+                        dominantHypothesis: null,
+                        probabilitySplit: null,
+                        biasDirection: hBias,
+                        keyAssumption: null,
+                        source: 'inferred',
+                        confidence: 'low',
+                        capturedAt: new Date().toISOString(),
+                        capturedFrom: 'portfolio'
+                    });
+                }
+            }
+        }
     } catch (e) { /* localStorage unavailable or full */ }
 }
 

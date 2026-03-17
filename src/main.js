@@ -36,6 +36,7 @@ import { initBatchRefresh, closeBatchModal } from './features/batch-refresh.js';
 import { generatePDFReport } from './features/pdf.js';
 import { initAddStock, openAddStockModal, closeAddStockModal, submitAddStock } from './features/add-stock.js';
 import { checkForAlerts, updateAlertBadge, initAlertPanel } from './features/thesis-monitor.js';
+import { saveThesis, getThesis, inferBiasFromQuestion } from './features/thesis-capture.js';
 
 // Deep Research page
 import { initDeepResearch } from './pages/deep-research.js';
@@ -58,6 +59,7 @@ window.openAddStockModal = openAddStockModal;
 window.closeAddStockModal = closeAddStockModal;
 window.submitAddStock = submitAddStock;
 window.CI_VOICE_RULES = VOICE_RULES;
+window.ThesisCapture = { saveThesis: saveThesis, getThesis: getThesis, inferBiasFromQuestion: inferBiasFromQuestion };
 
 // Expose state and utility globals needed by classic (non-module) scripts
 // (snapshot-generator.js, personalisation.js, DNE engines)
@@ -315,10 +317,19 @@ async function boot() {
         var newAlerts = checkForAlerts(STOCK_DATA);
         updateAlertBadge();
         if (newAlerts > 0) {
-          console.log('[ThesisMonitor] ' + newAlerts + ' new alert(s) after refresh');
           document.dispatchEvent(new CustomEvent('ci:thesis:alerts', { detail: { count: newAlerts } }));
         }
       } catch (e) { console.warn('[ThesisMonitor] post-refresh check failed:', e); }
+    }, 0);
+  });
+
+  // Re-check alerts when a thesis is saved from any capture point
+  document.addEventListener('ci:thesis:saved', function () {
+    setTimeout(function () {
+      try {
+        checkForAlerts(STOCK_DATA);
+        updateAlertBadge();
+      } catch (e) { console.warn('[ThesisMonitor] post-thesis-save check failed:', e); }
     }, 0);
   });
 

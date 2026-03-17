@@ -12,6 +12,7 @@
  */
 
 import { STOCK_DATA } from '../lib/state.js';
+import { saveThesis, getThesis, inferBiasFromQuestion, recordSignal, getConsistentSignalCount } from './thesis-capture.js';
 
 // ============================================================
 // CONFIGURATION
@@ -402,6 +403,28 @@ function sendMessage() {
     if (!question || isLoading) return;
 
     var ticker = currentTicker || (tickerSelect ? tickerSelect.value : '');
+
+    // Thesis capture: infer bias from the question
+    if (ticker) {
+      var _inferredBias = inferBiasFromQuestion(question);
+      if (_inferredBias && _inferredBias !== 'neutral') {
+        recordSignal(ticker, _inferredBias);
+        var _signalCount = getConsistentSignalCount(ticker, _inferredBias);
+        var _confidence = _signalCount >= 3 ? 'high' : 'low';
+
+        saveThesis({
+          ticker: ticker,
+          dominantHypothesis: null,
+          probabilitySplit: null,
+          biasDirection: _inferredBias,
+          keyAssumption: null,
+          source: 'inferred',
+          confidence: _confidence,
+          capturedAt: new Date().toISOString(),
+          capturedFrom: 'chat'
+        });
+      }
+    }
 
     if (!conversations[ticker]) conversations[ticker] = [];
     var convo = conversations[ticker];
