@@ -9,7 +9,7 @@ on:
 jobs:
   price-drivers:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
     steps:
       - name: Run price driver scan (per-ticker)
         env:
