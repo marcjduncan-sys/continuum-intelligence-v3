@@ -24,7 +24,7 @@ jobs:
             echo "--- Processing $t ---"
             HTTP_CODE=$(curl -s -o /tmp/pd_response.json -w "%{http_code}" \
               -H "X-API-Key: $API_KEY" \
-              --max-time 300 \
+              --max-time 480 \
               "$API_BASE/api/agents/drivers/$t?force=true")
             if [ "$HTTP_CODE" = "200" ]; then
               SUCCEEDED=$((SUCCEEDED + 1))
