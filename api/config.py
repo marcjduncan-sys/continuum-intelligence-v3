@@ -95,6 +95,39 @@ BATCH_SECRET = os.getenv("BATCH_SECRET", "")
 INSIGHTS_SECRET = os.getenv("INSIGHTS_SECRET", "")
 PRICE_DRIVERS_SECRET = os.getenv("PRICE_DRIVERS_SECRET", "")
 
+# ---------------------------------------------------------------------------
+# Production secrets check — fail loud on Railway if secrets are insecure
+# ---------------------------------------------------------------------------
+
+
+def check_production_secrets() -> None:
+    """Raise RuntimeError if running on Railway with insecure/missing secrets."""
+    railway_env = os.getenv("RAILWAY_ENVIRONMENT")
+    port_env = os.getenv("PORT")
+    is_production = railway_env is not None or (port_env is not None and port_env != "8000")
+
+    if not is_production:
+        return
+
+    insecure: list[str] = []
+    if JWT_SECRET == "dev-insecure-secret":
+        insecure.append("JWT_SECRET")
+    if not BATCH_SECRET:
+        insecure.append("BATCH_SECRET")
+    if not INSIGHTS_SECRET:
+        insecure.append("INSIGHTS_SECRET")
+    if not PRICE_DRIVERS_SECRET:
+        insecure.append("PRICE_DRIVERS_SECRET")
+
+    if insecure:
+        raise RuntimeError(
+            f"Production secrets not configured: {', '.join(insecure)}. "
+            "Set these environment variables before deploying to Railway."
+        )
+
+
+check_production_secrets()
+
 # GitHub PAT with repo write scope -- used by add_stock() to commit new
 # ticker scaffolds so data persists across Railway redeployments.
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
