@@ -548,13 +548,50 @@ def _load_research(ticker: str) -> dict:
     raise FileNotFoundError(f"No research file for {ticker}")
 
 
+def _validate_research_structure(data: dict, ticker: str) -> tuple[bool, str | None]:
+    """Validate research JSON has required structure before writing.
+
+    Returns (is_valid, error_message). Rejects empty data, missing
+    required keys, and empty hypothesis lists. This gate prevents
+    malformed refresh output from overwriting good research files.
+    """
+    if not data:
+        return False, f"{ticker}: empty data"
+
+    required_keys = ["hypotheses", "evidence", "narrative", "skew"]
+    missing = [k for k in required_keys if k not in data]
+    if missing:
+        return False, f"{ticker}: missing required keys: {missing}"
+
+    hyps = data.get("hypotheses")
+    if not isinstance(hyps, list) or len(hyps) == 0:
+        return False, f"{ticker}: hypotheses must be a non-empty list"
+
+    evidence = data.get("evidence")
+    if isinstance(evidence, dict):
+        cards = evidence.get("cards", [])
+        if not isinstance(cards, list) or len(cards) == 0:
+            return False, f"{ticker}: evidence.cards must be a non-empty list"
+
+    return True, None
+
+
 def _save_research(ticker: str, data: dict) -> None:
     """Save updated research JSON to both live data dir and dist dir.
 
     The /data/ endpoint serves from PROJECT_ROOT/data/ (live dir),
     while the catch-all frontend route serves from dist/. Both must
     be updated so the refresh result is immediately visible.
+
+    VALIDATION GATE: rejects structurally invalid data to prevent
+    blank research pages from malformed refresh output.
     """
+    # Structural validation gate: reject before writing
+    is_valid, error = _validate_research_structure(data, ticker)
+    if not is_valid:
+        logger.error(f"Research refresh REJECTED: {error}")
+        raise ValueError(f"Research validation failed: {error}")
+
     # Auto-fix common data quality issues before persisting
     data = validate_fix(data)
     errors = validate_check(data)

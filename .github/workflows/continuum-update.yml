@@ -68,6 +68,32 @@ jobs:
       - name: Sync research index
         run: node scripts/sync-index.js
 
+      - name: Validate research JSON
+        run: |
+          python3 -c "
+          import json, sys, glob
+          files = glob.glob('data/research/*.json')
+          files = [f for f in files if '_index.json' not in f]
+          errors = 0
+          for f in files:
+              with open(f) as fh:
+                  try:
+                      data = json.load(fh)
+                  except json.JSONDecodeError:
+                      print(f'INVALID JSON: {f}')
+                      errors += 1
+                      continue
+                  required = ['hypotheses', 'evidence', 'narrative', 'skew']
+                  missing = [k for k in required if k not in data]
+                  if missing:
+                      print(f'MISSING KEYS in {f}: {missing}')
+                      errors += 1
+          if errors:
+              print(f'{errors} file(s) failed validation. Aborting commit.')
+              sys.exit(1)
+          print(f'All {len(files)} research files validated.')
+          "
+
       - name: Check for changes
         id: changes
         run: |

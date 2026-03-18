@@ -1,8 +1,10 @@
-name: Daily Research Update (Legacy)
+name: Daily Research Update
 
-# DISABLED: Consolidated into continuum-update.yml
-# Kept for manual dispatch only.
 on:
+  schedule:
+    # 08:00 UTC Mon-Fri = 18:00 AEST / 19:00 AEDT (after ASX close + settlement)
+    # Runs ~90 min after the last continuum-update.yml cron (06:00 UTC)
+    - cron: '0 8 * * 1-5'
   workflow_dispatch:
     inputs:
       ticker:
@@ -45,6 +47,32 @@ jobs:
             ARGS="--ticker ${{ github.event.inputs.ticker }}"
           fi
           node scripts/update-research.js $ARGS
+
+      - name: Validate research JSON
+        run: |
+          python3 -c "
+          import json, sys, glob
+          files = glob.glob('data/research/*.json')
+          files = [f for f in files if '_index.json' not in f]
+          errors = 0
+          for f in files:
+              with open(f) as fh:
+                  try:
+                      data = json.load(fh)
+                  except json.JSONDecodeError:
+                      print(f'INVALID JSON: {f}')
+                      errors += 1
+                      continue
+                  required = ['hypotheses', 'evidence', 'narrative', 'skew']
+                  missing = [k for k in required if k not in data]
+                  if missing:
+                      print(f'MISSING KEYS in {f}: {missing}')
+                      errors += 1
+          if errors:
+              print(f'{errors} file(s) failed validation. Aborting commit.')
+              sys.exit(1)
+          print(f'All {len(files)} research files validated.')
+          "
 
       - name: Check for changes
         id: changes
