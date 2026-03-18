@@ -82,28 +82,29 @@ function _confLabel(conf) {
 // ============================================================
 
 var TYPE_CONFIG = {
-    conviction:       { label: 'CONVICTION',       borderColor: 'var(--signal-green, #2e7d32)' },
-    risk_flag:        { label: 'RISK FLAG',         borderColor: 'var(--signal-amber, #f57f17)' },
-    valuation:        { label: 'VALUATION',         borderColor: 'var(--accent, #003A70)' },
-    thesis_challenge: { label: 'THESIS CHALLENGE',  borderColor: 'var(--signal-red, #c62828)' },
-    process_note:     { label: 'PROCESS NOTE',      borderColor: 'var(--text-secondary, #888)' }
+    conviction:       { label: 'CONVICTION', borderColor: '#22c55e', badgeBg: 'rgba(34,197,94,.12)',  badgeColor: '#16a34a' },
+    risk_flag:        { label: 'RISK FLAG',  borderColor: '#f59e0b', badgeBg: 'rgba(245,158,11,.12)', badgeColor: '#d97706' },
+    valuation:        { label: 'VALUATION',  borderColor: '#3b82f6', badgeBg: 'rgba(59,130,246,.12)', badgeColor: '#2563eb' },
+    thesis_challenge: { label: 'CHALLENGE',  borderColor: '#ef4444', badgeBg: 'rgba(239,68,68,.12)',  badgeColor: '#dc2626' },
+    process_note:     { label: 'PROCESS',    borderColor: '#6b7280', badgeBg: 'rgba(107,114,128,.1)', badgeColor: '#4b5563' }
 };
 
 function _classifyMemory(m) {
     var content = (m.content || '').toLowerCase();
     var tags = (m.tags || []).map(function(t) { return t.toLowerCase(); });
 
-    // Check tags first
-    if (tags.indexOf('valuation') !== -1 || tags.indexOf('entry-point') !== -1 || tags.indexOf('dislocation') !== -1) return 'valuation';
-    if (tags.indexOf('risk') !== -1 || tags.indexOf('management-risk') !== -1 || tags.indexOf('governance') !== -1) return 'risk_flag';
+    // Non-ticker = process note (check early)
+    if (!m.ticker) return 'process_note';
+
+    // Check tags first (most reliable signal)
+    if (tags.indexOf('valuation') !== -1 || tags.indexOf('entry-point') !== -1 || tags.indexOf('dislocation') !== -1 || tags.indexOf('multiple') !== -1) return 'valuation';
+    if (tags.indexOf('risk') !== -1 || tags.indexOf('management-risk') !== -1 || tags.indexOf('governance') !== -1 || tags.indexOf('tail-risk') !== -1) return 'risk_flag';
+    if (tags.indexOf('catalyst') !== -1 || tags.indexOf('earnings') !== -1 || tags.indexOf('conviction') !== -1) return 'conviction';
 
     // Content-based classification
-    if (content.indexOf('risk') !== -1 || content.indexOf('concern') !== -1 || content.indexOf('worry') !== -1 || content.indexOf('flag') !== -1) return 'risk_flag';
-    if (content.indexOf('valuation') !== -1 || content.indexOf('price') !== -1 && (content.indexOf('entry') !== -1 || content.indexOf('target') !== -1 || content.indexOf('multiple') !== -1)) return 'valuation';
-    if (content.indexOf('disagree') !== -1 || content.indexOf('challenge') !== -1 || content.indexOf('skepti') !== -1 || content.indexOf('dismiss') !== -1) return 'thesis_challenge';
-
-    // Non-ticker = process note
-    if (!m.ticker) return 'process_note';
+    if (content.indexOf('disagree') !== -1 || content.indexOf('challenge') !== -1 || content.indexOf('skepti') !== -1 || content.indexOf('dismiss') !== -1 || content.indexOf('overstat') !== -1) return 'thesis_challenge';
+    if (content.indexOf('risk') !== -1 || content.indexOf('concern') !== -1 || content.indexOf('worry') !== -1 || content.indexOf('flag') !== -1 || content.indexOf('caution') !== -1) return 'risk_flag';
+    if (content.indexOf('valuation') !== -1 || (content.indexOf('price') !== -1 && (content.indexOf('entry') !== -1 || content.indexOf('target') !== -1 || content.indexOf('multiple') !== -1 || content.indexOf('cheap') !== -1 || content.indexOf('expensive') !== -1))) return 'valuation';
 
     // Default for positional/tactical with ticker = conviction
     return 'conviction';
@@ -122,7 +123,7 @@ function _injectCSS() {
     var style = document.createElement('style');
     style.id = 'journal-page-css';
     style.textContent =
-        '#page-memory{padding:24px 32px;max-width:960px;margin:0 auto}' +
+        '#page-memory{padding:96px 32px 24px;max-width:960px;margin:0 auto}' +
 
         // Header
         '.jnl-header{margin-bottom:8px}' +
@@ -151,9 +152,13 @@ function _injectCSS() {
         '.jnl-skew-downside{background:#fce4ec;color:#c62828}' +
         '.jnl-skew-balanced{background:#fff8e1;color:#f57f17}' +
 
-        // Type group
+        // Type group (collapsible)
         '.jnl-type-group{margin-bottom:24px}' +
-        '.jnl-type-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-secondary,#666);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border,#e5e5e5)}' +
+        '.jnl-type-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-secondary,#666);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border,#e5e5e5);cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}' +
+        '.jnl-type-title:hover{color:var(--text-primary,#333)}' +
+        '.jnl-type-arrow{transition:transform .2s;font-size:9px}' +
+        '.jnl-type-group.collapsed .jnl-type-arrow{transform:rotate(-90deg)}' +
+        '.jnl-type-group.collapsed .jnl-type-cards{display:none}' +
 
         // Date group
         '.jnl-date-group{margin-bottom:20px}' +
@@ -164,7 +169,7 @@ function _injectCSS() {
         '.jnl-card:hover{border-color:var(--border,#ccc)}' +
         '.jnl-card-body{flex:1;min-width:0}' +
         '.jnl-card-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}' +
-        '.jnl-type-badge{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:1px 6px;border-radius:3px;background:var(--bg-secondary,#f5f5f5);color:var(--text-secondary,#666)}' +
+        '.jnl-type-badge{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:3px}' +
         '.jnl-card-ticker{font-size:12px;font-weight:600;color:var(--accent,#003A70)}' +
         '.jnl-card-date{font-size:11px;color:var(--text-secondary,#999);margin-left:auto}' +
         '.jnl-card-content{font-size:13px;color:var(--text-primary,#222);line-height:1.5;margin-bottom:6px}' +
@@ -260,7 +265,8 @@ function _toSecondPerson(text) {
 // ============================================================
 
 function _renderCard(m, showTicker) {
-    var type = _classifyMemory(m);
+    // Use server-side insight_type if available, fall back to heuristic
+    var type = (m.insight_type && TYPE_CONFIG[m.insight_type]) ? m.insight_type : _classifyMemory(m);
     var cfg = _getTypeConfig(type);
     var borderStyle = 'border-left-color:' + cfg.borderColor;
 
@@ -269,7 +275,7 @@ function _renderCard(m, showTicker) {
 
     // Top row: type badge, ticker (if showing), date
     html += '<div class="jnl-card-top">';
-    html += '<span class="jnl-type-badge">' + cfg.label + '</span>';
+    html += '<span class="jnl-type-badge" style="background:' + cfg.badgeBg + ';color:' + cfg.badgeColor + '">' + cfg.label + '</span>';
     if (showTicker && m.ticker) {
         html += '<span class="jnl-card-ticker">' + _escHtml(m.ticker) + '</span>';
     }
@@ -382,7 +388,7 @@ function _renderByStock(memories) {
 function _renderByType(memories) {
     var byType = {};
     memories.forEach(function(m) {
-        var type = _classifyMemory(m);
+        var type = (m.insight_type && TYPE_CONFIG[m.insight_type]) ? m.insight_type : _classifyMemory(m);
         if (!byType[type]) byType[type] = [];
         byType[type].push(m);
     });
@@ -395,11 +401,16 @@ function _renderByType(memories) {
         if (!items || items.length === 0) return;
         var cfg = _getTypeConfig(type);
 
-        html += '<div class="jnl-type-group">';
-        html += '<div class="jnl-type-title">' + cfg.label + ' (' + items.length + ')</div>';
+        // Sort newest first within each type
+        items.sort(function(a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+
+        html += '<div class="jnl-type-group" data-type="' + type + '">';
+        html += '<div class="jnl-type-title"><span class="jnl-type-arrow">&#9660;</span> ' + cfg.label + ' (' + items.length + ')</div>';
+        html += '<div class="jnl-type-cards">';
         items.forEach(function(m) {
             html += _renderCard(m, true);
         });
+        html += '</div>';
         html += '</div>';
     });
 
