@@ -552,7 +552,7 @@ function closePanel() {
     isOpen = false;
     if (fab) {
         fab.setAttribute('aria-expanded', 'false');
-        if (window.innerWidth < 1024) fab.style.display = 'flex';
+        fab.style.display = 'flex';
     }
     console.log('[Analyst] Panel closed');
 }
