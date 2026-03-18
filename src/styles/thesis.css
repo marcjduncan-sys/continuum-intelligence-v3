@@ -66,6 +66,8 @@
     text-align: center;
     cursor: pointer;
     transition: all 150ms ease;
+    overflow: hidden;
+    min-width: 0;
 }
 
 .tc-stock-card:hover {
@@ -91,6 +93,8 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: block;
+    max-width: 100%;
 }
 
 .tc-input-step {
