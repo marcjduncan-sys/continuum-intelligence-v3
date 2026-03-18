@@ -699,7 +699,11 @@ if (panel) {
 
     // Collapse/close button
     if (collapseBtn) {
-        collapseBtn.addEventListener('click', closePanel);
+        collapseBtn.addEventListener('click', function() {
+            var isNowCollapsed = panel.classList.toggle('ap-user-collapsed');
+            try { localStorage.setItem('ci_panel_collapsed', isNowCollapsed ? '1' : '0'); } catch(e) {}
+            collapseBtn.style.transform = isNowCollapsed ? 'rotate(180deg)' : '';
+        });
     }
 
     // History panel
@@ -779,6 +783,12 @@ export function initChat() {
     sendBtn      = document.getElementById('apSend');
     tickerSelect = document.getElementById('apTickerSelect');
     tickerBadge  = document.getElementById('apTickerBadge');
+    try {
+        if (localStorage.getItem('ci_panel_collapsed') === '1' && panel) {
+            panel.classList.add('ap-user-collapsed');
+            if (collapseBtn) collapseBtn.style.transform = 'rotate(180deg)';
+        }
+    } catch(e) {}
 
     if (!panel) {
         console.warn('[Analyst] #analyst-panel not found -- analyst panel disabled');

@@ -21,6 +21,27 @@
 .analyst-panel.ap-open {
     transform: translateX(0);
 }
+.analyst-panel.ap-user-collapsed {
+    width: 52px !important;
+    min-width: 52px !important;
+    overflow: hidden;
+    transition: width 0.25s ease, min-width 0.25s ease;
+}
+.analyst-panel.ap-user-collapsed .ap-ticker-bar,
+.analyst-panel.ap-user-collapsed .ap-suggested,
+.analyst-panel.ap-user-collapsed .ap-messages,
+.analyst-panel.ap-user-collapsed .ap-input-area,
+.analyst-panel.ap-user-collapsed .tm-panel {
+    display: none !important;
+}
+.analyst-panel.ap-user-collapsed .ap-header-text,
+.analyst-panel.ap-user-collapsed .ap-header-actions > *:not(#apCollapseBtn) {
+    display: none !important;
+}
+.analyst-panel.ap-user-collapsed .ap-header {
+    padding: 0 10px;
+    justify-content: center;
+}
 
 /* --- Header --- */
 .ap-header {
