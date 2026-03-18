@@ -8,15 +8,14 @@ import { STOCK_DATA, SNAPSHOT_DATA } from './state.js';
 import { VALID_STATIC_PAGES } from './state.js';
 import { announcePageChange } from './dom.js';
 import { CACHE_VERSION } from '../data/loader.js';
+import { API_BASE } from './api-config.js';
 
 // --- Router state ---
 const renderedPages = new Set();
 const renderedSnapshots = new Set();
 
-// Railway API base (same pattern as batch-refresh.js)
-var _REFRESH_API_BASE = window.location.hostname.includes('github.io')
-  ? 'https://imaginative-vision-production-16cb.up.railway.app'
-  : '';
+// Railway API base (centralised in api-config.js)
+var _REFRESH_API_BASE = API_BASE;
 
 // Page renderer callbacks -- wired in during integration (Phase 6)
 let _pageRenderers = {};

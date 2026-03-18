@@ -18,6 +18,7 @@ import { renderFeaturedCard } from '../pages/home.js';
 import { renderTAChart, setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineChart } from '../pages/report-sections.js';
 import { renderReport } from '../pages/report.js';
 import ContinuumDynamics from '../data/dynamics.js';
+import { API_BASE } from '../lib/api-config.js';
 
 // ============================================================
 // LiveData -- Yahoo Finance OHLCV fetcher with localStorage cache
@@ -31,10 +32,8 @@ var _status = {}; // Per-ticker status: 'loading', 'live', 'failed'
 // OHLCV chart data routes through the Railway backend proxy to avoid CORS blocks.
 // Direct Yahoo Finance calls kept as best-effort fallback only (works in dev, blocked on GH Pages).
 
-// Railway API base (same pattern as batch-refresh.js, chat.js, etc.)
-var _CHART_API_BASE = window.location.hostname.includes('github.io')
-    ? 'https://imaginative-vision-production-16cb.up.railway.app'
-    : '';
+// Railway API base (centralised in api-config.js)
+var _CHART_API_BASE = API_BASE;
 
 // Chart data URLs: Railway proxy first, then direct Yahoo as fallback
 function chartUrls(ticker) {

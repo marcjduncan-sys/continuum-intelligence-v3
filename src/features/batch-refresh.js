@@ -14,13 +14,12 @@
 import { STOCK_DATA } from '../lib/state.js';
 import { CACHE_VERSION } from '../data/loader.js';
 import { fetchPriceDrivers } from '../pages/report-sections.js';
+import { API_BASE } from '../lib/api-config.js';
 
 // ============================================================
-// REFRESH API BASE (localhost detection pattern)
+// REFRESH API BASE (centralised in api-config.js)
 // ============================================================
-var REFRESH_API_BASE = window.location.hostname.includes('github.io')
-    ? 'https://imaginative-vision-production-16cb.up.railway.app'
-    : '';  // Same origin (Vite proxy in dev, Railway in prod)
+var REFRESH_API_BASE = API_BASE;
 
 var CI_API_KEY = window.CI_API_KEY || '';
 

@@ -4,6 +4,7 @@
 import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA, FEATURED_ORDER, ANNOUNCEMENTS_DATA } from '../lib/state.js';
 import { renderSparkline, formatDateAEST } from '../lib/format.js';
 import { normaliseScores, computeSkewScore } from '../lib/dom.js';
+import { API_BASE } from '../lib/api-config.js';
 
 const RS_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
 function RS_HDR(num, title) {
@@ -2532,10 +2533,7 @@ export function fetchPriceDrivers(ticker, force) {
   var container = document.getElementById('price-drivers-' + ticker);
   if (!container) return;
 
-  var isGHPages = window.location.hostname.includes('github.io');
-  var baseUrl = isGHPages
-    ? 'https://imaginative-vision-production-16cb.up.railway.app'
-    : '';
+  var baseUrl = API_BASE;
   var apiKey = window.CI_API_KEY || '';
 
   var headers = { 'Accept': 'application/json' };

@@ -6,13 +6,13 @@
  * Requires initAuth() to have run first (guest UUID available in localStorage).
  */
 
+import { API_BASE } from '../lib/api-config.js';
+
 // ---------------------------------------------------------------------------
-// Configuration (mirrors pattern from chat.js)
+// Configuration (centralised in api-config.js)
 // ---------------------------------------------------------------------------
 
-var _PRODUCTION_API = 'https://imaginative-vision-production-16cb.up.railway.app';
-var _isGitHubPages = window.location.hostname.indexOf('github.io') !== -1;
-var _NOTIF_BASE = (_isGitHubPages ? _PRODUCTION_API : '') + '/api/notifications';
+var _NOTIF_BASE = API_BASE + '/api/notifications';
 
 const POLL_INTERVAL_MS = 5 * 60 * 1000;
 let _pollTimer = null;

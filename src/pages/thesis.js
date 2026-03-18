@@ -5,6 +5,7 @@ import { STOCK_DATA, getTcData } from '../lib/state.js';
 import { truncateAtWord } from '../lib/format.js';
 import { ANALYST_SYSTEM_PROMPT } from '../features/chat.js';
 import { saveThesis, inferBiasFromSplit } from '../features/thesis-capture.js';
+import { API_BASE as _API_BASE } from '../lib/api-config.js';
 
 
 var tcSelectedTicker = null;
@@ -49,9 +50,7 @@ export function tcAnalyze() {
 
   var systemPrompt = buildComparatorPrompt(tcSelectedTicker);
 
-  var apiBase = (window.location.hostname.indexOf('github.io') !== -1)
-    ? 'https://imaginative-vision-production-16cb.up.railway.app'
-    : '';
+  var apiBase = _API_BASE;
 
   fetch(apiBase + '/api/research-chat', {
     method: 'POST',
@@ -305,14 +304,7 @@ function renderComparatorError(message) {
 // INLINE RESEARCH CHAT FUNCTIONS
 // ============================================================
 
-var PRODUCTION_API = 'https://imaginative-vision-production-16cb.up.railway.app';
-var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-var isGitHubPages = window.location.hostname.indexOf('github.io') !== -1;
-var apiOrigin = window.CHAT_API_URL
-  || (isLocal ? ''
-      : isGitHubPages ? PRODUCTION_API
-      : '');
-var API_BASE = apiOrigin + '/api/research-chat';
+var API_BASE = _API_BASE + '/api/research-chat';
 
 var inlineConversations = {};
 var inlineLoading = {};

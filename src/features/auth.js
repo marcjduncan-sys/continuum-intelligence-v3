@@ -7,14 +7,13 @@
  * Sets window.CI_AUTH for consumption by chat.js and other features.
  */
 
+import { API_BASE } from '../lib/api-config.js';
+
 // ============================================================
 // CONFIG
 // ============================================================
 
-const PRODUCTION_API = 'https://imaginative-vision-production-16cb.up.railway.app';
-const _authIsGHP = window.location.hostname.indexOf('github.io') !== -1;
-const _authApiOrigin = window.CHAT_API_URL || (_authIsGHP ? PRODUCTION_API : '');
-const AUTH_API_BASE = _authApiOrigin + '/api/auth';
+const AUTH_API_BASE = API_BASE + '/api/auth';
 
 const GUEST_ID_KEY = 'ci_guest_id';
 const TOKEN_KEY    = 'ci_auth_token';

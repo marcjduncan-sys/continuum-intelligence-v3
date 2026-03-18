@@ -7,15 +7,9 @@
  */
 
 import { STOCK_DATA } from '../lib/state.js';
+import { API_BASE } from '../lib/api-config.js';
 
-var PRODUCTION_API = 'https://imaginative-vision-production-16cb.up.railway.app';
-var isLocal       = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-var isFile        = window.location.protocol === 'file:';
-var isGitHubPages = window.location.hostname.indexOf('github.io') !== -1;
-var apiOrigin     = window.CHAT_API_URL
-    || (isFile        ? ''
-        : isGitHubPages ? PRODUCTION_API
-        : '');
+var apiOrigin = API_BASE;
 
 // ============================================================
 // VIEW STATE
