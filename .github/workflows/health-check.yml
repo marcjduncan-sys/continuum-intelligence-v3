@@ -1,0 +1,71 @@
+name: Workflow Health Check
+
+on:
+  schedule:
+    - cron: "0 19 * * *"   # 19:00 UTC = 06:00 AEDT next day
+  workflow_dispatch:
+
+permissions:
+  actions: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check all workflow last-run statuses
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          failed=""
+
+          # List all workflows in the repo
+          workflows=$(gh api "/repos/${REPO}/actions/workflows" --jq '.workflows[] | "\(.id)\t\(.name)\t\(.path)"')
+
+          while IFS=$'\t' read -r wf_id wf_name wf_path; do
+            # Skip this health-check workflow itself to avoid self-referential failure loops
+            if [[ "$wf_path" == *"health-check"* ]]; then
+              continue
+            fi
+
+            # Get the latest run for this workflow
+            latest=$(gh api "/repos/${REPO}/actions/workflows/${wf_id}/runs?per_page=1" --jq '.workflow_runs[0] // empty')
+
+            # Skip workflows that have never run
+            if [[ -z "$latest" ]]; then
+              echo "SKIP: ${wf_name} (never run)"
+              continue
+            fi
+
+            conclusion=$(echo "$latest" | jq -r '.conclusion // "null"')
+            status=$(echo "$latest" | jq -r '.status')
+            run_url=$(echo "$latest" | jq -r '.html_url')
+
+            # Skip runs still in progress
+            if [[ "$status" != "completed" ]]; then
+              echo "SKIP: ${wf_name} (still ${status})"
+              continue
+            fi
+
+            if [[ "$conclusion" == "success" || "$conclusion" == "skipped" ]]; then
+              echo "OK:   ${wf_name}"
+            else
+              echo "FAIL: ${wf_name} (conclusion: ${conclusion})"
+              echo "      ${run_url}"
+              failed="${failed}\n  - ${wf_name} (${conclusion}): ${run_url}"
+            fi
+          done <<< "$workflows"
+
+          if [[ -n "$failed" ]]; then
+            echo ""
+            echo "========================================="
+            echo "FAILED WORKFLOWS:"
+            echo -e "$failed"
+            echo "========================================="
+            exit 1
+          fi
+
+          echo ""
+          echo "All workflows healthy."
