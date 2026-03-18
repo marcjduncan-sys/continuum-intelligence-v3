@@ -14,7 +14,7 @@ npm run build        # Vite build → dist/; copies data/ → dist/data/
 npm run test         # Jest suite (tests/, src/**/*.test.js) — 61 tests
 npm run test:unit    # Vitest suite — what CI runs; must pass before pushing — 195 tests
 npm run test:all     # Jest + Vitest combined — 256 tests total
-npm run lint         # ESLint over scripts/ and src/ only (not js/)
+npm run lint         # ESLint over scripts/, src/, and public/js/
 npm run validate     # lint + test:all — run before any push
 ```
 
@@ -35,7 +35,7 @@ npm run validate     # lint + test:all — run before any push
 - **`api/` is the Railway backend (FastAPI/Python), not part of the GitHub Pages build.** Changes to `api/` require a Railway redeploy, not `npm run build`. The frontend connects to `https://imaginative-vision-production-16cb.up.railway.app` when on GitHub Pages, and to `localhost:8000` (via Vite proxy) in dev.
 - **`Documents/continuum-v3/` is a dead git worktree.** It contains its own `node_modules`, test files, and stale source. Never edit files there. The active codebase is at the repo root.
 - **Do not touch `data/research/_index.json` manually.** It is the canonical stock list and the authoritative source for stock count (currently 25 tickers). Editing it locally will conflict with the next automated commit. When adding a new ticker, update `_index.json` and `data/reference.json` -- do not rely on `REFERENCE_DATA` in `index.html`, which is a known defect covering fewer tickers than `_index.json`. Note: `reference.json` currently has 25 entries (RMC corrected 2026-03-07).
-- **`public/js/personalisation.js` is NOT linted by ESLint** (`npm run lint` covers `scripts/` and `src/` only). Bugs there will not surface in CI.
+- **`public/js/personalisation.js` is now linted by ESLint** (Task C4). `npm run lint` covers `scripts/`, `src/`, and `public/js/`. Zero errors; warnings only (no-var, prefer-const, etc.).
 - **`window.CI_API_KEY` injection is undocumented.** It is not set in `index.html`; Claude Code configured the injection mechanism. Do not modify anything related to `CI_API_KEY` without first grepping the entire repo for all references and tracing the injection point. If it is broken, check (in order): Railway environment variables, GitHub Secrets, any `<script>` tag in `index.html` setting the global.
 - **GitHub Actions secrets are not documented in the repo.** Do not rename or delete secrets without checking every workflow file for references first. To diagnose a failing workflow: open the workflow YAML, find which secret it references, then verify that secret exists at GitHub repo Settings > Secrets and variables > Actions.
 - **`js/personalisation.js` (root-level) was deleted 2026-03-08.** The canonical file is `public/js/personalisation.js`, which Vite copies verbatim to `dist/js/personalisation.js` via `publicDir: 'public'`. The root-level `js/` directory still exists for `js/dne/` (the DNE engine). Do not recreate `js/personalisation.js` at the repo root -- it is never served in production and creates a shadow copy problem where fixes appear to apply but have no effect.
@@ -55,7 +55,7 @@ npm run validate     # lint + test:all — run before any push
 **Session work (2026-03-08):**
 - [x] Shadow copy elimination complete (commit `f309fef`): deleted root-level `js/personalisation.js`, reconciled 57 divergent lines into `public/js/personalisation.js`, updated all references in CLAUDE.md and `src/features/chat.js`.
 - [x] Thesis Comparator rebuilt with LLM pipeline (commit `bebcb9c`): `tcAnalyze()` now POSTs to `/api/research-chat` with a structured ACH system prompt; `renderComparatorResult()` parses the ALIGNMENT line, populates hypothesis map from `tc.json`, and renders supporting/contradicting evidence. Loading animation, error state, and contrarian banner CSS added. Enter key wired. Verified end-to-end against WOW with real Railway responses on preview server.
-- [x] Analyst chat consistency and voice rules unified (commit `236bfee`): extracted `VOICE_RULES` constant from `src/features/chat.js` (16 rules, single source of truth); bridged to `window.CI_VOICE_RULES` in `src/main.js`; `pnBuildSystemPrompt()` now appends `window.CI_VOICE_RULES` instead of its own abbreviated copy; em-dash on line 700 of `public/js/personalisation.js` fixed; ~189 lines of dead Step 5 centre-panel chat code removed (`pnGetSharedConvo`, `renderChatMessages`, `showChatTyping`, `hideChatTyping`, `appendChatError`, `renderChatHeader`, `pnSendChat`); `bindStep5Inputs` and `pnOnRouteEnter` simplified; `window._continuumChat` fully eliminated. 185/185 tests passing.
+- [x] Analyst chat consistency and voice rules unified (commit `236bfee`): extracted `VOICE_RULES` constant from `src/features/chat.js`; bridged to `window.CI_VOICE_RULES` in `src/main.js`; dead Step 5 centre-panel chat code removed. **Superseded by Task C2**: voice rules now live in `data/config/voice-rules.json` (single source of truth); `chat.js` and `prompt_builder.py` both load from JSON; `window.CI_VOICE_RULES` bridge removed. `personalisation.js` falls back to simplified rules (acceptable since server-side `prompt_builder.py` is the real prompt source).
 
 **Phase 2 COMPLETE (2026-03-09).**
 - [x] Track A (auth backend): OTP email flow, JWT HS256, `api/auth.py`, `api/email_service.py`, `api/config.py`, `api/migrations/002_auth.sql` -- commit `566e945`.
@@ -168,14 +168,17 @@ npm run validate     # lint + test:all — run before any push
 - [x] **B4**: Conversation history token budget -- sliding window with 4000-token cap (commit `b16e3fc`).
 - [x] **C1**: Bundle CDN dependencies via Vite -- `marked` and `dompurify` as npm deps, CDN script tags removed, regex fallback parser removed, SheetJS CDN failure shows user alert (commit `4ae62e7`).
 - [x] **C3**: Structured error responses -- `api/errors.py` with `ErrorCode` constants and `{error, code, detail}` JSON envelope. All `HTTPException` raises in `main.py` replaced with `api_error()`. Custom handlers for `APIError` and `RateLimitExceeded` (commit `4ae62e7`).
+- [x] **C2**: Voice rules as build-time static JSON -- canonical rules in `data/config/voice-rules.json`. `api/prompt_builder.py` and `src/features/chat.js` both load from JSON. `window.CI_VOICE_RULES` bridge removed from `src/main.js` (commit `47372f1` + `4ae62e7`).
+- [x] **C4**: Personalisation.js ESLint coverage -- `public/js/` added to lint scope. Zero errors (194 warnings, all pre-existing no-var/prefer-const) (commit `4ae62e7`).
+- [x] **C5**: Package version and metadata cleanup -- `package.json` name updated to `continuum-intelligence-v3`, version to `3.0.0` (commit `4ae62e7`).
 
 **Recent commits (last six):**
-- `4ae62e7` feat: C1 bundle CDN deps via Vite + C3 structured error responses
+- `4ae62e7` feat: C1 bundle CDN deps via Vite + C2 voice rules JSON + C3 structured errors + C4 lint scope + C5 package v3
+- `47372f1` feat: voice rules as build-time static JSON (Task C2)
 - `b16e3fc` feat(api): add conversation history token budget (Task B4)
 - `f88eb1c` feat(api): pre-compute passage embeddings at ingestion (Task B1)
 - `cac218e` feat: B2 hybrid retrieval with RRF + B3 BM25 index caching
 - `76ab244` feat: A1 staleness warning injection + A5 chat debounce guard
-- `2d7e1b0` feat(ci): add daily workflow health check (Task A4)
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
