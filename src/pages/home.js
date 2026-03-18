@@ -53,7 +53,7 @@ export function renderFreshnessBadge(ticker) {
   if (typeof FRESHNESS_DATA === 'undefined' || !FRESHNESS_DATA[ticker]) return '';
   var f = FRESHNESS_DATA[ticker];
   var cls = 'fb-' + f.badge;
-  var label = f.daysSinceReview + 'd ago';
+  var label = f.daysSinceReview === 9999 ? 'Unknown' : f.daysSinceReview + 'd ago';
   if (f.badge === 'ok') label = 'Current';
   return ' <span class="freshness-badge ' + cls + '">' + label + '</span>';
 }
