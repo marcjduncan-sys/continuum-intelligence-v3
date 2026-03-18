@@ -30,6 +30,7 @@ import config
 import db
 import llm
 import memory_extractor
+import validator
 import memory_selector
 import prompt_builder
 import batch_analysis
@@ -456,6 +457,11 @@ async def research_chat(request: Request, body: ResearchChatRequest, background_
         raise HTTPException(status_code=502, detail=f"LLM API error: {str(e)}")
 
     response_text = result.text
+
+    # Validate claims against retrieved passages (Phase 1 hallucination detection)
+    validation = validator.validate_response(response_text, passages)
+    if validation.flagged_claims:
+        response_text = validation.annotated_text
 
     # Build source passages for the response
     sources = [
