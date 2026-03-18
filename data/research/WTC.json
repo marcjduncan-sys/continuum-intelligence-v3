@@ -5,12 +5,11 @@
   "company": "WiseTech Global Limited",
   "sector": "Information Technology",
   "sectorSub": "Logistics Software (SaaS)",
-  "price": 45.23,
+  "price": 44.6,
   "currency": "A$",
   "date": "18 March 2026",
   "reportId": "WTC-2026-002",
   "priceHistory": [
-    91.63,
     88.71,
     87.77,
     86.14,
@@ -261,7 +260,8 @@
     47.96,
     47.57,
     46.63,
-    45.23
+    45.23,
+    44.6
   ],
   "heroDescription": "Global Logistics Software &bull; ~17,000 Customers &bull; 174 Countries &bull; e2open Acquired",
   "heroCompanyDescription": "WiseTech Global (ASX: WTC) is the world's leading logistics technology company, operating the CargoWise platform that serves as the dominant operating system for international freight forwarding, customs brokerage, and supply chain management. The August 2025 acquisition of e2open for US$2.4bn transformed WiseTech from a pure-play logistics SaaS company into a broader supply chain platform. The company now serves approximately 17,000 organisations across 174 countries. Founder Richard White holds 36% of issued capital and serves as Executive Chairman.",
@@ -821,7 +821,7 @@
         "title": "6. Price Action & Market Behaviour",
         "epistemicClass": "ep-behavioural",
         "epistemicLabel": "Behavioural",
-        "finding": "<strong>Stock down 62% from highs; 1H26 results triggered volatile but constructive response.</strong> WTC fell from A$127 (October 2024) to A$47 (February 2026) through three phases: governance shock (-21% in one week), sustained institutional selling (death cross July 2025), and capitulation selling (break below A$70 December 2025, below A$50 February 2026). Mean reversion indicators show the stock at the 6th percentile of its 52-week range.",
+        "finding": "<strong>Stock down 63% from highs; 1H26 results triggered volatile but constructive response.</strong> WTC fell from A$127 (October 2024) to A$47 (February 2026) through three phases: governance shock (-21% in one week), sustained institutional selling (death cross July 2025), and capitulation selling (break below A$70 December 2025, below A$50 February 2026). Mean reversion indicators show the stock at the 6th percentile of its 52-week range.",
         "tension": "Extreme oversold conditions can persist in governance crisis stocks. The 63% decline may reflect appropriate repricing of structural governance risk rather than overshooting. The absence of institutional accumulation suggests the market views the discount as warranted, not as an opportunity.",
         "table": null,
         "tags": [
@@ -1166,7 +1166,7 @@
     "regime": "Bottoming",
     "clarity": "Moderate",
     "price": {
-      "current": 45.23,
+      "current": 44.6,
       "currency": "A$"
     },
     "movingAverages": {
@@ -1393,16 +1393,21 @@
     "hypothesesCount": "4 Active"
   },
   "_overcorrection": {
-    "active": true,
-    "triggerType": "FIVE_DAY_CUMULATIVE",
-    "triggerDate": "2026-03-11",
-    "triggerPrice": 49.24,
+    "active": false,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-03-18",
+    "triggerPrice": 44.6,
     "direction": "down",
-    "movePct": -2.8,
-    "reviewDate": "2026-03-18",
-    "message": "5-day cumulative move of +15.4% exceeds 15% threshold — possible overcorrection"
+    "movePct": -34.7,
+    "reviewDate": "2026-03-25",
+    "message": "Single-day move of -34.7% exceeds 10% threshold — possible overcorrection",
+    "reviewResult": {
+      "reversal_pct": -10.1,
+      "confirmed": false,
+      "message": "Overcorrection NOT confirmed — price only partially reversed"
+    }
   },
-  "_alertState": "OVERCORRECTION",
+  "_alertState": "NORMAL",
   "_deepResearch": true,
   "current_price": 47.1,
   "last_price_update": "2026-02-25T00:00:00.000Z"

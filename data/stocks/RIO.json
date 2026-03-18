@@ -11,10 +11,10 @@
       "what_to_watch": "Iron ore prices, Pilbara shipment volumes, C1 cost trajectory.",
       "upside": "Material re-rating if iron ore prices sustain above US$100/t and copper ramp accelerates.",
       "risk_plain": "If iron ore breaks below US$90/t, earnings compress significantly.",
-      "survival_score": 0.44,
+      "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-18T07:00:13.978Z"
+      "last_updated": "2026-03-18T07:20:14.386Z"
     },
     "N2": {
       "label": "Energy Transition Portfolio",
@@ -23,10 +23,10 @@
       "what_to_watch": "Oyu Tolgoi ramp-up progress, copper prices, Arcadium integration, lithium price recovery.",
       "upside": "If copper and lithium contribute 30-40% of EBITDA by 2030, significant re-rating potential.",
       "risk_plain": "If growth projects face cost overruns or commodity prices remain depressed, capital is destroyed.",
-      "survival_score": 0.46,
+      "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-18T07:00:13.978Z"
+      "last_updated": "2026-03-18T07:20:14.386Z"
     },
     "N3": {
       "label": "China Demand Slowdown",
@@ -38,7 +38,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-18T03:42:23.383Z"
+      "last_updated": "2026-03-18T07:20:14.386Z"
     },
     "N4": {
       "label": "Growth Capex Risk",
@@ -50,12 +50,12 @@
       "survival_score": 0.05,
       "status": "LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-02-25T08:09:34.728Z"
+      "last_updated": "2026-03-18T07:20:14.386Z"
     }
   },
   "dominant": "N2",
   "confidence": "LOW",
-  "alert_state": "OVERCORRECTION",
+  "alert_state": "NORMAL",
   "current_price": 156.38,
   "big_picture": "Rio Tinto Limited (ASX: RIO) — coverage initiated. Full analysis pending.",
   "last_flip": {
@@ -94,6 +94,20 @@
       "severity": "AMBER",
       "message": "Single-day move of +35.0% exceeds 10% threshold — possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-03-18",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "Single-day move of +32.5% exceeds 10% threshold — possible overcorrection",
+      "auto_generated": true
+    },
+    {
+      "date": "2026-03-18",
+      "type": "OVERCORRECTION_REVIEW",
+      "severity": "AMBER",
+      "message": "Overcorrection NOT confirmed — price held",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -116,25 +130,20 @@
       "cumulative_20d": 2.82,
       "results_day": false,
       "overcorrection_active": true
+    },
+    {
+      "date": "2026-03-18",
+      "classification": "MATERIAL",
+      "daily_change_pct": 32.53,
+      "volume_multiplier": 1,
+      "cumulative_5d": 1.67,
+      "cumulative_20d": 2.82,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    130.5,
-    129.8,
-    128.2,
-    126.5,
-    125,
-    123.4,
-    122.8,
-    121.5,
-    120,
-    119.2,
-    118,
-    117.5,
-    116.8,
-    115.2,
-    114,
     113.5,
     112.8,
     111,
@@ -193,7 +202,8 @@
     116.5,
     117,
     118,
-    118.45
+    118.45,
+    156.38
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -387,14 +397,19 @@
     }
   },
   "_overcorrection": {
-    "active": true,
+    "active": false,
     "triggerType": "SINGLE_DAY",
-    "triggerDate": "2026-02-25",
-    "triggerPrice": 159.32,
+    "triggerDate": "2026-03-18",
+    "triggerPrice": 156.38,
     "direction": "up",
-    "movePct": 35.02,
-    "reviewDate": "2026-03-04",
-    "message": "Single-day move of +35.0% exceeds 10% threshold — possible overcorrection"
+    "movePct": 32.53,
+    "reviewDate": "2026-03-25",
+    "message": "Single-day move of +32.5% exceeds 10% threshold — possible overcorrection",
+    "reviewResult": {
+      "reversal_pct": 5.3,
+      "confirmed": false,
+      "message": "Overcorrection NOT confirmed — price held"
+    }
   },
   "price_evidence": {
     "last_run": "2026-03-18T07:00:13.978Z",

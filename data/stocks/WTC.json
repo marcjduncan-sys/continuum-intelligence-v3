@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 5.2,
-      "last_updated": "2026-03-18T03:42:23.383Z"
+      "last_updated": "2026-03-18T07:20:14.370Z"
     },
     "N2": {
       "label": "Managed/Base Case",
@@ -26,7 +26,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2.8,
-      "last_updated": "2026-03-18T05:14:28.877Z"
+      "last_updated": "2026-03-18T07:20:14.370Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Board investigation outcomes, any new media reports, and mid-market customer retention data. If churn exceeds 8% or new governance issues emerge, this narrative strengthens.",
       "upside": null,
       "risk_plain": "If the governance situation worsens or major customers defect, the stock could test new lows below $60.",
-      "survival_score": 0.49,
+      "survival_score": 0.47,
       "status": "MODERATE",
       "weighted_inconsistency": 1.1,
-      "last_updated": "2026-03-18T07:00:13.978Z"
+      "last_updated": "2026-03-18T07:20:14.370Z"
     },
     "N4": {
       "label": "Disruption",
@@ -47,15 +47,15 @@
       "what_to_watch": "Competitive product launches from FourKites, project44, or new AI-native logistics platforms. Also monitor key engineering talent retention.",
       "upside": null,
       "risk_plain": "While the CargoWise moat is deep, the company's reliance on one person for technical vision is a genuine structural vulnerability.",
-      "survival_score": 0.41,
+      "survival_score": 0.43,
       "status": "MODERATE",
       "weighted_inconsistency": 5.8,
-      "last_updated": "2026-03-18T07:00:13.978Z"
+      "last_updated": "2026-03-18T07:20:14.370Z"
     }
   },
   "dominant": "N3",
   "confidence": "MODERATE",
-  "alert_state": "OVERCORRECTION",
+  "alert_state": "NORMAL",
   "alert_started": null,
   "current_price": 44.6,
   "big_picture": "WiseTech Global is an Australian software company that makes CargoWise, the world's leading logistics management platform. The company experienced a severe governance crisis in late 2024 when allegations about the founder's conduct emerged, causing the stock to drop 35%.",
@@ -175,6 +175,20 @@
       "severity": "AMBER",
       "message": "Single-day move of -37.1% exceeds 10% threshold — possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-03-18",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "Single-day move of -34.7% exceeds 10% threshold — possible overcorrection",
+      "auto_generated": true
+    },
+    {
+      "date": "2026-03-18",
+      "type": "OVERCORRECTION_REVIEW",
+      "severity": "AMBER",
+      "message": "Overcorrection NOT confirmed — price only partially reversed",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -239,6 +253,16 @@
       "cumulative_20d": -30.1,
       "results_day": false,
       "overcorrection_active": true
+    },
+    {
+      "date": "2026-03-18",
+      "classification": "MATERIAL",
+      "daily_change_pct": -34.7,
+      "volume_multiplier": 1,
+      "cumulative_5d": 0.44,
+      "cumulative_20d": -30.1,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
@@ -264,7 +288,8 @@
     67.8,
     68.1,
     68.3,
-    68.5
+    68.5,
+    44.6
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -477,14 +502,19 @@
     }
   },
   "_overcorrection": {
-    "active": true,
+    "active": false,
     "triggerType": "SINGLE_DAY",
-    "triggerDate": "2026-02-25",
-    "triggerPrice": 42.99,
+    "triggerDate": "2026-03-18",
+    "triggerPrice": 44.6,
     "direction": "down",
-    "movePct": -37.06,
-    "reviewDate": "2026-03-04",
-    "message": "Single-day move of -37.1% exceeds 10% threshold — possible overcorrection"
+    "movePct": -34.7,
+    "reviewDate": "2026-03-25",
+    "message": "Single-day move of -34.7% exceeds 10% threshold — possible overcorrection",
+    "reviewResult": {
+      "reversal_pct": -10.1,
+      "confirmed": false,
+      "message": "Overcorrection NOT confirmed — price only partially reversed"
+    }
   },
   "price_evidence": {
     "last_run": "2026-03-18T07:00:13.978Z",

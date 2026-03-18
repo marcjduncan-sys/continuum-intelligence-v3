@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-18T07:00:13.978Z"
+      "last_updated": "2026-03-18T07:20:14.388Z"
     },
     "N2": {
       "label": "Traditional Energy Cash Cow",
@@ -23,10 +23,10 @@
       "what_to_watch": "LNG investment cycle, Middle East upstream capex, oil price trajectory.",
       "upside": "If traditional energy spending sustains, segment provides stable cash flow and higher margins.",
       "risk_plain": "If oil prices collapse below US$60/bbl, traditional energy capex would be cut sharply.",
-      "survival_score": 0.34,
+      "survival_score": 0.31,
       "status": "LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-18T07:00:13.978Z"
+      "last_updated": "2026-03-18T07:20:14.388Z"
     },
     "N3": {
       "label": "Margin Pressure",
@@ -38,7 +38,7 @@
       "survival_score": 0.34,
       "status": "LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-18T07:00:13.978Z"
+      "last_updated": "2026-03-18T07:20:14.388Z"
     },
     "N4": {
       "label": "Cyclical Downturn",
@@ -47,15 +47,15 @@
       "what_to_watch": "Global recession indicators, oil price, government clean energy subsidy policies, backlog cancellations.",
       "upside": null,
       "risk_plain": "In past downturns revenue fell 20-30% and margins compressed to near-zero; elevated leverage amplifies risk.",
-      "survival_score": 0.27,
+      "survival_score": 0.3,
       "status": "LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-18T07:00:13.978Z"
+      "last_updated": "2026-03-18T07:20:14.388Z"
     }
   },
   "dominant": "N2",
   "confidence": "LOW",
-  "alert_state": "NORMAL",
+  "alert_state": "OVERCORRECTION",
   "current_price": 10.17,
   "big_picture": "Worley Limited (ASX: WOR) — coverage initiated. Full analysis pending.",
   "last_flip": {
@@ -68,7 +68,15 @@
     "to_survival": 0.37
   },
   "narrative_history": [],
-  "evidence_items": [],
+  "evidence_items": [
+    {
+      "date": "2026-03-18",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "Single-day move of -20.6% exceeds 10% threshold — possible overcorrection",
+      "auto_generated": true
+    }
+  ],
   "price_signals": [
     {
       "date": "2026-02-24",
@@ -89,25 +97,20 @@
       "cumulative_20d": 7.08,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-18",
+      "classification": "MATERIAL",
+      "daily_change_pct": -20.55,
+      "volume_multiplier": 1,
+      "cumulative_5d": 0.39,
+      "cumulative_20d": 7.08,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    17.5,
-    17.2,
-    16.8,
-    16.5,
-    16.2,
-    15.8,
-    15.5,
-    15.2,
-    14.8,
-    14.5,
-    14.2,
-    13.8,
-    13.5,
-    13.2,
-    12.8,
     12.5,
     12.2,
     11.8,
@@ -166,7 +169,8 @@
     12.2,
     12.5,
     12.8,
-    12.85
+    12.85,
+    10.17
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -363,5 +367,15 @@
     "last_run": "2026-03-18T07:00:13.978Z",
     "classification": "MATERIAL"
   },
-  "last_research_update": "2026-03-18T07:00:13.978Z"
+  "last_research_update": "2026-03-18T07:00:13.978Z",
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-03-18",
+    "triggerPrice": 10.17,
+    "direction": "down",
+    "movePct": -20.55,
+    "reviewDate": "2026-03-25",
+    "message": "Single-day move of -20.6% exceeds 10% threshold — possible overcorrection"
+  }
 }
