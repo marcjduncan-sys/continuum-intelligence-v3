@@ -2,6 +2,7 @@
 // Extracted from index.html without logic changes
 
 import { STOCK_DATA, getTcData } from '../lib/state.js';
+import { truncateAtWord } from '../lib/format.js';
 import { ANALYST_SYSTEM_PROMPT } from '../features/chat.js';
 import { saveThesis, inferBiasFromSplit } from '../features/thesis-capture.js';
 
@@ -444,7 +445,8 @@ export function initThesisPage() {
       card.dataset.ticker = ticker;
       card.onclick = function() { tcSelectStock(ticker); };
       card.innerHTML = '<div class="tc-stock-ticker">' + ticker + '</div>' +
-                       '<div class="tc-stock-name">' + (stock.company || ticker) + '</div>';
+                       '<div class="tc-stock-name">' + truncateAtWord(stock.company || ticker, 22) + '</div>';
+      card.title = stock.company || ticker;
       tcGrid.appendChild(card);
     });
   }
