@@ -239,6 +239,43 @@ async function _archiveMemory(id, token) {
     }
 }
 
+async function _fetchNotifications(token) {
+    var url = apiOrigin + '/api/notifications' + _getGuestParam(token);
+    var auth = _getAuthHeaders();
+    try {
+        var res = await fetch(url, { headers: auth.headers });
+        if (!res.ok) return [];
+        var data = await res.json();
+        return Array.isArray(data) ? data : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function _renderDriftAlerts(notifications) {
+    // Only show CONTRADICTS signals as evidence drift
+    var drifts = notifications.filter(function(n) { return n.signal === 'contradicts'; });
+    if (drifts.length === 0) return '';
+
+    var html = '<div class="jnl-drift">';
+    html += '<div class="jnl-drift-header">Evidence Drift (' + drifts.length + ')</div>';
+
+    drifts.forEach(function(n) {
+        html += '<div class="jnl-drift-item" data-id="' + _escHtml(n.id) + '">';
+        html += '<span class="jnl-drift-ticker">' + _escHtml(n.ticker) + '</span>';
+        html += '<div class="jnl-drift-text">' + _escHtml(n.summary) + '</div>';
+        html += '<div class="jnl-drift-actions">';
+        html += '<button class="jnl-drift-btn drift-research" data-ticker="' + _escHtml(n.ticker) + '">Open research</button>';
+        html += '<button class="jnl-drift-btn drift-discuss" data-ticker="' + _escHtml(n.ticker) + '" data-summary="' + _escHtml(n.summary) + '">Discuss with analyst</button>';
+        html += '<button class="jnl-drift-btn drift-dismiss" data-id="' + _escHtml(n.id) + '">Dismiss</button>';
+        html += '</div>';
+        html += '</div>';
+    });
+
+    html += '</div>';
+    return html;
+}
+
 // ============================================================
 // SECOND-PERSON VOICE REWRITE
 // ============================================================
@@ -485,6 +522,7 @@ export async function renderMemoryPage() {
 
     var auth = _getAuthHeaders();
     var memories = await _fetchMemories(auth.token);
+    var notifications = await _fetchNotifications(auth.token);
 
     if (memories.length === 0) {
         container.innerHTML =
@@ -531,6 +569,9 @@ export async function renderMemoryPage() {
     html += '<span class="jnl-count">' + filtered.length + ' entries</span>';
     html += '</div>';
 
+    // Evidence drift alerts (contradictions from proactive insights scan)
+    html += _renderDriftAlerts(notifications);
+
     // Render active view
     html += '<div class="jnl-active-cards">';
     if (_currentView === 'type') {
@@ -574,6 +615,45 @@ export async function renderMemoryPage() {
         header.addEventListener('click', function() {
             var group = header.closest('.jnl-stock-group');
             if (group) group.classList.toggle('collapsed');
+        });
+    });
+
+    // Wire drift alert buttons
+    container.querySelectorAll('.drift-research').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            window.location.hash = 'report-' + btn.getAttribute('data-ticker').toLowerCase();
+        });
+    });
+    container.querySelectorAll('.drift-discuss').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var ticker = btn.getAttribute('data-ticker');
+            var summary = btn.getAttribute('data-summary');
+            window.location.hash = 'report-' + ticker.toLowerCase();
+            setTimeout(function() {
+                var chatInput = document.getElementById('apInput');
+                if (chatInput) {
+                    chatInput.value = 'Evidence drift alert: "' + summary + '" -- Walk me through what changed and whether my view needs updating.';
+                    chatInput.dispatchEvent(new Event('input'));
+                    chatInput.focus();
+                }
+            }, 500);
+        });
+    });
+    container.querySelectorAll('.drift-dismiss').forEach(function(btn) {
+        btn.addEventListener('click', async function() {
+            var item = btn.closest('.jnl-drift-item');
+            var id = btn.getAttribute('data-id');
+            if (item) { item.style.opacity = '0.3'; item.style.pointerEvents = 'none'; }
+            var url = apiOrigin + '/api/notifications/' + id + '/dismiss' + _getGuestParam(auth.token);
+            try {
+                await fetch(url, { method: 'PATCH', headers: auth.headers });
+            } catch (e) { /* silent */ }
+            if (item) item.remove();
+            // Remove drift container if empty
+            var driftBox = container.querySelector('.jnl-drift');
+            if (driftBox && driftBox.querySelectorAll('.jnl-drift-item').length === 0) {
+                driftBox.remove();
+            }
         });
     });
 
