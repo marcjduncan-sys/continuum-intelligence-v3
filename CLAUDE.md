@@ -12,8 +12,8 @@ You are a senior engineer maintaining a production equity research platform used
 npm run dev          # Dev server on port 5000, proxies /api → localhost:8000
 npm run build        # Vite build → dist/; copies data/ → dist/data/
 npm run test         # Jest suite (tests/, src/**/*.test.js) — 61 tests
-npm run test:unit    # Vitest suite — what CI runs; must pass before pushing — 157 tests
-npm run test:all     # Jest + Vitest combined — 218 tests total
+npm run test:unit    # Vitest suite — what CI runs; must pass before pushing — 195 tests
+npm run test:all     # Jest + Vitest combined — 256 tests total
 npm run lint         # ESLint over scripts/ and src/ only (not js/)
 npm run validate     # lint + test:all — run before any push
 ```
@@ -42,7 +42,7 @@ npm run validate     # lint + test:all — run before any push
 
 ---
 
-## Current State — 2026-03-17
+## Current State — 2026-03-18
 
 **Phase 0 COMPLETE (2026-03-07).** The extraction of logic from `index.html` into `src/` modules is complete. `computeSkewScore` canonicalised to zero-contribution convention (commit `4493e8c`; see `docs/decisions/003-computeskewscore-neutral-convention.md`). `VALID_STATIC_PAGES` confirmed correct: `home`, `deep-research`, `portfolio`, `comparator`, `personalisation`, `about`.
 
@@ -64,7 +64,7 @@ npm run validate     # lint + test:all — run before any push
 - [x] Railway 502 fix: `asyncio.wait_for(asyncpg.create_pool(...), timeout=15.0)` in `api/db.py`; removed lifespan pre-warm from `api/main.py` -- commit `9a8dad7`.
 - [x] PostgreSQL provisioned in Railway; `DATABASE_URL` injected; migrations applied automatically.
 - [x] `JWT_SECRET` added to Railway dashboard.
-- [ ] **ACTION REQUIRED**: Add SMTP env vars (`EMAIL_FROM`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`) to Railway dashboard for live OTP email delivery. Until set, OTP codes are logged server-side only. (Deferred -- no SMTP provider yet.)
+- [x] **OTP email LIVE (2026-03-18)**: Migrated from aiosmtplib/SMTP to Resend HTTP API (`api/email_service.py`, `api/config.py`). Railway blocks all outbound SMTP; Resend uses HTTPS (port 443). Required env vars: `EMAIL_FROM` (sender address), `RESEND_API_KEY`. Both set in Railway dashboard. Confirmed working: OTP email received and login flow verified end-to-end. `aiosmtplib` removed from `requirements.txt`. Old SMTP vars (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`) are no longer used.
 
 **Phase 3 COMPLETE (2026-03-09).**
 - [x] Wave 1A: Sign in button added to `.nav-actions` in `index.html`; `initAuth()` wires click handler, updates button text on `ci:auth:login` event -- commit `fbb7a35`.
@@ -146,13 +146,26 @@ npm run validate     # lint + test:all — run before any push
 - [x] Commit `a68ec06`: Removed evidence gaps section from briefing to keep 2-page constraint.
 - [x] 157/157 Vitest passing. Build succeeds. Railway healthy (32 tickers).
 
+**Session work (2026-03-18) -- UI fixes, OTP email, memory pipeline hardening:**
+- [x] **OTP email migration**: `api/email_service.py` rewritten to use Resend HTTP API via `httpx` (10s timeout). Root cause was Railway blocking all outbound SMTP. `api/config.py` simplified to `EMAIL_FROM` + `RESEND_API_KEY`. Login flow verified end-to-end.
+- [x] **Fix 6 -- Card truncation** (commits in this session): `truncateAtWord(str, maxLen)` added to `src/lib/format.js`; imported in `src/pages/home.js` and applied at 120 chars to `fc-skew-rationale`.
+- [x] **Fix 7 -- Pending state for cards without price data**: `isDataPending()` helper in `home.js`; early return renders a dimmed "Analysis pending" card when all `featuredMetrics` are N/A/--. CSS: `.featured-card.fc-pending` (opacity 0.45/0.65), `.fc-pending-msg`. `src/styles/home.css` updated.
+- [x] **Fix 9 -- Collapsible analyst panel**: `--analyst-panel-width` corrected to 380px in `tokens.css`. `ap-user-collapsed` CSS class (52px wide, hides all content except collapse button) added to `chat.css`. `chat.js`: collapse button toggles class + persists state to `localStorage('ci_panel_collapsed')`; `initChat()` restores on load. FAB bug fixed: `closePanel()` now always restores FAB (removed `window.innerWidth < 1024` guard).
+- [x] **Fix 11 -- Personalisation wizard purpose banner**: `<div class="pn-wizard-purpose">` inserted before step 1 form grid in `public/js/personalisation.js`. CSS appended to `css/personalisation.css`.
+- [x] **ingest.py type guards** (commit `b557ab7`): `alignmentSummary` and `priceImplication` guarded with `isinstance(x, dict)` before `.get()` calls. 8 pytest tests added (`tests/test_ingest_type_guards.py`).
+- [x] **Em dash sweep** (commit `591872a`): 183 Unicode em dashes + 5 double-encoded em dashes fixed across 21 stock JSONs.
+- [x] **Memory pipeline -- Item 1** (commit `5127fff`): `api/migrations/011_remove_evolved_action.sql` drops `evolved` from `memory_consolidation_events` action CHECK constraint. Auto-applies on next Railway restart.
+- [x] **Memory pipeline -- Item 2** (commit `99adff6`): `db.enforce_memory_ceiling()` deactivates lowest-confidence active memories when a user exceeds 500. Priority: tactical > positional > structural. Called from `memory_extractor.py` after each successful insertion turn.
+- [x] **Memory pipeline -- Item 5** (commit `d527a5c`): `prompt_builder.format_memories_section()` capped at 1,200 chars (~300 tokens). Lower-scored memories dropped first; truncation notice appended so LLM is aware.
+- [x] 195/195 Vitest passing. Build succeeds.
+
 **Recent bug history (last six commits):**
-- `a68ec06` pdf briefing: remove evidence gaps section to keep 2 pages.
-- `386f2c0` pdf briefing: fill page 2 with full evidence, discriminators, tripwires.
-- `4ce17e1` pdf briefing: fix [object Object] in narrative, move tech to page 1.
-- `6226032` pdf briefing: move identity and narrative to page 1, increase hyp trunc.
-- `7781dd6` PDF reports: Goldman Sachs-standard layout rewrite.
-- `0e8465d` price-drivers workflow: increase timeouts (180min job, 480s per ticker).
+- `5127fff` migrations: drop 'evolved' from memory_consolidation_events action constraint.
+- `99adff6` db: enforce 500-memory ceiling per user; deactivate lowest-confidence excess on insertion.
+- `d527a5c` prompt_builder: cap memory injection block at 1,200 chars to protect system prompt budget.
+- `73908c7` feat: add purpose banner to personalisation wizard step 1.
+- `b0eaab5` tests: type guard coverage for alignment and priceImplication in _chunk_stock.
+- `591872a` fix encoding: em dashes in stock JSONs.
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
