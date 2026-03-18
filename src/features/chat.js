@@ -691,7 +691,7 @@ async function openHistory() {
 // EVENT LISTENERS
 // ============================================================
 
-if (panel) {
+function _setupListeners() {
     // FAB opens panel on mobile
     if (fab) {
         fab.addEventListener('click', function() { openPanel(); });
@@ -797,6 +797,7 @@ export function initChat() {
         return;
     }
 
+    _setupListeners();
     populateTickerSelect();
     _restoreFromDB(currentTicker).then(renderConversation);
 
