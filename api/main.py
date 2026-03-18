@@ -357,7 +357,7 @@ async def research_chat(request: Request, body: ResearchChatRequest, background_
     passages = []
     context = ""
     if has_research:
-        passages = retrieve(
+        passages = await retrieve(
             query=body.question,
             ticker=ticker,
             thesis_alignment=body.thesis_alignment,

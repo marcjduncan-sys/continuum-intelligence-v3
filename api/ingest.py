@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class Passage:
     """A single retrievable chunk of research content."""
 
-    __slots__ = ("ticker", "section", "subsection", "content", "tags", "weight")
+    __slots__ = ("ticker", "section", "subsection", "content", "tags", "weight", "embedding")
 
     def __init__(
         self,
@@ -36,6 +36,7 @@ class Passage:
         content: str,
         tags: list[str] | None = None,
         weight: float = 1.0,
+        embedding: list[float] | None = None,
     ):
         self.ticker = ticker
         self.section = section
@@ -43,6 +44,7 @@ class Passage:
         self.content = content
         self.tags = tags or []
         self.weight = weight
+        self.embedding = embedding
 
     def to_dict(self) -> dict:
         return {
@@ -777,6 +779,7 @@ def _chunk_stock(ticker: str, data: dict, ref: dict | None = None, fresh: dict |
 
 _store: dict[str, list[Passage]] = {}
 _all_passages: list[Passage] = []
+_ingest_version: int = 0
 
 
 def ingest(html_path: str | None = None) -> dict[str, list[Passage]]:
@@ -785,8 +788,9 @@ def ingest(html_path: str | None = None) -> dict[str, list[Passage]]:
     Falls back to legacy HTML parsing if JSON files are not found.
     Returns {ticker: [Passage, ...]}.
     """
-    global _store, _all_passages
+    global _store, _all_passages, _ingest_version
 
+    _ingest_version += 1
     data_dir = _get_data_dir()
     _store = {}
     _all_passages = []
@@ -848,6 +852,11 @@ def get_passages(ticker: str | None = None) -> list[Passage]:
 def get_tickers() -> list[str]:
     """Get list of available tickers."""
     return sorted(_store.keys())
+
+
+def get_ingest_version() -> int:
+    """Return the current ingest version counter (incremented on each ingest() call)."""
+    return _ingest_version
 
 
 def get_passage_count() -> dict[str, int]:
