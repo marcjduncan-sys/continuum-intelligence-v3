@@ -8,7 +8,28 @@ import { formatDateAEST, truncateAtWord } from '../lib/format.js';
 
 var coverageSortDir = 0; // 0 = unsorted (default), 1 = desc (bearish first), -1 = asc (bullish first)
 
+function isDataPending(data) {
+  var metrics = data.featuredMetrics || [];
+  if (metrics.length === 0) return true;
+  var naCount = metrics.filter(function(m) {
+    return !m.value || m.value === 'N/A' || m.value === '--';
+  }).length;
+  return naCount === metrics.length;
+}
+
 export function renderFeaturedCard(data) {
+  if (isDataPending(data)) {
+    return '<div class="featured-card skew-neutral fc-pending" data-ticker-card="' + data.ticker + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link">' +
+      '<div class="fc-top">' +
+        '<div>' +
+          '<div class="fc-ticker">' + (data.tickerFull || data.ticker) + '</div>' +
+          '<div class="fc-company">' + data.company + '</div>' +
+          '<div class="fc-sector">' + data.sector + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="fc-pending-msg">Analysis pending</div>' +
+    '</div>';
+  }
   var skew = data._skew || computeSkewScore(data);
   var dir = skew.direction;
   var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
