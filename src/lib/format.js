@@ -142,7 +142,7 @@ export function truncateAtWord(str, maxLen) {
   if (!str) return '';
   if (str.length <= maxLen) return str;
   var cut = str.lastIndexOf(' ', maxLen);
-  return (cut > 0 ? str.slice(0, cut) : str.slice(0, maxLen)) + '\u2026';
+  return (cut > maxLen * 0.5 ? str.slice(0, cut) : str.slice(0, maxLen)) + '\u2026';
 }
 
 export function renderSparkline(prices) {

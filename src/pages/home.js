@@ -64,7 +64,7 @@ export function renderFeaturedCard(data) {
         '<div class="skew-bar-bear" style="width:' + skew.bear + '%"></div>' +
       '</div>' +
       '<span class="skew-score ' + scoreCls + '" style="font-size:0.7rem">' + scoreLabel + '</span>' +
-      '<span class="fc-skew-rationale">' + truncateAtWord(data.featuredRationale, 120) + '</span>' +
+      '<span class="fc-skew-rationale">' + truncateAtWord(data.featuredRationale, 110) + '</span>' +
     '</div>' +
     '<div class="fc-date">' + formatDateAEST(data.date) + renderFreshnessBadge(data.ticker) + renderCatalystTag(data.ticker) + '</div>' +
   '</div>';
