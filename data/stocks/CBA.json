@@ -11,10 +11,10 @@
       "what_to_watch": "CommBank app MAU growth, cost-to-income ratio, home lending market share.",
       "upside": "Material re-rating if digital franchise premium expands further.",
       "risk_plain": "If premium multiples mean-revert, significant downside risk.",
-      "survival_score": 0.36,
-      "status": "MODERATE",
+      "survival_score": 0.38,
+      "status": "LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-02-25T08:09:34.727Z"
+      "last_updated": "2026-03-18T03:42:23.383Z"
     },
     "N2": {
       "label": "NIM Compression",
@@ -23,10 +23,10 @@
       "what_to_watch": "Quarterly NIM disclosures, RBA rate decisions, deposit mix trends.",
       "upside": null,
       "risk_plain": "If NIM falls to 1.85-1.90%, EPS could decline 5-8% from peak levels.",
-      "survival_score": 0.39,
+      "survival_score": 0.4,
       "status": "MODERATE",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-02-25T08:09:34.727Z"
+      "last_updated": "2026-03-18T03:42:23.383Z"
     },
     "N3": {
       "label": "Competitive Disruption",
@@ -35,10 +35,10 @@
       "what_to_watch": "Neo-bank/fintech mortgage share, CDR adoption, payments disintermediation.",
       "upside": null,
       "risk_plain": "If competitive moat narrows, the valuation premium compresses.",
-      "survival_score": 0.18,
-      "status": "LOW",
+      "survival_score": 0.17,
+      "status": "VERY_LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-02-25T08:09:34.727Z"
+      "last_updated": "2026-03-18T03:42:23.383Z"
     },
     "N4": {
       "label": "Credit Cycle Normalisation",
@@ -47,18 +47,26 @@
       "what_to_watch": "Unemployment rate, house prices, loan impairment expense, 90-day arrears.",
       "upside": null,
       "risk_plain": "If credit costs normalise to 15-25bp, cash NPAT could fall by $1-2B annually.",
-      "survival_score": 0.07,
-      "status": "LOW",
+      "survival_score": 0.05,
+      "status": "VERY_LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-02-25T08:09:34.727Z"
+      "last_updated": "2026-03-18T03:42:23.383Z"
     }
   },
-  "dominant": "N1",
+  "dominant": "N2",
   "confidence": "LOW",
   "alert_state": "NORMAL",
-  "current_price": 177.61,
+  "current_price": 176.67,
   "big_picture": "Commonwealth Bank of Australia (ASX: CBA) — coverage initiated. Full analysis pending.",
-  "last_flip": null,
+  "last_flip": {
+    "date": "2026-03-18",
+    "from": "N1",
+    "to": "N2",
+    "trigger": "Automated: survival score shift (Digital Franchise Premium → NIM Compression)",
+    "price_at_flip": 176.67,
+    "from_survival": 0.38,
+    "to_survival": 0.4
+  },
   "narrative_history": [],
   "evidence_items": [],
   "price_signals": [
@@ -215,7 +223,8 @@
   },
   "priceHistory": [
     178.5,
-    177.61
+    177.61,
+    176.67
   ],
   "freshness": {
     "pricePctChange": -0.5,
@@ -223,7 +232,7 @@
     "status": "OK",
     "badge": "ok"
   },
-  "last_price_update": "2026-02-26T00:17:58.498Z",
+  "last_price_update": "2026-03-18T03:42:22.701Z",
   "technicalAnalysis": {
     "date": "14 February 2026",
     "period": "12 months",
@@ -231,7 +240,7 @@
     "regime": "Overbought — Extended Rally",
     "clarity": "Clear trend, stretched extension",
     "price": {
-      "current": 177.61,
+      "current": 176.67,
       "currency": "A$"
     },
     "movingAverages": {
@@ -349,5 +358,10 @@
         "relativeReturn": 18.1
       }
     }
-  }
+  },
+  "price_evidence": {
+    "last_run": "2026-03-18T03:42:23.383Z",
+    "classification": "NOTABLE"
+  },
+  "last_research_update": "2026-03-18T03:42:23.383Z"
 }

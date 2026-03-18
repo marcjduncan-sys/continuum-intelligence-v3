@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.26,
-      "status": "MODERATE",
+      "survival_score": 0.16,
+      "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-02-25T08:09:34.723Z"
+      "last_updated": "2026-03-18T03:42:23.383Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.32,
-      "status": "MODERATE",
+      "survival_score": 0.22,
+      "status": "LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-02-25T08:09:34.723Z"
+      "last_updated": "2026-03-18T03:42:23.383Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Cost pressures, competitive threats, or macro headwinds.",
       "upside": null,
       "risk_plain": "Material downside if multiple risks crystallise simultaneously.",
-      "survival_score": 0.26,
+      "survival_score": 0.36,
       "status": "LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-02-25T08:09:34.723Z"
+      "last_updated": "2026-03-18T03:42:23.383Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -47,18 +47,26 @@
       "what_to_watch": "Industry disruption signals and regulatory changes.",
       "upside": null,
       "risk_plain": "If disruption materialises, prior assumptions become invalid.",
-      "survival_score": 0.16,
+      "survival_score": 0.26,
       "status": "LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-02-25T08:09:34.723Z"
+      "last_updated": "2026-03-18T03:42:23.383Z"
     }
   },
-  "dominant": "N2",
-  "confidence": "LOW",
+  "dominant": "N3",
+  "confidence": "MODERATE",
   "alert_state": "OVERCORRECTION",
-  "current_price": 1.09,
+  "current_price": 0.96,
   "big_picture": "Horizon Minerals Limited (ASX: HRZ) — coverage initiated. Full analysis pending.",
-  "last_flip": null,
+  "last_flip": {
+    "date": "2026-03-18",
+    "from": "N2",
+    "to": "N3",
+    "trigger": "Automated: survival score shift (Base Case/Managed → Risk/Downside)",
+    "price_at_flip": 0.96,
+    "from_survival": 0.22,
+    "to_survival": 0.36
+  },
   "narrative_history": [],
   "evidence_items": [
     {
@@ -207,148 +215,105 @@
   },
   "priceHistory": [
     1.105,
-    1.09
+    1.09,
+    0.96
   ],
   "freshness": {
-    "pricePctChange": -1.4,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
+    "pricePctChange": -11.9,
+    "urgency": 30,
+    "status": "MODERATE",
+    "badge": "moderate"
   },
-  "last_price_update": "2026-02-26T00:17:58.540Z",
+  "last_price_update": "2026-03-18T03:42:23.007Z",
   "technicalAnalysis": {
-    "date": "16 February 2026",
+    "date": "17 March 2026",
     "period": "1 Year",
     "source": "Continuum Technical Intelligence",
-    "regime": "Consolidation",
-    "clarity": "Moderate",
+    "regime": "Downtrend",
+    "clarity": "Clear",
     "price": {
-      "current": 1.09,
+      "current": 0.96,
       "currency": "A$"
     },
     "movingAverages": {
       "ma50": {
-        "value": 1.28,
-        "date": "16 Feb 2026"
+        "value": 1.2,
+        "date": "17 Mar 2026"
       },
       "ma200": {
-        "value": 1.05,
-        "date": "16 Feb 2026"
+        "value": 0.9,
+        "date": "17 Mar 2026"
       },
       "crossover": {
         "type": "Golden Cross",
-        "date": "w/c 6 January 2026",
-        "description": "50-day MA crossed above 200-day MA, confirming the uptrend from the A$0.64 low. However, the recent pullback from A$1.51 has brought the price back below the 50-day MA."
+        "date": "March 2026",
+        "description": "50-day MA crossed above 200-day MA (golden cross)"
       },
-      "priceVsMa50": -3.1,
-      "priceVsMa200": 18.1
+      "priceVsMa50": -20.4,
+      "priceVsMa200": 1.4
     },
     "trend": {
-      "direction": "Up (with pullback)",
-      "duration": "6 months",
-      "structure": "Strong rally from A$0.64 to A$1.51 followed by consolidation in A$1.15-1.35 range. Higher lows being established but momentum has stalled near A$1.50 resistance.",
+      "direction": "Down",
+      "duration": "11 months",
+      "structure": "Price in downtrend relative to 50-day and 200-day moving averages.",
       "peak": {
         "price": 1.51,
-        "date": "w/c 13 January 2026"
+        "date": "Recent"
       },
       "trough": {
         "price": 0.64,
-        "date": "w/c 5 August 2025"
+        "date": "Recent"
       },
-      "drawdown": -17.9
+      "drawdown": -36.4
     },
     "keyLevels": {
       "support": {
-        "price": 1.15,
-        "method": "Prior consolidation low and 20-day MA support zone"
+        "price": 0.92,
+        "method": "Recent low / swing support"
       },
       "resistance": {
-        "price": 1.51,
-        "method": "52-week high — previous rejection level with volume"
+        "price": 1.24,
+        "method": "Recent high / swing resistance"
       },
       "fiftyTwoWeekHigh": {
         "price": 1.51,
-        "date": "w/c 13 January 2026"
+        "date": "Last 12 months"
       },
       "fiftyTwoWeekLow": {
         "price": 0.64,
-        "date": "w/c 5 August 2025"
+        "date": "Last 12 months"
       }
     },
     "volume": {
-      "latestVs20DayAvg": 0.8,
-      "latestDate": "16 February 2026",
-      "priorSpikes": [
-        {
-          "period": "w/c 13 January 2026",
-          "ratio": 3.2,
-          "context": "Rally to 52-week high on gold sector momentum"
-        },
-        {
-          "period": "w/c 4 November 2025",
-          "ratio": 2.5,
-          "context": "Breakout above A$1.00 resistance on resource upgrade announcement"
-        }
-      ]
+      "latestVs20DayAvg": 1,
+      "latestDate": "17 March 2026",
+      "priorSpikes": []
     },
     "volatility": {
       "latestDailyRange": {
-        "high": 1.26,
-        "low": 1.22,
-        "date": "16 February 2026"
+        "high": 0.96,
+        "low": 0.92,
+        "date": "17 March 2026"
       },
-      "latestRangePercent": 3.2,
-      "avgDailyRangePercent30": 4.1,
-      "avgDailyRangePercent90": 4.8
+      "latestRangePercent": 3.4,
+      "avgDailyRangePercent30": 3.4,
+      "avgDailyRangePercent90": 3.4
     },
     "meanReversion": {
-      "vsMa50": -3.1,
-      "vsMa200": 18.1,
-      "rangePosition": 69,
+      "vsMa50": -20.4,
+      "vsMa200": 1.4,
+      "rangePosition": 36,
       "rangeHigh": 1.51,
       "rangeLow": 0.64
     },
-    "inflectionPoints": [
-      {
-        "date": "w/c 5 August 2025",
-        "price": 0.64,
-        "event": "52-week low — capitulation base"
-      },
-      {
-        "date": "w/c 4 November 2025",
-        "price": 1,
-        "event": "Breakout above A$1.00 psychological resistance"
-      },
-      {
-        "date": "w/c 6 January 2026",
-        "price": 1.28,
-        "event": "Golden Cross — 50-day crosses above 200-day MA"
-      },
-      {
-        "date": "w/c 13 January 2026",
-        "price": 1.51,
-        "event": "52-week high — gold sector momentum peak"
-      },
-      {
-        "date": "w/c 3 February 2026",
-        "price": 1.17,
-        "event": "Pullback support test — higher low established"
-      }
-    ],
+    "inflectionPoints": [],
     "relativePerformance": {
       "vsIndex": {
         "name": "S&P/ASX 200",
         "period": "12 months",
-        "stockReturn": 93.8,
-        "indexReturn": 6.9,
-        "relativeReturn": 86.9
-      },
-      "vsSector": {
-        "name": "S&P/ASX Gold Index",
-        "period": "12 months",
-        "stockReturn": 93.8,
-        "sectorReturn": 31.7,
-        "relativeReturn": 62.1
+        "stockReturn": 5.5,
+        "indexReturn": 6.5,
+        "relativeReturn": -1
       }
     }
   },
@@ -361,5 +326,10 @@
     "movePct": -10.89,
     "reviewDate": "2026-03-04",
     "message": "Single-day move of -10.9% exceeds 10% threshold — possible overcorrection"
-  }
+  },
+  "price_evidence": {
+    "last_run": "2026-03-18T03:42:23.383Z",
+    "classification": "MATERIAL"
+  },
+  "last_research_update": "2026-03-18T03:42:23.383Z"
 }
