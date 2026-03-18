@@ -74,16 +74,7 @@ export var ANALYST_SYSTEM_PROMPT =
 // DOM REFS
 // ============================================================
 
-var panel        = document.getElementById('analyst-panel');
-var fab          = document.getElementById('apFab');
-var collapseBtn  = document.getElementById('apCollapseBtn');
-var clearBtn     = document.getElementById('apClearBtn');
-var historyBtn   = document.getElementById('apHistoryBtn');
-var messages     = document.getElementById('apMessages');
-var input        = document.getElementById('apInput');
-var sendBtn      = document.getElementById('apSend');
-var tickerSelect = document.getElementById('apTickerSelect');
-var tickerBadge  = document.getElementById('apTickerBadge');
+var panel, fab, collapseBtn, clearBtn, historyBtn, messages, input, sendBtn, tickerSelect, tickerBadge;
 
 // ============================================================
 // STATE
@@ -778,6 +769,17 @@ if (panel) {
 // ============================================================
 
 export function initChat() {
+    panel        = document.getElementById('analyst-panel');
+    fab          = document.getElementById('apFab');
+    collapseBtn  = document.getElementById('apCollapseBtn');
+    clearBtn     = document.getElementById('apClearBtn');
+    historyBtn   = document.getElementById('apHistoryBtn');
+    messages     = document.getElementById('apMessages');
+    input        = document.getElementById('apInput');
+    sendBtn      = document.getElementById('apSend');
+    tickerSelect = document.getElementById('apTickerSelect');
+    tickerBadge  = document.getElementById('apTickerBadge');
+
     if (!panel) {
         console.warn('[Analyst] #analyst-panel not found -- analyst panel disabled');
         return;
