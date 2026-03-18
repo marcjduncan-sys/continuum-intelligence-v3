@@ -176,6 +176,16 @@ function _injectCSS() {
         '.jnl-action-btn:hover{color:var(--text-primary,#333);border-color:var(--border,#bbb);background:var(--bg-hover,rgba(0,0,0,.03))}' +
         '.jnl-action-btn.archive:hover{color:#c62828;border-color:#c62828}' +
 
+        // Archived section
+        '.jnl-archived{margin-top:32px;border-top:1px solid var(--border,#e5e5e5);padding-top:16px}' +
+        '.jnl-archived-toggle{background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-secondary,#888);padding:4px 0;display:flex;align-items:center;gap:6px}' +
+        '.jnl-archived-toggle:hover{color:var(--text-primary,#444)}' +
+        '.jnl-archived-toggle:focus-visible{outline:2px solid var(--accent,#003A70);outline-offset:2px}' +
+        '.jnl-toggle-arrow{font-size:10px;transition:transform .15s}' +
+        '.jnl-toggle-arrow.open{transform:rotate(90deg)}' +
+        '.jnl-archived-list .jnl-card{opacity:0.55}' +
+        '.jnl-archived-list .jnl-card:hover{opacity:0.8}' +
+
         // Empty and loading
         '.jnl-empty{text-align:center;padding:48px 16px;color:var(--text-secondary,#888);font-size:14px;line-height:1.5}' +
         '.jnl-loading{text-align:center;padding:48px 16px;color:var(--text-secondary,#999);font-size:13px}';
@@ -210,6 +220,42 @@ async function _archiveMemory(id, token) {
 }
 
 // ============================================================
+// SECOND-PERSON VOICE REWRITE
+// ============================================================
+
+function _toSecondPerson(text) {
+    if (!text) return '';
+    var t = text.trim();
+    var lower = t.toLowerCase();
+
+    // Already second person
+    if (lower.startsWith('you ') || lower.startsWith('your ')) return t;
+
+    // Conviction / directional views
+    if (/^(believes?|bullish|bearish|views?|interested|expects?|sees?|favou?rs?|considers?|thinks?|anticipates?)\b/i.test(t)) {
+        return 'You ' + t.charAt(0).toLowerCase() + t.slice(1);
+    }
+
+    // Risk flags / concerns
+    if (/^(concerned|skepti|worri|flag|caution|wary|nervous|uncertain|doubt)\b/i.test(t)) {
+        return 'You flagged: ' + t.charAt(0).toLowerCase() + t.slice(1);
+    }
+
+    // Process notes
+    if (/^(requires?|distinguishes?|prefers?|uses?|applies?|always|never|tracks?)\b/i.test(t)) {
+        return 'Your process: ' + t.charAt(0).toLowerCase() + t.slice(1);
+    }
+
+    // Challenge / disagreement
+    if (/^(disagrees?|challenges?|dismiss|rejects?|questions?)\b/i.test(t)) {
+        return 'You ' + t.charAt(0).toLowerCase() + t.slice(1);
+    }
+
+    // Fallback
+    return 'You noted: ' + t.charAt(0).toLowerCase() + t.slice(1);
+}
+
+// ============================================================
 // CARD RENDERING
 // ============================================================
 
@@ -230,8 +276,8 @@ function _renderCard(m, showTicker) {
     html += '<span class="jnl-card-date">' + _formatDate(m.created_at) + '</span>';
     html += '</div>';
 
-    // Content
-    html += '<div class="jnl-card-content">' + _escHtml(m.content) + '</div>';
+    // Content (rewritten to second person)
+    html += '<div class="jnl-card-content">' + _escHtml(_toSecondPerson(m.content)) + '</div>';
 
     // Source
     html += '<div class="jnl-card-source">Source: Analyst conversation' +
@@ -249,6 +295,9 @@ function _renderCard(m, showTicker) {
 
     // Actions
     html += '<div class="jnl-card-actions">';
+    if (m.ticker && m.source_conversation_id) {
+        html += '<button class="jnl-action-btn view-convo" data-ticker="' + _escHtml(m.ticker) + '">View conversation</button>';
+    }
     if (m.ticker) {
         html += '<button class="jnl-action-btn challenge" data-ticker="' + _escHtml(m.ticker) + '" ' +
             'data-content="' + _escHtml(m.content) + '">Challenge this view</button>';
@@ -495,6 +544,14 @@ export async function renderMemoryPage() {
                 var remaining = container.querySelectorAll('.jnl-card').length;
                 countEl.textContent = remaining + ' entries';
             }
+        });
+    });
+
+    // Wire "View conversation" buttons (navigate to stock report, opens analyst panel with history)
+    container.querySelectorAll('.jnl-action-btn.view-convo').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var ticker = btn.getAttribute('data-ticker');
+            window.location.hash = 'report-' + ticker.toLowerCase();
         });
     });
 
