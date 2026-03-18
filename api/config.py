@@ -102,11 +102,12 @@ PRICE_DRIVERS_SECRET = os.getenv("PRICE_DRIVERS_SECRET", "")
 
 def check_production_secrets() -> None:
     """Raise RuntimeError if running on Railway with insecure/missing secrets."""
-    railway_env = os.getenv("RAILWAY_ENVIRONMENT")
-    port_env = os.getenv("PORT")
-    is_production = railway_env is not None or (port_env is not None and port_env != "8000")
+    is_railway = (
+        os.getenv("RAILWAY_ENVIRONMENT") is not None
+        or os.getenv("RAILWAY_SERVICE_NAME") is not None
+    )
 
-    if not is_production:
+    if not is_railway:
         return
 
     insecure: list[str] = []
