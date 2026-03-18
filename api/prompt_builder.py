@@ -285,11 +285,19 @@ def _conf_label(conf: float) -> str:
     return "low confidence"
 
 
+_MEMORY_BLOCK_CHAR_BUDGET = 1200
+
+
 def format_memories_section(memories: list[dict]) -> str:
     """Format selected memories as a prompt section for injection.
 
     Returns an empty string if no memories are provided, so callers
     can unconditionally append the result.
+
+    The total injected block is capped at _MEMORY_BLOCK_CHAR_BUDGET characters
+    (~300 tokens) to protect the system prompt budget. Memories are already
+    sorted by relevance score descending by memory_selector.py, so lower-scored
+    entries are dropped first when the cap is reached.
     """
     if not memories:
         return ""
@@ -301,14 +309,23 @@ def format_memories_section(memories: list[dict]) -> str:
         "- POSITIONAL entries reflect current conviction levels on specific names; weight accordingly.\n"
         "- TACTICAL entries are time-sensitive; flag if the stated catalyst window may have passed.\n"
     ]
+    char_count = sum(len(l) for l in lines)
+    included = 0
+
     for mem in memories:
         age = mem.get("_age_days", 0)
         age_str = f" | {int(age)}d ago" if age > 0.5 else ""
         conf = _conf_label(mem.get("confidence", 1.0))
         mtype = mem.get("memory_type", "unknown").upper()
         ticker_str = f" | {mem['ticker']}" if mem.get("ticker") else ""
-        lines.append(
-            f"[{mtype}{ticker_str}{age_str} | {conf}] {mem['content']}"
-        )
+        line = f"[{mtype}{ticker_str}{age_str} | {conf}] {mem['content']}"
+        if char_count + len(line) + 1 > _MEMORY_BLOCK_CHAR_BUDGET:
+            break
+        char_count += len(line) + 1  # +1 for the newline
+        included += 1
+        lines.append(line)
+
+    if included < len(memories):
+        lines.append(f"[{len(memories) - included} lower-relevance memories omitted]")
 
     return "\n".join(lines) + "\n"
