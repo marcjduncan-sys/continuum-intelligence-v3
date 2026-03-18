@@ -131,6 +131,20 @@ export function formatDateAEST(utcDateStr) {
   return day + '-' + mon + '-' + year;
 }
 
+/**
+ * Truncate a string at a word boundary to at most maxLen characters.
+ * Appends '…' if truncated. Safe to call with null/undefined.
+ * @param {string} str
+ * @param {number} maxLen
+ * @returns {string}
+ */
+export function truncateAtWord(str, maxLen) {
+  if (!str) return '';
+  if (str.length <= maxLen) return str;
+  var cut = str.lastIndexOf(' ', maxLen);
+  return (cut > 0 ? str.slice(0, cut) : str.slice(0, maxLen)) + '\u2026';
+}
+
 export function renderSparkline(prices) {
   if (!prices || prices.length < 2) return '';
   var w = 280, h = 88, pad = 4;

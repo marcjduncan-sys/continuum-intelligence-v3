@@ -4,7 +4,7 @@
 import { STOCK_DATA, FRESHNESS_DATA, FEATURED_ORDER, COMING_SOON } from '../lib/state.js';
 import { computeSkewScore } from '../lib/dom.js';
 import { on } from '../lib/data-events.js';
-import { formatDateAEST } from '../lib/format.js';
+import { formatDateAEST, truncateAtWord } from '../lib/format.js';
 
 var coverageSortDir = 0; // 0 = unsorted (default), 1 = desc (bearish first), -1 = asc (bullish first)
 
@@ -43,7 +43,7 @@ export function renderFeaturedCard(data) {
         '<div class="skew-bar-bear" style="width:' + skew.bear + '%"></div>' +
       '</div>' +
       '<span class="skew-score ' + scoreCls + '" style="font-size:0.7rem">' + scoreLabel + '</span>' +
-      '<span class="fc-skew-rationale">' + data.featuredRationale + '</span>' +
+      '<span class="fc-skew-rationale">' + truncateAtWord(data.featuredRationale, 120) + '</span>' +
     '</div>' +
     '<div class="fc-date">' + formatDateAEST(data.date) + renderFreshnessBadge(data.ticker) + renderCatalystTag(data.ticker) + '</div>' +
   '</div>';
