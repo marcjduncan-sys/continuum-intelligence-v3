@@ -214,3 +214,15 @@ async def extract_memories(
             inserted,
             extra={"ticker": ticker, "user_id": user_id, "guest_id": guest_id},
         )
+        try:
+            deactivated = await db.enforce_memory_ceiling(
+                pool, user_id=user_id, guest_id=guest_id, ceiling=500
+            )
+            if deactivated:
+                logger.info(
+                    "Memory ceiling enforced: deactivated %d low-confidence memories",
+                    deactivated,
+                    extra={"user_id": user_id, "guest_id": guest_id},
+                )
+        except Exception as exc:
+            logger.warning("Memory ceiling enforcement failed: %s", exc)

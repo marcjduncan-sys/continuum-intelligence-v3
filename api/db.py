@@ -543,6 +543,62 @@ async def insert_memory(
         return str(row["id"]) if row else None
 
 
+async def enforce_memory_ceiling(
+    pool,
+    *,
+    user_id: str | None = None,
+    guest_id: str | None = None,
+    ceiling: int = 500,
+) -> int:
+    """Deactivate lowest-confidence memories if active count exceeds ceiling.
+
+    Deactivation priority: tactical first, then positional, then structural.
+    Returns the number of memories deactivated.
+    """
+    if pool is None:
+        return 0
+    if not user_id and not guest_id:
+        return 0
+
+    identity_col = "user_id" if user_id else "guest_id"
+    identity_val = user_id if user_id else guest_id
+
+    async with pool.acquire() as conn:
+        count_row = await conn.fetchrow(
+            f"SELECT COUNT(*) AS n FROM memories WHERE {identity_col} = $1 AND active = TRUE",
+            identity_val,
+        )
+        active_count = count_row["n"]
+        excess = active_count - ceiling
+        if excess <= 0:
+            return 0
+
+        # Fetch IDs to deactivate: ordered by type priority then confidence asc
+        rows = await conn.fetch(
+            f"""
+            SELECT id FROM memories
+            WHERE {identity_col} = $1 AND active = TRUE
+            ORDER BY
+                CASE memory_type
+                    WHEN 'tactical'   THEN 1
+                    WHEN 'positional' THEN 2
+                    WHEN 'structural' THEN 3
+                END,
+                confidence ASC
+            LIMIT $2
+            """,
+            identity_val,
+            excess,
+        )
+        ids_to_deactivate = [r["id"] for r in rows]
+        if ids_to_deactivate:
+            await conn.execute(
+                "UPDATE memories SET active = FALSE, updated_at = now() WHERE id = ANY($1)",
+                ids_to_deactivate,
+            )
+        return len(ids_to_deactivate)
+
+
 async def get_memories(
     pool,
     *,
