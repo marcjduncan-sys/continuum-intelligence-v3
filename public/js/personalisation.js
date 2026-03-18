@@ -921,6 +921,9 @@ function renderStep1() {
             '<h2 class="pn-step-heading">Firm Configuration</h2>' +
             '<p class="pn-step-desc">Tell us about your institutional context. This determines how signals are filtered and compliance requirements are applied.</p>' +
         '</div>' +
+        '<div class="pn-wizard-purpose">' +
+            'Complete 5 quick steps to unlock your <strong>calibrated AI analyst</strong> \u2014 research grounded in your firm\'s investment mandate, governance framework, and portfolio context.' +
+        '</div>' +
         '<div class="pn-form-grid">' +
             pnTextInput('firm-name', 'Firm Name', pnState.firm.name, 'e.g. Magellan Financial Group') +
             pnSelect('firm-type', 'Firm Type', PN_FIRM_OPTIONS.type, pnState.firm.type) +
