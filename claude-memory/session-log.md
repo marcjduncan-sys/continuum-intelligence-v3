@@ -1,5 +1,71 @@
 # Session Log
 
+## 2026-03-18 -- Structured Research Context Injection (Analyst Chat)
+
+**Duration**: ~25 min
+**Branch**: main (direct commit)
+**Commit**: `4817bb4`
+
+### What was done
+
+**Analyst chat now sees the full ACH research framework on every request.**
+
+Previously, the chat LLM received only BM25/cosine-ranked passage fragments and a minimal price snapshot (current price, 2D/5D/10D moves, raw skew number). It had no stable view of the hypothesis structure, scores, verdict, discriminators, or tripwires -- answering from training data instead of platform research.
+
+**`api/prompt_builder.py`** (parallel session authored `build_structured_research_context()`):
+- Reads `data/research/{TICKER}.json` and produces a `<structured_research>` block
+- Contains: hypotheses ranked by weight with scores/direction/status/description, skew direction and rationale, position in range with scenario prices, next decision point, tripwires (up to 6 with dates and consequences), discriminators sorted by diagnosticity (top 5 with current readings), evidence cards (top 8 with epistemic labels and alignment tags), conviction scores, verdict, narrative, price implication
+- Character budget capped at 6,000 chars (~1,500 tokens) with graceful truncation
+- Helper functions: `_truncate()`, `_safe_text()` for object-typed narrative fields
+- `_RESEARCH_DIR` resolves from `PROJECT_ROOT`
+
+**`api/main.py`** (this session):
+- Replaced `_get_price_snapshot()` call with `prompt_builder.build_structured_research_context(ticker)` in the `research_chat()` handler
+- Structured context injected as `<structured_research>` tags, passage context as `<research_context>` tags -- LLM can distinguish them
+- Injected fresh on every request (not stored in conversation history)
+- Removed dead `_build_research_snapshot()` function (written then superseded by parallel session's implementation)
+- Removed dangling call to `_build_research_snapshot()` left by parallel session
+
+### Key design decisions
+
+1. **Server-side, not client-side**: the server already has the research JSON; sending it from the frontend would duplicate data and add untrusted payload
+2. **Every request, not first-message-only**: research data updates with live prices; conversation history may be truncated; stale context from message 1 would mislead
+3. **Not stored in history**: keeps conversation records compact; every request gets current research state
+4. **Distinct XML tags**: `<structured_research>` for the framework snapshot, `<research_context>` for retrieved passages -- avoids confusion
+
+### Test results
+
+- 195/195 Vitest passing
+- `npm run build` succeeds
+- Python syntax validated for all changed files
+- Railway healthy post-deploy (DB ok)
+
+### Files changed
+
+```
+api/prompt_builder.py  -- build_structured_research_context() (parallel session)
+api/main.py            -- wiring, removed _get_price_snapshot, removed dead code
+```
+
+### Handoff notes for next session
+
+1. **Embeddings returning 404**: Railway health shows `embeddings: error:404` -- Gemini API key issue, pre-existing, unrelated to this change. Hybrid retrieval falls back to BM25-only when embeddings unavailable.
+2. **Parallel session coordination**: the parallel session authored `build_structured_research_context()` in prompt_builder.py and the initial wiring in main.py. This session cleaned up dangling references and dead code from the merge.
+3. **Not yet verified end-to-end in browser**: the structured context is injected server-side but has not been tested with a live chat question to confirm the LLM references hypothesis scores, skew, and tripwires by name. This is the critical verification step.
+4. **System prompt drift**: three divergent prompts exist (DEFAULT_SYSTEM_PROMPT, ANALYST_SYSTEM_PROMPT in chat.js, personalisation prompt). Separate task to unify.
+
+**Supplementary (parallel session, same date):**
+- Added `tests/test_structured_research_context.py` (9 pytest tests: graceful degradation, required sections, real data, token budget 600-1500, multi-ticker, ticker isolation, case insensitivity)
+- Fixed `None` ticker crash: added early `if not ticker: return ""` guard
+- Added em-dash sanitisation: `\u2014` to `\u2013` in output (27 em-dashes found across 12 tickers from source JSON data)
+- Restored `_build_research_snapshot()` call accidentally dropped during initial edit (live price, recent performance, primary driver data)
+- Token budget verified across all 32 tickers: 1,161 to 1,372 tokens (avg 1,318)
+- 22/22 Python pytest passing (including 9 new), 195/195 Vitest passing
+- Files: `api/prompt_builder.py` (guard + sanitisation), `tests/test_structured_research_context.py` (new)
+- **Not yet committed.** `prompt_builder.py` and test file are independently committable.
+
+---
+
 ## 2026-03-18 -- Track D Infrastructure Hardening (D1, D3)
 
 **Duration**: ~20 min
