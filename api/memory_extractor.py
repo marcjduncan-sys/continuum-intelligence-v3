@@ -12,6 +12,7 @@ Extracted memories are stored in the `memories` table with type classification
 
 import json
 import logging
+import math
 
 import db
 import embeddings
@@ -83,6 +84,46 @@ _EXTRACTION_PROMPT = (
 )
 
 
+def _cosine(a: list, b: list) -> float:
+    dot = sum(x * y for x, y in zip(a, b))
+    mag_a = math.sqrt(sum(x * x for x in a))
+    mag_b = math.sqrt(sum(x * x for x in b))
+    if mag_a == 0 or mag_b == 0:
+        return 0.0
+    return dot / (mag_a * mag_b)
+
+
+async def _is_duplicate(pool, user_id, guest_id, memory_type, content, embedding) -> bool:
+    """Return True if an equivalent memory already exists, to skip redundant insertion."""
+    try:
+        async with pool.acquire() as conn:
+            if memory_type == "structural":
+                row = await conn.fetchrow(
+                    "SELECT id FROM memories "
+                    "WHERE (user_id = $1 OR guest_id = $2) "
+                    "AND memory_type = 'structural' AND active = TRUE "
+                    "AND md5(content) = md5($3) LIMIT 1",
+                    user_id, guest_id, content,
+                )
+                return row is not None
+
+            if memory_type in ("positional", "tactical") and embedding is not None:
+                rows = await conn.fetch(
+                    "SELECT embedding FROM memories "
+                    "WHERE (user_id = $1 OR guest_id = $2) "
+                    "AND memory_type = $3 AND active = TRUE "
+                    "ORDER BY created_at DESC LIMIT 20",
+                    user_id, guest_id, memory_type,
+                )
+                for row in rows:
+                    existing = row["embedding"]
+                    if existing and _cosine(embedding, existing) >= 0.90:
+                        return True
+    except Exception as exc:
+        logger.warning("Dedup check failed (insertion will proceed): %s", exc)
+    return False
+
+
 async def extract_memories(
     *,
     user_id=None,
@@ -148,6 +189,9 @@ async def extract_memories(
 
         try:
             embedding = await embeddings.generate_embedding(content)
+            if await _is_duplicate(pool, user_id, guest_id, mem_type, content, embedding):
+                logger.debug("Skipping duplicate memory: %s", content[:60])
+                continue
             await db.insert_memory(
                 pool,
                 user_id=user_id,
