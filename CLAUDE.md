@@ -159,13 +159,23 @@ npm run validate     # lint + test:all — run before any push
 - [x] **Memory pipeline -- Item 5** (commit `d527a5c`): `prompt_builder.format_memories_section()` capped at 1,200 chars (~300 tokens). Lower-scored memories dropped first; truncation notice appended so LLM is aware.
 - [x] 195/195 Vitest passing. Build succeeds.
 
-**Recent bug history (last six commits):**
-- `5127fff` migrations: drop 'evolved' from memory_consolidation_events action constraint.
-- `99adff6` db: enforce 500-memory ceiling per user; deactivate lowest-confidence excess on insertion.
-- `d527a5c` prompt_builder: cap memory injection block at 1,200 chars to protect system prompt budget.
-- `73908c7` feat: add purpose banner to personalisation wizard step 1.
-- `b0eaab5` tests: type guard coverage for alignment and priceImplication in _chunk_stock.
-- `591872a` fix encoding: em dashes in stock JSONs.
+**Audit Track work (2026-03-18):**
+- [x] **A1**: Staleness warning injection in prompt_builder (commit `76ab244`).
+- [x] **A5**: Chat debounce guard -- 2s cooldown on send (commit `76ab244`).
+- [x] **B1**: Pre-compute passage embeddings at ingestion via Google text-embedding-004 (commit `f88eb1c`).
+- [x] **B2**: Hybrid retrieval with Reciprocal Rank Fusion -- BM25 + cosine similarity combined via RRF (commit `cac218e`).
+- [x] **B3**: BM25 index caching per ticker with version-gated invalidation (commit `cac218e`).
+- [x] **B4**: Conversation history token budget -- sliding window with 4000-token cap (commit `b16e3fc`).
+- [x] **C1**: Bundle CDN dependencies via Vite -- `marked` and `dompurify` as npm deps, CDN script tags removed, regex fallback parser removed, SheetJS CDN failure shows user alert (commit `4ae62e7`).
+- [x] **C3**: Structured error responses -- `api/errors.py` with `ErrorCode` constants and `{error, code, detail}` JSON envelope. All `HTTPException` raises in `main.py` replaced with `api_error()`. Custom handlers for `APIError` and `RateLimitExceeded` (commit `4ae62e7`).
+
+**Recent commits (last six):**
+- `4ae62e7` feat: C1 bundle CDN deps via Vite + C3 structured error responses
+- `b16e3fc` feat(api): add conversation history token budget (Task B4)
+- `f88eb1c` feat(api): pre-compute passage embeddings at ingestion (Task B1)
+- `cac218e` feat: B2 hybrid retrieval with RRF + B3 BM25 index caching
+- `76ab244` feat: A1 staleness warning injection + A5 chat debounce guard
+- `2d7e1b0` feat(ci): add daily workflow health check (Task A4)
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
@@ -180,8 +190,8 @@ npm run validate     # lint + test:all — run before any push
 - **`ContinuumDynamics.hydrateAll()` runs at boot before pages initialise.** Calling it again after `initHomePage()` will re-derive all computed metrics from the current `STOCK_DATA` live price. This will silently overwrite manual test values.
 - **`git log --all` throws mmap errors** on this path due to OneDrive file locking. Use `git log` without `--all`.
 - **`npm run build` copies `data/` via a Vite plugin, not `publicDir`.** The `public/` directory is copied separately. Verify new data files land in `dist/data/` after build.
-- **SheetJS is lazy-loaded on portfolio upload interaction only.** It loads from a CDN URL stored in a `data-src` attribute on a placeholder element in `index.html`. If the element is missing, `loadSheetJS()` fails silently with no user-visible error.
-- **`marked` and `DOMPurify` are CDN-loaded globals.** `chat.js` calls them as `window.marked` and `window.DOMPurify`. If the CDN fails, the analyst panel throws on first message send, not on load.
+- **SheetJS is lazy-loaded on portfolio upload interaction only.** It loads from a CDN URL stored in a `data-src` attribute on a placeholder element in `index.html`. If the CDN fails, an `alert()` tells the user to try CSV instead.
+- **`marked` and `DOMPurify` are bundled npm dependencies** (commit `4ae62e7`). `chat.js` imports them as ES modules. The CDN script tags and regex fallback parser were removed. `cdnjs.cloudflare.com` removed from the CSP.
 
 ---
 
