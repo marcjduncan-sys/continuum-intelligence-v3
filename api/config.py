@@ -37,6 +37,7 @@ DIST_DIR = os.path.realpath(os.getenv(
 ))
 MAX_PASSAGES = 12
 MAX_CONVERSATION_TURNS = 20
+HISTORY_TOKEN_BUDGET = int(os.getenv("HISTORY_TOKEN_BUDGET", "8000"))
 
 CHAT_MAX_TOKENS = int(os.getenv("CHAT_MAX_TOKENS", "2048"))
 
