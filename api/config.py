@@ -100,12 +100,9 @@ PRICE_DRIVERS_SECRET = os.getenv("PRICE_DRIVERS_SECRET", "")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
 JWT_EXPIRY_DAYS = int(os.getenv("JWT_EXPIRY_DAYS", "30"))
 
-# Email (SMTP) -- for OTP delivery. Optional: falls back to log-only if unset.
+# Email -- OTP delivery via Resend HTTP API. Optional: falls back to log-only if unset.
 EMAIL_FROM = os.getenv("EMAIL_FROM", "")
-SMTP_HOST = os.getenv("SMTP_HOST", "")
-SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
-SMTP_USER = os.getenv("SMTP_USER", "")
-SMTP_PASS = os.getenv("SMTP_PASS", "")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip()
 
 # ---------------------------------------------------------------------------
 # Shared Anthropic client (singleton with timeout)
