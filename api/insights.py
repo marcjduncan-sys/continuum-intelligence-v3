@@ -312,6 +312,184 @@ async def scan_ticker(pool, ticker: str) -> dict:
     }
 
 
+# ---------------------------------------------------------------------------
+# Evidence drift detection
+# ---------------------------------------------------------------------------
+
+_BULLISH_KEYWORDS = [
+    "bullish", "upside", "undervalued", "entry point", "dislocation",
+    "re-rate", "recovery", "intact", "attractive", "buying",
+]
+_BEARISH_KEYWORDS = [
+    "bearish", "downside", "overvalued", "risk", "concern", "skepti",
+    "deteriorat", "headwind", "expensive", "sell", "reduce",
+]
+
+
+def _infer_directional_bias(content: str) -> str | None:
+    """Infer bullish/bearish bias from memory content. Returns 'bullish', 'bearish', or None."""
+    lower = content.lower()
+    bull_hits = sum(1 for kw in _BULLISH_KEYWORDS if kw in lower)
+    bear_hits = sum(1 for kw in _BEARISH_KEYWORDS if kw in lower)
+    if bull_hits > bear_hits and bull_hits >= 1:
+        return "bullish"
+    if bear_hits > bull_hits and bear_hits >= 1:
+        return "bearish"
+    return None
+
+
+def _get_skew_direction(data: dict) -> str | None:
+    """Extract skew direction from research data. Returns 'upside', 'downside', 'balanced', or None."""
+    hero = data.get("hero", {})
+    skew = hero.get("skew", "")
+    if not skew:
+        skew_obj = data.get("skew", {})
+        skew = skew_obj.get("direction", "") if isinstance(skew_obj, dict) else ""
+    if not skew:
+        return None
+    lower = skew.strip().lower()
+    if "upside" in lower:
+        return "upside"
+    if "downside" in lower:
+        return "downside"
+    if "balanced" in lower or "neutral" in lower:
+        return "balanced"
+    return None
+
+
+def _get_evidence_after(data: dict, cutoff_iso: str) -> list[dict]:
+    """Return evidence cards added after a given ISO date."""
+    evidence = data.get("evidence", {})
+    cards = evidence.get("cards", [])
+    result = []
+    for card in cards:
+        date_str = card.get("date", card.get("asOf", ""))
+        if date_str and date_str > cutoff_iso:
+            result.append(card)
+    return result
+
+
+def detect_evidence_drift(memories: list[dict], research_data: dict) -> list[dict]:
+    """
+    Compare user's stated views against current research state.
+    Returns drift alerts where the user's directional bias contradicts
+    the current evidence skew, or where new diagnostic evidence has
+    been added since the memory was created.
+
+    Each alert: {memory_id, ticker, content, bias, current_skew, reason, new_evidence_count}
+    """
+    if not memories or not research_data:
+        return []
+
+    skew_dir = _get_skew_direction(research_data)
+    alerts = []
+
+    for mem in memories:
+        bias = _infer_directional_bias(mem["content"])
+        if not bias:
+            continue
+
+        memory_id = str(mem["id"])
+        ticker = mem.get("ticker", "")
+        content = mem["content"]
+        created = mem.get("created_at")
+        created_iso = created.isoformat() if hasattr(created, "isoformat") else str(created or "")
+
+        # Check 1: directional skew contradiction
+        skew_contradicts = False
+        reason_parts = []
+
+        if skew_dir and bias == "bullish" and skew_dir == "downside":
+            skew_contradicts = True
+            reason_parts.append(
+                f"Your bullish view was formed when skew may have been different. "
+                f"Current research skew is DOWNSIDE."
+            )
+        elif skew_dir and bias == "bearish" and skew_dir == "upside":
+            skew_contradicts = True
+            reason_parts.append(
+                f"Your bearish view was formed when skew may have been different. "
+                f"Current research skew is UPSIDE."
+            )
+
+        # Check 2: new evidence since memory creation
+        new_evidence = _get_evidence_after(research_data, created_iso[:10]) if created_iso else []
+        new_evidence_count = len(new_evidence)
+
+        if new_evidence_count >= 3:
+            reason_parts.append(
+                f"{new_evidence_count} new evidence items added since this view was formed."
+            )
+
+        if not reason_parts:
+            continue
+
+        alerts.append({
+            "memory_id": memory_id,
+            "ticker": ticker,
+            "content": content,
+            "bias": bias,
+            "current_skew": skew_dir or "unknown",
+            "reason": " ".join(reason_parts),
+            "new_evidence_count": new_evidence_count,
+        })
+
+    return alerts
+
+
+async def get_drift_alerts(pool, user_id, guest_id) -> list[dict]:
+    """
+    Fetch all active positional/tactical memories, check each against
+    current research data, and return drift alerts.
+    """
+    if pool is None:
+        return []
+
+    # Get all tickers with active memories for this user
+    if user_id:
+        condition = "user_id = $1"
+        param = user_id
+    elif guest_id:
+        condition = "guest_id = $1"
+        param = guest_id
+    else:
+        return []
+
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            f"""
+            SELECT id, user_id, guest_id, content, ticker, tags, confidence, created_at
+            FROM memories
+            WHERE {condition}
+              AND memory_type = ANY($2::text[])
+              AND active = TRUE
+              AND ticker IS NOT NULL
+            ORDER BY ticker, confidence DESC
+            """,
+            param,
+            _CONSOLIDATE_TYPES,
+        )
+
+    memories_by_ticker = {}
+    for r in rows:
+        d = dict(r)
+        t = d.get("ticker")
+        if t:
+            if t not in memories_by_ticker:
+                memories_by_ticker[t] = []
+            memories_by_ticker[t].append(d)
+
+    all_alerts = []
+    for ticker, mems in memories_by_ticker.items():
+        research = _fetch_research(ticker)
+        if not research:
+            continue
+        alerts = detect_evidence_drift(mems, research)
+        all_alerts.extend(alerts)
+
+    return all_alerts
+
+
 async def run_insight_scan(pool, tickers: list) -> dict:
     """
     Scan all supplied tickers. If tickers is empty, discover tickers with

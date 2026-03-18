@@ -750,6 +750,28 @@ async def get_notifications(request: Request):
     return await insights.get_notifications(pool, user_id=user_id, guest_id=guest_id)
 
 
+@app.get("/api/drift")
+async def get_drift_alerts(request: Request):
+    """
+    Return evidence drift alerts for the caller.
+
+    Compares stored user views against current research skew.
+    Flags when a bullish view faces downside skew (or vice versa),
+    or when significant new evidence has been added since the view was formed.
+    """
+    auth_header = request.headers.get("Authorization", "")
+    user_id = None
+    guest_id = None
+    if auth_header.startswith("Bearer "):
+        payload = decode_token(auth_header[7:])
+        if payload:
+            user_id = payload.get("sub")
+    if not user_id:
+        guest_id = request.query_params.get("guest_id")
+    pool = await db.get_pool()
+    return await insights.get_drift_alerts(pool, user_id=user_id, guest_id=guest_id)
+
+
 @app.patch("/api/notifications/{notification_id}/dismiss")
 async def dismiss_notification(notification_id: str, request: Request):
     """
