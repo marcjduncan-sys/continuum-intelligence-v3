@@ -140,9 +140,13 @@ function _injectCSS() {
         '.jnl-filter{padding:5px 10px;font-size:12px;border:1px solid var(--border,#e0e0e0);border-radius:5px;background:var(--bg-primary,#fff);color:var(--text-primary,#222);min-width:140px}' +
         '.jnl-count{font-size:12px;color:var(--text-secondary,#888);margin-left:auto}' +
 
-        // Stock group
+        // Stock group (collapsible)
         '.jnl-stock-group{margin-bottom:24px}' +
-        '.jnl-stock-header{display:flex;align-items:center;gap:10px;padding:8px 0 6px;border-bottom:1px solid var(--border,#e5e5e5);margin-bottom:10px}' +
+        '.jnl-stock-header{display:flex;align-items:center;gap:10px;padding:8px 0 6px;border-bottom:1px solid var(--border,#e5e5e5);margin-bottom:10px;cursor:pointer;user-select:none}' +
+        '.jnl-stock-header:hover .jnl-stock-ticker{opacity:.8}' +
+        '.jnl-stock-arrow{transition:transform .2s;font-size:9px;color:var(--text-secondary,#999)}' +
+        '.jnl-stock-group.collapsed .jnl-stock-arrow{transform:rotate(-90deg)}' +
+        '.jnl-stock-group.collapsed .jnl-stock-cards{display:none}' +
         '.jnl-stock-ticker{font-size:14px;font-weight:700;color:var(--accent,#003A70)}' +
         '.jnl-stock-name{font-size:13px;color:var(--text-secondary,#666)}' +
         '.jnl-stock-meta{margin-left:auto;display:flex;gap:10px;align-items:center;font-size:11px}' +
@@ -190,6 +194,17 @@ function _injectCSS() {
         '.jnl-toggle-arrow.open{transform:rotate(90deg)}' +
         '.jnl-archived-list .jnl-card{opacity:0.55}' +
         '.jnl-archived-list .jnl-card:hover{opacity:0.8}' +
+
+        // Evidence drift alerts
+        '.jnl-drift{margin-bottom:20px;border:1px solid rgba(239,68,68,.25);border-left:3px solid #ef4444;border-radius:4px;background:rgba(239,68,68,.04);padding:14px 16px}' +
+        '.jnl-drift-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#dc2626}' +
+        '.jnl-drift-item{padding:10px 0;border-top:1px solid rgba(239,68,68,.12)}' +
+        '.jnl-drift-item:first-child{border-top:none;padding-top:0}' +
+        '.jnl-drift-ticker{font-weight:700;color:var(--accent,#003A70);font-size:13px}' +
+        '.jnl-drift-text{font-size:13px;color:var(--text-primary,#222);line-height:1.45;margin:4px 0 8px}' +
+        '.jnl-drift-actions{display:flex;gap:8px}' +
+        '.jnl-drift-btn{background:none;border:1px solid rgba(239,68,68,.3);cursor:pointer;color:#dc2626;padding:3px 10px;border-radius:3px;font-size:11px;font-weight:600;transition:all .15s}' +
+        '.jnl-drift-btn:hover{background:rgba(239,68,68,.08);border-color:#ef4444}' +
 
         // Empty and loading
         '.jnl-empty{text-align:center;padding:48px 16px;color:var(--text-secondary,#888);font-size:14px;line-height:1.5}' +
@@ -347,8 +362,9 @@ function _renderByStock(memories) {
 
         html += '<div class="jnl-stock-group">';
         html += '<div class="jnl-stock-header">';
+        html += '<span class="jnl-stock-arrow">\u25BC</span>';
         html += '<span class="jnl-stock-ticker">' + _escHtml(ticker) + '</span>';
-        html += '<span class="jnl-stock-name">' + _escHtml(company) + '</span>';
+        html += '<span class="jnl-stock-name">\u2013 ' + _escHtml(company) + '</span>';
         html += '<div class="jnl-stock-meta">';
         html += '<span class="jnl-stock-count">' + items.length + ' active</span>';
         if (skewDir) {
@@ -356,10 +372,11 @@ function _renderByStock(memories) {
         }
         html += '</div>';
         html += '</div>';
-
+        html += '<div class="jnl-stock-cards">';
         items.forEach(function(m) {
             html += _renderCard(m, false);
         });
+        html += '</div>';
 
         html += '</div>';
     });
@@ -368,13 +385,16 @@ function _renderByStock(memories) {
     if (noTicker.length > 0) {
         html += '<div class="jnl-stock-group">';
         html += '<div class="jnl-stock-header">';
+        html += '<span class="jnl-stock-arrow">\u25BC</span>';
         html += '<span class="jnl-stock-ticker">GENERAL</span>';
-        html += '<span class="jnl-stock-name">Process notes and preferences</span>';
+        html += '<span class="jnl-stock-name">\u2013 Process notes and preferences</span>';
         html += '<div class="jnl-stock-meta"><span class="jnl-stock-count">' + noTicker.length + ' active</span></div>';
         html += '</div>';
+        html += '<div class="jnl-stock-cards">';
         noTicker.forEach(function(m) {
             html += _renderCard(m, false);
         });
+        html += '</div>';
         html += '</div>';
     }
 
@@ -545,6 +565,14 @@ export async function renderMemoryPage() {
     container.querySelectorAll('.jnl-type-title').forEach(function(title) {
         title.addEventListener('click', function() {
             var group = title.closest('.jnl-type-group');
+            if (group) group.classList.toggle('collapsed');
+        });
+    });
+
+    // Wire collapsible stock sections
+    container.querySelectorAll('.jnl-stock-header').forEach(function(header) {
+        header.addEventListener('click', function() {
+            var group = header.closest('.jnl-stock-group');
             if (group) group.classList.toggle('collapsed');
         });
     });
