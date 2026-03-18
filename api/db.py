@@ -543,6 +543,7 @@ async def insert_memory(
     confidence: float = 1.0,
     source_conversation_id: str | None = None,
     embedding: list[float] | None = None,
+    insight_type: str | None = None,
 ) -> str | None:
     """Insert a single memory observation. Returns memory id."""
     if pool is None:
@@ -554,8 +555,8 @@ async def insert_memory(
             """
             INSERT INTO memories
                 (user_id, guest_id, memory_type, content, ticker, tags,
-                 confidence, source_conversation_id, embedding)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                 confidence, source_conversation_id, embedding, insight_type)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             RETURNING id
             """,
             user_id,
@@ -567,6 +568,7 @@ async def insert_memory(
             confidence,
             source_conversation_id,
             embedding,
+            insight_type,
         )
         return str(row["id"]) if row else None
 
@@ -672,7 +674,7 @@ async def get_memories(
     where = " AND ".join(conditions)
     query = f"""
         SELECT id, memory_type, content, ticker, tags, confidence,
-               source_conversation_id, created_at, updated_at, active
+               source_conversation_id, created_at, updated_at, active, insight_type
         FROM memories
         WHERE {where}
         ORDER BY created_at DESC
@@ -694,6 +696,7 @@ async def get_memories(
                 "created_at": r["created_at"].isoformat() if r["created_at"] else None,
                 "updated_at": r["updated_at"].isoformat() if r["updated_at"] else None,
                 "active": r["active"],
+                "insight_type": r["insight_type"],
             }
             for r in rows
         ]

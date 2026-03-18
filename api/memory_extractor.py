@@ -46,12 +46,19 @@ EXTRACTION_SYSTEM = (
     "Schema per item:\n"
     "{\n"
     '  "type": "structural" | "positional" | "tactical",\n'
+    '  "insight_type": "conviction" | "risk_flag" | "valuation" | "thesis_challenge" | "process_note",\n'
     '  "content": "specific, self-contained observation in one sentence -- '
     "include the named reason or evidence where the user gave it\",\n"
     '  "ticker": "ASX ticker in uppercase" or null,\n'
     '  "tags": ["ticker-symbols", "themes", "analytical-categories"],\n'
     '  "confidence": 0.0 to 1.0\n'
     "}\n\n"
+    "insight_type classification:\n"
+    '- "conviction": a stated view with directional intent (bullish/bearish on a name, sector overweight)\n'
+    '- "risk_flag": an identified risk, concern, or worry about a specific factor\n'
+    '- "valuation": a price or valuation-dependent view (entry point, target, multiple, cheap/expensive)\n'
+    '- "thesis_challenge": where the user disagrees with or challenges a hypothesis from the research\n'
+    '- "process_note": analytical process preferences not tied to a specific stock (structural memories are often process notes)\n\n'
     "Content format rules:\n"
     "- Write in third person about the manager: 'Bearish on X due to Y', not 'User said'.\n"
     "- Include the named reason where given: 'Bearish on BHP margins due to strip ratio "
@@ -192,6 +199,9 @@ async def extract_memories(
             if await _is_duplicate(pool, user_id, guest_id, mem_type, content, embedding):
                 logger.debug("Skipping duplicate memory: %s", content[:60])
                 continue
+            insight_type = item.get("insight_type", "")
+            if insight_type not in ("conviction", "risk_flag", "valuation", "thesis_challenge", "process_note"):
+                insight_type = None
             await db.insert_memory(
                 pool,
                 user_id=user_id,
@@ -203,6 +213,7 @@ async def extract_memories(
                 confidence=min(max(float(item.get("confidence", 0.5)), 0.0), 1.0),
                 source_conversation_id=conversation_id,
                 embedding=embedding,
+                insight_type=insight_type,
             )
             inserted += 1
         except Exception as exc:

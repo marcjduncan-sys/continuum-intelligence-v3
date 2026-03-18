@@ -541,6 +541,14 @@ export async function renderMemoryPage() {
         });
     });
 
+    // Wire collapsible type sections
+    container.querySelectorAll('.jnl-type-title').forEach(function(title) {
+        title.addEventListener('click', function() {
+            var group = title.closest('.jnl-type-group');
+            if (group) group.classList.toggle('collapsed');
+        });
+    });
+
     // Wire ticker filter
     var filterEl = document.getElementById('jnlTickerFilter');
     if (filterEl) {
