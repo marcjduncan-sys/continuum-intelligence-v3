@@ -501,6 +501,7 @@ export async function renderMemoryPage() {
     html += '</div>';
 
     // Render active view
+    html += '<div class="jnl-active-cards">';
     if (_currentView === 'type') {
         html += _renderByType(filtered);
     } else if (_currentView === 'date') {
@@ -508,6 +509,16 @@ export async function renderMemoryPage() {
     } else {
         html += _renderByStock(filtered);
     }
+    html += '</div>';
+
+    // Archived section (collapsed by default)
+    html += '<div class="jnl-archived">';
+    html += '<button class="jnl-archived-toggle" aria-expanded="false">';
+    html += 'Archived (<span class="jnl-archived-count">0</span>) ';
+    html += '<span class="jnl-toggle-arrow">\u25B8</span>';
+    html += '</button>';
+    html += '<div class="jnl-archived-list" style="display:none;"></div>';
+    html += '</div>';
 
     container.innerHTML = html;
 
@@ -528,7 +539,7 @@ export async function renderMemoryPage() {
         });
     }
 
-    // Wire archive buttons
+    // Wire archive buttons: move card to archived section
     container.querySelectorAll('.jnl-action-btn.archive').forEach(function(btn) {
         btn.addEventListener('click', async function() {
             var card = btn.closest('.jnl-card');
@@ -537,15 +548,49 @@ export async function renderMemoryPage() {
             card.style.opacity = '0.3';
             card.style.pointerEvents = 'none';
             await _archiveMemory(id, auth.token);
-            card.remove();
-            // Update count
+
+            // Move card to archived section
+            var archivedList = container.querySelector('.jnl-archived-list');
+            if (archivedList) {
+                card.style.opacity = '';
+                card.style.pointerEvents = '';
+                // Remove archive button from the moved card
+                var archiveBtn = card.querySelector('.jnl-action-btn.archive');
+                if (archiveBtn) archiveBtn.remove();
+                card.parentNode.removeChild(card);
+                archivedList.appendChild(card);
+
+                // Update archived count
+                var archivedCount = container.querySelector('.jnl-archived-count');
+                if (archivedCount) {
+                    archivedCount.textContent = archivedList.querySelectorAll('.jnl-card').length;
+                }
+            } else {
+                card.remove();
+            }
+
+            // Update active count
             var countEl = container.querySelector('.jnl-count');
             if (countEl) {
-                var remaining = container.querySelectorAll('.jnl-card').length;
+                var remaining = container.querySelector('.jnl-active-cards').querySelectorAll('.jnl-card').length;
                 countEl.textContent = remaining + ' entries';
             }
         });
     });
+
+    // Wire archived section toggle
+    var archivedToggle = container.querySelector('.jnl-archived-toggle');
+    if (archivedToggle) {
+        archivedToggle.addEventListener('click', function() {
+            var list = container.querySelector('.jnl-archived-list');
+            var arrow = container.querySelector('.jnl-toggle-arrow');
+            if (!list) return;
+            var isOpen = list.style.display !== 'none';
+            list.style.display = isOpen ? 'none' : 'block';
+            if (arrow) arrow.classList.toggle('open', !isOpen);
+            archivedToggle.setAttribute('aria-expanded', String(!isOpen));
+        });
+    }
 
     // Wire "View conversation" buttons (navigate to stock report, opens analyst panel with history)
     container.querySelectorAll('.jnl-action-btn.view-convo').forEach(function(btn) {
