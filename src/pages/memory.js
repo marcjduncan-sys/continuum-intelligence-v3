@@ -204,6 +204,7 @@ function _injectCSS() {
         '.jnl-drift-text{font-size:13px;color:var(--text-primary,#222);line-height:1.45;margin:4px 0 8px}' +
         '.jnl-drift-actions{display:flex;gap:8px}' +
         '.jnl-drift-btn{background:none;border:1px solid rgba(239,68,68,.3);cursor:pointer;color:#dc2626;padding:3px 10px;border-radius:3px;font-size:11px;font-weight:600;transition:all .15s}' +
+        '.jnl-drift-skew{font-size:11px;font-weight:600;color:#dc2626;margin-left:4px}' +
         '.jnl-drift-btn:hover{background:rgba(239,68,68,.08);border-color:#ef4444}' +
 
         // Empty and loading
@@ -261,8 +262,15 @@ function _renderDriftAlerts(notifications) {
     html += '<div class="jnl-drift-header">Evidence Drift (' + drifts.length + ')</div>';
 
     drifts.forEach(function(n) {
+        var stock = STOCK_DATA[n.ticker] || {};
+        var skew = stock.skew || {};
+        var currentSkew = (skew.direction || '').toUpperCase();
+
         html += '<div class="jnl-drift-item" data-id="' + _escHtml(n.id) + '">';
         html += '<span class="jnl-drift-ticker">' + _escHtml(n.ticker) + '</span>';
+        if (currentSkew) {
+            html += ' <span class="jnl-drift-skew">Current skew: ' + _escHtml(currentSkew) + '</span>';
+        }
         html += '<div class="jnl-drift-text">' + _escHtml(n.summary) + '</div>';
         html += '<div class="jnl-drift-actions">';
         html += '<button class="jnl-drift-btn drift-research" data-ticker="' + _escHtml(n.ticker) + '">Open research</button>';
