@@ -30,6 +30,7 @@ from errors import api_error, APIError, api_error_handler, rate_limit_handler, E
 
 import config
 import db
+import embeddings
 import llm
 import memory_extractor
 import validator
@@ -48,6 +49,7 @@ from refresh import (
     run_batch_refresh, _data_dir,
 )
 from retriever import retrieve
+from task_monitor import monitored_task, get_failure_count
 from gold_agent import run_gold_analysis, check_gold_health, get_cached_result
 from github_commit import commit_files_to_github
 from price_drivers import (
@@ -151,7 +153,24 @@ async def lifespan(app: FastAPI):
 
     await embed_all_passages()
 
+    # Periodic database pool health check (every 60s)
+    async def _db_health_loop():
+        while True:
+            await asyncio.sleep(60)
+            status = await db.health_check()
+            if status != "ok":
+                logger.warning("Periodic DB health check: %s", status)
+
+    health_task = monitored_task(_db_health_loop(), name="db_health_loop")
+
     yield
+
+    health_task.cancel()
+    try:
+        await health_task
+    except asyncio.CancelledError:
+        pass
+    await embeddings.close_client()
     await db.close_pool()
 
 
@@ -503,11 +522,42 @@ async def research_chat(request: Request, body: ResearchChatRequest, background_
 
 @app.get("/api/health")
 async def health():
-    """Health check endpoint."""
+    """Full system health check with subsystem status reporting.
+
+    Returns HTTP 200 with structured JSON even when degraded.
+    Top-level 'status': 'healthy' | 'degraded' | 'unhealthy'.
+    """
+    # -- Subsystem checks --
+    db_status = await db.health_check()
+    embedding_status = await embeddings.health_check()
+    llm_status = llm.get_llm_status()
+    bg_failures = get_failure_count()
     tickers = get_tickers()
     counts = get_passage_count()
+
+    # -- Determine overall status --
+    # Critical: DB or LLM (no successful call ever recorded)
+    db_ok = db_status == "ok"
+    llm_ok = len(llm_status) > 0  # at least one provider has succeeded
+    # Non-critical: embeddings, background tasks
+    embedding_ok = embedding_status == "ok"
+    bg_ok = bg_failures < 10
+
+    if not db_ok or not llm_ok:
+        overall = "unhealthy"
+    elif not embedding_ok or not bg_ok:
+        overall = "degraded"
+    else:
+        overall = "healthy"
+
     return {
-        "status": "healthy",
+        "status": overall,
+        "subsystems": {
+            "database": db_status,
+            "llm": {"providers": llm_status} if llm_status else {"providers": {}, "note": "no calls recorded yet"},
+            "embeddings": embedding_status,
+            "background_tasks": {"failures_1h": bg_failures, "status": "ok" if bg_ok else "threshold_breached"},
+        },
         "tickers": tickers,
         "passage_counts": counts,
         "total_passages": sum(counts.values()),
@@ -1123,7 +1173,7 @@ async def add_stock(
             # RefreshJob.status is already set to "failed" by run_refresh().
             # The frontend will see this when polling /api/refresh/{ticker}/status.
 
-    asyncio.create_task(_tracked_coverage_initiation())
+    monitored_task(_tracked_coverage_initiation(), name=f"coverage_initiation:{ticker}")
     logger.info(f"[AddStock] Coverage initiation task launched for {ticker}")
 
     return {

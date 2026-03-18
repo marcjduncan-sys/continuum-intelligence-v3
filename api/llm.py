@@ -19,8 +19,12 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import config
+from task_monitor import monitored_task
 
 logger = logging.getLogger(__name__)
+
+# Tracks the last successful LLM call (wall-clock) per provider for health reporting.
+_last_success: dict[str, float] = {}  # provider -> time.time()
 
 # ---------------------------------------------------------------------------
 # Pricing (USD per 1M tokens)
@@ -258,16 +262,17 @@ async def complete(
                 json_mode=json_mode,
             )
             result.latency_ms = int((time.monotonic() - t0) * 1000)
+            _last_success[provider] = time.time()
 
             # Log success (fire-and-forget)
-            asyncio.create_task(_log_call(
+            monitored_task(_log_call(
                 feature=feature, model=model, provider=provider,
                 input_tokens=result.input_tokens,
                 output_tokens=result.output_tokens,
                 cost_usd=result.cost_usd,
                 latency_ms=result.latency_ms,
                 ticker=ticker, success=True,
-            ))
+            ), name="llm_log_call")
 
             return result
 
@@ -295,12 +300,12 @@ async def complete(
 
             if attempt >= max_retries:
                 # Log the failure
-                asyncio.create_task(_log_call(
+                monitored_task(_log_call(
                     feature=feature, model=model, provider=provider,
                     input_tokens=0, output_tokens=0, cost_usd=0.0,
                     latency_ms=latency, ticker=ticker, success=False,
                     error_message=str(e)[:500],
-                ))
+                ), name="llm_log_call")
                 break
 
     # Primary model exhausted retries; try fallback if available
@@ -369,3 +374,12 @@ async def _log_call(
         )
     except Exception as exc:
         logger.debug("Failed to log LLM call: %s", exc)
+
+
+def get_llm_status() -> dict:
+    """Return last-success timestamps per provider for health reporting."""
+    from datetime import datetime, timezone
+    result = {}
+    for provider, ts in _last_success.items():
+        result[provider] = datetime.fromtimestamp(ts, tz=timezone.utc).isoformat()
+    return result

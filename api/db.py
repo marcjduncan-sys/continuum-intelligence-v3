@@ -88,6 +88,34 @@ async def run_migrations(pool):
                 raise
 
 
+async def health_check() -> str:
+    """Test pool liveness with SELECT 1. Returns 'ok', 'reconnecting', or 'no_database'.
+
+    If the check fails, resets _pool to None so the next get_pool() call
+    creates a fresh connection pool.
+    """
+    global _pool
+    if _pool is None:
+        database_url = os.getenv("DATABASE_URL", "").strip()
+        if not database_url:
+            return "no_database"
+        # Pool was previously lost; trigger recreation
+        new_pool = await get_pool()
+        return "ok" if new_pool is not None else "reconnecting"
+    try:
+        async with _pool.acquire() as conn:
+            await conn.execute("SELECT 1")
+        return "ok"
+    except Exception as exc:
+        logger.warning("Pool health check failed: %s -- resetting pool", exc)
+        try:
+            await _pool.close()
+        except Exception:
+            pass
+        _pool = None
+        return "reconnecting"
+
+
 async def close_pool():
     """Gracefully close the connection pool on shutdown."""
     global _pool
