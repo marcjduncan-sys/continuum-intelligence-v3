@@ -30,7 +30,7 @@ import { setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineCha
 
 // Features
 import { initAuth, showAuthModal, hideAuthModal } from './features/auth.js';
-import { initChat, VOICE_RULES } from './features/chat.js';
+import { initChat } from './features/chat.js';
 import { initNotifications } from './features/notifications.js';
 import { initBatchRefresh, closeBatchModal } from './features/batch-refresh.js';
 import { generatePDFReport } from './features/pdf.js';
@@ -58,7 +58,6 @@ window.closeBatchModal = closeBatchModal;
 window.openAddStockModal = openAddStockModal;
 window.closeAddStockModal = closeAddStockModal;
 window.submitAddStock = submitAddStock;
-window.CI_VOICE_RULES = VOICE_RULES;
 window.ThesisCapture = { saveThesis: saveThesis, getThesis: getThesis, inferBiasFromQuestion: inferBiasFromQuestion };
 
 // Expose state and utility globals needed by classic (non-module) scripts
@@ -179,7 +178,10 @@ window.loadSheetJS = function(callback) {
   var script = document.createElement('script');
   script.src = placeholder.getAttribute('data-src');
   script.onload = function() { if (callback) callback(); };
-  script.onerror = function() { console.error('[SheetJS] Failed to load library'); };
+  script.onerror = function() {
+    console.error('[SheetJS] Failed to load library');
+    alert('Excel parsing library failed to load from CDN. Please try uploading a CSV file instead, or check your internet connection.');
+  };
   document.head.appendChild(script);
 };
 

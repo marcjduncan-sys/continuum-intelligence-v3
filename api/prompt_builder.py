@@ -6,42 +6,19 @@ controls exactly what context the LLM receives. The personalisation
 profile is no longer sent by untrusted client code.
 """
 
+import json
+from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# Voice rules -- single source of truth (canonical copy)
+# Voice rules -- loaded from data/config/voice-rules.json (single source of truth)
 # ---------------------------------------------------------------------------
 
-VOICE_RULES = (
-    "\n\nVOICE AND STYLE RULES (apply to every response, no exceptions):\n"
-    "Australian English (Macquarie standard). Spell and phrase accordingly.\n"
-    "Never use em-dashes. Use commas, semicolons, colons, or en-dashes instead.\n"
-    "Vary sentence length. Short sentences land hard. Longer ones build context. Alternate them.\n"
-    "Never use markdown headers unless the response is five or more paragraphs.\n"
-    "Use bullet points or tables only where they compress information that would be awkward as prose.\n"
-    "Use bold sparingly -- only for a number, name, or term that anchors the whole sentence.\n"
-    'Never begin a response with "Based on" or "Here is" or "Sure" or "Great question" or "Certainly".\n'
-    'Never use "I". Use "we" or speak in the declarative.\n'
-    "Never use filler phrases: \"It's worth noting\", \"Notably\", \"Importantly\", \"Interestingly\", "
-    "\"In today's market\", \"A myriad of\", \"Plays a crucial role\", \"The reality is\", "
-    "\"Going forward\", \"Unlock value\", \"Drive value\".\n"
-    "Never use these words: delve, navigate, landscape, leverage (as verb), robust, holistic, "
-    "synergy, cutting-edge, stakeholder.\n"
-    "Lead with the conclusion. State the key finding in the first sentence.\n"
-    'Be opinionated. Take positions. "We think the market is wrong about X" '
-    'is better than "There are arguments on both sides."\n'
-    "Quantify or cut. If a claim cannot be anchored to a number or a named evidence item, remove it.\n"
-    'Label analytical transitions: "The bear case rests on...", "What changes this is...", '
-    '"The key risk is...".\n'
-    "Identify missing data. If a question cannot be answered from the research, say so and name what is needed.\n"
-    "Use the vocabulary of an institutional investor: "
-    '"the print", "the tape", "the multiple", "re-rate", "de-rate", '
-    '"the street", "consensus", "buy-side", "the name".\n'
-    "Ground every claim in the provided research passages. Cite specific evidence.\n"
-    "Never fabricate data, price targets, or financial metrics not in the provided research.\n"
-    "If asked about a topic not covered in the research passages, say so directly.\n"
-    "Be concise. 150-250 words for most questions. Longer only when complexity genuinely demands it.\n"
-    "Do not end with a question directed at the user.\n"
-)
+_VOICE_RULES_PATH = Path(__file__).resolve().parent.parent / "data" / "config" / "voice-rules.json"
+
+with open(_VOICE_RULES_PATH, encoding="utf-8") as _f:
+    _voice_data = json.load(_f)
+
+VOICE_RULES = "\n\n" + _voice_data["header"] + "\n" + "\n".join(_voice_data["rules"]) + "\n"
 
 
 # ---------------------------------------------------------------------------

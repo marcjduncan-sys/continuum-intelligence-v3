@@ -22,9 +22,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, Field
-from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
+
+from errors import api_error, APIError, api_error_handler, rate_limit_handler, ErrorCode
 
 import config
 import db
@@ -104,10 +106,7 @@ def _sanitise_system_prompt(text: str | None) -> str | None:
     if text is None:
         return None
     if len(text) > 6000:
-        raise HTTPException(
-            status_code=400,
-            detail='system_prompt exceeds maximum length',
-        )
+        raise api_error(400, ErrorCode.VALIDATION_ERROR, 'system_prompt exceeds maximum length')
     lowered = text.lower()
     for marker in _INJECTION_MARKERS:
         if marker.lower() in lowered:
@@ -178,7 +177,8 @@ app.add_middleware(
 # Rate limiter (in-memory, resets on Railway restart — acceptable)
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_exception_handler(APIError, api_error_handler)
+app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
 
 app.include_router(auth_router)
 app.include_router(conversations_router)
@@ -202,7 +202,7 @@ async def verify_api_key(api_key: str | None = Depends(_api_key_header)):
     if not config.CI_API_KEY:
         return
     if not api_key or api_key != config.CI_API_KEY:
-        raise HTTPException(status_code=401, detail="Invalid or missing API key")
+        raise api_error(401, ErrorCode.AUTH_ERROR, "Invalid or missing API key")
 
 
 # Anthropic client (delegates to shared singleton in config)
@@ -210,10 +210,7 @@ def _get_client() -> anthropic.Anthropic:
     try:
         return config.get_anthropic_client()
     except RuntimeError:
-        raise HTTPException(
-            status_code=500,
-            detail="ANTHROPIC_API_KEY not configured. Set it as an environment variable.",
-        )
+        raise api_error(500, ErrorCode.SERVER_ERROR, "ANTHROPIC_API_KEY not configured. Set it as an environment variable.")
 
 
 # ---------------------------------------------------------------------------
@@ -343,17 +340,14 @@ async def research_chat(request: Request, body: ResearchChatRequest, background_
     """
     ticker = body.ticker.upper()
     if not TICKER_PATTERN.match(ticker):
-        raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{ticker}'")
+        raise api_error(400, ErrorCode.INVALID_TICKER, f"Invalid ticker format: '{ticker}'")
 
     # Validate ticker — skip for personalised chat with custom system prompt
     available = get_tickers()
     has_research = ticker in available
 
     if not has_research and not body.custom_system_prompt:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Ticker '{ticker}' not found. Available: {', '.join(available)}",
-        )
+        raise api_error(404, ErrorCode.NOT_FOUND, f"Ticker '{ticker}' not found", detail=f"Available: {', '.join(available)}")
 
     # Retrieve relevant passages (skip if ticker not indexed)
     passages = []
@@ -467,7 +461,7 @@ async def research_chat(request: Request, body: ResearchChatRequest, background_
         )
     except Exception as e:
         logger.error(f"LLM API error: {e}")
-        raise HTTPException(status_code=502, detail=f"LLM API error: {str(e)}")
+        raise api_error(502, ErrorCode.LLM_ERROR, "LLM API error", detail=str(e))
 
     response_text = result.text
 
@@ -545,7 +539,7 @@ async def chart_proxy(ticker: str, request: Request):
     """
     ticker = ticker.upper()
     if not TICKER_PATTERN.match(ticker):
-        raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{ticker}'")
+        raise api_error(400, ErrorCode.INVALID_TICKER, f"Invalid ticker format: '{ticker}'")
 
     url = _YAHOO_CHART_URL.format(ticker=ticker)
     params = {"range": "3y", "interval": "1d", "includePrePost": "false"}
@@ -555,13 +549,10 @@ async def chart_proxy(ticker: str, request: Request):
             resp = await client.get(url, params=params)
         except httpx.RequestError as exc:
             logger.error("Yahoo chart request failed for %s: %s", ticker, exc)
-            raise HTTPException(status_code=502, detail="Upstream request failed")
+            raise api_error(502, ErrorCode.UPSTREAM_ERROR, "Upstream request failed")
 
     if resp.status_code != 200:
-        raise HTTPException(
-            status_code=resp.status_code,
-            detail=f"Yahoo Finance returned {resp.status_code}",
-        )
+        raise api_error(resp.status_code, ErrorCode.UPSTREAM_ERROR, f"Yahoo Finance returned {resp.status_code}")
 
     return resp.json()
 
@@ -602,16 +593,16 @@ async def gold_agent_endpoint(ticker: str, request: Request, force: bool = False
     """
     ticker = ticker.upper()
     if not TICKER_PATTERN.match(ticker):
-        raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{ticker}'")
+        raise api_error(400, ErrorCode.INVALID_TICKER, f"Invalid ticker format: '{ticker}'")
 
     try:
         result = await run_gold_analysis(ticker, force=force, notebook_id=notebook_id)
         return result
     except RuntimeError as exc:
-        raise HTTPException(status_code=503, detail=str(exc))
+        raise api_error(503, ErrorCode.SERVICE_UNAVAILABLE, str(exc))
     except Exception as exc:
         logger.error("Gold agent error for %s: %s", ticker, exc)
-        raise HTTPException(status_code=500, detail=f"Gold analysis failed: {exc}")
+        raise api_error(500, ErrorCode.SERVER_ERROR, "Gold analysis failed", detail=str(exc))
 
 
 # ---------------------------------------------------------------------------
@@ -633,10 +624,10 @@ async def drivers_latest(ticker: str, request: Request):
     """Fetch the most recent cached price driver report for a ticker."""
     ticker = ticker.upper()
     if not TICKER_PATTERN.match(ticker):
-        raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{ticker}'")
+        raise api_error(400, ErrorCode.INVALID_TICKER, f"Invalid ticker format: '{ticker}'")
     result = await get_latest_driver_report(ticker)
     if not result:
-        raise HTTPException(status_code=404, detail=f"No price driver report for {ticker}")
+        raise api_error(404, ErrorCode.NOT_FOUND, f"No price driver report for {ticker}")
     return result
 
 
@@ -651,7 +642,7 @@ async def drivers_analyse(ticker: str, request: Request, force: bool = True):
     """
     ticker = ticker.upper()
     if not TICKER_PATTERN.match(ticker):
-        raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{ticker}'")
+        raise api_error(400, ErrorCode.INVALID_TICKER, f"Invalid ticker format: '{ticker}'")
 
     # Resolve company name from research data
     import os as _os
@@ -667,10 +658,10 @@ async def drivers_analyse(ticker: str, request: Request, force: bool = True):
         result = await run_price_driver_analysis(ticker, company_name, force=force)
         return result
     except RuntimeError as exc:
-        raise HTTPException(status_code=503, detail=str(exc))
+        raise api_error(503, ErrorCode.SERVICE_UNAVAILABLE, str(exc))
     except Exception as exc:
         logger.error("Price driver error for %s: %s", ticker, exc)
-        raise HTTPException(status_code=500, detail=f"Price driver analysis failed: {exc}")
+        raise api_error(500, ErrorCode.SERVER_ERROR, "Price driver analysis failed", detail=str(exc))
 
 
 @app.post("/api/agents/drivers/scan")
@@ -683,14 +674,14 @@ async def drivers_scan(request: Request, secret: str | None = Depends(_drivers_s
     is returned only after the scan completes (30-45 minutes for ~30 tickers).
     """
     if not config.PRICE_DRIVERS_SECRET or secret != config.PRICE_DRIVERS_SECRET:
-        raise HTTPException(status_code=401, detail="Invalid or missing drivers secret")
+        raise api_error(401, ErrorCode.AUTH_ERROR, "Invalid or missing drivers secret")
 
     try:
         result = await run_price_driver_scan()
         return {"status": "complete", "result": result}
     except Exception as exc:
         logger.error("Price driver scan failed: %s", exc)
-        raise HTTPException(status_code=500, detail=f"Scan failed: {str(exc)}")
+        raise api_error(500, ErrorCode.SERVER_ERROR, "Scan failed", detail=str(exc))
 
 
 # ---------------------------------------------------------------------------
@@ -710,14 +701,14 @@ async def batch_run(request: Request, secret: str | None = Depends(_batch_secret
     Returns a summary of users processed and memories merged/retired.
     """
     if not config.BATCH_SECRET or secret != config.BATCH_SECRET:
-        raise HTTPException(status_code=401, detail="Invalid or missing batch secret")
+        raise api_error(401, ErrorCode.AUTH_ERROR, "Invalid or missing batch secret")
     pool = await db.get_pool()
     try:
         result = await batch_analysis.run_batch_analysis(pool)
         return result
     except Exception as exc:
         logger.error("Batch run failed: %s", exc)
-        raise HTTPException(status_code=500, detail="Batch analysis failed")
+        raise api_error(500, ErrorCode.SERVER_ERROR, "Batch analysis failed")
 
 
 # ---------------------------------------------------------------------------
@@ -764,13 +755,13 @@ async def dismiss_notification(notification_id: str, request: Request):
     if not user_id:
         guest_id = request.query_params.get("guest_id")
     if not user_id and not guest_id:
-        raise HTTPException(status_code=401, detail="Authentication required")
+        raise api_error(401, ErrorCode.AUTH_ERROR, "Authentication required")
     pool = await db.get_pool()
     updated = await insights.dismiss_notification(
         pool, notification_id=notification_id, user_id=user_id, guest_id=guest_id
     )
     if not updated:
-        raise HTTPException(status_code=404, detail="Notification not found or already dismissed")
+        raise api_error(404, ErrorCode.NOT_FOUND, "Notification not found or already dismissed")
     return {"dismissed": True}
 
 
@@ -787,7 +778,7 @@ async def insights_scan(
     Optionally accepts {"tickers": ["WOW", ...]} to limit scope.
     """
     if not config.INSIGHTS_SECRET or secret != config.INSIGHTS_SECRET:
-        raise HTTPException(status_code=401, detail="Invalid or missing insights secret")
+        raise api_error(401, ErrorCode.AUTH_ERROR, "Invalid or missing insights secret")
     body = {}
     try:
         body = await request.json()
@@ -800,7 +791,7 @@ async def insights_scan(
         return result
     except Exception as exc:
         logger.error("Insight scan failed: %s", exc)
-        raise HTTPException(status_code=500, detail="Insight scan failed")
+        raise api_error(500, ErrorCode.SERVER_ERROR, "Insight scan failed")
 
 
 # ---------------------------------------------------------------------------
@@ -848,11 +839,11 @@ async def delete_memory(memory_id: str, request: Request, guest_id: str | None =
     resolved_guest_id = guest_id if not user_id else None
 
     if not user_id and not resolved_guest_id:
-        raise HTTPException(status_code=400, detail="Authentication required")
+        raise api_error(400, ErrorCode.AUTH_ERROR, "Authentication required")
 
     pool = await db.get_pool()
     if not pool:
-        raise HTTPException(status_code=503, detail="Database unavailable")
+        raise api_error(503, ErrorCode.SERVICE_UNAVAILABLE, "Database unavailable")
 
     try:
         async with pool.acquire() as conn:
@@ -871,7 +862,7 @@ async def delete_memory(memory_id: str, request: Request, guest_id: str | None =
         return {"deleted": True, "id": memory_id}
     except Exception as exc:
         logger.error("Failed to delete memory %s: %s", memory_id, exc)
-        raise HTTPException(status_code=500, detail="Failed to delete memory")
+        raise api_error(500, ErrorCode.SERVER_ERROR, "Failed to delete memory")
 
 
 @app.get("/api/admin/llm-usage")
@@ -945,7 +936,7 @@ async def add_stock(
 
     ticker = body.ticker.strip().upper()
     if not TICKER_PATTERN.match(ticker):
-        raise HTTPException(status_code=400, detail=f"Invalid ticker: '{ticker}'")
+        raise api_error(400, ErrorCode.INVALID_TICKER, f"Invalid ticker: '{ticker}'")
 
     # Check if already exists (check both data/ and dist/data/ directories)
     data_dir = Path(config.PROJECT_ROOT) / "data"
@@ -954,7 +945,7 @@ async def add_stock(
     if (research_dir / f"{ticker}.json").exists() or (
         dist_research_check.exists() and (dist_research_check / f"{ticker}.json").exists()
     ):
-        raise HTTPException(status_code=409, detail=f"{ticker} already exists")
+        raise api_error(409, ErrorCode.CONFLICT, f"{ticker} already exists")
 
     # ---- Fetch company metadata + price in parallel ----
     import asyncio as _aio
@@ -969,10 +960,7 @@ async def add_stock(
     # Handle errors
     if isinstance(price_data, Exception) or (isinstance(price_data, dict) and "error" in price_data):
         detail = str(price_data) if isinstance(price_data, Exception) else price_data.get("error")
-        raise HTTPException(
-            status_code=400,
-            detail=f"Could not fetch price data for {ticker}.AX — is it a valid ASX ticker? ({detail})",
-        )
+        raise api_error(400, ErrorCode.VALIDATION_ERROR, f"Could not fetch price data for {ticker}.AX", detail=f"Is it a valid ASX ticker? ({detail})")
 
     if isinstance(metadata, Exception):
         logger.warning(f"Metadata fetch failed for {ticker}: {metadata}")
@@ -1177,29 +1165,20 @@ async def trigger_refresh(
     """
     ticker = ticker.upper()
     if not TICKER_PATTERN.match(ticker):
-        raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{ticker}'")
+        raise api_error(400, ErrorCode.INVALID_TICKER, f"Invalid ticker format: '{ticker}'")
 
     # Validate ticker exists in research data
     data_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
     if not (data_dir / f"{ticker}.json").exists():
-        raise HTTPException(
-            status_code=404,
-            detail=f"No research data found for '{ticker}'",
-        )
+        raise api_error(404, ErrorCode.NOT_FOUND, f"No research data found for '{ticker}'")
 
     # Check if ticker is part of an active batch refresh
     if is_batch_running():
-        raise HTTPException(
-            status_code=409,
-            detail=f"{ticker} is part of an active batch refresh",
-        )
+        raise api_error(409, ErrorCode.CONFLICT, f"{ticker} is part of an active batch refresh")
 
     # Check for existing running job
     if is_running(ticker):
-        raise HTTPException(
-            status_code=409,
-            detail=f"Refresh already in progress for {ticker}",
-        )
+        raise api_error(409, ErrorCode.CONFLICT, f"Refresh already in progress for {ticker}")
 
     # Create job and launch in background
     background_tasks.add_task(_run_refresh_background, ticker)
@@ -1221,10 +1200,7 @@ async def refresh_status(ticker: str):
     ticker = ticker.upper()
     job = get_job(ticker)
     if job is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"No refresh job found for {ticker}",
-        )
+        raise api_error(404, ErrorCode.NOT_FOUND, f"No refresh job found for {ticker}")
     return job.to_dict()
 
 
@@ -1235,19 +1211,13 @@ async def refresh_result(ticker: str):
     job = get_job(ticker)
 
     if job is None:
-        raise HTTPException(status_code=404, detail=f"No refresh job for {ticker}")
+        raise api_error(404, ErrorCode.NOT_FOUND, f"No refresh job for {ticker}")
 
     if job.status == "failed":
-        raise HTTPException(
-            status_code=500,
-            detail=f"Refresh failed: {job.error}",
-        )
+        raise api_error(500, ErrorCode.SERVER_ERROR, "Refresh failed", detail=job.error)
 
     if job.status != "completed":
-        raise HTTPException(
-            status_code=202,
-            detail=f"Refresh still in progress: {job.stage_label}",
-        )
+        raise api_error(202, ErrorCode.CONFLICT, f"Refresh still in progress: {job.stage_label}")
 
     # Return the updated research data and free memory
     if job.result:
@@ -1262,7 +1232,7 @@ async def refresh_result(ticker: str):
         with open(path) as f:
             return json.load(f)
 
-    raise HTTPException(status_code=404, detail="Research data not found")
+    raise api_error(404, ErrorCode.NOT_FOUND, "Research data not found")
 
 
 # ---------------------------------------------------------------------------
@@ -1287,10 +1257,7 @@ async def trigger_refresh_all(
 ):
     """Trigger a batch refresh for all (or specified) stocks."""
     if is_batch_running():
-        raise HTTPException(
-            status_code=409,
-            detail="A batch refresh is already in progress",
-        )
+        raise api_error(409, ErrorCode.CONFLICT, "A batch refresh is already in progress")
 
     # Accept optional {"tickers": ["BHP", "CBA"]} to refresh only a subset
     raw_body: dict = {}
@@ -1303,7 +1270,7 @@ async def trigger_refresh_all(
         # Validate each requested ticker
         for t in raw_body["tickers"]:
             if not TICKER_PATTERN.match(t.upper()):
-                raise HTTPException(status_code=400, detail=f"Invalid ticker format: '{t}'")
+                raise api_error(400, ErrorCode.INVALID_TICKER, f"Invalid ticker format: '{t}'")
         tickers = sorted(set(t.upper() for t in raw_body["tickers"]))
     else:
         # Discover all tickers from research data files
@@ -1315,7 +1282,7 @@ async def trigger_refresh_all(
         )
 
     if not tickers:
-        raise HTTPException(status_code=404, detail="No research data found")
+        raise api_error(404, ErrorCode.NOT_FOUND, "No research data found")
 
     # Create batch ID and launch
     batch_id = time.strftime("%Y%m%d-%H%M%S")
@@ -1356,7 +1323,7 @@ async def batch_refresh_status():
     """Poll the progress of the latest batch refresh."""
     job = get_latest_batch_job()
     if job is None:
-        raise HTTPException(status_code=404, detail="No batch refresh found")
+        raise api_error(404, ErrorCode.NOT_FOUND, "No batch refresh found")
     return job.to_dict()
 
 
@@ -1365,13 +1332,10 @@ async def batch_refresh_results():
     """Fetch all completed research JSONs from the latest batch."""
     job = get_latest_batch_job()
     if job is None:
-        raise HTTPException(status_code=404, detail="No batch refresh found")
+        raise api_error(404, ErrorCode.NOT_FOUND, "No batch refresh found")
 
     if job.status in ("queued", "in_progress"):
-        raise HTTPException(
-            status_code=202,
-            detail="Batch refresh still in progress",
-        )
+        raise api_error(202, ErrorCode.CONFLICT, "Batch refresh still in progress")
 
     # Collect results from individual refresh_jobs
     results = {}
@@ -1443,9 +1407,9 @@ def _serve_file(base_dir: Path, file_path: str):
     base = base_dir.resolve()
     full_path = (base / file_path).resolve()
     if not str(full_path).startswith(str(base)):
-        raise HTTPException(status_code=403, detail="Access denied")
+        raise api_error(403, ErrorCode.ACCESS_DENIED, "Access denied")
     if not full_path.exists() or not full_path.is_file():
-        raise HTTPException(status_code=404, detail="File not found")
+        raise api_error(404, ErrorCode.NOT_FOUND, "File not found")
     mime = MIME_TYPES.get(full_path.suffix, "application/octet-stream")
     headers: dict[str, str] = {}
     cc = _CACHE_RULES.get(full_path.suffix)

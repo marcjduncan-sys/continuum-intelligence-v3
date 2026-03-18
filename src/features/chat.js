@@ -6,11 +6,13 @@
  *
  * Depends on:
  *   - window.STOCK_DATA (global, via state.js)
- *   - window.marked (CDN)
- *   - window.DOMPurify (CDN)
+ *   - marked (npm, bundled via Vite)
+ *   - dompurify (npm, bundled via Vite)
  *   - window.pnBuildSystemPrompt (classic script public/js/personalisation.js)
  */
 
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import { STOCK_DATA } from '../lib/state.js';
 import { saveThesis, getThesis, inferBiasFromQuestion, recordSignal, getConsistentSignalCount } from './thesis-capture.js';
 
@@ -30,31 +32,12 @@ var CHAT_API_BASE = apiOrigin + '/api/research-chat';
 var CI_API_KEY    = window.CI_API_KEY || '';
 
 // ============================================================
-// VOICE RULES -- single source of truth, shared across all surfaces
+// VOICE RULES -- loaded from data/config/voice-rules.json (single source of truth)
 // ============================================================
 
-export var VOICE_RULES = '\n\nVOICE AND STYLE RULES (apply to every response, no exceptions):\n' +
-    'Australian English (Macquarie standard). Spell and phrase accordingly.\n' +
-    'Never use em-dashes. Use commas, semicolons, colons, or en-dashes instead.\n' +
-    'Vary sentence length. Short sentences land hard. Longer ones build context. Alternate them.\n' +
-    'Never use markdown headers unless the response is five or more paragraphs.\n' +
-    'Use bullet points or tables only where they compress information that would be awkward as prose.\n' +
-    'Use bold sparingly -- only for a number, name, or term that anchors the whole sentence.\n' +
-    'Never begin a response with "Based on" or "Here is" or "Sure" or "Great question" or "Certainly".\n' +
-    'Never use "I". Use "we" or speak in the declarative.\n' +
-    'Never use filler phrases: "It\'s worth noting", "Notably", "Importantly", "Interestingly", "In today\'s market", "A myriad of", "Plays a crucial role", "The reality is", "Going forward", "Unlock value", "Drive value".\n' +
-    'Never use these words: delve, navigate, landscape, leverage (as verb), robust, holistic, synergy, cutting-edge, stakeholder.\n' +
-    'Lead with the conclusion. State the key finding in the first sentence.\n' +
-    'Be opinionated. Take positions. "We think the market is wrong about X" is better than "There are arguments on both sides."\n' +
-    'Quantify or cut. If a claim cannot be anchored to a number or a named evidence item, remove it.\n' +
-    'Label analytical transitions: "The bear case rests on...", "What changes this is...", "The key risk is...".\n' +
-    'Identify missing data. If a question cannot be answered from the research, say so and name what is needed.\n' +
-    'Use the vocabulary of an institutional investor: "the print", "the tape", "the multiple", "re-rate", "de-rate", "the street", "consensus", "buy-side", "the name".\n' +
-    'Ground every claim in the provided research passages. Cite specific evidence.\n' +
-    'Never fabricate data, price targets, or financial metrics not in the provided research.\n' +
-    'If asked about a topic not covered in the research passages, say so directly.\n' +
-    'Be concise. 150-250 words for most questions. Longer only when complexity genuinely demands it.\n' +
-    'Do not end with a question directed at the user.\n';
+import voiceRulesData from '../../data/config/voice-rules.json';
+
+export var VOICE_RULES = '\n\n' + voiceRulesData.header + '\n' + voiceRulesData.rules.join('\n') + '\n';
 
 // ============================================================
 // SYSTEM PROMPT (shared, used by thesis comparator and fallback)
@@ -255,22 +238,7 @@ function escapeHtml(str) {
 }
 
 function renderMarkdown(text) {
-    if (typeof window.marked !== 'undefined' && window.marked.parse && typeof window.DOMPurify !== 'undefined') {
-        return window.DOMPurify.sanitize(window.marked.parse(text));
-    }
-    var html = escapeHtml(text);
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-    html = html.replace(/^[-*]\s+(.+)$/gm, '<li>$1</li>');
-    html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
-    html = html.split(/\n{2,}/).map(function(block) {
-        block = block.trim();
-        if (!block) return '';
-        if (/^<(ul|ol|h[1-6]|div|blockquote)/.test(block)) return block;
-        return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
-    }).join('');
-    return html;
+    return DOMPurify.sanitize(marked.parse(text));
 }
 
 function renderWelcome() {

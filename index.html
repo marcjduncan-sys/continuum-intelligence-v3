@@ -16,7 +16,7 @@
     <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src 'self' 'unsafe-inline' https://cdn.sheetjs.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
+        script-src 'self' 'unsafe-inline' https://cdn.sheetjs.com https://cdn.jsdelivr.net;
         style-src 'self' 'unsafe-inline';
         font-src 'self';
         connect-src 'self' https://imaginative-vision-production-16cb.up.railway.app https://query1.finance.yahoo.com https://query2.finance.yahoo.com;
@@ -729,10 +729,7 @@
 <!-- Chart.js for narrative timeline visualisation -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 
-<!-- Markdown parser for chat responses -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
-<!-- DOMPurify for sanitizing Markdown-to-HTML output -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+<!-- marked + dompurify now bundled via Vite (npm dependencies) -->
 
 
 

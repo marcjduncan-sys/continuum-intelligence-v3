@@ -1,14 +1,14 @@
 {
-  "name": "continuum-intelligence-v2",
-  "version": "2.0.0",
+  "name": "continuum-intelligence-v3",
+  "version": "3.0.0",
   "description": "Continuum Intelligence — ACH-based equity research platform for ASX stocks",
   "private": true,
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint scripts/ src/ --ext .js",
-    "lint:fix": "eslint scripts/ src/ --ext .js --fix",
+    "lint": "eslint scripts/ src/ public/js/ --ext .js",
+    "lint:fix": "eslint scripts/ src/ public/js/ --ext .js --fix",
     "test": "jest --verbose",
     "test:ci": "jest --ci --coverage",
     "test:unit": "vitest run",
@@ -35,6 +35,8 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
+    "dompurify": "^3.3.3",
+    "marked": "^17.0.4",
     "yahoo-finance2": "^3.13.1"
   }
 }

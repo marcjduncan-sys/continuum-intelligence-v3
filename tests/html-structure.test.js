@@ -31,12 +31,9 @@ describe('Security Headers', () => {
     expect(HTML).toContain("default-src 'self'");
   });
 
-  test('DOMPurify CDN script is included', () => {
-    expect(HTML).toContain('dompurify');
-  });
-
-  test('marked.js CDN script is included', () => {
-    expect(HTML).toContain('marked');
+  test('marked + dompurify are bundled (no CDN scripts)', () => {
+    expect(HTML).not.toContain('cdnjs.cloudflare.com/ajax/libs/marked');
+    expect(HTML).not.toContain('cdnjs.cloudflare.com/ajax/libs/dompurify');
   });
 
   test('no inline STOCK_DATA assignments remain', () => {
