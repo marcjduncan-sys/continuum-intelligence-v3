@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import re
+from datetime import date as _date, datetime as _datetime
 from pathlib import Path
 from typing import Any
 
@@ -172,6 +173,38 @@ def _get_data_dir() -> Path:
     dist/ copy which may be stale.
     """
     return Path(PROJECT_ROOT) / "data" / "research"
+
+
+# ---------------------------------------------------------------------------
+# Staleness helpers
+# ---------------------------------------------------------------------------
+
+def _get_days_stale(data: dict) -> tuple[int, str] | None:
+    """
+    Compute staleness from research JSON data.
+
+    Tries _lastRefreshed (ISO 8601) first, then falls back to the 'date' field
+    ("18 March 2026" format). Returns (days_stale, iso_date_str) or None if no
+    parseable date is available.
+    """
+    last_refreshed = data.get("_lastRefreshed")
+    if last_refreshed:
+        try:
+            dt = _datetime.fromisoformat(str(last_refreshed))
+            review_date = dt.date()
+            return (_date.today() - review_date).days, review_date.isoformat()
+        except (ValueError, TypeError):
+            pass
+
+    date_str = data.get("date")
+    if date_str:
+        try:
+            review_date = _datetime.strptime(str(date_str), "%d %B %Y").date()
+            return (_date.today() - review_date).days, review_date.isoformat()
+        except (ValueError, TypeError):
+            pass
+
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -722,6 +755,19 @@ def _chunk_stock(ticker: str, data: dict, ref: dict | None = None, fresh: dict |
                     weight=1.0,
                 ))
 
+    # --- Staleness warning injection ---
+    staleness = _get_days_stale(data)
+    if staleness is not None:
+        days_stale, review_date_iso = staleness
+        if days_stale > 7:
+            warning = (
+                f"WARNING: This research was last reviewed {days_stale} days ago on "
+                f"{review_date_iso}. Material catalysts may have occurred since. "
+                f"Treat forward-looking statements as potentially invalidated."
+            )
+            for p in passages:
+                p.content = warning + "\n" + p.content
+
     return passages
 
 
@@ -749,6 +795,16 @@ def ingest(html_path: str | None = None) -> dict[str, list[Passage]]:
         logger.warning(f"Research data directory not found: {data_dir}")
         return _store
 
+    # Load freshness data (used for the freshness passage in each ticker)
+    freshness_data: dict = {}
+    freshness_path = Path(PROJECT_ROOT) / "data" / "freshness.json"
+    if freshness_path.exists():
+        try:
+            with open(freshness_path, "r", encoding="utf-8") as f:
+                freshness_data = json.load(f)
+        except (json.JSONDecodeError, OSError) as e:
+            logger.warning(f"Failed to load freshness.json: {e}")
+
     # Load per-ticker JSON files
     json_files = sorted(data_dir.glob("*.json"))
     loaded = 0
@@ -771,7 +827,7 @@ def ingest(html_path: str | None = None) -> dict[str, list[Passage]]:
             logger.warning(f"Unexpected data format in {json_file.name}, skipping")
             continue
 
-        passages = _chunk_stock(ticker, data)
+        passages = _chunk_stock(ticker, data, fresh=freshness_data.get(ticker))
         if passages:
             _store[ticker] = passages
             _all_passages.extend(passages)

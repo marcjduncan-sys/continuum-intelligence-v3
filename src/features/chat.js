@@ -82,6 +82,9 @@ var panel, fab, collapseBtn, clearBtn, historyBtn, messages, input, sendBtn, tic
 
 var isOpen        = false;
 var isLoading     = false;
+var _lastSendTime = 0;
+var _cooldownTimer = null;
+var SEND_COOLDOWN_MS = 2000;
 var conversations = (function() {
     try {
         var saved = sessionStorage.getItem('ci_conversations');
@@ -393,6 +396,15 @@ function sendMessage() {
     var question = input ? input.value.trim() : '';
     if (!question || isLoading) return;
 
+    // Debounce: block sends within cooldown window
+    var now = Date.now();
+    if (now - _lastSendTime < SEND_COOLDOWN_MS) return;
+    _lastSendTime = now;
+
+    // Schedule cooldown reset so button re-enables after the window
+    if (_cooldownTimer) clearTimeout(_cooldownTimer);
+    _cooldownTimer = setTimeout(function() { updateSendButton(); }, SEND_COOLDOWN_MS);
+
     var ticker = currentTicker || (tickerSelect ? tickerSelect.value : '');
 
     // Thesis capture: infer bias from the question
@@ -522,9 +534,15 @@ function autoResize() {
     input.style.height = Math.min(input.scrollHeight, 120) + 'px';
 }
 
+function _isInCooldown() {
+    return Date.now() - _lastSendTime < SEND_COOLDOWN_MS;
+}
+
 function updateSendButton() {
     if (!sendBtn || !input) return;
-    sendBtn.disabled = !input.value.trim() || isLoading;
+    var cooldown = _isInCooldown();
+    sendBtn.disabled = !input.value.trim() || isLoading || cooldown;
+    sendBtn.style.opacity = cooldown ? '0.4' : '';
 }
 
 // ============================================================
