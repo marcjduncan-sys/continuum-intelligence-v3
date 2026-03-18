@@ -42,13 +42,15 @@ async def send_otp_email(to_email: str, code: str) -> bool:
     try:
         import aiosmtplib
 
+        use_tls = config.SMTP_PORT == 465
         await aiosmtplib.send(
             message,
             hostname=config.SMTP_HOST,
             port=config.SMTP_PORT,
             username=config.SMTP_USER or None,
             password=config.SMTP_PASS or None,
-            start_tls=True,
+            use_tls=use_tls,
+            start_tls=not use_tls,
             timeout=10,
         )
         logger.info("OTP email sent to %s", to_email)
