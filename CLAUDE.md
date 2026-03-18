@@ -42,7 +42,7 @@ npm run validate     # lint + test:all — run before any push
 
 ---
 
-## Current State — 2026-03-18
+## Current State — 2026-03-19
 
 **Phase 0 COMPLETE (2026-03-07).** The extraction of logic from `index.html` into `src/` modules is complete. `computeSkewScore` canonicalised to zero-contribution convention (commit `4493e8c`; see `docs/decisions/003-computeskewscore-neutral-convention.md`). `VALID_STATIC_PAGES` confirmed correct: `home`, `deep-research`, `portfolio`, `comparator`, `personalisation`, `about`.
 
@@ -172,13 +172,27 @@ npm run validate     # lint + test:all — run before any push
 - [x] **C4**: Personalisation.js ESLint coverage -- `public/js/` added to lint scope. Zero errors (194 warnings, all pre-existing no-var/prefer-const) (commit `4ae62e7`).
 - [x] **C5**: Package version and metadata cleanup -- `package.json` name updated to `continuum-intelligence-v3`, version to `3.0.0` (commit `4ae62e7`).
 
+**Session work (2026-03-19) -- Gold Stock Coverage Pipeline (PRD complete):**
+- [x] **S0**: Fixed OBM/SNX NotebookLM notebook ID collision. SNX set to dedicated notebook `c5470e1a`.
+- [x] **S1**: Added `archetype` field to `reference.json` for all 32 tickers. 7 archetypes: `producer` (FMG, MIN, STO, WAF, NST, EVN, OBM), `developer` (HRZ, RMC), `explorer` (WIA, SNX), `diversified` (WOW, GYG, CSL, WDS, BHP, OCL, RFG, RIO, WOR), `financial` (MQG, NAB, CBA), `reit` (GMG, DXS), `tech` (XRO, WTC, DRO, PME, SIG, REA, ASB).
+- [x] **S2**: Created `data/config/metric-templates.json` with archetype-specific featuredMetrics templates. Explorer: [Mkt Cap, 52w Range, Gold Exposure, Drawdown]. Developer: [Mkt Cap, 52w Range, Analyst Target, Drawdown]. Tech: [Mkt Cap, Fwd P/E, Rev Growth, Drawdown]. Default/producer/financial/reit: [Mkt Cap, Fwd P/E, Div Yield, Drawdown].
+- [x] **S3**: `home.js` imports `REFERENCE_DATA`, uses `_getArchetype()` for archetype lookup.
+- [x] **S4**: `isDataPending()` now archetype-aware: explorer/developer stocks only require Mkt Cap or Drawdown to show as active (not P/E or Div Yield).
+- [x] **S5**: Populated `reference.json` for OBM (520M shares, A$775M), WIA (353M, A$177M), SNX (1860M, A$112M).
+- [x] **S6**: Regenerated `featuredMetrics` in `_index.json` for 6 gold stocks using archetype templates.
+- [x] **S7**: Unified gold section: single "Gold" nav entry in `renderSectionNav()`. `renderReport()` prefers `goldAgent`, falls back to `goldAnalysis`. Removed duplicate Section 11 nav entry.
+- [x] **S8**: SNX gold agent endpoint verified (HTTP 200, 55s). Notebook content contains RMS data; parked for manual notebook population.
+- [x] **S9**: `scaffold.py`: `_build_featured_metrics()` selects template by archetype at scaffold time.
+- [x] **S10**: `scaffold.py`: `infer_archetype()` with sector/sub-sector heuristics + `_ARCHETYPE_OVERRIDES` dict.
+- **NOTE**: SNX NotebookLM notebook (`c5470e1a`) currently contains Ramelius Resources (RMS) documents. Must be repopulated with SNX-specific source material before re-running the gold agent.
+
 **Recent commits (last six):**
+- `6ad2539` fix: correct SNX NotebookLM notebook ID
+- `d0be44c` feat: add SNX NotebookLM notebook ID for gold agent
+- `3f5d6d7` feat: stock archetype system + unified gold section + explorer metrics
 - `4ae62e7` feat: C1 bundle CDN deps via Vite + C2 voice rules JSON + C3 structured errors + C4 lint scope + C5 package v3
 - `47372f1` feat: voice rules as build-time static JSON (Task C2)
 - `b16e3fc` feat(api): add conversation history token budget (Task B4)
-- `f88eb1c` feat(api): pre-compute passage embeddings at ingestion (Task B1)
-- `cac218e` feat: B2 hybrid retrieval with RRF + B3 BM25 index caching
-- `76ab244` feat: A1 staleness warning injection + A5 chat debounce guard
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
