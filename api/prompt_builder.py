@@ -7,6 +7,8 @@ profile is no longer sent by untrusted client code.
 """
 
 import json
+import os
+from datetime import date
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -248,6 +250,201 @@ def build_personalised_prompt(data: dict) -> str:
     p += VOICE_RULES
 
     return p
+
+
+# ---------------------------------------------------------------------------
+# Structured research context injection
+# ---------------------------------------------------------------------------
+
+_RESEARCH_DIR = Path(__file__).resolve().parent.parent / "data" / "research"
+
+_RESEARCH_CONTEXT_CHAR_BUDGET = 5500  # ~1,375 tokens
+
+
+def _safe_text(val) -> str:
+    """Extract text from a value that may be a string, dict, or None."""
+    if val is None:
+        return ""
+    if isinstance(val, str):
+        return val
+    if isinstance(val, dict):
+        return val.get("text") or val.get("content") or val.get("summary") or str(val)
+    return str(val)
+
+
+def _truncate(text: str, max_len: int) -> str:
+    if len(text) <= max_len:
+        return text
+    return text[:max_len - 3].rsplit(" ", 1)[0] + "..."
+
+
+def build_structured_research_context(ticker: str) -> str:
+    """Serialise a stock's structured research data for LLM context injection.
+
+    Reads data/research/{TICKER}.json and returns a compact text block
+    wrapped in <structured_research> tags. Returns empty string if the
+    JSON is missing or malformed (graceful degradation).
+
+    Target: ~800-1,500 tokens (3,200-6,000 chars).
+    """
+    if not ticker:
+        return ""
+    path = _RESEARCH_DIR / f"{ticker.upper()}.json"
+    if not path.exists():
+        return ""
+
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return ""
+
+    today = date.today().isoformat()
+    ticker_full = data.get("tickerFull", ticker.upper())
+    company = data.get("company", ticker.upper())
+    lines = [f'<structured_research ticker="{ticker_full}" company="{company}" as_of="{today}">']
+
+    # -- Hypotheses
+    hypotheses = data.get("hypotheses", [])
+    if hypotheses:
+        # Sort by score descending (parse "75%" -> 75)
+        def _parse_score(h):
+            s = h.get("score", "0%")
+            try:
+                return float(str(s).replace("%", ""))
+            except (ValueError, TypeError):
+                return 0.0
+
+        ranked = sorted(hypotheses, key=_parse_score, reverse=True)
+        lines.append("")
+        lines.append("HYPOTHESES (ranked by weight):")
+        dominant = ranked[0] if ranked else None
+        for h in ranked:
+            tier = h.get("tier", "")
+            title = h.get("title", "")
+            score = h.get("score", "?")
+            direction = h.get("direction", "")
+            status = h.get("statusText", "")
+            desc = _truncate(h.get("description", ""), 200)
+            dom_tag = " [DOMINANT]" if h is dominant else ""
+            lines.append(
+                f"- {tier} {title} ({score}, {direction}){dom_tag} "
+                f"-- Status: {status}. {desc}"
+            )
+
+    # -- Skew
+    skew = data.get("skew", {})
+    hero = data.get("hero", {})
+    skew_dir = hero.get("skew") or skew.get("direction", "")
+    skew_rationale = hero.get("skew_description") or skew.get("rationale", "")
+    if skew_dir:
+        lines.append("")
+        lines.append(f"SKEW: {skew_dir.upper()}")
+        if skew_rationale:
+            lines.append(f"Rationale: {_truncate(skew_rationale, 300)}")
+
+    # -- Position in range
+    pir = hero.get("position_in_range", {})
+    worlds = pir.get("worlds", [])
+    current_price = data.get("price") or pir.get("current_price")
+    if worlds and current_price:
+        lines.append("")
+        currency = data.get("currency", "A$")
+        lines.append(f"POSITION IN RANGE: Current price {currency}{current_price}")
+        world_strs = [f"{w['label']} ({currency}{w['price']})" for w in worlds if w.get("price")]
+        lines.append(f"Scenarios: {' -- '.join(world_strs)}")
+
+    # -- Next decision point
+    ndp = hero.get("next_decision_point", {})
+    if ndp.get("event"):
+        lines.append(f"Next decision point: {ndp['event']} -- {ndp.get('date', 'TBD')}")
+
+    # -- Tripwires (all cards, compact)
+    tripwires = data.get("tripwires", {})
+    tw_cards = tripwires.get("cards", [])
+    if tw_cards:
+        lines.append("")
+        lines.append("TRIPWIRES:")
+        for tw in tw_cards[:6]:
+            name = tw.get("name", "")
+            tw_date = tw.get("date", "")
+            conditions = tw.get("conditions", [])
+            consequence = _truncate(conditions[0].get("then", ""), 150) if conditions else ""
+            lines.append(f"- {name} [{tw_date}]: {consequence}")
+
+    # -- Discriminators (top 5 by diagnosticity)
+    disc = data.get("discriminators", {})
+    disc_rows = disc.get("rows", [])
+    if disc_rows:
+        diag_order = {"HIGH": 0, "MEDIUM": 1, "LOW": 2}
+        sorted_rows = sorted(disc_rows, key=lambda r: diag_order.get(r.get("diagnosticity", "LOW"), 2))
+        lines.append("")
+        lines.append("KEY DISCRIMINATORS:")
+        for row in sorted_rows[:5]:
+            factor = row.get("discriminatesBetween", "")
+            reading = row.get("currentReading", "")
+            diag = row.get("diagnosticity", "")
+            lines.append(f"- [{diag}] {factor}: {reading}")
+
+    # -- Evidence (top 8 items, prefer those with diagnostic tags)
+    evidence = data.get("evidence", {})
+    ev_cards = evidence.get("cards", [])
+    if ev_cards:
+        lines.append("")
+        lines.append("KEY EVIDENCE:")
+        for card in ev_cards[:8]:
+            num = card.get("number", "")
+            title = card.get("title", "")
+            epistemic = card.get("epistemicLabel", "")
+            finding = _truncate(card.get("finding", ""), 120)
+            tags = card.get("tags", [])
+            tag_strs = [t.get("text", "") for t in tags[:3] if t.get("text")]
+            tag_line = "; ".join(tag_strs) if tag_strs else ""
+            lines.append(f"- E{num} {title} [{epistemic}]: {finding}")
+            if tag_line:
+                lines.append(f"  Alignment: {_truncate(tag_line, 150)}")
+
+    # -- Verdict
+    verdict = data.get("verdict", {})
+    verdict_text = verdict.get("text", "")
+    verdict_scores = verdict.get("scores", [])
+    if verdict_scores:
+        lines.append("")
+        score_parts = []
+        for vs in verdict_scores:
+            label = vs.get("label", "")
+            score = vs.get("score", "")
+            dir_text = vs.get("dirText", "")
+            score_parts.append(f"{label}: {score} ({dir_text})")
+        lines.append("CONVICTION SCORES: " + " | ".join(score_parts))
+    if verdict_text:
+        lines.append(f"VERDICT: {_truncate(verdict_text, 300)}")
+
+    # -- Narrative summary (compact)
+    narrative = data.get("narrative", {})
+    narr_text = _safe_text(narrative.get("theNarrative"))
+    if narr_text:
+        lines.append("")
+        lines.append(f"NARRATIVE: {_truncate(narr_text, 350)}")
+    price_impl = _safe_text(narrative.get("priceImplication"))
+    if price_impl:
+        lines.append(f"PRICE IMPLICATION: {_truncate(price_impl, 200)}")
+
+    lines.append("")
+    lines.append("</structured_research>")
+
+    result = "\n".join(lines)
+
+    # Sanitise em-dashes from source data (style rule: en-dashes only)
+    result = result.replace("\u2014", "\u2013")
+
+    # Enforce budget -- truncate from the end if over
+    if len(result) > _RESEARCH_CONTEXT_CHAR_BUDGET:
+        cut = result[:_RESEARCH_CONTEXT_CHAR_BUDGET - 30]
+        cut = cut.rsplit("\n", 1)[0]
+        result = cut + "\n[truncated]\n</structured_research>"
+
+    return result
 
 
 # ---------------------------------------------------------------------------
