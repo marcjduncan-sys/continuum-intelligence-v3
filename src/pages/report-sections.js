@@ -245,7 +245,7 @@ export function renderSectionNav(data) {
     ['hypotheses', 'Hypotheses']
   ];
 
-  if (data.goldAgent) {
+  if (data.goldAgent || data.goldAnalysis) {
     sections.push(['gold-analysis', 'Gold']);
   }
 
@@ -264,10 +264,6 @@ export function renderSectionNav(data) {
 
   if (data.priceDrivers) {
     sections.push(['price-drivers', 'Price Drivers']);
-  }
-
-  if (data.goldAnalysis) {
-    sections.push(['gold-section', 'Gold Analysis']);
   }
 
   sections.push(['chat', 'Research Chat']);

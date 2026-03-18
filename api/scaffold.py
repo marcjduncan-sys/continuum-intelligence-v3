@@ -296,6 +296,65 @@ SECTOR_COMMODITY_TEMPLATES: dict[str, dict] = {
 }
 
 
+# ---------------------------------------------------------------------------
+# Archetype detection
+# ---------------------------------------------------------------------------
+# Maps sector + sub-sector to stock archetypes that drive metric template
+# selection.  Keeps archetype classification centralised in the scaffold
+# pipeline so downstream consumers (home.js, report.js) just read the field.
+# ---------------------------------------------------------------------------
+
+_ARCHETYPE_RULES: list[tuple[str, str | None, str]] = [
+    # (sector_contains, sub_sector_contains, archetype)
+    # Order matters -- first match wins
+    ("Basic Materials", "Gold", "explorer"),      # default for gold; overridden below
+    ("Materials", "Gold", "explorer"),
+    ("Basic Materials", None, "diversified"),
+    ("Materials", None, "diversified"),
+    ("Energy", None, "producer"),
+    ("Financial", None, "financial"),
+    ("Real Estate", None, "reit"),
+    ("Technology", None, "tech"),
+    ("Software", None, "tech"),
+    ("Communication", None, "tech"),
+    ("Healthcare", None, "diversified"),
+    ("Consumer", None, "diversified"),
+    ("Industrial", None, "diversified"),
+]
+
+# Tickers with known archetypes that override heuristic detection
+_ARCHETYPE_OVERRIDES: dict[str, str] = {
+    "NST": "producer",
+    "EVN": "producer",
+    "WAF": "producer",
+    "OBM": "producer",
+    "HRZ": "developer",
+    "RMC": "developer",
+    "FMG": "producer",
+    "MIN": "producer",
+    "STO": "producer",
+}
+
+
+def infer_archetype(
+    ticker: str, sector: str | None, sector_sub: str | None,
+    market_data: dict | None = None,
+) -> str:
+    """Infer stock archetype from sector, sub-sector, and market data."""
+    if ticker in _ARCHETYPE_OVERRIDES:
+        return _ARCHETYPE_OVERRIDES[ticker]
+
+    s = (sector or "").lower()
+    ss = (sector_sub or "").lower()
+
+    for rule_sector, rule_sub, arch in _ARCHETYPE_RULES:
+        if rule_sector.lower() in s:
+            if rule_sub is None or rule_sub.lower() in ss:
+                return arch
+
+    return "diversified"
+
+
 def resolve_sector_commodities(
     sector: str | None, industry: str | None
 ) -> dict[str, Any]:
@@ -432,6 +491,55 @@ async def fetch_company_name(ticker: str) -> str | None:
         return None
     except Exception:
         return None
+
+
+# ---------------------------------------------------------------------------
+# Archetype-aware featured metrics
+# ---------------------------------------------------------------------------
+
+def _build_featured_metrics(
+    archetype: str,
+    market_cap_str: str,
+    pe_str: str,
+    div_yield_str: str,
+    yield_color_class: bool,
+    drawdown: str,
+    price: float,
+    high_52w: float,
+    low_52w: float,
+    currency: str,
+) -> list[dict]:
+    """Build featuredMetrics array based on stock archetype."""
+    range_str = f"{currency}{low_52w:.2f}\u2013{high_52w:.2f}" if high_52w > 0 else "N/A"
+
+    if archetype == "explorer":
+        return [
+            {"label": "Mkt Cap", "value": market_cap_str, "color": ""},
+            {"label": "52w Range", "value": range_str, "color": ""},
+            {"label": "Gold Exposure", "value": "100%", "color": ""},
+            {"label": "Drawdown", "value": drawdown, "color": ""},
+        ]
+    if archetype == "developer":
+        return [
+            {"label": "Mkt Cap", "value": market_cap_str, "color": ""},
+            {"label": "52w Range", "value": range_str, "color": ""},
+            {"label": "Analyst Target", "value": "N/A", "color": ""},
+            {"label": "Drawdown", "value": drawdown, "color": ""},
+        ]
+    if archetype == "tech":
+        return [
+            {"label": "Mkt Cap", "value": market_cap_str, "color": ""},
+            {"label": "Fwd P/E", "value": pe_str, "color": ""},
+            {"label": "Rev Growth", "value": "N/A", "color": ""},
+            {"label": "Drawdown", "value": drawdown, "color": ""},
+        ]
+    # default / producer / financial / reit / diversified
+    return [
+        {"label": "Mkt Cap", "value": market_cap_str, "color": ""},
+        {"label": "Fwd P/E", "value": pe_str, "color": ""},
+        {"label": "Div Yield", "value": div_yield_str, "color": "var(--signal-green)" if yield_color_class else ""},
+        {"label": "Drawdown", "value": drawdown, "color": ""},
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -617,13 +725,12 @@ def build_research_scaffold(
             ],
         },
 
-        # Featured card
-        "featuredMetrics": [
-            {"label": "Mkt Cap", "value": market_cap_str, "color": ""},
-            {"label": "Fwd P/E", "value": pe_str, "color": ""},
-            {"label": "Div Yield", "value": div_yield_str, "color": "var(--signal-green)" if yield_color_class else ""},
-            {"label": "Drawdown", "value": drawdown, "color": ""},
-        ],
+        # Featured card -- archetype-aware metric template
+        "featuredMetrics": _build_featured_metrics(
+            infer_archetype(ticker, sector, sector_sub, market_data),
+            market_cap_str, pe_str, div_yield_str,
+            yield_color_class, drawdown, price, high_52w, low_52w, currency,
+        ),
         "featuredPriceColor": "",
         "featuredRationale": "Auto-added to coverage. Full narrative analysis pending.",
 
@@ -883,7 +990,10 @@ def build_index_entry(
     }
 
 
-def build_reference_entry(ticker: str, market_data: dict) -> dict:
+def build_reference_entry(
+    ticker: str, market_data: dict,
+    sector: str | None = None, sector_sub: str | None = None,
+) -> dict:
     """Build an entry for data/reference.json."""
     price = market_data.get("price", 0)
     market_cap = market_data.get("market_cap")
@@ -894,6 +1004,7 @@ def build_reference_entry(ticker: str, market_data: dict) -> dict:
         market_cap_str = f"{currency}{market_cap / 1e9:.1f}B"
 
     return {
+        "archetype": infer_archetype(ticker, sector, sector_sub, market_data),
         "sharesOutstanding": None,
         "analystTarget": None,
         "analystBuys": None,

@@ -1018,7 +1018,7 @@ async def add_stock(
     research_data = build_research_scaffold(ticker, company, sector, industry, price_data)
     tickers_entry = build_tickers_entry(ticker, company, sector, industry, price_data)
     index_entry = build_index_entry(ticker, company, sector, industry, price_data)
-    reference_entry = build_reference_entry(ticker, price_data)
+    reference_entry = build_reference_entry(ticker, price_data, sector, industry)
     freshness_entry = build_freshness_entry(ticker, price_data.get("price", 0))
 
     # ---- Write files ----

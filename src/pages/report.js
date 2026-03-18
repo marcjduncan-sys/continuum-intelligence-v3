@@ -39,7 +39,7 @@ export function renderReport(data) {
     renderOvercorrectionBanner(data) +
     renderIdentity(data) +
     renderHypotheses(data) +
-    renderGoldDiscovery(data) +
+    (data.goldAgent ? renderGoldDiscovery(data) : renderGoldSection(data)) +
     renderNarrativeTimeline(data) +
     renderNarrative(data) +
     renderEvidence(data) +
@@ -47,8 +47,7 @@ export function renderReport(data) {
     renderTripwires(data) +
     renderGaps(data) +
     renderTechnicalAnalysis(data) +
-    renderPriceDrivers(data) +
-    renderGoldSection(data);
+    renderPriceDrivers(data);
 
   var floatingToggle =
     '<button class="sections-float-toggle" onclick="window.toggleAllSections(this)" data-state="expanded" aria-label="Collapse all sections">' +

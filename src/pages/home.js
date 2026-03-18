@@ -1,16 +1,41 @@
 // home.js — Home page renderers and initialization
 // Extracted from index.html without logic changes
 
-import { STOCK_DATA, FRESHNESS_DATA, FEATURED_ORDER, COMING_SOON } from '../lib/state.js';
+import { STOCK_DATA, FRESHNESS_DATA, REFERENCE_DATA, FEATURED_ORDER, COMING_SOON } from '../lib/state.js';
 import { computeSkewScore } from '../lib/dom.js';
 import { on } from '../lib/data-events.js';
 import { formatDateAEST, truncateAtWord } from '../lib/format.js';
 
 var coverageSortDir = 0; // 0 = unsorted (default), 1 = desc (bearish first), -1 = asc (bullish first)
 
+// Archetypes where null P/E and Div Yield are structurally expected (not a data failure)
+var NULLABLE_PE_ARCHETYPES = { explorer: true, developer: true };
+
+function _getArchetype(ticker) {
+  if (!REFERENCE_DATA || !REFERENCE_DATA[ticker]) return null;
+  return REFERENCE_DATA[ticker].archetype || null;
+}
+
 function isDataPending(data) {
   var metrics = data.featuredMetrics || [];
   if (metrics.length === 0) return true;
+
+  var archetype = _getArchetype(data.ticker);
+
+  // For explorer/developer archetypes, only check Mkt Cap and Drawdown (the structurally available metrics)
+  if (archetype && NULLABLE_PE_ARCHETYPES[archetype]) {
+    var hasMktCap = false;
+    var hasDrawdown = false;
+    for (var i = 0; i < metrics.length; i++) {
+      var v = metrics[i].value;
+      var filled = v && v !== 'N/A' && v !== '--';
+      if (metrics[i].label === 'Mkt Cap' && filled) hasMktCap = true;
+      if (metrics[i].label === 'Drawdown' && filled) hasDrawdown = true;
+    }
+    return !hasMktCap && !hasDrawdown;
+  }
+
+  // Default: pending if all but one metric are N/A
   var naCount = metrics.filter(function(m) {
     return !m.value || m.value === 'N/A' || m.value === '--';
   }).length;
