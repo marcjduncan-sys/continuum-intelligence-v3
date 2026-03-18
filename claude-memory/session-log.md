@@ -1,5 +1,89 @@
 # Session Log
 
+## 2026-03-18 -- Track D Infrastructure Hardening (D1, D3)
+
+**Duration**: ~20 min
+**Branch**: main (uncommitted; other session owns main.py wiring)
+
+### What was done
+
+**D1: Database Pool Health Check and Reconnection** (`api/db.py`):
+- Added `health_check()` function: runs `SELECT 1` on pool, returns `"ok"` / `"reconnecting"` / `"no_database"`
+- On failure: logs warning, closes dead pool, sets `_pool = None` so next `get_pool()` recreates it
+- If pool already None: attempts recreation via `get_pool()`
+- Wired into `/api/health` endpoint (returns `"db": status`) and 60-second background `asyncio.create_task` loop in lifespan
+
+**D3: Embeddings Connection Pooling** (`api/embeddings.py`):
+- Replaced per-request `httpx.AsyncClient` creation with module-level pooled client
+- Lazy init via `_get_client()` with `httpx.Limits(max_connections=10)`
+- Added `close_client()` for shutdown cleanup, wired into lifespan shutdown
+- Another session added `health_check()` to embeddings.py (not authored here)
+
+**`api/main.py` changes** (co-owned with parallel session):
+- `import embeddings` added
+- `/api/health` calls `db.health_check()`, includes `"db"` key in response
+- Lifespan: periodic `_db_health_loop` task (60s interval), `embeddings.close_client()` on shutdown
+- Note: parallel session has expanded `main.py` further (task_monitor, subsystem health, llm status)
+
+### Test results
+
+- 195/195 Vitest passing
+- `npm run build` succeeds
+- Python syntax validated for all changed files
+- No pytest tests collected (existing test suite does not cover backend modules)
+
+### Files changed
+
+```
+api/db.py          -- health_check() added (D1)
+api/embeddings.py  -- connection pooling + close_client() (D3)
+api/main.py        -- wiring (co-owned with parallel session)
+```
+
+### Handoff notes for next session
+
+1. **Do not commit main.py independently** -- parallel session is actively modifying it with task_monitor, expanded health endpoint, and llm status. Let that session own the main.py commit.
+2. `api/db.py` and `api/embeddings.py` are clean and independently committable if needed
+3. D2 (LLM client resilience) and D4+ not started in this session
+4. The parallel session added `embeddings.health_check()` and `api/task_monitor.py` -- review those changes before committing
+
+---
+
+## 2026-03-17 Session 5 -- Workflow Push, Comparator Triage, Coverage Confirmation
+
+**Duration**: ~15 min
+**Branch**: main (direct commit)
+**Commit**: `133906b`
+
+### What was done
+
+1. **Workflow commit and push**: pushed user-authored `.github/workflows/price-drivers.yml` rewrite (fail-fast on credit exhaustion, freshness skip, 502 retry). Validated YAML with `yaml.safe_load()` before commit.
+2. **Thesis Comparator 502 triage**: tested `POST /api/research-chat` for XRO directly; returned 200 with full analysis. Confirmed the 502 was transient (likely Anthropic rate limit saturation from the price driver scan). Verified `api/llm.py` already has retry logic covering 429, 500, 503, and overloaded errors. No code change required.
+3. **Price driver coverage check**: all 32/32 tickers now returning 200 from `/api/drivers/{ticker}`. Full coverage achieved, up from 26/32 (81%) at end of previous session.
+
+### Coverage results
+
+| Metric | Previous session | This session |
+|--------|-----------------|--------------|
+| Price driver cache | 26/32 (81%) | 32/32 (100%) |
+| Railway health | Healthy (1,014 passages) | Healthy (1,014 passages) |
+| Comparator endpoint | 502 (transient) | 200 |
+
+### Commits this session
+
+```
+133906b price-drivers workflow: fail-fast on credit exhaustion, freshness skip, 502 retry
+```
+
+### Handoff notes for next session
+
+1. Browser visual verification still outstanding: open 2-3 reports, test performance grid (green/red/muted) and both PDF buttons in print preview
+2. Test briefing with data-sparse (OBM, WIA) and data-dense (BHP, CBA) tickers
+3. `tasks/todo.md` still needs updating to mark price driver waves complete
+4. Fonts not embedded as base64 in PDF print HTML; falls back to system fonts without Inter/Source Serif 4
+
+---
+
 ## 2026-03-17 -- Price Driver Agent Upgrade
 
 **Duration**: ~3 hours (02:00-05:30 AEDT)
