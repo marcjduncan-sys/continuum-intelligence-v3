@@ -14,7 +14,7 @@ function isDataPending(data) {
   var naCount = metrics.filter(function(m) {
     return !m.value || m.value === 'N/A' || m.value === '--';
   }).length;
-  return naCount === metrics.length;
+  return naCount >= metrics.length - 1;
 }
 
 export function renderFeaturedCard(data) {
