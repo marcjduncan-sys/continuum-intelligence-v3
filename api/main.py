@@ -39,7 +39,7 @@ import summarise
 from auth import decode_token, router as auth_router
 from conversations import router as conversations_router
 from profiles import router as profiles_router
-from ingest import ingest, get_tickers, get_passage_count
+from ingest import ingest, embed_all_passages, get_tickers, get_passage_count
 from refresh import (
     RefreshJob, refresh_jobs, get_job, is_running, run_refresh,
     batch_jobs, get_batch_job, get_latest_batch_job, is_batch_running,
@@ -149,6 +149,8 @@ async def lifespan(app: FastAPI):
     )
     for ticker, count in sorted(counts.items()):
         logger.info(f"  {ticker}: {count} passages")
+
+    await embed_all_passages()
 
     yield
     await db.close_pool()
@@ -383,6 +385,17 @@ async def research_chat(request: Request, body: ResearchChatRequest, background_
         history = body.conversation_history[-config.MAX_CONVERSATION_TURNS * 2:]
         for msg in history:
             messages.append({"role": msg.role, "content": msg.content})
+
+    # Enforce token budget on conversation history (B4)
+    history_tokens = sum(len(m["content"]) // 4 for m in messages)
+    if history_tokens > config.HISTORY_TOKEN_BUDGET:
+        while len(messages) > 1 and history_tokens > config.HISTORY_TOKEN_BUDGET:
+            removed = messages.pop(0)
+            history_tokens -= len(removed["content"]) // 4
+        messages.insert(0, {
+            "role": "user",
+            "content": "[Conversation truncated - earlier messages removed to stay within context budget]",
+        })
 
     # Add the current question with context
     if context:
@@ -1060,6 +1073,7 @@ async def add_stock(
     # ---- Re-ingest so chat API sees the new ticker ----
     try:
         ingest()
+        await embed_all_passages()
         logger.info(f"[AddStock] Re-ingested passages after adding {ticker}")
     except Exception as e:
         logger.warning(f"[AddStock] Re-ingest failed (non-fatal): {e}")
@@ -1099,6 +1113,7 @@ async def add_stock(
             # Re-ingest so chat API sees populated content
             try:
                 ingest()
+                await embed_all_passages()
             except Exception as ingest_err:
                 logger.warning("[AddStock] Re-ingest failed (non-fatal): %s", ingest_err)
 

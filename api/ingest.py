@@ -5,6 +5,7 @@ Reads per-ticker JSON files from data/research/ and chunks them into
 retrievable passages with metadata for the research chat API.
 """
 
+import asyncio
 import json
 import logging
 import os
@@ -14,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from config import INDEX_HTML_PATH, PROJECT_ROOT
+from embeddings import generate_embedding
 
 
 logger = logging.getLogger(__name__)
@@ -780,6 +782,7 @@ def _chunk_stock(ticker: str, data: dict, ref: dict | None = None, fresh: dict |
 _store: dict[str, list[Passage]] = {}
 _all_passages: list[Passage] = []
 _ingest_version: int = 0
+_embeddings: dict[tuple[str, str, str], list[float] | None] = {}
 
 
 def ingest(html_path: str | None = None) -> dict[str, list[Passage]]:
@@ -788,12 +791,13 @@ def ingest(html_path: str | None = None) -> dict[str, list[Passage]]:
     Falls back to legacy HTML parsing if JSON files are not found.
     Returns {ticker: [Passage, ...]}.
     """
-    global _store, _all_passages, _ingest_version
+    global _store, _all_passages, _ingest_version, _embeddings
 
     _ingest_version += 1
     data_dir = _get_data_dir()
     _store = {}
     _all_passages = []
+    _embeddings = {}
 
     if not data_dir.exists():
         logger.warning(f"Research data directory not found: {data_dir}")
@@ -842,6 +846,37 @@ def ingest(html_path: str | None = None) -> dict[str, list[Passage]]:
     return _store
 
 
+async def embed_all_passages() -> None:
+    """Compute and cache embeddings for all passages in the store.
+
+    Call after ingest(). Uses asyncio.gather with a concurrency
+    semaphore to avoid overwhelming the embedding API.
+    """
+    global _embeddings
+    if not _all_passages:
+        return
+
+    sem = asyncio.Semaphore(10)
+    total = len(_all_passages)
+    succeeded = 0
+
+    async def _embed_one(p: Passage) -> None:
+        nonlocal succeeded
+        async with sem:
+            vec = await generate_embedding(p.content)
+        _embeddings[(p.ticker, p.section, p.subsection)] = vec
+        if vec is not None:
+            succeeded += 1
+
+    await asyncio.gather(*[_embed_one(p) for p in _all_passages])
+    logger.info(f"Embedded {succeeded}/{total} passages ({total - succeeded} failed/skipped)")
+
+
+def get_passage_embedding(ticker: str, section: str, subsection: str) -> list[float] | None:
+    """Return cached embedding for a passage, or None if not available."""
+    return _embeddings.get((ticker.upper(), section, subsection))
+
+
 def get_passages(ticker: str | None = None) -> list[Passage]:
     """Get passages, optionally filtered by ticker."""
     if ticker:
@@ -866,6 +901,7 @@ def get_passage_count() -> dict[str, int]:
 
 if __name__ == "__main__":
     store = ingest()
+    asyncio.run(embed_all_passages())
     for ticker, passages in sorted(store.items()):
         print(f"{ticker}: {len(passages)} passages")
         for p in passages[:3]:
