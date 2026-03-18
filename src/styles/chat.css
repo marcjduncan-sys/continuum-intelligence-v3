@@ -43,6 +43,15 @@
     justify-content: center;
 }
 
+/* Shrink body offset when panel is user-collapsed */
+body.analyst-panel-open:has(.analyst-panel.ap-user-collapsed) {
+    --_ap-body-offset: 52px;
+}
+/* Class-based fallback for browsers without :has() support */
+body.analyst-panel-open.ap-user-collapsed-active {
+    --_ap-body-offset: 52px;
+}
+
 /* --- Header --- */
 .ap-header {
     display: flex;

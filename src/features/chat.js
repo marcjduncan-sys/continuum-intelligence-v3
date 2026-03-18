@@ -701,6 +701,7 @@ if (panel) {
     if (collapseBtn) {
         collapseBtn.addEventListener('click', function() {
             var isNowCollapsed = panel.classList.toggle('ap-user-collapsed');
+            document.body.classList.toggle('ap-user-collapsed-active', isNowCollapsed);
             try { localStorage.setItem('ci_panel_collapsed', isNowCollapsed ? '1' : '0'); } catch(e) {}
             collapseBtn.style.transform = isNowCollapsed ? 'rotate(180deg)' : '';
         });
@@ -786,6 +787,7 @@ export function initChat() {
     try {
         if (localStorage.getItem('ci_panel_collapsed') === '1' && panel) {
             panel.classList.add('ap-user-collapsed');
+            document.body.classList.add('ap-user-collapsed-active');
             if (collapseBtn) collapseBtn.style.transform = 'rotate(180deg)';
         }
     } catch(e) {}
