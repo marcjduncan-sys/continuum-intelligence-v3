@@ -725,3 +725,55 @@ async def get_memory_candidates(
             }
             for r in rows
         ]
+
+
+async def cleanup_guest_memories(
+    pool,
+    *,
+    deactivate_after_days: int = 90,
+    delete_after_days: int = 180,
+) -> dict:
+    """Lifecycle management for guest (unauthenticated) memories.
+
+    Two-phase:
+      1. Deactivate active guest memories older than deactivate_after_days.
+      2. Hard-delete inactive guest memories older than delete_after_days.
+
+    Returns {"deactivated": int, "deleted": int}.
+    """
+    if pool is None:
+        return {"deactivated": 0, "deleted": 0}
+
+    async with pool.acquire() as conn:
+        deactivated = await conn.fetchval(
+            """
+            WITH updated AS (
+                UPDATE memories
+                SET active = FALSE, updated_at = now()
+                WHERE user_id IS NULL
+                  AND guest_id IS NOT NULL
+                  AND active = TRUE
+                  AND created_at < now() - make_interval(days => $1)
+                RETURNING id
+            )
+            SELECT COUNT(*) FROM updated
+            """,
+            deactivate_after_days,
+        )
+
+        deleted = await conn.fetchval(
+            """
+            WITH removed AS (
+                DELETE FROM memories
+                WHERE user_id IS NULL
+                  AND guest_id IS NOT NULL
+                  AND active = FALSE
+                  AND updated_at < now() - make_interval(days => $1)
+                RETURNING id
+            )
+            SELECT COUNT(*) FROM removed
+            """,
+            delete_after_days,
+        )
+
+        return {"deactivated": int(deactivated or 0), "deleted": int(deleted or 0)}

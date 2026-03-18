@@ -243,6 +243,8 @@ async def run_batch_analysis(pool) -> dict:
             "users_processed": 0,
             "memories_merged": 0,
             "memories_retired": 0,
+            "guest_memories_deactivated": 0,
+            "guest_memories_deleted": 0,
             "duration_seconds": 0,
         }
 
@@ -268,6 +270,20 @@ async def run_batch_analysis(pool) -> dict:
             logger.error(
                 "Consolidation error for user=%s guest=%s: %s", user_id, guest_id, exc
             )
+
+    guest_deactivated = 0
+    guest_deleted = 0
+    try:
+        guest_cleanup = await db.cleanup_guest_memories(pool)
+        guest_deactivated = guest_cleanup["deactivated"]
+        guest_deleted = guest_cleanup["deleted"]
+        logger.info(
+            "Guest memory cleanup: deactivated=%d deleted=%d",
+            guest_deactivated,
+            guest_deleted,
+        )
+    except Exception as exc:
+        logger.warning("Guest memory cleanup failed: %s", exc)
 
     duration = round(time.monotonic() - t_start, 2)
 
@@ -297,6 +313,8 @@ async def run_batch_analysis(pool) -> dict:
         "users_processed": len(users),
         "memories_merged": total_merged,
         "memories_retired": total_retired,
+        "guest_memories_deactivated": guest_deactivated,
+        "guest_memories_deleted": guest_deleted,
         "duration_seconds": duration,
         "error": error_msg,
     }
