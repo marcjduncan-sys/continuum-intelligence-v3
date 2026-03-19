@@ -2,8 +2,8 @@
 //
 // Centralised API base URL for all src/ modules.
 // Single source of truth for production URL and environment detection.
-// During migration, only this file changes (plus non-module files
-// that cannot import ES modules).
+// During migration, only this file changes (plus non-module files that
+// cannot import ES modules).
 
 const PRODUCTION_URL = 'https://api.continuumintelligence.ai';
 
