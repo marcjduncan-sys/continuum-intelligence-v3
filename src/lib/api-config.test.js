@@ -10,7 +10,7 @@ describe('api-config', () => {
   it('returns production URL when hostname is not localhost', async () => {
     const { _resolveApiBase } = await import('./api-config.js');
     expect(_resolveApiBase('continuumintelligence.ai', 'https:')).toBe(
-      'https://ci-api.fly.dev'
+      'https://api.continuumintelligence.ai'
     );
   });
 
@@ -32,14 +32,14 @@ describe('api-config', () => {
   it('returns production URL for github.io', async () => {
     const { _resolveApiBase } = await import('./api-config.js');
     expect(_resolveApiBase('marcjduncan-sys.github.io', 'https:')).toBe(
-      'https://ci-api.fly.dev'
+      'https://api.continuumintelligence.ai'
     );
   });
 
   it('returns production URL for pages.dev', async () => {
     const { _resolveApiBase } = await import('./api-config.js');
     expect(_resolveApiBase('ci-app.pages.dev', 'https:')).toBe(
-      'https://ci-api.fly.dev'
+      'https://api.continuumintelligence.ai'
     );
   });
 

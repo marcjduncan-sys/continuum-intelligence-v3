@@ -5,7 +5,7 @@
 // During migration, only this file changes (plus non-module files
 // that cannot import ES modules).
 
-const PRODUCTION_URL = 'https://ci-api.fly.dev';
+const PRODUCTION_URL = 'https://api.continuumintelligence.ai';
 
 /**
  * Resolve the API base URL given hostname, protocol, and optional override.

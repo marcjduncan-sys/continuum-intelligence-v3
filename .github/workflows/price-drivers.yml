@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Run price driver scan (per-ticker)
         env:
-          API_BASE: https://ci-api.fly.dev
+          API_BASE: https://api.continuumintelligence.ai
           API_KEY: ${{ secrets.CI_API_KEY }}
           FORCE_ALL: ${{ github.event.inputs.force_all || 'false' }}
           CUSTOM_TICKERS: ${{ github.event.inputs.tickers || '' }}

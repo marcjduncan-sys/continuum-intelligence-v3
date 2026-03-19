@@ -420,7 +420,7 @@ function pnSaveToLocalStorage() {
 
 function pnSaveToServer() {
     var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    var origin = isLocal ? '' : 'https://ci-api.fly.dev';
+    var origin = isLocal ? '' : 'https://api.continuumintelligence.ai';
 
     var headers = { 'Content-Type': 'application/json' };
     var token = window.CI_AUTH && window.CI_AUTH.getToken();
