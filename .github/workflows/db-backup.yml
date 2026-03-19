@@ -12,12 +12,17 @@ jobs:
         run: sudo apt-get install -y postgresql-client
 
       - name: Run pg_dump
-        env:
-          PGSSLMODE: disable
         run: |
           pg_dump --version
-          pg_dump --no-owner --no-tablespaces -Fc \
-            "${{ secrets.FLYIO_DATABASE_URL }}" \
+          # Strip any sslmode from URL, force sslmode=disable
+          DBURL="${{ secrets.FLYIO_DATABASE_URL }}"
+          DBURL=$(echo "$DBURL" | sed 's/[?&]sslmode=[^&]*//g')
+          if [[ "$DBURL" == *"?"* ]]; then
+            DBURL="${DBURL}&sslmode=disable"
+          else
+            DBURL="${DBURL}?sslmode=disable"
+          fi
+          pg_dump --no-owner --no-tablespaces -Fc "$DBURL" \
             > ci_backup_$(date +%Y%m%d).dump
           ls -lh ci_backup_*.dump
 
