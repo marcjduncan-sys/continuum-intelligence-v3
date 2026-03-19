@@ -63,20 +63,20 @@ def cache_result(ticker: str, result: dict) -> None:
 # ---------------------------------------------------------------------------
 
 SECTOR_ETF_MAP: dict[str, str] = {
-    "Materials": "XMJ.AX",
-    "Mining": "XMJ.AX",
-    "Gold": "XMJ.AX",
-    "Energy": "XEJ.AX",
-    "Financials": "XFJ.AX",
-    "Banking": "XFJ.AX",
-    "Healthcare": "XHJ.AX",
-    "Technology": "XIJ.AX",
-    "Software": "XIJ.AX",
-    "Real Estate": "XPJ.AX",
-    "Consumer Staples": "XSJ.AX",
-    "Consumer Discretionary": "XDJ.AX",
-    "Industrials": "XNJ.AX",
-    "Defence": "XNJ.AX",
+    "Materials": "^AXMJ",
+    "Mining": "^AXMJ",
+    "Gold": "^AXMJ",
+    "Energy": "^AXEJ",
+    "Financials": "^AXFJ",
+    "Banking": "^AXFJ",
+    "Healthcare": "^AXHJ",
+    "Technology": "^AXIJ",
+    "Software": "^AXIJ",
+    "Real Estate": "^AXPJ",
+    "Consumer Staples": "^AXSJ",
+    "Consumer Discretionary": "^AXDJ",
+    "Industrials": "^AXNJ",
+    "Defence": "^AXNJ",
 }
 
 # Peer tickers per stock (top 3 closest comparables)

@@ -19,7 +19,7 @@ import anthropic
 import httpx
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, Field
 from slowapi import Limiter
@@ -1408,8 +1408,6 @@ async def batch_refresh_results():
 # Serve frontend
 # ---------------------------------------------------------------------------
 
-# Vite build output (assets, css, fonts, bundled JS/CSS)
-DIST_ROOT = Path(config.DIST_DIR).resolve()
 # Live data directory (updated by CI/CD, used for both serving and ingestion)
 DATA_ROOT = Path(config.PROJECT_ROOT).resolve() / "data"
 
@@ -1460,23 +1458,6 @@ def _serve_file(base_dir: Path, file_path: str):
     if cc:
         headers["Cache-Control"] = cc
     return FileResponse(full_path, media_type=mime, headers=headers if headers else None)
-
-
-@app.get("/{full_path:path}")
-async def serve_frontend(full_path: str):
-    """Serve static files from dist/, falling back to index.html for SPA routes."""
-    if full_path:
-        candidate = (DIST_ROOT / full_path).resolve()
-        if (str(candidate).startswith(str(DIST_ROOT))
-                and candidate.exists()
-                and candidate.is_file()):
-            mime = MIME_TYPES.get(candidate.suffix, "application/octet-stream")
-            headers: dict[str, str] = {}
-            cc = _CACHE_RULES.get(candidate.suffix)
-            if cc:
-                headers["Cache-Control"] = cc
-            return FileResponse(candidate, media_type=mime, headers=headers if headers else None)
-    return FileResponse(config.INDEX_HTML_PATH, media_type="text/html")
 
 
 # ---------------------------------------------------------------------------
