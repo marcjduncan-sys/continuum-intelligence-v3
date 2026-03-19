@@ -13,7 +13,7 @@ jobs:
 
       - name: Run pg_dump
         env:
-          PGSSLNEGOTIATION: postgres
+          PGSSLMODE: disable
         run: |
           pg_dump --version
           pg_dump --no-owner --no-tablespaces -Fc \
