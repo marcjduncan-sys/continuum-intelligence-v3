@@ -10,7 +10,7 @@ import { computeSkewScore, normaliseScores } from '../lib/dom.js';
 // Bump this when the research JSON schema or score pipeline changes.
 // Any cached entry without a matching _cacheVersion is discarded so the
 // fresh static JSON is fetched instead, keeping the UI in sync with ingest.py.
-export var CACHE_VERSION = 'v2';
+export var CACHE_VERSION = 'v3';
 
 /**
  * Async loader for full research data (called before rendering a report page).
@@ -31,9 +31,12 @@ export function loadFullResearchData(ticker, callback) {
     var cached = localStorage.getItem('ci_research_' + ticker);
     if (cached) {
       var cachedData = JSON.parse(cached);
-      // Use cached data only if it has the current cache version (prevents stale
-      // Railway-refreshed scores diverging from the deployed static JSON and ingest.py).
-      if (cachedData._lastRefreshed && cachedData._cacheVersion === CACHE_VERSION) {
+      // Use cached data only if it has the current cache version AND is less than 24h old.
+      // TTL prevents stale localStorage from masking server-side updates (e.g. BMAD session,
+      // gold agent runs, or pipeline refreshes that bypass the client cache).
+      var cacheAge = cachedData._lastRefreshed ? Date.now() - new Date(cachedData._lastRefreshed).getTime() : Infinity;
+      var CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+      if (cachedData._lastRefreshed && cachedData._cacheVersion === CACHE_VERSION && cacheAge < CACHE_TTL_MS) {
         var prev = STOCK_DATA[ticker] || {};
         var livePrice = prev._livePrice;
         var livePriceHistory = prev.priceHistory;
