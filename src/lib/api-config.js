@@ -5,7 +5,7 @@
 // During migration, only this file changes (plus non-module files
 // that cannot import ES modules).
 
-const PRODUCTION_URL = 'https://imaginative-vision-production-16cb.up.railway.app';
+const PRODUCTION_URL = 'https://ci-api.fly.dev';
 
 /**
  * Resolve the API base URL given hostname, protocol, and optional override.

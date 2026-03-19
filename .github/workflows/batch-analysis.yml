@@ -14,4 +14,4 @@ jobs:
         run: |
           curl -s -f -X POST \
             -H "X-Batch-Secret: ${{ secrets.BATCH_SECRET }}" \
-            https://imaginative-vision-production-16cb.up.railway.app/api/batch/run
+            https://ci-api.fly.dev/api/batch/run

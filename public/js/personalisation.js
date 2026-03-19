@@ -421,7 +421,7 @@ function pnSaveToLocalStorage() {
 function pnSaveToServer() {
     var isGH = window.location.hostname.indexOf('github.io') !== -1;
     var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    var origin = isGH ? 'https://imaginative-vision-production-16cb.up.railway.app'
+    var origin = isGH ? 'https://ci-api.fly.dev'
                  : isLocal ? '' : null;
     if (origin === null) return;
 
