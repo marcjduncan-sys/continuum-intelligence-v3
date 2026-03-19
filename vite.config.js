@@ -2,10 +2,10 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { cpSync } from 'fs';
 
-// IMPORTANT: Do NOT change `base`. GitHub Pages serves from /continuum-intelligence-v3/.
-// Setting base to '/' causes all CSS, font, and asset paths to 404 in production.
+// base: '/' for Vercel / custom domain deployment.
+// Previously '/continuum-intelligence-v3/' for GitHub Pages.
 export default defineConfig({
-  base: '/continuum-intelligence-v3/',
+  base: '/',
   root: '.',
   publicDir: 'public',
   plugins: [{

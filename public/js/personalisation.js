@@ -419,11 +419,8 @@ function pnSaveToLocalStorage() {
 }
 
 function pnSaveToServer() {
-    var isGH = window.location.hostname.indexOf('github.io') !== -1;
     var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    var origin = isGH ? 'https://ci-api.fly.dev'
-                 : isLocal ? '' : null;
-    if (origin === null) return;
+    var origin = isLocal ? '' : 'https://ci-api.fly.dev';
 
     var headers = { 'Content-Type': 'application/json' };
     var token = window.CI_AUTH && window.CI_AUTH.getToken();
