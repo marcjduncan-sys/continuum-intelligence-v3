@@ -444,9 +444,8 @@ export function renderEvidenceCard(card) {
 }
 
 export function renderAlignmentSummary(data) {
-  if (!data.evidence.alignmentSummary) return '';
-
-  var as = data.evidence.alignmentSummary;
+  var as = data.evidence && data.evidence.alignmentSummary;
+  if (!as || typeof as !== 'object' || !Array.isArray(as.headers)) return '';
 
   var thHtml = '';
   for (var h = 0; h < as.headers.length; h++) {
@@ -1199,9 +1198,9 @@ export function prepareHypotheses(data) {
   }
 
   // Rebuild alignmentSummary column headers to match sorted display order.
-  if (data.evidence && data.evidence.alignmentSummary) {
+  if (data.evidence && data.evidence.alignmentSummary && typeof data.evidence.alignmentSummary === 'object') {
     var as = data.evidence.alignmentSummary;
-    if (as.headers && as.headers.length >= 5 && as.rows) {
+    if (Array.isArray(as.headers) && as.headers.length >= 5 && as.rows) {
       var nonNCount = as.headers.length - hyps.length;
       var newHeaders = as.headers.slice(0, nonNCount);
       for (var i = 0; i < hyps.length; i++) {
