@@ -175,6 +175,16 @@ async def lifespan(app: FastAPI):
 
 
 # ---------------------------------------------------------------------------
+# Sentry error monitoring (Phase 5)
+# ---------------------------------------------------------------------------
+
+_sentry_dsn = os.environ.get("SENTRY_DSN", "")
+if _sentry_dsn:
+    import sentry_sdk
+    sentry_sdk.init(dsn=_sentry_dsn, traces_sample_rate=0.1)
+    logger.info("Sentry initialised")
+
+# ---------------------------------------------------------------------------
 # App
 # ---------------------------------------------------------------------------
 

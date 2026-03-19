@@ -1,0 +1,29 @@
+name: Database Backup
+on:
+  schedule:
+    - cron: '0 18 * * *'  # 18:00 UTC = 04:00 AEDT
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install PostgreSQL 17 client
+        run: |
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y postgresql-client-17
+
+      - name: Run pg_dump
+        run: |
+          pg_dump --no-owner --no-tablespaces -Fc \
+            "${{ secrets.FLYIO_DATABASE_URL }}" \
+            > ci_backup_$(date +%Y%m%d).dump
+          ls -lh ci_backup_*.dump
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_id }}
+          path: ci_backup_*.dump
+          retention-days: 90
