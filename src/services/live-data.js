@@ -35,16 +35,10 @@ var _status = {}; // Per-ticker status: 'loading', 'live', 'failed'
 // Railway API base (centralised in api-config.js)
 var _CHART_API_BASE = API_BASE;
 
-// Chart data URLs: Railway proxy first, then direct Yahoo as fallback
+// Chart data URLs: Railway proxy only. Direct Yahoo calls are CORS-blocked
+// from GitHub Pages and generate noisy console errors.
 function chartUrls(ticker) {
-    var urls = [];
-    // Railway proxy (requires GET /api/chart/{ticker} endpoint on backend)
-    var proxyUrl = _CHART_API_BASE + '/api/chart/' + ticker;
-    urls.push(proxyUrl);
-    // Direct Yahoo fallback (CORS-blocked from GitHub Pages, works in dev)
-    urls.push('https://query1.finance.yahoo.com/v8/finance/chart/' + ticker + '?range=3y&interval=1d&includePrePost=false&events=history');
-    urls.push('https://query2.finance.yahoo.com/v8/finance/chart/' + ticker + '?range=3y&interval=1d&includePrePost=false');
-    return urls;
+    return [_CHART_API_BASE + '/api/chart/' + ticker];
 }
 
 function getCache(ticker) {
