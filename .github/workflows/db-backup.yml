@@ -8,13 +8,12 @@ jobs:
   backup:
     runs-on: ubuntu-latest
     steps:
-      - name: Install PostgreSQL 17 client
-        run: |
-          sudo apt-get install -y postgresql-common
-          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
-          sudo apt-get install -y postgresql-client-17
+      - name: Install PostgreSQL client
+        run: sudo apt-get install -y postgresql-client
 
       - name: Run pg_dump
+        env:
+          PGSSLNEGOTIATION: postgres
         run: |
           pg_dump --no-owner --no-tablespaces -Fc \
             "${{ secrets.FLYIO_DATABASE_URL }}" \
