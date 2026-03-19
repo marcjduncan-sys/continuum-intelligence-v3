@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-18T07:20:14.391Z"
+      "last_updated": "2026-03-19T07:17:33.155Z"
     },
     "N2": {
       "label": "Structural Narrowing",
@@ -26,7 +26,7 @@
       "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-18T07:20:14.391Z"
+      "last_updated": "2026-03-19T07:17:33.155Z"
     },
     "N3": {
       "label": "Capital Extraction",
@@ -38,7 +38,7 @@
       "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 4.5,
-      "last_updated": "2026-03-18T07:20:14.391Z"
+      "last_updated": "2026-03-19T07:17:33.155Z"
     },
     "N4": {
       "label": "Strategic Renewal",
@@ -50,12 +50,12 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-18T07:20:14.391Z"
+      "last_updated": "2026-03-19T07:17:33.155Z"
     }
   },
   "dominant": "N2",
   "confidence": "LOW",
-  "alert_state": "OVERCORRECTION_CONFIRMED",
+  "alert_state": "OVERCORRECTION",
   "current_price": 0.91,
   "big_picture": "Resimac Group (ASX: RMC) -- non-bank mortgage lender trading 12.8% above evidence-weighted fair value of A$1.02. 1H26 inflection impressive but rate-driven. Organic AUM growth 4% vs 25.3% sector. WAIT for FY26 result August 2026.",
   "last_flip": {
@@ -153,6 +153,13 @@
       "type": "OVERCORRECTION_REVIEW",
       "severity": "GREEN",
       "message": "Overcorrection CONFIRMED — 102% reversal since trigger",
+      "auto_generated": true
+    },
+    {
+      "date": "2026-03-19",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "5-day cumulative move of -23.3% exceeds 15% threshold — possible overcorrection",
       "auto_generated": true
     }
   ],
@@ -276,11 +283,20 @@
       "cumulative_20d": -5.05,
       "results_day": false,
       "overcorrection_active": true
+    },
+    {
+      "date": "2026-03-19",
+      "classification": "NOTABLE",
+      "daily_change_pct": -3.19,
+      "volume_multiplier": 1,
+      "cumulative_5d": -23.33,
+      "cumulative_20d": -7.07,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    0.99,
     0.96,
     0.97,
     0.96,
@@ -339,7 +355,8 @@
     0.96,
     0.94,
     0.94,
-    0.92
+    0.92,
+    0.91
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -563,18 +580,13 @@
     0.91
   ],
   "_overcorrection": {
-    "active": false,
+    "active": true,
     "triggerType": "FIVE_DAY_CUMULATIVE",
-    "triggerDate": "2026-03-18",
-    "triggerPrice": 0.92,
+    "triggerDate": "2026-03-19",
+    "triggerPrice": 0.91,
     "direction": "down",
-    "movePct": -2.13,
-    "reviewDate": "2026-03-25",
-    "message": "5-day cumulative move of -16.8% exceeds 15% threshold — possible overcorrection",
-    "reviewResult": {
-      "reversal_pct": 102.3,
-      "confirmed": true,
-      "message": "Overcorrection CONFIRMED — 102% reversal since trigger"
-    }
+    "movePct": -3.19,
+    "reviewDate": "2026-03-26",
+    "message": "5-day cumulative move of -23.3% exceeds 15% threshold — possible overcorrection"
   }
 }

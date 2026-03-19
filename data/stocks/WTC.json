@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 5.2,
-      "last_updated": "2026-03-18T07:20:14.370Z"
+      "last_updated": "2026-03-19T07:17:33.133Z"
     },
     "N2": {
       "label": "Managed/Base Case",
@@ -26,7 +26,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2.8,
-      "last_updated": "2026-03-18T07:20:14.370Z"
+      "last_updated": "2026-03-19T07:17:33.133Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Board investigation outcomes, any new media reports, and mid-market customer retention data. If churn exceeds 8% or new governance issues emerge, this narrative strengthens.",
       "upside": null,
       "risk_plain": "If the governance situation worsens or major customers defect, the stock could test new lows below $60.",
-      "survival_score": 0.45,
+      "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 1.1,
-      "last_updated": "2026-03-19T06:56:24.985Z"
+      "last_updated": "2026-03-19T07:17:33.133Z"
     },
     "N4": {
       "label": "Disruption",
@@ -47,15 +47,15 @@
       "what_to_watch": "Competitive product launches from FourKites, project44, or new AI-native logistics platforms. Also monitor key engineering talent retention.",
       "upside": null,
       "risk_plain": "While the CargoWise moat is deep, the company's reliance on one person for technical vision is a genuine structural vulnerability.",
-      "survival_score": 0.45,
+      "survival_score": 0.46,
       "status": "MODERATE",
       "weighted_inconsistency": 5.8,
-      "last_updated": "2026-03-19T06:56:24.985Z"
+      "last_updated": "2026-03-19T07:17:33.133Z"
     }
   },
   "dominant": "N3",
   "confidence": "LOW",
-  "alert_state": "NORMAL",
+  "alert_state": "OVERCORRECTION",
   "alert_started": null,
   "current_price": 41.47,
   "big_picture": "WiseTech Global is an Australian software company that makes CargoWise, the world's leading logistics management platform. The company experienced a severe governance crisis in late 2024 when allegations about the founder's conduct emerged, causing the stock to drop 35%.",
@@ -225,6 +225,13 @@
       "severity": "AMBER",
       "message": "Overcorrection NOT confirmed — price only partially reversed",
       "auto_generated": true
+    },
+    {
+      "date": "2026-03-19",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "Single-day move of -39.5% exceeds 10% threshold — possible overcorrection",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -299,6 +306,16 @@
       "cumulative_20d": -30.1,
       "results_day": false,
       "overcorrection_active": true
+    },
+    {
+      "date": "2026-03-19",
+      "classification": "MATERIAL",
+      "daily_change_pct": -39.46,
+      "volume_multiplier": 1,
+      "cumulative_5d": -34.41,
+      "cumulative_20d": -51.52,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
@@ -325,7 +342,8 @@
     68.1,
     68.3,
     68.5,
-    44.6
+    44.6,
+    41.47
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -488,19 +506,14 @@
     }
   },
   "_overcorrection": {
-    "active": false,
+    "active": true,
     "triggerType": "SINGLE_DAY",
-    "triggerDate": "2026-03-18",
-    "triggerPrice": 44.6,
+    "triggerDate": "2026-03-19",
+    "triggerPrice": 41.47,
     "direction": "down",
-    "movePct": -34.7,
-    "reviewDate": "2026-03-25",
-    "message": "Single-day move of -34.7% exceeds 10% threshold — possible overcorrection",
-    "reviewResult": {
-      "reversal_pct": -10.1,
-      "confirmed": false,
-      "message": "Overcorrection NOT confirmed — price only partially reversed"
-    }
+    "movePct": -39.46,
+    "reviewDate": "2026-03-26",
+    "message": "Single-day move of -39.5% exceeds 10% threshold — possible overcorrection"
   },
   "price_evidence": {
     "last_run": "2026-03-19T06:56:24.985Z",

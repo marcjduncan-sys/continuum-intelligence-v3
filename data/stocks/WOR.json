@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-18T07:20:14.388Z"
+      "last_updated": "2026-03-19T07:17:33.151Z"
     },
     "N2": {
       "label": "Traditional Energy Cash Cow",
@@ -23,10 +23,10 @@
       "what_to_watch": "LNG investment cycle, Middle East upstream capex, oil price trajectory.",
       "upside": "If traditional energy spending sustains, segment provides stable cash flow and higher margins.",
       "risk_plain": "If oil prices collapse below US$60/bbl, traditional energy capex would be cut sharply.",
-      "survival_score": 0.16,
+      "survival_score": 0.15,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-19T06:56:24.985Z"
+      "last_updated": "2026-03-19T07:17:33.151Z"
     },
     "N3": {
       "label": "Margin Pressure",
@@ -35,10 +35,10 @@
       "what_to_watch": "Quarterly EBITA margin, fixed-price contract run-off, sustainability vs traditional margin gap.",
       "upside": null,
       "risk_plain": "If margins cannot reach 8%+ by FY26, the market will question management execution credibility.",
-      "survival_score": 0.39,
+      "survival_score": 0.4,
       "status": "LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-19T05:11:21.298Z"
+      "last_updated": "2026-03-19T07:17:33.151Z"
     },
     "N4": {
       "label": "Cyclical Downturn",
@@ -50,7 +50,7 @@
       "survival_score": 0.4,
       "status": "MODERATE",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-19T06:56:24.985Z"
+      "last_updated": "2026-03-19T07:17:33.151Z"
     }
   },
   "dominant": "N4",
@@ -112,6 +112,13 @@
       "severity": "AMBER",
       "message": "Single-day move of -20.6% exceeds 10% threshold — possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-03-19",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "Single-day move of -18.5% exceeds 10% threshold — possible overcorrection",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -144,11 +151,20 @@
       "cumulative_20d": 7.08,
       "results_day": false,
       "overcorrection_active": true
+    },
+    {
+      "date": "2026-03-19",
+      "classification": "MATERIAL",
+      "daily_change_pct": -18.52,
+      "volume_multiplier": 1,
+      "cumulative_5d": -18.64,
+      "cumulative_20d": -16.64,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    12.5,
     12.2,
     11.8,
     11.5,
@@ -207,7 +223,8 @@
     12.5,
     12.8,
     12.85,
-    10.17
+    10.17,
+    10.47
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -412,11 +429,11 @@
   "_overcorrection": {
     "active": true,
     "triggerType": "SINGLE_DAY",
-    "triggerDate": "2026-03-18",
-    "triggerPrice": 10.17,
+    "triggerDate": "2026-03-19",
+    "triggerPrice": 10.47,
     "direction": "down",
-    "movePct": -20.55,
-    "reviewDate": "2026-03-25",
-    "message": "Single-day move of -20.6% exceeds 10% threshold — possible overcorrection"
+    "movePct": -18.52,
+    "reviewDate": "2026-03-26",
+    "message": "Single-day move of -18.5% exceeds 10% threshold — possible overcorrection"
   }
 }
