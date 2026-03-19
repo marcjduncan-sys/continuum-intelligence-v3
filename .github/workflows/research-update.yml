@@ -90,5 +90,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git commit -m "Research update — scores + freshness — $(date -u +'%d %b %Y')"
+          git checkout -- .
+          git clean -fd
           git pull --rebase origin main
           git push
