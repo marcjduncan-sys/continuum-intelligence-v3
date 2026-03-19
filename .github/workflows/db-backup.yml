@@ -18,13 +18,16 @@ jobs:
           sudo apt-get install -y postgresql-client-17
 
       - name: Run pg_dump
-        env:
-          PGSSLNEGOTIATION: postgres
-          PATH: /usr/lib/postgresql/17/bin:${{ env.PATH }}
         run: |
+          export PATH="/usr/lib/postgresql/17/bin:$PATH"
           pg_dump --version
-          pg_dump --no-owner --no-tablespaces -Fc \
-            "${{ secrets.FLYIO_DATABASE_URL }}" \
+          DBURL="${{ secrets.FLYIO_DATABASE_URL }}"
+          if [[ "$DBURL" == *"?"* ]]; then
+            DBURL="${DBURL}&sslnegotiation=postgres"
+          else
+            DBURL="${DBURL}?sslnegotiation=postgres"
+          fi
+          pg_dump --no-owner --no-tablespaces -Fc "$DBURL" \
             > ci_backup_$(date +%Y%m%d).dump
           ls -lh ci_backup_*.dump
 
