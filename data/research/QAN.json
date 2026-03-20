@@ -7,7 +7,7 @@
   "sectorSub": "Airlines",
   "price": 8.34,
   "currency": "A$",
-  "date": "20-Mar-26",
+  "date": "20-Mar-26 17:24 AEST",
   "reportId": "QAN-2026-001",
   "priceHistory": [
     9.46,
@@ -261,7 +261,7 @@
     8.34
   ],
   "heroDescription": "Airlines &bull; ASX-Listed",
-  "heroCompanyDescription": "Qantas Airways Limited (ASX: QAN): coverage initiated. Full analysis pending.",
+  "heroCompanyDescription": "Qantas Airways Limited is Australia's largest airline group and one of the world's longest-operating carriers, operating international and domestic passenger services, freight, and the Qantas Frequent Flyer loyalty program -- one of the most valuable loyalty ecosystems in the Asia-Pacific region. The group operates through two primary brands: the full-service Qantas mainline carrier and the low-cost subsidiary Jetstar, which serves both domestic Australian and international leisure markets.",
   "heroMetrics": [
     {
       "label": "Mkt Cap",
@@ -290,54 +290,77 @@
     }
   ],
   "hero": {
-    "embedded_thesis": null,
-    "skew": null,
-    "skew_description": null,
+    "embedded_thesis": "At A$8.34, the market appears to be pricing Qantas as a structurally sound but cyclically pressured airline facing a meaningful near-term earnings headwind from elevated fuel costs. With trailing twelve-month EPS of A$1.06, the stock trades at approximately 7.9x trailing earnings -- a discount to historical airline multiples that implies the market expects H2 FY26 and FY27 earnings to be materially lower than the H1 FY26 run-rate. The current price embeds the assumption that Brent Crude above US$100 per barrel will compress margins in the second half, that the A$105 million class action settlement represents a cash drag, and that the loyalty program changes signal further cost-cutting that may erode the Qantas brand premium. Conversely, the price does not appear to fully credit the possibility that airfare pricing power, fuel hedging, and the fleet expansion program could sustain earnings at or above H1 FY26 levels -- suggesting asymmetric upside if fuel costs moderate.",
+    "skew": "DOWNSIDE",
+    "skew_description": "The four hypotheses sum to 100%, with the base case (N2, 40%) carrying the highest weight as is appropriate for an initiation. The distribution is modestly bearish, with downside scenarios (N3 + N4) totalling 35% versus the upside scenario (N1) at 25%. The key swing factor is the trajectory of Brent Crude oil prices and whether Qantas's airfare pricing power can absorb the cost shock.",
     "position_in_range": {
       "current_price": 8.34,
-      "worlds": []
+      "worlds": [
+        {
+          "label": "Bear Case",
+          "price": 6.5
+        },
+        {
+          "label": "Base Case",
+          "price": 8.75
+        },
+        {
+          "label": "Bull Case",
+          "price": 11.5
+        },
+        {
+          "label": "Catalyst",
+          "price": 13.5
+        }
+      ],
+      "note": "World prices are indicative -- pending full W1-W4 valuation build. Bear Case reflects sustained fuel shock and earnings miss. Base Case reflects current earnings trajectory with margin compression. Bull Case reflects fuel normalisation and earnings re-rating. Catalyst reflects a transformative event such as a major loyalty program monetisation or strategic transaction."
     },
-    "next_decision_point": null,
-    "previousSkew": null
+    "next_decision_point": {
+      "event": "Qantas FY26 Full-Year Results Release",
+      "date": "August 2026",
+      "metric": "Full-year underlying profit before tax and H2 FY26 EBIT margin versus H1 FY26 margin",
+      "thresholds": "Full-year underlying PBT above A$2.7 billion would support N1/N2 and likely trigger a re-rating above A$9.50. Full-year PBT below A$2.3 billion would confirm N3 and risk a test of the A$7.00 level. H2 fuel cost per ASK (available seat kilometre) is the key operational metric to watch."
+    },
+    "previousSkew": ""
   },
   "skew": {
-    "direction": "neutral",
-    "rationale": "Auto-added stock. Narrative analysis pending. Skew assessment requires analyst research."
+    "direction": "bearish",
+    "rationale": "The probability distribution is skewed bearish at initiation, with N3 (downside) and N4 (tail downside) together carrying 35% weight versus N1 (upside) at 25%. The primary driver of this skew is the extraordinary 42.8% surge in Brent Crude to US$102.44, which represents a severe and immediate headwind to airline unit economics that the H1 FY26 results -- reported before the full impact of this move -- do not yet reflect. The stock's proximity to its 52-week low of A$8.02 suggests the market is already pricing meaningful risk, but the fuel shock may not be fully discounted."
   },
   "verdict": {
-    "text": "Qantas Airways Limited has been added to coverage. Trading at <span class=\"key-stat\">A$8.34</span>. Full narrative analysis with competing hypotheses is pending.",
+    "text": "Qantas enters our coverage at <span class='key-stat'>A$8.34</span>, near its 52-week low of <span class='key-stat'>A$8.02</span>, in a market that is pricing meaningful earnings compression from the extraordinary surge in Brent Crude to <span class='key-stat'>US$102.44</span>. The H1 FY26 result -- underlying PBT of <span class='key-stat'>A$1,456 million</span>, up 5% year-on-year -- demonstrates the business is operationally sound, and trailing EPS of <span class='key-stat'>A$1.06</span> implies a sub-8x P/E that looks cheap if earnings hold. However, the fuel shock is real and the H1 result predates its full impact, meaning the market is rationally cautious about the H2 FY26 and FY27 earnings trajectory. We assign a modestly bearish skew at initiation, with the base case (N2, 40%) centred on a A$8.75 indicative fair value -- a modest premium to the current price -- and the downside scenarios (N3 + N4, 35%) reflecting the genuine risk that fuel costs and loyalty program erosion disappoint. The stock is not obviously cheap enough to be a high-conviction buy at A$8.34 without greater clarity on the fuel cost trajectory, but the earnings quality and dividend reinstatement provide a floor. We will reassess at the FY26 full-year result in August 2026.",
     "borderColor": null,
     "scores": [
       {
         "label": "N1 Growth/Recovery",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "25%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&uarr;",
+        "dirText": "Upside",
         "dirColor": null
       },
       {
         "label": "N2 Base Case",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
+        "score": "40%",
+        "scoreColor": "var(--signal-amber)",
         "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "dirText": "Base",
         "dirColor": null
       },
       {
         "label": "N3 Risk/Downside",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "28%",
+        "scoreColor": "var(--signal-amber)",
+        "dirArrow": "&darr;",
+        "dirText": "Downside",
         "dirColor": null
       },
       {
         "label": "N4 Disruption/Catalyst",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "7%",
+        "scoreColor": "var(--signal-amber)",
+        "dirArrow": "&darr;",
+        "dirText": "Downside",
         "dirColor": null
       }
     ]
@@ -365,7 +388,7 @@
     }
   ],
   "featuredPriceColor": "",
-  "featuredRationale": "Auto-added to coverage. Full narrative analysis pending.",
+  "featuredRationale": "The four hypotheses sum to 100%, with the base case (N2, 40%) carrying the highest weight as is appropriate for an initiation. The distribution is modestly bearish, with downside scenarios (N3 + N4) totalling 35% versus the upside scenario (N1) at 25%. The key swing factor is the trajectory of Brent Crude oil prices and whether Qantas's airfare pricing power can absorb the cost shock.",
   "identity": {
     "rows": [
       [
@@ -437,19 +460,26 @@
       "direction": "upside",
       "title": "N1: Growth/Recovery",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "25%",
+      "scoreWidth": "25%",
+      "scoreMeta": "",
+      "description": "Qantas sustains its H1 FY26 earnings trajectory into the second half, with underlying PBT for full-year FY26 tracking toward A$2.8-3.0 billion. Fleet expansion delivers capacity discipline, loyalty program monetisation accelerates, and fuel cost headwinds are absorbed through airfare pricing power. The market re-rates QAN toward a normalised earnings multiple, recovering toward the 52-week high of A$12.12.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "H1 FY26 underlying PBT of A$1,456 million, up 5% year-on-year, demonstrates sustained earnings momentum",
+        "Revenue rose to A$12.9 billion in H1 FY26, with trailing twelve-month revenue at A$24.6 billion",
+        "Management announced higher dividends and a larger fleet for FY26, signalling confidence in forward earnings",
+        "A new substantial holder emerged on 11 March 2026, suggesting institutional conviction in the stock",
+        "Basic EPS of A$0.45 for H1 2026 and trailing twelve-month EPS of A$1.06 imply a single-digit P/E at current prices"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Brent Crude at US$102.44 represents a severe fuel cost headwind that may not be fully offset by airfare increases",
+        "Stock is trading near its 52-week low of A$8.02, suggesting the market is not yet pricing a re-rating",
+        "A$105 million class action settlement and lounge access cuts signal ongoing reputational and cost pressures",
+        "No explicit broker consensus price targets available to anchor upside valuation"
       ]
     },
     {
@@ -457,19 +487,25 @@
       "direction": "neutral",
       "title": "N2: Base Case",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "40%",
+      "scoreWidth": "40%",
+      "scoreMeta": "",
+      "description": "Qantas maintains solid top-line revenue growth and operational discipline, but elevated fuel costs at Brent Crude above US$100 per barrel compress H2 FY26 margins relative to H1. The stock trades in a A$8.00-A$9.50 range as investors weigh strong underlying earnings against macro headwinds, legal settlements, and loyalty program changes. No material re-rating occurs without a fuel price reversal or a significant capacity-driven pricing catalyst.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "H1 FY26 results confirm the business is operationally sound with 5% PBT growth and revenue of A$12.9 billion",
+        "Airfare increases have already been implemented in response to higher jet fuel costs, partially offsetting the headwind",
+        "Dividend reinstatement and update on 11 March 2026 signals management confidence in cash generation",
+        "Stock is near its 52-week low of A$8.02, suggesting limited further downside if earnings hold"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Brent Crude at US$102.44 is a structural headwind that could erode H2 FY26 margins materially",
+        "A$105 million class action settlement is a one-off cash drain reducing free cash flow",
+        "Jetstar lounge access changes triggered a 2.75% share price fall, indicating market sensitivity to loyalty program erosion",
+        "AUD/USD at US$0.71 increases the AUD cost of USD-denominated fuel purchases"
       ]
     },
     {
@@ -477,19 +513,26 @@
       "direction": "downside",
       "title": "N3: Risk/Downside",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "28%",
+      "scoreWidth": "28%",
+      "scoreMeta": "",
+      "description": "Sustained Brent Crude above US$100 per barrel through H2 FY26 materially compresses airline margins, and airfare increases prove insufficient to fully offset the cost shock. Consumer demand softens as cost-of-living pressures in Australia reduce discretionary travel, and the loyalty program changes accelerate customer attrition. Full-year FY26 PBT disappoints relative to H1 run-rate, and the stock tests or breaks below the 52-week low of A$8.02.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Brent Crude at US$102.44 represents a 42.8% surge, a historically severe headwind for airline unit economics",
+        "AUD/USD at US$0.71 amplifies the AUD cost of fuel, which is priced in USD",
+        "A$105 million class action settlement demonstrates ongoing legal and reputational risk",
+        "Jetstar lounge access cuts signal cost pressure and risk loyalty program degradation",
+        "Stock is already near its 52-week low of A$8.02, suggesting the market is pricing in meaningful risk"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "H1 FY26 PBT of A$1,456 million demonstrates the business can absorb cost pressures at current levels",
+        "Management has already implemented airfare increases in response to fuel costs",
+        "Fleet expansion plans suggest management does not anticipate a severe demand downturn",
+        "A new substantial holder emerged in March 2026, indicating some institutional buyers see value at current levels"
       ]
     },
     {
@@ -497,51 +540,383 @@
       "direction": "downside",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "7%",
+      "scoreWidth": "7%",
+      "scoreMeta": "",
+      "description": "A tail scenario in which a geopolitical escalation in the Middle East drives Brent Crude above US$120 per barrel, or a domestic Australian recession materially reduces air travel demand. Alternatively, a major operational incident, further regulatory action, or a competitor capacity surge could structurally impair Qantas's market position. In this scenario, the stock could fall well below A$7.00 and the dividend would be at risk.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Middle East conflict is already cited as a driver of the 42.8% Brent Crude surge, with further escalation possible",
+        "Australian consumer confidence is under pressure from cost-of-living headwinds, which could reduce discretionary travel",
+        "Qantas has a history of reputational crises (ghost flights, COVID flight credits) that can trigger regulatory and consumer backlash",
+        "A$105 million class action settlement demonstrates the company is not immune to material legal liability"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Qantas operates significant fuel hedging programs that provide short-term insulation from spot price moves",
+        "The Australian domestic aviation market is a duopoly, limiting competitive disruption risk",
+        "H1 FY26 results demonstrate the business is generating substantial cash flow even in a challenging environment",
+        "Management's fleet expansion plans suggest no anticipation of a structural demand collapse"
       ]
     }
   ],
   "narrative": {
-    "theNarrative": "Qantas Airways Limited has been auto-added to the Continuum Intelligence coverage universe. Full narrative analysis with competing hypotheses, evidence assessment, and discriminating data points is pending.",
+    "theNarrative": "<strong>[Coverage Initiated 20-Mar-26 17:24 AEST]</strong> Qantas Airways enters our coverage at <strong>A$8.34</strong> -- near its 52-week low of <strong>A$8.02</strong> -- in what we characterise as a <em>value-versus-headwind</em> tension. The company delivered a genuinely strong H1 FY26 result: underlying profit before tax of <strong>A$1,456 million</strong>, up <span class='key-stat'>5% year-on-year</span>, on revenue of <strong>A$12.9 billion</strong>, with management rewarding shareholders via higher dividends and committing to a larger fleet for FY26. On trailing twelve-month numbers, EPS of <span class='key-stat'>A$1.06</span> implies the stock trades at approximately <span class='key-stat'>7.9x earnings</span> -- a historically low multiple for a business generating this level of cash. <strong>The problem is the fuel price.</strong> Brent Crude has surged <span class='key-stat'>42.8%</span> to <span class='key-stat'>US$102.44</span>, driven by Middle East conflict, and jet fuel is the single largest variable cost for any airline. Qantas has already lifted airfares in response, but the degree to which pricing power can fully offset a cost shock of this magnitude in H2 FY26 is the central analytical question. Compounding the macro headwind, the company settled a flight credit class action for <strong>A$105 million</strong> in March 2026 and triggered a <span class='key-stat'>2.75% share price fall</span> by cutting Jetstar lounge access benefits -- both signals of a management team managing costs and legacy liabilities simultaneously. A new substantial holder emerged on <strong>11 March 2026</strong>, suggesting at least one institutional investor sees value at current levels. The next material test is the FY26 full-year result, where the market will assess whether H2 margins held up under the fuel shock -- and whether the current price is a floor or a ceiling.",
     "priceImplication": {
-      "label": "Coverage Initiated &mdash; QAN",
-      "content": "Full price implication analysis pending. Hypothesis framework requires analyst research before embedded assumptions can be identified."
+      "label": "Embedded Assumptions at A$8.34",
+      "content": "<strong>At A$8.34, the current price appears to embed the following assumptions:</strong><br><br><strong>1. H2 FY26 earnings compression:</strong> The market is pricing a meaningful step-down in H2 FY26 profitability relative to the H1 run-rate, driven by Brent Crude above US$100 per barrel.<br><br><strong>2. Limited re-rating potential near-term:</strong> At approximately 7.9x trailing EPS of A$1.06, the market is applying a distressed-cycle multiple, implying forward earnings are expected to be lower than the trailing figure.<br><br><strong>3. Loyalty program risk is real:</strong> The 2.75% share price fall on the Jetstar lounge access announcement suggests the market is sensitive to any erosion of the Qantas Frequent Flyer ecosystem, which is a key valuation support.<br><br><strong>4. Legal and reputational tail is not fully resolved:</strong> The A$105 million class action settlement is priced in, but the market may be applying a residual discount for further regulatory or legal risk.<br><br><strong>5. No near-term dividend catalyst:</strong> While dividends have been reinstated, the yield at current prices is not yet a dominant valuation support given earnings uncertainty."
     },
-    "evidenceCheck": "Pending analyst research.",
-    "narrativeStability": "Not yet assessed."
+    "evidenceCheck": "<p>The evidence base for this initiation is <strong>moderate in quality but uneven across domains</strong>. The strongest evidence comes from verified regulatory filings (Evidence Card 2), which confirm H1 FY26 underlying PBT of A$1,456 million and trailing twelve-month EPS of A$1.06 -- these are hard numbers from ASX-lodged results. The macro and commodity context (Evidence Card 5) is measured and directly relevant, with Brent Crude at US$102.44 representing a quantifiable headwind. Corporate communications (Evidence Card 1) are motivated by nature but consistent with the verified financials. <strong>Key gaps exist in three domains:</strong> broker research (Evidence Card 3) lacks specific price targets or consensus estimates; competitor disclosures (Evidence Card 4) are entirely absent, preventing relative benchmarking; and academic research (Evidence Card 7) is not available. The director interest notices (Evidence Card 9) are ambiguous -- we cannot determine whether the changes represent purchases or sales. The ownership data (Evidence Card 10) is intriguing but incomplete, as the identity and intent of the new substantial holder is unknown. Overall, the evidence is sufficient to construct a credible base case but insufficient to anchor precise valuation targets with high confidence.</p>",
+    "narrativeStability": "<p>The current market narrative -- <em>strong earnings, but fuel headwind creates uncertainty</em> -- is <strong>moderately stable but vulnerable to two near-term tests</strong>. The primary destabiliser is the trajectory of Brent Crude: if oil prices remain above US$100 per barrel through Q2 and Q3 2026, H2 FY26 margin compression will be confirmed at the full-year result, likely pushing the stock toward or below the 52-week low of A$8.02. Conversely, a meaningful oil price reversal -- driven by geopolitical de-escalation or demand destruction -- could rapidly shift the narrative toward the N1 bull case and trigger a re-rating. The secondary destabiliser is the loyalty program: the Jetstar lounge access changes are effective from <strong>1 July 2026</strong>, and any evidence of accelerated Frequent Flyer member attrition or booking softness in the months following implementation would be a negative narrative catalyst. The next formal narrative test is the <strong>FY26 full-year result</strong>, expected in August 2026, which will be the first comprehensive read on whether H2 margins held up under the fuel shock.</p>"
   },
   "evidence": {
-    "intro": "Evidence assessment pending. Stock was auto-added to coverage on 20-Mar-26.",
-    "cards": [],
+    "intro": "Evidence is assessed across ten epistemic domains, ranked by reliability. Each domain carries a distinct epistemic quality — from verified regulatory filings to unverified media commentary — ensuring the analyst understands what the evidence is before assessing what it means.",
+    "cards": [
+      {
+        "number": 1,
+        "title": "1. Corporate Communications",
+        "epistemicClass": "ep-motivated",
+        "epistemicLabel": "Motivated",
+        "finding": "Qantas reported a strong underlying profit before tax of A$1,456 million for H1 FY26, a 5% increase from the previous year, with revenue rising to A$12.9 billion. The company also announced higher dividends and plans for a bigger fleet for FY26, reinforcing a bullish outlook.",
+        "tension": "Despite positive financial results and fleet expansion plans, the company recently settled a flight credit class action for $105 million and announced changes to Jetstar lounge access, which led to a 2.75% share price fall to A$8.49.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N1",
+            "class": "supports"
+          }
+        ],
+        "source": "Qantas Group HY26 Results ASX and Media Release (26 Feb 2026); Qantas Settles Flight Credit Class Action (12 Mar 2026); Qantas (QAN.AX) Falls 2.75% to 8.49 AUD After Jetstar Lounge Access Cut (swikblog.com)"
+      },
+      {
+        "number": 2,
+        "title": "2. Regulatory Filings & Financial Statements",
+        "epistemicClass": "ep-verified",
+        "epistemicLabel": "Verified",
+        "finding": "For H1 FY26, Qantas reported an underlying profit before tax of A$1.46 billion, a 5% increase year-on-year, and revenue of A$12.9 billion. Basic EPS for H1 2026 was A$0.45, with trailing twelve-month revenue at A$24.6 billion and EPS at A$1.06.",
+        "tension": "While profit and revenue increased, the company is facing inflationary pressures and higher fuel costs, which could impact future margins despite airfare increases.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N1",
+            "class": "supports"
+          }
+        ],
+        "source": "Qantas Group HY26 Results ASX and Media Release (26 Feb 2026); Qantas earnings: Profit up, higher dividends, and bigger fleet for FY26 (fool.com.au); Qantas Airways H1 2026 Margin And EPS Progress Reinforces Bullish... (simplywall.st)"
+      },
+      {
+        "number": 3,
+        "title": "3. Broker Research",
+        "epistemicClass": "ep-modeled",
+        "epistemicLabel": "Modelled",
+        "finding": "Analysis from financial news outlets suggests Qantas's H1 2026 margin and EPS progress reinforces a bullish outlook, with some platforms providing interactive charts and historical prices for comparative analysis and forecasts.",
+        "tension": "Specific broker ratings, price targets, or detailed consensus estimates are not explicitly provided in the available data, limiting a comprehensive understanding of the modelled market view.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N1",
+            "class": "supports"
+          }
+        ],
+        "source": "Qantas Airways H1 2026 Margin And EPS Progress Reinforces Bullish... (simplywall.st); Qantas Airways Limited (ASX:QAN) - Shares, Dividends & News ... (intelligentinvestor.com.au); Qantas Airways Ltd, QAN:ASX summary - FT.com"
+      },
+      {
+        "number": 4,
+        "title": "4. Competitor Disclosures",
+        "epistemicClass": "ep-verified",
+        "epistemicLabel": "Verified",
+        "finding": "The provided data does not include any specific disclosures or financial results from Qantas's direct competitors in the airline industry.",
+        "tension": "Without competitor disclosures, it is challenging to benchmark Qantas's operational performance, market share, pricing strategies, or financial health against its peers, making a relative valuation difficult.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "N/A (Data Limitation)"
+      },
+      {
+        "number": 5,
+        "title": "5. Economic Data",
+        "epistemicClass": "ep-measured",
+        "epistemicLabel": "Measured",
+        "finding": "Brent Crude oil prices have surged by 42.8% to US$102.44, and the AUD/USD exchange rate is US$0.71. Qantas has already lifted airfares in response to higher jet fuel costs linked to Middle East conflict.",
+        "tension": "Significantly higher fuel costs, as indicated by the Brent Crude price surge, represent a major operational headwind for airlines, potentially eroding margins despite airfare increases.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N3",
+            "class": "contradicts"
+          }
+        ],
+        "source": "Provided Macro & Commodity Context (Brent Crude, AUD/USD); A Look At Qantas Airways (ASX:QAN) Valuation As Higher Fuel Costs Drive... (simplywall.st)"
+      },
+      {
+        "number": 6,
+        "title": "6. Alternative Data",
+        "epistemicClass": "ep-observed",
+        "epistemicLabel": "Observed",
+        "finding": "Qantas announced a major overhaul to its lounge access policy, effective July 1, 2026, restricting several frequent flyer benefits for Jetstar international passengers, which led to a 2.75% share price drop.",
+        "tension": "Changes to customer loyalty programs and benefits could negatively impact customer satisfaction and brand perception, potentially affecting future bookings and loyalty, despite cost-saving intentions.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N3",
+            "class": "contradicts"
+          }
+        ],
+        "source": "Qantas (QAN.AX) Falls 2.75% to 8.49 AUD After Jetstar Lounge Access Cut (swikblog.com)"
+      },
+      {
+        "number": 7,
+        "title": "7. Academic Research",
+        "epistemicClass": "ep-peer",
+        "epistemicLabel": "Peer-Reviewed",
+        "finding": "No specific academic research, industry studies, or peer-reviewed articles related to the airline sector or Qantas's structural trends are provided in the available data.",
+        "tension": "The absence of academic research limits the ability to assess long-term industry trends, structural shifts, or the broader economic impact on the airline sector from a peer-reviewed perspective.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "N/A (Data Limitation)"
+      },
+      {
+        "number": 8,
+        "title": "8. Media & Social",
+        "epistemicClass": "ep-unverified",
+        "epistemicLabel": "Unverified",
+        "finding": "Recent media coverage highlights both positive financial results (H1 FY26 profit up, higher dividends) and negative events such as the A$105 million flight credit class action settlement and a 2.75% share price fall due to changes in Jetstar lounge access.",
+        "tension": "The mixed media sentiment, balancing strong financial performance against legal liabilities and customer-impacting policy changes, creates uncertainty regarding public perception and future market reactions.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Qantas shares flying through $105 million legal turbulence (fool.com.au); Qantas (QAN.AX) Falls 2.75% to 8.49 AUD After Jetstar Lounge Access Cut (swikblog.com); Qantas earnings: Profit up, higher dividends, and bigger fleet for FY26 (fool.com.au)"
+      },
+      {
+        "number": 9,
+        "title": "9. Leadership & Governance",
+        "epistemicClass": "ep-observed",
+        "epistemicLabel": "Observed",
+        "finding": "Multiple \"Change of Director's Interest Notice\" announcements were made on March 6, 2026, indicating recent activity by company directors regarding their shareholdings.",
+        "tension": "The notices do not specify whether these changes represent director purchases or sales, making it difficult to infer management's confidence or concerns about the company's future prospects.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Change of Director's Interest Notice (ASX, 6 Mar 2026)"
+      },
+      {
+        "number": 10,
+        "title": "10. Ownership & Capital Flows",
+        "epistemicClass": "ep-measured",
+        "epistemicLabel": "Measured",
+        "finding": "Qantas announced an \"Update - Dividend/Distribution\" on March 11, 2026, indicating a return of capital to shareholders. Additionally, a \"Becoming a substantial holder\" announcement was made on the same date, signaling a significant change in the company's ownership structure.",
+        "tension": "While a dividend update is positive for shareholders, the \"Becoming a substantial holder\" announcement lacks details on the identity or strategic intent of the new substantial holder, which could have various implications.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N1",
+            "class": "supports"
+          }
+        ],
+        "source": "Update - Dividend/Distribution - QAN (ASX, 11 Mar 2026); Becoming a substantial holder (ASX, 11 Mar 2026)"
+      }
+    ],
     "alignmentSummary": null
   },
   "discriminators": {
-    "intro": "Discriminating evidence pending analyst research.",
-    "rows": [],
-    "nonDiscriminating": null
+    "intro": "The following data points carry high diagnosticity — they can meaningfully shift probability between competing hypotheses.",
+    "rows": [
+      {
+        "diagnosticity": "HIGH",
+        "diagnosticityClass": "disc-high",
+        "evidence": "H2 FY26 fuel cost per ASK (available seat kilometre) versus H1 FY26 -- the single most important metric to determine whether the Brent Crude surge at US$102.44 is materially compressing airline unit economics or being absorbed through hedging and pricing",
+        "discriminatesBetween": "N1 vs N3",
+        "currentReading": "Not yet reported -- H2 FY26 data will be available at the August 2026 full-year result. H1 FY26 showed 5% PBT growth despite cost pressures, but Brent Crude has surged further since the H1 reporting period.",
+        "readingClass": "td-amber"
+      },
+      {
+        "diagnosticity": "HIGH",
+        "diagnosticityClass": "disc-high",
+        "evidence": "Qantas Frequent Flyer active member count and points redemption velocity -- the loyalty program is a key valuation support and the Jetstar lounge access changes (effective 1 July 2026) represent the first material test of whether cost-cutting is eroding the program's value proposition",
+        "discriminatesBetween": "N2 vs N3",
+        "currentReading": "No post-announcement loyalty metrics available. The 2.75% share price fall on the lounge access announcement suggests the market views this as a negative signal, but the magnitude of member attrition is unknown.",
+        "readingClass": "td-amber"
+      },
+      {
+        "diagnosticity": "HIGH",
+        "diagnosticityClass": "disc-high",
+        "evidence": "Identity and strategic intent of the new substantial holder (ASX announcement 11 March 2026) -- a strategic or activist investor acquiring a substantial stake could be a significant positive catalyst, while a passive index rebalancing would be neutral",
+        "discriminatesBetween": "N1 vs N2",
+        "currentReading": "Substantial holder announcement filed 11 March 2026 but identity and intent not disclosed in available data. This is a material information gap.",
+        "readingClass": "td-amber"
+      }
+    ],
+    "nonDiscriminating": "<ul><li><strong>Revenue growth (A$12.9 billion H1 FY26):</strong> While impressive, top-line revenue growth does not discriminate between hypotheses because all scenarios assume continued revenue generation -- the key variable is margin, not revenue.</li><li><strong>Fleet expansion plans:</strong> Management's commitment to a larger fleet for FY26 is consistent with both the bull case (capacity-driven earnings growth) and the bear case (higher capex and depreciation in a margin-compressed environment).</li><li><strong>Dividend reinstatement:</strong> The dividend update on 11 March 2026 is positive but does not discriminate between N1 and N2, as both scenarios assume continued dividend payments at current earnings levels.</li><li><strong>52-week low proximity (A$8.02):</strong> The stock's proximity to its 52-week low is a technical observation that does not discriminate between hypotheses -- it is consistent with both a value opportunity (N1) and a stock in a downtrend (N3).</li><li><strong>A$105 million class action settlement:</strong> This is a one-off item that is now resolved and does not discriminate between the ongoing earnings scenarios, though it does confirm the company's history of reputational risk.</li></ul>"
   },
   "tripwires": {
-    "intro": "Tripwires pending analyst research.",
-    "cards": []
+    "intro": "The following catalysts could force a material revision to hypothesis weightings. Each carries conditional outcomes that map to specific narrative shifts.",
+    "cards": [
+      {
+        "date": "AUG 2026",
+        "name": "FY26 Full-Year Results",
+        "conditions": [
+          {
+            "if": "If full-year underlying PBT exceeds A$2.7 billion (implying H2 PBT above A$1.24 billion)",
+            "valence": "positive",
+            "then": "Then N1 bull case gains probability; stock likely re-rates above A$9.50 and potentially toward A$11.00 as market prices in earnings resilience"
+          },
+          {
+            "if": "If full-year underlying PBT falls below A$2.3 billion (implying H2 PBT below A$0.84 billion, a material step-down from H1)",
+            "valence": "negative",
+            "then": "Then N3 bear case is confirmed; stock risks testing or breaking the 52-week low of A$8.02 and potentially falling toward A$7.00"
+          }
+        ],
+        "source": "Qantas Group HY26 Results ASX and Media Release (26 Feb 2026); Continuum Intelligence analysis"
+      },
+      {
+        "date": "JUL 2026",
+        "name": "Jetstar Lounge Access Policy Change Effective",
+        "conditions": [
+          {
+            "if": "If Frequent Flyer member engagement metrics and forward booking data remain stable following the 1 July 2026 lounge access restriction",
+            "valence": "positive",
+            "then": "Then loyalty program risk is contained; the cost-saving rationale is validated and the market narrative stabilises around N2 base case"
+          },
+          {
+            "if": "If media reports or management commentary indicate accelerated Frequent Flyer member attrition or booking softness following the policy change",
+            "valence": "negative",
+            "then": "Then loyalty program erosion risk escalates toward N3; the Qantas brand premium is structurally impaired and the stock faces further de-rating"
+          }
+        ],
+        "source": "Qantas (QAN.AX) Falls 2.75% to 8.49 AUD After Jetstar Lounge Access Cut (swikblog.com); Qantas Settles Flight Credit Class Action (ASX, 12 Mar 2026)"
+      },
+      {
+        "date": "APR 2026",
+        "name": "Brent Crude Price Trajectory (Q2 2026 Average)",
+        "conditions": [
+          {
+            "if": "If Brent Crude averages below US$90 per barrel through April-June 2026, driven by geopolitical de-escalation or demand destruction",
+            "valence": "positive",
+            "then": "Then H2 FY26 fuel cost headwind is materially reduced; N1 bull case probability increases and the stock could recover toward A$10.00"
+          },
+          {
+            "if": "If Brent Crude remains above US$100 per barrel or escalates further toward US$120 per barrel through Q2 2026",
+            "valence": "negative",
+            "then": "Then N3/N4 downside scenarios gain probability; H2 FY26 margin compression is locked in and the stock risks breaking below A$8.00"
+          }
+        ],
+        "source": "Provided Macro and Commodity Context (Brent Crude US$102.44, +42.8%); A Look At Qantas Airways (ASX:QAN) Valuation As Higher Fuel Costs Drive... (simplywall.st)"
+      }
+    ]
   },
   "gaps": {
-    "coverageRows": [],
-    "couldntAssess": [
-      "Full evidence assessment pending &mdash; stock was auto-added to coverage."
+    "coverageRows": [
+      {
+        "domain": "Corporate Comms",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "26 Feb 2026 (HY26 Results); 12 Mar 2026 (Class Action Settlement)",
+        "confidence": "High -- ASX-lodged results and media releases are current and detailed",
+        "confidenceClass": "td-green"
+      },
+      {
+        "domain": "Regulatory Filings",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "26 Feb 2026 (HY26 ASX Release)",
+        "confidence": "High -- verified financial statements with specific PBT, revenue, and EPS figures",
+        "confidenceClass": "td-green"
+      },
+      {
+        "domain": "Broker Research",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "No dated broker reports available",
+        "confidence": "Low -- no specific price targets, ratings, or consensus estimates available; only general commentary from financial media",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Competitor Disclosures",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "N/A -- no competitor data available",
+        "confidence": "Low -- no Virgin Australia, Rex, or international peer data available for benchmarking",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Economic Data",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "20 Mar 2026 (Brent Crude, AUD/USD spot)",
+        "confidence": "High for commodity prices; Medium for Australian consumer demand and travel outlook",
+        "confidenceClass": "td-green"
+      },
+      {
+        "domain": "Alternative Data",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "Mar 2026 (lounge access announcement)",
+        "confidence": "Medium -- lounge access change is documented but no booking data, load factors, or yield data available",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Academic Research",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "N/A -- no academic research available",
+        "confidence": "Low -- no peer-reviewed research on airline sector dynamics or Qantas-specific structural trends",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Media and Social",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "13 Mar 2026 (most recent news articles)",
+        "confidence": "Medium -- coverage is current but sentiment is mixed and sources vary in quality",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Leadership and Governance",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "6 Mar 2026 (Director Interest Notices)",
+        "confidence": "Low -- director interest changes are documented but direction (buy/sell) and magnitude are unknown",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Ownership and Capital Flows",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "11 Mar 2026 (Substantial Holder Notice)",
+        "confidence": "Medium -- substantial holder emergence is confirmed but identity and strategic intent are unknown",
+        "confidenceClass": "td-amber"
+      }
     ],
-    "analyticalLimitations": "This stock was auto-added. All hypothesis scores, evidence assessments, and narrative analysis require manual research and population."
+    "couldntAssess": [
+      "Fuel hedging book -- the extent and duration of Qantas's jet fuel hedging program, which is critical to assessing H2 FY26 fuel cost exposure",
+      "Broker consensus price targets and earnings estimates for FY26 and FY27",
+      "Virgin Australia and Rex Airlines competitive capacity and pricing data",
+      "Qantas Frequent Flyer member count, engagement, and points liability",
+      "Load factor and yield data for H2 FY26 to date",
+      "Identity and strategic intent of the new substantial holder (ASX, 11 Mar 2026)",
+      "Direction of director share transactions (purchases vs sales) from the 6 March 2026 notices",
+      "Full-year FY26 guidance or management outlook statements beyond fleet expansion commentary"
+    ],
+    "analyticalLimitations": "This initiation is constrained by the absence of broker consensus estimates, which prevents us from anchoring our scenario prices to a market-derived valuation framework. The lack of competitor disclosure data means we cannot assess Qantas's relative market share, pricing power, or cost position versus Virgin Australia or international peers. Most critically, we do not have visibility into Qantas's fuel hedging book -- the single most important variable for H2 FY26 earnings -- which means our bear case fuel shock scenario could be either overstated (if hedging is extensive) or understated (if hedging coverage is limited). The macro context provided includes construction sector headlines that are not directly relevant to the airline sector, suggesting the sector macro feed may not be fully calibrated to aviation-specific drivers. All scenario prices in the position-in-range section are indicative and should be treated as directional rather than precise valuation outputs pending a full discounted cash flow and sum-of-parts analysis."
   },
   "technicalAnalysis": {
     "date": "20 March 2026",
@@ -630,14 +1005,15 @@
         "name": "S&P/ASX 200",
         "period": "12 months",
         "stockReturn": -11.8,
-        "indexReturn": 0,
-        "relativeReturn": -11.8
+        "indexReturn": 6.5,
+        "relativeReturn": -18.3
       }
     }
   },
   "footer": {
     "disclaimer": "This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information.",
-    "domainCount": "0 of 10",
-    "hypothesesCount": "4 Pending"
-  }
+    "domainCount": "10 of 10",
+    "hypothesesCount": "4 Active"
+  },
+  "_lastRefreshed": "2026-03-20T06:24:47.343478+00:00"
 }
