@@ -38,7 +38,8 @@ var _CHART_API_BASE = API_BASE;
 // Chart data URLs: Railway proxy only. Direct Yahoo calls are CORS-blocked
 // from GitHub Pages and generate noisy console errors.
 function chartUrls(ticker) {
-    return [_CHART_API_BASE + '/api/chart/' + ticker];
+    var clean = ticker.replace(/\.AX$/i, '');
+    return [_CHART_API_BASE + '/api/chart/' + clean];
 }
 
 function getCache(ticker) {

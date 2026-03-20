@@ -15,6 +15,7 @@ function RS_HDR(num, title) {
 }
 
 export function renderReportHero(data) {
+  if (!data.heroMetrics || !data.heroMetrics.length) return '';
   var metricsHtml = '';
   for (var i = 0; i < data.heroMetrics.length; i++) {
     var m = data.heroMetrics[i];
