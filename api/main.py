@@ -982,13 +982,10 @@ async def add_stock(
     if not TICKER_PATTERN.match(ticker):
         raise api_error(400, ErrorCode.INVALID_TICKER, f"Invalid ticker: '{ticker}'")
 
-    # Check if already exists (check both data/ and dist/data/ directories)
+    # Check if already exists
     data_dir = Path(config.PROJECT_ROOT) / "data"
     research_dir = data_dir / "research"
-    dist_research_check = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
-    if (research_dir / f"{ticker}.json").exists() or (
-        dist_research_check.exists() and (dist_research_check / f"{ticker}.json").exists()
-    ):
+    if (research_dir / f"{ticker}.json").exists():
         raise api_error(409, ErrorCode.CONFLICT, f"{ticker} already exists")
 
     # ---- Fetch company metadata + price in parallel ----
@@ -1037,13 +1034,6 @@ async def add_stock(
     with open(research_dir / f"{ticker}.json", "w") as f:
         json.dump(research_data, f, indent=2, ensure_ascii=False)
     logger.info(f"[AddStock] Saved data/research/{ticker}.json")
-
-    # Also write to dist/data/research/ so refresh pipeline can find it
-    dist_research_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
-    if dist_research_dir.exists() and dist_research_dir != research_dir.resolve():
-        with open(dist_research_dir / f"{ticker}.json", "w") as f:
-            json.dump(research_data, f, indent=2, ensure_ascii=False)
-        logger.info(f"[AddStock] Also saved dist/data/research/{ticker}.json")
 
     # 2. _index.json
     index_path = research_dir / "_index.json"
@@ -1212,7 +1202,7 @@ async def trigger_refresh(
         raise api_error(400, ErrorCode.INVALID_TICKER, f"Invalid ticker format: '{ticker}'")
 
     # Validate ticker exists in research data
-    data_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
+    data_dir = Path(config.PROJECT_ROOT) / "data" / "research"
     if not (data_dir / f"{ticker}.json").exists():
         raise api_error(404, ErrorCode.NOT_FOUND, f"No research data found for '{ticker}'")
 
@@ -1270,7 +1260,7 @@ async def refresh_result(ticker: str):
         return data
 
     # Fallback: read from disk
-    data_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
+    data_dir = Path(config.PROJECT_ROOT) / "data" / "research"
     path = data_dir / f"{ticker}.json"
     if path.exists():
         with open(path) as f:
@@ -1318,7 +1308,7 @@ async def trigger_refresh_all(
         tickers = sorted(set(t.upper() for t in raw_body["tickers"]))
     else:
         # Discover all tickers from research data files
-        data_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
+        data_dir = Path(config.PROJECT_ROOT) / "data" / "research"
         tickers = sorted(
             p.stem.upper()
             for p in data_dir.glob("*.json")
@@ -1383,7 +1373,7 @@ async def batch_refresh_results():
 
     # Collect results from individual refresh_jobs
     results = {}
-    data_dir = Path(config.INDEX_HTML_PATH).parent / "data" / "research"
+    data_dir = Path(config.PROJECT_ROOT) / "data" / "research"
     for ticker in job.tickers:
         ticker_job = get_job(ticker)
         if ticker_job and ticker_job.result:

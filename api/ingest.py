@@ -14,7 +14,7 @@ from datetime import date as _date, datetime as _datetime
 from pathlib import Path
 from typing import Any
 
-from config import INDEX_HTML_PATH, PROJECT_ROOT
+from config import PROJECT_ROOT
 from embeddings import generate_embedding
 
 

@@ -520,9 +520,8 @@ async def run_batch_refresh(batch_id: str, tickers: list[str]) -> dict:
 # ---------------------------------------------------------------------------
 
 def _data_dir() -> Path:
-    """Get the data/research directory relative to index.html (dist build)."""
-    index_dir = Path(config.INDEX_HTML_PATH).parent
-    return index_dir / "data" / "research"
+    """Get the data/research directory (project root)."""
+    return Path(config.PROJECT_ROOT) / "data" / "research"
 
 
 def _live_data_dir() -> Path:
