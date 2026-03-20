@@ -42,13 +42,40 @@
   "verdict": {
     "text": "PYC Therapeutics trades at a meaningful discount to probability-weighted value, with the primary catalyst arriving within months. The CPP platform addresses the central challenge in RNA therapeutics: delivering antisense oligonucleotides beyond the liver to target tissues including the retina, optic nerve, and kidney. VP-001 Phase 1/2 data in RP11 showed durable efficacy in a disease with no approved treatment. The sham-controlled registrational trial interim readout in H2 2026 is the critical de-risking event. At A$1.42, the market prices ~60% clinical failure probability; the evidence supports roughly 40%. Cash position of A$94M provides >24-month runway, eliminating the near-term dilution risk that plagues most pre-revenue biotech. Risk-reward skews upside at current levels.",
     "borderColor": "var(--signal-green)",
-    "scores": {
-      "quality": 7,
-      "momentum": 4,
-      "value": 7,
-      "catalyst": 9,
-      "risk": 5
-    }
+    "scores": [
+      {
+        "label": "N1 Platform Validated",
+        "score": "35%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&uarr;",
+        "dirText": "Phase 1/2 positive",
+        "dirColor": "var(--signal-green)"
+      },
+      {
+        "label": "N2 Clinical Failure",
+        "score": "25%",
+        "scoreColor": "var(--signal-red)",
+        "dirArrow": "&darr;",
+        "dirText": "Declining",
+        "dirColor": "var(--signal-green)"
+      },
+      {
+        "label": "N3 Acquired Pre-Approval",
+        "score": "20%",
+        "scoreColor": "var(--signal-amber)",
+        "dirArrow": "&rarr;",
+        "dirText": "Speculative",
+        "dirColor": "var(--signal-amber)"
+      },
+      {
+        "label": "N4 Slow Burn",
+        "score": "20%",
+        "scoreColor": "var(--signal-amber)",
+        "dirArrow": "&rarr;",
+        "dirText": "Watching",
+        "dirColor": "var(--signal-amber)"
+      }
+    ]
   },
   "hypotheses": [
     {
@@ -515,7 +542,10 @@
   },
   "narrative": {
     "theNarrative": "The market narrative is <strong>\"platform or nothing.\"</strong> PYC's value proposition rests entirely on whether the CPP delivery platform works in a controlled clinical setting. VP-001 Phase 1/2 data was encouraging but in an open-label, small-patient design. The sham-controlled registrational trial is the first rigorous test. At A$1.42, the market assigns majority probability to failure. The counter-narrative: the Phase 1/2 data showed durable efficacy in a disease with no treatment, the CPP platform addresses the largest unmet need in RNA therapeutics (beyond-liver delivery), and A$94M cash eliminates dilution risk through the readout.",
-    "priceImplication": "Binary outcome: positive VP-001 data supports A$3.50+; failure implies A$0.40&ndash;0.70 (cash backing). Current price of A$1.42 implies the market assigns roughly 60% probability to failure.",
+    "priceImplication": {
+      "label": "Embedded Assumptions at A$1.42",
+      "content": "<strong>~60% clinical failure priced:</strong> Market assigns majority probability to VP-001 registrational trial failure. <strong>Platform optionality discounted:</strong> CPP delivery platform valued at near-zero despite addressing the largest unmet need in RNA therapeutics. <strong>Cash position ignored:</strong> A$94M cash (>24-month runway) eliminates dilution risk through readout, yet the stock trades 29% below 52-week highs."
+    },
     "evidenceCheck": "Phase 1/2 data is published. Registrational trial design is disclosed. Cash position (A$94M) is audited. No independent replication of CPP platform efficacy exists outside PYC's own studies.",
     "narrativeStability": "Stable until H2 2026. The interim readout will force a decisive narrative shift in either direction."
   },

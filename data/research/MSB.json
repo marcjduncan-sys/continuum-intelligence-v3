@@ -312,13 +312,40 @@
   "verdict": {
     "text": "Mesoblast achieved a genuine breakthrough with Ryoncil's FDA approval but the stock has overshot the evidence. At A$2.11, the market prices multi-indication platform success that the clinical and financial data do not support. Ryoncil generates US$52M revenue against US$140M+ annual operating costs. The probability-weighted value across four plausible futures is approximately A$1.00 per share. Revascor BLA filing has slipped three times without public acknowledgement. Cash runway of ~18 months at current burn creates near-certainty of dilutive capital raising. The risk-reward skews decisively downside at current levels.",
     "borderColor": "var(--signal-red)",
-    "scores": {
-      "quality": 4,
-      "momentum": 2,
-      "value": 2,
-      "catalyst": 5,
-      "risk": 7
-    }
+    "scores": [
+      {
+        "label": "N1 Cash Trap",
+        "score": "45%",
+        "scoreColor": "var(--signal-red)",
+        "dirArrow": "&uarr;",
+        "dirText": "Dominant",
+        "dirColor": "var(--signal-red)"
+      },
+      {
+        "label": "N2 Platform",
+        "score": "20%",
+        "scoreColor": "var(--signal-amber)",
+        "dirArrow": "&rarr;",
+        "dirText": "Watching",
+        "dirColor": "var(--signal-amber)"
+      },
+      {
+        "label": "N3 Fire Sale",
+        "score": "25%",
+        "scoreColor": "var(--signal-red)",
+        "dirArrow": "&uarr;",
+        "dirText": "Rising",
+        "dirColor": "var(--signal-red)"
+      },
+      {
+        "label": "N4 Acquisition",
+        "score": "10%",
+        "scoreColor": "var(--signal-amber)",
+        "dirArrow": "&rarr;",
+        "dirText": "Speculative",
+        "dirColor": "var(--signal-amber)"
+      }
+    ]
   },
   "hypotheses": [
     {
@@ -511,7 +538,10 @@
   },
   "narrative": {
     "theNarrative": "The market narrative centres on <strong>\"first-mover platform value\"</strong> in allogeneic cell therapy. Ryoncil's FDA approval in December 2024 validated the technology after years of regulatory setbacks, triggering a re-rating from A$0.26 to A$2.11. The current price embeds expectations that the platform extends beyond SR-aGvHD into chronic heart failure (Revascor) and potentially ARDS, back pain, and other indications. The counter-narrative: Ryoncil is a genuine breakthrough in a tiny market (400&ndash;600 US patients per year), enterprise costs dwarf product revenue, and pipeline timeline slips suggest the platform extension is years away from generating meaningful cash flow.",
-    "priceImplication": "At A$2.11, the market assigns >60% probability to multi-indication success. The evidence supports roughly 20%. This gap defines the downside skew.",
+    "priceImplication": {
+      "label": "Embedded Assumptions at A$2.11",
+      "content": "<strong>Multi-indication success priced in:</strong> Market assigns >60% probability to platform extension beyond Ryoncil. <strong>Cash burn ignored:</strong> US$25M/quarter burn against US$52M revenue implies the market prices pipeline optionality at >A$1.1B. <strong>Evidence supports ~20% platform probability:</strong> The 53% overvaluation gap to probability-weighted value of A$1.00 defines the downside skew."
+    },
     "evidenceCheck": "Ryoncil approval is confirmed (FDA, Dec 2024). Revenue trajectory is verifiable (US$52M). Cash burn rate is disclosed (~US$25M/quarter). Pipeline timelines have slipped three times without public acknowledgement. No independent validation of Revascor regulatory pathway.",
     "narrativeStability": "Unstable. The narrative depends on pipeline catalysts that have repeatedly disappointed. Each BLA delay or cash raise resets expectations lower."
   },

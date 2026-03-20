@@ -45,13 +45,40 @@
   "verdict": {
     "text": "Mayne Pharma has completed a genuine transformation from generic distributor to branded specialty pharma, anchored by NEXTSTELLIS with exclusive US rights through 2043. The operating business is sound: A$413M revenue, A$86M EBITDA, 80% Women's Health margins. But the failed Cosette acquisition has created a cash crisis that overshadows franchise quality. Litigation costs of A$21M per half, earn-out payments of A$40M per year, and A$124M convertible note maturity in November 2027 leave minimal free cash flow. The Cosette appeal hearing on June 2&ndash;3, 2026 is the dominant catalyst. A favourable ruling removes the cash squeeze and could trigger a material re-rating toward franchise value. An unfavourable ruling intensifies the liquidity crisis.",
     "borderColor": "var(--signal-amber)",
-    "scores": {
-      "quality": 6,
-      "momentum": 4,
-      "value": 5,
-      "catalyst": 8,
-      "risk": 6
-    }
+    "scores": [
+      {
+        "label": "N1 Franchise Unlocked",
+        "score": "30%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&rarr;",
+        "dirText": "Awaiting catalyst",
+        "dirColor": "var(--signal-amber)"
+      },
+      {
+        "label": "N2 Litigation Drain",
+        "score": "30%",
+        "scoreColor": "var(--signal-red)",
+        "dirArrow": "&rarr;",
+        "dirText": "Awaiting catalyst",
+        "dirColor": "var(--signal-amber)"
+      },
+      {
+        "label": "N3 Acquisition",
+        "score": "20%",
+        "scoreColor": "var(--signal-amber)",
+        "dirArrow": "&rarr;",
+        "dirText": "Speculative",
+        "dirColor": "var(--signal-amber)"
+      },
+      {
+        "label": "N4 Growth Stalls",
+        "score": "20%",
+        "scoreColor": "var(--signal-amber)",
+        "dirArrow": "&rarr;",
+        "dirText": "Watching",
+        "dirColor": "var(--signal-amber)"
+      }
+    ]
   },
   "hypotheses": [
     {
@@ -487,7 +514,10 @@
   },
   "narrative": {
     "theNarrative": "The market narrative is <strong>\"cash crisis masking franchise value.\"</strong> Mayne Pharma's transformation is complete: NEXTSTELLIS is growing, Women's Health margins are 80%, and EBITDA is A$86M. But the failed Cosette acquisition created a liquidity trap: litigation costs, earn-outs, and convertible note maturity consume all free cash flow. The stock has fallen from A$6.10 to A$2.38 as the market prices the cash squeeze rather than the franchise. The Cosette appeal on June 2&ndash;3, 2026 is the binary event that resolves this tension.",
-    "priceImplication": "At A$2.38, the market prices roughly 50/50 odds on the Cosette appeal. A favourable outcome supports A$4.50+; unfavourable outcome suggests A$1.00&ndash;1.80.",
+    "priceImplication": {
+      "label": "Embedded Assumptions at A$2.38",
+      "content": "<strong>Cosette litigation as going-concern risk:</strong> Market prices the cash squeeze (A$21M/half litigation + A$40M/year earn-outs + A$124M convertible note) as potentially terminal rather than temporary. <strong>Franchise value discounted:</strong> A$86M EBITDA at ~6x EV/EBITDA suggests the market assigns material probability to liquidity-driven value destruction. <strong>Binary resolution:</strong> June 2-3 appeal hearing will resolve direction."
+    },
     "evidenceCheck": "Revenue (A$413M) and EBITDA (A$86M) are audited. Litigation costs (A$21M/half) are disclosed. Convertible note terms are public. NEXTSTELLIS prescription growth is verifiable via IQVIA data.",
     "narrativeStability": "Stable until June 2-3, 2026. The Cosette appeal hearing will force a narrative reset in either direction."
   },
