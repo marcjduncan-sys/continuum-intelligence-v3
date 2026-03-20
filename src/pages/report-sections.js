@@ -2,7 +2,7 @@
 // Extracted from index.html without logic changes
 
 import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA, FEATURED_ORDER, ANNOUNCEMENTS_DATA } from '../lib/state.js';
-import { renderSparkline, formatDateAEST } from '../lib/format.js';
+import { renderSparkline, formatDateAEST, fmtPE } from '../lib/format.js';
 import { normaliseScores, computeSkewScore } from '../lib/dom.js';
 import { API_BASE } from '../lib/api-config.js';
 
@@ -82,18 +82,85 @@ export function renderReportHero(data) {
     var maxP = Math.max.apply(null, prices);
     var rangeP = maxP - minP || 1;
 
+    // Map hypothesis weights to worlds via direction-based sort
+    var pirWeights = [];
+    var skewObj = data._skew;
+    if (typeof skewObj === 'string') { try { skewObj = JSON.parse(skewObj); } catch (e) { skewObj = null; } }
+    if (skewObj && skewObj.hypotheses && skewObj.hypotheses.length === worlds.length) {
+      var dirOrd = { downside: 0, neutral: 1, upside: 2 };
+      var sorted = skewObj.hypotheses.map(function(h) {
+        var tMatch = (h.title || '').match(/N(\d)/);
+        return { weight: parseInt(h.weight) || 0, direction: h.direction || 'neutral', tierNum: tMatch ? parseInt(tMatch[1]) : 9 };
+      }).sort(function(a, b) {
+        var da = dirOrd[a.direction] != null ? dirOrd[a.direction] : 1;
+        var db = dirOrd[b.direction] != null ? dirOrd[b.direction] : 1;
+        if (da !== db) return da - db;
+        if (a.weight !== b.weight) return a.weight - b.weight;
+        return b.tierNum - a.tierNum;
+      });
+      for (var si = 0; si < sorted.length; si++) pirWeights.push(sorted[si].weight);
+    }
+
+    // Derive implied valuation metric for each world price
+    var pirValLabel = '';
+    var pirDenom = 0;
+    if (data.heroMetrics) {
+      for (var vi = 0; vi < data.heroMetrics.length; vi++) {
+        var mLbl = data.heroMetrics[vi].label || '';
+        if (/P\/E|P\/B|EV\/|P\/S|P\/NTA/i.test(mLbl)) {
+          var mVal = String(data.heroMetrics[vi].value || '').replace(/[~x]/g, '');
+          var parsed = parseFloat(mVal);
+          if (parsed > 0 && isFinite(parsed) && current > 0) {
+            pirValLabel = mLbl;
+            pirDenom = current / parsed;
+          }
+          break;
+        }
+      }
+    }
+
     var worldMarkersHtml = '';
     for (var i = 0; i < worlds.length; i++) {
       var w = worlds[i];
       var pct = ((w.price - minP) / rangeP * 100).toFixed(1);
+      var probStr = pirWeights[i] != null ? ' (' + pirWeights[i] + '%)' : '';
+      var metricHtml = '';
+      if (pirDenom > 0 && w.price > 0) {
+        var implied = w.price / pirDenom;
+        var formatted = fmtPE(implied);
+        if (formatted) {
+          metricHtml = '<div class="pir-world-metric">' + formatted + ' ' + pirValLabel + '</div>';
+        }
+      }
       worldMarkersHtml +=
         '<div class="pir-world" style="left:' + pct + '%">' +
           '<div class="pir-world-tick"></div>' +
           '<div class="pir-world-price">A$' + w.price.toFixed(0) + '</div>' +
-          '<div class="pir-world-label">' + w.label + '</div>' +
+          '<div class="pir-world-label">' + w.label + probStr + '</div>' +
+          metricHtml +
         '</div>';
     }
     var currentPct = ((current - minP) / rangeP * 100).toFixed(1);
+
+    // Probability-weighted average price
+    var weightedAvgHtml = '';
+    var hasProbs = worlds.length > 0 && worlds[0].probability != null;
+    if (hasProbs) {
+      var weightedAvg = 0;
+      for (var wi = 0; wi < worlds.length; wi++) {
+        weightedAvg += (parseFloat(worlds[wi].probability) || 0) * worlds[wi].price;
+      }
+      var wavgPct = ((weightedAvg - minP) / rangeP * 100).toFixed(1);
+      var wavgDelta = ((weightedAvg - current) / current * 100);
+      var wavgDeltaCls = wavgDelta >= 0 ? 'upside' : 'downside';
+      var wavgDeltaLabel = (wavgDelta >= 0 ? '+' : '') + wavgDelta.toFixed(1) + '% ' + wavgDeltaCls;
+      weightedAvgHtml =
+        '<div class="pir-weighted-avg" style="left:' + wavgPct + '%">' +
+          '<div class="pir-weighted-avg-label">A$' + weightedAvg.toFixed(2) + '</div>' +
+          '<div class="pir-weighted-avg-delta ' + wavgDeltaCls + '">' + wavgDeltaLabel + '</div>' +
+          '<div class="pir-weighted-avg-line"></div>' +
+        '</div>';
+    }
 
     positionInRangeHtml =
       '<div class="rh-spec-block rh-position-range">' +
@@ -105,6 +172,7 @@ export function renderReportHero(data) {
               '<div class="pir-current-dot">&#9679;</div>' +
               '<div class="pir-current-label">A$' + current.toFixed(2) + '</div>' +
             '</div>' +
+            weightedAvgHtml +
           '</div>' +
         '</div>' +
         (pir.note ? '<div class="pir-note">' + pir.note + '</div>' : '') +
@@ -154,9 +222,9 @@ export function renderReportHero(data) {
       '<div class="rh-main">' +
         '<div class="rh-left">' +
           '<div class="rh-type">Narrative Intelligence &mdash; Initial Coverage</div>' +
-          '<div class="rh-ticker">' + data.company + '</div>' +
-          '<div class="rh-company">' + data.tickerFull + ' &bull; ' + data.exchange + ' &bull; ' + data.sector + '</div>' +
-          '<div class="rh-sector-tag">' + data.heroDescription + '</div>' +
+          '<div class="rh-ticker">' + (data.company || data.ticker || '') + '</div>' +
+          '<div class="rh-company">' + (data.tickerFull || '') + ' &bull; ' + (data.exchange || '') + ' &bull; ' + (data.sector || '') + '</div>' +
+          '<div class="rh-sector-tag">' + (data.heroDescription || '') + '</div>' +
           (data.heroCompanyDescription ? '<div class="rh-company-desc">' + data.heroCompanyDescription + '</div>' : '') +
           '<div class="refresh-controls">' +
             '<button class="btn-refresh" id="refresh-btn-' + data.ticker + '" onclick="triggerRefresh(\'' + data.ticker + '\')">' +
@@ -175,7 +243,7 @@ export function renderReportHero(data) {
           heroAnnouncementsHtml +
           '<div class="rh-right-bottom">' +
             sparklineHtml +
-            '<div class="rh-price"><span class="rh-price-currency">' + data.currency + '</span>' + data.price + '</div>' +
+            '<div class="rh-price"><span class="rh-price-currency">' + (data.currency || '') + '</span>' + (data.price || '') + '</div>' +
             '<div class="rh-metrics">' + metricsHtml + '</div>' +
           '</div>' +
         '</div>' +
@@ -191,11 +259,13 @@ export function renderReportHero(data) {
 }
 
 export function renderSkewBar(data) {
+  if (!data.skew && !data._skew && (!data.hypotheses || !data.hypotheses.length)) return '';
   var skew = data._skew || computeSkewScore(data);
   var dir = skew.direction;
   var arrow = dir === 'downside' ? '&#9660; DOWNSIDE' : dir === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
   var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
   var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
+  var rationale = (data.skew && data.skew.rationale) || '';
 
   return '<div class="risk-skew-bar">' +
     '<div class="rsb-inner">' +
@@ -206,35 +276,37 @@ export function renderSkewBar(data) {
         '<div class="skew-bar-bear" style="width:' + skew.bear + '%"></div>' +
       '</div>' +
       '<span class="skew-score ' + scoreCls + '" style="font-size:0.82rem">' + scoreLabel + '</span>' +
-      '<span class="rsb-rationale">' + data.skew.rationale + '</span>' +
+      '<span class="rsb-rationale">' + rationale + '</span>' +
     '</div>' +
   '</div>';
 }
 
 export function renderVerdict(data) {
   var v = data.verdict;
+  if (!v || !v.scores || !v.scores.length) return '';
   var borderStyle = v.borderColor ? ' style="border-color: ' + v.borderColor + '"' : '';
   var skewDir = (data.skew && data.skew.direction) || '';
   var vtCls = skewDir === 'upside' ? ' vt-positive' : skewDir === 'downside' ? ' vt-negative' : '';
-  var norm = (data.hypotheses && data.hypotheses.length)
-    ? normaliseScores(data.hypotheses)
+  var hyps = data.hypotheses || [];
+  var norm = (hyps.length)
+    ? normaliseScores(hyps)
     : normaliseScores(v.scores);
 
   var scoresHtml = '';
   for (var i = 0; i < v.scores.length; i++) {
     var s = v.scores[i];
     var dirStyle = s.dirColor ? ' style="color:' + s.dirColor + '"' : '';
-    var dirAttr = data.hypotheses[i] ? ' data-dir="' + (data.hypotheses[i].dirClass || 'dir-neutral') + '"' : '';
+    var dirAttr = hyps[i] ? ' data-dir="' + (hyps[i].dirClass || 'dir-neutral') + '"' : '';
     scoresHtml += '<div class="vs-item"' + dirAttr + '>' +
-      '<div class="vs-label">' + s.label + '</div>' +
-      '<div class="vs-score" style="color:' + s.scoreColor + '">' + norm[i] + '%</div>' +
-      '<div class="vs-direction"' + dirStyle + '>' + s.dirArrow + ' ' + s.dirText + '</div>' +
+      '<div class="vs-label">' + (s.label || '') + '</div>' +
+      '<div class="vs-score" style="color:' + (s.scoreColor || '') + '">' + (norm[i] != null ? norm[i] : 0) + '%</div>' +
+      '<div class="vs-direction"' + dirStyle + '>' + (s.dirArrow || '') + ' ' + (s.dirText || '') + '</div>' +
     '</div>';
   }
 
   return '<div class="verdict-section">' +
     '<div class="verdict-inner"' + borderStyle + '>' +
-      '<div class="verdict-text' + vtCls + '">' + v.text + '</div>' +
+      '<div class="verdict-text' + vtCls + '">' + (v.text || '') + '</div>' +
       '<div class="verdict-scores">' + scoresHtml + '</div>' +
     '</div>' +
   '</div>';
@@ -282,8 +354,9 @@ export function renderSectionNav(data) {
 }
 
 export function renderIdentity(data) {
-  var t = data.ticker.toLowerCase();
   var id = data.identity;
+  if (!id || !id.rows || !id.rows.length) return '';
+  var t = data.ticker.toLowerCase();
 
   var rowsHtml = '';
   for (var i = 0; i < id.rows.length; i++) {
@@ -309,6 +382,7 @@ export function renderIdentity(data) {
 }
 
 export function renderHypotheses(data) {
+  if (!data.hypotheses || !data.hypotheses.length) return '';
   var t = data.ticker.toLowerCase();
   var cardsHtml = '';
   var norm = normaliseScores(data.hypotheses);
@@ -370,29 +444,32 @@ export function renderHypotheses(data) {
 }
 
 export function renderNarrative(data) {
-  var t = data.ticker.toLowerCase();
   var n = data.narrative;
+  if (!n) return '';
+  var t = data.ticker.toLowerCase();
+  var pi = n.priceImplication || {};
 
   return '<div class="report-section" id="' + t + '-narrative">' +
     RS_HDR('Section 03', 'Dominant Narrative') +
     '<div class="rs-body">' +
     '<div class="rs-subtitle">The Narrative</div>' +
-    '<p class="rs-text">' + n.theNarrative + '</p>' +
-    '<div class="rs-subtitle">The Price Implication</div>' +
+    '<p class="rs-text">' + (n.theNarrative || 'Pending analysis.') + '</p>' +
+    (pi.label || pi.content ? '<div class="rs-subtitle">The Price Implication</div>' +
     '<div class="callout">' +
-      '<div class="callout-label">' + n.priceImplication.label + '</div>' +
-      '<p>' + n.priceImplication.content + '</p>' +
-    '</div>' +
-    '<div class="rs-subtitle">The Evidence Check</div>' +
-    '<p class="rs-text">' + n.evidenceCheck + '</p>' +
-    '<div class="rs-subtitle">Narrative Stability</div>' +
-    '<p class="rs-text">' + n.narrativeStability + '</p>' +
+      '<div class="callout-label">' + (pi.label || '') + '</div>' +
+      '<p>' + (pi.content || '') + '</p>' +
+    '</div>' : '') +
+    (n.evidenceCheck ? '<div class="rs-subtitle">The Evidence Check</div>' +
+    '<p class="rs-text">' + n.evidenceCheck + '</p>' : '') +
+    (n.narrativeStability ? '<div class="rs-subtitle">Narrative Stability</div>' +
+    '<p class="rs-text">' + n.narrativeStability + '</p>' : '') +
   '</div></div>';
 }
 
 export function renderEvidenceCard(card) {
+  if (!card) return '';
   var tableHtml = '';
-  if (card.table) {
+  if (card.table && card.table.headers && card.table.rows) {
     var thHtml = '';
     for (var h = 0; h < card.table.headers.length; h++) {
       thHtml += '<th>' + card.table.headers[h] + '</th>';
@@ -420,25 +497,26 @@ export function renderEvidenceCard(card) {
   }
 
   var tagsHtml = '';
-  for (var t = 0; t < card.tags.length; t++) {
-    tagsHtml += '<span class="ec-tag ' + card.tags[t].class + '">' + card.tags[t].text + '</span>';
+  var tags = card.tags || [];
+  for (var t = 0; t < tags.length; t++) {
+    tagsHtml += '<span class="ec-tag ' + (tags[t].class || '') + '">' + (tags[t].text || '') + '</span>';
   }
 
   return '<div class="evidence-card">' +
     '<div class="ec-header">' +
-      '<div class="ec-title">' + card.title + '</div>' +
+      '<div class="ec-title">' + (card.title || '') + '</div>' +
       '<div class="ec-header-right">' +
-        '<span class="ec-epistemic ' + card.epistemicClass + '">' + card.epistemicLabel + '</span>' +
+        '<span class="ec-epistemic ' + (card.epistemicClass || '') + '">' + (card.epistemicLabel || '') + '</span>' +
         '<span class="ec-toggle">&#9660;</span>' +
       '</div>' +
     '</div>' +
     '<div class="ec-body">' +
       tableHtml +
-      '<div class="ec-finding">' + card.finding + '</div>' +
+      '<div class="ec-finding">' + (card.finding || '') + '</div>' +
       tensionHtml +
       '<div class="ec-footer">' +
         '<div class="ec-tags">' + tagsHtml + '</div>' +
-        '<div class="ec-source">' + card.source + '</div>' +
+        '<div class="ec-source">' + (card.source || '') + '</div>' +
       '</div>' +
     '</div>' +
   '</div>';
@@ -490,12 +568,14 @@ export function renderAlignmentSummary(data) {
 }
 
 export function renderEvidence(data) {
-  var t = data.ticker.toLowerCase();
   var ev = data.evidence;
+  if (!ev) return '';
+  var t = data.ticker.toLowerCase();
+  var cards = ev.cards || [];
 
   var cardsHtml = '';
-  for (var i = 0; i < ev.cards.length; i++) {
-    cardsHtml += renderEvidenceCard(ev.cards[i]);
+  for (var i = 0; i < cards.length; i++) {
+    cardsHtml += renderEvidenceCard(cards[i]);
   }
 
   var alignmentHtml = renderAlignmentSummary(data);
@@ -503,39 +583,40 @@ export function renderEvidence(data) {
   return '<div class="report-section" id="' + t + '-evidence">' +
     RS_HDR('Section 04', 'Cross-Domain Evidence Synthesis') +
     '<div class="rs-body">' +
-    '<p class="rs-text">' + ev.intro + '</p>' +
+    '<p class="rs-text">' + (ev.intro || '') + '</p>' +
     cardsHtml +
     alignmentHtml +
   '</div></div>';
 }
 
 export function renderDiscriminators(data) {
-  var t = data.ticker.toLowerCase();
   var d = data.discriminators;
+  if (!d || !d.rows || !d.rows.length) return '';
+  var t = data.ticker.toLowerCase();
 
   var rowsHtml = '';
   for (var i = 0; i < d.rows.length; i++) {
     var r = d.rows[i];
     rowsHtml += '<tr>' +
-      '<td><span class="' + r.diagnosticityClass + '">' + r.diagnosticity + '</span></td>' +
-      '<td>' + r.evidence + '</td>' +
-      '<td>' + r.discriminatesBetween + '</td>' +
-      '<td class="' + r.readingClass + '">' + r.currentReading + '</td>' +
+      '<td><span class="' + (r.diagnosticityClass || '') + '">' + (r.diagnosticity || '') + '</span></td>' +
+      '<td>' + (r.evidence || '') + '</td>' +
+      '<td>' + (r.discriminatesBetween || '') + '</td>' +
+      '<td class="' + (r.readingClass || '') + '">' + (r.currentReading || '') + '</td>' +
     '</tr>';
   }
 
   return '<div class="report-section" id="' + t + '-discriminates">' +
     RS_HDR('Section 05', 'What Discriminates') +
     '<div class="rs-body">' +
-    '<p class="rs-text">' + d.intro + '</p>' +
+    '<p class="rs-text">' + (d.intro || '') + '</p>' +
     '<table class="disc-table">' +
       '<thead><tr><th>Diagnosticity</th><th>Evidence</th><th>Discriminates Between</th><th>Current Reading</th></tr></thead>' +
       '<tbody>' + rowsHtml + '</tbody>' +
     '</table>' +
-    '<div class="callout warn">' +
+    (d.nonDiscriminating ? '<div class="callout warn">' +
       '<div class="callout-label">Non-Discriminating Evidence &mdash; Assessed &amp; Discarded</div>' +
       '<p>' + d.nonDiscriminating + '</p>' +
-    '</div>' +
+    '</div>' : '') +
   '</div></div>';
 }
 
@@ -578,8 +659,9 @@ export function renderTripwires(data) {
 }
 
 export function renderGaps(data) {
-  var t = data.ticker.toLowerCase();
   var g = data.gaps;
+  if (!g || !g.coverageRows || !g.coverageRows.length) return '';
+  var t = data.ticker.toLowerCase();
 
   var coverageHtml = '';
   for (var i = 0; i < g.coverageRows.length; i++) {
@@ -609,8 +691,8 @@ export function renderGaps(data) {
     '</table>' +
     '<div class="rs-subtitle">What We Couldn\'t Assess</div>' +
     calloutsHtml +
-    '<div class="rs-subtitle">Analytical Limitations</div>' +
-    '<p class="rs-text">' + g.analyticalLimitations + '</p>' +
+    (g.analyticalLimitations ? '<div class="rs-subtitle">Analytical Limitations</div>' +
+    '<p class="rs-text">' + g.analyticalLimitations + '</p>' : '') +
   '</div></div>';
 }
 
@@ -680,8 +762,9 @@ export function renderTAChart(data) {
   function xPos(idx) { return padL + (idx / (n - 1)) * cW; }
   function yPos(val) { return padT + (1 - (val - pMin) / pRange) * cH; }
 
-  var supportPrice = ta ? parseFloat(ta.keyLevels.support.price) || null : null;
-  var resistPrice = ta ? parseFloat(ta.keyLevels.resistance.price) || null : null;
+  var taKl = ta && ta.keyLevels ? ta.keyLevels : {};
+  var supportPrice = taKl.support ? parseFloat(taKl.support.price) || null : null;
+  var resistPrice = taKl.resistance ? parseFloat(taKl.resistance.price) || null : null;
   var curPrice = parseFloat(useLive && live.currentPrice ? live.currentPrice : data.price) || 0;
   var cur = data.currency;
 
@@ -818,39 +901,51 @@ export function renderTechnicalAnalysis(data) {
   if (!data.technicalAnalysis) return '';
   var t = data.ticker.toLowerCase();
   var ta = data.technicalAnalysis;
+  var trend = ta.trend || {};
+  var price = ta.price || {};
+  var kl = ta.keyLevels || {};
+  var support = kl.support || {};
+  var resistance = kl.resistance || {};
+  var ma = ta.movingAverages || {};
+  var vol = ta.volume || {};
+  var vola = ta.volatility || {};
+  var mr = ta.meanReversion || {};
 
   var chartHtml = renderTAChart(data);
 
+  var trendDir = trend.direction || '';
   var regimeHtml = '<div class="ta-regime-bar">' +
-    '<div class="ta-regime-item"><div class="ta-regime-label">Regime</div><div class="ta-regime-value">' + ta.regime + '</div></div>' +
-    '<div class="ta-regime-item"><div class="ta-regime-label">Clarity</div><div class="ta-regime-value">' + ta.clarity + '</div></div>' +
-    '<div class="ta-regime-item"><div class="ta-regime-label">Trend</div><div class="ta-regime-value ' + (/down/i.test(ta.trend.direction) ? 'ta-down' : /up|recover/i.test(ta.trend.direction) ? 'ta-up' : '') + '">' + ta.trend.direction + ' (' + ta.trend.duration + ')</div></div>' +
-    '<div class="ta-regime-item"><div class="ta-regime-label">Structure</div><div class="ta-regime-value">' + ta.trend.structure + '</div></div>' +
-    '<div class="ta-regime-item"><div class="ta-regime-label">Support</div><div class="ta-regime-value">' + ta.price.currency + ta.keyLevels.support.price.toFixed(2) + '</div></div>' +
-    '<div class="ta-regime-item"><div class="ta-regime-label">Resistance</div><div class="ta-regime-value">' + ta.price.currency + ta.keyLevels.resistance.price.toFixed(2) + '</div></div>' +
+    '<div class="ta-regime-item"><div class="ta-regime-label">Regime</div><div class="ta-regime-value">' + (ta.regime || '') + '</div></div>' +
+    '<div class="ta-regime-item"><div class="ta-regime-label">Clarity</div><div class="ta-regime-value">' + (ta.clarity || '') + '</div></div>' +
+    '<div class="ta-regime-item"><div class="ta-regime-label">Trend</div><div class="ta-regime-value ' + (/down/i.test(trendDir) ? 'ta-down' : /up|recover/i.test(trendDir) ? 'ta-up' : '') + '">' + trendDir + (trend.duration ? ' (' + trend.duration + ')' : '') + '</div></div>' +
+    '<div class="ta-regime-item"><div class="ta-regime-label">Structure</div><div class="ta-regime-value">' + (trend.structure || '') + '</div></div>' +
+    (support.price != null ? '<div class="ta-regime-item"><div class="ta-regime-label">Support</div><div class="ta-regime-value">' + (price.currency || '') + support.price.toFixed(2) + '</div></div>' : '') +
+    (resistance.price != null ? '<div class="ta-regime-item"><div class="ta-regime-label">Resistance</div><div class="ta-regime-value">' + (price.currency || '') + resistance.price.toFixed(2) + '</div></div>' : '') +
   '</div>';
 
-  var maHtml = '<div class="rs-subtitle">Moving Averages</div>' +
+  var ma50 = ma.ma50 || {};
+  var ma200 = ma.ma200 || {};
+  var maHtml = (ma50.value != null || ma200.value != null) ? '<div class="rs-subtitle">Moving Averages</div>' +
     '<table class="ta-ma-table"><thead><tr>' +
       '<th>Measure</th><th>Value</th><th>Price vs MA</th><th>Note</th>' +
     '</tr></thead><tbody>' +
-    '<tr>' +
+    (ma50.value != null ? '<tr>' +
       '<td class="ta-label-cell">50-Day MA</td>' +
-      '<td>' + ta.price.currency + ta.movingAverages.ma50.value.toFixed(2) + '</td>' +
-      '<td style="color:' + (ta.movingAverages.priceVsMa50 >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (ta.movingAverages.priceVsMa50 >= 0 ? '+' : '') + ta.movingAverages.priceVsMa50.toFixed(1) + '%</td>' +
-      '<td>As at ' + ta.movingAverages.ma50.date + '</td>' +
-    '</tr>' +
-    '<tr>' +
+      '<td>' + (price.currency || '') + ma50.value.toFixed(2) + '</td>' +
+      '<td style="color:' + (ma.priceVsMa50 >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (ma.priceVsMa50 >= 0 ? '+' : '') + (ma.priceVsMa50 != null ? ma.priceVsMa50.toFixed(1) : '0.0') + '%</td>' +
+      '<td>As at ' + (ma50.date || '') + '</td>' +
+    '</tr>' : '') +
+    (ma200.value != null ? '<tr>' +
       '<td class="ta-label-cell">200-Day MA</td>' +
-      '<td>' + ta.price.currency + ta.movingAverages.ma200.value.toFixed(2) + '</td>' +
-      '<td style="color:' + (ta.movingAverages.priceVsMa200 >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (ta.movingAverages.priceVsMa200 >= 0 ? '+' : '') + ta.movingAverages.priceVsMa200.toFixed(1) + '%</td>' +
-      '<td>As at ' + ta.movingAverages.ma200.date + '</td>' +
-    '</tr>' +
-    '</tbody></table>';
+      '<td>' + (price.currency || '') + ma200.value.toFixed(2) + '</td>' +
+      '<td style="color:' + (ma.priceVsMa200 >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (ma.priceVsMa200 >= 0 ? '+' : '') + (ma.priceVsMa200 != null ? ma.priceVsMa200.toFixed(1) : '0.0') + '%</td>' +
+      '<td>As at ' + (ma200.date || '') + '</td>' +
+    '</tr>' : '') +
+    '</tbody></table>' : '';
 
   var crossoverHtml = '';
-  if (ta.movingAverages.crossover) {
-    var cx = ta.movingAverages.crossover;
+  if (ma.crossover) {
+    var cx = ma.crossover;
     crossoverHtml = '<div class="ta-crossover-callout">' +
       '<div class="ta-crossover-label">' + cx.type + '</div>' +
       '<div class="ta-crossover-text">' + cx.description + ' &mdash; ' + cx.date + '</div>' +
@@ -874,55 +969,64 @@ export function renderTechnicalAnalysis(data) {
       '</tr></thead><tbody>' + inflRows + '</tbody></table>';
   }
 
-  var volHtml = '<div class="ta-metrics-grid">' +
-    '<div class="ta-metric-card">' +
-      '<div class="ta-metric-card-title">Volume</div>' +
-      '<div class="ta-metric-row"><div class="ta-metric-name">Latest vs 20-day avg</div><div class="ta-metric-val">' + ta.volume.latestVs20DayAvg.toFixed(1) + 'x</div></div>' +
-      '<div class="ta-metric-row"><div class="ta-metric-name">Date</div><div class="ta-metric-val">' + ta.volume.latestDate + '</div></div>';
-  if (ta.volume.priorSpikes) {
-    for (var v = 0; v < ta.volume.priorSpikes.length; v++) {
-      var sp = ta.volume.priorSpikes[v];
-      volHtml += '<div class="ta-metric-row"><div class="ta-metric-name">' + sp.period + '</div><div class="ta-metric-val">' + sp.ratio.toFixed(1) + 'x <span class="ta-metric-desc">&mdash; ' + sp.context + '</span></div></div>';
+  var volHtml = '';
+  if (vol.latestVs20DayAvg != null) {
+    volHtml = '<div class="ta-metrics-grid">' +
+      '<div class="ta-metric-card">' +
+        '<div class="ta-metric-card-title">Volume</div>' +
+        '<div class="ta-metric-row"><div class="ta-metric-name">Latest vs 20-day avg</div><div class="ta-metric-val">' + vol.latestVs20DayAvg.toFixed(1) + 'x</div></div>' +
+        '<div class="ta-metric-row"><div class="ta-metric-name">Date</div><div class="ta-metric-val">' + (vol.latestDate || '') + '</div></div>';
+    if (vol.priorSpikes) {
+      for (var v = 0; v < vol.priorSpikes.length; v++) {
+        var sp = vol.priorSpikes[v];
+        volHtml += '<div class="ta-metric-row"><div class="ta-metric-name">' + (sp.period || '') + '</div><div class="ta-metric-val">' + (sp.ratio != null ? sp.ratio.toFixed(1) : '0.0') + 'x <span class="ta-metric-desc">&mdash; ' + (sp.context || '') + '</span></div></div>';
+      }
     }
+    volHtml += '</div>';
+    if (vola.latestRangePercent != null) {
+      var latestRange = vola.latestDailyRange || {};
+      volHtml +=
+        '<div class="ta-metric-card">' +
+          '<div class="ta-metric-card-title">Volatility</div>' +
+          '<div class="ta-metric-row"><div class="ta-metric-name">Latest daily range</div><div class="ta-metric-val">' + vola.latestRangePercent.toFixed(1) + '%</div></div>' +
+          '<div class="ta-metric-row"><div class="ta-metric-name">30-day avg range</div><div class="ta-metric-val">' + (vola.avgDailyRangePercent30 != null ? vola.avgDailyRangePercent30.toFixed(1) : '0.0') + '%</div></div>' +
+          '<div class="ta-metric-row"><div class="ta-metric-name">90-day avg range</div><div class="ta-metric-val">' + (vola.avgDailyRangePercent90 != null ? vola.avgDailyRangePercent90.toFixed(1) : '0.0') + '%</div></div>' +
+          (latestRange.high != null && latestRange.low != null ? '<div class="ta-metric-row"><div class="ta-metric-name">Latest session</div><div class="ta-metric-val">' + (price.currency || '') + latestRange.high.toFixed(2) + ' &ndash; ' + (price.currency || '') + latestRange.low.toFixed(2) + '</div></div>' : '') +
+        '</div>';
+    }
+    volHtml += '</div>';
   }
-  volHtml += '</div>' +
-    '<div class="ta-metric-card">' +
-      '<div class="ta-metric-card-title">Volatility</div>' +
-      '<div class="ta-metric-row"><div class="ta-metric-name">Latest daily range</div><div class="ta-metric-val">' + ta.volatility.latestRangePercent.toFixed(1) + '%</div></div>' +
-      '<div class="ta-metric-row"><div class="ta-metric-name">30-day avg range</div><div class="ta-metric-val">' + ta.volatility.avgDailyRangePercent30.toFixed(1) + '%</div></div>' +
-      '<div class="ta-metric-row"><div class="ta-metric-name">90-day avg range</div><div class="ta-metric-val">' + ta.volatility.avgDailyRangePercent90.toFixed(1) + '%</div></div>' +
-      '<div class="ta-metric-row"><div class="ta-metric-name">Latest session</div><div class="ta-metric-val">' + ta.price.currency + ta.volatility.latestDailyRange.high.toFixed(2) + ' &ndash; ' + ta.price.currency + ta.volatility.latestDailyRange.low.toFixed(2) + '</div></div>' +
-    '</div>' +
-  '</div>';
 
-  var mr = ta.meanReversion;
-  var rangeSpan = mr.rangeHigh - mr.rangeLow;
-  var pricePct = rangeSpan > 0 ? ((ta.price.current - mr.rangeLow) / rangeSpan) * 100 : 50;
-  var ma50Pct = rangeSpan > 0 ? ((ta.movingAverages.ma50.value - mr.rangeLow) / rangeSpan) * 100 : 50;
-  var ma200Pct = rangeSpan > 0 ? ((ta.movingAverages.ma200.value - mr.rangeLow) / rangeSpan) * 100 : 50;
+  var mrHtml = '';
+  if (mr.rangeHigh != null && mr.rangeLow != null) {
+    var rangeSpan = mr.rangeHigh - mr.rangeLow;
+    var pricePct = rangeSpan > 0 ? (((price.current || 0) - mr.rangeLow) / rangeSpan) * 100 : 50;
+    var ma50Pct = rangeSpan > 0 ? (((ma50.value || 0) - mr.rangeLow) / rangeSpan) * 100 : 50;
+    var ma200Pct = rangeSpan > 0 ? (((ma200.value || 0) - mr.rangeLow) / rangeSpan) * 100 : 50;
 
-  var mrHtml = '<div class="ta-mr-container">' +
-    '<div class="ta-mr-title">Mean Reversion Positioning</div>' +
-    '<div class="ta-mr-bar-track">' +
-      '<div class="ta-mr-ma200-marker" style="left:' + ma200Pct.toFixed(1) + '%"></div>' +
-      '<div class="ta-mr-ma50-marker" style="left:' + ma50Pct.toFixed(1) + '%"></div>' +
-      '<div class="ta-mr-marker" style="left:' + pricePct.toFixed(1) + '%"></div>' +
-    '</div>' +
-    '<div class="ta-mr-bar-labels">' +
-      '<span>' + ta.price.currency + mr.rangeLow.toFixed(2) + '</span>' +
-      '<span>' + ta.price.currency + mr.rangeHigh.toFixed(2) + '</span>' +
-    '</div>' +
-    '<div class="ta-mr-legend">' +
-      '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-red)"></div>Price (' + ta.price.currency + ta.price.current.toFixed(2) + ')</div>' +
-      '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-amber)"></div>50-Day MA (' + ta.price.currency + ta.movingAverages.ma50.value.toFixed(2) + ')</div>' +
-      '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-blue)"></div>200-Day MA (' + ta.price.currency + ta.movingAverages.ma200.value.toFixed(2) + ')</div>' +
+    mrHtml = '<div class="ta-mr-container">' +
+      '<div class="ta-mr-title">Mean Reversion Positioning</div>' +
+      '<div class="ta-mr-bar-track">' +
+        '<div class="ta-mr-ma200-marker" style="left:' + ma200Pct.toFixed(1) + '%"></div>' +
+        '<div class="ta-mr-ma50-marker" style="left:' + ma50Pct.toFixed(1) + '%"></div>' +
+        '<div class="ta-mr-marker" style="left:' + pricePct.toFixed(1) + '%"></div>' +
+      '</div>' +
+      '<div class="ta-mr-bar-labels">' +
+        '<span>' + (price.currency || '') + mr.rangeLow.toFixed(2) + '</span>' +
+        '<span>' + (price.currency || '') + mr.rangeHigh.toFixed(2) + '</span>' +
+      '</div>' +
+      '<div class="ta-mr-legend">' +
+        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-red)"></div>Price (' + (price.currency || '') + (price.current != null ? price.current.toFixed(2) : '0.00') + ')</div>' +
+        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-amber)"></div>50-Day MA (' + (price.currency || '') + (ma50.value != null ? ma50.value.toFixed(2) : '0.00') + ')</div>' +
+        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-blue)"></div>200-Day MA (' + (price.currency || '') + (ma200.value != null ? ma200.value.toFixed(2) : '0.00') + ')</div>' +
     '</div>' +
     '<table class="ta-ma-table" style="margin-top:var(--space-sm)"><thead><tr><th>Measure</th><th>Value</th></tr></thead><tbody>' +
-      '<tr><td class="ta-label-cell">vs 50-Day MA</td><td style="color:var(--signal-red)">' + mr.vsMa50.toFixed(1) + '%</td></tr>' +
-      '<tr><td class="ta-label-cell">vs 200-Day MA</td><td style="color:var(--signal-red)">' + mr.vsMa200.toFixed(1) + '%</td></tr>' +
-      '<tr><td class="ta-label-cell">12-Month Range Position</td><td>' + (mr.rangePosition <= 50 ? 'Lower ' : 'Upper ') + mr.rangePosition + '%</td></tr>' +
+      '<tr><td class="ta-label-cell">vs 50-Day MA</td><td style="color:var(--signal-red)">' + (mr.vsMa50 != null ? mr.vsMa50.toFixed(1) : '0.0') + '%</td></tr>' +
+      '<tr><td class="ta-label-cell">vs 200-Day MA</td><td style="color:var(--signal-red)">' + (mr.vsMa200 != null ? mr.vsMa200.toFixed(1) : '0.0') + '%</td></tr>' +
+      '<tr><td class="ta-label-cell">12-Month Range Position</td><td>' + ((mr.rangePosition || 50) <= 50 ? 'Lower ' : 'Upper ') + (mr.rangePosition || 50) + '%</td></tr>' +
     '</tbody></table>' +
   '</div>';
+  }
 
   var relHtml = '';
   if (ta.relativePerformance && ta.relativePerformance.vsIndex && ta.relativePerformance.vsSector) {
@@ -946,16 +1050,18 @@ export function renderTechnicalAnalysis(data) {
       '</tbody></table>';
   }
 
-  var levelsHtml = '<div class="rs-subtitle">Key Levels</div>' +
+  var ftw52High = kl.fiftyTwoWeekHigh || {};
+  var ftw52Low = kl.fiftyTwoWeekLow || {};
+  var levelsHtml = (support.price != null || resistance.price != null) ? '<div class="rs-subtitle">Key Levels</div>' +
     '<table class="ta-ma-table"><thead><tr><th>Level</th><th>Price</th><th>Derivation</th></tr></thead><tbody>' +
-    '<tr><td class="ta-label-cell">Support</td><td>' + ta.price.currency + ta.keyLevels.support.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + ta.keyLevels.support.method + '</td></tr>' +
-    '<tr><td class="ta-label-cell">Resistance</td><td>' + ta.price.currency + ta.keyLevels.resistance.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + ta.keyLevels.resistance.method + '</td></tr>' +
-    '<tr><td class="ta-label-cell">52-Week High</td><td>' + ta.price.currency + ta.keyLevels.fiftyTwoWeekHigh.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + ta.keyLevels.fiftyTwoWeekHigh.date + '</td></tr>' +
-    '<tr><td class="ta-label-cell">52-Week Low</td><td>' + ta.price.currency + ta.keyLevels.fiftyTwoWeekLow.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + ta.keyLevels.fiftyTwoWeekLow.date + '</td></tr>' +
-    '</tbody></table>';
+    (support.price != null ? '<tr><td class="ta-label-cell">Support</td><td>' + (price.currency || '') + support.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + (support.method || '') + '</td></tr>' : '') +
+    (resistance.price != null ? '<tr><td class="ta-label-cell">Resistance</td><td>' + (price.currency || '') + resistance.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + (resistance.method || '') + '</td></tr>' : '') +
+    (ftw52High.price != null ? '<tr><td class="ta-label-cell">52-Week High</td><td>' + (price.currency || '') + ftw52High.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + (ftw52High.date || '') + '</td></tr>' : '') +
+    (ftw52Low.price != null ? '<tr><td class="ta-label-cell">52-Week Low</td><td>' + (price.currency || '') + ftw52Low.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + (ftw52Low.date || '') + '</td></tr>' : '') +
+    '</tbody></table>' : '';
 
   var footerHtml = '<div style="font-size:0.6rem;color:var(--text-muted);margin-top:var(--space-md);padding-top:var(--space-sm);border-top:1px solid var(--border)">' +
-    'Analysis period: ' + ta.period + ' &bull; Generated: ' + ta.date + ' &bull; Source: ' + (ta.source || 'Continuum Technical Intelligence') +
+    'Analysis period: ' + (ta.period || '') + ' &bull; Generated: ' + (ta.date || '') + ' &bull; Source: ' + (ta.source || 'Continuum Technical Intelligence') +
   '</div>';
 
   return '<div class="report-section ta-section" id="' + t + '-technical">' +
@@ -975,16 +1081,17 @@ export function renderTechnicalAnalysis(data) {
 }
 
 export function renderReportFooter(data) {
+  var footer = data.footer || {};
   return '<div class="report-footer-section">' +
     '<div class="rf-inner">' +
-      '<div class="rf-disclaimer-text">' + data.footer.disclaimer + '</div>' +
+      '<div class="rf-disclaimer-text">' + (footer.disclaimer || '') + '</div>' +
       '<div class="rf-meta-row">' +
         '<div class="rf-brand">Contin<span class="brand-green">uu</span>m Inte<span class="brand-green">ll</span>igence</div>' +
-        '<div class="rf-meta-item">ID: ' + data.reportId + '</div>' +
+        '<div class="rf-meta-item">ID: ' + (data.reportId || '') + '</div>' +
         '<div class="rf-meta-item">Mode: Narrative Intelligence</div>' +
-        '<div class="rf-meta-item">Domains: ' + data.footer.domainCount + '</div>' +
-        '<div class="rf-meta-item">Hypotheses: ' + data.footer.hypothesesCount + '</div>' +
-        '<div class="rf-meta-item">' + formatDateAEST(data.date) + '</div>' +
+        '<div class="rf-meta-item">Domains: ' + (footer.domainCount || 0) + '</div>' +
+        '<div class="rf-meta-item">Hypotheses: ' + (footer.hypothesesCount || 0) + '</div>' +
+        '<div class="rf-meta-item">' + (data.date ? formatDateAEST(data.date) : '') + '</div>' +
       '</div>' +
     '</div>' +
   '</div>';
@@ -1170,6 +1277,7 @@ export function renderHypSidebar(data) {
 export function prepareHypotheses(data) {
   if (data._hypothesesPrepared) return;
   data._hypothesesPrepared = true;
+  if (!data.hypotheses || !data.hypotheses.length) return;
 
   var dirMap = { upside: 'dir-up', downside: 'dir-down', neutral: 'dir-neutral' };
   var colorMap = { 'dir-up': 'var(--signal-green)', 'dir-down': 'var(--signal-red)', 'dir-neutral': 'var(--signal-amber)' };

@@ -17,6 +17,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Clear stale VM leases
+        run: |
+          for id in $(flyctl machines list -a ci-api --json | jq -r '.[].id'); do
+            flyctl machines lease clear -a ci-api "$id" 2>/dev/null || true
+          done
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
       - run: flyctl deploy --remote-only --app ci-api --lease-timeout=120s --wait-timeout=300
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

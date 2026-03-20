@@ -684,6 +684,19 @@ def build_research_scaffold(
             {"label": "52w Low", "value": f"{currency}{low_52w}", "colorClass": ""},
         ],
 
+        # Hero spec block (Section 1.2-1.5 in report-sections.js)
+        "hero": {
+            "embedded_thesis": None,
+            "skew": None,
+            "skew_description": None,
+            "position_in_range": {
+                "current_price": price,
+                "worlds": [],
+            },
+            "next_decision_point": None,
+            "previousSkew": None,
+        },
+
         # Skew
         "skew": {
             "direction": "neutral",

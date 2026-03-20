@@ -193,29 +193,29 @@
 .pir-bar-wrap {
     position: relative;
     margin-top: var(--space-md);
-    padding: 32px 0 52px;
+    padding: 28px 0 64px;
     overflow: visible;
 }
 .pir-bar {
     position: relative;
-    height: 20px;
+    height: 10px;
     background: linear-gradient(to right, var(--signal-red), var(--signal-amber), var(--signal-green));
-    border-radius: 10px;
+    border-radius: 5px;
     margin: 0 8px;
 }
 .pir-world {
     position: absolute;
     transform: translateX(-50%);
     text-align: center;
-    top: 22px;
+    top: 12px;
 }
 .pir-world-tick {
     position: absolute;
-    top: -22px;
+    top: -12px;
     left: 50%;
     transform: translateX(-50%);
     width: 1.5px;
-    height: 22px;
+    height: 12px;
     background: rgba(138,154,184,0.45);
     margin: 0;
 }
@@ -232,10 +232,18 @@
     white-space: nowrap;
     margin-top: 3px;
 }
+.pir-world-metric {
+    font-family: var(--font-data);
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    margin-top: 2px;
+    opacity: 0.7;
+}
 .pir-current {
     position: absolute;
     transform: translateX(-50%);
-    top: -30px;
+    top: -25px;
     text-align: center;
     display: flex;
     flex-direction: column-reverse;
@@ -253,6 +261,38 @@
     color: var(--accent-teal);
     white-space: nowrap;
     margin-bottom: 3px;
+}
+.pir-weighted-avg {
+    position: absolute;
+    transform: translateX(-50%);
+    top: -42px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+}
+.pir-weighted-avg-label {
+    font-family: var(--font-data);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+    white-space: nowrap;
+}
+.pir-weighted-avg-delta {
+    font-family: var(--font-data);
+    font-size: 0.68rem;
+    font-weight: 600;
+    white-space: nowrap;
+    margin-bottom: 2px;
+}
+.pir-weighted-avg-delta.upside { color: var(--signal-green); }
+.pir-weighted-avg-delta.downside { color: var(--signal-red); }
+.pir-weighted-avg-line {
+    width: 2px;
+    height: 30px;
+    background: var(--accent-teal);
+    opacity: 0.6;
 }
 .pir-note {
     display: none !important; /* Force hide the indicative text */
