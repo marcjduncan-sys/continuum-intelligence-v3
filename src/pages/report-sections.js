@@ -446,7 +446,7 @@ export function renderEvidenceCard(card) {
 
 export function renderAlignmentSummary(data) {
   var as = data.evidence && data.evidence.alignmentSummary;
-  if (!as || typeof as !== 'object' || !Array.isArray(as.headers)) return '';
+  if (!as || typeof as !== 'object' || !Array.isArray(as.headers) || !Array.isArray(as.rows)) return '';
 
   var thHtml = '';
   for (var h = 0; h < as.headers.length; h++) {
@@ -593,9 +593,10 @@ export function renderGaps(data) {
     '</tr>';
   }
 
+  var couldntAssess = g.couldntAssess || [];
   var calloutsHtml = '';
-  for (var j = 0; j < g.couldntAssess.length; j++) {
-    calloutsHtml += '<div class="callout"><p>' + g.couldntAssess[j] + '</p></div>';
+  for (var j = 0; j < couldntAssess.length; j++) {
+    calloutsHtml += '<div class="callout"><p>' + couldntAssess[j] + '</p></div>';
   }
 
   return '<div class="report-section" id="' + t + '-gaps">' +
