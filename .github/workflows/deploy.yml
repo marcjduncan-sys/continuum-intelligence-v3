@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   deploy:
-    if: false  # Disabled: frontend migrated to Cloudflare Pages (Phase 3)
+    # Re-enabled: GitHub Pages active for research app
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
