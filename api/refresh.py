@@ -632,9 +632,19 @@ def _update_index(ticker: str, data: dict) -> None:
                         index[i]["verdict"] = data["verdict"].get("text", entry.get("verdict", ""))
                     break
         elif isinstance(index, dict):
+            # Extract the same fields sync-index.js uses for home page cards
+            _INDEX_FIELDS = [
+                "ticker", "tickerFull", "exchange", "company", "sector", "sectorSub",
+                "price", "currency", "date", "reportId", "priceHistory",
+                "heroDescription", "heroCompanyDescription", "heroMetrics",
+                "skew", "verdict", "featuredMetrics", "featuredPriceColor", "featuredRationale",
+                "hypotheses", "identity", "footer", "_deepResearch",
+            ]
+            entry = {k: data[k] for k in _INDEX_FIELDS if k in data}
             if ticker in index:
-                index[ticker]["price"] = data.get("price", index[ticker].get("price"))
-                index[ticker]["date"] = data.get("date", index[ticker].get("date"))
+                index[ticker].update(entry)
+            else:
+                index[ticker] = entry
 
         with open(index_path, "w") as f:
             json.dump(index, f, indent=2, ensure_ascii=False)
