@@ -553,7 +553,7 @@ _YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}.A
 
 
 @app.get("/api/chart/{ticker}")
-@limiter.limit("10/minute")
+@limiter.limit("60/minute")
 async def chart_proxy(ticker: str, request: Request):
     """Proxy Yahoo Finance chart data for an ASX ticker.
 
