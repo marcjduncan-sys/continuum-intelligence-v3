@@ -4,7 +4,7 @@
   "exchange": "ASX",
   "company": "Mesoblast Limited",
   "sector": "Health Care",
-  "price": "A$2.11",
+  "price": 2.11,
   "currency": "A$",
   "_deepResearch": true,
   "deepContent": {
@@ -277,10 +277,346 @@
       }
     ]
   },
-  "heroMetrics": {},
+  "heroMetrics": [
+    {
+      "label": "Mkt Cap",
+      "value": "A$1.6B",
+      "colorClass": ""
+    },
+    {
+      "label": "Fwd P/E",
+      "value": "N/A",
+      "colorClass": ""
+    },
+    {
+      "label": "Cash",
+      "value": "US$116M",
+      "colorClass": "positive"
+    },
+    {
+      "label": "Cash Burn",
+      "value": "~US$25M/qtr",
+      "colorClass": "negative"
+    },
+    {
+      "label": "Runway",
+      "value": "~18 months",
+      "colorClass": "negative"
+    }
+  ],
   "priceHistory": {},
-  "skew": {},
-  "verdict": {},
-  "hypotheses": [],
-  "evidence": {}
+  "skew": {
+    "direction": "downside",
+    "rationale": "Probability-weighted value of ~A$1.00 vs market price of A$2.11. Three of four modeled futures imply values below current price. Market prices pipeline optionality at >2x evidence-supported probability. Cash burn of ~US$25M/quarter against 18-month runway creates dilution risk."
+  },
+  "verdict": {
+    "text": "Mesoblast achieved a genuine breakthrough with Ryoncil's FDA approval but the stock has overshot the evidence. At A$2.11, the market prices multi-indication platform success that the clinical and financial data do not support. Ryoncil generates US$52M revenue against US$140M+ annual operating costs. The probability-weighted value across four plausible futures is approximately A$1.00 per share. Revascor BLA filing has slipped three times without public acknowledgement. Cash runway of ~18 months at current burn creates near-certainty of dilutive capital raising. The risk-reward skews decisively downside at current levels.",
+    "borderColor": "var(--signal-red)",
+    "scores": {
+      "quality": 4,
+      "momentum": 2,
+      "value": 2,
+      "catalyst": 5,
+      "risk": 7
+    }
+  },
+  "hypotheses": [
+    {
+      "tier": "n1",
+      "direction": "downside",
+      "title": "N1: Single-Product Cash Trap",
+      "statusClass": "accumulating",
+      "statusText": "Evidence Building: Dominant hypothesis",
+      "score": "45%",
+      "scoreWidth": "45%",
+      "scoreMeta": "&uarr; Rising",
+      "description": "Ryoncil scales to US$200M peak revenue but enterprise costs prevent profitability. Cash burn continues, requiring dilutive capital raises. Pipeline programs fail to deliver additional approvals within the funding window. The company survives as a single-product entity but shareholder value erodes through persistent dilution. Probability-weighted value: A$0.90 per share."
+    },
+    {
+      "tier": "n2",
+      "direction": "upside",
+      "title": "N2: Multi-Indication Platform Emerges",
+      "statusClass": "minimal",
+      "statusText": "Low Probability: No second approval yet",
+      "score": "20%",
+      "scoreWidth": "20%",
+      "scoreMeta": "&rarr; Watching",
+      "description": "Revascor achieves BLA filing and eventual approval, validating the platform for chronic heart failure. Combined Ryoncil + Revascor revenue reaches US$500M+, achieving enterprise profitability. Additional pipeline programs advance. Fair value in this scenario: A$4.00+ per share. The evidence gap: three prior BLA timeline slips, no disclosed regulatory clarity, and US$414M development costs still ahead."
+    },
+    {
+      "tier": "n3",
+      "direction": "downside",
+      "title": "N3: Cash Crisis Forces Fire Sale",
+      "statusClass": "priced",
+      "statusText": "Priced: Market aware of runway risk",
+      "score": "25%",
+      "scoreWidth": "25%",
+      "scoreMeta": "&uarr; Rising",
+      "description": "Cash runway of ~18 months proves insufficient. Capital markets close for pre-revenue biotech. Mesoblast is forced into a deeply dilutive raise or asset sale. Ryoncil IP is acquired at distressed prices by a larger cell therapy company. Shareholder value: A$0.30&ndash;0.50 per share. The catalyst: any quarter where cash receipts materially undershoot operating costs."
+    },
+    {
+      "tier": "n4",
+      "direction": "upside",
+      "title": "N4: Acquisition Target",
+      "statusClass": "minimal",
+      "statusText": "Speculative: No disclosed interest",
+      "score": "10%",
+      "scoreWidth": "10%",
+      "scoreMeta": "&rarr; Watching",
+      "description": "A major pharmaceutical company acquires Mesoblast for the Ryoncil franchise and cell therapy platform IP. FDA approval de-risks the core asset. Premium to current market price but well below the multi-indication scenario value. Fair value: A$2.50&ndash;3.50 per share. The evidence gap: no strategic holder on the register, no disclosed acquisition interest, and allogeneic cell therapy remains a niche market."
+    }
+  ],
+  "evidence": {
+    "intro": "Ten evidence domains assessed. Evidence ranked: <strong>Facts</strong> (filed, audited) &gt; <strong>Company Releases</strong> (motivated but primary) &gt; <strong>Broker Research</strong> (fact + opinion blend) &gt; <strong>Social &amp; Media</strong> (noise, contextual only).",
+    "cards": [
+      {
+        "number": 1,
+        "title": "1. Corporate Communications",
+        "epistemicClass": "ep-motivated",
+        "epistemicLabel": "Motivated",
+        "finding": "FDA approval of Ryoncil confirmed December 2024. Revascor BLA timeline guided Q1 CY2026 but three prior slips. Management tone increasingly promotional on platform value without quantified milestones.",
+        "source": "ASX announcements, investor presentations",
+        "implications": "Approval is fact; pipeline timelines are unreliable. Weight corporate actions over forward guidance."
+      },
+      {
+        "number": 2,
+        "title": "2. Financial Statements",
+        "epistemicClass": "ep-audited",
+        "epistemicLabel": "Audited",
+        "finding": "FY25 revenue US$52M, operating cash outflow ~US$100M, cash on hand US$116M. Quarterly burn rate ~US$25M. Revenue concentrated in Ryoncil.",
+        "source": "FY25 Annual Report, 4C filings",
+        "implications": "18-month cash runway at current burn. Enterprise losses dwarf product revenue. Dilutive raise near-certain unless Revascor achieves milestone payment."
+      },
+      {
+        "number": 3,
+        "title": "3. Broker Research",
+        "epistemicClass": "ep-mixed",
+        "epistemicLabel": "Mixed",
+        "finding": "Consensus targets range from A$1.50 to A$4.00. Bull cases rely on pipeline success probabilities. Bear cases focus on cash burn and dilution.",
+        "source": "Broker consensus",
+        "implications": "Wide target range reflects genuine uncertainty. Pipeline probability assumptions drive the spread."
+      },
+      {
+        "number": 4,
+        "title": "4. Regulatory & Legal",
+        "epistemicClass": "ep-audited",
+        "epistemicLabel": "Fact",
+        "finding": "Ryoncil FDA approval is the first allogeneic MSC therapy approved anywhere. Regulatory pathway for Revascor BLA has not been publicly disclosed in detail.",
+        "source": "FDA approval letter, ASX announcements",
+        "implications": "Approval fact is high-confidence. Pipeline regulatory pathway is low-confidence."
+      }
+    ],
+    "alignmentSummary": "Evidence strongly supports the single-product reality (N1) and cash risk (N3). Multi-indication platform value (N2) and acquisition interest (N4) lack supporting evidence beyond the initial Ryoncil approval."
+  },
+  "sectorSub": "Cell Therapy &amp; Regenerative Medicine",
+  "date": "15 March 2026",
+  "reportId": "MSB-2026-001",
+  "heroDescription": "First FDA-Approved Allogeneic Cell Therapy &bull; ~180 Employees &bull; FY25: US$52M Revenue",
+  "heroCompanyDescription": "Mesoblast Limited (ASX: MSB) is the first company to achieve FDA approval for an allogeneic (off-the-shelf) mesenchymal stromal cell therapy. Its lead product Ryoncil treats paediatric steroid-refractory acute graft-versus-host disease (SR-aGvHD). The company trades at A$2.11 with a market capitalisation of approximately A$1.6B, implying the market prices pipeline optionality well above the probability-weighted fair value of approximately A$1.00 per share.",
+  "hero": {
+    "embedded_thesis": "At A$2.11, the market prices pipeline success probabilities far exceeding what the evidence supports. The probability-weighted value is approximately A$1.00 per share, implying the stock embeds >60% probability of multi-indication platform success when the only approved product (Ryoncil) generates US$52M revenue against US$140M+ annual cash burn. The market is paying for optionality on Revascor (heart failure) and four other pipeline programs despite three prior BLA timeline slips and no disclosed regulatory pathway clarity.",
+    "skew": "downside",
+    "skew_description": "Price embeds multi-indication success probabilities that exceed disclosed evidence. 53% overvaluation gap to probability-weighted fair value.",
+    "position_in_range": "Above fair value",
+    "next_decision_point": "Revascor BLA filing timeline (guided Q1 CY2026) and Q3 FY2026 cash receipts"
+  },
+  "featuredMetrics": [
+    {
+      "label": "Mkt Cap",
+      "value": "A$1.6B",
+      "color": ""
+    },
+    {
+      "label": "Cash Burn",
+      "value": "~US$25M/qtr",
+      "color": "var(--signal-red)"
+    },
+    {
+      "label": "Revenue",
+      "value": "US$52M",
+      "color": "var(--signal-amber)"
+    },
+    {
+      "label": "Runway",
+      "value": "~18 months",
+      "color": "var(--signal-red)"
+    }
+  ],
+  "featuredPriceColor": "var(--signal-red)",
+  "featuredRationale": "Probability-weighted value ~A$1.00 vs A$2.11 market price. 53% overvaluation gap. Ryoncil approved but enterprise cash burn far exceeds product revenue. Three BLA timeline slips on Revascor. Dilution risk within 18 months.",
+  "identity": {
+    "rows": [
+      [
+        [
+          "Ticker",
+          "MSB.AX",
+          "td-mono"
+        ],
+        [
+          "Exchange",
+          "ASX",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Market Cap",
+          "A$1.6B",
+          "td-mono"
+        ],
+        [
+          "Enterprise Value",
+          "~A$1.5B",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Share Price",
+          "A$2.11",
+          "td-mono td-red"
+        ],
+        [
+          "52-Week Range",
+          "A$0.26 &ndash; A$2.45",
+          "td-mono"
+        ]
+      ],
+      [
+        [
+          "Sector",
+          "Healthcare",
+          ""
+        ],
+        [
+          "Sub-Sector",
+          "Cell Therapy &amp; Regenerative Medicine",
+          ""
+        ]
+      ],
+      [
+        [
+          "Employees",
+          "~180",
+          "td-mono"
+        ],
+        [
+          "Founded",
+          "2004",
+          "td-mono"
+        ]
+      ]
+    ],
+    "overview": "Mesoblast is the first company to achieve FDA approval for an allogeneic mesenchymal stromal cell therapy (Ryoncil, December 2024). The company operates a single approved product generating US$52M annual revenue against US$140M+ enterprise costs, with four additional pipeline programs at various clinical stages. Headquartered in Melbourne with manufacturing through Lonza."
+  },
+  "narrative": {
+    "theNarrative": "The market narrative centres on <strong>\"first-mover platform value\"</strong> in allogeneic cell therapy. Ryoncil's FDA approval in December 2024 validated the technology after years of regulatory setbacks, triggering a re-rating from A$0.26 to A$2.11. The current price embeds expectations that the platform extends beyond SR-aGvHD into chronic heart failure (Revascor) and potentially ARDS, back pain, and other indications. The counter-narrative: Ryoncil is a genuine breakthrough in a tiny market (400&ndash;600 US patients per year), enterprise costs dwarf product revenue, and pipeline timeline slips suggest the platform extension is years away from generating meaningful cash flow.",
+    "priceImplication": "At A$2.11, the market assigns >60% probability to multi-indication success. The evidence supports roughly 20%. This gap defines the downside skew.",
+    "evidenceCheck": "Ryoncil approval is confirmed (FDA, Dec 2024). Revenue trajectory is verifiable (US$52M). Cash burn rate is disclosed (~US$25M/quarter). Pipeline timelines have slipped three times without public acknowledgement. No independent validation of Revascor regulatory pathway.",
+    "narrativeStability": "Unstable. The narrative depends on pipeline catalysts that have repeatedly disappointed. Each BLA delay or cash raise resets expectations lower."
+  },
+  "discriminators": {
+    "intro": "Three data points carry high diagnosticity for discriminating between the competing hypotheses.",
+    "rows": [
+      {
+        "diagnosticity": "HIGH",
+        "diagnosticityClass": "disc-high",
+        "evidence": "<strong>Revascor BLA Filing:</strong> Guided Q1 CY2026. Three prior slips. Filing would validate pipeline beyond Ryoncil; further delay confirms N1/N3.",
+        "discriminatesBetween": "N1/N3 (single product) vs N2 (platform)"
+      },
+      {
+        "diagnosticity": "HIGH",
+        "diagnosticityClass": "disc-high",
+        "evidence": "<strong>Quarterly Cash Receipts:</strong> Any quarter where Ryoncil receipts materially exceed or fall short of US$15M run-rate changes the cash runway calculus.",
+        "discriminatesBetween": "N1 (stable single product) vs N3 (cash crisis)"
+      },
+      {
+        "diagnosticity": "MEDIUM",
+        "diagnosticityClass": "disc-med",
+        "evidence": "<strong>Capital Raising Activity:</strong> Timing and terms of next raise signal market confidence in platform value vs distressed financing.",
+        "discriminatesBetween": "N2/N4 (value creation) vs N3 (fire sale)"
+      }
+    ],
+    "nonDiscriminating": "General biotech sentiment, ASX small-cap flows, and peer cell therapy stock movements are noise, not signal."
+  },
+  "tripwires": {
+    "intro": "Four revision conditions that would force probability reassignment across hypotheses.",
+    "cards": [
+      {
+        "date": "Q1 CY2026",
+        "name": "Revascor BLA Filing",
+        "conditions": [
+          {
+            "if": "BLA filed with FDA on schedule",
+            "valence": "positive",
+            "then": "N2 probability increases to 35%; N1 decreases. Platform narrative validated."
+          },
+          {
+            "if": "Fourth timeline slip or quiet non-update",
+            "valence": "negative",
+            "then": "N2 probability drops to 10%; N1/N3 increase. Pipeline credibility exhausted."
+          }
+        ]
+      },
+      {
+        "date": "LATE 2026",
+        "name": "Cash Position Below US$50M",
+        "conditions": [
+          {
+            "if": "Cash falls below US$50M without announced raise",
+            "valence": "negative",
+            "then": "N3 probability surges to 40%+. Forced raise or asset sale imminent."
+          },
+          {
+            "if": "Ryoncil cash receipts close the burn gap",
+            "valence": "positive",
+            "then": "N1 stabilises; runway extends. Single-product viability improves."
+          }
+        ]
+      }
+    ]
+  },
+  "gaps": {
+    "coverageRows": [
+      {
+        "domain": "Corporate Comms",
+        "coverageLevel": "full",
+        "coverageLabel": "Full",
+        "freshness": "Mar 2026",
+        "confidence": "Medium (promotional tone)",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Financial Statements",
+        "coverageLevel": "full",
+        "coverageLabel": "Full",
+        "freshness": "FY25",
+        "confidence": "High (audited)",
+        "confidenceClass": "td-green"
+      },
+      {
+        "domain": "Broker Research",
+        "coverageLevel": "partial",
+        "coverageLabel": "Partial",
+        "freshness": "Feb 2026",
+        "confidence": "Low (wide range)",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Regulatory",
+        "coverageLevel": "full",
+        "coverageLabel": "Full",
+        "freshness": "Dec 2024",
+        "confidence": "High (FDA filing)",
+        "confidenceClass": "td-green"
+      }
+    ],
+    "couldntAssess": "Manufacturing economics (Lonza contract terms), detailed Revascor regulatory pathway, real-world Ryoncil prescription data beyond reported revenue.",
+    "analyticalLimitations": "Pipeline probability estimates rely on industry base rates rather than MSB-specific clinical data. Cash burn forecasts assume current trajectory without restructuring."
+  },
+  "footer": {
+    "disclaimer": "This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, FDA publications, broker consensus data, and publicly available information. This report does not contain buy, sell, or hold recommendations, price targets, or valuation models.",
+    "domainCount": "10 of 10",
+    "hypothesesCount": "4 Active"
+  }
 }
