@@ -10,6 +10,7 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "").strip()
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
 _DEFAULT_ORIGINS = (
     "https://app.continuumintelligence.ai,"
+    "https://marcjduncan-sys.github.io,"
     "https://continuum-intelligence-v3.pages.dev,"
     "http://localhost:3000,"
     "http://localhost:5000,"

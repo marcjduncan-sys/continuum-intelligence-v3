@@ -1046,18 +1046,6 @@ async def add_stock(
     with open(index_path, "w") as f:
         json.dump(index, f, indent=2, ensure_ascii=False)
 
-    # Also update dist/data/research/_index.json for refresh pipeline
-    dist_index_path = dist_research_dir / "_index.json" if dist_research_dir.exists() else None
-    if dist_index_path and dist_index_path.resolve() != index_path.resolve() and dist_index_path.exists():
-        try:
-            with open(dist_index_path) as f:
-                dist_index = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            dist_index = {}
-        dist_index[ticker] = index_entry
-        with open(dist_index_path, "w") as f:
-            json.dump(dist_index, f, indent=2, ensure_ascii=False)
-
     # 3. tickers.json
     tickers_path = data_dir / "config" / "tickers.json"
     try:
