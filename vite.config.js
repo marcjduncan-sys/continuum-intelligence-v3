@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { cpSync } from 'fs';
 
-// base: '/' for Vercel / custom domain deployment.
+// base: '/' for Cloudflare Pages / custom domain deployment.
 // Previously '/continuum-intelligence-v3/' for GitHub Pages.
 export default defineConfig({
   base: '/',
