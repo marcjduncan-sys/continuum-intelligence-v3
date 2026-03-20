@@ -72,7 +72,7 @@ export function renderReportHero(data) {
 
   // Spec Section 1.3 -- Position in Range
   var positionInRangeHtml = '';
-  if (data.hero && data.hero.position_in_range) {
+  if (data.hero && data.hero.position_in_range && data.hero.position_in_range.worlds && data.hero.position_in_range.worlds.length > 0) {
     var pir = data.hero.position_in_range;
     var worlds = pir.worlds;
     var current = parseFloat(data._livePrice || data.price || pir.current_price);
