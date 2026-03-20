@@ -2,7 +2,7 @@
 
 ## Operating Context
 
-You are a senior engineer maintaining a production equity research platform used daily by fund managers. Mistakes ship to GitHub Pages and break live sessions with no rollback beyond a manual revert commit. The default posture is conservative: understand before changing, smallest possible diff, test before marking done. Experimental approaches require explicit instruction.
+You are a senior engineer maintaining a production equity research platform used daily by fund managers. Mistakes ship to Cloudflare Pages (frontend) and Fly.io (backend) and break live sessions with no rollback beyond a manual revert commit. The default posture is conservative: understand before changing, smallest possible diff, test before marking done. Experimental approaches require explicit instruction.
 
 ---
 
@@ -12,16 +12,15 @@ You are a senior engineer maintaining a production equity research platform used
 npm run dev          # Dev server on port 5000, proxies /api → localhost:8000
 npm run build        # Vite build → dist/; copies data/ → dist/data/
 npm run test         # Jest suite (tests/, src/**/*.test.js) — 61 tests
-npm run test:unit    # Vitest suite — what CI runs; must pass before pushing — 195 tests
-npm run test:all     # Jest + Vitest combined — 256 tests total
+npm run test:unit    # Vitest suite — what CI runs; must pass before pushing — 202 tests
+npm run test:all     # Jest + Vitest combined — 263 tests total
 npm run lint         # ESLint over scripts/, src/, and public/js/
 npm run validate     # lint + test:all — run before any push
 ```
 
 **Never run** `npm run test:e2e` without a local server running (Playwright requires a live page).
-**Never change** `base` in [vite.config.js](vite.config.js). The deploy workflow hard-checks for `base: '/continuum-intelligence-v3/'` and fails the build if it is absent or altered.
-**Deploy** is automatic on push to `main` via [.github/workflows/deploy.yml](.github/workflows/deploy.yml). Do not trigger it manually except to rerun a failed build.
-**Railway** redeploys automatically when `api/` changes are pushed to `main`. No manual command is needed. Confirm success: `curl https://imaginative-vision-production-16cb.up.railway.app/api/health`. If the health check fails, check Railway dashboard logs. Required environment variables are set in the Railway dashboard, not in code -- read [api/config.py](api/config.py) to see what is required before touching the dashboard.
+**Frontend** deploys automatically to Cloudflare Pages on push to `main`. The GitHub Pages deploy workflow (`.github/workflows/deploy.yml`) is disabled (`if: false`). Cloudflare Pages builds are configured in the Cloudflare dashboard (build command: `npm run build`, output: `dist/`).
+**Backend** deploys automatically to Fly.io on push to `main` when `api/`, `data/`, `Dockerfile`, or `fly.toml` change (`.github/workflows/fly-deploy.yml`). Confirm success: `curl https://ci-api.fly.dev/api/health`. Required environment variables are set in the Fly.io dashboard, not in code -- read [api/config.py](api/config.py) to see what is required.
 
 ---
 
@@ -32,17 +31,17 @@ npm run validate     # lint + test:all — run before any push
 - **Never replace the `STOCK_DATA`, `REFERENCE_DATA`, `FRESHNESS_DATA`, or `SNAPSHOT_DATA` object references.** They are exported by reference from `src/lib/state.js` and aliased to `window.*`. Replace the reference and every module holding the old pointer will silently diverge. Use `initStockData()`, `setStockData()`, `patchStock()`, or `Object.assign()` instead.
 - **`FEATURED_ORDER` and `SNAPSHOT_ORDER` are Proxy objects** backed by live `Object.keys(STOCK_DATA)`. Do not destructure them into a plain array at module load time; they will become stale immediately. Call `.forEach()`, `.map()`, etc. at render time, not at import time.
 - **`src/lib/state.js` owns all global state.** No module may declare its own copy of stock, freshness, reference, or snapshot data. The only exceptions are local caches invalidated within the same render cycle.
-- **`api/` is the Railway backend (FastAPI/Python), not part of the GitHub Pages build.** Changes to `api/` require a Railway redeploy, not `npm run build`. The frontend connects to `https://imaginative-vision-production-16cb.up.railway.app` when on GitHub Pages, and to `localhost:8000` (via Vite proxy) in dev.
+- **`api/` is the Fly.io backend (FastAPI/Python), not part of the Cloudflare Pages build.** Changes to `api/` trigger a Fly.io redeploy, not `npm run build`. The frontend connects to `https://api.continuumintelligence.ai` (Fly.io) in production and to `localhost:8000` (via Vite proxy) in dev. The API no longer serves static frontend files; Cloudflare Pages handles all frontend hosting.
 - **`Documents/continuum-v3/` is a dead git worktree.** It contains its own `node_modules`, test files, and stale source. Never edit files there. The active codebase is at the repo root.
 - **Do not touch `data/research/_index.json` manually.** It is the canonical stock list and the authoritative source for stock count (currently 25 tickers). Editing it locally will conflict with the next automated commit. When adding a new ticker, update `_index.json` and `data/reference.json` -- do not rely on `REFERENCE_DATA` in `index.html`, which is a known defect covering fewer tickers than `_index.json`. Note: `reference.json` currently has 25 entries (RMC corrected 2026-03-07).
 - **`public/js/personalisation.js` is now linted by ESLint** (Task C4). `npm run lint` covers `scripts/`, `src/`, and `public/js/`. Zero errors; warnings only (no-var, prefer-const, etc.).
-- **`window.CI_API_KEY` injection is undocumented.** It is not set in `index.html`; Claude Code configured the injection mechanism. Do not modify anything related to `CI_API_KEY` without first grepping the entire repo for all references and tracing the injection point. If it is broken, check (in order): Railway environment variables, GitHub Secrets, any `<script>` tag in `index.html` setting the global.
+- **`window.CI_API_KEY` injection is undocumented.** It is not set in `index.html`; Claude Code configured the injection mechanism. Do not modify anything related to `CI_API_KEY` without first grepping the entire repo for all references and tracing the injection point. If it is broken, check (in order): Fly.io environment variables, GitHub Secrets, any `<script>` tag in `index.html` setting the global.
 - **GitHub Actions secrets are not documented in the repo.** Do not rename or delete secrets without checking every workflow file for references first. To diagnose a failing workflow: open the workflow YAML, find which secret it references, then verify that secret exists at GitHub repo Settings > Secrets and variables > Actions.
 - **`js/personalisation.js` (root-level) was deleted 2026-03-08.** The canonical file is `public/js/personalisation.js`, which Vite copies verbatim to `dist/js/personalisation.js` via `publicDir: 'public'`. The root-level `js/` directory still exists for `js/dne/` (the DNE engine). Do not recreate `js/personalisation.js` at the repo root -- it is never served in production and creates a shadow copy problem where fixes appear to apply but have no effect.
 
 ---
 
-## Current State — 2026-03-19
+## Current State — 2026-03-20
 
 **Phase 0 COMPLETE (2026-03-07).** The extraction of logic from `index.html` into `src/` modules is complete. `computeSkewScore` canonicalised to zero-contribution convention (commit `4493e8c`; see `docs/decisions/003-computeskewscore-neutral-convention.md`). `VALID_STATIC_PAGES` confirmed correct: `home`, `deep-research`, `portfolio`, `comparator`, `personalisation`, `about`.
 
@@ -84,19 +83,19 @@ npm run validate     # lint + test:all — run before any push
 
 **Session work (2026-03-10) -- Gold Agent pilot:**
 - [x] Phase 3 (gold analysis sessions) COMPLETE: NST (skew 60), EVN (skew 63), WAF (skew 40) -- all three pass schema validation and content standards (Phase 3G gate).
-- [x] Phase 4 COMPLETE -- commit `627f74d`: `api/gold_agent.py` (7-query NLM runner + Claude synthesis); `GET /api/agents/gold/{ticker}` endpoint in `api/main.py`; `notebooklm-py>=0.3.3` added to `requirements.txt`; `NOTEBOOKLM_GOLD_NOTEBOOK_ID` + `NOTEBOOKLM_AUTH_JSON` env vars added to `api/config.py`. 129/129 tests pass; Railway healthy.
-- [x] **Phase 4 LIVE (2026-03-10)**: Railway env vars set. Live test against NST returned full CI v3 JSON (skew 52, 10 evidence items, 6 gaps) in ~90 seconds. Endpoint confirmed operational.
-- **NOTE**: NOTEBOOKLM_AUTH_JSON credentials expire every 1-2 weeks. When the endpoint returns 503, re-run Get NotebookLM Auth.bat from Desktop, copy NOTEBOOKLM_AUTH_JSON.txt content, and update the Railway variable.
+- [x] Phase 4 COMPLETE -- commit `627f74d`: `api/gold_agent.py` (7-query NLM runner + Claude synthesis); `GET /api/agents/gold/{ticker}` endpoint in `api/main.py`; `notebooklm-py>=0.3.3` added to `requirements.txt`; `NOTEBOOKLM_GOLD_NOTEBOOK_ID` + `NOTEBOOKLM_AUTH_JSON` env vars added to `api/config.py`. 129/129 tests pass; Fly.io healthy.
+- [x] **Phase 4 LIVE (2026-03-10)**: Fly.io env vars set. Live test against NST returned full CI v3 JSON (skew 52, 10 evidence items, 6 gaps) in ~90 seconds. Endpoint confirmed operational.
+- **NOTE**: NOTEBOOKLM_AUTH_JSON credentials expire every 1-2 weeks. When the endpoint returns 503, re-run Get NotebookLM Auth.bat from Desktop, copy NOTEBOOKLM_AUTH_JSON.txt content, and update the Fly.io variable.
 
 **Session work (2026-03-12) -- Phase 8: Batch Analysis:**
 - [x] Phase 8 COMPLETE -- commit `d70b6ae`: `api/migrations/008_batch_analysis.sql` (two tables: `memory_batch_runs`, `memory_consolidation_events`); `api/batch_analysis.py` (union-find clustering, Haiku contradiction detection, per-user consolidation); `BATCH_SECRET` added to `api/config.py`; `POST /api/batch/run` endpoint added to `api/main.py` (X-Batch-Secret auth guard); `.github/workflows/batch-analysis.yml` (cron 0 16 * * * = 02:00 AEDT). 218/218 tests passing.
 - [x] Endpoint live and auth-guarded: returns 401 on wrong secret; returns batch summary on valid secret.
-- [x] **8E DONE (user)**: `BATCH_SECRET` added to Railway env vars and GitHub Secrets.
+- [x] **8E DONE (user)**: `BATCH_SECRET` added to Fly.io env vars and GitHub Secrets.
 - [x] **8G DONE**: `batch-analysis` workflow_dispatch triggered; Railway logs confirmed `POST /api/batch/run HTTP/1.1' 200 OK`.
 
 **Session work (2026-03-12) -- Phase 9: Proactive Insights:**
-- [x] Phase 9 COMPLETE -- commit `7ec36e1`: `api/migrations/009_notifications.sql` (notifications table + 3 indices); `api/insights.py` (Haiku classifier, 7-day re-notification guard, `scan_ticker`, `run_insight_scan`, `get_notifications`, `dismiss_notification`); `api/main.py` (`GET /api/notifications`, `PATCH /api/notifications/{id}/dismiss`, `POST /api/insights/scan` with X-Insights-Secret auth); `api/config.py` (`INSIGHTS_SECRET`); `src/features/notifications.js` (badge + panel surface, 5-min poll, dynamic CSS injection); `src/main.js` (`initNotifications` wired between Auth and Chat); `.github/workflows/insights-scan.yml` (cron `0 17 * * 1-5` = 03:00 AEDT Mon-Fri). 157/157 Vitest tests passing. Railway healthy; `GET /api/notifications?guest_id=test` returns `[]`.
-- [x] **9D DONE (user)**: `INSIGHTS_SECRET` added to Railway env vars and GitHub Secrets.
+- [x] Phase 9 COMPLETE -- commit `7ec36e1`: `api/migrations/009_notifications.sql` (notifications table + 3 indices); `api/insights.py` (Haiku classifier, 7-day re-notification guard, `scan_ticker`, `run_insight_scan`, `get_notifications`, `dismiss_notification`); `api/main.py` (`GET /api/notifications`, `PATCH /api/notifications/{id}/dismiss`, `POST /api/insights/scan` with X-Insights-Secret auth); `api/config.py` (`INSIGHTS_SECRET`); `src/features/notifications.js` (badge + panel surface, 5-min poll, dynamic CSS injection); `src/main.js` (`initNotifications` wired between Auth and Chat); `.github/workflows/insights-scan.yml` (cron `0 17 * * 1-5` = 03:00 AEDT Mon-Fri). 157/157 Vitest tests passing. Fly.io healthy; `GET /api/notifications?guest_id=test` returns `[]`.
+- [x] **9D DONE (user)**: `INSIGHTS_SECRET` added to Fly.io env vars and GitHub Secrets.
 - [x] **9E DONE**: `insights-scan` workflow_dispatch triggered; Railway logs confirmed `POST /api/insights/scan HTTP/1.1' 200 OK`. 9 tickers scanned (tickers with active memories in DB), 97 memories checked -- expected behaviour; scan discovers tickers dynamically from memory table.
 
 **Session work (2026-03-13) -- Memory pipeline audit fixes:**
@@ -121,16 +120,16 @@ npm run validate     # lint + test:all — run before any push
 **Session work (2026-03-13 session 2) -- Add Stock synchronous coverage:**
 - [x] Commit `e1bbb19`: `api/main.py` `add_stock()` now runs `run_refresh()` synchronously (150s timeout) instead of fire-and-forget background task. Quality gate checks evidence cards >= 5, hypothesis scores ending in "%", and `theNarrative` present. Returns `coverage_status` (completed/degraded/failed/timeout) and `coverage_error`.
 - [x] `src/features/add-stock.js` rewritten: `AbortController` (180s client timeout), progress poller (2.5s interval on `/api/refresh/{ticker}/status`), handles all coverage outcomes, extracted `_loadResearchIntoApp()` and `_loadScaffold()` helpers, fixed `$` sign corruption via Unicode escapes, removed fragile `triggerRefresh` polling.
-- [x] 157/157 Vitest passing. Build succeeds. Railway healthy (29 tickers). Pre-existing Jest data-integrity failures (EVN scaffold missing hypotheses in `_index.json`) unrelated.
+- [x] 157/157 Vitest passing. Build succeeds. Fly.io healthy (29 tickers). Pre-existing Jest data-integrity failures (EVN scaffold missing hypotheses in `_index.json`) unrelated.
 
 **Session work (2026-03-16) -- Gold Agent Mapping Persistency:**
-- [x] Commit `749e46c`: Persisted `NOTEBOOKLM_TICKER_NOTEBOOKS` mapping in the repo. Created `data/config/notebooklm-notebooks.json` as primary source; `config.py` now merges this with env var overrides. This removes the need for manual Railway env var edits when adding new gold stocks.
+- [x] Commit `749e46c`: Persisted `NOTEBOOKLM_TICKER_NOTEBOOKS` mapping in the repo. Created `data/config/notebooklm-notebooks.json` as primary source; `config.py` now merges this with env var overrides. This removes the need for manual Fly.io env var edits when adding new gold stocks.
 - [x] Verified syntax and mapping integrity locally.
 
 **Session work (2026-03-13 session 3) -- Home page tile data audit:**
 - [x] Commit `f362d11`: Populated `reference.json` for ASB, WAF, NST, EVN (sharesOutstanding, EPS, divPerShare, analyst targets). Fixed RMC `sharesOutstanding` from 396000000 (raw) to 396 (millions convention) -- was producing nonsensical "A$372,240B" market cap. Replaced "Div Yield: N/A" with "Analyst Target" for ASB/WAF (non-dividend payers).
 - [x] Commit `3ae5b9c`: Patched `_index.json` for EVN and NST -- missing `featuredMetrics`, `featuredRationale`, `hypotheses`, `skew` fields caused literal "undefined" text on home page cards. Root cause: scaffold process wrote full research JSON but did not copy card fields to `_index.json`.
-- [x] 157/157 Vitest passing. Railway healthy (29 tickers).
+- [x] 157/157 Vitest passing. Fly.io healthy (29 tickers).
 
 **Session work (2026-03-17) -- Price Driver Agent Upgrade:**
 - [x] Backend: DB TTL 48h → 7 days, scan endpoint synchronous, `_compute_period_returns()` helper (2D/5D/10D stock vs ASX200), broker queries split (upgrades/downgrades/notes), social queries split (HotCopper/Reddit/X-via-media), Layer 3 synthesis prompt expanded. Rate limit relaxed to 2/min.
@@ -144,7 +143,7 @@ npm run validate     # lint + test:all — run before any push
 - [x] Commit `4ce17e1`: Fixed `[object Object]` bug in narrative fields (added `narrText()` helper for object-typed fields). Moved technical structure to page 1. Removed forced page break.
 - [x] Commit `386f2c0`: Page 2 density -- all evidence cards in 2-col grid (truncation 400/250), all discriminator rows with currentReading column, all tripwires (no caps), verdict callout between discriminators and tripwires.
 - [x] Commit `a68ec06`: Removed evidence gaps section from briefing to keep 2-page constraint.
-- [x] 157/157 Vitest passing. Build succeeds. Railway healthy (32 tickers).
+- [x] 157/157 Vitest passing. Build succeeds. Fly.io healthy (32 tickers).
 
 **Session work (2026-03-18) -- UI fixes, OTP email, memory pipeline hardening:**
 - [x] **OTP email migration**: `api/email_service.py` rewritten to use Resend HTTP API via `httpx` (10s timeout). Root cause was Railway blocking all outbound SMTP. `api/config.py` simplified to `EMAIL_FROM` + `RESEND_API_KEY`. Login flow verified end-to-end.
@@ -186,16 +185,26 @@ npm run validate     # lint + test:all — run before any push
 - [x] **S10**: `scaffold.py`: `infer_archetype()` with sector/sub-sector heuristics + `_ARCHETYPE_OVERRIDES` dict.
 - **NOTE**: SNX NotebookLM notebook (`c5470e1a`) currently contains Ramelius Resources (RMS) documents. Must be repopulated with SNX-specific source material before re-running the gold agent.
 
+**Session work (2026-03-20) -- Infrastructure migration and workflow fixes:**
+- [x] **Cloudflare Pages frontend deployment**: migrated from Vercel. GitHub Pages deploy workflow disabled (`if: false`).
+- [x] **Fly.io backend deployment**: `fly-deploy.yml` updated with `--lease-timeout=120s --wait-timeout=300` to handle VM lease contention from concurrent data pipeline deploys.
+- [x] **Database Backup workflow fixed**: `db-backup.yml` pinned to `ubuntu-22.04` with pg 17 client from PGDG repo; `sslmode=disable` forced in connection URL (Fly.io proxy handles transport encryption, does not support PostgreSQL SSL negotiation).
+- [x] **Daily Research Update workflow fixed**: Added `git checkout -- .` and `git clean -fd` after commit but before `git pull --rebase` to clean unstaged changes from scripts.
+- [x] **Analyst panel width**: `--analyst-panel-width` changed from 380px to 480px in `src/styles/tokens.css`.
+- [x] **Static file serving removed from API**: `serve_frontend` catch-all and `DIST_ROOT` removed from `api/main.py`. `/data/` endpoint preserved for research JSON serving to Cloudflare Pages frontend.
+- [x] **Sector ETF tickers fixed**: All 14 entries in `SECTOR_ETF_MAP` (`api/price_drivers.py`) changed from `.AX` ETF format to `^AX` index format. Yahoo Finance returns 404 for all `.AX` sector ETF symbols; `^AX` equivalents all return 200.
+- [x] 202/202 Vitest passing. Build succeeds. Fly.io healthy.
+
 **Recent commits (last six):**
-- `6ad2539` fix: correct SNX NotebookLM notebook ID
-- `d0be44c` feat: add SNX NotebookLM notebook ID for gold agent
-- `3f5d6d7` feat: stock archetype system + unified gold section + explorer metrics
-- `4ae62e7` feat: C1 bundle CDN deps via Vite + C2 voice rules JSON + C3 structured errors + C4 lint scope + C5 package v3
-- `47372f1` feat: voice rules as build-time static JSON (Task C2)
-- `b16e3fc` feat(api): add conversation history token budget (Task B4)
+- `fcd77b5` fix: remove static file serving + fix sector ETF Yahoo tickers
+- `b954bff` chore: Vercel config (since removed; migrated to Cloudflare Pages)
+- `4b991ff` fix: install pg 17 client on ubuntu-22.04 for db-backup
+- `71ce5ea` fix: repair three failing GitHub Actions workflows
+- `037c3a6` fix: widen analyst panel from 380px to 480px
+- `db3b031` feat: wire custom domain api.continuumintelligence.ai (Phase 4)
 
 **Do not fix without instruction:**
-- `previousSkew` is empty string on the first Railway refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
+- `previousSkew` is empty string on the first Fly.io refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
 - `window.CI_API_KEY` is not set in `index.html`. It is injected via a mechanism not in this repo. The fallback `window.CI_API_KEY || ''` disables auth in dev mode. Do not add a hardcoded key.
 
 ---
@@ -220,8 +229,8 @@ npm run validate     # lint + test:all — run before any push
 - **If a fix touches more than two files:** enter Plan Mode. Present the diff surface before writing code.
 - **If a Jest test fails but Vitest passes:** report it rather than patching to silence it. Jest uses jsdom; some DOM interactions behave differently. Do not block the task on a Jest-only failure.
 - **If you find a bug unrelated to the current task:** record it in a note and raise it. Do not fix it inline. Silent scope creep has caused multiple regressions in this codebase.
-- **If Railway returns 5xx on `/api/refresh/TICKER`:** do not retry automatically. The job may already be running. Check `/api/refresh/TICKER/status` first.
-- **When uncertain about environment:** `window.location.hostname.includes('github.io')` is the canonical environment check used throughout the codebase.
+- **If Fly.io returns 5xx on `/api/refresh/TICKER`:** do not retry automatically. The job may already be running. Check `/api/refresh/TICKER/status` first.
+- **When uncertain about environment:** `src/lib/api-config.js` is the canonical source. It returns `https://api.continuumintelligence.ai` for any non-localhost hostname. The frontend runs on Cloudflare Pages (`continuum-intelligence-v3.pages.dev` or custom domain `app.continuumintelligence.ai`).
 
 ---
 
@@ -313,7 +322,7 @@ Rewritten to prevent wasted API spend and improve operational resilience.
 **Three safeguards added:**
 1. **Fail-fast on credit exhaustion:** Checks response body for "credit balance" on any 500. Sets `CREDIT_EXHAUSTED=1` and skips all remaining tickers. Proved out: 8-second run vs 1h 25m.
 2. **Freshness skip:** Hits `/api/agents/drivers/{ticker}/latest` before each ticker. If `analysis_date` matches today's UTC date, skips. Prevents redundant re-processing on re-runs.
-3. **502 retry:** Gateway timeouts get one retry at 600s (up from 480s) after 10s cooldown. Handles Railway timeout flakiness.
+3. **502 retry:** Gateway timeouts get one retry at 600s (up from 480s) after 10s cooldown. Handles Fly.io timeout flakiness.
 
 **Manual dispatch inputs added:**
 - `tickers`: space-separated custom list (blank = all 33)

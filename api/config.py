@@ -10,8 +10,7 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "").strip()
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
 _DEFAULT_ORIGINS = (
     "https://app.continuumintelligence.ai,"
-    "https://continuum-intelligence-v3.vercel.app,"
-    "https://marcjduncan-sys.github.io,"
+    "https://continuum-intelligence-v3.pages.dev,"
     "http://localhost:3000,"
     "http://localhost:5000,"
     "http://localhost:5173"
@@ -31,11 +30,6 @@ INDEX_HTML_PATH = os.path.realpath(os.getenv(
 PROJECT_ROOT = os.path.realpath(os.getenv(
     "PROJECT_ROOT",
     os.path.join(os.path.dirname(__file__), ".."),
-))
-# Built frontend directory (Vite output)
-DIST_DIR = os.path.realpath(os.getenv(
-    "DIST_DIR",
-    os.path.join(os.path.dirname(__file__), "..", "dist"),
 ))
 MAX_PASSAGES = 12
 MAX_CONVERSATION_TURNS = 20
