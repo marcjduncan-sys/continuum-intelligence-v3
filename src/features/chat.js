@@ -16,6 +16,7 @@ import DOMPurify from 'dompurify';
 import { STOCK_DATA } from '../lib/state.js';
 import { saveThesis, getThesis, inferBiasFromQuestion, recordSignal, getConsistentSignalCount } from './thesis-capture.js';
 import { API_BASE } from '../lib/api-config.js';
+import { handleAnalystToPMHandoff } from './pm-chat.js';
 
 // ============================================================
 // CONFIGURATION
@@ -304,6 +305,14 @@ function renderConversation() {
                 html += '</div>';
                 html += '</div>';
             }
+            // Phase F: Handoff button on Analyst responses when ticker is active
+            if (ticker) {
+                html += '<div class="ap-handoff-actions">' +
+                    '<button class="ap-handoff-btn" data-ticker="' + escapeHtml(ticker) + '" ' +
+                    'title="Send this analysis to PM for portfolio-fit assessment">' +
+                    '<span class="ap-handoff-icon">&#8594;</span> Assess portfolio fit in PM' +
+                    '</button></div>';
+            }
         }
         html += '</div>';
         html += '</div>';
@@ -312,6 +321,7 @@ function renderConversation() {
     messages.innerHTML = html;
     scrollToBottom();
     bindSourceToggles();
+    _bindHandoffButtons();
 }
 
 function bindSourceToggles() {
@@ -319,6 +329,44 @@ function bindSourceToggles() {
         btn.addEventListener('click', function() {
             var target = document.getElementById(btn.getAttribute('data-target'));
             if (target) target.classList.toggle('open');
+        });
+    });
+}
+
+function _bindHandoffButtons() {
+    if (!messages) return;
+    messages.querySelectorAll('.ap-handoff-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var hTicker = btn.getAttribute('data-ticker');
+            if (!hTicker) return;
+
+            // Fetch Analyst summary then hand off to PM
+            btn.disabled = true;
+            btn.textContent = 'Sending to PM...';
+
+            var _fetchHeaders = { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY };
+            var _fetchToken = window.CI_AUTH && window.CI_AUTH.getToken();
+            if (_fetchToken) _fetchHeaders['Authorization'] = 'Bearer ' + _fetchToken;
+            var _guestId = window.CI_AUTH && window.CI_AUTH.getGuestId ? window.CI_AUTH.getGuestId() : null;
+
+            fetch(apiOrigin + '/api/handoffs/analyst-to-pm', {
+                method: 'POST',
+                headers: _fetchHeaders,
+                body: JSON.stringify({
+                    ticker: hTicker,
+                    source_conversation_id: dbConversationIds[hTicker] || null,
+                    handoff_reason: 'assess_portfolio_fit',
+                    guest_id: _guestId
+                })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                handleAnalystToPMHandoff(hTicker, data.summary_payload || null);
+            })
+            .catch(function(err) {
+                console.warn('[Analyst] Handoff failed:', err);
+                btn.textContent = 'Handoff failed';
+            });
         });
     });
 }

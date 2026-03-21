@@ -52,6 +52,7 @@
             <a href="#portfolio" data-nav="portfolio">Portfolio</a>
             <a href="#personalisation" data-nav="personalisation">Personalisation</a>
             <a href="#memory" data-nav="memory">Journal</a>
+            <a href="#pm" data-nav="pm">PM</a>
             <a href="#about" data-nav="about">About</a>
         </div>
         <div class="nav-actions">
@@ -572,6 +573,11 @@
      ============================================================ -->
 <div class="page" id="page-memory"></div>
 
+<!-- ============================================================
+     PAGE: PM (Portfolio Manager)
+     ============================================================ -->
+<div class="page" id="page-pm"></div>
+
 <!-- Report Pages (dynamically rendered) -->
 <div class="page" id="page-report-WOW"></div>
 <div class="page" id="page-report-XRO"></div>
@@ -725,6 +731,65 @@
     <span>Analyst</span>
 </button>
 
+<!-- ============================================================
+     PM PANEL -- Portfolio Manager docked right-rail
+     Mode-switches with Analyst panel via rail-mode-switch
+     ============================================================ -->
+
+<aside id="pm-panel" class="pm-panel" aria-label="Portfolio Manager" role="complementary">
+
+    <div class="pm-header">
+        <div class="pm-header-left">
+            <div class="pm-header-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+            </div>
+            <div class="pm-header-text">
+                <div class="pm-header-title">PORTFOLIO MANAGER</div>
+                <div class="pm-context-bar">
+                    <span class="pm-portfolio-badge" id="pmPortfolioBadge">NO PORTFOLIO</span>
+                </div>
+            </div>
+        </div>
+        <div class="pm-header-actions">
+            <button class="pm-clear-btn" id="pmClearBtn" title="Clear conversation" aria-label="Clear PM conversation">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                </svg>
+            </button>
+            <button class="pm-collapse-btn" id="pmCollapseBtn" title="Switch to Analyst" aria-label="Switch to Analyst panel">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="9 18 15 12 9 6"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="pm-messages" id="pmMessages" aria-live="polite" role="log" aria-label="PM conversation"></div>
+
+    <div class="pm-input-area">
+        <label for="pmInput" class="sr-only">Ask the portfolio manager a question</label>
+        <textarea class="pm-input" id="pmInput" placeholder="Ask about your portfolio..." rows="1" aria-label="Ask the portfolio manager a question"></textarea>
+        <div class="pm-input-actions">
+            <span class="pm-shortcut-hint">&#8984;&#8629;</span>
+            <button class="pm-send-btn" id="pmSend" disabled aria-label="Send message">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+</aside>
+
+<!-- Mobile PM FAB -->
+<button class="pm-fab" id="pmFab" aria-label="Open portfolio manager" aria-expanded="false" aria-controls="pm-panel" style="display:none">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+    </svg>
+    <span>PM</span>
+</button>
 
 <!-- Chart.js for narrative timeline visualisation -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin="anonymous"></script>

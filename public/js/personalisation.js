@@ -13,7 +13,7 @@
 
 var PN_STEP_LABELS = [
     { num: 1, title: 'Firm', subtitle: 'Institutional context' },
-    { num: 2, title: 'Strategy', subtitle: 'Fund mandate' },
+    { num: 2, title: 'Strategy', subtitle: 'Fund & mandate' },
     { num: 3, title: 'Portfolio', subtitle: 'Current holdings' },
     { num: 4, title: 'Assessment', subtitle: 'Cognitive profile' },
     { num: 5, title: 'Chat', subtitle: 'Calibrated AI' }
@@ -344,6 +344,19 @@ var pnState = {
         riskBudget: 10,
         holdingPeriod: ''
     },
+    mandate: {
+        maxPositionSize: 15,
+        sectorCap: 35,
+        cashRangeMin: 3,
+        cashRangeMax: 25,
+        turnoverTolerance: 'moderate',
+        concentrationTolerance: 'moderate',
+        styleBias: 'none',
+        riskAppetite: 'moderate',
+        positionDirection: 'long_only',
+        restrictedNames: [],
+        benchmarkFraming: 'relative'
+    },
     portfolio: [],
     portfolioSkipped: false,
     assessment: {
@@ -360,6 +373,78 @@ var pnState = {
     assessmentBlock: 0
 };
 
+// ---------------------------------------------------------------------------
+// Mandate safety caps (absolute maximums -- Constitution floor)
+// User mandate overrides house defaults but cannot exceed these.
+// ---------------------------------------------------------------------------
+
+var PN_MANDATE_SAFETY_CAPS = {
+    maxPositionSize: { min: 1, max: 50 },
+    sectorCap: { min: 5, max: 50 },
+    cashRangeMin: { min: 0, max: 20 },
+    cashRangeMax: { min: 5, max: 50 }
+};
+
+// ---------------------------------------------------------------------------
+// Mandate option lists
+// ---------------------------------------------------------------------------
+
+var PN_MANDATE_OPTIONS = {
+    turnoverTolerance: [
+        'Low (< 20% annual)',
+        'Moderate (20-50% annual)',
+        'High (50-100% annual)',
+        'Very High (> 100% annual)'
+    ],
+    concentrationTolerance: [
+        'Low (max 20 positions)',
+        'Moderate (10-20 positions)',
+        'Concentrated (5-10 positions)',
+        'Highly Concentrated (< 5 positions)'
+    ],
+    styleBias: [
+        'None',
+        'Value',
+        'Growth',
+        'GARP',
+        'Quality',
+        'Momentum',
+        'Income / Yield'
+    ],
+    riskAppetite: [
+        'Conservative',
+        'Moderate',
+        'Aggressive',
+        'Opportunistic'
+    ],
+    positionDirection: [
+        'Long Only',
+        'Long-Short'
+    ],
+    benchmarkFraming: [
+        'Relative (track benchmark)',
+        'Absolute return',
+        'Benchmark-aware (soft reference)',
+        'Unconstrained'
+    ]
+};
+
+function pnClampMandate(mandate) {
+    var caps = PN_MANDATE_SAFETY_CAPS;
+    mandate.maxPositionSize = Math.max(caps.maxPositionSize.min,
+        Math.min(caps.maxPositionSize.max, mandate.maxPositionSize || 15));
+    mandate.sectorCap = Math.max(caps.sectorCap.min,
+        Math.min(caps.sectorCap.max, mandate.sectorCap || 35));
+    mandate.cashRangeMin = Math.max(caps.cashRangeMin.min,
+        Math.min(caps.cashRangeMin.max, mandate.cashRangeMin || 3));
+    mandate.cashRangeMax = Math.max(caps.cashRangeMax.min,
+        Math.min(caps.cashRangeMax.max, mandate.cashRangeMax || 25));
+    if (mandate.cashRangeMin > mandate.cashRangeMax) {
+        mandate.cashRangeMax = mandate.cashRangeMin;
+    }
+    return mandate;
+}
+
 
 // =========================================================================
 // PERSISTENCE (localStorage)
@@ -370,13 +455,14 @@ var PN_STORAGE_KEY = 'continuum_personalisation_profile';
 function pnSaveToLocalStorage() {
     try {
         var data = {
-            version: 2,
+            version: 3,
             savedAt: new Date().toISOString(),
             state: {
                 currentStep: pnState.currentStep,
                 maxStepReached: pnState.maxStepReached,
                 firm: pnState.firm,
                 fund: pnState.fund,
+                mandate: pnClampMandate(pnState.mandate),
                 portfolio: pnState.portfolio,
                 portfolioSkipped: pnState.portfolioSkipped,
                 assessment: pnState.assessment,
@@ -429,6 +515,7 @@ function pnSaveToServer() {
     var body = {
         firm: pnState.firm || {},
         fund: pnState.fund || {},
+        mandate: pnState.mandate || {},
         portfolio: pnState.portfolio || [],
         profile: pnState.profile || {}
     };
@@ -444,17 +531,165 @@ function pnSaveToServer() {
     }).catch(function() { /* fire-and-forget */ });
 }
 
+// ---------------------------------------------------------------------------
+// Portfolio DB bridge (Phase D0.2)
+// Personalisation Step 3 writes to Phase B DB portfolio as canonical source.
+// localStorage portfolio_id links the wizard to the DB entity.
+// ---------------------------------------------------------------------------
+
+var PN_PORTFOLIO_ID_KEY = 'continuum_pm_portfolio_id';
+var PN_NOTIONAL_TOTAL = 1000000; // $1M notional for weight-to-value conversion
+
+function pnGetPortfolioId() {
+    try { return localStorage.getItem(PN_PORTFOLIO_ID_KEY) || null; } catch(e) { return null; }
+}
+
+function pnSetPortfolioId(id) {
+    try { localStorage.setItem(PN_PORTFOLIO_ID_KEY, id); } catch(e) {}
+}
+
+function pnSyncPortfolioToDB() {
+    // Convert lightweight Step 3 holdings (ticker + weight%) to Phase B DB snapshot
+    var validHoldings = (pnState.portfolio || []).filter(function(h) {
+        return h.ticker && h.ticker.trim() && parseFloat(h.weight) > 0;
+    });
+    if (validHoldings.length === 0) return;
+
+    var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    var origin = isLocal ? '' : 'https://api.continuumintelligence.ai';
+
+    var headers = { 'Content-Type': 'application/json' };
+    var token = window.CI_AUTH && window.CI_AUTH.getToken();
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    var apiKey = window.CI_API_KEY;
+    if (apiKey) headers['X-API-Key'] = apiKey;
+
+    var guestId = (!token && window.CI_AUTH && window.CI_AUTH.getGuestId) ? window.CI_AUTH.getGuestId() : null;
+
+    var existingId = pnGetPortfolioId();
+
+    // Build snapshot holdings from weights
+    var totalWeight = 0;
+    for (var i = 0; i < validHoldings.length; i++) {
+        totalWeight += parseFloat(validHoldings[i].weight) || 0;
+    }
+    if (totalWeight <= 0) return;
+
+    var holdingsData = [];
+    var holdingsMarketValue = 0;
+    for (var j = 0; j < validHoldings.length; j++) {
+        var w = parseFloat(validHoldings[j].weight) || 0;
+        var mv = Math.round((w / 100) * PN_NOTIONAL_TOTAL * 100) / 100;
+        holdingsMarketValue += mv;
+        holdingsData.push({
+            ticker: validHoldings[j].ticker.toUpperCase(),
+            quantity: 1,
+            price: mv,
+            market_value: mv,
+            sector: null,
+            asset_class: 'equity'
+        });
+    }
+    var cashValue = Math.max(0, PN_NOTIONAL_TOTAL - holdingsMarketValue);
+
+    function createSnapshot(portfolioId) {
+        var today = new Date().toISOString().split('T')[0];
+        return fetch(origin + '/api/portfolios/' + portfolioId + '/snapshots', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({
+                as_of_date: today,
+                total_value: PN_NOTIONAL_TOTAL,
+                cash_value: cashValue,
+                holdings: holdingsData,
+                notes: 'Synced from Personalisation wizard',
+                guest_id: guestId
+            })
+        });
+    }
+
+    if (existingId) {
+        // Portfolio exists, just create a new snapshot
+        createSnapshot(existingId).catch(function() { /* silent fail */ });
+    } else {
+        // Create portfolio first, then snapshot
+        var createBody = { name: 'Personalisation Portfolio', currency: 'AUD' };
+        if (guestId) createBody.guest_id = guestId;
+        fetch(origin + '/api/portfolios', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(createBody)
+        })
+        .then(function(res) { return res.ok ? res.json() : null; })
+        .then(function(data) {
+            if (data && data.id) {
+                pnSetPortfolioId(data.id);
+                return createSnapshot(data.id);
+            }
+        })
+        .catch(function() { /* silent fail -- localStorage holdings remain as fallback */ });
+    }
+}
+
+function pnLoadPortfolioFromDB() {
+    // Attempt to load portfolio state from DB and populate Step 3
+    var portfolioId = pnGetPortfolioId();
+    if (!portfolioId) return;
+
+    var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    var origin = isLocal ? '' : 'https://api.continuumintelligence.ai';
+
+    var headers = {};
+    var token = window.CI_AUTH && window.CI_AUTH.getToken();
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    var apiKey = window.CI_API_KEY;
+    if (apiKey) headers['X-API-Key'] = apiKey;
+
+    fetch(origin + '/api/portfolios/' + portfolioId + '/state', {
+        method: 'GET',
+        headers: headers
+    })
+    .then(function(res) { return res.ok ? res.json() : null; })
+    .then(function(state) {
+        if (!state || !state.holdings || state.holdings.length === 0) return;
+
+        // Convert DB holdings back to lightweight Step 3 format
+        var totalMV = 0;
+        for (var i = 0; i < state.holdings.length; i++) {
+            totalMV += parseFloat(state.holdings[i].market_value) || 0;
+        }
+        if (totalMV <= 0) return;
+
+        var portfolio = [];
+        for (var j = 0; j < state.holdings.length && j < 5; j++) {
+            var h = state.holdings[j];
+            var weight = Math.round(((parseFloat(h.market_value) || 0) / totalMV) * 100 * 10) / 10;
+            portfolio.push({ ticker: h.ticker, weight: String(weight) });
+        }
+
+        // Only update if DB has data and local is empty or stale
+        if (portfolio.length > 0) {
+            pnState.portfolio = portfolio;
+            pnSaveToLocalStorage();
+        }
+    })
+    .catch(function() { /* silent fail -- keep localStorage fallback */ });
+}
+
 function pnLoadFromLocalStorage() {
     try {
         var raw = localStorage.getItem(PN_STORAGE_KEY);
         if (!raw) return false;
         var data = JSON.parse(raw);
-        if (!data || data.version !== 2) return false;
+        if (!data || (data.version !== 2 && data.version !== 3)) return false;
         var s = data.state;
         pnState.currentStep = s.currentStep || 1;
         pnState.maxStepReached = s.maxStepReached || 1;
         pnState.firm = s.firm || pnState.firm;
         pnState.fund = s.fund || pnState.fund;
+        if (s.mandate) {
+            pnState.mandate = pnClampMandate(s.mandate);
+        }
         pnState.portfolio = s.portfolio || [];
         pnState.portfolioSkipped = s.portfolioSkipped || false;
         pnState.assessment = s.assessment || pnState.assessment;
@@ -680,7 +915,7 @@ function pnBlockComplete(blockIndex) {
 // SYSTEM PROMPT BUILDER
 // =========================================================================
 
-function pnBuildSystemPrompt(profile, firm, fund, portfolio) {
+function pnBuildSystemPrompt(profile, firm, fund, portfolio, mandate) {
     var p = '';
 
     p += 'You are a senior equity research analyst at Continuum Intelligence, an independent research platform focused on ASX-listed companies. ';
@@ -714,6 +949,26 @@ function pnBuildSystemPrompt(profile, firm, fund, portfolio) {
             }
             p += '\n';
         }
+    }
+
+    if (mandate && typeof mandate === 'object') {
+        p += '## PORTFOLIO MANDATE\n';
+        p += 'These are hard constraints set by the portfolio owner. Recommendations must respect them.\n';
+        p += '- Max single-name position: ' + (mandate.maxPositionSize || 15) + '%\n';
+        p += '- Max sector exposure: ' + (mandate.sectorCap || 35) + '%\n';
+        p += '- Cash target range: ' + (mandate.cashRangeMin || 3) + '%-' + (mandate.cashRangeMax || 25) + '%\n';
+        if (mandate.turnoverTolerance) p += '- Turnover tolerance: ' + mandate.turnoverTolerance + '\n';
+        if (mandate.concentrationTolerance) p += '- Concentration tolerance: ' + mandate.concentrationTolerance + '\n';
+        if (mandate.styleBias && mandate.styleBias !== 'none' && mandate.styleBias !== 'None') {
+            p += '- Style bias: ' + mandate.styleBias + '\n';
+        }
+        if (mandate.riskAppetite) p += '- Risk appetite: ' + mandate.riskAppetite + '\n';
+        p += '- Position direction: ' + (mandate.positionDirection === 'long_short' ? 'Long-Short (analytics not yet supported)' : 'Long Only') + '\n';
+        if (mandate.benchmarkFraming) p += '- Benchmark framing: ' + mandate.benchmarkFraming + '\n';
+        if (mandate.restrictedNames && mandate.restrictedNames.length > 0) {
+            p += '- RESTRICTED NAMES (do not recommend): ' + mandate.restrictedNames.join(', ') + '\n';
+        }
+        p += '\n';
     }
 
     p += '## MANAGER COGNITIVE PROFILE\n\n';
@@ -932,10 +1187,17 @@ function renderStep1() {
 }
 
 function renderStep2() {
+    var longShortWarning = '';
+    if (pnState.mandate.positionDirection === 'long_short') {
+        longShortWarning = '<div class="pn-mandate-warning">Long-Short is not yet supported in PM analytics. Stored for future use.</div>';
+    }
+
+    var restrictedStr = (pnState.mandate.restrictedNames || []).join(', ');
+
     return '<div class="pn-step" data-step="2">' +
         '<div class="pn-step-header">' +
-            '<h2 class="pn-step-heading">Fund & Strategy</h2>' +
-            '<p class="pn-step-desc">Define your fund mandate. This calibrates which signals are relevant and how analysis is framed for your strategy.</p>' +
+            '<h2 class="pn-step-heading">Fund, Strategy & Mandate</h2>' +
+            '<p class="pn-step-desc">Define your fund strategy and portfolio mandate. These constraints calibrate signals, frame analysis, and set hard limits for PM recommendations.</p>' +
         '</div>' +
         '<div class="pn-form-grid">' +
             pnTextInput('fund-name', 'Fund Name', pnState.fund.name, 'e.g. Magellan Global Fund') +
@@ -945,6 +1207,30 @@ function renderStep2() {
             pnSelect('fund-holding', 'Typical Holding Period', PN_FUND_OPTIONS.holdingPeriod, pnState.fund.holdingPeriod) +
             pnSlider('fund-risk', 'Risk Budget (Tracking Error)', 2, 25, pnState.fund.riskBudget, '%') +
         '</div>' +
+        '<div class="pn-mandate-divider"></div>' +
+        '<div class="pn-mandate-header">' +
+            '<h3 class="pn-mandate-heading">Portfolio Mandate</h3>' +
+            '<p class="pn-mandate-desc">These constraints override house defaults for PM recommendations. Safety caps prevent extreme values.</p>' +
+        '</div>' +
+        '<div class="pn-form-grid">' +
+            pnSlider('mandate-max-position', 'Max Position Size', 1, 50, pnState.mandate.maxPositionSize, '%') +
+            pnSlider('mandate-sector-cap', 'Max Sector Exposure', 5, 50, pnState.mandate.sectorCap, '%') +
+            pnSlider('mandate-cash-min', 'Minimum Cash', 0, 20, pnState.mandate.cashRangeMin, '%') +
+            pnSlider('mandate-cash-max', 'Maximum Cash', 5, 50, pnState.mandate.cashRangeMax, '%') +
+            pnSelect('mandate-turnover', 'Turnover Tolerance', PN_MANDATE_OPTIONS.turnoverTolerance, pnState.mandate.turnoverTolerance) +
+            pnSelect('mandate-concentration', 'Concentration Tolerance', PN_MANDATE_OPTIONS.concentrationTolerance, pnState.mandate.concentrationTolerance) +
+            pnSelect('mandate-style', 'Style Bias', PN_MANDATE_OPTIONS.styleBias, pnState.mandate.styleBias) +
+            pnSelect('mandate-risk', 'Risk Appetite', PN_MANDATE_OPTIONS.riskAppetite, pnState.mandate.riskAppetite) +
+            pnSelect('mandate-direction', 'Position Direction', PN_MANDATE_OPTIONS.positionDirection, pnState.mandate.positionDirection) +
+            pnSelect('mandate-benchmark-framing', 'Benchmark Framing', PN_MANDATE_OPTIONS.benchmarkFraming, pnState.mandate.benchmarkFraming) +
+            '<div class="pn-form-group full-width">' +
+                '<label class="pn-label" for="pn-mandate-restricted">Restricted Names <span style="opacity:0.5;font-size:0.75rem">(comma-separated tickers, optional)</span></label>' +
+                '<input type="text" class="pn-input" id="pn-mandate-restricted" ' +
+                    'value="' + escapeAttr(restrictedStr) + '" ' +
+                    'placeholder="e.g. CBA, WBC, ANZ">' +
+            '</div>' +
+        '</div>' +
+        longShortWarning +
     '</div>';
 }
 
@@ -1286,6 +1572,9 @@ function bindNavigation() {
     if (nextBtn) {
         nextBtn.addEventListener('click', function() {
             if (!pnValidateStep(pnState.currentStep)) return;
+            if (pnState.currentStep === 3 && pnHasPortfolioEntry()) {
+                pnSyncPortfolioToDB();
+            }
             if (pnState.currentStep === 4) {
                 pnState.profile = pnBuildProfile();
                 pnSaveToServer();
@@ -1360,6 +1649,65 @@ function bindStep2Inputs() {
         slider.addEventListener('input', function() {
             pnState.fund.riskBudget = parseInt(this.value, 10);
             if (sliderVal) sliderVal.textContent = this.value + '%';
+            pnSaveToLocalStorage();
+        });
+    }
+
+    // Mandate sliders
+    bindMandateSlider('pn-mandate-max-position', 'maxPositionSize');
+    bindMandateSlider('pn-mandate-sector-cap', 'sectorCap');
+    bindMandateSlider('pn-mandate-cash-min', 'cashRangeMin');
+    bindMandateSlider('pn-mandate-cash-max', 'cashRangeMax');
+
+    // Mandate selects
+    bindSelectInput('pn-mandate-turnover', function(val) { pnState.mandate.turnoverTolerance = val; });
+    bindSelectInput('pn-mandate-concentration', function(val) { pnState.mandate.concentrationTolerance = val; });
+    bindSelectInput('pn-mandate-style', function(val) { pnState.mandate.styleBias = val; });
+    bindSelectInput('pn-mandate-risk', function(val) { pnState.mandate.riskAppetite = val; });
+    bindSelectInput('pn-mandate-direction', function(val) {
+        pnState.mandate.positionDirection = val;
+        // Re-render to show/hide long-short warning
+        pnRefresh();
+    });
+    bindSelectInput('pn-mandate-benchmark-framing', function(val) { pnState.mandate.benchmarkFraming = val; });
+
+    // Restricted names
+    var restrictedInput = document.getElementById('pn-mandate-restricted');
+    if (restrictedInput) {
+        restrictedInput.addEventListener('input', function() {
+            var raw = this.value;
+            pnState.mandate.restrictedNames = raw
+                .split(',')
+                .map(function(t) { return t.trim().toUpperCase(); })
+                .filter(function(t) { return t.length > 0; });
+            pnSaveToLocalStorage();
+        });
+    }
+}
+
+function bindMandateSlider(elementId, stateKey) {
+    var el = document.getElementById(elementId);
+    var valEl = document.getElementById(elementId + '-value');
+    if (el) {
+        el.addEventListener('input', function() {
+            var v = parseInt(this.value, 10);
+            pnState.mandate[stateKey] = v;
+            if (valEl) valEl.textContent = v + '%';
+            // Cross-validate cash range
+            if (stateKey === 'cashRangeMin' && v > pnState.mandate.cashRangeMax) {
+                pnState.mandate.cashRangeMax = v;
+                var maxEl = document.getElementById('pn-mandate-cash-max');
+                var maxValEl = document.getElementById('pn-mandate-cash-max-value');
+                if (maxEl) maxEl.value = v;
+                if (maxValEl) maxValEl.textContent = v + '%';
+            }
+            if (stateKey === 'cashRangeMax' && v < pnState.mandate.cashRangeMin) {
+                pnState.mandate.cashRangeMin = v;
+                var minEl = document.getElementById('pn-mandate-cash-min');
+                var minValEl = document.getElementById('pn-mandate-cash-min-value');
+                if (minEl) minEl.value = v;
+                if (minValEl) minValEl.textContent = v + '%';
+            }
             pnSaveToLocalStorage();
         });
     }
@@ -1498,6 +1846,7 @@ function bindStep5Inputs() {
                 pnState.maxStepReached = 1;
                 pnState.firm = { name: '', type: '', aum: '', regulations: [], governance: '' };
                 pnState.fund = { name: '', strategy: '', geography: '', benchmark: '', riskBudget: 10, holdingPeriod: '' };
+                pnState.mandate = { maxPositionSize: 15, sectorCap: 35, cashRangeMin: 3, cashRangeMax: 25, turnoverTolerance: 'moderate', concentrationTolerance: 'moderate', styleBias: 'none', riskAppetite: 'moderate', positionDirection: 'long_only', restrictedNames: [], benchmarkFraming: 'relative' };
                 pnState.portfolio = [];
                 pnState.portfolioSkipped = false;
                 pnState.assessment = { ipip: {}, crt: {}, philosophy: {}, bias: {}, preferences: {} };
@@ -1640,6 +1989,8 @@ window.renderPersonalisationPage = function() {
 
 window.initPersonalisationDemo = function() {
     pnLoadFromLocalStorage();
+    // Attempt to refresh portfolio from DB (non-blocking, updates on next render)
+    pnLoadPortfolioFromDB();
     var wizard = document.getElementById('pn-wizard');
     if (wizard && pnState.currentStep > 1) {
         wizard.innerHTML = renderStepIndicator() +
@@ -1656,5 +2007,25 @@ window.pnOnRouteEnter = function() {
 };
 
 window.pnBuildSystemPrompt = pnBuildSystemPrompt;
+
+window.pnGetPortfolioId = pnGetPortfolioId;
+
+window.pnGetPersonalisationContext = function() {
+    return {
+        firm: pnState.firm || {},
+        fund: pnState.fund || {},
+        mandate: pnState.mandate || {},
+        portfolio: pnState.portfolio || [],
+        profile: pnState.profile || null,
+        hasProfile: pnState.profile !== null,
+        hasMandate: pnState.mandate && (
+            pnState.mandate.maxPositionSize !== 15 ||
+            pnState.mandate.sectorCap !== 35 ||
+            pnState.mandate.cashRangeMin !== 3 ||
+            pnState.mandate.cashRangeMax !== 25 ||
+            (pnState.mandate.restrictedNames && pnState.mandate.restrictedNames.length > 0)
+        )
+    };
+};
 
 })();
