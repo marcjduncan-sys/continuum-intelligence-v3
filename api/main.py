@@ -42,6 +42,11 @@ import summarise
 from auth import decode_token, router as auth_router
 from conversations import router as conversations_router
 from profiles import router as profiles_router
+from pm_chat import router as pm_chat_router
+from pm_conversations import router as pm_conversations_router
+from pm_journal import router as pm_journal_router
+from handoff_api import router as handoff_router
+from portfolio_api import router as portfolio_router
 from ingest import ingest, embed_all_passages, get_tickers, get_passage_count
 from refresh import (
     RefreshJob, refresh_jobs, get_job, is_running, run_refresh,
@@ -212,6 +217,15 @@ app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
 app.include_router(auth_router)
 app.include_router(conversations_router)
 app.include_router(profiles_router)
+if os.environ.get("ENABLE_PM", "true").lower() == "true":
+    app.include_router(pm_chat_router)
+    app.include_router(pm_conversations_router)
+    app.include_router(pm_journal_router)
+    app.include_router(handoff_router)
+    app.include_router(portfolio_router)
+    logger.info("PM endpoints enabled")
+else:
+    logger.info("PM endpoints disabled (ENABLE_PM != true)")
 
 
 # ---------------------------------------------------------------------------

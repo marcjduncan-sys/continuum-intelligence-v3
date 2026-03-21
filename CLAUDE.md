@@ -12,7 +12,8 @@ You are a senior engineer maintaining a production equity research platform used
 npm run dev          # Dev server on port 5000, proxies /api → localhost:8000
 npm run build        # Vite build → dist/; copies data/ → dist/data/
 npm run test         # Jest suite (tests/, src/**/*.test.js) — 61 tests
-npm run test:unit    # Vitest suite — what CI runs; must pass before pushing — 202 tests
+npm run test:unit    # Vitest suite — what CI runs; must pass before pushing — 206 tests
+# Python tests: 394 (run via pytest from api/ directory)
 npm run test:all     # Jest + Vitest combined — 263 tests total
 npm run lint         # ESLint over scripts/, src/, and public/js/
 npm run validate     # lint + test:all — run before any push
@@ -283,6 +284,675 @@ When given a bug report, just fix it. Point at logs, errors, failing tests, then
 - Simplicity first. Make every change as simple as possible. Minimal code impact.
 - No laziness. Find root causes. No temporary fixes. Senior developer standards.
 - Minimal blast radius. Changes touch only what is necessary. Avoid introducing bugs.
+
+## Session Log: 21 Mar 2026 -- PM Chat Phase D (PM Intelligence and Structured Recommendations)
+
+### PM Constitution
+
+`api/pm_constitution.py` -- operational rules injected as hard constraints into the PM system prompt. Not guidelines; these are limits the PM must obey.
+
+**Artefacts:**
+- `CONVICTION_SIZE_LADDER`: 5 rungs from Highest (4-6%) to Watch (0%). Maps conviction level to position sizing range.
+- `SOURCE_OF_FUNDS_HIERARCHY`: 6-step priority order for funding new positions (excess cash first, do-not-fund last).
+- `PORTFOLIO_ROLES`: Core, Satellite, Starter, Legacy, Cash.
+- `RECOMMENDATION_TYPES`: Add, Trim, Hold, Watch, Rebalance, Exit, No Action.
+- `RISK_FLAG_TAXONOMY`: 7 codes (HIGH_SINGLE_NAME, HIGH_TOP5, HIGH_TOP10, HIGH_SECTOR, LOW_CASH, HIGH_CASH, UNMAPPED_SECTOR) with category and urgency.
+- `RECOMMENDATION_SCHEMA`: 8-field structured output (action, security, sizing_band, rationale, portfolio_effect, risks_tradeoffs, data_basis, confidence).
+- `build_constitution_text(thresholds?)`: generates full Constitution text for prompt injection. Accepts custom thresholds.
+
+### PM context assembler
+
+`api/pm_context.py` -- converts raw portfolio state into PM-readable context blocks.
+
+- `snapshot_staleness_days(as_of_date)`: days between snapshot and today.
+- `staleness_warning(days)`: None if fresh (<2 days), note if 2-4 days, WARNING if >=5 days.
+- `build_portfolio_context(portfolio_state, analytics?)`: formats snapshot + analytics into markdown with holdings table, sector exposure, theme exposure, active flags.
+- `build_analyst_context(ticker, summary?)`: optional Analyst summary for referenced ticker. "No Analyst summary available" if None.
+- `build_safe_failure_context(...)`: graduated degradation: no portfolio, no snapshot, stale data, unmapped sectors, zero holdings. Returns None when all clear.
+
+### PM prompt builder
+
+`api/pm_prompt_builder.py` -- single assembly point for the PM system prompt. 7 sections:
+
+1. PM_IDENTITY: first-person plural, numerically precise, trade-off aware, defers to Analyst on stock quality.
+2. PM_VOICE_RULES: lead with decision, use sizing ranges, cite actual numbers, structured recommendation format.
+3. Constitution: hard constraints from `pm_constitution.py`.
+4. Safe-failure warnings: conditional, only if data problems detected.
+5. Portfolio context: snapshot + analytics + flags (only if portfolio loaded).
+6. Analyst summary: for referenced ticker (only if selected_ticker or candidate_security provided).
+7. Candidate security framing: source-of-funds and portfolio-effect analysis (only if candidate_security provided).
+
+`build_pm_system_prompt()` accepts: portfolio_state, analytics, thresholds, analyst_summary, selected_ticker, candidate_security.
+
+### PM Chat endpoint update
+
+`api/pm_chat.py` -- endpoint now fetches portfolio state via `portfolio_db.get_portfolio_state()` and passes full context to `build_pm_system_prompt()`. Conversation history bounded to MAX_CONVERSATION_TURNS * 2 messages.
+
+### Recommendation renderer
+
+`src/features/pm-chat.js` -- `_renderRecommendationCard()` and `_parseRecommendationBlocks()` parse structured recommendation blocks from PM responses and render colour-coded cards. Colours: Add (teal), Trim (amber), Exit (red), Hold (blue-grey), Watch (purple), Rebalance (cyan), No Action (grey-green).
+
+### Evaluation pack
+
+`api/tests/pm_eval_pack.py` -- 9 scenarios for manual review or future LLM-graded evals. Each has portfolio data, question, expected_behaviours list, anti_behaviours list. Scenarios: concentrated_winner, good_stock_wrong_portfolio, new_idea_no_source, high_cash_no_action, sector_crowding, incomplete_mapping, zero_holdings, do_nothing, stale_data.
+
+### Files created
+- `api/pm_constitution.py` -- PM Constitution (~150 lines)
+- `api/pm_context.py` -- context assembler (~170 lines)
+- `api/tests/test_pm_prompt.py` -- 30 unit tests (Constitution, context, safe-failure, staleness, prompt builder)
+- `api/tests/pm_eval_pack.py` -- 9 evaluation scenarios
+
+### Files modified
+- `api/pm_prompt_builder.py` -- complete rewrite from Phase A stub to 7-section prompt assembly
+- `api/pm_chat.py` -- endpoint now fetches portfolio state and builds full PM prompt with context
+- `src/features/pm-chat.js` -- recommendation card renderer with colour-coded structured output parsing
+
+### Test results
+- Vitest: 206/206 passing (no regressions)
+- Pytest portfolio (Phase B): 24/24 passing
+- Pytest analytics (Phase C): 47/47 passing
+- Pytest PM prompt (Phase D): 30/30 passing
+- Total Python tests: 101/101 passing
+
+---
+
+## Session Log: 21 Mar 2026 -- PM Chat Phase D0 (Personalisation-PM Unification)
+
+Phase D0 unifies the Personalisation system with PM Chat so PM operates off the user's actual mandate and portfolio context. Reclassified from Phase E to D0 (prerequisite to PM intelligence). Key architectural decisions: Phase B DB is canonical portfolio source; mandate in localStorage v1 only; alignment computed once on backend; Constitution safety caps > user mandate > house defaults.
+
+### D0.1: Mandate settings in Personalisation wizard
+
+`public/js/personalisation.js` -- added `mandate` object to `pnState` with 11 fields (maxPositionSize, sectorCap, cashRangeMin, cashRangeMax, turnoverTolerance, concentrationTolerance, styleBias, riskAppetite, positionDirection, restrictedNames, benchmarkFraming). `PN_MANDATE_SAFETY_CAPS` enforces absolute limits. `pnClampMandate()` clamps on save. Step 2 extended with sliders, selects, restricted names input, long-short warning. localStorage bumped v2 to v3 with backward compatibility.
+
+### D0.2: Canonical portfolio bridge
+
+`public/js/personalisation.js` -- `pnSyncPortfolioToDB()` converts Step 3 holdings to Phase B snapshot via `POST /api/portfolios/{id}/snapshots` using notional $1M total value. `pnLoadPortfolioFromDB()` fetches DB state and populates Step 3. `window.pnGetPortfolioId` and `window.pnGetPersonalisationContext` exports wired. `src/features/pm-chat.js` updated to include `portfolio_id` and `personalisation_context` in fetch body.
+
+### D0.3: Shared PersonalisationContext
+
+`api/personalisation_context.py` (~260 lines) -- `SAFETY_CAPS` dict (absolute maximums), `MANDATE_DEFAULTS` dict. `MandateSettings` dataclass: 11 fields, `__post_init__` clamps to safety caps, `to_thresholds()`, `has_custom_values()`. `CognitiveProfile` dataclass: big_five, crt_score, biases, preferences. `PersonalisationContext` dataclass: mandate + cognitive_profile + firm/fund fields. `parse_personalisation_context(data)` parses frontend JSON with percentage-to-decimal conversion. `api/pm_chat.py` updated to parse personalisation context and derive mandate thresholds.
+
+### D0.4: Backend alignment engine
+
+`api/portfolio_alignment.py` (~330 lines) -- pure deterministic, no LLM, no network (except local research JSON reads).
+
+- `classify_alignment(position_direction, evidence_skew)`: single source of truth for alignment classification (aligned/contradicts/neutral/not-covered)
+- `compute_hypothesis_dna()`: portfolio-level upside/downside weighted exposure, concentration risk detection (>50% of covered weight on single hypothesis)
+- `compute_hedge_gaps()`: correlated downside (>=2 holdings, >10% combined weight sharing same downside hypothesis) and single-name unhedged (>40% score, >5% weight)
+- `compute_reweighting_deltas()`: trim contradicts, review aligned below half-max, trim above mandate limit
+- `detect_changes()`: new/removed positions, weight changes >1pp
+- `compute_alignment()`: master entry point, returns complete diagnostics dict
+
+### D0.5: PM prompt builder extension
+
+`api/pm_prompt_builder.py` -- added `personalisation` and `alignment_diagnostics` parameters. `_build_mandate_section()` renders firm/fund context, mandate settings with percentage formatting, cognitive profile with behavioural cues (high neuroticism = calm framing, high CRT = Socratic questioning), bias vulnerabilities. `_build_alignment_section()` renders alignment summary, hypothesis DNA, hedge gaps (capped at 5), restricted violations, reweighting signals, recent changes. Section ordering: Identity > Voice > Constitution > Mandate > Safe-failure > Portfolio Context > Alignment > Analyst Summary > Candidate Security.
+
+### D0.6: Eval pack
+
+- `api/tests/test_personalisation_context.py` -- 17 tests (MandateSettings defaults/clamping/thresholds/custom values, parse_personalisation_context full payload/clamping/pct conversion, CognitiveProfile)
+- `api/tests/test_portfolio_alignment.py` -- 39 tests (classify_alignment 7, parse_score 4, resolve_skew 3, hypothesis_dna 3, hedge_gaps 3, reweighting_deltas 4, detect_changes 5, compute_alignment integration 4, prompt builder integration 6)
+
+### Bug fix during testing
+
+`portfolio_alignment.py` line 424: no-research fallback skew direction was `"balanced"` (classifying as neutral) instead of `""` (classifying as not-covered). Fixed to empty string so tickers without research correctly report as not-covered.
+
+### Files created
+- `api/personalisation_context.py` -- shared PersonalisationContext (~260 lines)
+- `api/portfolio_alignment.py` -- alignment engine (~330 lines)
+- `api/tests/test_personalisation_context.py` -- 17 tests
+- `api/tests/test_portfolio_alignment.py` -- 39 tests
+
+### Files modified
+- `public/js/personalisation.js` -- mandate settings, DB bridge, window exports
+- `public/css/personalisation.css` -- mandate section styling
+- `api/pm_prompt_builder.py` -- mandate section, alignment diagnostics section
+- `api/pm_chat.py` -- personalisation_context field, alignment computation, prompt wiring
+- `src/features/pm-chat.js` -- portfolio_id and personalisation_context in fetch body
+
+### Test results
+- Vitest: 206/206 passing (no regressions)
+- Pytest personalisation context (Phase D0.3): 17/17 passing
+- Pytest portfolio alignment (Phase D0.4-D0.6): 39/39 passing
+- Pytest existing (Phases B+C+D): 101/101 passing
+- Total Python tests: 157/157 passing
+
+---
+
+## Session Log: 21 Mar 2026 -- PM Chat Phase D1 (Decision Discipline Remediation)
+
+Phase D1 closes the governance gaps identified in the D0/D audit. The bones of PM existed (Constitution, context assembler, prompt builder, recommendation renderer, 9 eval scenarios) but the decision discipline was incomplete. D1 adds the controls that stop PM from behaving like a polished generalist instead of a real allocator.
+
+### D1.1: Mandate breach engine
+
+`api/portfolio_alignment.py` -- `compute_mandate_breaches()` added. Deterministic, backend-only. Cross-references actual portfolio analytics against the user's mandate limits.
+
+**Breach types detected:**
+- `POSITION_BREACH`: single-name weight exceeds mandate max. Recommended posture: `trim`.
+- `SECTOR_BREACH`: sector exposure exceeds mandate cap (Unclassified sector ignored). Recommended posture: `trim`.
+- `CASH_BELOW_MIN`: cash weight below mandate minimum. Recommended posture: `block_add`.
+- `CASH_ABOVE_MAX`: cash weight above mandate maximum. Recommended posture: `review`.
+
+**Breach object structure:** code, severity (critical/warning), metric, metric_name, limit, recommended_posture, description.
+
+Severity thresholds: position breach critical if overshoot >10pp; sector breach critical if overshoot >15pp; cash-above-max critical if >50%.
+
+Integrated into `compute_alignment()` master entry point. New parameters: `mandate_sector_cap`, `mandate_cash_min`, `mandate_cash_max`, `mandate_turnover_tolerance`, `analytics`. `pm_chat.py` passes all mandate parameters and analytics to alignment computation.
+
+### D1.2: PM prompt discipline patch -- not-covered names and reweighting signals
+
+`api/pm_prompt_builder.py` -- two new prompt sections added to `PM_VOICE_RULES`:
+
+**NOT-COVERED NAME RULES:** Flag explicitly as unsupported by research. Treat conservatively (zero alignment contribution). Do not recommend increase without Analyst coverage. If material (>5%), recommend requesting coverage. Frame as information gap, not sell signal.
+
+**REWEIGHTING SIGNAL RULES:** Explicitly framed as evidence inputs, not instructions. PM must assess mandate fit, source of funds, turnover cost, concentration effect, and coverage quality for each signal. If signals conflict, explain tension and use mandate hierarchy to resolve.
+
+### D1.3: Five PM answer types codified
+
+`api/pm_prompt_builder.py` -- `PM ANSWER TYPES` section added with explicit response policies:
+
+1. **Mandate-aware recommendations**: check breach/approach to limits, state constraint explicitly, address existing breaches first.
+2. **Evidence contradictions**: name the contradiction, state weight at risk, recommend proportional action, do NOT auto-sell.
+3. **Hypothesis concentration risks**: name shared hypothesis and combined weight, distinguish intentional thematic bet from accidental correlated risk.
+4. **Source-of-funds within mandate constraints**: apply hierarchy strictly, check funding source does not create new breach, flag turnover tolerance, state what worsens.
+5. **Change-driven alerts**: state what changed, assess alignment impact, address mandate breaches immediately.
+
+### D1.4: Eval pack expansion -- 9 mandate-aware scenarios
+
+`api/tests/pm_eval_pack.py` -- 9 new scenarios added (total: 18):
+
+10. `restricted_name_violation` -- BHP on restricted list, PM must flag and recommend exit
+11. `uncovered_top5_position` -- NOEXIST at 33% weight with no research coverage
+12. `mandate_tighter_than_default` -- user max 10% vs Constitution default 15%
+13. `sector_breach_user_mandate` -- Financials 80% vs user cap 25%
+14. `turnover_constrained_rebalance` -- low turnover tolerance constrains trade count
+15. `evidence_contradiction_no_sell` -- contradiction present but no automatic exit
+16. `reweight_blocked_by_mandate` -- evidence supports but mandate max already breached
+17. `long_short_unsupported` -- user selected long-short but analytics do not support
+18. `do_nothing_despite_signals` -- reweighting signals exist but best action is no action
+
+### D1.5: Mandate and breaches surfaced in PM UI
+
+`src/features/pm-chat.js` -- PM Chat response handler now captures `mandate_breaches`, `alignment_score`, and `not_covered_count` from the API response. `_renderMandateStatus()` renders a compact status bar above the messages area with:
+
+- Alignment score pill (green >=70%, gold 40-69%, red <40%)
+- Uncovered count pill (if any holdings lack research)
+- Breach summary pill with count by severity (tooltip shows descriptions)
+
+`api/pm_chat.py` -- `PMChatResponse` extended with `mandate_breaches` (list of `MandateBreach`), `alignment_score` (float), `not_covered_count` (int).
+
+`src/styles/pm-chat.css` -- 6 new status pill classes with both dark and light theme support.
+
+### Files created
+- None (all changes are modifications to existing files)
+
+### Files modified
+- `api/portfolio_alignment.py` -- `compute_mandate_breaches()`, expanded `compute_alignment()` signature
+- `api/pm_prompt_builder.py` -- answer types, not-covered rules, reweighting rules, mandate breach prompt section
+- `api/pm_chat.py` -- `MandateBreach` model, expanded response, full mandate params to alignment
+- `api/tests/pm_eval_pack.py` -- 9 new mandate-aware scenarios (18 total)
+- `api/tests/test_portfolio_alignment.py` -- 15 new tests (mandate breaches, prompt rules)
+- `src/features/pm-chat.js` -- mandate status bar rendering, response metadata capture
+- `src/styles/pm-chat.css` -- mandate status bar styling
+
+### Test results
+- Vitest: 206/206 passing (no regressions)
+- Pytest personalisation context (D0): 17/17 passing
+- Pytest portfolio alignment (D0+D1): 50/50 passing
+- Pytest existing (Phases B+C+D): 101/101 passing
+- Pytest eval pack prompt tests: 4/4 new passing
+- Total Python tests: 172/172 passing
+
+---
+
+## Session Log: 21 Mar 2026 -- Phase F (Analyst-to-PM Handoff)
+
+Phase F makes Analyst and PM work like a real investment team. The Analyst underwrites stocks; the PM decides portfolio action. Phase F adds explicit cross-role handoff, structured summary delivery, handoff logging, and UI actions in both panels.
+
+### F.1: Database schema (migration 016)
+
+`api/migrations/016_handoffs.sql` -- handoff log table:
+- `handoffs`: source_role, destination_role, ticker, summary_payload JSONB, source_conversation_id, handoff_reason, coverage_state, analyst_summary_version
+- Indexes on identity + recency, ticker + recency
+
+### F.2: Analyst summary assembly
+
+`api/handoff.py` -- assembles Analyst summary from existing memories:
+- `build_analyst_summary()`: async, pulls memories from DB, computes coverage state (covered/stale/not_covered)
+- Extracts: conviction_level (high/medium/low/none), valuation_stance (undervalued/fair/overvalued/unknown), key_risks (max 5), tripwires (max 5)
+- `_compute_summary_version()`: deterministic hash of memory IDs + timestamps
+- `_assess_coverage_state()`: checks freshness of most recent memory against staleness threshold (default 30 days)
+- Handoff payload schema: ticker, analyst_summary_text, conviction_level, valuation_stance, key_risks, tripwires, coverage_state, timestamp, summary_version
+
+### F.3: Handoff API endpoints
+
+`api/handoff_api.py` -- REST endpoints:
+- `POST /api/handoffs/analyst-to-pm`: Analyst sends ticker to PM, assembles summary, logs handoff
+- `POST /api/handoffs/pm-requests-analyst`: PM requests Analyst summary, logs handoff
+- `GET /api/handoffs/summary/{ticker}`: read-only Analyst summary (no log)
+- `GET /api/handoffs`: list handoff log entries with ticker/role filters
+
+### F.4: PM prompt injection
+
+`api/pm_context.py` -- enhanced `build_analyst_context()`:
+- Now accepts str (legacy), dict (handoff payload), or None
+- Dict path renders rich context: coverage state badge, conviction, valuation, risks, tripwires, version
+- Stale coverage gets explicit WARNING before content
+- Not-covered gets clear information gap framing
+
+`api/pm_chat.py` -- auto-fetch:
+- When `selected_ticker` or `candidate_security` is set, auto-fetches Analyst summary via `handoff.build_analyst_summary()`
+- Passes structured payload to `build_pm_system_prompt(analyst_summary=...)`
+
+### F.5: Decision basis extensions
+
+`api/pm_memory_extractor.py` -- `build_decision_basis()` now F.1:
+- Added: `analyst_summary_version`, `analyst_coverage_state`
+- Version bumped from E.1 to F.1
+- PM decisions now record whether they had Analyst input and its freshness
+
+### F.6: Frontend UI
+
+`src/features/chat.js` -- Analyst panel:
+- "Assess portfolio fit in PM" button on every Analyst response when ticker is active
+- Button calls `POST /api/handoffs/analyst-to-pm`, logs handoff, then switches to PM mode
+- PM receives a contextualised question including conviction and valuation from the Analyst
+
+`src/features/pm-chat.js` -- PM panel:
+- `handleAnalystToPMHandoff()`: receives ticker + summary payload, switches to PM mode, auto-sends
+- `viewAnalystSummary()`: fetches and displays inline card with coverage state, conviction, risks, tripwires
+- "View Analyst Summary" button on PM responses when a handoff ticker is tracked
+- Analyst summary card shows: source badge, coverage state, conviction level, valuation, risks, tripwires, version
+
+### F.7: Eval scenarios (6 new, 24 total)
+
+`api/tests/pm_eval_pack.py` -- Phase F scenarios:
+- 19: `handoff_covered_stock` -- Analyst-to-PM with full coverage
+- 20: `handoff_uncovered_stock` -- Analyst-to-PM with no coverage
+- 21: `handoff_stale_analyst_summary` -- PM requests stale coverage
+- 22: `handoff_missing_analyst_record` -- PM handles missing Analyst record
+- 23: `handoff_no_duplicate_clutter` -- handoff doesn't duplicate memory
+- 24: `handoff_recommendation_changes` -- PM changes after Analyst input
+
+### F.8: Tests
+
+`api/tests/test_handoff.py` -- 42 tests across 7 classes:
+- `TestAnalystSummaryAssembly` (17): version hash, conviction extraction, valuation, risks, tripwires, summary text
+- `TestCoverageState` (4): not_covered, covered, stale, custom threshold
+- `TestHandoffPayload` (4): no pool, no identity, field schema, ticker uppercasing
+- `TestDecisionBasisPhaseF` (4): version F.1, analyst fields, defaults
+- `TestHandoffDBGuards` (5): pool-None and identity-None guards
+- `TestPMContextHandoff` (5): plain string, None, dict covered/not_covered/stale
+- `TestPhaseFFEvalCoverage` (4): 24 scenarios, Phase F names, analyst_summary fields
+
+### Test results
+
+- Pytest: 259/259 passing (42 new Phase F tests)
+- Vitest: 206/206 passing
+- Vite build: passes
+
+---
+
+## Session Log: 21 Mar 2026 -- Portfolio Go-Live Verification Gates 2 and 3
+
+### Gate 2 -- Golden Portfolio Test Suite
+
+Built and passing.
+
+**Coverage:** 92 tests across 15 fixed portfolios with hand-computed expected outputs.
+
+**Assertions:**
+- position weights
+- concentration metrics
+- risk flags
+- mandate breaches
+- alignment classifications
+- theme exposures
+
+All asserted against manually calculated values with **0.05% tolerance**.
+
+**Portfolio set includes:**
+- balanced portfolio
+- concentrated portfolio
+- single-stock portfolio
+- all-cash portfolio
+- cash-heavy portfolio
+- cash-light portfolio
+- exact-threshold edge cases
+- mixed alignment with real research files
+- multi-breach detection
+- tight and relaxed mandates
+- restricted names
+- change detection
+- HHI verification
+- determinism
+- input non-mutation
+
+**Result:** all 92 tests pass.
+
+### Gate 3 -- PM Decision Quality Scoring Harness
+
+Built and passing.
+
+**Coverage:** 43 tests validating the 24-scenario PM eval pack structurally.
+
+**Rubric:** 5 dimensions at 20 points each, for a **100-point maximum**:
+- Decision Clarity
+- Constitution Fidelity
+- Evidence Grounding
+- Role Discipline
+- Trade-off Disclosure
+
+**Harness guarantees:**
+- each scenario covers 2 or more rubric dimensions
+- all dimensions are tested by 5 or more scenarios
+- expected and anti-behaviours do not overlap
+- anti-behaviours contain explicit negation language
+- all 5 PM answer types are covered
+- all 4 breach types are covered
+- all 3 coverage states are represented: `covered`, `stale`, `not_covered`
+
+Includes a keyword-based `score_pm_response()` function for offline scoring.
+**Production recommendation:** use LLM-as-judge for final qualitative grading.
+
+**Result:** all 43 tests pass.
+
+### Verification status
+
+**Full suite:** 394 pytest + 206 Vitest = **600 total tests passing**.
+**Build:** Vite production build clean.
+
+---
+
+## Session Log: 21 Mar 2026 -- Gates 4-6 Verification and Defect Fixes
+
+### Gates 4-6 verification
+
+Code-level verification of all checklist items in `GATES_4_6_CHECKLIST.md`. 119 items checked across UX walkthrough, memory/journal audit, and production readiness. Results: 113 pass, 5 defects found, 1 not applicable.
+
+### Defects found and fixed
+
+**D4-1 (Low, FIXED):** PM insight confidence not displayed in Journal. Added confidence badge to `_renderPMInsightCard` in `src/pages/memory.js` with green/gold/red styling. CSS classes: `.jnl-pm-confidence--high/med/low`.
+
+**D5-1 (Low, accepted risk):** No deduplication between PM decisions and insights. Extraction prompt discourages it; max caps (3 decisions, 5 insights) limit blast radius.
+
+**D6-1 (Medium, FIXED):** No feature flag for PM endpoints. Added `ENABLE_PM` environment variable gate to `api/main.py`. Defaults to `true`. Set `ENABLE_PM=false` to disable all 5 PM routers without code changes.
+
+**D6-2 (Low, FIXED):** PM Chat requests not logged. Added `logger.info()` to PM Chat endpoint in `api/pm_chat.py` logging identity, portfolio_id, and context_mode.
+
+**D6-3 (Low, FIXED):** Handoff events not logged. Added `logger.info()` to `log_handoff()` in `api/handoff.py` logging source_role, destination_role, ticker, coverage_state, and handoff_id.
+
+**D6-4 (Low, operational):** PM monitoring dashboards not set up. Blocks full rollout, not canary.
+
+### Release decision
+
+GO FOR CANARY. Full rollout after D6-4 monitoring dashboards and 48-hour clean canary window. See `RELEASE_SIGNOFF.md` for complete sign-off sheet.
+
+### Files created
+- `GATES_4_6_CHECKLIST.md` -- 78-item operator checklist for Gates 4-6
+- `RELEASE_SIGNOFF.md` -- formal release sign-off sheet
+
+### Files modified
+- `api/main.py` -- ENABLE_PM feature flag on PM router registration
+- `api/pm_chat.py` -- request logging on PM Chat endpoint
+- `api/handoff.py` -- event logging in log_handoff()
+- `src/pages/memory.js` -- confidence badge in PM insight cards + CSS
+
+### Test results
+- Pytest: 394/394 passing
+- Vitest: 206/206 passing
+- Vite build: clean
+
+---
+
+## Session Log: 21 Mar 2026 -- PM Memory Phase E (PM Memory and Journal Integration)
+
+Phase E adds persistent memory, structured decision logging, and Journal integration for the PM. PM conversations, decisions, and insights are stored separately from Analyst memory. The PM extractor uses a conservative 7-type taxonomy and logs a compact `decision_basis` object with every decision.
+
+### E.1: Database schema (migration 015)
+
+`api/migrations/015_pm_memory.sql` -- 4 new tables:
+
+- **pm_conversations**: PM conversation sessions linked to portfolio_id and snapshot_id. Separate from Analyst `conversations` (which are per-ticker).
+- **pm_messages**: Messages within PM conversations, with `metadata_json` for response metadata (breaches, alignment score).
+- **pm_decisions**: Structured decision log with `action_type` (trim/add/exit/hold/rebalance/watch/no_action), `rationale`, `sizing_band`, `source_of_funds`, `mandate_basis`, `breach_codes`, `coverage_state`, and `decision_basis` (JSONB).
+- **pm_insights**: PM-specific insights with 7-type taxonomy, `tickers[]`, `tags[]`, `confidence`, `active` flag, and `archived_at` for archive-not-delete semantics.
+
+Indexes on identity + recency for all tables, plus ticker index on decisions and type index on insights.
+
+### E.2: PM database layer
+
+`api/pm_db.py` -- CRUD helpers for all 4 tables, following the same patterns as `db.py`:
+
+- `create_pm_conversation()`, `get_pm_conversation()`, `append_pm_message()`, `list_pm_conversations()`
+- `insert_pm_decision()`, `get_pm_decisions()`
+- `insert_pm_insight()`, `get_pm_insights()`, `archive_pm_insight()`, `restore_pm_insight()`
+
+All functions are no-op safe (return None/[] if pool is None or identity is missing).
+
+### E.3: PM memory extraction
+
+`api/pm_memory_extractor.py` -- Haiku-powered extraction after each PM Chat turn. Fire-and-forget pattern matching `memory_extractor.py`.
+
+**Decision extraction**: max 3 per turn. Valid action types: trim, add, exit, hold, rebalance, watch, no_action. Each decision gets a compact `decision_basis` object with: snapshot_id, alignment_score, breach_codes, uncovered_count, related_tickers, mandate_hash, version.
+
+**Insight extraction**: max 5 per turn. Conservative taxonomy (7 types):
+1. `pm_decision` -- explicit action recommendation logged
+2. `portfolio_risk` -- portfolio-level risk or concentration concern
+3. `mandate_breach` -- mandate limit violation
+4. `sizing_principle` -- sizing or position-management principle
+5. `rebalance_suggestion` -- suggested rebalance with trade-offs
+6. `uncovered_exposure` -- exposure to names without research coverage
+7. `change_alert` -- recent portfolio change affecting alignment
+
+`build_decision_basis()` constructs the compact decision context object (version E.1).
+
+### E.4: PM Chat persistence wiring
+
+`api/pm_chat.py` -- modified for Phase E:
+- Added `pm_conversation_id` and `guest_id` to request model
+- Added `pm_conversation_id` to response model
+- Identity resolution via JWT/guest_id pattern
+- Auto-creates PM conversation if none provided
+- Stores user + assistant messages with metadata
+- Fires background `extract_pm_memory()` task after each response
+- Added `_mandate_hash()` for deterministic mandate versioning
+
+### E.5: PM Conversations API
+
+`api/pm_conversations.py` -- endpoints:
+- `GET /api/pm-conversations` -- list conversations
+- `GET /api/pm-conversations/latest` -- latest for portfolio
+- `POST /api/pm-conversations` -- create new
+- `GET /api/pm-conversations/{id}` -- restore by ID
+- `POST /api/pm-conversations/{id}/messages` -- append message
+
+### E.6: PM Journal API
+
+`api/pm_journal.py` -- unified Journal view:
+- `GET /api/pm-journal` -- combined decisions + insights feed, chronologically sorted, with `journal_type` field for frontend filtering
+- `GET /api/pm-journal/decisions` -- decisions only
+- `GET /api/pm-journal/insights` -- insights only, with type/ticker filters
+- `POST /api/pm-journal/insights/{id}/archive` -- archive (soft-delete)
+- `POST /api/pm-journal/insights/{id}/restore` -- restore archived
+
+### E.7: Frontend Journal integration
+
+`src/pages/memory.js` -- extended with Analyst | PM source toggle:
+- Source toggle bar at top of Journal page (Analyst | PM tabs)
+- PM view renders decisions (with action badges, sizing, source-of-funds, breach tags) and insights (with type badges, ticker tags, archive/restore actions)
+- Archive-not-delete semantics: archived insights shown in collapsed section with restore option
+- PM-specific CSS with action badge colours and decision card layout
+
+`src/features/pm-chat.js` -- conversation persistence:
+- Tracks `_pmConversationId` across turns
+- Sends `pm_conversation_id` and `guest_id` in request body
+- Captures `pm_conversation_id` from response for continuity
+- Resets on conversation clear
+
+### E.8: PM memory quality evals
+
+`api/tests/test_pm_memory.py` -- 34 tests:
+- `TestDecisionBasis` (4): minimal, full, defaults
+- `TestPMExtraction` (8): skip guards, decision/insight extraction, action type validation, insight type validation, cap enforcement, no_action validity
+- `TestPMExtractionPrompt` (4): taxonomy coverage, action types, caps, no_action
+- `TestPMChatPersistence` (4): request/response model fields, mandate hash determinism
+- `TestPMDB` (9): pool-None guards, identity-None guards for all CRUD ops
+- `TestPMEvalScenarioCoverage` (4): 18 scenarios parse, key scenarios exist
+
+### Bug fix: pm_eval_pack.py
+
+`api/tests/pm_eval_pack.py` -- Fixed syntax error where scenarios 10-18 were outside the `EVAL_SCENARIOS` list. Removed stray `]` at line 280 so all 18 scenarios are in a single list.
+
+### Files created
+- `api/migrations/015_pm_memory.sql`
+- `api/pm_db.py`
+- `api/pm_memory_extractor.py`
+- `api/pm_conversations.py`
+- `api/pm_journal.py`
+- `api/tests/test_pm_memory.py`
+
+### Files modified
+- `api/pm_chat.py` -- persistence wiring, identity resolution, background extraction
+- `api/main.py` -- registered pm_conversations_router and pm_journal_router
+- `api/tests/pm_eval_pack.py` -- syntax fix (scenarios inside list)
+- `src/pages/memory.js` -- Analyst|PM source toggle, PM card rendering, PM API calls
+- `src/features/pm-chat.js` -- conversation ID tracking, guest_id in request
+
+### Test results
+- Vitest: 206/206 passing (no regressions)
+- Pytest Phase E (PM memory): 34/34 new passing
+- Pytest total: 217/217 passing
+- Build: succeeds
+
+---
+
+## Session Log: 21 Mar 2026 -- PM Chat Phase C (Deterministic Portfolio Analytics)
+
+### Analytics engine
+
+`api/portfolio_analytics.py` -- pure deterministic module, no LLM, no network. Single entry point: `compute_analytics(holdings, total_value, cash_value, thresholds?)`.
+
+**Metrics computed:**
+- Position count, total value, cash value, cash weight
+- Concentration: max single-name weight, top 5, top 10, HHI, equal-weight deviation, normalised concentration score (0-100)
+- Sector exposure: market-value-weighted by sector
+- Theme exposure: aggregated from sector map (Cyclical, Defensive, Growth, Financial, Real Assets)
+- Top 5 positions with ticker, weight, market_value, sector
+- Full holdings list with derived weights
+
+**Threshold framework** (`ThresholdConfig` dataclass): max_single_position=15%, max_top5=50%, max_top10=75%, max_sector=35%, min_cash=3%, max_cash=25%. All configurable.
+
+**Explainability:** Each flag is an `AnalyticsFlag` with code, severity, human-readable message (containing the actual number and threshold), metric_name, metric_value, threshold. Flag codes: HIGH_SINGLE_NAME, HIGH_TOP5, HIGH_TOP10, HIGH_SECTOR, UNMAPPED_SECTOR, LOW_CASH, HIGH_CASH.
+
+### Persistence
+
+`api/migrations/014_portfolio_analytics.sql` -- `portfolio_analytics` table: snapshot_id (unique FK), analytics_json (JSONB), thresholds_json (JSONB). One row per snapshot; upserts on re-computation.
+
+CRUD in `portfolio_db.py`: `save_analytics()`, `get_analytics()`. Auto-computed and persisted on snapshot creation via `portfolio_api.py`. On-the-fly computation for pre-Phase-C snapshots via `GET /api/portfolios/{id}/analytics`.
+
+### PM dashboard
+
+`src/pages/pm.js` -- exports `renderPMPage()` (static layout) and `updatePMDashboard(analytics)` (dynamic data injection). Sections: summary metrics, concentration (4-metric grid), top positions (ticker/weight/value rows), sector exposure (bar chart), risk flags (icon + message).
+
+### Files created
+- `api/portfolio_analytics.py` -- analytics engine (~300 lines)
+- `api/migrations/014_portfolio_analytics.sql` -- analytics table migration
+- `api/tests/test_portfolio_analytics.py` -- 47 hand-checked test cases
+
+### Files modified
+- `api/portfolio_db.py` -- added `save_analytics()`, `get_analytics()`, analytics injection in `get_portfolio_state()`
+- `api/portfolio_api.py` -- analytics auto-persist on snapshot create, new `GET /{id}/analytics` endpoint
+- `src/pages/pm.js` -- Phase C dashboard with concentration, top positions, sector exposure, flags
+
+### Test results
+- Vitest: 206/206 passing (no regressions)
+- Pytest portfolio (Phase B): 24/24 passing
+- Pytest analytics (Phase C): 47/47 passing (71 total Python)
+
+### Test coverage by scenario
+- Long-only diversified (10 positions) -- all metrics hand-checked
+- Concentrated (2 positions, 92% single name) -- flags and explanations verified
+- Cash-heavy (80% cash) -- HIGH_CASH flag, no LOW_CASH
+- Unknown sectors -- UNMAPPED_SECTOR flag, Unclassified bucket
+- Single holding -- concentration score = 100
+- Zero holdings (all cash) -- no divide-by-zero, position_count = 0
+- Custom thresholds -- relaxed = no warnings, tight = many warnings
+- Explainability -- every flag has message, metric_value, threshold, percentage
+- Low cash -- LOW_CASH flag with correct numbers
+- Determinism -- repeated calls produce identical output, no input mutation
+
+---
+
+## Session Log: 21 Mar 2026 -- PM Chat Phase B (Portfolio Data Layer)
+
+### Schema
+
+Three new tables via `api/migrations/013_portfolios.sql`:
+- `portfolios`: id (UUID), user_id, guest_id, name, currency, active. Owner check constraint.
+- `portfolio_snapshots`: id, portfolio_id (FK), as_of_date, total_value, cash_value, notes. Non-negative constraints.
+- `portfolio_holdings`: id, snapshot_id (FK), ticker, quantity, price, market_value, sector, asset_class, notes. Positive constraints. Unique (snapshot_id, ticker).
+
+Design decision: store market_value and quantity/price per holding; derive weights deterministically in Python. No weight column.
+
+### Frozen design decisions (do not change without explicit instruction)
+
+1. **Long-only v1.** The schema enforces positive quantity, price, and market_value. Short positions are not supported. If long/short is needed later, the constraints in `013_portfolios.sql` must be relaxed intentionally via a new migration, not patched.
+2. **Derived weights are the source of truth.** `portfolio_db.compute_weights()` divides each holding's market_value by snapshot total_value. No user-supplied or stored weight column exists. This must remain the single derivation path.
+3. **Validation tolerance for market_value.** `portfolio_validation.validate_snapshot()` allows market_value to deviate from qty * price by up to 1% or $0.01, whichever is greater. This accommodates rounding, FX conversion, and mid-price vs last-price discrepancies without false failures.
+
+### Files created
+- `api/migrations/013_portfolios.sql` -- migration (idempotent, auto-applied by `db.run_migrations()`)
+- `api/portfolio_db.py` -- CRUD + pure analytics: `create_portfolio`, `get_portfolios`, `get_portfolio`, `create_snapshot`, `get_latest_snapshot`, `get_snapshots`, `add_holding`, `add_holdings_batch`, `get_holdings`, `compute_weights`, `compute_sector_exposure`, `concentration_flags`, `get_portfolio_state`
+- `api/portfolio_validation.py` -- `validate_snapshot()`: checks negative values, duplicate tickers, missing prices, zero quantities, market_value mismatch, sum inconsistency
+- `api/portfolio_api.py` -- REST endpoints: `POST /api/portfolios`, `GET /api/portfolios`, `POST /api/portfolios/{id}/snapshots`, `GET /api/portfolios/{id}/state`, `GET /api/portfolios/{id}/snapshots`
+- `api/tests/test_portfolio.py` -- 24 unit tests covering validation, weight derivation, sector exposure, concentration flags
+
+### Files modified
+- `api/main.py` -- registered `portfolio_router`
+- `api/pm_chat.py` -- expanded `PMChatRequest` with `snapshot_id`, `selected_ticker`, `candidate_security`, `context_mode`; expanded `PMChatResponse` with `snapshot_id`, `context_mode`
+- `src/features/pm-chat.js` -- replaced cloned mode switch with `_createModeSwitch()` factory + `_syncAllModeSwitches()` for proper ARIA tablist keyboard navigation (arrow keys, Home/End), synced active states, mobile FAB visibility fix
+- `src/pages/pm.js` -- added portfolio selector placeholder, snapshot summary metrics stub (Total Value / Cash / Positions)
+
+### Test results
+- Vitest: 206/206 passing (no regressions)
+- Pytest portfolio: 24/24 passing
+
+---
+
+## Session Log: 21 Mar 2026 -- PM Chat Phase A (Shell Implementation)
+
+### Architecture
+
+PM Chat is a separate right-rail panel that mode-switches with the Analyst panel. One panel is visible at a time, never both.
+
+**Mode switch:** `pm-chat.js:_injectModeSwitch()` creates a `.rail-mode-switch` widget with two buttons (Analyst / PM) and inserts it into the Analyst panel header. A second copy is placed in the PM panel header. Clicking either button calls `switchRailMode()` which hides one aside and shows the other.
+
+**localStorage keys:**
+- `ci_rail_mode`: `'analyst'` or `'pm'` -- persists the user's last active rail mode
+- `ci_pm_conversations`: JSON object keyed by portfolio key -- PM conversation history (sessionStorage)
+
+**DOM ownership:**
+- Analyst panel: `<aside id="analyst-panel">` -- untouched, managed by `chat.js`
+- PM panel: `<aside id="pm-panel">` -- managed by `pm-chat.js`
+- Mode switch: injected into both panel headers by `pm-chat.js:_injectModeSwitch()`
+
+**Rail behaviour:**
+- Desktop (>=1024px): one panel always visible, docked right, 480px wide. Mode switch toggles between Analyst and PM.
+- Mobile (<1024px): panels slide up from bottom. FABs control open/close. Only one panel open at a time.
+- Default mode on boot: Analyst (unless `ci_rail_mode === 'pm'` in localStorage)
+
+**Backend:**
+- `POST /api/pm-chat`: separate endpoint from `/api/research-chat`
+- `api/pm_chat.py`: owns the PM router, request/response models, API key check
+- `api/pm_prompt_builder.py`: PM system prompt identity, stub for future portfolio context injection
+
+**CSS prefix:** all PM styles use `.pm-*` prefix. Rail mode switch uses `.rail-mode-*`. Zero overlap with `.ap-*`.
+
+**Files created:** `src/features/pm-chat.js`, `src/styles/pm-chat.css`, `src/pages/pm.js`, `api/pm_chat.py`, `api/pm_prompt_builder.py`
+
+**Files modified:** `src/lib/state.js` (added 'pm' to VALID_STATIC_PAGES), `src/lib/router.js` (PM lazy render + page name), `src/main.js` (imports + boot sequence), `src/styles/index.css` (CSS import), `index.html` (nav link, page div, PM panel aside, PM FAB), `api/main.py` (PM router mount), `src/lib/state.test.js` (updated Set size assertion)
+
+---
 
 ## Session Log: 17 Mar 2026 -- PDF Report Redesign + Price Drivers Workflow Fix
 

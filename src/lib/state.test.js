@@ -15,12 +15,12 @@ beforeEach(() => {
 });
 
 describe('VALID_STATIC_PAGES', () => {
-  it('is a Set with 7 entries', () => {
+  it('is a Set with 8 entries', () => {
     expect(VALID_STATIC_PAGES).toBeInstanceOf(Set);
-    expect(VALID_STATIC_PAGES.size).toBe(7);
+    expect(VALID_STATIC_PAGES.size).toBe(8);
   });
   it('contains all static page names', () => {
-    ['home', 'deep-research', 'portfolio', 'comparator', 'personalisation', 'memory', 'about']
+    ['home', 'deep-research', 'portfolio', 'comparator', 'personalisation', 'memory', 'pm', 'about']
       .forEach(page => expect(VALID_STATIC_PAGES.has(page)).toBe(true));
   });
   it('rejects unknown pages', () => {

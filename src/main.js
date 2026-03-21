@@ -24,6 +24,7 @@ import { initPortfolioPage, clearPortfolio, populateSidebar } from './pages/port
 import { initThesisPage, tcAnalyze } from './pages/thesis.js';
 import { initAboutPage } from './pages/about.js';
 import { renderMemoryPage } from './pages/memory.js';
+import { renderPMPage } from './pages/pm.js';
 
 // Report sections (needed for router callbacks)
 import { setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineChart } from './pages/report-sections.js';
@@ -31,6 +32,7 @@ import { setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineCha
 // Features
 import { initAuth, showAuthModal, hideAuthModal } from './features/auth.js';
 import { initChat } from './features/chat.js';
+import { initPMChat } from './features/pm-chat.js';
 import { initNotifications } from './features/notifications.js';
 import { initBatchRefresh, closeBatchModal } from './features/batch-refresh.js';
 import { generatePDFReport } from './features/pdf.js';
@@ -284,6 +286,7 @@ async function boot() {
     renderSnapshotPage: renderSnapshotPage,
     renderPersonalisationPage: window.renderPersonalisationPage,
     renderMemoryPage: renderMemoryPage,
+    renderPMPage: renderPMPage,
     loadFullResearchData: loadFullResearchData,
     buildSnapshotFromStock: buildSnapshotFromStock,
     setupScrollSpy: setupScrollSpy,
@@ -302,6 +305,7 @@ async function boot() {
     ['Auth', initAuth],
     ['Notifications', initNotifications],
     ['Chat', initChat],
+    ['PMChat', initPMChat],
     ['About', initAboutPage],
     ['AddStock', initAddStock],
     ['DeepResearch', function() { initDeepResearch('deep-research-container'); }],
