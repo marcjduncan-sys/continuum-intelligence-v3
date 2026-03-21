@@ -5,6 +5,7 @@ import { STOCK_DATA, REFERENCE_DATA, TC_DATA } from '../lib/state.js';
 import { computeSkewScore, normaliseScores } from '../lib/dom.js';
 import { buildCoverageData } from './home.js';
 import { on } from '../lib/data-events.js';
+import { API_BASE } from '../lib/api-config.js';
 
 // Coverage data matching portal reports (built dynamically from STOCK_DATA)
 var COVERAGE_DATA = null;
@@ -185,6 +186,7 @@ export function processPortfolioData(rows) {
 
   savePortfolio(positions);
   renderPortfolio(positions, grossExposure);
+  _syncPortfolioToPMDatabase(positions, grossExposure);
 }
 
 /** @deprecated Use classifyAlignment() instead. Kept for backward compatibility. */
@@ -696,6 +698,7 @@ export function loadPortfolio() {
 
 export function clearPortfolio() {
   localStorage.removeItem('continuum-portfolio');
+  _pmPortfolioId = null;
   document.getElementById('uploadZone').style.display = '';
   document.getElementById('portfolioTable').style.display = 'none';
   document.getElementById('portfolioSummary').style.display = 'none';
@@ -709,6 +712,103 @@ export function clearPortfolio() {
   if (diag) diag.style.display = 'none';
   if (reweight) reweight.style.display = 'none';
   if (alertsEl) alertsEl.style.display = 'none';
+}
+
+/* ------------------------------------------------------------------ */
+/*  PM Database sync -- bridge Portfolio page to Phase B backend       */
+/* ------------------------------------------------------------------ */
+
+var _pmPortfolioId = null;
+
+/**
+ * Sync the uploaded portfolio to the PM database so PM Chat has access.
+ * Fire-and-forget: errors are logged but do not block the UI.
+ */
+function _syncPortfolioToPMDatabase(positions, grossExposure) {
+  var apiBase = API_BASE;
+  var apiKey = window.CI_API_KEY || '';
+  var headers = { 'Content-Type': 'application/json' };
+  if (apiKey) headers['X-API-Key'] = apiKey;
+  var guestId = (window.CI_AUTH && window.CI_AUTH.getGuestId) ? window.CI_AUTH.getGuestId() : null;
+
+  // Only sync positions with valid prices (skip uncovered/unpriced)
+  var validPositions = positions.filter(function(p) { return p.currentPrice > 0 && p.units !== 0; });
+  if (validPositions.length === 0) return;
+
+  // Calculate total value (gross exposure + notional cash buffer at 5%)
+  var totalMV = 0;
+  validPositions.forEach(function(p) { totalMV += Math.abs(p.units * p.currentPrice); });
+  var cashValue = Math.round(totalMV * 0.05);
+  var totalValue = totalMV + cashValue;
+
+  // Build holdings array for the API
+  var holdingsPayload = validPositions.map(function(p) {
+    var mv = Math.abs(p.units * p.currentPrice);
+    var coverageData = getCoverageData();
+    var sector = null;
+    if (coverageData[p.ticker] && coverageData[p.ticker].sector) {
+      sector = coverageData[p.ticker].sector;
+    }
+    return {
+      ticker: p.ticker,
+      quantity: Math.abs(p.units),
+      price: p.currentPrice,
+      market_value: mv,
+      sector: sector,
+      asset_class: 'equity'
+    };
+  });
+
+  var snapshotBody = {
+    as_of_date: new Date().toISOString().slice(0, 10),
+    total_value: totalValue,
+    cash_value: cashValue,
+    holdings: holdingsPayload,
+    notes: 'Synced from Portfolio page upload',
+    guest_id: guestId
+  };
+
+  // Step 1: ensure portfolio exists (create or reuse)
+  // Check if personalisation wizard already created one
+  var existingId = _pmPortfolioId || (typeof window.pnGetPortfolioId === 'function' ? window.pnGetPortfolioId() : null);
+  var ensurePortfolio = existingId
+    ? Promise.resolve(existingId)
+    : fetch(apiBase + '/api/portfolios', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ name: 'Portfolio', currency: 'AUD', guest_id: guestId })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        _pmPortfolioId = data.id;
+        // Expose for PM Chat to pick up
+        window.pnGetPortfolioId = function() { return _pmPortfolioId; };
+        return _pmPortfolioId;
+      });
+
+  // Step 2: create snapshot
+  ensurePortfolio
+    .then(function(portfolioId) {
+      return fetch(apiBase + '/api/portfolios/' + portfolioId + '/snapshots', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(snapshotBody)
+      });
+    })
+    .then(function(r) {
+      if (r.ok) {
+        console.log('[Portfolio] Synced to PM database: ' + validPositions.length + ' holdings');
+      } else {
+        r.json().then(function(err) {
+          console.warn('[Portfolio] PM sync failed:', err);
+        }).catch(function() {
+          console.warn('[Portfolio] PM sync failed: HTTP ' + r.status);
+        });
+      }
+    })
+    .catch(function(err) {
+      console.warn('[Portfolio] PM sync error:', err.message || err);
+    });
 }
 
 export function populateSidebar(ticker) {
