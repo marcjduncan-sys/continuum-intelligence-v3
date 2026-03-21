@@ -798,6 +798,10 @@ function _syncPortfolioToPMDatabase(positions, grossExposure) {
     .then(function(r) {
       if (r.ok) {
         console.log('[Portfolio] Synced to PM database: ' + validPositions.length + ' holdings');
+        // Notify PM panel that portfolio is loaded
+        window.dispatchEvent(new CustomEvent('ci:portfolio:synced', {
+          detail: { holdings: validPositions.length, totalValue: totalValue }
+        }));
       } else {
         r.json().then(function(err) {
           console.warn('[Portfolio] PM sync failed:', err);

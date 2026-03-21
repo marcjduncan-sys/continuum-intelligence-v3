@@ -24,10 +24,12 @@
     color: var(--text-muted);
     background: transparent;
     border: none;
-    padding: 5px 12px;
+    padding: 5px 16px;
     cursor: pointer;
     transition: color 0.15s, background 0.15s;
     white-space: nowrap;
+    flex: 1;
+    text-align: center;
 }
 .rail-mode-btn:hover {
     color: var(--text-secondary);
@@ -116,12 +118,17 @@
     font-size: 0.58rem;
     font-weight: 700;
     letter-spacing: 0.08em;
-    color: var(--text-primary);
-    background: rgba(201, 169, 110, 0.12);
-    border: 1px solid rgba(201, 169, 110, 0.25);
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     padding: 1px 6px;
     border-radius: 3px;
     white-space: nowrap;
+}
+.pm-portfolio-badge.pm-badge-active {
+    color: var(--accent-teal);
+    background: rgba(56, 178, 172, 0.10);
+    border-color: rgba(56, 178, 172, 0.25);
 }
 .pm-header-actions {
     display: flex;
@@ -647,8 +654,14 @@
     color: #1A1F2E;
 }
 [data-theme="light"] .pm-portfolio-badge {
-    background: rgba(201, 169, 110, 0.08);
-    border-color: rgba(201, 169, 110, 0.2);
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.08);
+    color: #718096;
+}
+[data-theme="light"] .pm-portfolio-badge.pm-badge-active {
+    color: #2B6CB0;
+    background: rgba(43, 108, 176, 0.08);
+    border-color: rgba(43, 108, 176, 0.2);
 }
 [data-theme="light"] .pm-shortcut-hint {
     color: #A0AEC0;

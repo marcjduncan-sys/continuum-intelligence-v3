@@ -766,6 +766,15 @@ export function initPMChat() {
         }
     } catch(e) {}
 
+    // Listen for portfolio sync from Portfolio page
+    window.addEventListener('ci:portfolio:synced', function(e) {
+        if (portfolioBadge) {
+            var n = e.detail && e.detail.holdings ? e.detail.holdings : 0;
+            portfolioBadge.textContent = n + ' HOLDINGS';
+            portfolioBadge.classList.add('pm-badge-active');
+        }
+    });
+
     console.log('[PM] Initialised');
 }
 
