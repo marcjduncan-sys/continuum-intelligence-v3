@@ -423,63 +423,8 @@
    PORTFOLIO (Step 3)
    --------------------------------------------------------------------------- */
 
-.pn-portfolio-grid {
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-.pn-portfolio-header {
-    display: grid;
-    grid-template-columns: 1fr 100px;
-    gap: var(--space-sm);
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: var(--space-sm);
-}
-
-.pn-portfolio-header span {
-    font-family: var(--font-ui);
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.pn-portfolio-row {
-    display: grid;
-    grid-template-columns: 1fr 100px;
-    gap: var(--space-sm);
-    margin-bottom: 8px;
-}
-
-.pn-portfolio-row .pn-input {
-    font-size: 0.85rem;
-    padding: 8px 12px;
-}
-
-.pn-skip-btn {
-    display: block;
-    margin: var(--space-xl) auto 0;
-    font-family: var(--font-ui);
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    background: transparent;
-    border: 1px dashed var(--border);
-    border-radius: 6px;
-    padding: 12px 28px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.pn-skip-btn:hover {
-    border-color: var(--accent-teal);
-    color: var(--accent-teal);
-    border-style: solid;
-}
-
 /* ---------------------------------------------------------------------------
-   ASSESSMENT COMPONENTS (Step 4)
+   ASSESSMENT COMPONENTS (Step 3)
    --------------------------------------------------------------------------- */
 
 /* Assessment sub-nav (tabs) */
@@ -805,7 +750,7 @@
 }
 
 /* ---------------------------------------------------------------------------
-   CHAT INTERFACE (Step 5)
+   CHAT INTERFACE (Step 4)
    --------------------------------------------------------------------------- */
 
 .pn-step-chat {
@@ -1396,10 +1341,6 @@
         border-radius: 0;
         border-left: none;
         border-right: none;
-    }
-
-    .pn-portfolio-row {
-        grid-template-columns: 1fr 80px;
     }
 
     .pn-step-line {

@@ -1,7 +1,8 @@
 /* ============================================================
    PERSONALISATION ONBOARDING WIZARD
-   5-step wizard: Firm > Strategy > Portfolio > Assessment > Chat
+   4-step wizard: Firm > Strategy > Assessment > Chat
    All scoring happens client-side. Profile saved to localStorage.
+   Portfolio configuration lives in the dedicated PORTFOLIO tab.
    ============================================================ */
 
 (function() {
@@ -14,9 +15,8 @@
 var PN_STEP_LABELS = [
     { num: 1, title: 'Firm', subtitle: 'Institutional context' },
     { num: 2, title: 'Strategy', subtitle: 'Fund & mandate' },
-    { num: 3, title: 'Portfolio', subtitle: 'Current holdings' },
-    { num: 4, title: 'Assessment', subtitle: 'Cognitive profile' },
-    { num: 5, title: 'Chat', subtitle: 'Calibrated AI' }
+    { num: 3, title: 'Assessment', subtitle: 'Cognitive profile' },
+    { num: 4, title: 'Chat', subtitle: 'Calibrated AI' }
 ];
 
 // ---------------------------------------------------------------------------
@@ -357,8 +357,6 @@ var pnState = {
         restrictedNames: [],
         benchmarkFraming: 'relative'
     },
-    portfolio: [],
-    portfolioSkipped: false,
     assessment: {
         ipip: {},
         crt: {},
@@ -455,7 +453,7 @@ var PN_STORAGE_KEY = 'continuum_personalisation_profile';
 function pnSaveToLocalStorage() {
     try {
         var data = {
-            version: 3,
+            version: 4,
             savedAt: new Date().toISOString(),
             state: {
                 currentStep: pnState.currentStep,
@@ -463,44 +461,12 @@ function pnSaveToLocalStorage() {
                 firm: pnState.firm,
                 fund: pnState.fund,
                 mandate: pnClampMandate(pnState.mandate),
-                portfolio: pnState.portfolio,
-                portfolioSkipped: pnState.portfolioSkipped,
                 assessment: pnState.assessment,
                 profile: pnState.profile,
                 assessmentBlock: pnState.assessmentBlock
             }
         };
         localStorage.setItem(PN_STORAGE_KEY, JSON.stringify(data));
-
-        // Thesis capture: infer thesis from portfolio weights
-        if (window.ThesisCapture && pnState.portfolio && pnState.portfolio.length > 0) {
-            var totalWeight = 0;
-            for (var ti = 0; ti < pnState.portfolio.length; ti++) {
-                totalWeight += (parseFloat(pnState.portfolio[ti].weight) || 0);
-            }
-            if (totalWeight > 0) {
-                for (var tj = 0; tj < pnState.portfolio.length; tj++) {
-                    var holding = pnState.portfolio[tj];
-                    var hTicker = (holding.ticker || '').toUpperCase();
-                    if (!hTicker) continue;
-                    var hWeight = parseFloat(holding.weight) || 0;
-                    var relWeight = hWeight / totalWeight;
-                    var hBias = relWeight > 0.05 ? 'bullish' : 'neutral';
-
-                    window.ThesisCapture.saveThesis({
-                        ticker: hTicker,
-                        dominantHypothesis: null,
-                        probabilitySplit: null,
-                        biasDirection: hBias,
-                        keyAssumption: null,
-                        source: 'inferred',
-                        confidence: 'low',
-                        capturedAt: new Date().toISOString(),
-                        capturedFrom: 'portfolio'
-                    });
-                }
-            }
-        }
     } catch (e) { /* localStorage unavailable or full */ }
 }
 
@@ -516,7 +482,6 @@ function pnSaveToServer() {
         firm: pnState.firm || {},
         fund: pnState.fund || {},
         mandate: pnState.mandate || {},
-        portfolio: pnState.portfolio || [],
         profile: pnState.profile || {}
     };
     if (!token) {
@@ -532,13 +497,12 @@ function pnSaveToServer() {
 }
 
 // ---------------------------------------------------------------------------
-// Portfolio DB bridge (Phase D0.2)
-// Personalisation Step 3 writes to Phase B DB portfolio as canonical source.
-// localStorage portfolio_id links the wizard to the DB entity.
+// Portfolio ID bridge (Phase D0.2)
+// Portfolio tab is the canonical source. These helpers read/write the
+// localStorage portfolio_id so PM Chat can reference it.
 // ---------------------------------------------------------------------------
 
 var PN_PORTFOLIO_ID_KEY = 'continuum_pm_portfolio_id';
-var PN_NOTIONAL_TOTAL = 1000000; // $1M notional for weight-to-value conversion
 
 function pnGetPortfolioId() {
     try { return localStorage.getItem(PN_PORTFOLIO_ID_KEY) || null; } catch(e) { return null; }
@@ -548,150 +512,27 @@ function pnSetPortfolioId(id) {
     try { localStorage.setItem(PN_PORTFOLIO_ID_KEY, id); } catch(e) {}
 }
 
-function pnSyncPortfolioToDB() {
-    // Convert lightweight Step 3 holdings (ticker + weight%) to Phase B DB snapshot
-    var validHoldings = (pnState.portfolio || []).filter(function(h) {
-        return h.ticker && h.ticker.trim() && parseFloat(h.weight) > 0;
-    });
-    if (validHoldings.length === 0) return;
-
-    var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    var origin = isLocal ? '' : 'https://api.continuumintelligence.ai';
-
-    var headers = { 'Content-Type': 'application/json' };
-    var token = window.CI_AUTH && window.CI_AUTH.getToken();
-    if (token) headers['Authorization'] = 'Bearer ' + token;
-    var apiKey = window.CI_API_KEY;
-    if (apiKey) headers['X-API-Key'] = apiKey;
-
-    var guestId = (!token && window.CI_AUTH && window.CI_AUTH.getGuestId) ? window.CI_AUTH.getGuestId() : null;
-
-    var existingId = pnGetPortfolioId();
-
-    // Build snapshot holdings from weights
-    var totalWeight = 0;
-    for (var i = 0; i < validHoldings.length; i++) {
-        totalWeight += parseFloat(validHoldings[i].weight) || 0;
-    }
-    if (totalWeight <= 0) return;
-
-    var holdingsData = [];
-    var holdingsMarketValue = 0;
-    for (var j = 0; j < validHoldings.length; j++) {
-        var w = parseFloat(validHoldings[j].weight) || 0;
-        var mv = Math.round((w / 100) * PN_NOTIONAL_TOTAL * 100) / 100;
-        holdingsMarketValue += mv;
-        holdingsData.push({
-            ticker: validHoldings[j].ticker.toUpperCase(),
-            quantity: 1,
-            price: mv,
-            market_value: mv,
-            sector: null,
-            asset_class: 'equity'
-        });
-    }
-    var cashValue = Math.max(0, PN_NOTIONAL_TOTAL - holdingsMarketValue);
-
-    function createSnapshot(portfolioId) {
-        var today = new Date().toISOString().split('T')[0];
-        return fetch(origin + '/api/portfolios/' + portfolioId + '/snapshots', {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify({
-                as_of_date: today,
-                total_value: PN_NOTIONAL_TOTAL,
-                cash_value: cashValue,
-                holdings: holdingsData,
-                notes: 'Synced from Personalisation wizard',
-                guest_id: guestId
-            })
-        });
-    }
-
-    if (existingId) {
-        // Portfolio exists, just create a new snapshot
-        createSnapshot(existingId).catch(function() { /* silent fail */ });
-    } else {
-        // Create portfolio first, then snapshot
-        var createBody = { name: 'Personalisation Portfolio', currency: 'AUD' };
-        if (guestId) createBody.guest_id = guestId;
-        fetch(origin + '/api/portfolios', {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(createBody)
-        })
-        .then(function(res) { return res.ok ? res.json() : null; })
-        .then(function(data) {
-            if (data && data.id) {
-                pnSetPortfolioId(data.id);
-                return createSnapshot(data.id);
-            }
-        })
-        .catch(function() { /* silent fail -- localStorage holdings remain as fallback */ });
-    }
-}
-
-function pnLoadPortfolioFromDB() {
-    // Attempt to load portfolio state from DB and populate Step 3
-    var portfolioId = pnGetPortfolioId();
-    if (!portfolioId) return;
-
-    var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    var origin = isLocal ? '' : 'https://api.continuumintelligence.ai';
-
-    var headers = {};
-    var token = window.CI_AUTH && window.CI_AUTH.getToken();
-    if (token) headers['Authorization'] = 'Bearer ' + token;
-    var apiKey = window.CI_API_KEY;
-    if (apiKey) headers['X-API-Key'] = apiKey;
-
-    fetch(origin + '/api/portfolios/' + portfolioId + '/state', {
-        method: 'GET',
-        headers: headers
-    })
-    .then(function(res) { return res.ok ? res.json() : null; })
-    .then(function(state) {
-        if (!state || !state.holdings || state.holdings.length === 0) return;
-
-        // Convert DB holdings back to lightweight Step 3 format
-        var totalMV = 0;
-        for (var i = 0; i < state.holdings.length; i++) {
-            totalMV += parseFloat(state.holdings[i].market_value) || 0;
-        }
-        if (totalMV <= 0) return;
-
-        var portfolio = [];
-        for (var j = 0; j < state.holdings.length && j < 5; j++) {
-            var h = state.holdings[j];
-            var weight = Math.round(((parseFloat(h.market_value) || 0) / totalMV) * 100 * 10) / 10;
-            portfolio.push({ ticker: h.ticker, weight: String(weight) });
-        }
-
-        // Only update if DB has data and local is empty or stale
-        if (portfolio.length > 0) {
-            pnState.portfolio = portfolio;
-            pnSaveToLocalStorage();
-        }
-    })
-    .catch(function() { /* silent fail -- keep localStorage fallback */ });
-}
-
 function pnLoadFromLocalStorage() {
     try {
         var raw = localStorage.getItem(PN_STORAGE_KEY);
         if (!raw) return false;
         var data = JSON.parse(raw);
-        if (!data || (data.version !== 2 && data.version !== 3)) return false;
+        if (!data || ![2, 3, 4].includes(data.version)) return false;
         var s = data.state;
-        pnState.currentStep = s.currentStep || 1;
-        pnState.maxStepReached = s.maxStepReached || 1;
+        var step = s.currentStep || 1;
+        var maxStep = s.maxStepReached || 1;
+        // Migrate from 5-step (v2/v3) to 4-step (v4): old 3→3, old 4→3, old 5→4
+        if (data.version < 4) {
+            if (step >= 4) step = step - 1;
+            if (maxStep >= 4) maxStep = maxStep - 1;
+        }
+        pnState.currentStep = Math.min(step, 4);
+        pnState.maxStepReached = Math.min(maxStep, 4);
         pnState.firm = s.firm || pnState.firm;
         pnState.fund = s.fund || pnState.fund;
         if (s.mandate) {
             pnState.mandate = pnClampMandate(s.mandate);
         }
-        pnState.portfolio = s.portfolio || [];
-        pnState.portfolioSkipped = s.portfolioSkipped || false;
         pnState.assessment = s.assessment || pnState.assessment;
         pnState.profile = s.profile || null;
         pnState.assessmentBlock = s.assessmentBlock || 0;
@@ -816,21 +657,12 @@ function pnValidateStep(stepNum) {
                    pnState.fund.benchmark !== '' &&
                    pnState.fund.holdingPeriod !== '';
         case 3:
-            return pnState.portfolioSkipped || pnHasPortfolioEntry();
-        case 4:
             return pnAssessmentComplete();
-        case 5:
+        case 4:
             return true;
         default:
             return false;
     }
-}
-
-function pnHasPortfolioEntry() {
-    for (var i = 0; i < pnState.portfolio.length; i++) {
-        if (pnState.portfolio[i].ticker && pnState.portfolio[i].ticker.trim() !== '') return true;
-    }
-    return false;
 }
 
 function pnAssessmentComplete() {
@@ -1162,7 +994,6 @@ function renderCurrentStep() {
         case 2: return renderStep2();
         case 3: return renderStep3();
         case 4: return renderStep4();
-        case 5: return renderStep5();
         default: return '';
     }
 }
@@ -1174,7 +1005,7 @@ function renderStep1() {
             '<p class="pn-step-desc">Tell us about your institutional context. This determines how signals are filtered and compliance requirements are applied.</p>' +
         '</div>' +
         '<div class="pn-wizard-purpose">' +
-            'Complete 5 quick steps to unlock your <strong>calibrated AI analyst</strong> \u2014 research grounded in your firm\'s investment mandate, governance framework, and portfolio context.' +
+            'Complete 4 quick steps to unlock your <strong>calibrated AI analyst</strong> \u2014 research grounded in your firm\'s investment mandate, governance framework, and cognitive profile.' +
         '</div>' +
         '<div class="pn-form-grid">' +
             pnTextInput('firm-name', 'Firm Name', pnState.firm.name, 'e.g. Magellan Financial Group') +
@@ -1235,40 +1066,6 @@ function renderStep2() {
 }
 
 function renderStep3() {
-    var holdingsHtml = '';
-    for (var i = 0; i < 5; i++) {
-        var h = pnState.portfolio[i] || { ticker: '', weight: '' };
-        holdingsHtml += '<div class="pn-portfolio-row">' +
-            '<input type="text" class="pn-input pn-ticker-input" data-index="' + i + '" ' +
-                'value="' + escapeAttr(h.ticker || '') + '" placeholder="e.g. BHP" ' +
-                'list="pn-ticker-list" autocomplete="off">' +
-            '<input type="number" class="pn-input pn-weight-input" data-index="' + i + '" ' +
-                'value="' + (h.weight || '') + '" placeholder="%" min="0" max="100" step="0.5">' +
-        '</div>';
-    }
-
-    var datalistHtml = '<datalist id="pn-ticker-list">';
-    var tickers = (typeof STOCK_DATA !== 'undefined') ? Object.keys(STOCK_DATA).sort() : [];
-    for (var i = 0; i < tickers.length; i++) {
-        datalistHtml += '<option value="' + tickers[i] + '">';
-    }
-    datalistHtml += '</datalist>';
-
-    return '<div class="pn-step" data-step="3">' +
-        '<div class="pn-step-header">' +
-            '<h2 class="pn-step-heading">Portfolio Holdings</h2>' +
-            '<p class="pn-step-desc">Enter up to 5 current holdings so the AI can reference your positions in conversation. This step is optional.</p>' +
-        '</div>' +
-        datalistHtml +
-        '<div class="pn-portfolio-grid">' +
-            '<div class="pn-portfolio-header"><span>Ticker</span><span>Weight %</span></div>' +
-            holdingsHtml +
-        '</div>' +
-        '<button class="pn-skip-btn" id="pn-skip-portfolio">Skip \u2014 use representative portfolio</button>' +
-    '</div>';
-}
-
-function renderStep4() {
     var progress = pnAssessmentProgress();
     var blockNames = [
         { title: 'Personality', items: PN_IPIP_ITEMS.length },
@@ -1299,7 +1096,7 @@ function renderStep4() {
         case 4: contentHtml = renderPreferencesBlock(); break;
     }
 
-    return '<div class="pn-step" data-step="4">' +
+    return '<div class="pn-step" data-step="3">' +
         '<div class="pn-step-header">' +
             '<h2 class="pn-step-heading">Cognitive & Behavioural Assessment</h2>' +
             '<p class="pn-step-desc">This takes approximately 15 minutes. Complete all sections to build your profile.</p>' +
@@ -1420,17 +1217,17 @@ function renderForcedChoice(item, currentValue) {
     '</div>';
 }
 
-function renderStep5() {
+function renderStep4() {
     if (!pnState.profile) {
         pnState.profile = pnBuildProfile();
         pnSaveToLocalStorage();
         pnSaveToServer();
     }
 
-    return '<div class="pn-step pn-step-chat" data-step="5">' +
+    return '<div class="pn-step pn-step-chat" data-step="4">' +
         '<div class="pn-step-header">' +
             '<h2 class="pn-step-heading">Calibrated AI Active</h2>' +
-            '<p class="pn-step-desc">Your cognitive profile is now active. The Analyst incorporates your firm context, strategy mandate, portfolio, and cognitive style on every question.</p>' +
+            '<p class="pn-step-desc">Your cognitive profile is now active. The Analyst incorporates your firm context, strategy mandate, and cognitive style on every question.</p>' +
         '</div>' +
         '<div class="pn-chat-layout">' +
             renderProfileSidebar() +
@@ -1440,7 +1237,7 @@ function renderStep5() {
                         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
                     '</div>' +
                     '<div class="pn-calibration-title">Profile loaded into Analyst</div>' +
-                    '<div class="pn-calibration-body">Your Analyst panel (top right) now has full context of your firm, mandate, holdings, and cognitive biases. Every research question you ask is filtered through this profile.</div>' +
+                    '<div class="pn-calibration-body">Your Analyst panel (top right) now has full context of your firm, mandate, and cognitive biases. Every research question you ask is filtered through this profile.</div>' +
                     '<div class="pn-calibration-chips">' +
                         '<button class="pn-chip" onclick="window.location.hash=\'#home\'">Browse coverage \u2192</button>' +
                     '</div>' +
@@ -1519,18 +1316,18 @@ function renderProfileSidebar() {
 
 function renderWizardFooter() {
     var isFirst = pnState.currentStep === 1;
-    var isLast = pnState.currentStep === 5;
+    var isLast = pnState.currentStep === 4;
     var canAdvance = pnValidateStep(pnState.currentStep);
 
     var nextLabel = 'Continue';
-    if (pnState.currentStep === 4) nextLabel = 'Build Profile & Chat';
+    if (pnState.currentStep === 3) nextLabel = 'Build Profile & Chat';
 
     return '<div class="pn-wizard-footer">' +
         '<button class="pn-btn pn-btn-secondary" id="pn-prev"' + (isFirst ? ' style="visibility:hidden"' : '') + '>' +
             '\u2190 Back' +
         '</button>' +
         '<div class="pn-wizard-footer-center">' +
-            '<span class="pn-step-counter">Step ' + pnState.currentStep + ' of 5</span>' +
+            '<span class="pn-step-counter">Step ' + pnState.currentStep + ' of 4</span>' +
         '</div>' +
         (isLast ? '<div></div>' :
             '<button class="pn-btn pn-btn-primary" id="pn-next"' + (canAdvance ? '' : ' disabled') + '>' +
@@ -1572,10 +1369,7 @@ function bindNavigation() {
     if (nextBtn) {
         nextBtn.addEventListener('click', function() {
             if (!pnValidateStep(pnState.currentStep)) return;
-            if (pnState.currentStep === 3 && pnHasPortfolioEntry()) {
-                pnSyncPortfolioToDB();
-            }
-            if (pnState.currentStep === 4) {
+            if (pnState.currentStep === 3) {
                 pnState.profile = pnBuildProfile();
                 pnSaveToServer();
             }
@@ -1605,7 +1399,6 @@ function bindCurrentStepInputs() {
         case 2: bindStep2Inputs(); break;
         case 3: bindStep3Inputs(); break;
         case 4: bindStep4Inputs(); break;
-        case 5: bindStep5Inputs(); break;
     }
 }
 
@@ -1714,39 +1507,6 @@ function bindMandateSlider(elementId, stateKey) {
 }
 
 function bindStep3Inputs() {
-    var tickerInputs = document.querySelectorAll('.pn-ticker-input');
-    for (var i = 0; i < tickerInputs.length; i++) {
-        tickerInputs[i].addEventListener('input', function() {
-            var idx = parseInt(this.getAttribute('data-index'), 10);
-            if (!pnState.portfolio[idx]) pnState.portfolio[idx] = { ticker: '', weight: '' };
-            pnState.portfolio[idx].ticker = this.value.toUpperCase();
-            pnState.portfolioSkipped = false;
-            pnSaveToLocalStorage();
-            updateNextButton();
-        });
-    }
-
-    var weightInputs = document.querySelectorAll('.pn-weight-input');
-    for (var i = 0; i < weightInputs.length; i++) {
-        weightInputs[i].addEventListener('input', function() {
-            var idx = parseInt(this.getAttribute('data-index'), 10);
-            if (!pnState.portfolio[idx]) pnState.portfolio[idx] = { ticker: '', weight: '' };
-            pnState.portfolio[idx].weight = this.value;
-            pnSaveToLocalStorage();
-        });
-    }
-
-    var skipBtn = document.getElementById('pn-skip-portfolio');
-    if (skipBtn) {
-        skipBtn.addEventListener('click', function() {
-            pnState.portfolioSkipped = true;
-            pnSaveToLocalStorage();
-            updateNextButton();
-        });
-    }
-}
-
-function bindStep4Inputs() {
     var navItems = document.querySelectorAll('.pn-assessment-nav-item');
     for (var i = 0; i < navItems.length; i++) {
         navItems[i].addEventListener('click', function() {
@@ -1835,7 +1595,7 @@ function bindPreferenceInputs() {
     }
 }
 
-function bindStep5Inputs() {
+function bindStep4Inputs() {
     var resetBtn = document.getElementById('pn-reset-profile');
 
     if (resetBtn) {
@@ -1847,8 +1607,6 @@ function bindStep5Inputs() {
                 pnState.firm = { name: '', type: '', aum: '', regulations: [], governance: '' };
                 pnState.fund = { name: '', strategy: '', geography: '', benchmark: '', riskBudget: 10, holdingPeriod: '' };
                 pnState.mandate = { maxPositionSize: 15, sectorCap: 35, cashRangeMin: 3, cashRangeMax: 25, turnoverTolerance: 'moderate', concentrationTolerance: 'moderate', styleBias: 'none', riskAppetite: 'moderate', positionDirection: 'long_only', restrictedNames: [], benchmarkFraming: 'relative' };
-                pnState.portfolio = [];
-                pnState.portfolioSkipped = false;
                 pnState.assessment = { ipip: {}, crt: {}, philosophy: {}, bias: {}, preferences: {} };
                 pnState.profile = null;
                 pnState.assessmentBlock = 0;
@@ -1989,8 +1747,6 @@ window.renderPersonalisationPage = function() {
 
 window.initPersonalisationDemo = function() {
     pnLoadFromLocalStorage();
-    // Attempt to refresh portfolio from DB (non-blocking, updates on next render)
-    pnLoadPortfolioFromDB();
     var wizard = document.getElementById('pn-wizard');
     if (wizard && pnState.currentStep > 1) {
         wizard.innerHTML = renderStepIndicator() +
@@ -2015,7 +1771,7 @@ window.pnGetPersonalisationContext = function() {
         firm: pnState.firm || {},
         fund: pnState.fund || {},
         mandate: pnState.mandate || {},
-        portfolio: pnState.portfolio || [],
+        portfolio: [],
         profile: pnState.profile || null,
         hasProfile: pnState.profile !== null,
         hasMandate: pnState.mandate && (
