@@ -334,7 +334,11 @@ def build_structured_research_context(ticker: str) -> str:
 
     # -- Skew
     skew = data.get("skew", {})
+    if not isinstance(skew, dict):
+        skew = {}
     hero = data.get("hero", {})
+    if not isinstance(hero, dict):
+        hero = {}
     skew_dir = hero.get("skew") or skew.get("direction", "")
     skew_rationale = hero.get("skew_description") or skew.get("rationale", "")
     if skew_dir:
@@ -345,6 +349,8 @@ def build_structured_research_context(ticker: str) -> str:
 
     # -- Position in range
     pir = hero.get("position_in_range", {})
+    if not isinstance(pir, dict):
+        pir = {}
     worlds = pir.get("worlds", [])
     current_price = data.get("price") or pir.get("current_price")
     if worlds and current_price:
@@ -356,6 +362,8 @@ def build_structured_research_context(ticker: str) -> str:
 
     # -- Next decision point
     ndp = hero.get("next_decision_point", {})
+    if not isinstance(ndp, dict):
+        ndp = {}
     if ndp.get("event"):
         lines.append(f"Next decision point: {ndp['event']} -- {ndp.get('date', 'TBD')}")
 
