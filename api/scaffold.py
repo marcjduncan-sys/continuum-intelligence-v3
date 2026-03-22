@@ -1007,33 +1007,60 @@ def build_reference_entry(
     ticker: str, market_data: dict,
     sector: str | None = None, sector_sub: str | None = None,
 ) -> dict:
-    """Build an entry for data/reference.json."""
+    """Build an entry for data/reference.json from Yahoo Finance data."""
     price = market_data.get("price", 0)
     market_cap = market_data.get("market_cap")
     currency = market_data.get("currency", "A$")
+
+    # Derive sharesOutstanding in millions (convention: BHP=5078 means 5.078B)
+    shares_outstanding = market_data.get("shares_outstanding")
+    if not shares_outstanding and market_cap and price and price > 0:
+        shares_outstanding = market_cap / price
+    # Convert raw count to millions if needed
+    if shares_outstanding and shares_outstanding > 1_000_000:
+        shares_outstanding = round(shares_outstanding / 1e6, 1)
+    elif shares_outstanding:
+        shares_outstanding = round(shares_outstanding, 1)
+
+    # EPS: derive from P/E ratios
+    forward_pe = market_data.get("forward_pe")
+    trailing_pe = market_data.get("trailing_pe")
+    eps_forward = round(price / forward_pe, 4) if forward_pe and forward_pe > 0 and price else None
+    eps_trailing = round(price / trailing_pe, 4) if trailing_pe and trailing_pe > 0 and price else None
+
+    # Dividend per share: prefer direct, fall back to yield * price
+    div_per_share = market_data.get("dividend_per_share")
+    if not div_per_share:
+        div_yield = market_data.get("dividend_yield")
+        if div_yield and price:
+            div_per_share = round(div_yield * price, 4)
+    elif div_per_share:
+        div_per_share = round(div_per_share, 4)
 
     market_cap_str = None
     if market_cap and market_cap > 0:
         market_cap_str = f"{currency}{market_cap / 1e9:.1f}B"
 
+    analyst_target = market_data.get("target_mean_price")
+
     return {
         "archetype": infer_archetype(ticker, sector, sector_sub, market_data),
-        "sharesOutstanding": None,
-        "analystTarget": None,
+        "sharesOutstanding": shares_outstanding,
+        "analystTarget": analyst_target,
         "analystBuys": None,
         "analystHolds": None,
         "analystSells": None,
         "analystCount": None,
-        "epsTrailing": None,
-        "epsForward": None,
-        "divPerShare": None,
+        "epsTrailing": eps_trailing,
+        "epsForward": eps_forward,
+        "divPerShare": div_per_share,
         "reportingCurrency": currency,
-        "revenue": None,
+        "revenue": market_data.get("revenue"),
         "_anchors": {
             "price": price,
             "marketCapStr": market_cap_str,
-            "pe": None,
-            "divYield": None,
+            "pe": round(forward_pe, 1) if forward_pe else None,
+            "divYield": round(market_data.get("dividend_yield", 0) * 100, 1) if market_data.get("dividend_yield") else None,
         },
     }
 

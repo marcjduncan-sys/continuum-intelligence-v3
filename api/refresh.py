@@ -2317,6 +2317,54 @@ def _merge_initiation(
 
     current_price = float(price_data.get("price", 0)) if "error" not in price_data else 0
 
+    # -- Rebuild featuredMetrics from fresh Yahoo data --
+    # The scaffold may have written N/A if Yahoo chart endpoint missed market_cap.
+    # Stage 1 gathering re-fetches price data which may now have it.
+    if "error" not in price_data:
+        from scaffold import _build_featured_metrics, infer_archetype as _infer_arch
+
+        _market_cap = price_data.get("market_cap")
+        _currency = price_data.get("currency", "A$")
+        _price = price_data.get("price", 0)
+        _high_52w = price_data.get("high_52w", _price)
+        _low_52w = price_data.get("low_52w", _price)
+
+        _market_cap_str = f"{_currency}{_market_cap / 1e9:.1f}B" if _market_cap and _market_cap > 0 else "N/A"
+        _drawdown = f"-{(1 - _price / _high_52w) * 100:.1f}%" if _high_52w and _high_52w > 0 else "0.0%"
+
+        _forward_pe = price_data.get("forward_pe")
+        _trailing_pe = price_data.get("trailing_pe")
+        _dividend_yield = price_data.get("dividend_yield")
+
+        def _fmt_ratio(v, suffix="x"):
+            return f"{v:.1f}{suffix}" if v and v != 0 else "N/A"
+
+        def _fmt_pct(v):
+            return f"{v * 100:.1f}%" if v is not None else "N/A"
+
+        _pe_str = _fmt_ratio(_forward_pe or _trailing_pe)
+        _div_yield_str = _fmt_pct(_dividend_yield)
+        _yield_color = _dividend_yield is not None and _dividend_yield > 0.03
+
+        ticker = updated.get("ticker", "")
+        _archetype = _infer_arch(
+            ticker,
+            updated.get("sector"),
+            updated.get("sectorSub"),
+            price_data,
+        )
+
+        rebuilt_metrics = _build_featured_metrics(
+            _archetype, _market_cap_str, _pe_str, _div_yield_str,
+            _yield_color, _drawdown, _price, _high_52w, _low_52w, _currency,
+        )
+
+        old_na = sum(1 for m in updated.get("featuredMetrics", []) if m.get("value") in (None, "N/A", "--"))
+        new_na = sum(1 for m in rebuilt_metrics if m.get("value") in (None, "N/A", "--"))
+        if new_na < old_na or old_na >= 3:
+            updated["featuredMetrics"] = rebuilt_metrics
+            logger.info(f"[{updated.get('ticker', '?')}] Rebuilt featuredMetrics: {old_na} N/A -> {new_na} N/A")
+
     # -- Replace evidence cards entirely --
     evidence_cards = evidence_update.get("cards", [])
     if evidence_cards:

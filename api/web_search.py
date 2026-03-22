@@ -377,12 +377,57 @@ YAHOO_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 }
 
+# Yahoo crumb cache (required for quoteSummary v10 endpoint)
+_yahoo_crumb: str | None = None
+_yahoo_crumb_client: httpx.AsyncClient | None = None
+
 
 def _get_http_client() -> httpx.AsyncClient:
     global _http_client
-    if _http_client is None:
-        _http_client = httpx.AsyncClient(timeout=15.0)
+    if _http_client is None or _http_client.is_closed:
+        _http_client = httpx.AsyncClient(timeout=15.0, http2=False)
     return _http_client
+
+
+async def _get_yahoo_crumb_client() -> tuple[httpx.AsyncClient, str | None]:
+    """Return a (client, crumb) pair for Yahoo quoteSummary requests.
+
+    Yahoo's v10 quoteSummary endpoint requires a crumb + session cookie.
+    We fetch both once and cache them for the process lifetime.
+    """
+    global _yahoo_crumb, _yahoo_crumb_client
+    if _yahoo_crumb and _yahoo_crumb_client and not _yahoo_crumb_client.is_closed:
+        return _yahoo_crumb_client, _yahoo_crumb
+    try:
+        _yahoo_crumb_client = httpx.AsyncClient(timeout=15.0, follow_redirects=True)
+        # Step 1: hit fc.yahoo.com to establish session cookies
+        await _yahoo_crumb_client.get("https://fc.yahoo.com", headers=YAHOO_HEADERS)
+        # Step 2: fetch crumb
+        r = await _yahoo_crumb_client.get(
+            "https://query2.finance.yahoo.com/v1/test/getcrumb",
+            headers=YAHOO_HEADERS,
+        )
+        if r.status_code == 200 and r.text:
+            _yahoo_crumb = r.text
+            logger.info("Yahoo crumb obtained")
+        else:
+            logger.warning(f"Yahoo crumb fetch failed: {r.status_code}")
+            _yahoo_crumb = None
+    except Exception as e:
+        logger.warning(f"Yahoo crumb init error: {e}")
+        _yahoo_crumb = None
+    return _yahoo_crumb_client, _yahoo_crumb
+
+
+def _reset_http_client() -> None:
+    """Close and discard the shared client (stale transport recovery)."""
+    global _http_client
+    if _http_client is not None:
+        try:
+            asyncio.get_event_loop().create_task(_http_client.aclose())
+        except Exception:
+            pass
+        _http_client = None
 
 
 # ---------------------------------------------------------------------------
@@ -475,6 +520,12 @@ async def fetch_yahoo_price(ticker: str) -> dict[str, Any]:
     financials = await _fetch_yahoo_financials(yahoo_ticker, client)
     base_result.update(financials)
 
+    # --- 3. Ensure market_cap is populated from the best available source ---
+    if not base_result.get("market_cap") and base_result.get("market_cap_summary"):
+        base_result["market_cap"] = base_result["market_cap_summary"]
+    if not base_result.get("market_cap") and base_result.get("shares_outstanding") and base_result.get("price"):
+        base_result["market_cap"] = base_result["shares_outstanding"] * base_result["price"]
+
     return base_result
 
 
@@ -484,9 +535,17 @@ async def _fetch_yahoo_financials(yahoo_ticker: str, client: httpx.AsyncClient) 
 
     Returns a dict of financial metrics. Missing fields are set to None.
     """
-    url = f"https://query1.finance.yahoo.com/v10/finance/quoteSummary/{yahoo_ticker}"
     modules = "defaultKeyStatistics,financialData,summaryDetail,assetProfile"
-    params = {"modules": modules}
+
+    # Use crumb-authenticated client (Yahoo v10 requires it)
+    crumb_client, crumb = await _get_yahoo_crumb_client()
+    if crumb and crumb_client:
+        url = f"https://query2.finance.yahoo.com/v10/finance/quoteSummary/{yahoo_ticker}"
+        params = {"modules": modules, "crumb": crumb}
+        client = crumb_client
+    else:
+        url = f"https://query1.finance.yahoo.com/v10/finance/quoteSummary/{yahoo_ticker}"
+        params = {"modules": modules}
 
     financials: dict[str, Any] = {
         "forward_pe": None,
@@ -502,6 +561,9 @@ async def _fetch_yahoo_financials(yahoo_ticker: str, client: httpx.AsyncClient) 
         "sector": None,
         "industry": None,
         "description": "",
+        "shares_outstanding": None,
+        "market_cap_summary": None,
+        "target_mean_price": None,
     }
 
     try:
@@ -521,18 +583,21 @@ async def _fetch_yahoo_financials(yahoo_ticker: str, client: httpx.AsyncClient) 
         financials["forward_pe"] = _yf_raw(dks.get("forwardPE"))
         financials["enterprise_value"] = _yf_raw(dks.get("enterpriseValue"))
         financials["ev_to_ebitda"] = _yf_raw(dks.get("enterpriseToEbitda"))
+        financials["shares_outstanding"] = _yf_raw(dks.get("sharesOutstanding"))
 
         # --- financialData ---
         fd = summary.get("financialData", {})
         financials["revenue"] = _yf_raw(fd.get("totalRevenue"))
         financials["ebitda"] = _yf_raw(fd.get("ebitda"))
         financials["total_debt"] = _yf_raw(fd.get("totalDebt"))
+        financials["target_mean_price"] = _yf_raw(fd.get("targetMeanPrice"))
 
         # --- summaryDetail ---
         sd = summary.get("summaryDetail", {})
         financials["trailing_pe"] = _yf_raw(sd.get("trailingPE"))
         financials["dividend_yield"] = _yf_raw(sd.get("dividendYield"))
         financials["dividend_per_share"] = _yf_raw(sd.get("dividendRate"))
+        financials["market_cap_summary"] = _yf_raw(sd.get("marketCap"))
 
         # --- assetProfile ---
         ap = summary.get("assetProfile", {})

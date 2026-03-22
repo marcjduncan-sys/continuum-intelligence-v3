@@ -31,11 +31,16 @@ from web_search import (
     fetch_commodity_price,
     SECTOR_COMMODITY_MAP,
     _get_http_client,
+    _reset_http_client,
     _parse_ddg_html,
     YAHOO_HEADERS,
 )
 
 logger = logging.getLogger(__name__)
+
+# Stale-transport errors that indicate Fly.io machine sleep/wake recycled TCP
+_STALE_TRANSPORT_ERRORS = (httpx.ConnectError, httpx.RemoteProtocolError, httpx.ReadError)
+
 
 # ---------------------------------------------------------------------------
 # Cache (in-memory, 24h TTL -- supplements PostgreSQL persistence)
@@ -209,9 +214,19 @@ async def _fetch_index_ohlcv() -> dict[str, Any]:
     """Fetch ASX200 index OHLCV for relative performance."""
     url = "https://query1.finance.yahoo.com/v8/finance/chart/%5EAXJO"
     params = {"interval": "1d", "range": "1mo"}
-    client = _get_http_client()
+    for attempt in range(2):
+        client = _get_http_client()
+        try:
+            resp = await client.get(url, params=params, headers=YAHOO_HEADERS)
+            break
+        except _STALE_TRANSPORT_ERRORS as exc:
+            if attempt == 0:
+                logger.warning("Stale transport on ASX200 fetch, resetting client: %s", exc)
+                _reset_http_client()
+                continue
+            logger.error("ASX200 index fetch error after retry: %s", exc)
+            return {"error": str(exc)}
     try:
-        resp = await client.get(url, params=params, headers=YAHOO_HEADERS)
         resp.raise_for_status()
         data = resp.json()
         result = data.get("chart", {}).get("result", [])
@@ -238,14 +253,26 @@ async def _fetch_index_ohlcv() -> dict[str, Any]:
 
 async def _fetch_peer_prices(peers: list[str]) -> list[dict[str, Any]]:
     """Fetch 1-month OHLCV for peer tickers."""
-    client = _get_http_client()
     results = []
     for peer in peers[:3]:
         yahoo_ticker = peer if ".AX" in peer else f"{peer}.AX"
         try:
             url = f"https://query1.finance.yahoo.com/v8/finance/chart/{yahoo_ticker}"
             params = {"interval": "1d", "range": "1mo"}
-            resp = await client.get(url, params=params, headers=YAHOO_HEADERS)
+            resp = None
+            for attempt in range(2):
+                client = _get_http_client()
+                try:
+                    resp = await client.get(url, params=params, headers=YAHOO_HEADERS)
+                    break
+                except _STALE_TRANSPORT_ERRORS as exc:
+                    if attempt == 0:
+                        logger.warning("Stale transport on peer %s, resetting client: %s", peer, exc)
+                        _reset_http_client()
+                        continue
+                    raise
+            if resp is None:
+                continue
             resp.raise_for_status()
             data = resp.json()
             chart_result = data.get("chart", {}).get("result", [])
@@ -273,11 +300,20 @@ async def _fetch_peer_prices(peers: list[str]) -> list[dict[str, Any]]:
 async def _fetch_sector_etf(sector: str) -> dict[str, Any]:
     """Fetch sector ETF performance."""
     etf_ticker = SECTOR_ETF_MAP.get(sector, "XJO.AX")
-    client = _get_http_client()
     try:
         url = f"https://query1.finance.yahoo.com/v8/finance/chart/{etf_ticker}"
         params = {"interval": "1d", "range": "1mo"}
-        resp = await client.get(url, params=params, headers=YAHOO_HEADERS)
+        for attempt in range(2):
+            client = _get_http_client()
+            try:
+                resp = await client.get(url, params=params, headers=YAHOO_HEADERS)
+                break
+            except _STALE_TRANSPORT_ERRORS as exc:
+                if attempt == 0:
+                    logger.warning("Stale transport on sector ETF %s, resetting client: %s", etf_ticker, exc)
+                    _reset_http_client()
+                    continue
+                raise
         resp.raise_for_status()
         data = resp.json()
         chart_result = data.get("chart", {}).get("result", [])
@@ -300,22 +336,31 @@ async def _fetch_sector_etf(sector: str) -> dict[str, Any]:
 
 async def _ddg_search(query: str, timeframe: str = "m", max_results: int = 5) -> list[dict[str, str]]:
     """Generic DuckDuckGo HTML search with rate-limit awareness."""
-    client = _get_http_client()
-    try:
-        resp = await client.post(
-            "https://html.duckduckgo.com/html/",
-            data={"q": query, "df": timeframe},
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-        )
-        if resp.status_code != 200:
+    for attempt in range(2):
+        client = _get_http_client()
+        try:
+            resp = await client.post(
+                "https://html.duckduckgo.com/html/",
+                data={"q": query, "df": timeframe},
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            )
+            if resp.status_code != 200:
+                return []
+            return _parse_ddg_html(resp.text, max_results)
+        except _STALE_TRANSPORT_ERRORS as exc:
+            if attempt == 0:
+                logger.warning("Stale transport on DDG search, resetting client: %s", exc)
+                _reset_http_client()
+                continue
+            logger.warning("DDG search error for '%s' after retry: %s", query[:60], exc)
             return []
-        return _parse_ddg_html(resp.text, max_results)
-    except Exception as e:
-        logger.warning("DDG search error for '%s': %s", query[:60], e)
-        return []
+        except Exception as e:
+            logger.warning("DDG search error for '%s': %s", query[:60], e)
+            return []
+    return []
 
 
 def _compute_period_returns(stock_history: list[dict], index_history: list[dict]) -> dict:

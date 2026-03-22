@@ -1141,12 +1141,36 @@ async def add_stock(
             except Exception as ingest_err:
                 logger.warning("[AddStock] Re-ingest failed (non-fatal): %s", ingest_err)
 
-            # Commit the POPULATED research to GitHub
+            # Update reference.json with fresh Yahoo data from the refresh
+            commit_files = {}
             dist_research_path = _data_dir() / f"{ticker}.json"
             commit_path = dist_research_path if dist_research_path.exists() else (research_dir / f"{ticker}.json")
+            commit_files[f"data/research/{ticker}.json"] = commit_path
+
+            try:
+                from web_search import fetch_yahoo_price as _fetch_yp
+                from scaffold import build_reference_entry as _build_ref
+                fresh_price = await _fetch_yp(ticker)
+                if "error" not in fresh_price:
+                    ref_path = data_dir / "reference.json"
+                    with open(ref_path) as _rf:
+                        ref_data = json.load(_rf)
+                    ref_data[ticker] = _build_ref(ticker, fresh_price, sector, industry)
+                    with open(ref_path, "w") as _wf:
+                        json.dump(ref_data, _wf, indent=2, ensure_ascii=False)
+                    commit_files["data/reference.json"] = ref_path
+                    logger.info("[AddStock] Updated reference.json for %s", ticker)
+            except Exception as ref_err:
+                logger.warning("[AddStock] reference.json update failed (non-fatal): %s", ref_err)
+
+            # Also commit updated _index.json (featuredMetrics may have been rebuilt)
+            if index_path.exists():
+                commit_files["data/research/_index.json"] = index_path
+
+            # Commit the POPULATED research + updated reference to GitHub
             try:
                 await commit_files_to_github(
-                    {f"data/research/{ticker}.json": commit_path},
+                    commit_files,
                     f"Add {ticker}: coverage initiation ({company})",
                     config.GITHUB_TOKEN,
                 )
