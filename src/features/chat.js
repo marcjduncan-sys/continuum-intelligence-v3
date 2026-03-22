@@ -306,9 +306,9 @@ function renderConversation() {
                 html += '</div>';
             }
             // Phase F: Handoff button on Analyst responses when ticker is active
-            if (ticker) {
+            if (currentTicker) {
                 html += '<div class="ap-handoff-actions">' +
-                    '<button class="ap-handoff-btn" data-ticker="' + escapeHtml(ticker) + '" ' +
+                    '<button class="ap-handoff-btn" data-ticker="' + escapeHtml(currentTicker) + '" ' +
                     'title="Send this analysis to PM for portfolio-fit assessment">' +
                     '<span class="ap-handoff-icon">&#8594;</span> Assess portfolio fit in PM' +
                     '</button></div>';
