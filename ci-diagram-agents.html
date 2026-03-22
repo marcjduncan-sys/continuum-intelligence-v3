@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continuum Intelligence v3 — Agent Systems & Prompts</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8f7f4;
+            color: #1a2332;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body {
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #2563eb 0%, #0f766e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #6b7280;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        .card {
+            border: 1px solid #e0ddd7;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(37, 99, 235, 0.3);
+            background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .card-title-section {
+            flex: 1;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1a2332;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .status-operational {
+            background: rgba(5, 150, 105, 0.1);
+            color: #059669;
+            border: 1px solid rgba(5, 150, 105, 0.3);
+        }
+
+        .status-broken {
+            background: rgba(168, 50, 50, 0.1);
+            color: #a83232;
+            border: 1px solid rgba(168, 50, 50, 0.3);
+        }
+
+        .status-nightly {
+            background: #f3f4f6;
+            color: #2563eb;
+            border: 1px solid #e0ddd7;
+        }
+
+        .card-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .meta-item {
+            font-size: 0.85rem;
+        }
+
+        .meta-label {
+            color: #6b7280;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-value {
+            color: #1a2332;
+            font-weight: 600;
+            word-break: break-all;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.8rem;
+        }
+
+        .description {
+            font-size: 0.95rem;
+            color: #2d3436;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .sections {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .section {
+            border: 1px solid #e0ddd7;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 0.9rem 1rem;
+            background: #f9fafb;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            transition: background 0.2s ease;
+            border-left: 3px solid #2563eb;
+        }
+
+        .section-header:hover {
+            background: #f3f4f6;
+            border-left-color: #2563eb;
+        }
+
+        .section-header.active {
+            background: #f3f4f6;
+            border-left-color: #2563eb;
+        }
+
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1a2332;
+        }
+
+        .section-toggle {
+            font-size: 1.1rem;
+            color: #6b7280;
+            transition: transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+        }
+
+        .section.active .section-toggle {
+            transform: rotate(180deg);
+        }
+
+        .section-content {
+            max-height: 0;
+            overflow: hidden;
+            background: #f9fafb;
+            transition: max-height 0.3s ease;
+        }
+
+        .section.active .section-content {
+            max-height: 4000px;
+        }
+
+        .section-content-inner {
+            padding: 1rem;
+        }
+
+        .prose {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: #2d3436;
+            margin-bottom: 1rem;
+        }
+
+        .prose strong {
+            color: #1a2332;
+            font-weight: 600;
+        }
+
+        .list-item {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #2d3436;
+            font-size: 0.9rem;
+        }
+
+        .list-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.6em;
+            width: 4px;
+            height: 4px;
+            background: #2563eb;
+            border-radius: 50%;
+        }
+
+        .ordered-list {
+            counter-reset: item;
+            padding-left: 0;
+        }
+
+        .ordered-list .list-item {
+            padding-left: 2rem;
+            counter-increment: item;
+        }
+
+        .ordered-list .list-item::before {
+            content: counter(item);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: rgba(37, 99, 235, 0.1);
+            border-radius: 3px;
+            color: #2563eb;
+            font-size: 0.75rem;
+            font-weight: 600;
+            position: absolute;
+            left: 0;
+        }
+
+        .code-block {
+            background: #f3f4f6;
+            border: 1px solid #e0ddd7;
+            border-radius: 4px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 0.75rem 0;
+        }
+
+        .code-block code {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #1e293b;
+            line-height: 1.5;
+            display: block;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .pipeline-box {
+            background: #f0fdfa;
+            border: 1px solid #ccf0ee;
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 0.75rem 0;
+        }
+
+        .pipeline-title {
+            color: #0f766e;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .pipeline-item {
+            color: #2d3436;
+            font-size: 0.85rem;
+            margin-bottom: 0.4rem;
+            padding-left: 1rem;
+        }
+
+        .pipeline-item::before {
+            content: '→';
+            color: #0f766e;
+            margin-left: -0.8rem;
+            margin-right: 0.5rem;
+        }
+
+        .callout {
+            grid-column: 1 / -1;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(255, 251, 235, 0.8) 0%, rgba(255, 251, 235, 0.9) 100%);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .callout-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #b45309;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .callout-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(180, 83, 9, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .callout-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .callout-section {
+            border-left: 3px solid #b45309;
+            padding-left: 1rem;
+        }
+
+        .callout-section-title {
+            font-weight: 600;
+            color: #b45309;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .callout-prose {
+            color: #2d3436;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge-blue {
+            background: rgba(37, 99, 235, 0.1);
+            color: #2563eb;
+        }
+
+        .badge-teal {
+            background: rgba(15, 118, 110, 0.1);
+            color: #0f766e;
+        }
+
+        .badge-red {
+            background: rgba(168, 50, 50, 0.1);
+            color: #a83232;
+        }
+
+        .badge-amber {
+            background: rgba(180, 83, 9, 0.1);
+            color: #b45309;
+        }
+
+        .note {
+            background: #f9fafb;
+            border-left: 3px solid #2563eb;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #2d3436;
+        }
+
+        .warning-note {
+            background: rgba(168, 50, 50, 0.08);
+            border-left-color: #a83232;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #6b7280;
+            font-size: 0.85rem;
+            border-top: 1px solid #e0ddd7;
+            margin-top: 3rem;
+        }
+
+        .footer-link {
+            color: #2563eb;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Continuum Intelligence v3</h1>
+            <p class="subtitle">Agent Systems & Prompt Architecture</p>
+        </header>
+
+        <div class="grid">
+            <!-- AGENT 1: Price Drivers -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title-section">
+                        <h2 class="card-title">Price Drivers Agent</h2>
+                        <span class="status-badge status-operational">● OPERATIONAL</span>
+                    </div>
+                </div>
+
+                <div class="card-meta">
+                    <div class="meta-item">
+                        <div class="meta-label">Trigger</div>
+                        <div class="meta-value">GitHub Actions 8x/day + manual</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Endpoint</div>
+                        <div class="meta-value">GET /api/agents/drivers/{ticker}</div>
+                    </div>
+                </div>
+
+                <p class="description">Autonomous system that analyzes historical price movements and social/sentiment signals to identify short-term drivers. Runs in 4-layer pipeline: programmatic signals → Claude classification → red team challenge → synthesis.</p>
+
+                <div class="sections">
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">Layer 0: Data Sources</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Programmatic Signals</div>
+                                    <div class="list-item">Yahoo Finance: 2D/5D/10D vs ASX200</div>
+                                    <div class="list-item">ASX announcements & corporate actions</div>
+                                    <div class="list-item">Broker upgrades, downgrades, analyst notes</div>
+                                    <div class="list-item">Social signals: HotCopper, Reddit, X-via-media</div>
+                                    <div class="list-item">Commodity prices (for mining producers)</div>
+                                    <div class="list-item">Peer performance & sector ETF performance</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">Layer 1-3: Claude Processing</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Layer 1: Classification</div>
+                                    <div class="prose">Classify drivers by type: macro, sector, or firm-specific. Score each by impact (0-10).</div>
+                                </div>
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Layer 2: Red Team</div>
+                                    <div class="prose">Challenge conclusions. Identify hidden biases. Test for overconfidence.</div>
+                                </div>
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Layer 3: Synthesis</div>
+                                    <div class="prose">Merge all signals into structured JSON with prose narrative.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">Safeguards & Cache</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="note">
+                                    <strong>Credit exhaustion detection:</strong> Monitors API response for "credit balance". Stops mid-batch if exhausted.
+                                </div>
+                                <div class="note">
+                                    <strong>Freshness skip:</strong> Checks <code>/api/agents/drivers/{ticker}/latest</code> before each run. Skips if <code>analysis_date</code> matches today (UTC).
+                                </div>
+                                <div class="note">
+                                    <strong>502 retry logic:</strong> Gateway timeouts get one retry at 600s timeout (up from 480s) after 10s cooldown.
+                                </div>
+                                <div class="note">
+                                    <strong>Cache:</strong> 7-day TTL in PostgreSQL + in-memory.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AGENT 2: Gold Agent -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title-section">
+                        <h2 class="card-title">Gold Agent</h2>
+                        <span class="status-badge status-broken">● BROKEN — AUTH EXPIRY</span>
+                    </div>
+                </div>
+
+                <div class="card-meta">
+                    <div class="meta-item">
+                        <div class="meta-label">Trigger</div>
+                        <div class="meta-value">Manual via GET endpoint</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Endpoint</div>
+                        <div class="meta-value">GET /api/agents/gold/{ticker}</div>
+                    </div>
+                </div>
+
+                <p class="description">Specialized mining analyst that synthesizes NotebookLM corpus analysis + deterministic overlays into structured gold equity underwriting. 20-query NLM runner + Claude synthesis pipeline.</p>
+
+                <div class="sections">
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">20-Query NLM Framework</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="prose"><strong>Asset & Geology (Queries 1-4):</strong></div>
+                                <div class="ordered-list">
+                                    <div class="list-item">Company stage & asset base</div>
+                                    <div class="list-item">Deposit type & geology</div>
+                                    <div class="list-item">JORC resources & reserves</div>
+                                    <div class="list-item">Metallurgy & processing</div>
+                                </div>
+
+                                <div class="prose" style="margin-top: 1.5rem;"><strong>Operations & Costs (Queries 5-9):</strong></div>
+                                <div class="ordered-list">
+                                    <div class="list-item">Mining method & schedule</div>
+                                    <div class="list-item">Operating reconciliation (guidance vs. actual)</div>
+                                    <div class="list-item">Quarterly reserve bridge & depletion</div>
+                                    <div class="list-item">Cost structure (AISC, opex breakdown)</div>
+                                    <div class="list-item">Production profile & lifecycle</div>
+                                </div>
+
+                                <div class="prose" style="margin-top: 1.5rem;"><strong>Capital & Development (Queries 10-14):</strong></div>
+                                <div class="ordered-list">
+                                    <div class="list-item">Capital intensity & project returns</div>
+                                    <div class="list-item">Balance sheet & funding sources</div>
+                                    <div class="list-item">Royalties, taxes, fiscal regime</div>
+                                    <div class="list-item">Development schedule & milestones</div>
+                                    <div class="list-item">Exploration & reserve replacement rate</div>
+                                </div>
+
+                                <div class="prose" style="margin-top: 1.5rem;"><strong>Management & Market (Queries 15-20):</strong></div>
+                                <div class="ordered-list">
+                                    <div class="list-item">Management track record & incentives</div>
+                                    <div class="list-item">Jurisdiction & ESG risks</div>
+                                    <div class="list-item">Accounting quality & red flags</div>
+                                    <div class="list-item">Peer valuation & comparable analysis</div>
+                                    <div class="list-item">Valuation & commodity sensitivities</div>
+                                    <div class="list-item">Feasibility study & technical risk</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">System Prompt</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="code-block">
+                                    <code>You are a senior mining investment committee analyst
+with the combined skills of a chief geologist,
+mining engineer, metallurgist, mining executive
+and top-ranked gold equities analyst.
+
+Analyse the asset before the company,
+and the company before the stock.
+
+Treat missing information as a risk.
+Do not fill gaps with confident invention.
+
+Prefer technical reports, quarterly reports
+and annual reports over presentations or
+commentary.
+
+Where corpus evidence conflicts, prefer the most
+technical, most recent, and most directly
+attributable source.
+
+Label statements internally as fact or inference.
+Output only JSON.
+Use Australian English.</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">Deterministic Overlays</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="list-item">Stage normalisation (explorer → producer → decline)</div>
+                                <div class="list-item">Evidence weighting by source credibility</div>
+                                <div class="list-item">Risk flags: jurisdiction, ESG, reserve quality, cost inflation</div>
+                                <div class="list-item">Proxy valuation: NAV per oz, P/NAV multiple</div>
+                                <div class="list-item">Asset-level scenario NAVs (bull/base/bear)</div>
+                                <div class="list-item">Underwriting tests: IRR, payback, NPV10</div>
+                                <div class="list-item">Reconciliation flags: guidance vs. actuals, reserve depletion</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">Known Issues & Coverage</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="warning-note">
+                                    <strong>Auth expiry:</strong> NotebookLM auth (browser cookies) expires every 1-2 weeks. Manual recovery required: run Desktop batch file → copy <code>NOTEBOOKLM_AUTH_JSON.txt</code> → update Fly.io env var.
+                                </div>
+                                <div class="note" style="margin-top: 1rem;">
+                                    <strong>Coverage:</strong> 8 gold stocks (NST, EVN, WAF, HRZ, WIA, SNX, OBM, RMC).
+                                </div>
+                                <div class="warning-note" style="margin-top: 1rem;">
+                                    <strong>SNX notebook issue:</strong> Currently contains RMS (Ramelius Resources) documents. Must be repopulated with SNX-specific source material before re-running.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AGENT 3: Analyst Chat -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title-section">
+                        <h2 class="card-title">Analyst Chat</h2>
+                        <span class="status-badge status-operational">● OPERATIONAL</span>
+                    </div>
+                </div>
+
+                <div class="card-meta">
+                    <div class="meta-item">
+                        <div class="meta-label">Classification</div>
+                        <div class="meta-value">Memory-Enhanced RAG</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Endpoint</div>
+                        <div class="meta-value">POST /api/research-chat</div>
+                    </div>
+                </div>
+
+                <p class="description">Reactive RAG system responding to user queries with conversational equity research. Autonomous background: memory extraction after each turn, nightly consolidation. Not an autonomous agent — responds to user input, not self-directed.</p>
+
+                <div class="sections">
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">System Prompt: 7 Sections</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">1. Identity</div>
+                                    <div class="prose">Senior equity research analyst at Continuum Intelligence. First-person plural. Direct, precise, opinionated — like a fund manager talking to another fund manager.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">2. Price Driver Awareness</div>
+                                    <div class="prose">Reference recent 2D/5D/10D performance, broker activity, social signals when relevant. Link current narrative to price moves.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">3. Voice Rules (26 rules from voice-rules.json)</div>
+                                    <div class="prose">Australian English, no em-dashes. Lead with conclusion. Quantify or cut. Institutional vocabulary ("the print", "the tape", "the multiple"). 150-250 words. Never fabricate.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">4. Research Context (~5,500 chars)</div>
+                                    <div class="prose">Hypotheses (ranked by conviction). Skew direction. Position in range. Tripwires (top 6). Discriminators (top 5). Evidence (top 8). Verdict. Narrative text.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">5. Memory Injection (1,200 char cap)</div>
+                                    <div class="prose">Structural / Positional / Tactical memories with age and confidence labels. Lower-scored memories dropped first if over budget.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">6. Personalisation (if configured)</div>
+                                    <div class="prose">Big Five + CRT score. Cognitive profile. Bias counter-interventions. Delivery preferences (verbose vs. terse).</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">7. Staleness Warning (conditional)</div>
+                                    <div class="prose">Injected only if research &gt; 30 days old. Signals information recency concern.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">Retrieval & Memory</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="note">
+                                    <strong>Hybrid retrieval:</strong> BM25 + cosine similarity → Reciprocal Rank Fusion (top 10 passages).
+                                </div>
+                                <div class="note">
+                                    <strong>Memory extraction (background, Haiku):</strong> Max 5 per turn. Types: conviction, risk_flag, valuation, thesis_challenge, process_note. Deduplication at cosine ≥ 0.90.
+                                </div>
+                                <div class="note">
+                                    <strong>Conversation persistence:</strong> Per-ticker in PostgreSQL. Rolling summarisation at 20 messages. 4000-token sliding window.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">Autonomous Background Work</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Per-Turn: Memory Extraction</div>
+                                    <div class="prose">Haiku-powered fire-and-forget task after each response. Max 5 memories. Stored in PostgreSQL with version hash.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Nightly: Batch Consolidation</div>
+                                    <div class="prose">Union-find clustering (cosine ≥ 0.85). Contradiction detection. Guest cleanup (&gt;7d deactivate, &gt;30d hard-delete).</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Nightly: Proactive Insights</div>
+                                    <div class="prose">Scan active memories against fresh research JSON. Haiku classifies: CONFIRMS / CONTRADICTS / NEUTRAL. Re-notification guard: skip if notified within 7 days.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AGENT 4: PM Chat -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title-section">
+                        <h2 class="card-title">PM Chat</h2>
+                        <span class="status-badge status-operational">● OPERATIONAL</span>
+                    </div>
+                </div>
+
+                <div class="card-meta">
+                    <div class="meta-item">
+                        <div class="meta-label">Classification</div>
+                        <div class="meta-value">Memory-Enhanced RAG + Deterministic Analytics</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Endpoint</div>
+                        <div class="meta-value">POST /api/pm-chat</div>
+                    </div>
+                </div>
+
+                <p class="description">Reactive RAG system for portfolio construction and risk management. Unique: deterministic portfolio analytics (alignment, breaches, concentration) run BEFORE LLM response. Autonomous background: memory extraction after each turn, nightly batch jobs.</p>
+
+                <div class="sections">
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">Pre-LLM Deterministic Pipeline</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">1. Portfolio Analytics</div>
+                                    <div class="prose">Position count, concentration (HHI, top-5, top-10), sector exposure, theme exposure, cash weight, risk flags.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">2. Alignment Diagnostics</div>
+                                    <div class="prose">% aligned vs. contradicts vs. neutral vs. not-covered. Hypothesis DNA (upside/downside concentration). Hedge gaps.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">3. Mandate Breach Detection</div>
+                                    <div class="prose"><strong>POSITION_BREACH:</strong> single-name &gt; user max (trim). <strong>SECTOR_BREACH:</strong> sector &gt; cap (trim). <strong>CASH_BELOW_MIN</strong> (block add). <strong>CASH_ABOVE_MAX</strong> (review).</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">4. Constraint Check</div>
+                                    <div class="prose">Constitution safety caps override user mandate. All checks run before LLM sees the portfolio.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">System Prompt: 9+ Sections</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">1. PM Identity</div>
+                                    <div class="prose">Senior portfolio manager. First-person plural. Numerically precise, trade-off aware. Does NOT perform equity research — defers to Analyst for stock quality.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">2. Voice Rules</div>
+                                    <div class="prose">Lead with decision. Use sizing ranges (2-3%, not 2.47%). Cite actual portfolio numbers. Structured recommendation format.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">3. Five Answer Types</div>
+                                    <div class="prose">Mandate-aware recommendations. Evidence contradictions (don't auto-sell). Hypothesis concentration risks. Source-of-funds within constraints. Change-driven alerts.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">4. Constitution (hard constraints)</div>
+                                    <div class="prose">Conviction Size Ladder. Source of Funds Hierarchy. Portfolio Roles. Risk Flag Taxonomy. Safety caps (max 15% single-name, default thresholds).</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">5. Personalisation Mandate (if configured)</div>
+                                    <div class="prose">User's mandate overrides: max position, sector cap, cash range, turnover tolerance, restricted names. Cognitive profile with behavioural cues.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">6. Portfolio Context</div>
+                                    <div class="prose">Holdings table. Sector / theme exposure. Concentration metrics. Risk flags.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">7. Alignment Diagnostics</div>
+                                    <div class="prose">Alignment score (% aligned/contradicts/neutral/not-covered). Hypothesis DNA. Hedge gaps. Mandate breaches. Reweighting signals.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">8. Analyst Summary (handoff)</div>
+                                    <div class="prose">Coverage state. Conviction. Valuation. Risks. Tripwires. Version hash.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">9. Candidate Security Framing</div>
+                                    <div class="prose">Source-of-funds analysis. Portfolio effect assessment. Position sizing rationale.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">Memory & Journal</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Per-Turn: Decision Extraction</div>
+                                    <div class="prose">Haiku-powered fire-and-forget. Max 3 decisions (trim/add/exit/hold/rebalance/watch/no_action). Each records: action, ticker, sizing, source-of-funds, mandate basis, breach codes, coverage state, decision basis.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Per-Turn: Insight Extraction</div>
+                                    <div class="prose">Max 5 insights. 7-type taxonomy: pm_decision, portfolio_risk, mandate_breach, sizing_principle, rebalance_suggestion, uncovered_exposure, change_alert.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Decision Basis (compact record)</div>
+                                    <div class="prose">snapshot_id, alignment_score, breach_codes[], uncovered_count, related_tickers[], mandate_hash, version (F.1).</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Journal Integration</div>
+                                    <div class="prose">GET /api/pm-journal: decisions + insights feed, chronologically sorted. Archive-not-delete semantics. Source toggle: Analyst | PM.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AGENT 5: Batch Analysis -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title-section">
+                        <h2 class="card-title">Batch Analysis</h2>
+                        <span class="status-badge status-nightly">● OPERATIONAL — NIGHTLY</span>
+                    </div>
+                </div>
+
+                <div class="card-meta">
+                    <div class="meta-item">
+                        <div class="meta-label">Trigger</div>
+                        <div class="meta-value">GitHub Actions cron 02:00 AEDT</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Endpoint</div>
+                        <div class="meta-value">POST /api/batch/run (X-Batch-Secret)</div>
+                    </div>
+                </div>
+
+                <p class="description">True autonomous agent. Runs nightly without user input. Consolidates all user memories, detects contradictions, cleans up guest data.</p>
+
+                <div class="sections">
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">Pipeline</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Step 1: Union-Find Clustering</div>
+                                    <div class="prose">Cosine similarity ≥ 0.85 → merge duplicates. Keep highest confidence, retire lower.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Step 2: Contradiction Detection (Haiku)</div>
+                                    <div class="prose">Same-ticker tactical memories. Newer contradicts older? Flag and mark for review.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Step 3: Guest Cleanup</div>
+                                    <div class="prose">Deactivate guests &gt; 7 days idle. Hard-delete &gt; 30 days.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Output</div>
+                                    <div class="prose">Batch summary: users processed, memories merged/retired/deleted, contradictions flagged.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AGENT 6: Proactive Insights -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title-section">
+                        <h2 class="card-title">Proactive Insights</h2>
+                        <span class="status-badge status-nightly">● OPERATIONAL — NIGHTLY</span>
+                    </div>
+                </div>
+
+                <div class="card-meta">
+                    <div class="meta-item">
+                        <div class="meta-label">Trigger</div>
+                        <div class="meta-value">GitHub Actions cron 03:00 AEDT Mon-Fri</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Endpoint</div>
+                        <div class="meta-value">POST /api/insights/scan (X-Insights-Secret)</div>
+                    </div>
+                </div>
+
+                <p class="description">True autonomous agent. Nightly scan: compares stored user memories against fresh research JSON. Detects if new data confirms, contradicts, or is neutral.</p>
+
+                <div class="sections">
+                    <div class="section">
+                        <div class="section-header">
+                            <span class="section-title">Pipeline</span>
+                            <span class="section-toggle">▼</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-content-inner">
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Step 1: Fetch Active Memories</div>
+                                    <div class="prose">Per-user, grouped by ticker. Include type, age, confidence.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Step 2: Fetch Fresh Research</div>
+                                    <div class="prose">Pull latest research JSON from Cloudflare Pages for each ticker.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Step 3: Haiku Classification</div>
+                                    <div class="prose">Does current research CONFIRM, CONTRADICT, or is it NEUTRAL vs. stored user view?</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Step 4: Re-notification Guard</div>
+                                    <div class="prose">Skip if user was notified within 7 days on same ticker + classification.</div>
+                                </div>
+
+                                <div class="pipeline-box">
+                                    <div class="pipeline-title">Step 5: Insert & Push</div>
+                                    <div class="prose">Create notification in DB → frontend polls every 5 min → badge appears.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CALLOUT: Should these be agents? -->
+            <div class="callout">
+                <h3 class="callout-title">
+                    <span class="callout-icon">⚡</span>
+                    Should the Analyst & PM Chats Be Autonomous Agents?
+                </h3>
+
+                <div class="callout-grid">
+                    <div class="callout-section">
+                        <div class="callout-section-title">Current State: Reactive RAG</div>
+                        <div class="callout-prose">
+                            Both Analyst and PM chats are reactive systems. They respond to user queries, not self-directed. Users initiate every conversation turn.
+                        </div>
+                    </div>
+
+                    <div class="callout-section">
+                        <div class="callout-section-title">Agent-Like Properties</div>
+                        <div class="callout-prose">
+                            <strong>Memory extraction:</strong> Runs autonomously after each turn (fire-and-forget Haiku).
+                            <br><br>
+                            <strong>Nightly batch jobs:</strong> Memory consolidation and proactive insights run without user input.
+                            <br><br>
+                            <strong>Pre-LLM analytics:</strong> PM runs deterministic alignment and breach detection before generating a response.
+                        </div>
+                    </div>
+
+                    <div class="callout-section">
+                        <div class="callout-section-title">What's Missing for Full Agency</div>
+                        <div class="callout-prose">
+                            <strong>Autonomous monitoring:</strong> No system watches for price moves or news that affect positions and proactively alerts.
+                            <br><br>
+                            <strong>Cross-role coordination:</strong> Analyst doesn't auto-flag coverage gaps to PM when portfolio changes.
+                            <br><br>
+                            <strong>Self-directed research:</strong> PM doesn't autonomously trigger Analyst deep-dives into under-covered stocks.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="callout-section" style="margin-top: 1.5rem;">
+                    <div class="callout-section-title">Recommendation: Augmented RAG + Event Bus</div>
+                    <div class="callout-prose">
+                        The current "augmented RAG" architecture (memory + retrieval + background tasks) is sound. Converting the chats to true agents would require an event-driven architecture:
+                        <br><br>
+                        • <strong>Price/news events:</strong> Trigger PM re-evaluation of affected positions.
+                        <br>
+                        • <strong>Portfolio changes:</strong> Trigger Analyst coverage requests for new holdings.
+                        <br>
+                        • <strong>Evidence changes:</strong> Trigger PM reweighting recommendations.
+                        <br><br>
+                        The Batch Analysis and Proactive Insights agents (Agents 5 & 6) are already the closest to true autonomous agents. They run on schedule and push outcomes without user input. An event bus would make Analyst and PM similarly autonomous.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Continuum Intelligence v3 — Agent Systems Documentation</p>
+            <p style="margin-top: 0.5rem; font-size: 0.75rem;">Generated 2026-03-22 | All systems live on Fly.io &amp; Cloudflare Pages</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Section accordion behavior
+            const sectionHeaders = document.querySelectorAll('.section-header');
+
+            sectionHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const section = this.closest('.section');
+                    section.classList.toggle('active');
+                });
+            });
+
+            // Prevent multiple sections from being open at once (optional - remove for multi-open)
+            // Commenting this out to allow multiple sections open simultaneously
+            /*
+            document.querySelectorAll('.card').forEach(card => {
+                const sections = card.querySelectorAll('.section');
+                sections.forEach(section => {
+                    const header = section.querySelector('.section-header');
+                    header.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        sections.forEach(s => {
+                            if (s !== section) s.classList.remove('active');
+                        });
+                    });
+                });
+            });
+            */
+        });
+    </script>
+</body>
+</html>

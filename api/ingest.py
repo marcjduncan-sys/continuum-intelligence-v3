@@ -825,9 +825,9 @@ def ingest(html_path: str | None = None) -> dict[str, list[Passage]]:
         ticker = json_file.stem.upper()
 
         try:
-            with open(json_file, "r", encoding="utf-8") as f:
+            with open(json_file, "r", encoding="utf-8", errors="replace") as f:
                 data = json.load(f)
-        except (json.JSONDecodeError, OSError) as e:
+        except (json.JSONDecodeError, OSError, UnicodeDecodeError) as e:
             logger.warning(f"Failed to load {json_file.name}: {e}")
             continue
 

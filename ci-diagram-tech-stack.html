@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continuum Intelligence v3 - Technology Stack</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #f8f7f4;
+            --navy-light: #ffffff;
+            --slate: #ffffff;
+            --blue: #2563eb;
+            --blue-dark: #1e40af;
+            --teal: #0f766e;
+            --amber: #b45309;
+            --red: #a83232;
+            --green: #059669;
+            --gray-light: #1a2332;
+            --gray-dim: #6b7280;
+            --border: rgba(0, 0, 0, 0.06);
+            --border-hover: rgba(0, 0, 0, 0.12);
+        }
+
+        html, body {
+            height: 100%;
+            background: var(--navy);
+            color: #2d3436;
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.5;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 24px;
+            gap: 16px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-light);
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--gray-dim);
+            margin-top: 2px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        button {
+            padding: 8px 16px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: var(--blue-dark);
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .legend-user { background: var(--blue); }
+        .legend-job { background: var(--amber); }
+        .legend-data { background: var(--teal); }
+        .legend-auth { background: var(--green); }
+
+        .canvas-wrapper {
+            flex: 1;
+            overflow: auto;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--navy-light);
+            position: relative;
+        }
+
+        svg {
+            display: block;
+            min-width: 100%;
+            min-height: 100%;
+            background: var(--navy-light);
+        }
+
+        .layer {
+            opacity: 1;
+            transition: opacity 0.2s;
+        }
+
+        .layer-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--gray-light);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .tech-box {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tech-box:hover rect {
+            stroke: var(--blue) !important;
+            stroke-width: 2 !important;
+        }
+
+        .tech-box:hover text {
+            fill: var(--blue);
+        }
+
+        .tech-box text {
+            font-size: 12px;
+            font-weight: 500;
+            fill: var(--gray-light);
+            pointer-events: none;
+        }
+
+        .tech-name {
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .tech-detail {
+            font-size: 11px;
+            fill: var(--gray-dim);
+        }
+
+        /* Connection arrows */
+        .arrow {
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+
+        .arrow:hover {
+            stroke-width: 3;
+            opacity: 1;
+        }
+
+        .arrow-user { stroke: var(--blue); opacity: 0.4; }
+        .arrow-job { stroke: var(--amber); opacity: 0.4; }
+        .arrow-data { stroke: var(--teal); opacity: 0.4; }
+        .arrow-auth { stroke: var(--green); opacity: 0.4; }
+
+        /* Detailed panel */
+        .detail-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
+            max-height: 300px;
+            background: var(--slate);
+            border: 1px solid var(--border-hover);
+            border-radius: 6px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            overflow-y: auto;
+            display: none;
+            z-index: 10;
+        }
+
+        .detail-panel.active {
+            display: block;
+            animation: slideIn 0.2s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .detail-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--blue);
+            margin-bottom: 8px;
+        }
+
+        .detail-content {
+            font-size: 12px;
+            line-height: 1.6;
+            color: #2d3436;
+        }
+
+        .detail-field {
+            margin-bottom: 8px;
+        }
+
+        .detail-label {
+            color: var(--gray-dim);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: var(--teal);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: var(--gray-dim);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: var(--gray-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 16px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .detail-panel {
+                width: 280px;
+            }
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: var(--slate);
+            border: 1px solid var(--border-hover);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 11px;
+            color: #2d3436;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+        }
+
+        /* Scrollbar styling */
+        .canvas-wrapper::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .canvas-wrapper::-webkit-scrollbar-track {
+            background: var(--navy);
+        }
+
+        .canvas-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        .canvas-wrapper::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .collapsible-indicator {
+            font-size: 10px;
+            fill: var(--gray-dim);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>Continuum Intelligence v3 Technology Stack</h1>
+                <div class="subtitle">Layered architecture diagram for technical and non-technical audiences</div>
+            </div>
+            <div class="header-controls">
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-dot legend-user"></div>
+                        <span>User Request</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot legend-job"></div>
+                        <span>Scheduled Job</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot legend-data"></div>
+                        <span>Data Update</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot legend-auth"></div>
+                        <span>Authentication</span>
+                    </div>
+                </div>
+                <button id="collapseBtn">Collapse All</button>
+            </div>
+        </header>
+
+        <div class="canvas-wrapper">
+            <svg id="stackDiagram" width="1200" height="1600"></svg>
+            <div id="detailPanel" class="detail-panel">
+                <button class="close-btn" onclick="closeDetailPanel()">✕</button>
+                <div id="detailContent"></div>
+            </div>
+            <div id="tooltip" class="tooltip"></div>
+        </div>
+    </div>
+
+    <script>
+        const COLORS = {
+            navy: '#f8f7f4',
+            'navy-light': '#ffffff',
+            slate: '#ffffff',
+            blue: '#2563eb',
+            'blue-dark': '#1e40af',
+            teal: '#0f766e',
+            amber: '#b45309',
+            red: '#a83232',
+            green: '#059669',
+            'gray-light': '#1a2332',
+            'gray-dim': '#6b7280',
+            border: 'rgba(0, 0, 0, 0.06)'
+        };
+
+        const TECH_DATA = {
+            // Layer 1: UI
+            'cloudflare-pages': {
+                name: 'Cloudflare Pages',
+                category: 'Layer 1: User Interface',
+                details: {
+                    domain: 'app.continuumintelligence.ai',
+                    'static-hosting': 'Edge CDN',
+                    build: 'Vite 7.3',
+                    'test-coverage': 'Vitest 206 tests, Jest 61 tests',
+                    'linting': 'ESLint'
+                }
+            },
+            'frontend-tech': {
+                name: 'Frontend Stack',
+                category: 'Layer 1: User Interface',
+                details: {
+                    language: 'Vanilla JS ES6+',
+                    css: 'CSS Custom Properties (dark mode)',
+                    fonts: 'Inter, Source Serif 4 (WOFF2)',
+                    markdown: 'marked 17.0',
+                    sanitisation: 'DOMPurify 3.3',
+                    'e2e-testing': 'Playwright'
+                }
+            },
+
+            // Layer 2: API
+            'flyio-backend': {
+                name: 'Fly.io Backend',
+                category: 'Layer 2: API',
+                details: {
+                    domain: 'api.continuumintelligence.ai',
+                    region: 'Sydney',
+                    runtime: 'Python 3.11',
+                    framework: 'FastAPI 0.115',
+                    server: 'Uvicorn ASGI (port 8080)',
+                    container: 'Docker python:3.11-slim'
+                }
+            },
+            'fastapi-stack': {
+                name: 'API Dependencies',
+                category: 'Layer 2: API',
+                details: {
+                    database: 'asyncpg 0.29 (async PostgreSQL)',
+                    'http-client': 'httpx 0.28',
+                    'rate-limiting': 'slowapi 0.1',
+                    auth: 'PyJWT 2.8',
+                    validation: 'Pydantic 2.10',
+                    'full-text': 'rank-bm25 0.2',
+                    monitoring: 'sentry-sdk (optional)'
+                }
+            },
+
+            // Layer 3: AI Services
+            'claude-api': {
+                name: 'Anthropic Claude',
+                category: 'Layer 3: AI/ML Services',
+                details: {
+                    'package': 'anthropic 0.43',
+                    'sonnet-4.6': 'Research chat, PM chat, synthesis (primary)',
+                    'haiku-4.5': 'Memory extraction, contradiction detection'
+                }
+            },
+            'google-gemini': {
+                name: 'Google Gemini',
+                category: 'Layer 3: AI/ML Services',
+                details: {
+                    package: 'google-genai 1.14',
+                    'gemini-flash': 'Domain analysis, price drivers, fallback',
+                    embedding: 'text-embedding-004 (768-dim)'
+                }
+            },
+            'notebooklm': {
+                name: 'NotebookLM',
+                category: 'Layer 3: AI/ML Services',
+                details: {
+                    package: 'notebooklm-py 0.3',
+                    purpose: 'Gold stock document RAG',
+                    auth: 'Browser cookie (expires ~2 weeks)'
+                }
+            },
+
+            // Layer 4: Data
+            'postgresql': {
+                name: 'Railway PostgreSQL',
+                category: 'Layer 4: Data Layer',
+                details: {
+                    version: 'PostgreSQL 16',
+                    migrations: '16 auto-applied',
+                    tables: '24 (auth, memory, portfolio, PM, operations)',
+                    driver: 'asyncpg 0.29'
+                }
+            },
+            'static-data': {
+                name: 'Static Data (Git)',
+                category: 'Layer 4: Data Layer',
+                details: {
+                    research: 'data/research/{TICKER}.json (25 stocks)',
+                    reference: 'data/reference.json (fundamentals)',
+                    'canonical-list': 'data/_index.json',
+                    config: 'data/config/*.json (voice rules, metrics)',
+                    'gold-corpus': 'data/gold-corpus/{TICKER}/*.pdf'
+                }
+            },
+
+            // Layer 5: Automation
+            'github-actions': {
+                name: 'GitHub Actions',
+                category: 'Layer 5: Automation',
+                details: {
+                    workflows: '15 total',
+                    'pre-market': 'update-daily (price backfill)',
+                    'market-hours': 'continuum-update (5x), update-intraday, price-drivers',
+                    'post-market': 'research-update (2x)',
+                    'overnight': 'batch-analysis (02:00), insights-scan (03:00)',
+                    'on-push': 'fly-deploy, Cloudflare Pages'
+                }
+            },
+
+            // External Sources
+            'yahoo-finance': {
+                name: 'Yahoo Finance',
+                category: 'External Data Sources',
+                details: {
+                    'data-types': 'Prices, OHLCV',
+                    'update-frequency': 'Intraday (during market hours)'
+                }
+            },
+            'asx-rss': {
+                name: 'ASX RSS',
+                category: 'External Data Sources',
+                details: {
+                    'data-types': 'Stock announcements',
+                    'update-frequency': 'Real-time during ASX trading'
+                }
+            },
+            'duckduckgo': {
+                name: 'DuckDuckGo',
+                category: 'External Data Sources',
+                details: {
+                    purpose: 'News search',
+                    'update-frequency': 'On-demand'
+                }
+            },
+            'resend': {
+                name: 'Resend',
+                category: 'External Data Sources',
+                details: {
+                    purpose: 'OTP email delivery',
+                    protocol: 'HTTPS API (port 443)'
+                }
+            }
+        };
+
+        const svg = document.getElementById('stackDiagram');
+        const detailPanel = document.getElementById('detailPanel');
+        const detailContent = document.getElementById('detailContent');
+        const tooltip = document.getElementById('tooltip');
+        const collapseBtn = document.getElementById('collapseBtn');
+
+        let expandedItems = new Set();
+        let currentDetailItem = null;
+
+        // Create SVG definitions
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+
+        const arrowhead = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+        arrowhead.setAttribute('id', 'arrowhead');
+        arrowhead.setAttribute('markerWidth', '10');
+        arrowhead.setAttribute('markerHeight', '10');
+        arrowhead.setAttribute('refX', '9');
+        arrowhead.setAttribute('refY', '3');
+        arrowhead.setAttribute('orient', 'auto');
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        path.setAttribute('points', '0 0, 10 3, 0 6');
+        path.setAttribute('fill', COLORS.blue);
+        arrowhead.appendChild(path);
+        defs.appendChild(arrowhead);
+
+        svg.appendChild(defs);
+
+        function createTechBox(x, y, width, height, name, detail, id, color = COLORS.blue) {
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            group.classList.add('tech-box');
+            group.setAttribute('data-id', id);
+
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', x);
+            rect.setAttribute('y', y);
+            rect.setAttribute('width', width);
+            rect.setAttribute('height', height);
+            rect.setAttribute('fill', 'none');
+            rect.setAttribute('stroke', color);
+            rect.setAttribute('stroke-width', '1.5');
+            rect.setAttribute('rx', '4');
+            group.appendChild(rect);
+
+            const nameText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            nameText.setAttribute('x', x + 12);
+            nameText.setAttribute('y', y + 22);
+            nameText.setAttribute('class', 'tech-name');
+            nameText.textContent = name;
+            group.appendChild(nameText);
+
+            if (detail) {
+                const detailText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                detailText.setAttribute('x', x + 12);
+                detailText.setAttribute('y', y + 38);
+                detailText.setAttribute('class', 'tech-detail');
+                detailText.textContent = detail;
+                group.appendChild(detailText);
+            }
+
+            const indicator = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            indicator.setAttribute('x', x + width - 8);
+            indicator.setAttribute('y', y + height - 4);
+            indicator.setAttribute('class', 'collapsible-indicator');
+            indicator.setAttribute('text-anchor', 'end');
+            indicator.textContent = '▼';
+            group.appendChild(indicator);
+
+            group.addEventListener('click', () => showDetailPanel(id));
+            group.addEventListener('mouseenter', () => showTooltip(TECH_DATA[id].category));
+            group.addEventListener('mouseleave', () => hideTooltip());
+
+            return group;
+        }
+
+        function createArrow(x1, y1, x2, y2, type = 'user') {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.classList.add('arrow', `arrow-${type}`);
+            return line;
+        }
+
+        function createLayerGroup(y, title) {
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            group.classList.add('layer');
+
+            const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bg.setAttribute('x', '0');
+            bg.setAttribute('y', y - 20);
+            bg.setAttribute('width', '1200');
+            bg.setAttribute('height', '200');
+            bg.setAttribute('fill', COLORS['navy-light']);
+            bg.setAttribute('opacity', '0.3');
+            group.appendChild(bg);
+
+            const titleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            titleText.setAttribute('x', '20');
+            titleText.setAttribute('y', y - 4);
+            titleText.setAttribute('class', 'layer-title');
+            titleText.textContent = title;
+            group.appendChild(titleText);
+
+            return group;
+        }
+
+        // Build Layer 1: UI
+        const layer1 = createLayerGroup(60, 'Layer 1: User Interface');
+        layer1.appendChild(createTechBox(40, 80, 220, 60, 'Cloudflare Pages', 'app.continuumintelligence.ai', 'cloudflare-pages', COLORS.blue));
+        layer1.appendChild(createTechBox(280, 80, 220, 60, 'Frontend Stack', 'Vite + Vanilla JS', 'frontend-tech', COLORS.blue));
+        svg.appendChild(layer1);
+
+        // Build Layer 2: API
+        const layer2 = createLayerGroup(220, 'Layer 2: API (Python/FastAPI)');
+        layer2.appendChild(createTechBox(40, 240, 220, 60, 'Fly.io Backend', 'api.continuumintelligence.ai', 'flyio-backend', COLORS.blue));
+        layer2.appendChild(createTechBox(280, 240, 220, 60, 'API Dependencies', 'asyncpg, httpx, PyJWT', 'fastapi-stack', COLORS.blue));
+        svg.appendChild(layer2);
+
+        // Add arrows from Layer 1 to Layer 2
+        svg.appendChild(createArrow(150, 140, 150, 240, 'user'));
+        svg.appendChild(createArrow(390, 140, 390, 240, 'user'));
+
+        // Build Layer 3: AI Services
+        const layer3 = createLayerGroup(380, 'Layer 3: AI/ML Services');
+        layer3.appendChild(createTechBox(40, 400, 180, 60, 'Claude API', 'Sonnet 4.6, Haiku 4.5', 'claude-api', COLORS.teal));
+        layer3.appendChild(createTechBox(240, 400, 180, 60, 'Google Gemini', 'Gemini Flash, Embeddings', 'google-gemini', COLORS.teal));
+        layer3.appendChild(createTechBox(440, 400, 180, 60, 'NotebookLM', 'Gold stock RAG', 'notebooklm', COLORS.teal));
+        svg.appendChild(layer3);
+
+        // Add arrows from Layer 2 to Layer 3
+        svg.appendChild(createArrow(130, 300, 130, 400, 'data'));
+        svg.appendChild(createArrow(330, 300, 330, 400, 'data'));
+
+        // Build Layer 4: Data
+        const layer4 = createLayerGroup(540, 'Layer 4: Data Layer');
+        layer4.appendChild(createTechBox(40, 560, 220, 60, 'PostgreSQL', '16 tables, 16 migrations', 'postgresql', COLORS.amber));
+        layer4.appendChild(createTechBox(280, 560, 220, 60, 'Static Data', 'Git-committed JSON/PDF', 'static-data', COLORS.amber));
+        svg.appendChild(layer4);
+
+        // Add arrows from Layer 3 to Layer 4
+        svg.appendChild(createArrow(130, 460, 150, 560, 'data'));
+        svg.appendChild(createArrow(330, 460, 390, 560, 'data'));
+
+        // Build External Sources (side)
+        const externalGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        externalGroup.classList.add('layer');
+
+        const externalTitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        externalTitle.setAttribute('x', '620');
+        externalTitle.setAttribute('y', '304');
+        externalTitle.setAttribute('class', 'layer-title');
+        externalTitle.textContent = 'External Data Sources';
+        externalGroup.appendChild(externalTitle);
+
+        externalGroup.appendChild(createTechBox(600, 320, 180, 60, 'Yahoo Finance', 'Prices, OHLCV', 'yahoo-finance', COLORS.green));
+        externalGroup.appendChild(createTechBox(800, 320, 180, 60, 'ASX RSS', 'Announcements', 'asx-rss', COLORS.green));
+        externalGroup.appendChild(createTechBox(600, 400, 180, 60, 'DuckDuckGo', 'News search', 'duckduckgo', COLORS.green));
+        externalGroup.appendChild(createTechBox(800, 400, 180, 60, 'Resend', 'OTP delivery', 'resend', COLORS.green));
+
+        svg.appendChild(externalGroup);
+
+        // Add arrows from External Sources to Layer 2/4
+        svg.appendChild(createArrow(600, 350, 500, 280, 'data'));
+        svg.appendChild(createArrow(800, 350, 500, 320, 'data'));
+        svg.appendChild(createArrow(600, 430, 480, 580, 'data'));
+
+        // Build Layer 5: Automation
+        const layer5 = createLayerGroup(700, 'Layer 5: Automation & Deployment');
+        layer5.appendChild(createTechBox(40, 720, 440, 100, 'GitHub Actions', '15 workflows: pre-market, intraday, post-market, overnight, on-push', 'github-actions', COLORS.amber));
+        svg.appendChild(layer5);
+
+        // Add arrows from Layer 5 back up (to show deployment cycle)
+        svg.appendChild(createArrow(260, 720, 260, 620, 'job'));
+        svg.appendChild(createArrow(260, 720, 150, 300, 'job'));
+
+        function showDetailPanel(id) {
+            const data = TECH_DATA[id];
+            if (!data) return;
+
+            currentDetailItem = id;
+            let html = `<div class="detail-title">${data.name}</div>`;
+            html += `<div class="detail-content">`;
+
+            for (const [key, value] of Object.entries(data.details)) {
+                html += `<div class="detail-field">`;
+                html += `<div class="detail-label">${key.replace(/-/g, ' ')}</div>`;
+                html += `<div class="detail-value">${value}</div>`;
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+            detailContent.innerHTML = html;
+            detailPanel.classList.add('active');
+        }
+
+        function closeDetailPanel() {
+            detailPanel.classList.remove('active');
+            currentDetailItem = null;
+        }
+
+        function showTooltip(text) {
+            tooltip.textContent = text;
+            tooltip.classList.add('visible');
+        }
+
+        function hideTooltip() {
+            tooltip.classList.remove('visible');
+        }
+
+        collapseBtn.addEventListener('click', () => {
+            detailPanel.classList.remove('active');
+            expandedItems.clear();
+        });
+
+        // Add some data flow visualizations
+        function addDataFlowLabels() {
+            // User Request Flow
+            const userFlowLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            userFlowLabel.setAttribute('x', '20');
+            userFlowLabel.setAttribute('y', '190');
+            userFlowLabel.setAttribute('font-size', '11');
+            userFlowLabel.setAttribute('fill', COLORS.blue);
+            userFlowLabel.setAttribute('opacity', '0.7');
+            userFlowLabel.textContent = 'User Request ↓';
+            svg.appendChild(userFlowLabel);
+
+            // Data Flow to AI
+            const aiFlowLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            aiFlowLabel.setAttribute('x', '500');
+            aiFlowLabel.setAttribute('y', '350');
+            aiFlowLabel.setAttribute('font-size', '11');
+            aiFlowLabel.setAttribute('fill', COLORS.teal);
+            aiFlowLabel.setAttribute('opacity', '0.7');
+            aiFlowLabel.textContent = '← Request Processing → Response';
+            svg.appendChild(aiFlowLabel);
+
+            // Automation Flow
+            const automationLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            automationLabel.setAttribute('x', '20');
+            automationLabel.setAttribute('y', '690');
+            automationLabel.setAttribute('font-size', '11');
+            automationLabel.setAttribute('fill', COLORS.amber);
+            automationLabel.setAttribute('opacity', '0.7');
+            automationLabel.textContent = 'Scheduled Updates ↑';
+            svg.appendChild(automationLabel);
+        }
+
+        addDataFlowLabels();
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeDetailPanel();
+            }
+        });
+
+        // Click outside detail panel to close
+        document.addEventListener('click', (e) => {
+            if (detailPanel.classList.contains('active') &&
+                !detailPanel.contains(e.target) &&
+                !e.target.closest('.tech-box')) {
+                closeDetailPanel();
+            }
+        });
+    </script>
+</body>
+</html>

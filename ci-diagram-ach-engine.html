@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continuum Intelligence v3 — ACH Research Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f8f7f4;
+            color: #1a2332;
+            line-height: 1.6;
+        }
+
+        body {
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a2332;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: #6b7280;
+        }
+
+        /* Section heading */
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a2332;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e0ddd7;
+        }
+
+        /* Pipeline Overview */
+        .pipeline-section {
+            margin-bottom: 60px;
+        }
+
+        .pipeline-flow {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 32px;
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e0ddd7;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .pipeline-stage {
+            flex: 1;
+            text-align: center;
+        }
+
+        .pipeline-stage-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a2332;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pipeline-stage-time {
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .pipeline-stage:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            margin-left: 8px;
+            color: #2563eb;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Parallel Tracks */
+        .tracks-container {
+            background: #ffffff;
+            border: 1px solid #e0ddd7;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 40px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .track {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0ddd7;
+        }
+
+        .track:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .track-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #1a2332;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .track-label .llm-badge {
+            display: inline-block;
+            background: #b45309;
+            color: #ffffff;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .track-label .time-badge {
+            display: inline-block;
+            background: #e0ddd7;
+            color: #1a2332;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .track-bar {
+            background: linear-gradient(to right, #2563eb 0%, #0f766e 100%);
+            height: 4px;
+            border-radius: 2px;
+            width: 100%;
+        }
+
+        .track.parallel {
+            opacity: 0.85;
+        }
+
+        /* Grid Layout for 8 Sections */
+        .sections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+
+        .schema-card {
+            background: #ffffff;
+            border: 1px solid #e0ddd7;
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .schema-card:hover {
+            border-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+        }
+
+        .schema-card.expanded {
+            grid-column: 1 / -1;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a2332;
+        }
+
+        .card-expand-icon {
+            font-size: 16px;
+            color: #6b7280;
+            transition: transform 0.2s ease;
+        }
+
+        .schema-card.expanded .card-expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .card-description {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .card-content {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e0ddd7;
+        }
+
+        .schema-card.expanded .card-content {
+            display: block;
+        }
+
+        /* Field List */
+        .field-list {
+            list-style: none;
+        }
+
+        .field-item {
+            font-size: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .field-item:last-child {
+            border-bottom: none;
+        }
+
+        .field-name {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #0f766e;
+            font-size: 11px;
+        }
+
+        .field-type {
+            display: inline-block;
+            background: #f3f4f6;
+            color: #1e293b;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            margin-left: 6px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .field-desc {
+            display: block;
+            color: #6b7280;
+            font-size: 11px;
+            margin-top: 3px;
+            margin-left: 0;
+        }
+
+        /* Schema Tables */
+        .schema-table {
+            width: 100%;
+            font-size: 11px;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        .schema-table th {
+            background: #f3f4f6;
+            color: #1a2332;
+            padding: 8px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #e0ddd7;
+        }
+
+        .schema-table td {
+            padding: 8px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #2d3436;
+        }
+
+        /* Prompts Section */
+        .prompts-section {
+            margin-bottom: 60px;
+        }
+
+        .prompt-panel {
+            background: #ffffff;
+            border: 1px solid #e0ddd7;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .prompt-header {
+            background: #f3f4f6;
+            padding: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #1a2332;
+            user-select: none;
+            transition: background 0.2s ease;
+        }
+
+        .prompt-header:hover {
+            background: #e0ddd7;
+        }
+
+        .prompt-toggle {
+            font-size: 14px;
+            color: #6b7280;
+            transition: transform 0.2s ease;
+        }
+
+        .prompt-panel.open .prompt-toggle {
+            transform: rotate(180deg);
+        }
+
+        .prompt-content {
+            display: none;
+            padding: 16px;
+            border-top: 1px solid #e0ddd7;
+        }
+
+        .prompt-panel.open .prompt-content {
+            display: block;
+        }
+
+        .prompt-text {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            background: #f3f4f6;
+            color: #1e293b;
+            padding: 12px;
+            border-radius: 4px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: auto;
+        }
+
+        .prompt-label {
+            display: inline-block;
+            background: #b45309;
+            color: #ffffff;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        /* Validation Rules */
+        .validation-section {
+            margin-bottom: 60px;
+        }
+
+        .validation-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .validation-card {
+            background: #ffffff;
+            border: 1px solid #e0ddd7;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .validation-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a2332;
+            margin-bottom: 16px;
+        }
+
+        .rule-list {
+            list-style: none;
+        }
+
+        .rule-item {
+            font-size: 12px;
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            color: #2d3436;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .rule-item:last-child {
+            border-bottom: none;
+        }
+
+        .rule-item::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        .rule-item.fix::before {
+            content: '⚙';
+            color: #b45309;
+        }
+
+        /* Data Sources Table */
+        .data-sources-section {
+            margin-bottom: 60px;
+        }
+
+        .sources-table {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #e0ddd7;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .sources-table th {
+            background: #f3f4f6;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #1a2332;
+            font-size: 12px;
+            border-bottom: 1px solid #e0ddd7;
+        }
+
+        .sources-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 12px;
+            color: #2d3436;
+        }
+
+        .sources-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .reliability-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .reliability-high {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .reliability-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Skew Calculator */
+        .skew-calculator-section {
+            margin-bottom: 60px;
+        }
+
+        .calculator-container {
+            background: #ffffff;
+            border: 1px solid #e0ddd7;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        .calculator-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .hypothesis-input {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .hypothesis-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a2332;
+        }
+
+        .hypothesis-label .direction {
+            display: inline-block;
+            background: #7c3aed;
+            color: #ffffff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            margin-left: 6px;
+        }
+
+        .hypothesis-label .direction.upside {
+            background: #0f766e;
+        }
+
+        .hypothesis-label .direction.downside {
+            background: #a83232;
+        }
+
+        .hypothesis-label .direction.neutral {
+            background: #6b7280;
+        }
+
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slider-group input[type="range"] {
+            flex: 1;
+            height: 4px;
+            border-radius: 2px;
+            appearance: none;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, #7c3aed 0%, #7c3aed var(--value), #e0ddd7 var(--value), #e0ddd7 100%);
+            cursor: pointer;
+        }
+
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #7c3aed;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .slider-group input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #7c3aed;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .slider-value {
+            min-width: 45px;
+            text-align: right;
+            font-weight: 600;
+            color: #1a2332;
+            font-size: 12px;
+        }
+
+        .calculator-output {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: #f3f4f6;
+            padding: 16px;
+            border-radius: 6px;
+        }
+
+        .output-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0ddd7;
+            font-size: 12px;
+        }
+
+        .output-row:last-child {
+            border-bottom: none;
+        }
+
+        .output-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .output-value {
+            font-weight: 600;
+            color: #1a2332;
+            font-family: 'Courier New', monospace;
+        }
+
+        .skew-result {
+            margin-top: 16px;
+            padding: 16px;
+            border-radius: 6px;
+            text-align: center;
+            background: #f0f9ff;
+            border: 1px solid #2563eb;
+        }
+
+        .skew-result.upside {
+            background: #d1fae5;
+            border-color: #0f766e;
+        }
+
+        .skew-result.downside {
+            background: #fee2e2;
+            border-color: #a83232;
+        }
+
+        .skew-result.balanced {
+            background: #f3f4f6;
+            border-color: #6b7280;
+        }
+
+        .skew-direction {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a2332;
+            margin-bottom: 4px;
+        }
+
+        .skew-score {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sections-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .validation-container {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .section-title {
+                font-size: 18px;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: #6b7280;
+            font-size: 12px;
+            padding-top: 40px;
+            border-top: 1px solid #e0ddd7;
+            margin-top: 60px;
+        }
+
+        /* Example visualization for hypothesis diagram */
+        .hypothesis-viz {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            margin-top: 12px;
+            height: 80px;
+        }
+
+        .hypothesis-bar {
+            flex: 1;
+            background: #7c3aed;
+            border-radius: 4px 4px 0 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 11px;
+            padding-bottom: 8px;
+        }
+
+        .hypothesis-bar.upside {
+            background: linear-gradient(to top, #0f766e, #2d7c7a);
+        }
+
+        .hypothesis-bar.downside {
+            background: linear-gradient(to top, #a83232, #c84e4e);
+        }
+
+        .hypothesis-bar.neutral {
+            background: linear-gradient(to top, #6b7280, #8b8f96);
+        }
+
+        /* Evidence grid */
+        .evidence-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .evidence-item {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .evidence-item-name {
+            font-weight: 600;
+            color: #1a2332;
+            margin-bottom: 4px;
+        }
+
+        .evidence-item-class {
+            display: inline-block;
+            background: #0f766e;
+            color: #ffffff;
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        /* Tag styling */
+        .tag {
+            display: inline-block;
+            background: #e0ddd7;
+            color: #1a2332;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            margin-right: 4px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Continuum Intelligence v3 — ACH Research Engine</h1>
+            <p>How equity research is generated: every LLM call, prompt, schema field, and validation rule</p>
+        </div>
+
+        <!-- Section 1: Pipeline Overview -->
+        <div class="pipeline-section">
+            <h2 class="section-title">1. Research Generation Pipeline</h2>
+
+            <div class="pipeline-flow">
+                <div class="pipeline-stage">
+                    <div class="pipeline-stage-name">Data Gathering</div>
+                    <div class="pipeline-stage-time">~30 sec</div>
+                </div>
+                <div class="pipeline-stage">
+                    <div class="pipeline-stage-name">Evidence Analysis</div>
+                    <div class="pipeline-stage-time">~20 sec</div>
+                </div>
+                <div class="pipeline-stage">
+                    <div class="pipeline-stage-name">Hypothesis Synthesis</div>
+                    <div class="pipeline-stage-time">~80 sec</div>
+                </div>
+                <div class="pipeline-stage">
+                    <div class="pipeline-stage-name">Merge & Validate</div>
+                    <div class="pipeline-stage-time">~5 sec</div>
+                </div>
+                <div class="pipeline-stage">
+                    <div class="pipeline-stage-name">Publish</div>
+                    <div class="pipeline-stage-time">~2 sec</div>
+                </div>
+            </div>
+
+            <h3 class="section-title" style="margin-top: 32px; margin-bottom: 16px; font-size: 16px; border-bottom: none;">Parallel Execution Tracks</h3>
+            <div class="tracks-container">
+                <div class="track">
+                    <div class="track-label">
+                        Track 1: Data Gathering
+                        <span class="time-badge">Synchronous — Block All Other Tracks</span>
+                    </div>
+                    <div class="track-bar" style="background: linear-gradient(to right, #2563eb 0%, #2563eb 100%);"></div>
+                    <div style="font-size: 11px; color: #6b7280; margin-top: 6px;">Pull price data from Yahoo Finance, ASX announcements from RSS, news from DuckDuckGo, commodity futures for macro context. ~30 seconds total.</div>
+                </div>
+
+                <div class="track parallel">
+                    <div class="track-label">
+                        Track 2: Evidence Update/Creation
+                        <span class="llm-badge">Gemini 2.0 Flash</span>
+                        <span class="time-badge">~20 sec</span>
+                    </div>
+                    <div class="track-bar"></div>
+                    <div style="font-size: 11px; color: #6b7280; margin-top: 6px;">Produce or update 10 evidence domain cards. Runs in parallel with Tracks 3, 4, 5, 6.</div>
+                </div>
+
+                <div class="track parallel">
+                    <div class="track-label">
+                        Track 3: Hypothesis Synthesis
+                        <span class="llm-badge">Claude Sonnet 4.6</span>
+                        <span class="time-badge">~80 sec</span>
+                    </div>
+                    <div class="track-bar"></div>
+                    <div style="font-size: 11px; color: #6b7280; margin-top: 6px;">Four hypotheses (N1-N4) with narrative, verdict, and skew computation. Runs parallel with Track 2, awaits Track 1 completion.</div>
+                </div>
+
+                <div class="track parallel">
+                    <div class="track-label">
+                        Track 4: Structure Update
+                        <span class="llm-badge">Gemini 2.0 Flash</span>
+                        <span class="time-badge">~15 sec</span>
+                    </div>
+                    <div class="track-bar" style="background: linear-gradient(to right, #b45309 0%, #b45309 100%);"></div>
+                    <div style="font-size: 11px; color: #6b7280; margin-top: 6px;">Discriminators, tripwires, technical analysis, gaps. Runs in parallel with Track 3.</div>
+                </div>
+
+                <div class="track parallel">
+                    <div class="track-label">
+                        Track 5: Price Driver Analysis
+                        <span class="llm-badge">Claude Sonnet 4.6</span>
+                        <span class="time-badge">~120 sec (optional)</span>
+                    </div>
+                    <div class="track-bar" style="background: linear-gradient(to right, #0f766e 0%, #0f766e 100%);"></div>
+                    <div style="font-size: 11px; color: #6b7280; margin-top: 6px;">Broker research, social sentiment, macro period returns. Optional, runs in background.</div>
+                </div>
+
+                <div class="track parallel">
+                    <div class="track-label">
+                        Track 6: Gold Overlay
+                        <span class="llm-badge">NotebookLM + Claude</span>
+                        <span class="time-badge">~90 sec (gold stocks only)</span>
+                    </div>
+                    <div class="track-bar" style="background: linear-gradient(to right, #7c3aed 0%, #7c3aed 100%);"></div>
+                    <div style="font-size: 11px; color: #6b7280; margin-top: 6px;">Deep fundamental analysis via NotebookLM agent. Gold stocks (FMG, RMS, OBM, etc.) only.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: The 8 Research Sections -->
+        <div style="margin-bottom: 60px;">
+            <h2 class="section-title">2. Research JSON Schema — 8 Sections</h2>
+            <p style="color: #6b7280; font-size: 13px; margin-bottom: 20px;">Click each card to expand and see the full schema with field descriptions.</p>
+
+            <div class="sections-grid">
+                <!-- Section 1: Price History -->
+                <div class="schema-card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Section 1: Price History</div>
+                            <div class="card-description">365-day price series from Yahoo Finance</div>
+                        </div>
+                        <div class="card-expand-icon">▼</div>
+                    </div>
+                    <div class="card-content">
+                        <ul class="field-list">
+                            <li class="field-item">
+                                <span class="field-name">priceHistory</span>
+                                <span class="field-type">array</span>
+                                <span class="field-desc">Array of daily price objects: { price: float, currency: string, date: YYYY-MM-DD }</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">currentPrice</span>
+                                <span class="field-type">float</span>
+                                <span class="field-desc">Most recent close price in A$</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">currency</span>
+                                <span class="field-type">string</span>
+                                <span class="field-desc">ISO 4217 code (AUD)</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">date</span>
+                                <span class="field-type">string</span>
+                                <span class="field-desc">Most recent price date (YYYY-MM-DD)</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Section 2: Hero / Home Page -->
+                <div class="schema-card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Section 2: Hero / Home Page</div>
+                            <div class="card-description">Summary card for home page tile</div>
+                        </div>
+                        <div class="card-expand-icon">▼</div>
+                    </div>
+                    <div class="card-content">
+                        <ul class="field-list">
+                            <li class="field-item">
+                                <span class="field-name">heroDescription</span>
+                                <span class="field-type">string</span>
+                                <span class="field-desc">One-line: "BHP is a diversified resources major with exposure to iron ore, coal, copper, and oil."</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">heroCompanyDescription</span>
+                                <span class="field-type">string (HTML)</span>
+                                <span class="field-desc">4-6 sentence overview with links and formatting</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">heroMetrics</span>
+                                <span class="field-type">array</span>
+                                <span class="field-desc">4 key metrics: [{ label: "Mkt Cap", value: "A$195B" }, ...]</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">hero.skew</span>
+                                <span class="field-type">enum</span>
+                                <span class="field-desc">UPSIDE | DOWNSIDE | BALANCED (computed from hypothesis scores)</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">hero.skew_description</span>
+                                <span class="field-type">string</span>
+                                <span class="field-desc">2-3 sentence skew rationale</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">hero.embedded_thesis</span>
+                                <span class="field-type">string</span>
+                                <span class="field-desc">What the current price assumes (3-5 sentences)</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">hero.position_in_range</span>
+                                <span class="field-type">object</span>
+                                <span class="field-desc">{ bear: 10.50, base: 12.25, bull: 15.00, catalyst: 18.75 }</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">hero.next_decision_point</span>
+                                <span class="field-type">object</span>
+                                <span class="field-desc">{ event: "Q2 earnings", date: "2026-07-15", metric: "EBITDA", thresholds: { positive: ">$5.2B", negative: "<$4.8B" } }</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Section 3: Hypotheses -->
+                <div class="schema-card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Section 3: Hypotheses</div>
+                            <div class="card-description">ACH core: 4 competing scenarios</div>
+                        </div>
+                        <div class="card-expand-icon">▼</div>
+                    </div>
+                    <div class="card-content">
+                        <p style="font-size: 11px; color: #6b7280; margin-bottom: 12px;">Four hypotheses (N1-N4) with probabilistic weights that sum to 100%.</p>
+                        <table class="schema-table">
+                            <tr>
+                                <th>Hypothesis</th>
+                                <th>Direction</th>
+                                <th>Key Fields</th>
+                            </tr>
+                            <tr>
+                                <td><strong>N1</strong></td>
+                                <td>upside</td>
+                                <td>title, score (%), description, supporting[], contradicting[], requires[]</td>
+                            </tr>
+                            <tr>
+                                <td><strong>N2</strong></td>
+                                <td>any</td>
+                                <td>Base case — usually highest weight</td>
+                            </tr>
+                            <tr>
+                                <td><strong>N3</strong></td>
+                                <td>downside</td>
+                                <td>Bear case with evidence</td>
+                            </tr>
+                            <tr>
+                                <td><strong>N4</strong></td>
+                                <td>any</td>
+                                <td>Tail risk, low probability</td>
+                            </tr>
+                        </table>
+                        <div class="hypothesis-viz">
+                            <div class="hypothesis-bar upside" style="height: 35%;">N1 35%</div>
+                            <div class="hypothesis-bar neutral" style="height: 40%;">N2 40%</div>
+                            <div class="hypothesis-bar downside" style="height: 20%;">N3 20%</div>
+                            <div class="hypothesis-bar downside" style="height: 5%;">N4 5%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Narrative -->
+                <div class="schema-card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Section 4: Narrative</div>
+                            <div class="card-description">The story: what & what price assumes</div>
+                        </div>
+                        <div class="card-expand-icon">▼</div>
+                    </div>
+                    <div class="card-content">
+                        <ul class="field-list">
+                            <li class="field-item">
+                                <span class="field-name">theNarrative</span>
+                                <span class="field-type">string</span>
+                                <span class="field-desc">Dominant theme right now (3-5 sentences, updated with new data)</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">priceImplication</span>
+                                <span class="field-type">object</span>
+                                <span class="field-desc">{ summary: "...", details: ["bullet1", "bullet2", ...] } — what price assumes</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">evidenceCheck</span>
+                                <span class="field-type">string</span>
+                                <span class="field-desc">How strong is the evidence base for this narrative</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">narrativeStability</span>
+                                <span class="field-type">enum</span>
+                                <span class="field-desc">robust | fragile | uncertain — how easily could the narrative break</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Section 5: Evidence -->
+                <div class="schema-card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Section 5: Evidence</div>
+                            <div class="card-description">10 domain cards with epistemic classification</div>
+                        </div>
+                        <div class="card-expand-icon">▼</div>
+                    </div>
+                    <div class="card-content">
+                        <p style="font-size: 11px; color: #6b7280; margin-bottom: 12px;">All 10 domains must be covered (or explicitly marked unavailable).</p>
+                        <div class="evidence-grid">
+                            <div class="evidence-item">
+                                <div class="evidence-item-name">1. Corporate Communications</div>
+                                <span class="evidence-item-class">motivated</span>
+                            </div>
+                            <div class="evidence-item">
+                                <div class="evidence-item-name">2. Regulatory & Financials</div>
+                                <span class="evidence-item-class">verified</span>
+                            </div>
+                            <div class="evidence-item">
+                                <div class="evidence-item-name">3. Broker Research</div>
+                                <span class="evidence-item-class">modelled</span>
+                            </div>
+                            <div class="evidence-item">
+                                <div class="evidence-item-name">4. Competitor Disclosures</div>
+                                <span class="evidence-item-class">verified</span>
+                            </div>
+                            <div class="evidence-item">
+                                <div class="evidence-item-name">5. Economic Data</div>
+                                <span class="evidence-item-class">measured</span>
+                            </div>
+                            <div class="evidence-item">
+                                <div class="evidence-item-name">6. Alternative Data</div>
+                                <span class="evidence-item-class">observed</span>
+                            </div>
+                            <div class="evidence-item">
+                                <div class="evidence-item-name">7. Academic Research</div>
+                                <span class="evidence-item-class">peer-reviewed</span>
+                            </div>
+                            <div class="evidence-item">
+                                <div class="evidence-item-name">8. Media & Social</div>
+                                <span class="evidence-item-class">unverified</span>
+                            </div>
+                            <div class="evidence-item">
+                                <div class="evidence-item-name">9. Leadership</div>
+                                <span class="evidence-item-class">observed</span>
+                            </div>
+                            <div class="evidence-item">
+                                <div class="evidence-item-name">10. Ownership & Flows</div>
+                                <span class="evidence-item-class">measured</span>
+                            </div>
+                        </div>
+                        <p style="font-size: 11px; color: #6b7280; margin-top: 12px;"><strong>Each card contains:</strong> finding (with specific numbers), tension (counter-narrative), source, tags (Supports N1, Contradicts N3, etc.), optional data table</p>
+                    </div>
+                </div>
+
+                <!-- Section 6: Verdict & Skew -->
+                <div class="schema-card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Section 6: Verdict & Skew</div>
+                            <div class="card-description">Market verdict & upside/downside classification</div>
+                        </div>
+                        <div class="card-expand-icon">▼</div>
+                    </div>
+                    <div class="card-content">
+                        <ul class="field-list">
+                            <li class="field-item">
+                                <span class="field-name">verdict</span>
+                                <span class="field-type">object</span>
+                                <span class="field-desc">{ text: "Market assumes...", scores: [35%, 40%, 20%, 5%] }</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">skew</span>
+                                <span class="field-type">enum</span>
+                                <span class="field-desc">UPSIDE | DOWNSIDE | BALANCED (computed from hypothesis net direction)</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">skew_score</span>
+                                <span class="field-type">integer (0-100)</span>
+                                <span class="field-desc">Confidence in skew direction: 60 = moderately upside, 85 = strongly upside</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">skew_computation</span>
+                                <span class="field-type">string</span>
+                                <span class="field-desc">Deterministic: upside_sum = sum(N1 & upside-N2), downside_sum = sum(N3, N4 & downside-N2), net = upside - downside</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Section 7: Discriminators & Tripwires -->
+                <div class="schema-card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Section 7: Discriminators & Tripwires</div>
+                            <div class="card-description">Diagnostic metrics & future catalysts</div>
+                        </div>
+                        <div class="card-expand-icon">▼</div>
+                    </div>
+                    <div class="card-content">
+                        <p style="font-size: 11px; color: #6b7280; margin-bottom: 12px;"><strong>Discriminators (3-10):</strong> Which hypotheses do they differentiate? What's the current reading?</p>
+                        <table class="schema-table">
+                            <tr>
+                                <th>Metric</th>
+                                <th>Diagnosticity</th>
+                                <th>Discriminates</th>
+                                <th>Current</th>
+                            </tr>
+                            <tr>
+                                <td>EBITDA margin</td>
+                                <td>HIGH</td>
+                                <td>N1 vs N3</td>
+                                <td><span style="color: #065f46; font-weight: 600;">32% ✓</span></td>
+                            </tr>
+                            <tr>
+                                <td>Capex/revenue</td>
+                                <td>MEDIUM</td>
+                                <td>N2 vs N4</td>
+                                <td><span style="color: #92400e; font-weight: 600;">4.1% ⚠</span></td>
+                            </tr>
+                        </table>
+                        <p style="font-size: 11px; color: #6b7280; margin-top: 12px;"><strong>Tripwires (2-10):</strong> Future catalysts that could trigger position changes</p>
+                        <div style="background: #f3f4f6; padding: 10px; border-radius: 4px; font-size: 11px; margin-top: 8px;">
+                            <strong>Tripwire:</strong> "Q2 EBITDA < A$500M" → triggers exit from N2 base case<br/>
+                            <strong>Catalyst:</strong> "Q1 production guidance cut" → timing/event<br/>
+                            <strong>Valence:</strong> negative (downside surprise)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 8: Technical & Gaps -->
+                <div class="schema-card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Section 8: Technical & Gaps</div>
+                            <div class="card-description">Technical analysis & coverage gaps</div>
+                        </div>
+                        <div class="card-expand-icon">▼</div>
+                    </div>
+                    <div class="card-content">
+                        <ul class="field-list">
+                            <li class="field-item">
+                                <span class="field-name">technical.regime</span>
+                                <span class="field-type">enum</span>
+                                <span class="field-desc">Uptrend | Downtrend | Sideways</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">technical.ma50_ma200</span>
+                                <span class="field-type">string</span>
+                                <span class="field-desc">"50-day at A$12.50, 200-day at A$11.80, bullish crossover"</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">technical.volatility</span>
+                                <span class="field-type">float</span>
+                                <span class="field-desc">Annualised: 24% = moderate</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">gapCoverage</span>
+                                <span class="field-type">array (10 rows)</span>
+                                <span class="field-desc">One row per evidence domain: { domain: "...", coverage: "Full|Good|Limited" }</span>
+                            </li>
+                            <li class="field-item">
+                                <span class="field-name">analyticalLimitations</span>
+                                <span class="field-type">string</span>
+                                <span class="field-desc">What couldn't be assessed and why</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: LLM Prompts -->
+        <div class="prompts-section">
+            <h2 class="section-title">3. LLM System Prompts — The Research Generation Instructions</h2>
+            <p style="color: #6b7280; font-size: 13px; margin-bottom: 20px;">Click to expand each prompt and see exactly what instructions are given to Gemini and Claude.</p>
+
+            <!-- Prompt A -->
+            <div class="prompt-panel">
+                <div class="prompt-header">
+                    <div>
+                        <span class="prompt-label">A: EVIDENCE CREATION</span>
+                        <strong>Gemini 2.0 Flash</strong> — Coverage Initiation (~20 sec)
+                    </div>
+                    <div class="prompt-toggle">▼</div>
+                </div>
+                <div class="prompt-content">
+                    <div class="prompt-text">You are a senior equity research analyst at Continuum Intelligence conducting an initial coverage assessment.
+
+For each of the 10 evidence domains below, produce a structured evidence card with:
+- "finding": 2-4 sentences with specific numbers, dates, and citations
+- "tension": 1-2 sentence counter-narrative or information gap
+- "source": data source description
+- "tags": array of hypothesis support/contradict tags
+- "table": null or structured data table if quantitative
+
+The 10 domains (MUST produce all 10):
+1. Corporate Communications (epistemic class: motivated)
+2. Regulatory Filings & Financial Statements (verified)
+3. Broker Research (modelled)
+4. Competitor Disclosures (verified)
+5. Economic Data (measured)
+6. Alternative Data (observed)
+7. Academic Research (peer-reviewed)
+8. Media & Social (unverified)
+9. Leadership & Governance (observed)
+10. Ownership & Capital Flows (measured)
+
+Rules:
+- Cite dates, numbers, and sources. Never fabricate data.
+- If data is unavailable for a domain, state the gap explicitly in "tension".
+- Australian English. No em-dashes. Use en-dashes or restructured sentences.
+- Each finding must reference specific data from the provided context.
+- Structure your response as JSON: { "evidence_cards": [ { "domain": "...", "finding": "...", "tension": "...", "source": "...", "tags": [...], "table": null } ] }</div>
+                </div>
+            </div>
+
+            <!-- Prompt B -->
+            <div class="prompt-panel">
+                <div class="prompt-header">
+                    <div>
+                        <span class="prompt-label">B: EVIDENCE UPDATE</span>
+                        <strong>Gemini 2.0 Flash</strong> — Refresh Cycle (~20 sec)
+                    </div>
+                    <div class="prompt-toggle">▼</div>
+                </div>
+                <div class="prompt-content">
+                    <div class="prompt-text">You are updating evidence cards for an existing equity research coverage.
+
+Given:
+- Existing 10 evidence domain cards (current state)
+- New data since last update (announcements, reports, news)
+- Current market price and volatility
+
+For each existing card, assess whether the new data warrants a material update.
+
+Rules:
+- Only update a card if new data is MATERIAL (price-moving or thesis-affecting).
+- Set "material_change": true only for genuine updates.
+- Preserve the existing finding/tension structure unless new data fundamentally changes it.
+- Cite dates, numbers, sources in any updates.
+- Use macro commodity prices (iron ore, copper, oil, gold) for resource/commodity companies.
+- Australian English. No em-dashes.
+- If no material change, return: { "domain": "...", "material_change": false }
+
+Structure your response as JSON: { "updated_cards": [ { "domain": "...", "material_change": true/false, "finding": "...", "tension": "...", "source": "...", "tags": [...] } ] }</div>
+                </div>
+            </div>
+
+            <!-- Prompt C -->
+            <div class="prompt-panel">
+                <div class="prompt-header">
+                    <div>
+                        <span class="prompt-label">C: HYPOTHESIS SYNTHESIS</span>
+                        <strong>Claude Sonnet 4.6</strong> — Coverage Initiation (~80 sec)
+                    </div>
+                    <div class="prompt-toggle">▼</div>
+                </div>
+                <div class="prompt-content">
+                    <div class="prompt-text">You are a senior equity research analyst conducting initial ACH (Analysis of Competing Hypotheses) coverage.
+
+Given:
+- Company overview and sector context
+- Current market price and recent price history
+- 10 evidence domain cards (or data to assess them)
+
+Produce:
+
+1. FOUR HYPOTHESES (N1-N4):
+   - N1: Bull case (upside direction)
+   - N2: Base case (usually highest weight, any direction)
+   - N3: Bear case (downside direction)
+   - N4: Tail risk (low probability extreme, any direction)
+
+   Each hypothesis MUST have:
+   - title: "N1: [descriptive 6-8 word title]"
+   - direction: "upside" or "downside" or "neutral"
+   - score: integer percentage as string (e.g., "35%")
+   - description: 2-3 sentence scenario description
+   - supporting: array of 2-4 supporting evidence lines
+   - contradicting: array of 1-3 contradicting evidence lines
+   - requires: what must be true for this scenario to play out
+
+   CONSTRAINT: Scores MUST sum to 100%.
+
+2. embedded_thesis (3-5 sentences): What does the current price assume? Reference the actual share price.
+
+3. skew_description (2-3 sentences): Why is it upside/downside/balanced?
+
+4. Narrative sections:
+   - theNarrative: Dominant theme right now (3-5 sentences)
+   - priceImplication: { summary: "...", details: ["bullet1", "bullet2", ...] }
+   - evidenceCheck: Is the evidence base strong or weak?
+   - narrativeStability: robust | fragile | uncertain
+
+5. verdict: { text: "What the market is pricing and whether it's correct", scores: [35%, 40%, 20%, 5%] }
+
+6. next_decision_point: { event: "Q2 earnings", date: "2026-07-15", metric: "EBITDA", thresholds: { positive: ">$5.2B", negative: "<$4.8B" } }
+
+7. position_in_range: { bear: 10.50, base: 12.25, bull: 15.00, catalyst: 18.75 } (plain numbers in A$)
+
+8. company_description: 4-6 sentence overview of what the company is and does
+
+Rules:
+- Reference the current price throughout. Update it to today's date.
+- All dates in next_decision_point must be future.
+- Be opinionated. Take a view on probability. Don't hedge with 25/25/25/25.
+- No emoji anywhere.
+- Australian English, no em-dashes.
+- Distinguish between N1 upside and N2 base; don't duplicate logic.
+
+Return as JSON: { "hypotheses": [ ... ], "embedded_thesis": "...", "skew_description": "...", "theNarrative": "...", "priceImplication": {...}, "evidenceCheck": "...", "narrativeStability": "...", "verdict": {...}, "next_decision_point": {...}, "position_in_range": {...}, "company_description": "..." }</div>
+                </div>
+            </div>
+
+            <!-- Prompt D -->
+            <div class="prompt-panel">
+                <div class="prompt-header">
+                    <div>
+                        <span class="prompt-label">D: HYPOTHESIS UPDATE</span>
+                        <strong>Claude Sonnet 4.6</strong> — Refresh Cycle (~80 sec)
+                    </div>
+                    <div class="prompt-toggle">▼</div>
+                </div>
+                <div class="prompt-content">
+                    <div class="prompt-text">You are updating an existing ACH equity research coverage.
+
+Given:
+- Current hypothesis weights: [existing scores]
+- Updated evidence cards: [10 cards with material_change flags]
+- New market data: [current price, price history, announcements, news]
+- Current date and time context
+
+Reassess hypothesis probabilities in light of new evidence.
+
+Rules:
+- Scores MUST sum to 100% (integer percentages).
+- Only change scores if evidence warrants it. Don't move scores for the sake of it.
+- Explain score changes in a rationale line.
+- Rewrite ALL narrative sections to reflect current reality.
+- next_decision_point MUST be a future date (not past).
+- Reference the current market price, not stale prices from prior updates.
+- If evidence is ambiguous or contradictory, state the ambiguity explicitly.
+- Don't invent data. Use only what's provided.
+
+Update and return: { "hypotheses": [ ... ], "score_changes_rationale": "...", "embedded_thesis": "...", "skew_description": "...", "theNarrative": "...", "priceImplication": {...}, "verdict": {...}, "next_decision_point": {...}, "position_in_range": {...} }</div>
+                </div>
+            </div>
+
+            <!-- Prompt E -->
+            <div class="prompt-panel">
+                <div class="prompt-header">
+                    <div>
+                        <span class="prompt-label">E: STRUCTURE UPDATE</span>
+                        <strong>Gemini 2.0 Flash</strong> — Refresh Cycle (~15 sec)
+                    </div>
+                    <div class="prompt-toggle">▼</div>
+                </div>
+                <div class="prompt-content">
+                    <div class="prompt-text">Update the structural analysis sections (discriminators, tripwires, technical analysis, gaps) based on new market data.
+
+Return null for any section with no material change.
+
+For discriminators (3-10 rows):
+- diagnosticity: "HIGH" | "MEDIUM" | "LOW"
+- evidence: the specific data point or metric
+- discriminatesBetween: "N1 vs N3" format (which hypotheses does this differentiate?)
+- currentReading: current level with interpretation
+- scoreColor: "td-green" (bullish) | "td-amber" (neutral) | "td-red" (bearish)
+
+For tripwires (2-10 cards):
+- description: what event or metric triggers the wire
+- valence: "positive" | "negative" (upside or downside surprise?)
+- hypotheses_affected: which N1-N4 are affected
+- date_context: "Q2 2026" or "within 90 days"
+
+For technical_analysis:
+- regime: "Uptrend" | "Downtrend" | "Sideways"
+- ma50_ma200: current moving average relationship
+- volatility: annualised percentage
+- relative_performance: vs ASX200 (outperforming/underperforming/in-line)
+- commentary: 2-4 sentences
+
+For gaps:
+- gapCoverage: array of 10 rows, one per evidence domain
+- analyticalLimitations: what couldn't be assessed and why
+
+Return as JSON: { "discriminators": [ ... ], "tripwires": [ ... ], "technical_analysis": {...}, "gapCoverage": [ ... ], "analyticalLimitations": "..." }</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Validation Rules -->
+        <div class="validation-section">
+            <h2 class="section-title">4. Validation & Auto-Fix Rules</h2>
+
+            <div class="validation-container">
+                <div class="validation-card">
+                    <h3>12 Auto-Fix Corrections (Applied Before Save)</h3>
+                    <ul class="rule-list">
+                        <li class="rule-item fix">String prices → float conversion</li>
+                        <li class="rule-item fix">Gap percentage normalisation (0-100 scale)</li>
+                        <li class="rule-item fix">Missing currentPrice filled from priceHistory[-1]</li>
+                        <li class="rule-item fix">Empty scoreColor derived from hypothesis direction</li>
+                        <li class="rule-item fix">Missing indexReturn defaults to 6.5%</li>
+                        <li class="rule-item fix">relativeReturn recalculated (stockReturn - indexReturn)</li>
+                        <li class="rule-item fix">Mojibake cleanup (recursive through all strings)</li>
+                        <li class="rule-item fix">Emoji stripping (recursive through all strings)</li>
+                        <li class="rule-item fix">heroCompanyDescription trim (max 600 chars)</li>
+                        <li class="rule-item fix">Missing confidenceClass filled (high|medium|low)</li>
+                        <li class="rule-item fix">Footer count correction (evidence card count)</li>
+                        <li class="rule-item fix">Hypothesis score string normalisation ("%")</li>
+                    </ul>
+                </div>
+
+                <div class="validation-card">
+                    <h3>19 Validation Checks (Logged, Not Blocking)</h3>
+                    <ul class="rule-list">
+                        <li class="rule-item">Ticker uppercase</li>
+                        <li class="rule-item">Company name non-empty</li>
+                        <li class="rule-item">Hypotheses count = 3-4</li>
+                        <li class="rule-item">Hypothesis scores sum to 100%</li>
+                        <li class="rule-item">Evidence cards >= 5</li>
+                        <li class="rule-item">Verdict text present & > 50 chars</li>
+                        <li class="rule-item">Narrative text present & > 100 chars</li>
+                        <li class="rule-item">Skew direction valid (UPSIDE|DOWNSIDE|BALANCED)</li>
+                        <li class="rule-item">Position in range worlds = 4</li>
+                        <li class="rule-item">Discriminators 3-10</li>
+                        <li class="rule-item">Tripwires 2-10</li>
+                        <li class="rule-item">Gap coverage rows = 10</li>
+                        <li class="rule-item">Evidence intro >= 50 chars</li>
+                        <li class="rule-item">No em-dashes (regex check)</li>
+                        <li class="rule-item">All prices are numbers</li>
+                        <li class="rule-item">Identity rows > 0</li>
+                        <li class="rule-item">Hero metrics valid & present</li>
+                        <li class="rule-item">Verdict score count matches hypothesis count</li>
+                        <li class="rule-item">Verdict/hypothesis score divergence auto-fix</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Data Sources -->
+        <div class="data-sources-section">
+            <h2 class="section-title">5. External Data Sources</h2>
+
+            <table class="sources-table">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Type</th>
+                        <th>Latency</th>
+                        <th>Reliability</th>
+                        <th>Data Coverage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Yahoo Finance</strong></td>
+                        <td>Price</td>
+                        <td>15-20 min</td>
+                        <td><span class="reliability-badge reliability-high">High</span></td>
+                        <td>OHLCV, market cap, 52-week range, dividend yield</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ASX RNS RSS</strong></td>
+                        <td>Announcements</td>
+                        <td>Real-time</td>
+                        <td><span class="reliability-badge reliability-high">High</span></td>
+                        <td>Official corporate announcements, quarterly/annual reports</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DuckDuckGo News</strong></td>
+                        <td>News Aggregation</td>
+                        <td>~1 hour</td>
+                        <td><span class="reliability-badge reliability-medium">Medium</span></td>
+                        <td>Up to 8 news headlines per search query, sector news</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Commodity Futures</strong></td>
+                        <td>Macro Pricing</td>
+                        <td>15-20 min</td>
+                        <td><span class="reliability-badge reliability-high">High</span></td>
+                        <td>Gold, iron ore, copper, oil, natural gas spot/futures prices</td>
+                    </tr>
+                    <tr>
+                        <td><strong>NotebookLM</strong></td>
+                        <td>Document AI</td>
+                        <td>~2 minutes</td>
+                        <td><span class="reliability-badge reliability-high">High</span></td>
+                        <td>Deep analysis over user-supplied documents (gold stocks only)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 6: Skew Calculator -->
+        <div class="skew-calculator-section">
+            <h2 class="section-title">6. Skew Computation — Interactive Calculator</h2>
+            <p style="color: #6b7280; font-size: 13px; margin-bottom: 20px;">Drag the sliders to adjust hypothesis scores and watch the skew direction update in real time. Scores must sum to 100%.</p>
+
+            <div class="calculator-container">
+                <div class="calculator-grid">
+                    <div class="calculator-inputs">
+                        <div class="hypothesis-input">
+                            <label class="hypothesis-label">
+                                N1: Bull Case
+                                <span class="direction upside">UPSIDE</span>
+                            </label>
+                            <div class="slider-group">
+                                <input type="range" id="n1-slider" min="0" max="100" value="35" style="--value: 35%;">
+                                <span class="slider-value"><span id="n1-value">35</span>%</span>
+                            </div>
+                        </div>
+
+                        <div class="hypothesis-input">
+                            <label class="hypothesis-label">
+                                N2: Base Case
+                                <span class="direction neutral">NEUTRAL</span>
+                            </label>
+                            <div class="slider-group">
+                                <input type="range" id="n2-slider" min="0" max="100" value="40" style="--value: 40%;">
+                                <span class="slider-value"><span id="n2-value">40</span>%</span>
+                            </div>
+                        </div>
+
+                        <div class="hypothesis-input">
+                            <label class="hypothesis-label">
+                                N3: Bear Case
+                                <span class="direction downside">DOWNSIDE</span>
+                            </label>
+                            <div class="slider-group">
+                                <input type="range" id="n3-slider" min="0" max="100" value="20" style="--value: 20%;">
+                                <span class="slider-value"><span id="n3-value">20</span>%</span>
+                            </div>
+                        </div>
+
+                        <div class="hypothesis-input">
+                            <label class="hypothesis-label">
+                                N4: Tail Risk
+                                <span class="direction downside">DOWNSIDE</span>
+                            </label>
+                            <div class="slider-group">
+                                <input type="range" id="n4-slider" min="0" max="100" value="5" style="--value: 5%;">
+                                <span class="slider-value"><span id="n4-value">5</span>%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="calculator-output">
+                        <div class="output-row">
+                            <span class="output-label">Sum of Scores</span>
+                            <span class="output-value" id="sum-value">100%</span>
+                        </div>
+                        <div class="output-row">
+                            <span class="output-label">Upside Sum (N1)</span>
+                            <span class="output-value" id="upside-sum">35%</span>
+                        </div>
+                        <div class="output-row">
+                            <span class="output-label">Downside Sum (N3+N4)</span>
+                            <span class="output-value" id="downside-sum">25%</span>
+                        </div>
+                        <div class="output-row">
+                            <span class="output-label">Net Direction</span>
+                            <span class="output-value" id="net-direction">+10</span>
+                        </div>
+                        <div class="output-row">
+                            <span class="output-label">Skew Threshold</span>
+                            <span class="output-value">±5 (absolute)</span>
+                        </div>
+
+                        <div id="skew-result" class="skew-result upside">
+                            <div class="skew-direction">⬆ UPSIDE</div>
+                            <div class="skew-score">Skew Score: 60/100</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; padding: 16px; background: #f3f4f6; border-radius: 6px; font-size: 11px; color: #2d3436;">
+                    <strong>Skew Computation Logic:</strong><br/>
+                    1. Upside Sum = N1 (if upside direction) + any N2/N4 with upside direction<br/>
+                    2. Downside Sum = N3 (if downside direction) + N4 (if downside direction) + any N2 with downside direction<br/>
+                    3. Net = Upside Sum − Downside Sum<br/>
+                    4. If Net > 5: UPSIDE | If Net < −5: DOWNSIDE | If −5 ≤ Net ≤ 5: BALANCED<br/>
+                    5. Skew Score = Abs(Net) × 6 (capped at 100)
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Continuum Intelligence v3 — ACH Research Engine Documentation</p>
+            <p style="margin-top: 8px;">This diagram represents the complete research generation pipeline as of 22 March 2026.</p>
+        </div>
+    </div>
+
+    <script>
+        // Schema card expansion
+        document.querySelectorAll('.schema-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                // Don't toggle if clicking on a link or interactive element
+                if (e.target.tagName === 'A') return;
+
+                const isExpanded = card.classList.contains('expanded');
+                document.querySelectorAll('.schema-card.expanded').forEach(c => {
+                    if (c !== card) c.classList.remove('expanded');
+                });
+                card.classList.toggle('expanded');
+            });
+        });
+
+        // Prompt panel expansion
+        document.querySelectorAll('.prompt-panel').forEach(panel => {
+            const header = panel.querySelector('.prompt-header');
+            header.addEventListener('click', () => {
+                panel.classList.toggle('open');
+            });
+        });
+
+        // Skew calculator
+        const sliders = {
+            n1: document.getElementById('n1-slider'),
+            n2: document.getElementById('n2-slider'),
+            n3: document.getElementById('n3-slider'),
+            n4: document.getElementById('n4-slider')
+        };
+
+        const updateSlider = (slider) => {
+            slider.style.setProperty('--value', slider.value + '%');
+        };
+
+        const computeSkew = () => {
+            const n1 = parseInt(sliders.n1.value);
+            const n2 = parseInt(sliders.n2.value);
+            const n3 = parseInt(sliders.n3.value);
+            const n4 = parseInt(sliders.n4.value);
+
+            const sum = n1 + n2 + n3 + n4;
+
+            // Update display values
+            document.getElementById('n1-value').textContent = n1;
+            document.getElementById('n2-value').textContent = n2;
+            document.getElementById('n3-value').textContent = n3;
+            document.getElementById('n4-value').textContent = n4;
+            document.getElementById('sum-value').textContent = sum + '%';
+
+            // Compute upside/downside
+            // N1 is upside, N3+N4 are downside, N2 is neutral
+            const upside = n1; // N1 is always upside
+            const downside = n3 + n4; // N3+N4 are always downside
+            const net = upside - downside;
+
+            document.getElementById('upside-sum').textContent = upside + '%';
+            document.getElementById('downside-sum').textContent = downside + '%';
+            document.getElementById('net-direction').textContent = (net > 0 ? '+' : '') + net;
+
+            // Determine skew
+            let skewClass = 'balanced';
+            let skewText = 'BALANCED';
+            let skewScore = Math.abs(net) * 6;
+
+            if (net > 5) {
+                skewClass = 'upside';
+                skewText = '⬆ UPSIDE';
+            } else if (net < -5) {
+                skewClass = 'downside';
+                skewText = '⬇ DOWNSIDE';
+            }
+
+            const skewResult = document.getElementById('skew-result');
+            skewResult.className = 'skew-result ' + skewClass;
+            skewResult.innerHTML = `<div class="skew-direction">${skewText}</div><div class="skew-score">Skew Score: ${Math.min(Math.round(skewScore), 100)}/100</div>`;
+        };
+
+        Object.values(sliders).forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                updateSlider(e.target);
+                computeSkew();
+            });
+        });
+
+        // Initial compute
+        computeSkew();
+    </script>
+</body>
+</html>

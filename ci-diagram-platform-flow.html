@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continuum Intelligence v3 - Platform Flow</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #f8f7f4;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a2332;
+            --text-secondary: #2d3436;
+            --border-subtle: 1px solid #e0ddd7;
+            --accent-blue: #2563eb;
+            --accent-teal: #0d9488;
+            --accent-amber: #b45309;
+            --accent-red: #a83232;
+            --stage-1: #6d28d9;
+            --stage-2: #2563eb;
+            --stage-3: #0d9488;
+            --stage-4: #b45309;
+            --stage-5: #be185d;
+            --stage-6: #0891b2;
+            --stage-7: #10b981;
+        }
+
+        html {
+            scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+            scrollbar-width: thin;
+        }
+
+        ::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: var(--border-subtle);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: var(--border-subtle);
+            border-radius: 6px;
+            background-color: transparent;
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 200ms ease;
+        }
+
+        .btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .btn.active {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #f8f7f4;
+        }
+
+        .diagram-wrapper {
+            overflow-x: auto;
+            overflow-y: visible;
+            background-color: var(--bg-secondary);
+            border: var(--border-subtle);
+            border-radius: 8px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .diagram-scroll-hint {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            font-size: 12px;
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        svg {
+            min-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .stage-node {
+            cursor: pointer;
+            transition: all 200ms ease;
+        }
+
+        .stage-node rect {
+            transition: fill 200ms ease;
+        }
+
+        .stage-node:hover rect {
+            filter: brightness(1.2);
+        }
+
+        .stage-node text {
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .detail-panel {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: var(--bg-secondary);
+            border: var(--border-subtle);
+            border-radius: 8px;
+            min-height: 150px;
+            animation: slideDown 200ms ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .detail-panel h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-stage-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .detail-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .detail-item {
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.02);
+            border: var(--border-subtle);
+            border-radius: 6px;
+            transition: all 200ms ease;
+        }
+
+        .detail-item:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 0, 0, 0.12);
+        }
+
+        .detail-item h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-item p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .detail-item .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background-color: rgba(0, 0, 0, 0.08);
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 0.75rem;
+            margin-right: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .legend {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: var(--bg-primary);
+            border: var(--border-subtle);
+            border-radius: 6px;
+            padding: 1rem;
+            font-size: 12px;
+            z-index: 10;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend-swatch {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: var(--bg-primary);
+            border: var(--border-subtle);
+            border-radius: 6px;
+            padding: 0.75rem;
+            font-size: 12px;
+            color: var(--text-secondary);
+            max-width: 200px;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 200ms ease;
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        @media (max-width: 1024px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .controls {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+                text-align: center;
+            }
+
+            .legend {
+                position: static;
+                margin-bottom: 1rem;
+            }
+
+            .diagram-wrapper {
+                overflow-x: scroll;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .controls {
+                flex-wrap: wrap;
+            }
+
+            .detail-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Continuum Intelligence v3 — Platform Flow</h1>
+            <div class="controls">
+                <button class="btn" id="expandAllBtn">Expand All</button>
+                <button class="btn" id="collapseAllBtn">Collapse All</button>
+            </div>
+        </div>
+
+        <div class="diagram-wrapper" id="diagramWrapper">
+            <svg id="platformDiagram" width="2200" height="700" viewBox="0 0 2200 700">
+                <!-- Define gradients and styles -->
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#6d28d9;stop-opacity:0.2" />
+                        <stop offset="100%" style="stop-color:#6d28d9;stop-opacity:0.05" />
+                    </linearGradient>
+                    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#2563eb;stop-opacity:0.2" />
+                        <stop offset="100%" style="stop-color:#2563eb;stop-opacity:0.05" />
+                    </linearGradient>
+                    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#0d9488;stop-opacity:0.2" />
+                        <stop offset="100%" style="stop-color:#0d9488;stop-opacity:0.05" />
+                    </linearGradient>
+                    <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#b45309;stop-opacity:0.2" />
+                        <stop offset="100%" style="stop-color:#b45309;stop-opacity:0.05" />
+                    </linearGradient>
+                    <linearGradient id="grad5" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#be185d;stop-opacity:0.2" />
+                        <stop offset="100%" style="stop-color:#be185d;stop-opacity:0.05" />
+                    </linearGradient>
+                    <linearGradient id="grad6" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#0891b2;stop-opacity:0.2" />
+                        <stop offset="100%" style="stop-color:#0891b2;stop-opacity:0.05" />
+                    </linearGradient>
+                    <linearGradient id="grad7" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.2" />
+                        <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.05" />
+                    </linearGradient>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="rgba(0, 0, 0, 0.3)" />
+                    </marker>
+                </defs>
+
+                <!-- Background -->
+                <rect width="2200" height="700" fill="none" />
+
+                <!-- Data Flow Arrows -->
+                <g id="arrows" stroke="rgba(0, 0, 0, 0.15)" stroke-width="2" fill="none">
+                    <!-- Stage 1 to Stage 2 -->
+                    <path d="M 280 300 L 380 300" marker-end="url(#arrowhead)" />
+                    <text x="320" y="290" font-size="11" fill="rgba(0, 0, 0, 0.4)" text-anchor="middle">Live Data</text>
+
+                    <!-- Stage 2 to Stage 3 -->
+                    <path d="M 580 300 L 680 300" marker-end="url(#arrowhead)" />
+                    <text x="620" y="290" font-size="11" fill="rgba(0, 0, 0, 0.4)" text-anchor="middle">Research JSON</text>
+
+                    <!-- Stage 3 to Stage 4 -->
+                    <path d="M 880 300 L 980 300" marker-end="url(#arrowhead)" />
+                    <text x="920" y="290" font-size="11" fill="rgba(0, 0, 0, 0.4)" text-anchor="middle">Passages</text>
+
+                    <!-- Stage 4 to Stage 5 -->
+                    <path d="M 1180 300 L 1280 300" marker-end="url(#arrowhead)" />
+                    <text x="1220" y="290" font-size="11" fill="rgba(0, 0, 0, 0.4)" text-anchor="middle">Decisions</text>
+
+                    <!-- Stage 5 to Stage 6 -->
+                    <path d="M 1480 300 L 1580 300" marker-end="url(#arrowhead)" />
+                    <text x="1520" y="290" font-size="11" fill="rgba(0, 0, 0, 0.4)" text-anchor="middle">Context</text>
+
+                    <!-- Stage 6 to Stage 7 -->
+                    <path d="M 1780 300 L 1880 300" marker-end="url(#arrowhead)" />
+                    <text x="1820" y="290" font-size="11" fill="rgba(0, 0, 0, 0.4)" text-anchor="middle">Reports</text>
+                </g>
+
+                <!-- Stage 1: Data Collection -->
+                <g class="stage-node" data-stage="1">
+                    <rect x="50" y="200" width="230" height="200" rx="8" fill="url(#grad1)" stroke="#6d28d9" stroke-width="2" />
+                    <text x="165" y="235" font-size="16" font-weight="600" text-anchor="middle" fill="#1a2332">Data Collection</text>
+                    <text x="165" y="260" font-size="12" text-anchor="middle" fill="rgba(0, 0, 0, 0.5)">External Sources</text>
+                    <circle cx="80" cy="295" r="3" fill="#6d28d9" />
+                    <text x="95" y="300" font-size="11" fill="#2d3436">Yahoo Finance</text>
+                    <circle cx="80" cy="325" r="3" fill="#6d28d9" />
+                    <text x="95" y="330" font-size="11" fill="#2d3436">ASX RSS Feed</text>
+                    <circle cx="80" cy="355" r="3" fill="#6d28d9" />
+                    <text x="95" y="360" font-size="11" fill="#2d3436">DuckDuckGo News</text>
+                    <circle cx="80" cy="385" r="3" fill="#6d28d9" />
+                    <text x="95" y="390" font-size="11" fill="#2d3436">Gold Corpus</text>
+                </g>
+
+                <!-- Stage 2: Automated Processing -->
+                <g class="stage-node" data-stage="2">
+                    <rect x="380" y="200" width="200" height="200" rx="8" fill="url(#grad2)" stroke="#2563eb" stroke-width="2" />
+                    <text x="480" y="235" font-size="16" font-weight="600" text-anchor="middle" fill="#1a2332">GitHub Actions</text>
+                    <text x="480" y="260" font-size="12" text-anchor="middle" fill="rgba(0, 0, 0, 0.5)">5x daily workflows</text>
+                    <circle cx="410" cy="295" r="3" fill="#2563eb" />
+                    <text x="425" y="300" font-size="11" fill="#2d3436">continuum-update</text>
+                    <circle cx="410" cy="325" r="3" fill="#2563eb" />
+                    <text x="425" y="330" font-size="11" fill="#2d3436">research-update</text>
+                    <circle cx="410" cy="355" r="3" fill="#2563eb" />
+                    <text x="425" y="360" font-size="11" fill="#2d3436">price-drivers</text>
+                    <circle cx="410" cy="385" r="3" fill="#2563eb" />
+                    <text x="425" y="390" font-size="11" fill="#2d3436">live-prices</text>
+                </g>
+
+                <!-- Stage 3: Research Engine -->
+                <g class="stage-node" data-stage="3">
+                    <rect x="680" y="200" width="200" height="200" rx="8" fill="url(#grad3)" stroke="#0d9488" stroke-width="2" />
+                    <text x="780" y="235" font-size="16" font-weight="600" text-anchor="middle" fill="#1a2332">Research Engine</text>
+                    <text x="780" y="260" font-size="12" text-anchor="middle" fill="rgba(0, 0, 0, 0.5)">Fly.io Backend</text>
+                    <circle cx="710" cy="295" r="3" fill="#0d9488" />
+                    <text x="725" y="300" font-size="11" fill="#2d3436">Ingest & Embed</text>
+                    <circle cx="710" cy="325" r="3" fill="#0d9488" />
+                    <text x="725" y="330" font-size="11" fill="#2d3436">ACH Framework</text>
+                    <circle cx="710" cy="355" r="3" fill="#0d9488" />
+                    <text x="725" y="360" font-size="11" fill="#2d3436">Hybrid Retrieval</text>
+                    <circle cx="710" cy="385" r="3" fill="#0d9488" />
+                    <text x="725" y="390" font-size="11" fill="#2d3436">Validation (19-rule)</text>
+                </g>
+
+                <!-- Stage 4: Intelligence Layer -->
+                <g class="stage-node" data-stage="4">
+                    <rect x="980" y="200" width="200" height="200" rx="8" fill="url(#grad4)" stroke="#b45309" stroke-width="2" />
+                    <text x="1080" y="235" font-size="16" font-weight="600" text-anchor="middle" fill="#1a2332">Intelligence</text>
+                    <text x="1080" y="260" font-size="12" text-anchor="middle" fill="rgba(0, 0, 0, 0.5)">LLM Orchestration</text>
+                    <circle cx="1010" cy="295" r="3" fill="#b45309" />
+                    <text x="1025" y="300" font-size="11" fill="#2d3436">Claude Sonnet</text>
+                    <circle cx="1010" cy="325" r="3" fill="#b45309" />
+                    <text x="1025" y="330" font-size="11" fill="#2d3436">Claude Haiku</text>
+                    <circle cx="1010" cy="355" r="3" fill="#b45309" />
+                    <text x="1025" y="360" font-size="11" fill="#2d3436">Gemini Flash</text>
+                    <circle cx="1010" cy="385" r="3" fill="#b45309" />
+                    <text x="1025" y="390" font-size="11" fill="#2d3436">NotebookLM</text>
+                </g>
+
+                <!-- Stage 5: Memory & Personalisation -->
+                <g class="stage-node" data-stage="5">
+                    <rect x="1280" y="200" width="200" height="200" rx="8" fill="url(#grad5)" stroke="#be185d" stroke-width="2" />
+                    <text x="1380" y="235" font-size="16" font-weight="600" text-anchor="middle" fill="#1a2332">Memory Layer</text>
+                    <text x="1380" y="260" font-size="12" text-anchor="middle" fill="rgba(0, 0, 0, 0.5)">Persistence</text>
+                    <circle cx="1310" cy="295" r="3" fill="#be185d" />
+                    <text x="1325" y="300" font-size="11" fill="#2d3436">Extract & Embed</text>
+                    <circle cx="1310" cy="325" r="3" fill="#be185d" />
+                    <text x="1325" y="330" font-size="11" fill="#2d3436">Personalisation</text>
+                    <circle cx="1310" cy="355" r="3" fill="#be185d" />
+                    <text x="1325" y="360" font-size="11" fill="#2d3436">Mandate Settings</text>
+                    <circle cx="1310" cy="385" r="3" fill="#be185d" />
+                    <text x="1325" y="390" font-size="11" fill="#2d3436">Proactive Insights</text>
+                </g>
+
+                <!-- Stage 6: User Interface -->
+                <g class="stage-node" data-stage="6">
+                    <rect x="1580" y="200" width="200" height="200" rx="8" fill="url(#grad6)" stroke="#0891b2" stroke-width="2" />
+                    <text x="1680" y="235" font-size="16" font-weight="600" text-anchor="middle" fill="#1a2332">User Interface</text>
+                    <text x="1680" y="260" font-size="12" text-anchor="middle" fill="rgba(0, 0, 0, 0.5)">Cloudflare Pages</text>
+                    <circle cx="1610" cy="295" r="3" fill="#0891b2" />
+                    <text x="1625" y="300" font-size="11" fill="#2d3436">Home & Reports</text>
+                    <circle cx="1610" cy="325" r="3" fill="#0891b2" />
+                    <text x="1625" y="330" font-size="11" fill="#2d3436">Analyst Panel</text>
+                    <circle cx="1610" cy="355" r="3" fill="#0891b2" />
+                    <text x="1625" y="360" font-size="11" fill="#2d3436">PM Dashboard</text>
+                    <circle cx="1610" cy="385" r="3" fill="#0891b2" />
+                    <text x="1625" y="390" font-size="11" fill="#2d3436">Portfolio Journal</text>
+                </g>
+
+                <!-- Stage 7: Outputs -->
+                <g class="stage-node" data-stage="7">
+                    <rect x="1880" y="200" width="230" height="200" rx="8" fill="url(#grad7)" stroke="#10b981" stroke-width="2" />
+                    <text x="1995" y="235" font-size="16" font-weight="600" text-anchor="middle" fill="#1a2332">Outputs</text>
+                    <text x="1995" y="260" font-size="12" text-anchor="middle" fill="rgba(0, 0, 0, 0.5)">End-user Delivery</text>
+                    <circle cx="1910" cy="295" r="3" fill="#10b981" />
+                    <text x="1925" y="300" font-size="11" fill="#2d3436">Recommendations</text>
+                    <circle cx="1910" cy="325" r="3" fill="#10b981" />
+                    <text x="1925" y="330" font-size="11" fill="#2d3436">Mandate Alerts</text>
+                    <circle cx="1910" cy="355" r="3" fill="#10b981" />
+                    <text x="1925" y="360" font-size="11" fill="#2d3436">Notifications</text>
+                    <circle cx="1910" cy="385" r="3" fill="#10b981" />
+                    <text x="1925" y="390" font-size="11" fill="#2d3436">PDF Reports</text>
+                </g>
+
+                <!-- Bottom labels for each stage -->
+                <text x="165" y="430" font-size="13" font-weight="600" text-anchor="middle" fill="rgba(0, 0, 0, 0.7)">Stage 1</text>
+                <text x="480" y="430" font-size="13" font-weight="600" text-anchor="middle" fill="rgba(0, 0, 0, 0.7)">Stage 2</text>
+                <text x="780" y="430" font-size="13" font-weight="600" text-anchor="middle" fill="rgba(0, 0, 0, 0.7)">Stage 3</text>
+                <text x="1080" y="430" font-size="13" font-weight="600" text-anchor="middle" fill="rgba(0, 0, 0, 0.7)">Stage 4</text>
+                <text x="1380" y="430" font-size="13" font-weight="600" text-anchor="middle" fill="rgba(0, 0, 0, 0.7)">Stage 5</text>
+                <text x="1680" y="430" font-size="13" font-weight="600" text-anchor="middle" fill="rgba(0, 0, 0, 0.7)">Stage 6</text>
+                <text x="1995" y="430" font-size="13" font-weight="600" text-anchor="middle" fill="rgba(0, 0, 0, 0.7)">Stage 7</text>
+            </svg>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-swatch" style="background-color: #6d28d9;"></div>
+                    <span>Data</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-swatch" style="background-color: #2563eb;"></div>
+                    <span>Automation</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-swatch" style="background-color: #0d9488;"></div>
+                    <span>Processing</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-swatch" style="background-color: #b45309;"></div>
+                    <span>Intelligence</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-swatch" style="background-color: #be185d;"></div>
+                    <span>Memory</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-swatch" style="background-color: #0891b2;"></div>
+                    <span>Interface</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-swatch" style="background-color: #10b981;"></div>
+                    <span>Delivery</span>
+                </div>
+            </div>
+
+            <div class="diagram-scroll-hint">↔ Scroll to explore</div>
+        </div>
+
+        <!-- Detail Panel -->
+        <div id="detailPanel" class="detail-panel" style="display: none;">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <div class="empty-state" id="emptyState">
+            <p>Click on any stage above to view detailed technical information.</p>
+        </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Stage details configuration
+        const stageDetails = {
+            1: {
+                title: 'Data Collection',
+                description: 'External data sources feed the platform in real-time.',
+                items: [
+                    {
+                        title: 'Yahoo Finance',
+                        description: 'Live prices, OHLCV bars, 52-week ranges, market cap, P/E ratios. Delayed 15-20 minutes.',
+                        badge: 'Real-time'
+                    },
+                    {
+                        title: 'ASX RSS Feed',
+                        description: 'Company announcements, earnings reports, dividend announcements, board changes.',
+                        badge: 'Scheduled'
+                    },
+                    {
+                        title: 'DuckDuckGo News',
+                        description: 'News headlines, broker commentary, macro events, regulatory updates affecting stocks.',
+                        badge: 'Real-time'
+                    },
+                    {
+                        title: 'Gold Corpus',
+                        description: 'PDF technical reports, geological surveys, mining production data for gold stocks only.',
+                        badge: 'Manual'
+                    }
+                ]
+            },
+            2: {
+                title: 'Automated Processing',
+                description: '5 scheduled GitHub Actions workflows process data in parallel daily.',
+                items: [
+                    {
+                        title: 'continuum-update',
+                        description: 'Runs 5x daily. Fetches prices, announcements, and generates research updates.',
+                        badge: '5x/day'
+                    },
+                    {
+                        title: 'research-update',
+                        description: 'Runs 2x daily. Refreshes hypotheses, synthesises evidence, validates research JSON.',
+                        badge: '2x/day'
+                    },
+                    {
+                        title: 'price-drivers',
+                        description: 'Runs 8x daily. Multi-layer LLM pipeline analyzing price drivers and sentiment.',
+                        badge: '8x/day'
+                    },
+                    {
+                        title: 'update-daily',
+                        description: 'Pre-market run. Historical price backfilling for technical analysis.',
+                        badge: '1x/day'
+                    },
+                    {
+                        title: 'live-prices',
+                        description: 'Intraday injection of current prices into the frontend index.html.',
+                        badge: 'Intraday'
+                    }
+                ]
+            },
+            3: {
+                title: 'Research Engine (ACH)',
+                description: 'The core intellectual engine. Implements Analysis of Competing Hypotheses (ACH) -- a structured intelligence methodology that forces explicit probability assignment across bull/base/bear/tail scenarios, maps evidence across 10 epistemic domains, and tracks discriminating indicators that resolve between hypotheses. See the ACH Engine diagram for full prompt text and schema detail.',
+                items: [
+                    {
+                        title: 'ACH Hypothesis Framework',
+                        description: 'Four hypotheses per stock (N1 Bull, N2 Base, N3 Bear, N4 Tail). Integer probability scores summing to 100%. Each hypothesis carries direction (upside/downside/neutral), supporting and contradicting evidence, and requirements. Scores are reassessed on every refresh cycle when evidence changes materially. Skew is computed deterministically: net = sum(upside) - sum(downside). If net > 5: UPSIDE, < -5: DOWNSIDE, else BALANCED.',
+                        badge: 'Core Logic'
+                    },
+                    {
+                        title: '10 Evidence Domains',
+                        description: 'Each stock is analysed across 10 epistemic domains: (1) Corporate Communications [motivated], (2) Regulatory Filings [verified], (3) Broker Research [modelled], (4) Competitor Disclosures [verified], (5) Economic Data [measured], (6) Alternative Data [observed], (7) Academic Research [peer-reviewed], (8) Media & Social [unverified], (9) Leadership & Governance [observed], (10) Ownership & Capital Flows [measured]. Each card has a finding, counter-narrative tension, source, and hypothesis alignment tags.',
+                        badge: '10 Domains'
+                    },
+                    {
+                        title: 'Research JSON (8 Sections)',
+                        description: 'Output schema: (1) Price History -- 365-day sparkline, (2) Hero -- skew, embedded thesis, position in range with 4 price worlds, next catalyst, (3) Hypotheses -- 4-tier ACH with scores and evidence links, (4) Narrative -- dominant theme, price implication, evidence check, stability, (5) Evidence -- 10 domain cards with epistemic classification, (6) Verdict + Skew -- market pricing assessment, (7) Discriminators + Tripwires + Gaps -- diagnostic indicators, future catalysts, coverage matrix, (8) Technical Analysis -- regime, MAs, volatility, relative performance.',
+                        badge: '8 Sections'
+                    },
+                    {
+                        title: 'Multi-Model Generation Pipeline',
+                        description: 'Stage 1: Data gathering from Yahoo, ASX, DuckDuckGo (~30s, no LLM). Stage 2: Gemini Flash analyses 10 evidence domains (~20s). Stage 3: Claude Sonnet synthesises hypotheses, narratives, verdict (~80s). Stage 4: Gemini Flash updates discriminators, gaps, technical structure (parallel with Stage 3). Stage 5: Merge, auto-fix (12 corrections), validate (19 rules), publish to Git.',
+                        badge: '5 Stages'
+                    },
+                    {
+                        title: 'Hybrid Retrieval (Chat)',
+                        description: 'For Analyst chat: BM25 keyword search + cosine similarity on pre-computed 768-dim embeddings, combined via Reciprocal Rank Fusion (RRF). Top 10 passages injected into system prompt with ~5,500 char budget. Research staleness warning prepended if data > 7 days old.',
+                        badge: 'Search'
+                    },
+                    {
+                        title: 'Validation & Quality Gates',
+                        description: '12 auto-fix corrections (mojibake, emoji, score normalisation, price type coercion, footer counts). 19 validation checks (hypothesis scores sum to 100%, evidence >= 5 cards, all prices numeric, no em-dashes, score divergence detection). Quality gate on Add Stock: >= 5 evidence cards, hypothesis scores ending in %, theNarrative present.',
+                        badge: 'QA'
+                    }
+                ]
+            },
+            4: {
+                title: 'Intelligence Layer',
+                description: 'Multi-model LLM orchestration for analysis, synthesis, and extraction.',
+                items: [
+                    {
+                        title: 'Claude Sonnet',
+                        description: 'High-reasoning Analyst responses. PM recommendations. Research synthesis and narrative generation.',
+                        badge: 'Analyst'
+                    },
+                    {
+                        title: 'Claude Haiku',
+                        description: 'Fast extraction: memory synthesis, contradiction detection, insight classification. Runs in background tasks.',
+                        badge: 'Extraction'
+                    },
+                    {
+                        title: 'Gemini Flash',
+                        description: 'Specialist domain analysis (10 domains). Price driver data gathering from news and sentiment sources.',
+                        badge: 'Specialist'
+                    },
+                    {
+                        title: 'NotebookLM',
+                        description: '7-query RAG pipeline for gold stock analysis. Document-driven insights using technical reports and geological data.',
+                        badge: 'Gold Only'
+                    }
+                ]
+            },
+            5: {
+                title: 'Memory & Personalisation',
+                description: 'Persistent user context, decision tracking, and proactive insights.',
+                items: [
+                    {
+                        title: 'Memory Pipeline',
+                        description: 'Extract → Embed → Deduplicate → Store. Structural (never expire), Positional (90d), Tactical (7d). 500-memory ceiling per user.',
+                        badge: 'PostgreSQL'
+                    },
+                    {
+                        title: 'Nightly Consolidation',
+                        description: 'Union-find clustering detects contradictions. Batch consensus synthesis. Memory decay applied.',
+                        badge: 'Async'
+                    },
+                    {
+                        title: 'Personalisation',
+                        description: 'Big Five cognitive profile, CRT score, mandate settings (position size, sector caps, cash range), bias interventions.',
+                        badge: 'Context'
+                    },
+                    {
+                        title: 'Proactive Insights',
+                        description: 'Nightly scan compares user memories vs fresh research. Notifications: confirms/contradicts/gaps. 7-day re-notification guard.',
+                        badge: 'Alerts'
+                    }
+                ]
+            },
+            6: {
+                title: 'User Interface',
+                description: 'Cloudflare Pages frontend. Real-time data binding. Two-rail layout (Analyst + PM).',
+                items: [
+                    {
+                        title: 'Home Page',
+                        description: 'Featured stock cards with skew direction, key metrics, sparklines, analyst targets.',
+                        badge: 'Public'
+                    },
+                    {
+                        title: 'Report Page',
+                        description: 'Full ACH research: hypotheses, evidence cards, discriminators, tripwires, price drivers, narrative.',
+                        badge: 'Per-stock'
+                    },
+                    {
+                        title: 'Analyst Panel',
+                        description: 'Memory-enhanced chat. Right rail. Persistent conversation history. Handoff to PM with structured summary.',
+                        badge: 'Auth'
+                    },
+                    {
+                        title: 'PM Dashboard',
+                        description: 'Portfolio-aware recommendations with mandate constraints. Concentration analysis. Risk flags. Alignment diagnostics.',
+                        badge: 'Auth'
+                    },
+                    {
+                        title: 'Journal',
+                        description: 'Unified feed of Analyst memories and PM decisions. Archive semantics. Insight filtering by type and ticker.',
+                        badge: 'Auth'
+                    }
+                ]
+            },
+            7: {
+                title: 'Outputs & Delivery',
+                description: 'End-user recommendations, alerts, and reports.',
+                items: [
+                    {
+                        title: 'Recommendation Cards',
+                        description: 'Structured output: Add/Trim/Hold/Exit/Rebalance/Watch. Colour-coded. Sizing bands. Source-of-funds rationale.',
+                        badge: 'PM'
+                    },
+                    {
+                        title: 'Mandate Breach Alerts',
+                        description: 'Position weight > max. Sector exposure > cap. Cash above/below range. Critical vs warning severity.',
+                        badge: 'Portfolio'
+                    },
+                    {
+                        title: 'Proactive Notifications',
+                        description: 'Research confirms/contradicts user thesis. New evidence gaps. Hypothesis concentration risk. Uncovered exposures.',
+                        badge: 'Insight'
+                    },
+                    {
+                        title: 'PDF Reports',
+                        description: 'Goldman Sachs-standard briefing (2-page) and institutional (full). Print-optimised. Structured hypothesis summary.',
+                        badge: 'Download'
+                    }
+                ]
+            }
+        };
+
+        // Initialize state
+        let expandedStages = new Set();
+        const svg = document.getElementById('platformDiagram');
+        const detailPanel = document.getElementById('detailPanel');
+        const emptyState = document.getElementById('emptyState');
+        const tooltip = document.getElementById('tooltip');
+        const expandAllBtn = document.getElementById('expandAllBtn');
+        const collapseAllBtn = document.getElementById('collapseAllBtn');
+
+        // Stage node click handler
+        const stageNodes = svg.querySelectorAll('.stage-node');
+        stageNodes.forEach(node => {
+            node.addEventListener('click', function() {
+                const stage = this.getAttribute('data-stage');
+                toggleStage(stage);
+            });
+            node.addEventListener('mouseover', function(e) {
+                const stage = this.getAttribute('data-stage');
+                showTooltip(e, stage);
+            });
+            node.addEventListener('mouseout', hideTooltip);
+        });
+
+        // Tooltip text by stage
+        const tooltips = {
+            1: 'Click to expand: Data sources feeding the platform',
+            2: 'Click to expand: Automated GitHub Actions workflows',
+            3: 'Click to expand: ACH research engine -- hypotheses, evidence domains, prompts',
+            4: 'Click to expand: Multi-model LLM orchestration',
+            5: 'Click to expand: Memory and personalization layer',
+            6: 'Click to expand: User interface on Cloudflare Pages',
+            7: 'Click to expand: End-user recommendations and reports'
+        };
+
+        function showTooltip(event, stage) {
+            tooltip.textContent = tooltips[stage];
+            tooltip.classList.add('visible');
+            const rect = event.target.getBoundingClientRect();
+            tooltip.style.left = (rect.left + rect.width / 2 - 100) + 'px';
+            tooltip.style.top = (rect.top + rect.height + 10) + 'px';
+        }
+
+        function hideTooltip() {
+            tooltip.classList.remove('visible');
+        }
+
+        function toggleStage(stage) {
+            if (expandedStages.has(stage)) {
+                expandedStages.delete(stage);
+            } else {
+                expandedStages.add(stage);
+            }
+            renderDetailPanel();
+        }
+
+        function expandAll() {
+            expandedStages = new Set(['1', '2', '3', '4', '5', '6', '7']);
+            renderDetailPanel();
+            expandAllBtn.classList.add('active');
+            collapseAllBtn.classList.remove('active');
+        }
+
+        function collapseAll() {
+            expandedStages.clear();
+            detailPanel.style.display = 'none';
+            emptyState.style.display = 'block';
+            expandAllBtn.classList.remove('active');
+            collapseAllBtn.classList.add('active');
+        }
+
+        function renderDetailPanel() {
+            if (expandedStages.size === 0) {
+                detailPanel.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            detailPanel.style.display = 'block';
+
+            let html = '';
+            const stages = Array.from(expandedStages).sort();
+
+            stages.forEach(stage => {
+                const stageData = stageDetails[stage];
+                const stageColors = {
+                    1: '#6d28d9',
+                    2: '#2563eb',
+                    3: '#0d9488',
+                    4: '#b45309',
+                    5: '#be185d',
+                    6: '#0891b2',
+                    7: '#10b981'
+                };
+
+                html += `
+                    <h3>
+                        <div class="detail-stage-indicator" style="background-color: ${stageColors[stage]};"></div>
+                        ${stageData.title}
+                    </h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 13px;">${stageData.description}</p>
+                    <div class="detail-content">
+                `;
+
+                stageData.items.forEach(item => {
+                    html += `
+                        <div class="detail-item">
+                            <h4>${item.title}</h4>
+                            <p>${item.description}</p>
+                            <span class="badge">${item.badge}</span>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                if (stage !== stages[stages.length - 1]) {
+                    html += `<div style="border-top: var(--border-subtle); margin: 2rem 0;"></div>`;
+                }
+            });
+
+            detailPanel.innerHTML = html;
+        }
+
+        // Event listeners
+        expandAllBtn.addEventListener('click', expandAll);
+        collapseAllBtn.addEventListener('click', collapseAll);
+
+        // Initial state
+        renderDetailPanel();
+    </script>
+</body>
+</html>
