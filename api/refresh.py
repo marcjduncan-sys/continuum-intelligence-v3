@@ -408,7 +408,10 @@ async def _run_single_in_batch(
 
         if scaffold_mode:
             updated_research = _merge_initiation(
-                research, gathered, evidence_update, hypothesis_update
+                research, gathered, evidence_update, hypothesis_update,
+                structure_update=structure_result,
+                price_driver_result=pd_result,
+                gold_result=gold_result,
             )
         else:
             updated_research = _merge_updates(
@@ -1221,7 +1224,10 @@ async def run_refresh(ticker: str) -> dict:
 
         if scaffold_mode:
             updated_research = _merge_initiation(
-                research, gathered, evidence_update, hypothesis_update
+                research, gathered, evidence_update, hypothesis_update,
+                structure_update=structure_result,
+                price_driver_result=price_driver_result,
+                gold_result=gold_result,
             )
         else:
             updated_research = _merge_updates(
@@ -2286,6 +2292,9 @@ def _merge_initiation(
     gathered: dict,
     evidence_update: dict,
     hypothesis_update: dict,
+    structure_update: dict | None = None,
+    price_driver_result: dict | None = None,
+    gold_result: dict | None = None,
 ) -> dict:
     """Merge coverage initiation results into the scaffold, replacing placeholders."""
     ev_cards = evidence_update.get("cards", [])
@@ -2609,6 +2618,96 @@ def _merge_initiation(
         updated["footer"]["domainCount"] = f"{domains_covered} of 10"
     if active_hyps:
         updated["footer"]["hypothesesCount"] = f"{len(active_hyps)} Active"
+
+    # -- Track 3: Structure update (identity, discriminators, gaps, TA commentary) --
+    # In scaffold mode this was previously discarded. Now we merge it.
+    if structure_update and isinstance(structure_update, dict):
+        su_intro = structure_update.get("evidence_intro")
+        if su_intro and "evidence" in updated:
+            updated["evidence"]["intro"] = su_intro
+        su_align = structure_update.get("alignment_summary")
+        if su_align and "evidence" in updated:
+            updated["evidence"]["alignmentSummary"] = su_align
+        su_disc = structure_update.get("discriminators")
+        if su_disc and isinstance(su_disc, list):
+            updated.setdefault("discriminators", {})["rows"] = su_disc
+        su_gaps = structure_update.get("gaps")
+        if su_gaps and isinstance(su_gaps, dict):
+            if not gaps_data:
+                updated["gaps"] = su_gaps
+        su_identity = structure_update.get("identity")
+        if su_identity and isinstance(su_identity, dict):
+            for k, v in su_identity.items():
+                if v is not None:
+                    updated[k] = v
+        if structure_update.get("technical_commentary"):
+            updated.setdefault("technicalAnalysis", {})["commentary"] = (
+                structure_update["technical_commentary"]
+            )
+
+    # -- Track 4: Price drivers --
+    if price_driver_result and isinstance(price_driver_result, dict):
+        updated["priceDrivers"] = price_driver_result
+
+    # -- Track 5: Gold overlay --
+    if gold_result and isinstance(gold_result, dict):
+        updated["goldAnalysis"] = gold_result
+
+    # -- Rebuild identity table from gathered price data --
+    # The scaffold writes N/A for financial fields when Yahoo is blocked.
+    if "error" not in price_data:
+        _cur = price_data.get("currency", "A$")
+        _pr = price_data.get("price", 0)
+        _mc = price_data.get("market_cap")
+        _ev = price_data.get("enterprise_value")
+        _h52 = price_data.get("high_52w", _pr)
+        _l52 = price_data.get("low_52w", _pr)
+        _fpe = price_data.get("forward_pe")
+        _eve = price_data.get("ev_to_ebitda")
+        _dy = price_data.get("dividend_yield")
+        _dps = price_data.get("dividend_per_share")
+        _rev = price_data.get("revenue")
+
+        def _id_fmt(v, cur="A$"):
+            if v is None or v == 0:
+                return "N/A"
+            a = abs(v)
+            if a >= 1e12:
+                return f"{cur}{v / 1e12:.1f}T"
+            if a >= 1e9:
+                return f"{cur}{v / 1e9:.1f}B"
+            if a >= 1e6:
+                return f"{cur}{v / 1e6:.0f}M"
+            return f"{cur}{v:,.0f}"
+
+        def _id_ratio(v, s="x"):
+            return f"~{v:.1f}{s}" if v else "N/A"
+
+        _range = f"{_cur}{_l52:.2f} \u2013 {_cur}{_h52:.2f}" if _h52 and _h52 > 0 else "N/A"
+        _div_str = "N/A"
+        if _dps and _dy:
+            _div_str = f"{_cur}{_dps:.2f} (~{_dy * 100:.1f}%)"
+        elif _dy:
+            _div_str = f"~{_dy * 100:.1f}%"
+
+        new_rows = [
+            [["Ticker", f"{ticker}.AX", "td-mono"], ["Exchange", "ASX", "td-mono"]],
+            [["Market Cap", _id_fmt(_mc), "td-mono"], ["Enterprise Value", _id_fmt(_ev), "td-mono"]],
+            [["Share Price", f"{_cur}{_pr}", "td-mono"], ["52-Week Range", _range, "td-mono"]],
+            [["Forward P/E", _id_ratio(_fpe), "td-mono"], ["EV/EBITDA", _id_ratio(_eve), "td-mono"]],
+            [["Dividend Yield", _div_str, "td-mono"], ["Revenue (FY)", _id_fmt(_rev), "td-mono"]],
+        ]
+
+        existing_rows = updated.get("identity", {}).get("rows", [])
+        existing_na = sum(
+            1 for row in existing_rows for cell in row
+            if len(cell) >= 2 and cell[1] in ("N/A", None, "")
+        )
+        if existing_na >= 4:
+            if "identity" not in updated:
+                updated["identity"] = {}
+            updated["identity"]["rows"] = new_rows
+            logger.info(f"[{ticker}] Rebuilt identity table ({existing_na} N/As replaced)")
 
     # -- Timestamp --
     updated["date"] = now

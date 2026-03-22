@@ -168,6 +168,44 @@ async def lifespan(app: FastAPI):
 
     monitored_task(_embed_background(), name="embed_all_passages")
 
+    # Auto-retry incomplete coverage initiations (scaffolds stuck from failed adds)
+    async def _retry_incomplete_coverage():
+        await asyncio.sleep(60)  # Let embedding and health check stabilise
+        from refresh import _is_scaffold, _load_research, is_running, run_refresh, _data_dir
+        data_dir = _data_dir()
+        if not data_dir.exists():
+            logger.info("[AutoRetry] No data directory found, skipping")
+            return
+        retried = []
+        for f in sorted(data_dir.glob("*.json")):
+            if f.name.startswith("_"):
+                continue
+            ticker = f.stem
+            try:
+                research = _load_research(ticker)
+                if not _is_scaffold(research):
+                    continue
+                if is_running(ticker):
+                    logger.info("[AutoRetry] %s is already running, skipping", ticker)
+                    continue
+                logger.info("[AutoRetry] %s is a scaffold, retrying coverage initiation", ticker)
+                await run_refresh(ticker)
+                retried.append(ticker)
+                logger.info("[AutoRetry] %s coverage initiation completed", ticker)
+                try:
+                    ingest()
+                    await embed_all_passages()
+                except Exception as e:
+                    logger.warning("[AutoRetry] Re-ingest after %s failed: %s", ticker, e)
+            except Exception as e:
+                logger.error("[AutoRetry] %s retry failed: %s", ticker, e, exc_info=True)
+        if retried:
+            logger.info("[AutoRetry] Retried %d scaffolds: %s", len(retried), retried)
+        else:
+            logger.info("[AutoRetry] No scaffolds found, all stocks have coverage")
+
+    monitored_task(_retry_incomplete_coverage(), name="retry_incomplete_coverage")
+
     # Periodic database pool health check (every 60s)
     async def _db_health_loop():
         while True:
