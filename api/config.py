@@ -43,7 +43,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
 # Embedding model (Phase 7: Memory Selection & Ranking)
-EMBEDDING_MODEL = "text-embedding-004"
+EMBEDDING_MODEL = "gemini-embedding-001"
 
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 

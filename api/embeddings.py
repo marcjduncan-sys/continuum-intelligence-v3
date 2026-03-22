@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 _EMBED_URL = (
     "https://generativelanguage.googleapis.com"
-    "/v1beta/models/text-embedding-004:embedContent"
+    "/v1beta/models/gemini-embedding-001:embedContent"
 )
 
 # Module-level pooled HTTP client (lazy init, reused across all calls)
@@ -62,8 +62,9 @@ async def generate_embedding(text: str) -> list[float] | None:
         return None
 
     payload = {
-        "model": "models/text-embedding-004",
+        "model": "models/gemini-embedding-001",
         "content": {"parts": [{"text": text.strip()}]},
+        "outputDimensionality": 768,
     }
 
     client = _get_client()
@@ -103,8 +104,9 @@ async def health_check() -> str:
             _EMBED_URL,
             params={"key": config.GEMINI_API_KEY},
             json={
-                "model": "models/text-embedding-004",
+                "model": "models/gemini-embedding-001",
                 "content": {"parts": [{"text": "health"}]},
+                "outputDimensionality": 768,
             },
             timeout=10.0,
         )
