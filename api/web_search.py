@@ -513,8 +513,8 @@ async def fetch_yahoo_price(ticker: str) -> dict[str, Any]:
         }
 
     except Exception as e:
-        logger.error(f"Yahoo Finance chart error for {ticker}: {e}")
-        return {"error": str(e)}
+        logger.warning(f"Yahoo Finance chart error for {ticker}: {e} -- trying yfinance fallback")
+        return await _fetch_yahoo_via_yfinance(ticker)
 
     # --- 2. Financial metrics from quoteSummary ---
     financials = await _fetch_yahoo_financials(yahoo_ticker, client)
@@ -526,7 +526,112 @@ async def fetch_yahoo_price(ticker: str) -> dict[str, Any]:
     if not base_result.get("market_cap") and base_result.get("shares_outstanding") and base_result.get("price"):
         base_result["market_cap"] = base_result["shares_outstanding"] * base_result["price"]
 
+    # --- 4. If primary path got price but missed financials, try yfinance enrichment ---
+    _critical_missing = (
+        not base_result.get("market_cap")
+        and not base_result.get("shares_outstanding")
+        and not base_result.get("forward_pe")
+    )
+    if _critical_missing and base_result.get("price"):
+        logger.info(f"Primary path for {ticker} got price but no financials; trying yfinance enrichment")
+        yf_data = await _fetch_yahoo_via_yfinance(ticker)
+        if "error" not in yf_data:
+            for key in ["market_cap", "market_cap_summary", "shares_outstanding",
+                        "forward_pe", "trailing_pe", "dividend_yield", "dividend_per_share",
+                        "revenue", "ebitda", "enterprise_value", "ev_to_ebitda",
+                        "total_debt", "employees", "sector", "industry", "description"]:
+                if not base_result.get(key) and yf_data.get(key):
+                    base_result[key] = yf_data[key]
+            # Re-run market_cap fallback with enriched data
+            if not base_result.get("market_cap") and base_result.get("market_cap_summary"):
+                base_result["market_cap"] = base_result["market_cap_summary"]
+            if not base_result.get("market_cap") and base_result.get("shares_outstanding") and base_result.get("price"):
+                base_result["market_cap"] = base_result["shares_outstanding"] * base_result["price"]
+
     return base_result
+
+
+async def _fetch_yahoo_via_yfinance(ticker: str) -> dict[str, Any]:
+    """Fallback: fetch price and financial data via the yfinance library.
+
+    yfinance handles crumb rotation, cookie management, and TLS fingerprint
+    impersonation. It is more resilient to Yahoo's IP blocks than raw httpx.
+    Runs in a thread pool to avoid blocking the event loop.
+    """
+    import asyncio
+    from concurrent.futures import ThreadPoolExecutor
+
+    def _sync_fetch():
+        try:
+            import yfinance as yf
+        except ImportError:
+            logger.warning("yfinance not installed; fallback unavailable")
+            return {"error": "yfinance not installed"}
+
+        yahoo_ticker = f"{ticker}.AX"
+        try:
+            t = yf.Ticker(yahoo_ticker)
+            info = t.info or {}
+            hist = t.history(period="1y")
+
+            price = info.get("currentPrice") or info.get("regularMarketPrice") or 0
+            prev_close = info.get("previousClose") or info.get("regularMarketPreviousClose") or 0
+            change = round(price - prev_close, 4) if prev_close else 0
+            change_pct = round((change / prev_close) * 100, 2) if prev_close else 0
+
+            price_history = []
+            if hist is not None and not hist.empty:
+                for date, row in hist.iterrows():
+                    close = row.get("Close")
+                    if close is not None:
+                        price_history.append({
+                            "date": date.strftime("%Y-%m-%d"),
+                            "close": round(float(close), 2),
+                        })
+
+            closes = [p["close"] for p in price_history] if price_history else [price]
+            high_52w = max(closes) if closes else price
+            low_52w = min(closes) if closes else price
+
+            currency = {"AUD": "A$", "USD": "US$", "NZD": "NZ$", "GBP": "£"}.get(
+                info.get("currency", "AUD"), info.get("currency", "A$")
+            )
+
+            return {
+                "price": round(price, 2) if price else 0,
+                "change": round(change, 2),
+                "change_pct": change_pct,
+                "volume": info.get("volume") or info.get("regularMarketVolume", 0),
+                "high_52w": round(high_52w, 2),
+                "low_52w": round(low_52w, 2),
+                "market_cap": info.get("marketCap"),
+                "currency": currency,
+                "price_history": price_history,
+                "fetched_at": datetime.now(timezone.utc).isoformat(),
+                "forward_pe": info.get("forwardPE"),
+                "trailing_pe": info.get("trailingPE"),
+                "ev_to_ebitda": info.get("enterpriseToEbitda"),
+                "dividend_yield": info.get("dividendYield"),
+                "dividend_per_share": info.get("dividendRate"),
+                "revenue": info.get("totalRevenue"),
+                "ebitda": info.get("ebitda"),
+                "total_debt": info.get("totalDebt"),
+                "enterprise_value": info.get("enterpriseValue"),
+                "employees": info.get("fullTimeEmployees"),
+                "sector": info.get("sector"),
+                "industry": info.get("industry"),
+                "description": info.get("longBusinessSummary", ""),
+                "shares_outstanding": info.get("sharesOutstanding"),
+                "market_cap_summary": info.get("marketCap"),
+                "_source": "yfinance",
+            }
+        except Exception as e:
+            logger.warning(f"yfinance fallback failed for {ticker}: {e}")
+            return {"error": str(e)}
+
+    loop = asyncio.get_event_loop()
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        return await loop.run_in_executor(pool, _sync_fetch)
 
 
 async def _fetch_yahoo_financials(yahoo_ticker: str, client: httpx.AsyncClient) -> dict[str, Any]:
