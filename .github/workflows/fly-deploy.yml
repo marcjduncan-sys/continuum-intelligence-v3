@@ -4,7 +4,7 @@ on:
     branches: [main]
     paths:
       - 'api/**'
-      - 'data/**'
+      - 'data/config/**'
       - 'Dockerfile'
       - 'fly.toml'
   workflow_dispatch:
@@ -24,6 +24,6 @@ jobs:
           done
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-      - run: flyctl deploy --remote-only --app ci-api --lease-timeout=120s --wait-timeout=300
+      - run: flyctl deploy --remote-only --app ci-api --lease-timeout=120s --wait-timeout=600
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

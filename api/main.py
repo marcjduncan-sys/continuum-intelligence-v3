@@ -156,7 +156,17 @@ async def lifespan(app: FastAPI):
     for ticker, count in sorted(counts.items()):
         logger.info(f"  {ticker}: {count} passages")
 
-    await embed_all_passages()
+    # Run embedding in background so health check passes during deploy.
+    # embed_all_passages() can take 2-6 minutes with 3000+ passages;
+    # blocking here causes Fly.io deploy timeout (--wait-timeout=300).
+    async def _embed_background():
+        try:
+            await embed_all_passages()
+            logger.info("Background embedding complete")
+        except Exception:
+            logger.exception("Background embedding failed (non-fatal)")
+
+    monitored_task(_embed_background(), name="embed_all_passages")
 
     # Periodic database pool health check (every 60s)
     async def _db_health_loop():

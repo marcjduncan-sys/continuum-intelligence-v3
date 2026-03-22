@@ -61,11 +61,13 @@ jobs:
           if [[ -n "$failed" ]]; then
             echo ""
             echo "========================================="
-            echo "FAILED WORKFLOWS:"
+            echo "FAILED WORKFLOWS (informational only):"
             echo -e "$failed"
             echo "========================================="
-            exit 1
+            echo ""
+            echo "Note: this workflow reports but does not fail."
+            echo "Individual workflow failures send their own notifications."
           fi
 
           echo ""
-          echo "All workflows healthy."
+          echo "All workflows checked."
