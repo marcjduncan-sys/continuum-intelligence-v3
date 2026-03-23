@@ -1440,19 +1440,40 @@ export function initNarrativeTimelineChart(ticker) {
     var history = histData.entries;
     var flips = histData.flips || [];
 
+    // Canonical ID: map T-prefixed IDs to N-prefixed (same hypotheses, renamed mid-history)
+    function canonId(id) {
+      if (typeof id === 'string' && id.charAt(0) === 'T') return 'N' + id.slice(1);
+      return id;
+    }
+
+    // Normalise both history schemas into {N1: score, N2: score, ...} with integer 0-100 scale
+    function extractScores(entry) {
+      var result = {};
+      if (entry.hypotheses) {
+        for (var j = 0; j < entry.hypotheses.length; j++) {
+          result[canonId(entry.hypotheses[j].id)] = entry.hypotheses[j].survival_score;
+        }
+      } else if (entry.scores) {
+        var keys = Object.keys(entry.scores);
+        for (var j = 0; j < keys.length; j++) {
+          result[canonId(keys[j])] = Math.round(entry.scores[keys[j]] * 100);
+        }
+      }
+      return result;
+    }
+
     var labels = [];
     var priceData = [];
     var hypDatasets = {};
     var hypIdSet = {};
     var hypIds = [];
     for (var i = 0; i < history.length; i++) {
-      if (history[i].hypotheses) {
-        for (var h = 0; h < history[i].hypotheses.length; h++) {
-          var hid = history[i].hypotheses[h].id;
-          if (!hypIdSet[hid]) {
-            hypIdSet[hid] = true;
-            hypIds.push(hid);
-          }
+      var scores = extractScores(history[i]);
+      var sKeys = Object.keys(scores);
+      for (var h = 0; h < sKeys.length; h++) {
+        if (!hypIdSet[sKeys[h]]) {
+          hypIdSet[sKeys[h]] = true;
+          hypIds.push(sKeys[h]);
         }
       }
     }
@@ -1467,24 +1488,35 @@ export function initNarrativeTimelineChart(ticker) {
       }
       priceData.push(entry.price);
 
+      var scores = extractScores(entry);
       for (var h = 0; h < hypIds.length; h++) {
         var hid = hypIds[h];
         if (!hypDatasets[hid]) hypDatasets[hid] = [];
-        var found = null;
-        if (entry.hypotheses) {
-          for (var j = 0; j < entry.hypotheses.length; j++) {
-            if (entry.hypotheses[j].id === hid) { found = entry.hypotheses[j]; break; }
-          }
-        }
-        hypDatasets[hid].push(found ? found.survival_score : null);
+        hypDatasets[hid].push(scores[hid] != null ? scores[hid] : null);
       }
     }
 
+    // Resolve hypothesis names: old-schema rich names first, then STOCK_DATA research fallback
     var hypNames = {};
-    var lastEntry = history[history.length - 1];
-    if (lastEntry.hypotheses) {
-      for (var h = 0; h < lastEntry.hypotheses.length; h++) {
-        hypNames[lastEntry.hypotheses[h].id] = lastEntry.hypotheses[h].name;
+    for (var i = history.length - 1; i >= 0; i--) {
+      if (history[i].hypotheses) {
+        for (var h = 0; h < history[i].hypotheses.length; h++) {
+          var cid = canonId(history[i].hypotheses[h].id);
+          if (!hypNames[cid]) {
+            hypNames[cid] = history[i].hypotheses[h].name;
+          }
+        }
+        if (Object.keys(hypNames).length >= hypIds.length) break;
+      }
+    }
+    // Fall back to STOCK_DATA hypotheses (tier/title) for any gaps
+    var stockHyps = STOCK_DATA[ticker] && STOCK_DATA[ticker].hypotheses;
+    if (stockHyps) {
+      for (var h = 0; h < stockHyps.length; h++) {
+        var cid = canonId(stockHyps[h].tier || stockHyps[h].id || '');
+        if (cid && !hypNames[cid]) {
+          hypNames[cid] = stockHyps[h].title || stockHyps[h].name || cid;
+        }
       }
     }
 
@@ -1520,9 +1552,18 @@ export function initNarrativeTimelineChart(ticker) {
       });
     }
 
-    var flipMarkers = [];
+    // Filter out false flips caused by T->N rename (same canonical ID)
+    var realFlips = [];
     for (var f = 0; f < flips.length; f++) {
-      var flip = flips[f];
+      var fl = flips[f];
+      var fromId = fl.from && fl.from.id ? canonId(fl.from.id) : null;
+      var toId = fl.to && fl.to.id ? canonId(fl.to.id) : null;
+      if (fromId !== toId) realFlips.push(fl);
+    }
+
+    var flipMarkers = [];
+    for (var f = 0; f < realFlips.length; f++) {
+      var flip = realFlips[f];
       var flipParts = (flip.date || '').split('-');
       if (flipParts.length === 3) {
         var flipLabel = flipParts[2] + '/' + flipParts[1];
@@ -1677,10 +1718,10 @@ export function initNarrativeTimelineChart(ticker) {
     canvasCheck._ntChart = chart;
 
     var legendEl = document.getElementById('nt-legend-' + ticker);
-    if (legendEl && flips.length > 0) {
+    if (legendEl && realFlips.length > 0) {
       legendEl.innerHTML = '';
-      for (var f = 0; f < flips.length; f++) {
-        var fl = flips[f];
+      for (var f = 0; f < realFlips.length; f++) {
+        var fl = realFlips[f];
         var item = document.createElement('div');
         item.className = 'nt-flip-item';
         var marker = document.createElement('span');
