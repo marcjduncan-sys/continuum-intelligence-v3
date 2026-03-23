@@ -88,6 +88,14 @@
 .portfolio-summary-value.positive { color: var(--signal-green); }
 .portfolio-summary-value.negative { color: var(--signal-red); }
 
+/* Concentration Score Colours */
+.portfolio-summary-value.conc-green { color: var(--signal-green); }
+.portfolio-summary-value.conc-amber { color: var(--signal-amber, #f59e0b); }
+.portfolio-summary-value.conc-red { color: var(--signal-red); }
+.portfolio-summary-value .conc-green { color: var(--signal-green); }
+.portfolio-summary-value .conc-amber { color: var(--signal-amber, #f59e0b); }
+.portfolio-summary-value .conc-muted { color: var(--text-muted); }
+
 /* Portfolio Table */
 .portfolio-table {
     width: 100%;
@@ -479,6 +487,158 @@
     line-height: 1.5;
 }
 
+/* ============================================================
+   CONCENTRATION DETAIL (backend analytics)
+   ============================================================ */
+
+.port-conc-section {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+}
+
+.port-conc-header { margin-bottom: var(--space-lg); }
+
+.port-conc-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.port-conc-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.port-conc-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.port-conc-metric {
+    text-align: center;
+    padding: var(--space-md);
+    background: var(--bg-elevated);
+    border-radius: 6px;
+}
+
+.port-conc-metric-label {
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.port-conc-metric-value {
+    font-family: var(--font-data);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.port-conc-section-label {
+    font-family: var(--font-data);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    margin-bottom: var(--space-sm);
+    margin-top: var(--space-lg);
+}
+
+/* Sector bars */
+.port-conc-sector-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: 6px;
+}
+
+.port-conc-sector-name {
+    font-size: 0.72rem;
+    color: var(--text-primary);
+    min-width: 120px;
+    flex-shrink: 0;
+}
+
+.port-conc-sector-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.port-conc-sector-bar {
+    height: 100%;
+    background: var(--accent-gold);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
+
+.port-conc-sector-pct {
+    font-family: var(--font-data);
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    min-width: 44px;
+    text-align: right;
+}
+
+/* Flags */
+.port-conc-flag {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.port-conc-flag:last-child { border-bottom: none; }
+
+.port-conc-flag-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-family: var(--font-data);
+    font-size: 0.55rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.port-conc-flag-warn .port-conc-flag-icon {
+    background: var(--signal-amber, #f59e0b);
+    color: var(--bg-body);
+}
+
+.port-conc-flag-info .port-conc-flag-icon {
+    background: var(--text-muted);
+    color: var(--bg-body);
+}
+
+.port-conc-flag-msg {
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.port-conc-no-flags {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    padding: var(--space-sm) 0;
+}
+
 /* Light Theme Overrides */
 [data-theme="light"] .port-dna-card,
 [data-theme="light"] .port-insight-card {
@@ -488,6 +648,15 @@
 
 [data-theme="light"] .port-dna-bar {
     background: #F0F1F4;
+}
+
+[data-theme="light"] .port-conc-section {
+    background: #FFFFFF;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+[data-theme="light"] .port-conc-metric {
+    background: #F7F8FA;
 }
 
 @media (max-width: 768px) {
@@ -500,4 +669,10 @@
     .portfolio-table { display: block; overflow-x: auto; white-space: nowrap; }
     .portfolio-summary-bar { flex-wrap: wrap; gap: var(--space-sm); }
     .portfolio-summary-item { min-width: 90px; }
+    .port-conc-metrics {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .port-conc-sector-name {
+        min-width: 80px;
+    }
 }
