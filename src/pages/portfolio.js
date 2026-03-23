@@ -292,7 +292,7 @@ export function renderPortfolio(positions, grossExposure) {
   /* Render diagnostics, reweighting, and alerts */
   renderPortfolioDiagnostics(positions, grossExposure);
   renderReweighting(positions, grossExposure);
-  renderChangeAlerts(positions);
+  /* Change Detection Alerts removed -- was hardcoded demo data */
 }
 
 export function renderPortfolioFromSaved(positions) {
@@ -594,99 +594,8 @@ export function renderReweighting(positions, grossExposure) {
   sectionEl.style.display = '';
 }
 
-export function renderChangeAlerts(positions) {
-  var sectionEl = document.getElementById('changeAlertsSection');
-  var feedEl = document.getElementById('changeAlertsFeed');
-  var emptyEl = document.getElementById('changeAlertsEmpty');
-
-  if (!sectionEl) return;
-  sectionEl.style.display = '';
-
-  var alerts = [];
-  var tickers = positions.map(function(p) { return p.ticker; });
-
-  if (tickers.includes('XRO')) {
-    alerts.push({
-      type: 'critical',
-      icon: '\uD83D\uDD34',
-      title: 'XRO: N3 Probability Increased',
-      text: 'AI disruption thesis strengthened following Claude 4 announcement. N3 (Execution Failure) raised from 35% -> 42%.',
-      ticker: 'XRO',
-      time: '2 hours ago',
-      impact: 'Affects 15% of portfolio'
-    });
-  }
-
-  if (tickers.includes('WOW')) {
-    alerts.push({
-      type: 'warning',
-      icon: '\uD83D\uDFE1',
-      title: 'WOW: Earnings Preview',
-      text: 'Q1 FY26 results due Feb 25. Consensus expects 11.8% EBIT growth vs management guidance of "mid-to-high single digits". Watch for N1/N2 inflection.',
-      ticker: 'WOW',
-      time: '1 day ago',
-      impact: 'Affects 12% of portfolio'
-    });
-  }
-
-  if (tickers.includes('CSL')) {
-    alerts.push({
-      type: 'info',
-      icon: '\uD83D\uDD35',
-      title: 'CSL: Plasma Collection Update',
-      text: 'Weekly collection data shows continued normalization. N1 (Recovery) probability stable at 45%. No change to thesis.',
-      ticker: 'CSL',
-      time: '3 days ago',
-      impact: 'Affects 20% of portfolio'
-    });
-  }
-
-  if (tickers.includes('WTC')) {
-    alerts.push({
-      type: 'critical',
-      icon: '\uD83D\uDD34',
-      title: 'WTC: Governance Concerns Escalate',
-      text: 'Additional board member resignation. N3 (Governance Risk) elevated from 30% -> 35%. Review position sizing.',
-      ticker: 'WTC',
-      time: '4 hours ago',
-      impact: 'Affects 8% of portfolio'
-    });
-  }
-
-  if (alerts.length < 2) {
-    alerts.push({
-      type: 'info',
-      icon: '\uD83D\uDCCA',
-      title: 'Market: ASX 200 Volatility Elevated',
-      text: 'VIX-equivalent at 18-month high. Consider position sizing across all hypotheses.',
-      ticker: 'MARKET',
-      time: '5 hours ago',
-      impact: 'Broad market'
-    });
-  }
-
-  if (alerts.length > 0 && feedEl) {
-    feedEl.innerHTML = alerts.map(function(a) {
-      return '<div class="change-alert-item ' + a.type + '">' +
-        '<div class="change-alert-icon">' + a.icon + '</div>' +
-        '<div class="change-alert-content">' +
-          '<div class="change-alert-title">' + a.title + '</div>' +
-          '<div class="change-alert-text">' + a.text + '</div>' +
-          '<div class="change-alert-meta">' +
-            '<span class="change-alert-ticker">' + a.ticker + '</span>' +
-            '<span>\u23F1 ' + a.time + '</span>' +
-            '<span>\uD83D\uDCBC ' + a.impact + '</span>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-    }).join('');
-    feedEl.style.display = '';
-    if (emptyEl) emptyEl.style.display = 'none';
-  } else if (emptyEl) {
-    if (feedEl) feedEl.style.display = 'none';
-    emptyEl.style.display = '';
-  }
-}
+/* renderChangeAlerts removed -- was hardcoded demo data (XRO, WOW, CSL, WTC).
+   Real alerting is handled by thesis-monitor.js and api/insights.py. */
 
 export function savePortfolio(positions) {
   try { localStorage.setItem('continuum-portfolio', JSON.stringify(positions)); } catch(e) {}
@@ -708,10 +617,8 @@ export function clearPortfolio() {
   /* Hide diagnostics, reweighting, and alerts */
   var diag = document.getElementById('portfolioDiagnostics');
   var reweight = document.getElementById('portfolioReweighting');
-  var alertsEl = document.getElementById('changeAlertsSection');
   if (diag) diag.style.display = 'none';
   if (reweight) reweight.style.display = 'none';
-  if (alertsEl) alertsEl.style.display = 'none';
 }
 
 /* ------------------------------------------------------------------ */
