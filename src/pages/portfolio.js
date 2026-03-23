@@ -272,8 +272,12 @@ export function renderPortfolio(positions, grossExposure) {
     else neutralWeight += p.weight;
   });
 
-  document.getElementById('summaryLong').textContent = 'A$' + formatNum(totalLong, 0);
-  document.getElementById('summaryShort').textContent = 'A$' + formatNum(totalShortAbs, 0);
+  document.getElementById('summaryPositions').textContent = String(positions.length);
+  // Reset async-populated fields to "--" (will be updated when analytics arrive)
+  var concResetEl = document.getElementById('summaryConcentration');
+  if (concResetEl) { concResetEl.textContent = '--'; concResetEl.className = 'portfolio-summary-value'; }
+  var flagsResetEl = document.getElementById('summaryFlags');
+  if (flagsResetEl) flagsResetEl.textContent = '--';
   document.getElementById('summaryNet').textContent = 'A$' + formatNum(netExposure, 0);
   document.getElementById('summaryGross').textContent = 'A$' + formatNum(grossCalc, 0);
   var pnlEl = document.getElementById('summaryPnL');
@@ -281,7 +285,6 @@ export function renderPortfolio(positions, grossExposure) {
   pnlEl.className = 'portfolio-summary-value ' + (totalPnL >= 0 ? 'positive' : 'negative');
   document.getElementById('summaryAligned').textContent = formatNum(alignedWeight, 1) + '%';
   document.getElementById('summaryContra').textContent = formatNum(contraWeight, 1) + '%';
-  document.getElementById('summaryNeutral').textContent = formatNum(neutralWeight, 1) + '%';
 
   /* Show/hide elements */
   zone.style.display = 'none';
@@ -637,6 +640,7 @@ function _syncPortfolioToPMDatabase(positions, grossExposure) {
   var headers = { 'Content-Type': 'application/json' };
   if (apiKey) headers['X-API-Key'] = apiKey;
   var guestId = (window.CI_AUTH && window.CI_AUTH.getGuestId) ? window.CI_AUTH.getGuestId() : null;
+  var _syncedPortfolioId = null;
 
   // Only sync positions with valid prices (skip uncovered/unpriced)
   var validPositions = positions.filter(function(p) { return p.currentPrice > 0 && p.units !== 0; });
@@ -696,6 +700,7 @@ function _syncPortfolioToPMDatabase(positions, grossExposure) {
   // Step 2: create snapshot
   ensurePortfolio
     .then(function(portfolioId) {
+      _syncedPortfolioId = portfolioId;
       return fetch(apiBase + '/api/portfolios/' + portfolioId + '/snapshots', {
         method: 'POST',
         headers: headers,
@@ -709,6 +714,7 @@ function _syncPortfolioToPMDatabase(positions, grossExposure) {
         window.dispatchEvent(new CustomEvent('ci:portfolio:synced', {
           detail: { holdings: validPositions.length, totalValue: totalValue }
         }));
+        _fetchAndDispatchAnalytics(_syncedPortfolioId);
       } else {
         r.json().then(function(err) {
           console.warn('[Portfolio] PM sync failed:', err);
@@ -719,6 +725,30 @@ function _syncPortfolioToPMDatabase(positions, grossExposure) {
     })
     .catch(function(err) {
       console.warn('[Portfolio] PM sync error:', err.message || err);
+    });
+}
+
+/**
+ * Fetch backend analytics for a portfolio and dispatch event for UI consumption.
+ * Fire-and-forget: errors are logged but do not block the UI.
+ */
+function _fetchAndDispatchAnalytics(portfolioId) {
+  var apiBase = API_BASE;
+  var apiKey = window.CI_API_KEY || '';
+  var headers = { 'Content-Type': 'application/json' };
+  if (apiKey) headers['X-API-Key'] = apiKey;
+
+  fetch(apiBase + '/api/portfolios/' + portfolioId + '/analytics', { headers: headers })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(analytics) {
+      console.log('[Portfolio] Analytics received: score=' + analytics.concentration_score + ', flags=' + (analytics.flags || []).length);
+      window.dispatchEvent(new CustomEvent('ci:portfolio:analytics', { detail: analytics }));
+    })
+    .catch(function(err) {
+      console.warn('[Portfolio] Analytics fetch failed:', err.message || err);
     });
 }
 
@@ -907,3 +937,134 @@ export function initPortfolioPage() {
     renderPortfolio(positions, grossExposure);
   });
 }
+
+/**
+ * Update the summary header with backend analytics data.
+ * Called when ci:portfolio:analytics event fires.
+ */
+export function updateSummaryHeader(analytics) {
+  var posEl = document.getElementById('summaryPositions');
+  var concEl = document.getElementById('summaryConcentration');
+  var flagsEl = document.getElementById('summaryFlags');
+
+  if (!analytics) {
+    if (posEl) posEl.textContent = '--';
+    if (concEl) { concEl.textContent = '--'; concEl.className = 'portfolio-summary-value'; }
+    if (flagsEl) flagsEl.textContent = '--';
+    return;
+  }
+
+  if (posEl) posEl.textContent = String(analytics.position_count || 0);
+
+  if (concEl) {
+    var score = analytics.concentration_score != null ? Math.round(analytics.concentration_score) : null;
+    if (score != null) {
+      concEl.textContent = String(score);
+      var colorClass = score <= 30 ? 'conc-green' : score <= 60 ? 'conc-amber' : 'conc-red';
+      concEl.className = 'portfolio-summary-value ' + colorClass;
+    } else {
+      concEl.textContent = '--';
+      concEl.className = 'portfolio-summary-value';
+    }
+  }
+
+  if (flagsEl) {
+    var flags = analytics.flags || [];
+    var warnings = flags.filter(function(f) { return f.severity === 'warning'; }).length;
+    var infos = flags.filter(function(f) { return f.severity === 'info'; }).length;
+    if (flags.length === 0) {
+      flagsEl.innerHTML = '<span class="conc-green">0</span>';
+    } else {
+      var parts = [];
+      if (warnings > 0) parts.push('<span class="conc-amber">' + warnings + '</span>');
+      if (infos > 0) parts.push('<span class="conc-muted">' + infos + '</span>');
+      flagsEl.innerHTML = parts.join(' / ');
+    }
+  }
+}
+
+/**
+ * Render the concentration detail section with backend analytics.
+ * Shows max single-name, top 5, top 10, HHI, sector bars, and risk flags.
+ */
+export function renderConcentrationDetail(analytics) {
+  var container = document.getElementById('portConcentrationDetail');
+  if (!container) return;
+
+  if (!analytics) {
+    container.style.display = 'none';
+    return;
+  }
+
+  container.style.display = '';
+  var conc = analytics.concentration || {};
+
+  var maxEl = document.getElementById('concMaxSingle');
+  var top5El = document.getElementById('concTop5');
+  var top10El = document.getElementById('concTop10');
+  var hhiEl = document.getElementById('concHHI');
+
+  if (maxEl) maxEl.textContent = _fmtWeight(conc.max_single_weight);
+  if (top5El) top5El.textContent = _fmtWeight(conc.top5_weight);
+  if (top10El) top10El.textContent = _fmtWeight(conc.top10_weight);
+  if (hhiEl) hhiEl.textContent = conc.hhi != null ? conc.hhi.toFixed(3) : '--';
+
+  var sectorsEl = document.getElementById('portConcSectors');
+  if (sectorsEl && analytics.sector_exposure) {
+    var sectors = Object.entries(analytics.sector_exposure);
+    if (sectors.length > 0) {
+      sectorsEl.innerHTML =
+        '<div class="port-conc-section-label">SECTOR EXPOSURE</div>' +
+        sectors.map(function(entry) {
+          var name = entry[0];
+          var weight = entry[1];
+          var barWidth = Math.min(weight * 100, 100);
+          return '<div class="port-conc-sector-row">' +
+            '<div class="port-conc-sector-name">' + _escText(name) + '</div>' +
+            '<div class="port-conc-sector-bar-wrap">' +
+              '<div class="port-conc-sector-bar" style="width:' + barWidth + '%"></div>' +
+            '</div>' +
+            '<div class="port-conc-sector-pct">' + _fmtWeight(weight) + '</div>' +
+          '</div>';
+        }).join('');
+    } else {
+      sectorsEl.innerHTML = '';
+    }
+  }
+
+  var flagsEl = document.getElementById('portConcFlags');
+  if (flagsEl) {
+    var flags = analytics.flags || [];
+    if (flags.length === 0) {
+      flagsEl.innerHTML = '<div class="port-conc-no-flags">No risk flags triggered</div>';
+    } else {
+      flagsEl.innerHTML =
+        '<div class="port-conc-section-label">RISK FLAGS</div>' +
+        flags.map(function(f) {
+          var icon = f.severity === 'warning' ? '!' : 'i';
+          var cls = f.severity === 'warning' ? 'port-conc-flag-warn' : 'port-conc-flag-info';
+          return '<div class="port-conc-flag ' + cls + '">' +
+            '<span class="port-conc-flag-icon">' + icon + '</span>' +
+            '<span class="port-conc-flag-msg">' + _escText(f.message) + '</span>' +
+          '</div>';
+        }).join('');
+    }
+  }
+}
+
+function _fmtWeight(w) {
+  if (w == null || isNaN(w)) return '--';
+  return (w * 100).toFixed(1) + '%';
+}
+
+function _escText(str) {
+  var d = document.createElement('div');
+  d.textContent = str != null ? String(str) : '';
+  return d.innerHTML;
+}
+
+// Listen for backend analytics to update summary header and concentration detail
+window.addEventListener('ci:portfolio:analytics', function(e) {
+  updateSummaryHeader(e.detail);
+  renderConcentrationDetail(e.detail);
+});

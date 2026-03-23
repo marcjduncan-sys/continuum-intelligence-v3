@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, it, expect } from 'vitest';
 import {
   calculateReweightingScores,
@@ -5,7 +6,9 @@ import {
   classifyAlignment,
   calculateExposureDollar,
   calculateGrossExposure,
-  calculateCurrentWeightPct
+  calculateCurrentWeightPct,
+  updateSummaryHeader,
+  renderConcentrationDetail
 } from './portfolio.js';
 
 /* ------------------------------------------------------------------ */
@@ -655,5 +658,123 @@ describe('calculateReweightingScores', () => {
       expect(bhp.action).not.toBe('Hold');
       expect(bhp.shareAction).not.toBe('De minimis');
     });
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/*  updateSummaryHeader                                                */
+/* ------------------------------------------------------------------ */
+
+describe('updateSummaryHeader', () => {
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <div id="summaryPositions">--</div>
+      <div class="portfolio-summary-value" id="summaryConcentration">--</div>
+      <div id="summaryFlags">--</div>
+    `;
+  });
+
+  it('populates position count, concentration score, and flag count', () => {
+    updateSummaryHeader({
+      position_count: 12,
+      concentration_score: 28.4,
+      flags: [
+        { severity: 'warning', message: 'test' },
+        { severity: 'info', message: 'test2' }
+      ]
+    });
+    expect(document.getElementById('summaryPositions').textContent).toBe('12');
+    expect(document.getElementById('summaryConcentration').textContent).toBe('28');
+    expect(document.getElementById('summaryFlags').querySelectorAll('span').length).toBe(2);
+  });
+
+  it('applies green class for score 0-30', () => {
+    updateSummaryHeader({ position_count: 5, concentration_score: 15.0, flags: [] });
+    expect(document.getElementById('summaryConcentration').className).toContain('conc-green');
+  });
+
+  it('applies amber class for score 31-60', () => {
+    updateSummaryHeader({ position_count: 5, concentration_score: 45.0, flags: [] });
+    expect(document.getElementById('summaryConcentration').className).toContain('conc-amber');
+  });
+
+  it('applies red class for score 61-100', () => {
+    updateSummaryHeader({ position_count: 3, concentration_score: 72.0, flags: [] });
+    expect(document.getElementById('summaryConcentration').className).toContain('conc-red');
+  });
+
+  it('shows -- when analytics is null', () => {
+    updateSummaryHeader(null);
+    expect(document.getElementById('summaryConcentration').textContent).toBe('--');
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/*  renderConcentrationDetail                                          */
+/* ------------------------------------------------------------------ */
+
+describe('renderConcentrationDetail', () => {
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <div id="portConcentrationDetail" style="display:none">
+        <div id="concMaxSingle">--</div>
+        <div id="concTop5">--</div>
+        <div id="concTop10">--</div>
+        <div id="concHHI">--</div>
+        <div id="portConcSectors"></div>
+        <div id="portConcFlags"></div>
+      </div>
+    `;
+  });
+
+  it('populates concentration metrics from analytics', () => {
+    renderConcentrationDetail({
+      concentration: { max_single_weight: 0.182, top5_weight: 0.521, top10_weight: 0.784, hhi: 0.089 },
+      sector_exposure: { Materials: 0.35 },
+      flags: [{ code: 'HIGH_SINGLE_NAME', severity: 'warning', message: 'BHP is 18.2%' }]
+    });
+    expect(document.getElementById('concMaxSingle').textContent).toBe('18.2%');
+    expect(document.getElementById('concTop5').textContent).toBe('52.1%');
+    expect(document.getElementById('concTop10').textContent).toBe('78.4%');
+    expect(document.getElementById('concHHI').textContent).toBe('0.089');
+    expect(document.getElementById('portConcentrationDetail').style.display).toBe('');
+  });
+
+  it('renders sector bars', () => {
+    renderConcentrationDetail({
+      concentration: { max_single_weight: 0.1, top5_weight: 0.3, top10_weight: 0.5, hhi: 0.05 },
+      sector_exposure: { Materials: 0.35, Financials: 0.25, Energy: 0.15 },
+      flags: []
+    });
+    var sectors = document.getElementById('portConcSectors');
+    expect(sectors.querySelectorAll('.port-conc-sector-row').length).toBe(3);
+  });
+
+  it('renders flag messages', () => {
+    renderConcentrationDetail({
+      concentration: { max_single_weight: 0.2, top5_weight: 0.6, top10_weight: 0.8, hhi: 0.1 },
+      sector_exposure: {},
+      flags: [
+        { code: 'HIGH_SINGLE_NAME', severity: 'warning', message: 'BHP is 20%' },
+        { code: 'UNMAPPED_SECTOR', severity: 'info', message: '5% unmapped' }
+      ]
+    });
+    var flagsEl = document.getElementById('portConcFlags');
+    expect(flagsEl.querySelectorAll('.port-conc-flag').length).toBe(2);
+  });
+
+  it('hides section when analytics is null', () => {
+    renderConcentrationDetail(null);
+    expect(document.getElementById('portConcentrationDetail').style.display).toBe('none');
+  });
+
+  it('shows section with no flags gracefully', () => {
+    renderConcentrationDetail({
+      concentration: { max_single_weight: 0.08, top5_weight: 0.3, top10_weight: 0.5, hhi: 0.04 },
+      sector_exposure: {},
+      flags: []
+    });
+    var flagsEl = document.getElementById('portConcFlags');
+    expect(flagsEl.textContent).toContain('No risk flags');
   });
 });
