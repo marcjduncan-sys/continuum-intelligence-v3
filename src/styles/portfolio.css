@@ -646,51 +646,53 @@
 .port-mandate-section {
     background: var(--bg-surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: var(--space-xl);
-    margin-bottom: var(--space-xl);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-top: 8px;
+    margin-bottom: var(--space-sm);
 }
 
-.port-mandate-header { margin-bottom: var(--space-lg); }
+.port-mandate-header { margin-bottom: 4px; }
 
 .port-mandate-title {
-    font-size: 1rem;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: var(--space-xs);
+    margin-bottom: 2px;
 }
 
 .port-mandate-subtitle {
-    font-size: 0.78rem;
+    font-size: 11px;
     color: var(--text-muted);
 }
 
 .port-mandate-clear {
-    font-size: 0.85rem;
+    font-size: 12px;
     color: var(--signal-green);
     font-weight: 600;
-    padding: var(--space-sm) 0;
+    padding: 2px 0;
 }
 
 .port-mandate-flag {
     display: flex;
     align-items: flex-start;
-    gap: var(--space-sm);
-    padding: var(--space-sm) 0;
+    gap: 6px;
+    padding: 4px 8px;
+    margin-bottom: 2px;
     border-bottom: 1px solid var(--border);
 }
 
-.port-mandate-flag:last-child { border-bottom: none; }
+.port-mandate-flag:last-child { border-bottom: none; margin-bottom: 0; }
 
 .port-mandate-flag-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     font-family: var(--font-data);
-    font-size: 0.55rem;
+    font-size: 0.5rem;
     font-weight: 700;
     flex-shrink: 0;
     margin-top: 1px;
@@ -707,8 +709,8 @@
 }
 
 .port-mandate-flag-msg {
-    font-size: 0.78rem;
-    line-height: 1.5;
+    font-size: 12px;
+    line-height: 1.4;
     color: var(--text-secondary);
 }
 
