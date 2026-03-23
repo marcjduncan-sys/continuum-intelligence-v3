@@ -108,9 +108,13 @@ Files explicitly out of scope:
 | 4 | IMPORTANT | Timeseries off-by-one dropped today's data | Changed range(days) to range(days + 1) |
 | 5 | IMPORTANT | zero_state_reason non-null when has_data true | Forced null when has_data is true |
 
-## Status
+## Status: CLOSED -- production validated
 
 - **Branch commit:** `50c5d9d` on `process/flywheel-core-pilot` (2026-03-23)
-- **Staging smoke test:** PENDING -- requires OPS_SECRET set in Fly.io
-- **Merge to main:** BLOCKED on staging smoke test
-- **Known follow-on:** replace localStorage secret model in a future bead
+- **Merge to main:** `d86d9b6` (2026-03-23)
+- **Production smoke test:** PASSED (2026-03-23, https://ci-api.fly.dev)
+  - No secret: 401
+  - Wrong secret: 401
+  - Correct secret: 200 (populated state -- 8 requests, 2 decisions, 18 insights, 2 tickers)
+- **has_data:** true; **traffic_status:** normal; **zero_state_reason:** null
+- **Known follow-on:** replace X-Ops-Secret / localStorage model with proper admin auth (future bead)
