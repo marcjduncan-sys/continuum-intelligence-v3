@@ -92,6 +92,25 @@ Files explicitly out of scope:
 
 ## Completion evidence
 
-- Tests run: pytest count, vitest count, build result
-- Screens / artefacts: screenshot of `/ops` page with real data (or zeros if no PM activity yet)
-- Reviewer: fresh-context review using `docs/templates/REVIEW_TEMPLATE.md`
+- **Pytest (BEAD-001):** 19/19 passing (auth, traffic classification, timeseries, schema contract)
+- **Vitest:** 176/176 passing (pre-existing portfolio.test.js failure unchanged)
+- **ESLint:** 0 errors
+- **Vite build:** clean
+- **Reviewer:** fresh-context review completed; 5 issues found (2 critical, 3 important), all fixed and re-verified
+
+## Reviewer issues found and resolved
+
+| # | Severity | Issue | Fix |
+|---|---|---|---|
+| 1 | CRITICAL | OPS_SECRET allowed all requests when env var empty | Changed to reject-always pattern; added to check_production_secrets() |
+| 2 | CRITICAL | OPS_SECRET read via os.getenv() bypassing config.py | Removed; imports config.OPS_SECRET |
+| 3 | IMPORTANT | has_data excluded insights_total | Added `or insights_total > 0` |
+| 4 | IMPORTANT | Timeseries off-by-one dropped today's data | Changed range(days) to range(days + 1) |
+| 5 | IMPORTANT | zero_state_reason non-null when has_data true | Forced null when has_data is true |
+
+## Status
+
+- **Branch commit:** `50c5d9d` on `process/flywheel-core-pilot` (2026-03-23)
+- **Staging smoke test:** PENDING -- requires OPS_SECRET set in Fly.io
+- **Merge to main:** BLOCKED on staging smoke test
+- **Known follow-on:** replace localStorage secret model in a future bead
