@@ -310,6 +310,9 @@ export function renderPortfolioFromSaved(positions) {
     p.alignment = classifyAlignment(dir, p.skew);
   });
   renderPortfolio(positions, grossExposure);
+  // Ensure PM database has current portfolio state (handles page refresh,
+  // live price updates, and recovery from failed initial sync)
+  _syncPortfolioToPMDatabase(positions, grossExposure);
 }
 
 export function formatNum(n, decimals) {
@@ -637,12 +640,20 @@ export function clearPortfolio() {
 /* ------------------------------------------------------------------ */
 
 var _pmPortfolioId = null;
+var _lastSyncTimestamp = 0;
+var _PM_SYNC_COOLDOWN_MS = 30000; // 30s cooldown between syncs
 
 /**
  * Sync the uploaded portfolio to the PM database so PM Chat has access.
  * Fire-and-forget: errors are logged but do not block the UI.
+ * Includes a 30-second cooldown to avoid redundant syncs on rapid re-renders.
  */
 function _syncPortfolioToPMDatabase(positions, grossExposure) {
+  var now = Date.now();
+  if (now - _lastSyncTimestamp < _PM_SYNC_COOLDOWN_MS) {
+    return; // skip redundant sync
+  }
+  _lastSyncTimestamp = now;
   var apiBase = API_BASE;
   var apiKey = window.CI_API_KEY || '';
   var headers = { 'Content-Type': 'application/json' };
