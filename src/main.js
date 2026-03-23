@@ -25,6 +25,7 @@ import { initThesisPage, tcAnalyze } from './pages/thesis.js';
 import { initAboutPage } from './pages/about.js';
 import { renderMemoryPage } from './pages/memory.js';
 import { renderPMPage } from './pages/pm.js';
+import { renderOpsPage } from './pages/ops.js';
 
 // Report sections (needed for router callbacks)
 import { setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineChart } from './pages/report-sections.js';
@@ -287,6 +288,7 @@ async function boot() {
     renderPersonalisationPage: window.renderPersonalisationPage,
     renderMemoryPage: renderMemoryPage,
     renderPMPage: renderPMPage,
+    renderOpsPage: renderOpsPage,
     loadFullResearchData: loadFullResearchData,
     buildSnapshotFromStock: buildSnapshotFromStock,
     setupScrollSpy: setupScrollSpy,

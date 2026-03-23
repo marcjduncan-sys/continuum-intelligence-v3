@@ -47,6 +47,7 @@ from pm_conversations import router as pm_conversations_router
 from pm_journal import router as pm_journal_router
 from handoff_api import router as handoff_router
 from portfolio_api import router as portfolio_router
+from pm_ops import router as pm_ops_router
 from ingest import ingest, embed_all_passages, get_tickers, get_passage_count
 from refresh import (
     RefreshJob, refresh_jobs, get_job, is_running, run_refresh,
@@ -271,6 +272,7 @@ if os.environ.get("ENABLE_PM", "true").lower() == "true":
     app.include_router(pm_journal_router)
     app.include_router(handoff_router)
     app.include_router(portfolio_router)
+    app.include_router(pm_ops_router)
     logger.info("PM endpoints enabled")
 else:
     logger.info("PM endpoints disabled (ENABLE_PM != true)")

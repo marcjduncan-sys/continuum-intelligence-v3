@@ -92,6 +92,7 @@ JWT_SECRET = os.getenv("JWT_SECRET", "dev-insecure-secret")
 BATCH_SECRET = os.getenv("BATCH_SECRET", "")
 INSIGHTS_SECRET = os.getenv("INSIGHTS_SECRET", "")
 PRICE_DRIVERS_SECRET = os.getenv("PRICE_DRIVERS_SECRET", "")
+OPS_SECRET = os.getenv("OPS_SECRET", "")
 
 # ---------------------------------------------------------------------------
 # Production secrets check — fail loud on Railway if secrets are insecure
@@ -117,6 +118,8 @@ def check_production_secrets() -> None:
         insecure.append("INSIGHTS_SECRET")
     if not PRICE_DRIVERS_SECRET:
         insecure.append("PRICE_DRIVERS_SECRET")
+    if not OPS_SECRET:
+        insecure.append("OPS_SECRET")
 
     if insecure:
         raise RuntimeError(

@@ -244,6 +244,11 @@ export function route() {
     _pageRenderers.renderPMPage();
   }
 
+  // Lazy render ops page (URL-only, no nav link)
+  if (hash === 'ops' && _pageRenderers.renderOpsPage) {
+    _pageRenderers.renderOpsPage();
+  }
+
   // Lazy render snapshot pages on first visit
   if (hash.startsWith('snapshot-')) {
     const ticker = hash.replace('snapshot-', '');

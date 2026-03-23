@@ -1,0 +1,300 @@
+/* ============================================================
+   OPS.CSS -- PM Operations Dashboard styles (BEAD-001)
+   Uses CSS custom properties from tokens.css.
+   ============================================================ */
+
+/* --- Layout --- */
+.ops-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-sm, 8px);
+  margin-bottom: var(--space-md, 16px);
+}
+
+.ops-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary, #e0e0e0);
+  margin: 0;
+}
+
+.ops-header-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm, 8px);
+}
+
+.ops-generated {
+  font-size: 0.75rem;
+  color: var(--text-muted, #888);
+}
+
+/* --- Status badges --- */
+.ops-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ops-badge--ok { background: var(--brand-green, #00c49a); color: #000; }
+.ops-badge--warn { background: var(--amber, #f5a623); color: #000; }
+.ops-badge--err { background: var(--red, #e74c3c); color: #fff; }
+
+/* --- Metrics grid --- */
+.ops-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-sm, 8px);
+  margin-bottom: var(--space-lg, 24px);
+}
+
+.ops-metric {
+  background: var(--card-bg, #1e1e2e);
+  border: 1px solid var(--border-color, #333);
+  border-radius: 8px;
+  padding: var(--space-sm, 8px) var(--space-md, 16px);
+  text-align: center;
+}
+
+.ops-metric-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary, #e0e0e0);
+  line-height: 1.2;
+}
+
+.ops-metric-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #888);
+  margin-top: 4px;
+}
+
+.ops-metric-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted, #888);
+}
+
+/* --- Period selector --- */
+.ops-period-selector {
+  display: flex;
+  gap: 4px;
+  margin-bottom: var(--space-md, 16px);
+}
+
+.ops-period-btn {
+  padding: 4px 14px;
+  border: 1px solid var(--border-color, #333);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted, #888);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.ops-period-btn:hover {
+  background: var(--card-bg, #1e1e2e);
+  color: var(--text-primary, #e0e0e0);
+}
+.ops-period-btn:focus-visible {
+  outline: 2px solid var(--brand-green, #00c49a);
+  outline-offset: 2px;
+}
+.ops-period-btn--active {
+  background: var(--brand-green, #00c49a);
+  color: #000;
+  border-color: var(--brand-green, #00c49a);
+}
+
+/* --- Bar chart --- */
+.ops-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 80px;
+  margin-bottom: var(--space-sm, 8px);
+}
+
+.ops-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.ops-bar {
+  width: 100%;
+  max-width: 24px;
+  background: var(--brand-green, #00c49a);
+  border-radius: 2px 2px 0 0;
+  min-height: 2px;
+  transition: height 0.2s;
+}
+
+.ops-bar-label {
+  font-size: 0.6rem;
+  color: var(--text-muted, #888);
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+/* --- Sections --- */
+.ops-section {
+  margin-bottom: var(--space-md, 16px);
+}
+
+.ops-section-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, #888);
+  margin: 0 0 var(--space-xs, 4px) 0;
+  border-bottom: 1px solid var(--border-color, #333);
+  padding-bottom: 4px;
+}
+
+/* --- Breakdowns grid --- */
+.ops-breakdowns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-md, 16px);
+  margin-bottom: var(--space-lg, 24px);
+}
+
+/* --- Tables --- */
+.ops-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.ops-table th,
+.ops-table td {
+  padding: 4px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color, #333);
+  color: var(--text-primary, #e0e0e0);
+}
+
+.ops-table th {
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, #888);
+}
+
+.ops-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Events table --- */
+.ops-events-table td:first-child { width: 100px; }
+.ops-events-table td:nth-child(2) { width: 160px; white-space: nowrap; }
+
+.ops-event-type {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.ops-event-type--pm_request { background: var(--brand-green, #00c49a); color: #000; }
+.ops-event-type--handoff { background: var(--amber, #f5a623); color: #000; }
+.ops-event-type--decision { background: #6c5ce7; color: #fff; }
+
+/* --- States --- */
+.ops-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  padding: var(--space-lg, 24px);
+}
+
+.ops-state--loading {
+  color: var(--text-muted, #888);
+}
+
+.ops-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color, #333);
+  border-top-color: var(--brand-green, #00c49a);
+  border-radius: 50%;
+  animation: ops-spin 0.8s linear infinite;
+  margin-bottom: var(--space-sm, 8px);
+}
+
+@keyframes ops-spin {
+  to { transform: rotate(360deg); }
+}
+
+.ops-state--error {
+  color: var(--red, #e74c3c);
+}
+
+.ops-error-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.ops-error-detail {
+  font-size: 0.85rem;
+  color: var(--text-muted, #888);
+  margin: 0 0 var(--space-md, 16px) 0;
+}
+
+.ops-retry-btn {
+  padding: 6px 16px;
+  border: 1px solid var(--border-color, #333);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary, #e0e0e0);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.ops-retry-btn:hover {
+  background: var(--card-bg, #1e1e2e);
+}
+.ops-retry-btn:focus-visible {
+  outline: 2px solid var(--brand-green, #00c49a);
+  outline-offset: 2px;
+}
+
+.ops-state--zero {
+  color: var(--text-muted, #888);
+}
+
+.ops-zero-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.ops-zero-detail {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* --- Reduced motion --- */
+@media (prefers-reduced-motion: reduce) {
+  .ops-spinner { animation: none; }
+  .ops-bar { transition: none; }
+}
