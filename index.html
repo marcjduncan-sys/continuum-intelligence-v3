@@ -267,12 +267,12 @@
         <!-- Summary Bar (hidden until data loaded) -->
         <div class="portfolio-summary-bar" id="portfolioSummary" style="display:none">
             <div class="portfolio-summary-item">
-                <div class="portfolio-summary-label">Long Book</div>
-                <div class="portfolio-summary-value positive" id="summaryLong">--</div>
+                <div class="portfolio-summary-label">Positions</div>
+                <div class="portfolio-summary-value" id="summaryPositions">--</div>
             </div>
             <div class="portfolio-summary-item">
-                <div class="portfolio-summary-label">Short Book</div>
-                <div class="portfolio-summary-value negative" id="summaryShort">--</div>
+                <div class="portfolio-summary-label">Concentration</div>
+                <div class="portfolio-summary-value" id="summaryConcentration">--</div>
             </div>
             <div class="portfolio-summary-item">
                 <div class="portfolio-summary-label">Net Position</div>
@@ -295,8 +295,8 @@
                 <div class="portfolio-summary-value negative" id="summaryContra">--</div>
             </div>
             <div class="portfolio-summary-item">
-                <div class="portfolio-summary-label">Balanced / Neutral</div>
-                <div class="portfolio-summary-value" id="summaryNeutral">--</div>
+                <div class="portfolio-summary-label">Flags</div>
+                <div class="portfolio-summary-value" id="summaryFlags">--</div>
             </div>
         </div>
 
@@ -344,6 +344,34 @@
                     <div class="port-dna-item"><span class="port-dna-dot n3"></span><span id="lblN3">N3</span> <span id="valN3">$0</span></div>
                     <div class="port-dna-item"><span class="port-dna-dot n4"></span><span id="lblN4">N4</span> <span id="valN4">$0</span></div>
                 </div>
+            </div>
+
+            <!-- Name Concentration Detail (populated by backend analytics) -->
+            <div id="portConcentrationDetail" class="port-conc-section" style="display:none">
+                <div class="port-conc-header">
+                    <div class="port-conc-title">Name Concentration</div>
+                    <div class="port-conc-subtitle">Single-name and top-N position weight analysis</div>
+                </div>
+                <div class="port-conc-metrics" id="portConcMetrics">
+                    <div class="port-conc-metric">
+                        <div class="port-conc-metric-label">Max Single</div>
+                        <div class="port-conc-metric-value" id="concMaxSingle">--</div>
+                    </div>
+                    <div class="port-conc-metric">
+                        <div class="port-conc-metric-label">Top 5</div>
+                        <div class="port-conc-metric-value" id="concTop5">--</div>
+                    </div>
+                    <div class="port-conc-metric">
+                        <div class="port-conc-metric-label">Top 10</div>
+                        <div class="port-conc-metric-value" id="concTop10">--</div>
+                    </div>
+                    <div class="port-conc-metric">
+                        <div class="port-conc-metric-label">HHI</div>
+                        <div class="port-conc-metric-value" id="concHHI">--</div>
+                    </div>
+                </div>
+                <div class="port-conc-sectors" id="portConcSectors"></div>
+                <div class="port-conc-flags" id="portConcFlags"></div>
             </div>
 
             <!-- Risk Insights Grid -->
