@@ -1765,6 +1765,7 @@ window.pnOnRouteEnter = function() {
 window.pnBuildSystemPrompt = pnBuildSystemPrompt;
 
 window.pnGetPortfolioId = pnGetPortfolioId;
+window.pnSetPortfolioId = pnSetPortfolioId;
 
 window.pnGetPersonalisationContext = function() {
     return {
