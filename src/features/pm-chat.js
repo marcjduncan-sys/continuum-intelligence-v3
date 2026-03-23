@@ -733,6 +733,37 @@ function _setupListeners() {
     }
 }
 
+/**
+ * Check if a portfolio already exists in localStorage/backend
+ * and update the PM badge accordingly. Handles page refresh scenario
+ * where ci:portfolio:synced event was never fired.
+ */
+function _checkExistingPortfolio() {
+    var pid = (typeof window.pnGetPortfolioId === 'function') ? window.pnGetPortfolioId() : null;
+    if (!pid || !portfolioBadge) return;
+
+    var headers = {};
+    var apiKey = window.CI_API_KEY || '';
+    if (apiKey) headers['X-API-Key'] = apiKey;
+
+    var url = apiOrigin + '/api/portfolios/' + pid + '/state';
+    var guestId = (window.CI_AUTH && window.CI_AUTH.getGuestId) ? window.CI_AUTH.getGuestId() : null;
+    if (guestId) url += '?guest_id=' + encodeURIComponent(guestId);
+
+    fetch(url, { headers: headers })
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .then(function(data) {
+            if (data && data.holdings && data.holdings.length > 0) {
+                portfolioBadge.textContent = data.holdings.length + ' HOLDINGS';
+                portfolioBadge.classList.add('pm-badge-active');
+                console.log('[PM] Existing portfolio detected: ' + data.holdings.length + ' holdings');
+            }
+        })
+        .catch(function(err) {
+            console.log('[PM] Portfolio check skipped: ' + (err.message || err));
+        });
+}
+
 // ============================================================
 // INIT
 // ============================================================
@@ -774,6 +805,17 @@ export function initPMChat() {
             portfolioBadge.classList.add('pm-badge-active');
         }
     });
+
+    // Listen for portfolio clear
+    window.addEventListener('ci:portfolio:cleared', function() {
+        if (portfolioBadge) {
+            portfolioBadge.textContent = 'NO PORTFOLIO';
+            portfolioBadge.classList.remove('pm-badge-active');
+        }
+    });
+
+    // Check for existing portfolio on startup (handles page refresh)
+    _checkExistingPortfolio();
 
     console.log('[PM] Initialised');
 }
