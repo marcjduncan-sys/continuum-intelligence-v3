@@ -278,6 +278,9 @@ export function renderPortfolio(positions, grossExposure) {
   if (concResetEl) { concResetEl.textContent = '--'; concResetEl.className = 'portfolio-summary-value'; }
   var flagsResetEl = document.getElementById('summaryFlags');
   if (flagsResetEl) flagsResetEl.textContent = '--';
+  // Hide stale concentration detail until fresh analytics arrive
+  var concDetailEl = document.getElementById('portConcentrationDetail');
+  if (concDetailEl) concDetailEl.style.display = 'none';
   document.getElementById('summaryNet').textContent = 'A$' + formatNum(netExposure, 0);
   document.getElementById('summaryGross').textContent = 'A$' + formatNum(grossCalc, 0);
   var pnlEl = document.getElementById('summaryPnL');
@@ -611,6 +614,11 @@ export function loadPortfolio() {
 export function clearPortfolio() {
   localStorage.removeItem('continuum-portfolio');
   _pmPortfolioId = null;
+  if (typeof window.pnSetPortfolioId === 'function') {
+    window.pnSetPortfolioId('');
+  }
+  // Notify PM panel that portfolio was cleared
+  window.dispatchEvent(new CustomEvent('ci:portfolio:cleared'));
   document.getElementById('uploadZone').style.display = '';
   document.getElementById('portfolioTable').style.display = 'none';
   document.getElementById('portfolioSummary').style.display = 'none';
@@ -683,7 +691,13 @@ function _syncPortfolioToPMDatabase(positions, grossExposure) {
   // Check if personalisation wizard already created one
   var existingId = _pmPortfolioId || (typeof window.pnGetPortfolioId === 'function' ? window.pnGetPortfolioId() : null);
   var ensurePortfolio = existingId
-    ? Promise.resolve(existingId)
+    ? (function() {
+        _pmPortfolioId = existingId;
+        if (typeof window.pnSetPortfolioId === 'function') {
+          window.pnSetPortfolioId(existingId);
+        }
+        return Promise.resolve(existingId);
+      })()
     : fetch(apiBase + '/api/portfolios', {
         method: 'POST',
         headers: headers,
@@ -692,7 +706,9 @@ function _syncPortfolioToPMDatabase(positions, grossExposure) {
       .then(function(r) { return r.json(); })
       .then(function(data) {
         _pmPortfolioId = data.id;
-        // Expose for PM Chat to pick up
+        if (typeof window.pnSetPortfolioId === 'function') {
+          window.pnSetPortfolioId(_pmPortfolioId);
+        }
         window.pnGetPortfolioId = function() { return _pmPortfolioId; };
         return _pmPortfolioId;
       });
@@ -948,13 +964,13 @@ export function updateSummaryHeader(analytics) {
   var flagsEl = document.getElementById('summaryFlags');
 
   if (!analytics) {
-    if (posEl) posEl.textContent = '--';
     if (concEl) { concEl.textContent = '--'; concEl.className = 'portfolio-summary-value'; }
     if (flagsEl) flagsEl.textContent = '--';
     return;
   }
 
-  if (posEl) posEl.textContent = String(analytics.position_count || 0);
+  // Position count is set by renderPortfolio() from frontend data (all uploaded rows).
+  // Backend position_count may differ (excludes unpriced holdings). Frontend count is kept.
 
   if (concEl) {
     var score = analytics.concentration_score != null ? Math.round(analytics.concentration_score) : null;

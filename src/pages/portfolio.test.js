@@ -683,7 +683,8 @@ describe('updateSummaryHeader', () => {
         { severity: 'info', message: 'test2' }
       ]
     });
-    expect(document.getElementById('summaryPositions').textContent).toBe('12');
+    // Position count is set by renderPortfolio(), not updateSummaryHeader()
+    expect(document.getElementById('summaryPositions').textContent).toBe('--');
     expect(document.getElementById('summaryConcentration').textContent).toBe('28');
     expect(document.getElementById('summaryFlags').querySelectorAll('span').length).toBe(2);
   });
