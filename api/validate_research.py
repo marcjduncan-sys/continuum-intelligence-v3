@@ -190,9 +190,9 @@ def fix(data: dict) -> dict:
                 vs["scoreColor"] = "var(--text-muted)"
 
     # --- 5: indexReturn == 0 → default 6.5 ---
-    ta = data.get("technicalAnalysis", {})
-    rp = ta.get("relativePerformance", {})
-    vs_index = rp.get("vsIndex", {})
+    ta = data.get("technicalAnalysis") or {}
+    rp = ta.get("relativePerformance") or {}
+    vs_index = rp.get("vsIndex") or {}
     if vs_index.get("indexReturn", 0) == 0:
         vs_index["indexReturn"] = 6.5
 
@@ -216,7 +216,7 @@ def fix(data: dict) -> dict:
             data["heroCompanyDescription"] = truncated
 
     # --- 10: Missing confidenceClass on coverage rows ---
-    gaps = data.get("gaps", {})
+    gaps = data.get("gaps") or {}
     for row in gaps.get("coverageRows", []):
         if not row.get("confidenceClass"):
             confidence = row.get("confidence", "").lower()
@@ -228,7 +228,7 @@ def fix(data: dict) -> dict:
                 row["confidenceClass"] = "td-amber"
 
     # --- 11: Fix footer counts from actual data ---
-    footer = data.get("footer", {})
+    footer = data.get("footer") or {}
     hyp_count = len(hypotheses)
     if hyp_count > 0:
         # Check if initiated (scores are not "?")
@@ -288,8 +288,8 @@ def validate(data: dict) -> list[str]:
         return errors
 
     # --- Rule 1: position_in_range.current_price ---
-    hero = data.get("hero", {})
-    pir = hero.get("position_in_range", {})
+    hero = data.get("hero") or {}
+    pir = hero.get("position_in_range") or {}
     cp = pir.get("current_price")
     if cp is None or not isinstance(cp, (int, float)) or cp <= 0:
         errors.append(
@@ -322,8 +322,8 @@ def validate(data: dict) -> list[str]:
             )
 
     # --- Rule 5: verdict.scores length ---
-    verdict = data.get("verdict", {})
-    scores = verdict.get("scores", [])
+    verdict = data.get("verdict") or {}
+    scores = verdict.get("scores") or []
     if len(scores) != 4:
         errors.append(f"Rule 5: verdict.scores must have exactly 4 items, got {len(scores)}")
 
@@ -350,8 +350,8 @@ def validate(data: dict) -> list[str]:
         errors.append(f"Rule 7: verdict scores sum to {total}, expected 90-110")
 
     # --- Rule 8: identity.rows >= 5 ---
-    identity = data.get("identity", {})
-    rows = identity.get("rows", [])
+    identity = data.get("identity") or {}
+    rows = identity.get("rows") or []
     if len(rows) < 5:
         errors.append(f"Rule 8: identity.rows has {len(rows)} rows, need >= 5")
 
@@ -366,9 +366,9 @@ def validate(data: dict) -> list[str]:
         errors.append(f"Rule 10: featuredMetrics has {len(featured)} items, need >= 3")
 
     # --- Rule 11: indexReturn != 0 ---
-    ta = data.get("technicalAnalysis", {})
-    rp = ta.get("relativePerformance", {})
-    vs_index = rp.get("vsIndex", {})
+    ta = data.get("technicalAnalysis") or {}
+    rp = ta.get("relativePerformance") or {}
+    vs_index = rp.get("vsIndex") or {}
     if vs_index.get("indexReturn", 0) == 0:
         errors.append("Rule 11: technicalAnalysis indexReturn is 0 (use ~6.5 default)")
 
@@ -382,8 +382,8 @@ def validate(data: dict) -> list[str]:
             )
 
     # --- Rule 13: 10 coverageRows with non-empty confidenceClass ---
-    gaps = data.get("gaps", {})
-    coverage = gaps.get("coverageRows", [])
+    gaps = data.get("gaps") or {}
+    coverage = gaps.get("coverageRows") or []
     if len(coverage) != 10:
         errors.append(f"Rule 13: gaps.coverageRows has {len(coverage)} rows, need 10")
     for i, cr in enumerate(coverage):
@@ -391,8 +391,8 @@ def validate(data: dict) -> list[str]:
             errors.append(f"Rule 13: coverageRows[{i}] missing confidenceClass")
 
     # --- Rule 14: 10 evidence cards with finding > 50 chars ---
-    evidence = data.get("evidence", {})
-    cards = evidence.get("cards", [])
+    evidence = data.get("evidence") or {}
+    cards = evidence.get("cards") or []
     if len(cards) != 10:
         errors.append(f"Rule 14: evidence.cards has {len(cards)}, need 10")
     for i, card in enumerate(cards):

@@ -868,11 +868,52 @@ async def _call_llm(system_prompt: str, user_content: str, max_tokens: int = 819
 
 
 def _extract_json(text: str) -> dict:
-    """Extract JSON from LLM response, handling markdown code fences."""
+    """Extract JSON from LLM response, handling markdown code fences and trailing prose."""
     # Strip markdown code fences
     cleaned = re.sub(r"^```(?:json)?\s*\n?", "", text.strip())
     cleaned = re.sub(r"\n?```\s*$", "", cleaned)
-    return json.loads(cleaned)
+
+    # Fast path: clean JSON
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        pass
+
+    # Fallback 1: find the outermost { ... } block (handles trailing prose)
+    first_brace = cleaned.find("{")
+    if first_brace != -1:
+        depth = 0
+        in_string = False
+        escape_next = False
+        last_brace = -1
+        for i in range(first_brace, len(cleaned)):
+            c = cleaned[i]
+            if escape_next:
+                escape_next = False
+                continue
+            if c == "\\":
+                escape_next = True
+                continue
+            if c == '"':
+                in_string = not in_string
+                continue
+            if in_string:
+                continue
+            if c == "{":
+                depth += 1
+            elif c == "}":
+                depth -= 1
+                if depth == 0:
+                    last_brace = i
+                    break
+        if last_brace != -1:
+            try:
+                return json.loads(cleaned[first_brace:last_brace + 1])
+            except json.JSONDecodeError:
+                pass
+
+    # Nothing worked
+    raise json.JSONDecodeError("Could not extract valid JSON from LLM response", cleaned[:200], 0)
 
 
 # ---------------------------------------------------------------------------
@@ -966,11 +1007,17 @@ async def run_price_driver_analysis(
     try:
         final_result = _extract_json(synthesis_raw)
     except json.JSONDecodeError:
-        logger.error("[%s] Synthesis pass returned invalid JSON", ticker)
-        final_result = {
-            "error": "synthesis_failed",
-            "report": {"executive_summary": "Analysis could not be completed due to a synthesis error.", "full_note": "", "title": ""},
-        }
+        logger.warning("[%s] Synthesis pass returned invalid JSON, retrying once", ticker)
+        await asyncio.sleep(2)
+        try:
+            synthesis_raw = await _call_llm(_SYNTHESIS_SYSTEM_PROMPT, synthesis_input, max_tokens=8192)
+            final_result = _extract_json(synthesis_raw)
+        except (json.JSONDecodeError, Exception) as retry_err:
+            logger.error("[%s] Synthesis retry also failed: %s", ticker, retry_err)
+            final_result = {
+                "error": "synthesis_failed",
+                "report": {"executive_summary": "Analysis could not be completed due to a synthesis error.", "full_note": "", "title": ""},
+            }
 
     # Inject programmatic returns -- overrides LLM estimates
     if "computed_returns" in gathered:

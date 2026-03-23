@@ -42,7 +42,7 @@ export function compute(ticker) {
   var currency = stock.currency || 'A$';
 
   // 52-week high/low from priceHistory
-  var history = stock.priceHistory || [];
+  var history = Array.isArray(stock.priceHistory) ? stock.priceHistory : [];
   var h252 = history.slice(-252);
   var high52 = h252.length > 0 ? Math.max.apply(null, h252) : null;
   var low52  = h252.length > 0 ? Math.min.apply(null, h252) : null;
