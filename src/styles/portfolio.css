@@ -639,7 +639,85 @@
     padding: var(--space-sm) 0;
 }
 
+/* ============================================================
+   MANDATE COMPLIANCE
+   ============================================================ */
+
+.port-mandate-section {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+}
+
+.port-mandate-header { margin-bottom: var(--space-lg); }
+
+.port-mandate-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.port-mandate-subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.port-mandate-clear {
+    font-size: 0.85rem;
+    color: var(--signal-green);
+    font-weight: 600;
+    padding: var(--space-sm) 0;
+}
+
+.port-mandate-flag {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.port-mandate-flag:last-child { border-bottom: none; }
+
+.port-mandate-flag-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-family: var(--font-data);
+    font-size: 0.55rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.port-mandate-flag-breach .port-mandate-flag-icon {
+    background: var(--signal-red);
+    color: var(--bg-body);
+}
+
+.port-mandate-flag-warn .port-mandate-flag-icon {
+    background: var(--signal-amber, #f59e0b);
+    color: var(--bg-body);
+}
+
+.port-mandate-flag-msg {
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
 /* Light Theme Overrides */
+[data-theme="light"] .port-mandate-section {
+    background: #FFFFFF;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
 [data-theme="light"] .port-dna-card,
 [data-theme="light"] .port-insight-card {
     background: #FFFFFF;

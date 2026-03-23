@@ -298,7 +298,7 @@ export function renderPortfolio(positions, grossExposure) {
   /* Render diagnostics, reweighting, and alerts */
   renderPortfolioDiagnostics(positions, grossExposure);
   renderReweighting(positions, grossExposure);
-  /* Change Detection Alerts removed -- was hardcoded demo data */
+  renderMandateBreaches(positions, grossExposure);
 }
 
 export function renderPortfolioFromSaved(positions) {
@@ -403,6 +403,113 @@ export function renderPortfolioDiagnostics(positions, grossExposure) {
   } else {
     alignmentEl.innerHTML = '<span class="alert-highlight">' + formatNum(alignedWeight, 0) + '% aligned</span> with Continuum. Significant divergence. You may see value we do not (or vice versa).';
   }
+}
+
+/**
+ * Render mandate compliance flags using the user's personalisation settings.
+ * Falls back to house defaults if no personalisation is configured.
+ */
+export function renderMandateBreaches(positions, grossExposure) {
+  var container = document.getElementById('portfolioMandateBreaches');
+  if (!container) return;
+  if (grossExposure <= 0) { container.style.display = 'none'; return; }
+
+  var ctx = (typeof window.pnGetPersonalisationContext === 'function')
+    ? window.pnGetPersonalisationContext() : null;
+  var mandate = (ctx && ctx.mandate) ? ctx.mandate : {};
+
+  // Mandate values are stored as whole percentages (15 = 15%); convert to decimals
+  var maxSingle = (mandate.maxPositionSize || 15) / 100;
+  var maxTop5 = 0.50; // not yet in mandate; house default
+  var maxSector = (mandate.sectorCap || 35) / 100;
+  var cashMin = (mandate.cashRangeMin || 3) / 100;
+  var cashMax = (mandate.cashRangeMax || 25) / 100;
+
+  var isCustom = mandate.maxPositionSize || mandate.sectorCap ||
+    mandate.cashRangeMin || mandate.cashRangeMax;
+
+  // Sort positions by absolute exposure descending
+  var sorted = positions.slice().sort(function(a, b) {
+    return Math.abs(b.exposureDollar || 0) - Math.abs(a.exposureDollar || 0);
+  });
+
+  var coverageData = getCoverageData();
+  var flags = [];
+
+  // Single-name check
+  sorted.forEach(function(p) {
+    var wt = Math.abs(p.exposureDollar || 0) / grossExposure;
+    if (wt > maxSingle) {
+      flags.push({
+        severity: 'breach',
+        text: p.ticker + ' at ' + (wt * 100).toFixed(1) + '% exceeds ' + (maxSingle * 100).toFixed(0) + '% single-name limit'
+      });
+    }
+  });
+
+  // Top 5 check
+  var top5Weight = 0;
+  for (var i = 0; i < Math.min(5, sorted.length); i++) {
+    top5Weight += Math.abs(sorted[i].exposureDollar || 0) / grossExposure;
+  }
+  if (top5Weight > maxTop5) {
+    flags.push({
+      severity: 'breach',
+      text: 'Top 5 concentration: ' + (top5Weight * 100).toFixed(1) + '% exceeds ' + (maxTop5 * 100).toFixed(0) + '% limit'
+    });
+  }
+
+  // Sector check
+  var sectorWeights = {};
+  positions.forEach(function(p) {
+    var sector = (coverageData[p.ticker] && coverageData[p.ticker].sector) || 'Unclassified';
+    if (!sectorWeights[sector]) sectorWeights[sector] = 0;
+    sectorWeights[sector] += Math.abs(p.exposureDollar || 0) / grossExposure;
+  });
+  Object.keys(sectorWeights).forEach(function(s) {
+    if (s !== 'Unclassified' && sectorWeights[s] > maxSector) {
+      flags.push({
+        severity: 'breach',
+        text: s + ' sector at ' + (sectorWeights[s] * 100).toFixed(1) + '% exceeds ' + (maxSector * 100).toFixed(0) + '% sector limit'
+      });
+    }
+  });
+
+  // Cash check (portfolio page uses 5% notional cash buffer in sync)
+  var cashEst = 0.05;
+  if (cashEst < cashMin) {
+    flags.push({
+      severity: 'warning',
+      text: 'Estimated cash at ' + (cashEst * 100).toFixed(0) + '% is below ' + (cashMin * 100).toFixed(0) + '% minimum'
+    });
+  }
+
+  // Build HTML
+  var html = '<div class="port-mandate-header">' +
+    '<div class="port-mandate-title">Mandate Compliance</div>' +
+    '<div class="port-mandate-subtitle">' +
+      (isCustom ? 'Checked against your personalised mandate'
+                : 'Using house defaults. Set your mandate in Personalisation to customise.') +
+    '</div>' +
+  '</div>';
+
+  if (flags.length === 0) {
+    html += '<div class="port-mandate-clear">All position limits within mandate</div>';
+  } else {
+    html += '<div class="port-mandate-flags">';
+    flags.forEach(function(f) {
+      var cls = f.severity === 'breach' ? 'port-mandate-flag-breach' : 'port-mandate-flag-warn';
+      var icon = f.severity === 'breach' ? '!' : 'i';
+      html += '<div class="port-mandate-flag ' + cls + '">' +
+        '<span class="port-mandate-flag-icon">' + icon + '</span>' +
+        '<span class="port-mandate-flag-msg">' + _escText(f.text) + '</span>' +
+      '</div>';
+    });
+    html += '</div>';
+  }
+
+  container.innerHTML = html;
+  container.style.display = '';
 }
 
 /**
@@ -628,11 +735,13 @@ export function clearPortfolio() {
   document.getElementById('portfolioActions').style.display = 'none';
   document.getElementById('portfolioBody').innerHTML = '';
 
-  /* Hide diagnostics, reweighting, and alerts */
+  /* Hide diagnostics, reweighting, mandate, and alerts */
   var diag = document.getElementById('portfolioDiagnostics');
   var reweight = document.getElementById('portfolioReweighting');
+  var mandateEl = document.getElementById('portfolioMandateBreaches');
   if (diag) diag.style.display = 'none';
   if (reweight) reweight.style.display = 'none';
+  if (mandateEl) mandateEl.style.display = 'none';
 }
 
 /* ------------------------------------------------------------------ */
