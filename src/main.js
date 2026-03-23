@@ -300,11 +300,11 @@ async function boot() {
 
   // Initialize pages (each wrapped so one failure does not block the rest)
   var _inits = [
+    ['Auth', initAuth],
     ['Home', initHomePage],
     ['BatchRefresh', initBatchRefresh],
     ['Portfolio', initPortfolioPage],
     ['Thesis', initThesisPage],
-    ['Auth', initAuth],
     ['Notifications', initNotifications],
     ['Chat', initChat],
     ['PMChat', initPMChat],

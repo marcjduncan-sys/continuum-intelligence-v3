@@ -115,6 +115,13 @@ async def create_portfolio(
     user_id = getattr(request.state, "user_id", None)
     guest_id = body.guest_id
 
+    if not user_id and not guest_id:
+        raise api_error(
+            422,
+            ErrorCode.AUTH_ERROR,
+            "Portfolio requires an owner: provide guest_id or authenticate first",
+        )
+
     portfolio_id = await portfolio_db.create_portfolio(
         pool,
         name=body.name,
