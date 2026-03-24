@@ -12,8 +12,8 @@ You are a senior engineer maintaining a production equity research platform used
 npm run dev          # Dev server on port 5000, proxies /api → localhost:8000
 npm run build        # Vite build → dist/; copies data/ → dist/data/
 npm run test         # Jest suite (tests/, src/**/*.test.js) — 61 tests
-npm run test:unit    # Vitest suite — what CI runs; must pass before pushing — 206 tests
-# Python tests: 394 (run via pytest from api/ directory)
+npm run test:unit    # Vitest suite — what CI runs; must pass before pushing — 234 tests
+# Python tests: 427 sync passing + 28 async (require pytest-asyncio, not installed locally)
 npm run test:all     # Jest + Vitest combined — 263 tests total
 npm run lint         # ESLint over scripts/, src/, and public/js/
 npm run validate     # lint + test:all — run before any push
@@ -42,7 +42,7 @@ npm run validate     # lint + test:all — run before any push
 
 ---
 
-## Current State — 2026-03-20
+## Current State — 2026-03-24
 
 **Phase 0 COMPLETE (2026-03-07).** The extraction of logic from `index.html` into `src/` modules is complete. `computeSkewScore` canonicalised to zero-contribution convention (commit `4493e8c`; see `docs/decisions/003-computeskewscore-neutral-convention.md`). `VALID_STATIC_PAGES` confirmed correct: `home`, `deep-research`, `portfolio`, `comparator`, `personalisation`, `about`.
 
@@ -196,13 +196,17 @@ npm run validate     # lint + test:all — run before any push
 - [x] **Sector ETF tickers fixed**: All 14 entries in `SECTOR_ETF_MAP` (`api/price_drivers.py`) changed from `.AX` ETF format to `^AX` index format. Yahoo Finance returns 404 for all `.AX` sector ETF symbols; `^AX` equivalents all return 200.
 - [x] 202/202 Vitest passing. Build succeeds. Fly.io healthy.
 
-**Recent commits (last six):**
-- `fcd77b5` fix: remove static file serving + fix sector ETF Yahoo tickers
-- `b954bff` chore: Vercel config (since removed; migrated to Cloudflare Pages)
-- `4b991ff` fix: install pg 17 client on ubuntu-22.04 for db-backup
-- `71ce5ea` fix: repair three failing GitHub Actions workflows
-- `037c3a6` fix: widen analyst panel from 380px to 480px
-- `db3b031` feat: wire custom domain api.continuumintelligence.ai (Phase 4)
+**Recent commits (last ten):**
+- `b7748ac` fix: handoff verdict.get('verdict') to verdict.get('text') + strip HTML -- all 38 tickers returning conviction:none
+- `569cabd` fix: pm_context._build_analyst_context_from_payload() missing return -- injecting None into PM context
+- `b612e78` PM Chat: change blocking protocol to advisory -- flags noted then question answered
+- `4de10dd` fix: strip .AX suffix in load_research() so FPH.AX resolves to FPH.json
+- `cfe9718` fix: audit defects D1/D6/D8 and remove dead fetchDiagnosticsAsync
+- `2cb57ea` fix: compute skew from hypothesis scores, not stale narrative field
+- `4f38606` fix: PM handoff falls back to research JSON when no conversation memories exist
+- `798c7f1` fix: derive position direction from quantity sign for alignment classification
+- `605606b` feat: Phase G BEAD-001 through BEAD-009 -- portfolio diagnostics endpoint and PM dashboard
+- `e0e5313` Portfolio dashboard: diagnostics endpoint + 8 PM sections (beads 001-009)
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on the first Fly.io refresh after a fresh deploy. This is expected; momentum arrows are suppressed when empty.
@@ -823,6 +827,58 @@ All functions are no-op safe (return None/[] if pool is None or identity is miss
 - Pytest Phase E (PM memory): 34/34 new passing
 - Pytest total: 217/217 passing
 - Build: succeeds
+
+---
+
+## Session Log: 24 Mar 2026 -- PM Chat Bug Sweep (8 fixes across alignment, handoff, context, and protocol)
+
+Eight bugs fixed in the PM Chat pipeline. All were latent since Phase D/F; the FPH.AX test case exposed the chain.
+
+### Bugs fixed
+
+**1. Short position direction hardcoded to "long"** (`798c7f1`)
+`api/portfolio_alignment.py` -- alignment classification hardcoded `position_direction = "long"` for all holdings. Fix: derive direction from `notes` field (`direction:short`) or negative quantity/market_value.
+
+**2. PM handoff "not covered" false negative** (`4f38606`)
+`api/handoff.py` -- `build_analyst_summary()` only queried the memories DB table. When no conversation memories existed, it returned "not_covered" even for tickers with full research JSON. Fix: added research JSON fallback path via `load_research()`.
+
+**3. Skew computation from stale narrative field** (`2cb57ea`)
+`api/portfolio_alignment.py` -- `resolve_skew()` consulted the stale `_skew`/`skew` narrative field instead of computing from hypothesis scores. 19/38 tickers had wrong skew direction. Fix: rewrote to compute bull/bear from hypothesis scores using exact frontend `normaliseScores()` algorithm. Extracted `_normalise_scores()` standalone function.
+
+**4. Audit defects D1/D6/D8** (`cfe9718`)
+- D1 (CRITICAL): `_normalise_scores()` algorithm mismatch with frontend -- extracted as standalone function replicating all 4 steps (clamp, scale, iterative post-normalisation, rounding residual fixup).
+- D6 (IMPORTANT): Conviction extraction in `handoff.py` -- contradictory evidence (both sides >= 60%) now returns "medium" not "high".
+- D8 (IMPORTANT): Not-covered tickers now listed by name and weight in PM prompt (`pm_prompt_builder.py`).
+- Dead code: removed unused `fetchDiagnosticsAsync()` from `src/pages/pm.js`.
+
+**5. FPH.AX exchange suffix breaks coverage lookup** (`4de10dd`)
+`api/portfolio_alignment.py` -- `load_research("FPH.AX")` looked for `FPH.AX.json` which does not exist. Fix: added `_normalise_ticker()` to strip `.AX` suffix. Added `get_covered_tickers()` for dynamic filesystem-based coverage via glob (replaces any hardcoded ticker lists).
+
+**6. PM blocking protocol** (`b612e78`)
+`api/pm_constitution.py` and `api/pm_prompt_builder.py` -- PM refused to answer questions when mandate breaches existed ("I cannot ignore CSL"). Fix: changed Risk Flag Response Protocol from blocking to advisory. Flags noted at top in 2-3 lines, then question answered in full. "ACTIVE MANDATE BREACHES" renamed to "ACTIVE MANDATE FLAGS". Constitution framing changed from "cannot override" to "inform, not gate".
+
+**7. Missing return in analyst context builder** (`569cabd`)
+`api/pm_context.py` -- `_build_analyst_context_from_payload()` built a `lines` list but never returned it. Python returned `None`, which either crashed `"\n\n".join(sections)` with `TypeError` or injected "None" into the PM system prompt. Fix: added `return "\n".join(lines)`.
+
+**8. Handoff verdict key mismatch -- all 38 tickers hollow** (`b7748ac`)
+`api/handoff.py` -- `_build_summary_from_research()` read `verdict.get("verdict")` but all 38 research JSON files use `verdict.text`. Every ticker's handoff payload returned `conviction: "none"`, `valuation: "unknown"`, `summary_text: "Research data available for {ticker}."`. Fix: changed to `verdict.get("text")` and added `_strip_html()` to remove HTML tags and decode entities from verdict text.
+
+### Files modified
+- `api/portfolio_alignment.py` -- short position direction, skew computation, .AX suffix, normalise_scores, get_covered_tickers
+- `api/handoff.py` -- research JSON fallback, conviction edge case, verdict key fix, HTML stripping
+- `api/pm_constitution.py` -- advisory protocol (blocking to flags)
+- `api/pm_prompt_builder.py` -- advisory protocol, not-covered ticker listing, mandate flags rename
+- `api/pm_context.py` -- missing return statement
+- `api/tests/test_portfolio_alignment.py` -- updated assertions for new behaviour
+- `api/tests/test_handoff.py` -- updated test fixtures for verdict.text key
+- `api/tests/test_golden_portfolios.py` -- corrected expected values for skew recomputation
+- `src/pages/pm.js` -- dead code removal (fetchDiagnosticsAsync)
+
+### Test results
+- Vitest: 234/234 passing
+- Pytest (sync): 427/427 passing
+- Pytest (async, pre-existing): 28 failing (pytest-asyncio not installed locally; pass in CI)
+- Vite build: clean
 
 ---
 
