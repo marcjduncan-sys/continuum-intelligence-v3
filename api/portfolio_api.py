@@ -16,6 +16,7 @@ import db
 import portfolio_db
 import portfolio_validation
 import portfolio_analytics
+import portfolio_alignment
 from errors import api_error, ErrorCode
 
 logger = logging.getLogger(__name__)
@@ -313,3 +314,89 @@ async def get_portfolio_analytics(
         logger.warning("Failed to persist on-the-fly analytics: %s", exc)
 
     return analytics
+
+
+@router.get("/{portfolio_id}/diagnostics")
+async def get_portfolio_diagnostics(
+    portfolio_id: str,
+    mandate_max_position: float = 0.15,
+    mandate_sector_cap: float = 0.35,
+    mandate_cash_min: float = 0.03,
+    mandate_cash_max: float = 0.25,
+    mandate_risk_appetite: str = "moderate",
+    mandate_turnover_tolerance: str = "moderate",
+    restricted_names: str | None = None,
+    _=Depends(_verify_api_key),
+):
+    """Get full diagnostics: analytics + alignment for the latest snapshot.
+
+    Bundles compute_analytics() and compute_alignment() into one call.
+    Accepts mandate query params so the frontend can pass user settings.
+    Fetches previous snapshot for change detection.
+    """
+    pool = await db.get_pool()
+    if pool is None:
+        raise api_error(503, ErrorCode.LLM_ERROR, "Database unavailable")
+
+    # Get latest snapshot
+    snapshot = await portfolio_db.get_latest_snapshot(pool, portfolio_id)
+    if not snapshot:
+        raise api_error(404, ErrorCode.AUTH_ERROR, "No snapshots found for portfolio")
+
+    snapshot_id = str(snapshot["id"])
+
+    # Get holdings
+    holdings_raw = await portfolio_db.get_holdings(pool, snapshot_id)
+    holdings = [dict(h) for h in holdings_raw]
+
+    # Compute analytics
+    analytics = portfolio_analytics.compute_analytics(
+        holdings=holdings,
+        total_value=float(snapshot["total_value"]),
+        cash_value=float(snapshot["cash_value"]),
+    )
+
+    # Derive weights for alignment engine (analytics has holdings_with_weights)
+    holdings_with_weights = analytics.get("holdings_with_weights", [])
+
+    # Fetch previous snapshot for change detection
+    previous_holdings = None
+    snapshots = await portfolio_db.get_snapshots(pool, portfolio_id, limit=2)
+    if len(snapshots) >= 2:
+        prev_snapshot_id = str(snapshots[1]["id"])
+        prev_holdings_raw = await portfolio_db.get_holdings(pool, prev_snapshot_id)
+        if prev_holdings_raw:
+            prev_total = float(snapshots[1]["total_value"])
+            if prev_total > 0:
+                previous_holdings = []
+                for ph in prev_holdings_raw:
+                    phd = dict(ph)
+                    phd["weight"] = float(phd.get("market_value", 0)) / prev_total
+                    previous_holdings.append(phd)
+
+    # Parse restricted names from comma-separated string
+    restricted_list = None
+    if restricted_names:
+        restricted_list = [n.strip() for n in restricted_names.split(",") if n.strip()]
+
+    # Compute alignment diagnostics
+    alignment = portfolio_alignment.compute_alignment(
+        holdings=holdings_with_weights,
+        mandate_max_position=mandate_max_position,
+        mandate_sector_cap=mandate_sector_cap,
+        mandate_cash_min=mandate_cash_min,
+        mandate_cash_max=mandate_cash_max,
+        mandate_risk_appetite=mandate_risk_appetite,
+        mandate_turnover_tolerance=mandate_turnover_tolerance,
+        restricted_names=restricted_list,
+        previous_holdings=previous_holdings,
+        analytics=analytics,
+    )
+
+    return {
+        "portfolio_id": portfolio_id,
+        "snapshot_id": snapshot_id,
+        "as_of_date": snapshot["as_of_date"].isoformat() if hasattr(snapshot["as_of_date"], "isoformat") else str(snapshot["as_of_date"]),
+        "analytics": analytics,
+        "alignment": alignment,
+    }

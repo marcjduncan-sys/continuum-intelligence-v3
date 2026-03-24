@@ -24,7 +24,7 @@ import { initPortfolioPage, clearPortfolio, populateSidebar } from './pages/port
 import { initThesisPage, tcAnalyze } from './pages/thesis.js';
 import { initAboutPage } from './pages/about.js';
 import { renderMemoryPage } from './pages/memory.js';
-import { renderPMPage } from './pages/pm.js';
+import { renderPMPage, fetchDiagnostics } from './pages/pm.js';
 import { renderOpsPage } from './pages/ops.js';
 
 // Report sections (needed for router callbacks)
@@ -62,6 +62,8 @@ window.openAddStockModal = openAddStockModal;
 window.closeAddStockModal = closeAddStockModal;
 window.submitAddStock = submitAddStock;
 window.ThesisCapture = { saveThesis: saveThesis, getThesis: getThesis, inferBiasFromQuestion: inferBiasFromQuestion };
+window.CI = window.CI || {};
+window.CI.fetchDiagnostics = fetchDiagnostics;
 
 // Expose state and utility globals needed by classic (non-module) scripts
 // (snapshot-generator.js, personalisation.js, DNE engines)

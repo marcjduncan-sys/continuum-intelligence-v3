@@ -817,6 +817,16 @@ export function initPMChat() {
     // Check for existing portfolio on startup (handles page refresh)
     _checkExistingPortfolio();
 
+    // Listen for "Send to PM" events from the PM dashboard (BEAD-008)
+    document.addEventListener('ci:pm:ask', function(e) {
+        var question = e.detail && e.detail.question;
+        if (!question || !inputEl) return;
+        switchRailMode('pm');
+        inputEl.value = question;
+        updateSendButton();
+        sendMessage();
+    });
+
     console.log('[PM] Initialised');
 }
 
