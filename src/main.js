@@ -290,6 +290,7 @@ async function boot() {
     renderPersonalisationPage: window.renderPersonalisationPage,
     renderMemoryPage: renderMemoryPage,
     renderPMPage: renderPMPage,
+    fetchDiagnostics: fetchDiagnostics,
     renderOpsPage: renderOpsPage,
     loadFullResearchData: loadFullResearchData,
     buildSnapshotFromStock: buildSnapshotFromStock,

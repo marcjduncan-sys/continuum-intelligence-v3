@@ -918,3 +918,28 @@ function _esc(str) {
     d.textContent = str != null ? String(str) : '';
     return d.innerHTML;
 }
+
+async function fetchDiagnosticsAsync(portfolioId) {
+    const raw = localStorage.getItem('continuum_personalisation_profile');
+    let mandate = {};
+    if (raw) {
+        try {
+            const parsed = JSON.parse(raw);
+            mandate = parsed.state?.mandate || {};
+        } catch(e) {}
+    }
+    const params = new URLSearchParams({
+        max_position: mandate.maxPosition ?? 0.10,
+        sector_cap: mandate.sectorCap ?? 0.35,
+        cash_min: mandate.cashRangeMin != null ? mandate.cashRangeMin : 0.0,
+        cash_max: mandate.cashRangeMax ?? 1.0,
+        risk_appetite: mandate.riskAppetite ?? 'moderate',
+        turnover_tolerance: mandate.turnoverTolerance ?? 'medium',
+        restricted: (mandate.restrictedNames || []).join(',')
+    });
+    const res = await fetch(`/api/portfolios/${portfolioId}/diagnostics?${params}`);
+    if (!res.ok) return null;
+    return res.json();
+}
+
+export { fetchDiagnosticsAsync };
