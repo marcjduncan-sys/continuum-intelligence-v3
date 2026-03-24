@@ -216,6 +216,8 @@ def _build_analyst_context_from_payload(ticker: str, payload: dict) -> str:
     if version or ts:
         lines.append(f"\n(Summary version: {version}, assembled: {ts})")
 
+    return "\n".join(lines)
+
     return "\n".join(lines) + "\n"
 
 
