@@ -71,36 +71,31 @@ def parse_hypotheses(research: dict) -> list[dict]:
     return result
 
 
-def _compute_skew_from_hypotheses(hypotheses: list[dict]) -> dict:
-    """Compute skew from hypothesis scores using the same algorithm as the frontend's
-    computeSkewScore(): clamp each score to [5, 80], normalise proportionally to 100,
-    sum upside vs downside, derive direction from score difference (threshold +/- 5).
-    Neutral hypotheses contribute zero directional weight."""
+def _normalise_scores(raw_scores: list[int]) -> list[int]:
+    """Normalise hypothesis scores to sum to 100, matching the frontend normaliseScores().
+
+    Four steps:
+    1. Clamp each score to [FLOOR, CEILING]
+    2. Scale proportionally to sum to 100
+    3. Iterative post-normalisation clamp (up to 20 iterations)
+    4. Rounding residual fixup on the largest eligible value
+    """
     FLOOR, CEILING = 5, 80
 
-    if not hypotheses:
-        return {"direction": "balanced", "score": 0, "rationale": "", "source": "computed"}
+    if not raw_scores:
+        return []
 
-    # Parse raw scores
-    raw = []
-    for h in hypotheses:
-        s = h.get("score", 0)
-        if isinstance(s, str):
-            try:
-                s = int(s.replace("%", "").strip())
-            except (ValueError, TypeError):
-                s = 0
-        raw.append(int(s) if isinstance(s, (int, float)) else 0)
+    # Step 1: Clamp
+    clamped = [max(FLOOR, min(CEILING, v)) for v in raw_scores]
 
-    # Clamp
-    clamped = [max(FLOOR, min(CEILING, v)) for v in raw]
+    # Step 2: Scale to 100
     total = sum(clamped)
     if total == 0:
         norm = [round(100 / len(clamped))] * len(clamped)
     else:
         norm = [round((c / total) * 100) for c in clamped]
 
-    # Iterative post-normalisation clamp (matches frontend Step 3)
+    # Step 3: Iterative post-normalisation clamp
     for _ in range(20):
         overflow = 0
         underflow = 0
@@ -140,7 +135,7 @@ def _compute_skew_from_hypotheses(hypotheses: list[dict]) -> dict:
                 norm[fi] -= take
                 remaining -= take
 
-    # Fix rounding residual (matches frontend Step 4)
+    # Step 4: Fix rounding residual
     rounded_sum = sum(norm)
     if rounded_sum != 100:
         diff = 100 - rounded_sum
@@ -153,6 +148,30 @@ def _compute_skew_from_hypotheses(hypotheses: list[dict]) -> dict:
         if best_idx == -1:
             best_idx = max(range(len(norm)), key=lambda i: norm[i])
         norm[best_idx] += diff
+
+    return norm
+
+
+def _compute_skew_from_hypotheses(hypotheses: list[dict]) -> dict:
+    """Compute skew from hypothesis scores using the same algorithm as the frontend's
+    computeSkewScore(): normalise scores, sum upside vs downside, derive direction
+    from score difference (threshold +/- 5).
+    Neutral hypotheses contribute zero directional weight."""
+    if not hypotheses:
+        return {"direction": "balanced", "score": 0, "rationale": "", "source": "computed"}
+
+    # Parse raw scores
+    raw = []
+    for h in hypotheses:
+        s = h.get("score", 0)
+        if isinstance(s, str):
+            try:
+                s = int(s.replace("%", "").strip())
+            except (ValueError, TypeError):
+                s = 0
+        raw.append(int(s) if isinstance(s, (int, float)) else 0)
+
+    norm = _normalise_scores(raw)
 
     # Sum upside vs downside
     bull = 0

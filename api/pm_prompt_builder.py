@@ -372,6 +372,18 @@ def _build_alignment_section(diagnostics: dict) -> str | None:
             f"Research coverage: {summary.get('covered_count', 0)}/{summary.get('total_count', 0)} positions"
         )
 
+    # List not-covered holdings by name so PM can reference them specifically
+    holdings_list = diagnostics.get("holdings") or []
+    not_covered = [
+        h for h in holdings_list
+        if (h.get("alignment") or {}).get("cls") == "not-covered"
+    ]
+    if not_covered:
+        names = ", ".join(
+            f"{h['ticker']} ({h.get('weight', 0)*100:.1f}%)" for h in not_covered
+        )
+        lines.append(f"Not-covered holdings: {names}")
+
     # Hypothesis DNA
     dna = diagnostics.get("hypothesis_dna") or {}
     if dna:

@@ -131,10 +131,28 @@ def _build_summary_from_research(research: dict, ticker: str) -> dict:
     hypotheses = research.get("hypotheses", [])
     verdict = research.get("verdict", {})
 
-    # Conviction from verdict
+    # Conviction: check for contradictory evidence first (both sides >= 60%)
+    # then fall back to verdict text
     conviction = "none"
+    upside_total = 0
+    downside_total = 0
+    for h in hypotheses:
+        score = h.get("score", "50%")
+        try:
+            score_val = int(str(score).replace("%", ""))
+        except (ValueError, TypeError):
+            score_val = 50
+        direction = str(h.get("direction", "")).lower()
+        if direction == "upside":
+            upside_total += score_val
+        elif direction == "downside":
+            downside_total += score_val
+
     verdict_text = (verdict.get("verdict") or "").lower()
-    if "high" in verdict_text:
+    if upside_total >= 60 and downside_total >= 60:
+        # Contradictory evidence: both sides have strong support -> uncertain, not high
+        conviction = "medium"
+    elif "high" in verdict_text:
         conviction = "high"
     elif "medium" in verdict_text or "moderate" in verdict_text:
         conviction = "medium"
