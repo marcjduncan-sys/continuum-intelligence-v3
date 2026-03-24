@@ -406,6 +406,7 @@ def compute_analytics(
                 "weight": h["weight"],
                 "sector": h.get("sector") or "Unclassified",
                 "asset_class": h.get("asset_class", "equity"),
+                "notes": h.get("notes"),
             }
             for h in weighted
         ],

@@ -783,6 +783,7 @@ function _syncPortfolioToPMDatabase(positions, grossExposure) {
   // Build holdings array for the API
   var holdingsPayload = validPositions.map(function(p) {
     var mv = Math.abs(p.units * p.currentPrice);
+    var isShort = p.units < 0;
     var coverageData = getCoverageData();
     var sector = null;
     if (coverageData[p.ticker] && coverageData[p.ticker].sector) {
@@ -794,7 +795,8 @@ function _syncPortfolioToPMDatabase(positions, grossExposure) {
       price: p.currentPrice,
       market_value: mv,
       sector: sector,
-      asset_class: 'equity'
+      asset_class: 'equity',
+      notes: isShort ? 'direction:short' : null
     };
   });
 
