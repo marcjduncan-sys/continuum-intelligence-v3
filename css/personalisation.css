@@ -761,6 +761,76 @@
 }
 
 /* ---------------------------------------------------------------------------
+   BLOCK BOTTOM NAV (Assessment sub-section navigation)
+   --------------------------------------------------------------------------- */
+
+.pn-block-bottom-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--border);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.pn-block-complete {
+    background: var(--accent-teal);
+    color: #fff;
+}
+
+/* ---------------------------------------------------------------------------
+   STICKY ASSESSMENT FOOTER BAR
+   --------------------------------------------------------------------------- */
+
+.pn-sticky-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 24px;
+    background: var(--accent-teal);
+    color: #fff;
+    font-family: var(--font-ui);
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.pn-sticky-bar--visible {
+    transform: translateY(0);
+}
+
+.pn-sticky-label {
+    font-size: 0.82rem;
+    font-weight: 500;
+    opacity: 0.95;
+}
+
+.pn-sticky-btn {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    font-size: 0.8rem !important;
+    padding: 8px 20px !important;
+}
+
+.pn-sticky-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.pn-sticky-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------------------
    CHAT INTERFACE (Step 5)
    --------------------------------------------------------------------------- */
 

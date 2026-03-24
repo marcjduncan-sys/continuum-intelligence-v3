@@ -1110,6 +1110,7 @@ function renderStep3() {
         '<div class="pn-assessment-content" id="pn-assessment-content">' +
             contentHtml +
         '</div>' +
+        renderBlockBottomNav() +
     '</div>';
 }
 
@@ -1215,6 +1216,178 @@ function renderForcedChoice(item, currentValue) {
             '</button>' +
         '</div>' +
     '</div>';
+}
+
+var PN_BLOCK_NAMES = ['Personality', 'Cognitive', 'Philosophy', 'Bias', 'Preferences'];
+
+function renderBlockBottomNav() {
+    var current = pnState.assessmentBlock;
+    var isLast = current === PN_BLOCK_NAMES.length - 1;
+    var html = '<div class="pn-block-bottom-nav">';
+
+    if (current > 0) {
+        html += '<button class="pn-btn pn-btn-secondary pn-block-prev">' +
+            '\u2190 ' + PN_BLOCK_NAMES[current - 1] +
+        '</button>';
+    } else {
+        html += '<div></div>';
+    }
+
+    if (isLast) {
+        html += '<button class="pn-btn pn-btn-primary pn-block-next pn-block-complete"' +
+            (pnAssessmentComplete() ? '' : ' disabled') + '>' +
+            'Complete Assessment \u2192' +
+        '</button>';
+    } else {
+        html += '<button class="pn-btn pn-btn-primary pn-block-next">' +
+            'Next: ' + PN_BLOCK_NAMES[current + 1] + ' \u2192' +
+        '</button>';
+    }
+
+    html += '</div>';
+    return html;
+}
+
+function bindBlockBottomNav() {
+    var nextBtn = document.querySelector('.pn-block-next');
+    var prevBtn = document.querySelector('.pn-block-prev');
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function() {
+            var current = pnState.assessmentBlock;
+            if (current === PN_BLOCK_NAMES.length - 1) {
+                // Complete Assessment: advance wizard to step 4
+                if (!pnAssessmentComplete()) return;
+                pnState.profile = pnBuildProfile();
+                pnSaveToServer();
+                pnState.currentStep = 4;
+                if (pnState.currentStep > pnState.maxStepReached) {
+                    pnState.maxStepReached = pnState.currentStep;
+                }
+                pnSaveToLocalStorage();
+                pnRefresh();
+            } else {
+                pnState.assessmentBlock = current + 1;
+                pnSaveToLocalStorage();
+                pnRefreshAssessment();
+            }
+        });
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function() {
+            if (pnState.assessmentBlock > 0) {
+                pnState.assessmentBlock = pnState.assessmentBlock - 1;
+                pnSaveToLocalStorage();
+                pnRefreshAssessment();
+            }
+        });
+    }
+}
+
+// =========================================================================
+// STICKY ASSESSMENT FOOTER BAR
+// =========================================================================
+
+var _stickyObserver = null;
+
+function initStickyBar() {
+    // Clean up previous observer
+    destroyStickyBar();
+
+    var navRow = document.querySelector('.pn-assessment-nav');
+    if (!navRow) return;
+
+    // Create the sticky bar element
+    var bar = document.createElement('div');
+    bar.className = 'pn-sticky-bar';
+    bar.id = 'pn-sticky-bar';
+    updateStickyBarContent(bar);
+    document.body.appendChild(bar);
+
+    _stickyObserver = new IntersectionObserver(function(entries) {
+        var bar = document.getElementById('pn-sticky-bar');
+        if (!bar) return;
+        // Show sticky bar when nav row scrolls out of view
+        bar.classList.toggle('pn-sticky-bar--visible', !entries[0].isIntersecting);
+    }, { threshold: 0 });
+
+    _stickyObserver.observe(navRow);
+}
+
+function updateStickyBarContent(bar) {
+    if (!bar) bar = document.getElementById('pn-sticky-bar');
+    if (!bar) return;
+
+    var current = pnState.assessmentBlock;
+    var isLast = current === PN_BLOCK_NAMES.length - 1;
+    var blockItems = [PN_IPIP_ITEMS, PN_CRT_ITEMS, PN_PHILOSOPHY_ITEMS, PN_BIAS_ITEMS, PN_PREFERENCE_ITEMS];
+    var totalInBlock = blockItems[current].length;
+    var answeredInBlock = 0;
+    var k;
+
+    switch (current) {
+        case 0:
+            for (k in pnState.assessment.ipip) { if (pnState.assessment.ipip.hasOwnProperty(k)) answeredInBlock++; }
+            break;
+        case 1:
+            for (k in pnState.assessment.crt) { if (pnState.assessment.crt.hasOwnProperty(k) && pnState.assessment.crt[k] !== '') answeredInBlock++; }
+            break;
+        case 2:
+            for (k in pnState.assessment.philosophy) { if (pnState.assessment.philosophy.hasOwnProperty(k)) answeredInBlock++; }
+            break;
+        case 3:
+            for (k in pnState.assessment.bias) { if (pnState.assessment.bias.hasOwnProperty(k)) answeredInBlock++; }
+            break;
+        case 4:
+            for (k in pnState.assessment.preferences) { if (pnState.assessment.preferences.hasOwnProperty(k)) answeredInBlock++; }
+            break;
+    }
+
+    var label = PN_BLOCK_NAMES[current] + ' \u2014 ' + answeredInBlock + ' of ' + totalInBlock + ' answered';
+
+    var btnHtml;
+    if (isLast) {
+        btnHtml = '<button class="pn-btn pn-btn-primary pn-sticky-btn pn-sticky-complete"' +
+            (pnAssessmentComplete() ? '' : ' disabled') + '>' +
+            'Complete Assessment \u2192</button>';
+    } else {
+        btnHtml = '<button class="pn-btn pn-btn-primary pn-sticky-btn">' +
+            'Next: ' + PN_BLOCK_NAMES[current + 1] + ' \u2192</button>';
+    }
+
+    bar.innerHTML = '<span class="pn-sticky-label">' + label + '</span>' + btnHtml;
+
+    // Bind the sticky button
+    var stickyBtn = bar.querySelector('.pn-sticky-btn');
+    if (stickyBtn) {
+        stickyBtn.addEventListener('click', function() {
+            if (current === PN_BLOCK_NAMES.length - 1) {
+                if (!pnAssessmentComplete()) return;
+                pnState.profile = pnBuildProfile();
+                pnSaveToServer();
+                pnState.currentStep = 4;
+                if (pnState.currentStep > pnState.maxStepReached) {
+                    pnState.maxStepReached = pnState.currentStep;
+                }
+                pnSaveToLocalStorage();
+                pnRefresh();
+            } else {
+                pnState.assessmentBlock = current + 1;
+                pnSaveToLocalStorage();
+                pnRefreshAssessment();
+            }
+        });
+    }
+}
+
+function destroyStickyBar() {
+    if (_stickyObserver) {
+        _stickyObserver.disconnect();
+        _stickyObserver = null;
+    }
+    var bar = document.getElementById('pn-sticky-bar');
+    if (bar) bar.remove();
 }
 
 function renderStep4() {
@@ -1519,6 +1692,8 @@ function bindStep3Inputs() {
         });
     }
     bindAssessmentBlockInputs();
+    bindBlockBottomNav();
+    initStickyBar();
 }
 
 function bindAssessmentBlockInputs() {
@@ -1648,6 +1823,11 @@ function updateNextButton() {
     if (btn) {
         btn.disabled = !pnValidateStep(pnState.currentStep);
     }
+    // Keep "Complete Assessment" bottom button in sync
+    var completeBtn = document.querySelector('.pn-block-complete');
+    if (completeBtn) {
+        completeBtn.disabled = !pnAssessmentComplete();
+    }
 }
 
 function updateProgress() {
@@ -1666,11 +1846,17 @@ function updateProgress() {
             navItems[i].classList.remove('complete');
         }
     }
+
+    updateStickyBarContent();
 }
 
 function pnRefresh() {
     var wizard = document.getElementById('pn-wizard');
     if (!wizard) return;
+    // Clean up sticky bar when leaving step 3
+    if (pnState.currentStep !== 3) {
+        destroyStickyBar();
+    }
     wizard.innerHTML = renderStepIndicator() +
         '<div class="pn-wizard-body" id="pn-wizard-body">' +
             renderCurrentStep() +
@@ -1694,6 +1880,12 @@ function pnRefreshAssessment() {
     }
     contentEl.innerHTML = contentHtml;
 
+    // Update bottom nav
+    var bottomNav = document.querySelector('.pn-block-bottom-nav');
+    if (bottomNav) {
+        bottomNav.outerHTML = renderBlockBottomNav();
+    }
+
     var navItems = document.querySelectorAll('.pn-assessment-nav-item');
     for (var i = 0; i < navItems.length; i++) {
         var blockIdx = parseInt(navItems[i].getAttribute('data-block'), 10);
@@ -1701,8 +1893,15 @@ function pnRefreshAssessment() {
     }
 
     bindAssessmentBlockInputs();
+    bindBlockBottomNav();
+    updateStickyBarContent();
     updateProgress();
     updateNextButton();
+
+    // Scroll assessment content into view after block switch
+    if (contentEl) {
+        contentEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
 function escapeHtml(str) {
