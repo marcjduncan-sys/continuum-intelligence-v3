@@ -282,6 +282,13 @@ export function fetchDiagnostics() {
         .then(function(r) { return r.ok ? r.json() : null; })
         .then(function(data) {
             if (!data) return;
+            // Update portfolio name badge
+            var nameEl = document.getElementById('pmPortfolioName');
+            if (nameEl) {
+                var pc = (data.analytics && data.analytics.position_count) || 0;
+                var tv = (data.analytics && data.analytics.total_value) || 0;
+                nameEl.textContent = pc + ' holdings -- ' + _fmtCurrency(tv);
+            }
             updatePMDashboard(data.analytics);
             updatePMDiagnostics(data.alignment, data.analytics);
             _renderMandateSettings(mandate);
@@ -777,19 +784,20 @@ function _renderReweighting(suggestions) {
     wrapper.style.display = '';
     var rows = suggestions.map(function(s) {
         var actionColor = '#95a5a6';
-        var action = s.action || s.signal || '';
-        if (action === 'trim' || action === 'reduce') actionColor = '#e74c3c';
-        else if (action === 'add' || action === 'increase') actionColor = '#27ae60';
-        else if (action === 'review') actionColor = 'var(--accent-gold)';
+        var action = s.suggested_direction || s.action || '';
+        if (action.indexOf('trim') >= 0) actionColor = '#e74c3c';
+        else if (action.indexOf('increase') >= 0 || action === 'add') actionColor = '#27ae60';
+        else if (action.indexOf('review') >= 0) actionColor = 'var(--accent-gold)';
+        var actionLabel = action.replace(/_/g, ' ');
 
         return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">' +
             '<span style="font-weight:600;color:var(--text-primary);font-size:0.72rem;min-width:50px">' + _esc(s.ticker || '') + '</span>' +
             '<span style="' +
                 'font-family:var(--font-data);font-size:0.50rem;font-weight:700;padding:2px 6px;' +
                 'border-radius:3px;color:#fff;background:' + actionColor +
-            '">' + _esc(action.toUpperCase()) + '</span>' +
+            '">' + _esc(actionLabel.toUpperCase()) + '</span>' +
             '<span style="flex:1;font-size:0.65rem;color:var(--text-muted)">' + _esc(s.reason || s.rationale || '') + '</span>' +
-            '<button class="pm-send-to-pm-btn" data-ticker="' + _esc(s.ticker || '') + '" data-action="' + _esc(action) + '" style="' +
+            '<button class="pm-send-to-pm-btn" data-ticker="' + _esc(s.ticker || '') + '" data-action="' + _esc(actionLabel) + '" data-reason="' + _esc(s.reason || '') + '" style="' +
                 'font-family:var(--font-data);font-size:0.50rem;font-weight:600;' +
                 'color:var(--accent-gold);background:none;border:1px solid var(--accent-gold);' +
                 'border-radius:3px;padding:2px 8px;cursor:pointer;white-space:nowrap' +
@@ -803,8 +811,10 @@ function _renderReweighting(suggestions) {
         btn.addEventListener('click', function() {
             var ticker = btn.getAttribute('data-ticker');
             var action = btn.getAttribute('data-action');
-            var question = 'Reweighting signal for ' + ticker + ': ' + action +
-                '. Assess the portfolio impact, source of funds, and mandate compliance.';
+            var reason = btn.getAttribute('data-reason') || '';
+            var question = 'Reweighting signal for ' + ticker + ': ' + action + '.' +
+                (reason ? ' Reason: ' + reason + '.' : '') +
+                ' Assess the portfolio impact, source of funds, and mandate compliance.';
             document.dispatchEvent(new CustomEvent('ci:pm:ask', { detail: { question: question } }));
         });
     });
@@ -820,58 +830,29 @@ function _renderChangeLog(changes) {
     var body = document.getElementById('pmChangeLogBody');
     if (!wrapper || !body) return;
 
-    if (!changes) {
+    // Backend returns a flat array of {ticker, change_type, description}
+    if (!changes || !Array.isArray(changes) || changes.length === 0) {
         wrapper.style.display = 'none';
         return;
     }
 
-    var hasContent = false;
     var html = '';
+    changes.forEach(function(c) {
+        var type = c.change_type || '';
+        var badgeColor = '#95a5a6';
+        var badgeLabel = 'CHANGE';
+        if (type === 'new_position') { badgeColor = '#27ae60'; badgeLabel = 'NEW'; }
+        else if (type === 'removed_position') { badgeColor = '#e74c3c'; badgeLabel = 'REMOVED'; }
+        else if (type.indexOf('weight_') === 0) { badgeColor = 'var(--accent-gold)'; badgeLabel = 'WEIGHT'; }
 
-    // New positions
-    if (changes.new_positions && changes.new_positions.length > 0) {
-        hasContent = true;
-        changes.new_positions.forEach(function(p) {
-            html += '<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);align-items:center">' +
-                '<span style="font-family:var(--font-data);font-size:0.50rem;font-weight:700;padding:2px 6px;border-radius:3px;color:#fff;background:#27ae60">NEW</span>' +
-                '<span style="font-size:0.70rem;font-weight:600;color:var(--text-primary)">' + _esc(p.ticker || p) + '</span>' +
-                (p.weight ? '<span style="font-size:0.62rem;color:var(--text-muted)">' + _fmtPctDec(p.weight) + '</span>' : '') +
-            '</div>';
-        });
-    }
+        html += '<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);align-items:center">' +
+            '<span style="font-family:var(--font-data);font-size:0.50rem;font-weight:700;padding:2px 6px;border-radius:3px;color:#fff;background:' + badgeColor + '">' + badgeLabel + '</span>' +
+            '<span style="font-weight:600;color:var(--text-primary);font-size:0.70rem">' + _esc(c.ticker || '') + '</span>' +
+            '<span style="font-size:0.62rem;color:var(--text-muted)">' + _esc(c.description || '') + '</span>' +
+        '</div>';
+    });
 
-    // Removed positions
-    if (changes.removed_positions && changes.removed_positions.length > 0) {
-        hasContent = true;
-        changes.removed_positions.forEach(function(p) {
-            html += '<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);align-items:center">' +
-                '<span style="font-family:var(--font-data);font-size:0.50rem;font-weight:700;padding:2px 6px;border-radius:3px;color:#fff;background:#e74c3c">REMOVED</span>' +
-                '<span style="font-size:0.70rem;font-weight:600;color:var(--text-primary)">' + _esc(p.ticker || p) + '</span>' +
-            '</div>';
-        });
-    }
-
-    // Weight changes
-    if (changes.weight_changes && changes.weight_changes.length > 0) {
-        hasContent = true;
-        changes.weight_changes.forEach(function(c) {
-            var delta = (c.new_weight || 0) - (c.old_weight || 0);
-            var deltaColor = delta > 0 ? '#27ae60' : '#e74c3c';
-            var arrow = delta > 0 ? '\u2191' : '\u2193';
-            html += '<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);align-items:center">' +
-                '<span style="font-family:var(--font-data);font-size:0.50rem;font-weight:700;padding:2px 6px;border-radius:3px;color:#fff;background:var(--accent-gold)">CHANGE</span>' +
-                '<span style="font-size:0.70rem;font-weight:600;color:var(--text-primary)">' + _esc(c.ticker) + '</span>' +
-                '<span style="font-size:0.62rem;color:var(--text-muted)">' +
-                    _fmtPctDec(c.old_weight) + ' &rarr; ' + _fmtPctDec(c.new_weight) +
-                '</span>' +
-                '<span style="font-size:0.62rem;font-weight:600;color:' + deltaColor + '">' +
-                    arrow + ' ' + _fmtPctDec(Math.abs(delta)) +
-                '</span>' +
-            '</div>';
-        });
-    }
-
-    if (!hasContent) {
+    if (!html) {
         wrapper.style.display = 'none';
         return;
     }
