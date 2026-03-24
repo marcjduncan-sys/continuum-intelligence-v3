@@ -19,6 +19,7 @@ The handoff payload contains:
 import hashlib
 import json
 import logging
+import re
 from datetime import datetime, timezone
 from typing import Any
 
@@ -26,6 +27,16 @@ import db
 from portfolio_alignment import load_research
 
 logger = logging.getLogger(__name__)
+
+_HTML_TAG_RE = re.compile(r"<[^>]+>")
+
+
+def _strip_html(text: str) -> str:
+    """Remove HTML tags and decode common entities."""
+    text = _HTML_TAG_RE.sub("", text)
+    for entity, char in (("&amp;", "&"), ("&lt;", "<"), ("&gt;", ">"), ("&#39;", "'"), ("&quot;", '"')):
+        text = text.replace(entity, char)
+    return text.strip()
 
 
 # ---------------------------------------------------------------------------
@@ -148,7 +159,7 @@ def _build_summary_from_research(research: dict, ticker: str) -> dict:
         elif direction == "downside":
             downside_total += score_val
 
-    verdict_text = (verdict.get("verdict") or "").lower()
+    verdict_text = _strip_html(verdict.get("text") or "").lower()
     if upside_total >= 60 and downside_total >= 60:
         # Contradictory evidence: both sides have strong support -> uncertain, not high
         conviction = "medium"
@@ -204,9 +215,9 @@ def _build_summary_from_research(research: dict, ticker: str) -> dict:
     elif isinstance(narrative, str) and narrative.strip():
         parts.append(narrative.strip())
 
-    verdict_summary = verdict.get("verdict") or ""
+    verdict_summary = _strip_html(verdict.get("text") or "")
     if verdict_summary:
-        parts.append(verdict_summary.strip())
+        parts.append(verdict_summary)
 
     summary_text = " | ".join(parts) if parts else f"Research data available for {ticker}."
 

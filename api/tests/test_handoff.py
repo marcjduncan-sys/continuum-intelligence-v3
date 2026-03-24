@@ -428,7 +428,7 @@ class TestResearchFallback:
                 {"description": "Gold price upside", "score": "35%"},
                 {"description": "Cost blowout risk", "score": "65%", "tripwires": ["Costs exceed $1500/oz"]},
             ],
-            "verdict": {"verdict": "Medium conviction -- balanced risk/reward"},
+            "verdict": {"text":"Medium conviction -- balanced risk/reward"},
             "theNarrative": {"coreThesis": "Gold producer with operational leverage"},
             "skew": {"score": 55},
             "lastUpdated": "2026-03-20",
@@ -441,20 +441,20 @@ class TestResearchFallback:
 
     def test_conviction_extraction_high(self):
         from handoff import _build_summary_from_research
-        research = {"verdict": {"verdict": "High conviction buy"}, "hypotheses": []}
+        research = {"verdict": {"text":"High conviction buy"}, "hypotheses": []}
         result = _build_summary_from_research(research, "BHP")
         assert result["conviction_level"] == "high"
 
     def test_conviction_extraction_low(self):
         from handoff import _build_summary_from_research
-        research = {"verdict": {"verdict": "Low conviction, too many unknowns"}, "hypotheses": []}
+        research = {"verdict": {"text":"Low conviction, too many unknowns"}, "hypotheses": []}
         result = _build_summary_from_research(research, "DRO")
         assert result["conviction_level"] == "low"
 
     def test_valuation_stance_undervalued(self):
         from handoff import _build_summary_from_research
         research = {
-            "verdict": {"verdict": "Undervalued relative to peers"},
+            "verdict": {"text":"Undervalued relative to peers"},
             "hypotheses": [],
         }
         result = _build_summary_from_research(research, "WOR")
