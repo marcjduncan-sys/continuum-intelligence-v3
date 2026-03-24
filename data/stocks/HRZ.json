@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-23T07:41:39.642Z"
+      "last_updated": "2026-03-24T07:32:10.782Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -26,7 +26,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-23T07:41:39.642Z"
+      "last_updated": "2026-03-24T07:32:10.782Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Cost pressures, competitive threats, or macro headwinds.",
       "upside": null,
       "risk_plain": "Material downside if multiple risks crystallise simultaneously.",
-      "survival_score": 0.44,
+      "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-24T07:02:20.536Z"
+      "last_updated": "2026-03-24T07:32:10.782Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -47,10 +47,10 @@
       "what_to_watch": "Industry disruption signals and regulatory changes.",
       "upside": null,
       "risk_plain": "If disruption materialises, prior assumptions become invalid.",
-      "survival_score": 0.46,
+      "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-24T07:02:20.536Z"
+      "last_updated": "2026-03-24T07:32:10.782Z"
     }
   },
   "dominant": "N4",
@@ -282,6 +282,13 @@
       "severity": "AMBER",
       "message": "5-day cumulative move of -27.9% exceeds 15% threshold — possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-03-24",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "5-day cumulative move of -34.7% exceeds 15% threshold — possible overcorrection",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -344,11 +351,20 @@
       "cumulative_20d": -28.46,
       "results_day": false,
       "overcorrection_active": true
+    },
+    {
+      "date": "2026-03-24",
+      "classification": "NOTABLE",
+      "daily_change_pct": -3.41,
+      "volume_multiplier": 1,
+      "cumulative_5d": -34.68,
+      "cumulative_20d": -36.72,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    1.2,
     1.09,
     1.09,
     1.11,
@@ -407,7 +423,8 @@
     0.95,
     0.83,
     0.88,
-    0.81
+    0.81,
+    0.85
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -585,12 +602,12 @@
   "_overcorrection": {
     "active": true,
     "triggerType": "FIVE_DAY_CUMULATIVE",
-    "triggerDate": "2026-03-23",
-    "triggerPrice": 0.81,
+    "triggerDate": "2026-03-24",
+    "triggerPrice": 0.85,
     "direction": "down",
-    "movePct": -2.41,
-    "reviewDate": "2026-03-30",
-    "message": "5-day cumulative move of -27.9% exceeds 15% threshold — possible overcorrection"
+    "movePct": -3.41,
+    "reviewDate": "2026-03-31",
+    "message": "5-day cumulative move of -34.7% exceeds 15% threshold — possible overcorrection"
   },
   "price_evidence": {
     "last_run": "2026-03-24T07:02:20.536Z",
