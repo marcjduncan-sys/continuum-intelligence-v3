@@ -18,6 +18,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
+import anthropic
 import httpx
 
 import config
@@ -851,7 +852,11 @@ Return valid JSON only. No markdown fences. No prefatory text."""
 
 
 def _call_llm_sync(system_prompt: str, user_content: str, max_tokens: int = 8192) -> str:
-    """Synchronous Claude call using the shared Anthropic client."""
+    """Synchronous Claude call using the shared Anthropic client.
+
+    Raises anthropic.APIError subclasses on transport/API failures.
+    Returns the raw text on success (may still be invalid JSON).
+    """
     client = config.get_anthropic_client()
     response = client.messages.create(
         model=config.ANTHROPIC_MODEL,
@@ -1003,21 +1008,59 @@ async def run_price_driver_analysis(
         "research_pass": research_result,
         "red_team_pass": red_team_result,
     }, default=str)
-    synthesis_raw = await _call_llm(_SYNTHESIS_SYSTEM_PROMPT, synthesis_input, max_tokens=8192)
-    try:
-        final_result = _extract_json(synthesis_raw)
-    except json.JSONDecodeError:
-        logger.warning("[%s] Synthesis pass returned invalid JSON, retrying once", ticker)
-        await asyncio.sleep(2)
+    _SYNTHESIS_FALLBACK = {
+        "error": "synthesis_failed",
+        "report": {"executive_summary": "Analysis could not be completed due to a synthesis error.", "full_note": "", "title": ""},
+    }
+
+    final_result = None
+    last_synthesis_raw = None
+    for _attempt in range(3):
         try:
-            synthesis_raw = await _call_llm(_SYNTHESIS_SYSTEM_PROMPT, synthesis_input, max_tokens=8192)
-            final_result = _extract_json(synthesis_raw)
-        except (json.JSONDecodeError, Exception) as retry_err:
-            logger.error("[%s] Synthesis retry also failed: %s", ticker, retry_err)
-            final_result = {
-                "error": "synthesis_failed",
-                "report": {"executive_summary": "Analysis could not be completed due to a synthesis error.", "full_note": "", "title": ""},
-            }
+            last_synthesis_raw = await _call_llm(
+                _SYNTHESIS_SYSTEM_PROMPT, synthesis_input, max_tokens=8192,
+            )
+            final_result = _extract_json(last_synthesis_raw)
+            break  # Success
+        except json.JSONDecodeError:
+            logger.warning(
+                "[%s] Synthesis returned invalid JSON (attempt %d/3), raw[:500]: %s",
+                ticker, _attempt + 1, (last_synthesis_raw or "")[:500],
+            )
+            await asyncio.sleep(2 * (_attempt + 1))
+        except (anthropic.APITimeoutError, anthropic.APIConnectionError) as api_err:
+            logger.warning(
+                "[%s] Synthesis API transport error (attempt %d/3): %s",
+                ticker, _attempt + 1, api_err,
+            )
+            await asyncio.sleep(5 * (_attempt + 1))
+        except anthropic.APIStatusError as api_err:
+            if api_err.status_code in (429, 529):
+                wait = min(10 * (_attempt + 1), 30)
+                logger.warning(
+                    "[%s] Synthesis rate-limited %d (attempt %d/3), waiting %ds",
+                    ticker, api_err.status_code, _attempt + 1, wait,
+                )
+                await asyncio.sleep(wait)
+            elif api_err.status_code >= 500:
+                logger.warning(
+                    "[%s] Synthesis server error %d (attempt %d/3): %s",
+                    ticker, api_err.status_code, _attempt + 1, api_err,
+                )
+                await asyncio.sleep(5 * (_attempt + 1))
+            else:
+                logger.error("[%s] Synthesis non-retryable API error: %s", ticker, api_err)
+                break
+        except Exception as exc:
+            logger.error("[%s] Synthesis unexpected error (attempt %d/3): %s", ticker, _attempt + 1, exc)
+            break
+
+    if final_result is None:
+        logger.error(
+            "[%s] Synthesis failed after all attempts. Last raw[:1000]: %s",
+            ticker, (last_synthesis_raw or "")[:1000],
+        )
+        final_result = _SYNTHESIS_FALLBACK
 
     # Inject programmatic returns -- overrides LLM estimates
     if "computed_returns" in gathered:
