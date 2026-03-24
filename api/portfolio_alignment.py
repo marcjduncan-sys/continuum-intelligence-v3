@@ -10,6 +10,7 @@ Pure functions, no LLM, no network, no database.
 
 from __future__ import annotations
 
+import glob
 import json
 import os
 from typing import Any
@@ -22,9 +23,34 @@ from typing import Any
 _RESEARCH_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "research")
 
 
+def _normalise_ticker(ticker: str) -> str:
+    """Normalise ticker to base form: strip .AX suffix, uppercase."""
+    t = ticker.upper().strip()
+    if t.endswith(".AX"):
+        t = t[:-3]
+    return t
+
+
+def get_covered_tickers() -> set[str]:
+    """Derive covered tickers dynamically from research JSON files on disk.
+
+    Any ticker with a research JSON file is automatically covered.
+    No manual list maintenance required.
+    """
+    return {
+        os.path.basename(f).replace(".json", "")
+        for f in glob.glob(os.path.join(_RESEARCH_DIR, "*.json"))
+        if not os.path.basename(f).startswith("_")
+    }
+
+
 def load_research(ticker: str) -> dict | None:
-    """Load research JSON for a ticker. Returns None if not found."""
-    path = os.path.join(_RESEARCH_DIR, f"{ticker.upper()}.json")
+    """Load research JSON for a ticker. Returns None if not found.
+
+    Handles .AX suffix (e.g. FPH.AX -> FPH.json) and other exchange suffixes.
+    """
+    normalised = _normalise_ticker(ticker)
+    path = os.path.join(_RESEARCH_DIR, f"{normalised}.json")
     if not os.path.isfile(path):
         return None
     try:
