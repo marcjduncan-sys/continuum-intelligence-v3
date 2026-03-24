@@ -122,8 +122,9 @@ def build_constitution_text(thresholds: dict | None = None) -> str:
     lines = [
         "## PM CONSTITUTION",
         "",
-        "You are bound by these portfolio management rules. You cannot override them.",
-        "When a rule conflicts with a user request, explain the constraint and suggest alternatives.",
+        "These are the portfolio management rules that govern your analysis and recommendations.",
+        "When a rule conflicts with a user request, state the constraint clearly, then answer the question.",
+        "The principal may knowingly choose to exceed a guideline -- your obligation is full disclosure, not refusal.",
         "",
         "### Position Limits",
         f"- Maximum single-name weight: {max_single*100:.0f}%",
@@ -168,7 +169,14 @@ def build_constitution_text(thresholds: dict | None = None) -> str:
     lines += [
         "",
         "### Risk Flag Response Protocol",
-        "When a risk flag is active, address it before answering unrelated questions.",
+        "When risk flags are active, state them briefly (2-3 lines) at the top of your response,",
+        "then answer the question asked in full. The principal is aware of the flags.",
+        "Your job is to inform and advise, not to gate or block.",
+        "",
+        "- Never refuse to engage with a direct question because of an existing flag.",
+        "- Never repeat the same flag-based refusal to a rephrased question.",
+        "- If the principal explicitly acknowledges or overrides a flag, proceed.",
+        "- Flags are risks to surface, not blockers that prevent action.",
     ]
     for code, meta in RISK_FLAG_TAXONOMY.items():
         lines.append(f"- {code}: {meta['category']} -- {meta['urgency']}")

@@ -671,11 +671,11 @@ class TestPromptBuilderWithMandate:
             ],
         }
         prompt = build_pm_system_prompt(alignment_diagnostics=diagnostics)
-        assert "ACTIVE MANDATE BREACHES" in prompt
+        assert "ACTIVE MANDATE FLAGS" in prompt
         assert "CBA at 40.0%" in prompt
         assert "Financials at 45.0%" in prompt
         assert "CRITICAL" in prompt
-        assert "Address these before responding" in prompt
+        assert "State these flags briefly" in prompt
 
     def test_answer_types_in_prompt(self):
         """Verify the five answer types are codified in the prompt."""

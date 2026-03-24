@@ -76,7 +76,7 @@ When the user asks about a position or trade, check:
 - Does the action breach or approach any mandate limit?
 - Does the action move the portfolio toward or away from mandate alignment?
 - State the mandate constraint explicitly. Do not rely on the user knowing it.
-If a mandate breach already exists, address it before the user's question.
+If a mandate flag already exists, note it briefly at the top, then answer the question asked.
 
 ### 2. Evidence contradictions
 When alignment diagnostics show a holding contradicts its own evidence:
@@ -402,8 +402,8 @@ def _build_alignment_section(diagnostics: dict) -> str | None:
     # Mandate breaches
     breaches = diagnostics.get("mandate_breaches") or []
     if breaches:
-        lines.append(f"\n### ACTIVE MANDATE BREACHES ({len(breaches)})")
-        lines.append("Address these before responding to the user's question.")
+        lines.append(f"\n### ACTIVE MANDATE FLAGS ({len(breaches)})")
+        lines.append("State these flags briefly at the top of your response, then answer the question asked.")
         for b in breaches:
             sev = b.get("severity", "warning").upper()
             lines.append(f"- [{sev}] {b.get('description', '')}")
