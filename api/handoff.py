@@ -23,6 +23,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 import db
+from portfolio_alignment import load_research
 
 logger = logging.getLogger(__name__)
 
@@ -125,6 +126,93 @@ def _build_summary_text(memories: list[dict], ticker: str) -> str:
     return " | ".join(parts) if parts else f"Limited Analyst notes for {ticker}."
 
 
+def _build_summary_from_research(research: dict, ticker: str) -> dict:
+    """Build a handoff payload from research JSON when no memories exist."""
+    hypotheses = research.get("hypotheses", [])
+    verdict = research.get("verdict", {})
+
+    # Conviction from verdict
+    conviction = "none"
+    verdict_text = (verdict.get("verdict") or "").lower()
+    if "high" in verdict_text:
+        conviction = "high"
+    elif "medium" in verdict_text or "moderate" in verdict_text:
+        conviction = "medium"
+    elif "low" in verdict_text:
+        conviction = "low"
+
+    # Valuation stance from verdict or hypotheses
+    valuation = "unknown"
+    all_text = verdict_text + " " + " ".join(
+        (h.get("description") or "").lower() for h in hypotheses
+    )
+    if "undervalued" in all_text:
+        valuation = "undervalued"
+    elif "overvalued" in all_text:
+        valuation = "overvalued"
+    elif "fair value" in all_text or "fairly valued" in all_text:
+        valuation = "fair"
+
+    # Risks from hypotheses with downside skew
+    risks = []
+    for h in hypotheses:
+        score = h.get("score", "50%")
+        try:
+            score_val = int(str(score).replace("%", ""))
+        except (ValueError, TypeError):
+            score_val = 50
+        if score_val >= 50:
+            desc = (h.get("description") or "").strip()
+            if desc and desc not in risks:
+                risks.append(desc)
+    risks = risks[:5]
+
+    # Tripwires
+    tripwires = []
+    for h in hypotheses:
+        for tw in (h.get("tripwires") or []):
+            text = tw.strip() if isinstance(tw, str) else (tw.get("description") or "").strip()
+            if text and text not in tripwires:
+                tripwires.append(text)
+    tripwires = tripwires[:5]
+
+    # Summary text from narrative + verdict
+    parts = []
+    narrative = research.get("theNarrative")
+    if isinstance(narrative, dict):
+        core = narrative.get("coreThesis") or narrative.get("narrative") or ""
+        if core:
+            parts.append(core.strip())
+    elif isinstance(narrative, str) and narrative.strip():
+        parts.append(narrative.strip())
+
+    verdict_summary = verdict.get("verdict") or ""
+    if verdict_summary:
+        parts.append(verdict_summary.strip())
+
+    summary_text = " | ".join(parts) if parts else f"Research data available for {ticker}."
+
+    # Version string from research metadata
+    version_parts = []
+    if research.get("lastUpdated"):
+        version_parts.append(str(research["lastUpdated"]))
+    if research.get("skew", {}).get("score") is not None:
+        version_parts.append(f"skew:{research['skew']['score']}")
+    version = hashlib.md5("|".join(version_parts).encode()).hexdigest()[:10] if version_parts else "research"
+
+    return {
+        "ticker": ticker.upper(),
+        "analyst_summary_text": summary_text,
+        "conviction_level": conviction,
+        "valuation_stance": valuation,
+        "key_risks": risks,
+        "tripwires": tripwires,
+        "coverage_state": "covered",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "summary_version": version,
+    }
+
+
 def _assess_coverage_state(
     memories: list[dict],
     staleness_days: int = 30,
@@ -180,19 +268,38 @@ async def build_analyst_summary(
             limit=50,
         )
 
-    coverage_state = _assess_coverage_state(memories, staleness_days)
-    summary_version = _compute_summary_version(memories)
+    # If memories exist, use memory-based summary
+    if memories:
+        coverage_state = _assess_coverage_state(memories, staleness_days)
+        summary_version = _compute_summary_version(memories)
+        return {
+            "ticker": ticker.upper(),
+            "analyst_summary_text": _build_summary_text(memories, ticker.upper()),
+            "conviction_level": _extract_conviction(memories),
+            "valuation_stance": _extract_valuation_stance(memories),
+            "key_risks": _extract_risks(memories),
+            "tripwires": _extract_tripwires(memories),
+            "coverage_state": coverage_state,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "summary_version": summary_version,
+        }
 
+    # Fallback: check research JSON file
+    research = load_research(ticker)
+    if research:
+        return _build_summary_from_research(research, ticker)
+
+    # Truly not covered: no memories and no research
     return {
         "ticker": ticker.upper(),
-        "analyst_summary_text": _build_summary_text(memories, ticker.upper()),
-        "conviction_level": _extract_conviction(memories),
-        "valuation_stance": _extract_valuation_stance(memories),
-        "key_risks": _extract_risks(memories),
-        "tripwires": _extract_tripwires(memories),
-        "coverage_state": coverage_state,
+        "analyst_summary_text": f"No Analyst coverage available for {ticker.upper()}.",
+        "conviction_level": "none",
+        "valuation_stance": "unknown",
+        "key_risks": [],
+        "tripwires": [],
+        "coverage_state": "not_covered",
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "summary_version": summary_version,
+        "summary_version": "empty",
     }
 
 

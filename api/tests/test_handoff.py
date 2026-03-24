@@ -412,3 +412,105 @@ class TestPhaseFFEvalCoverage:
         for s in EVAL_SCENARIOS:
             missing = required - set(s.keys())
             assert not missing, f"Scenario {s['name']} missing: {missing}"
+
+
+# ---------------------------------------------------------------------------
+# Test: Research JSON fallback (build_analyst_summary)
+# ---------------------------------------------------------------------------
+
+class TestResearchFallback:
+    """Tests for the research JSON fallback path when no memories exist."""
+
+    def test_build_summary_from_research_basic(self):
+        from handoff import _build_summary_from_research
+        research = {
+            "hypotheses": [
+                {"description": "Gold price upside", "score": "35%"},
+                {"description": "Cost blowout risk", "score": "65%", "tripwires": ["Costs exceed $1500/oz"]},
+            ],
+            "verdict": {"verdict": "Medium conviction -- balanced risk/reward"},
+            "theNarrative": {"coreThesis": "Gold producer with operational leverage"},
+            "skew": {"score": 55},
+            "lastUpdated": "2026-03-20",
+        }
+        result = _build_summary_from_research(research, "NST")
+        assert result["ticker"] == "NST"
+        assert result["coverage_state"] == "covered"
+        assert "Gold producer" in result["analyst_summary_text"]
+        assert result["conviction_level"] == "medium"
+
+    def test_conviction_extraction_high(self):
+        from handoff import _build_summary_from_research
+        research = {"verdict": {"verdict": "High conviction buy"}, "hypotheses": []}
+        result = _build_summary_from_research(research, "BHP")
+        assert result["conviction_level"] == "high"
+
+    def test_conviction_extraction_low(self):
+        from handoff import _build_summary_from_research
+        research = {"verdict": {"verdict": "Low conviction, too many unknowns"}, "hypotheses": []}
+        result = _build_summary_from_research(research, "DRO")
+        assert result["conviction_level"] == "low"
+
+    def test_valuation_stance_undervalued(self):
+        from handoff import _build_summary_from_research
+        research = {
+            "verdict": {"verdict": "Undervalued relative to peers"},
+            "hypotheses": [],
+        }
+        result = _build_summary_from_research(research, "WOR")
+        assert result["valuation_stance"] == "undervalued"
+
+    def test_risks_from_hypotheses(self):
+        from handoff import _build_summary_from_research
+        research = {
+            "hypotheses": [
+                {"description": "Benign risk", "score": "30%"},
+                {"description": "Cost overrun risk", "score": "70%"},
+                {"description": "Regulatory headwind", "score": "55%"},
+            ],
+            "verdict": {},
+        }
+        result = _build_summary_from_research(research, "CSL")
+        assert "Cost overrun risk" in result["key_risks"]
+        assert "Regulatory headwind" in result["key_risks"]
+        # 30% score hypothesis should NOT appear as risk
+        assert "Benign risk" not in result["key_risks"]
+
+    def test_tripwires_extraction(self):
+        from handoff import _build_summary_from_research
+        research = {
+            "hypotheses": [
+                {"description": "H1", "score": "40%", "tripwires": ["Price below $5", "Volume drops 50%"]},
+                {"description": "H2", "score": "60%", "tripwires": ["Margin below 10%"]},
+            ],
+            "verdict": {},
+        }
+        result = _build_summary_from_research(research, "FMG")
+        assert "Price below $5" in result["tripwires"]
+        assert "Margin below 10%" in result["tripwires"]
+        assert len(result["tripwires"]) <= 5
+
+    def test_version_string_from_metadata(self):
+        from handoff import _build_summary_from_research
+        research = {
+            "hypotheses": [],
+            "verdict": {},
+            "lastUpdated": "2026-03-20",
+            "skew": {"score": 55},
+        }
+        result = _build_summary_from_research(research, "WTC")
+        assert result["summary_version"] != "empty"
+        assert len(result["summary_version"]) == 10
+
+    def test_end_to_end_wtc_research_fallback(self):
+        """WTC has research JSON but no memories -- should return covered."""
+        import asyncio
+        from handoff import build_analyst_summary
+        # Pass pool=None so no DB query happens, and no user/guest so memories=[]
+        result = asyncio.get_event_loop().run_until_complete(
+            build_analyst_summary(None, ticker="WTC", user_id=None, guest_id=None)
+        )
+        # WTC has a research JSON file in data/research/WTC.json
+        assert result["coverage_state"] == "covered"
+        assert result["ticker"] == "WTC"
+        assert result["analyst_summary_text"] != "No Analyst coverage available for WTC."

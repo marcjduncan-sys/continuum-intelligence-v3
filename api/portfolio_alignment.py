@@ -543,13 +543,6 @@ def compute_alignment(
         hypotheses = parse_hypotheses(research) if research else []
         skew = resolve_skew(research) if research else {"direction": "", "score": None, "rationale": "", "source": "none"}
 
-<<<<<<< HEAD
-        # Derive position direction from quantity or market_value sign
-        qty = h.get("quantity", 0)
-        mv = h.get("market_value", 0)
-        direction = "short" if (qty < 0 or mv < 0) else "long"
-        alignment = classify_alignment(direction, skew["direction"])
-=======
         # Derive position direction from multiple signals:
         # 1. Explicit notes field (set by portfolio sync: "direction:short")
         # 2. Negative quantity or market_value (if DB constraints are relaxed)
@@ -564,7 +557,6 @@ def compute_alignment(
             pos_direction = "long"
 
         alignment = classify_alignment(pos_direction, skew["direction"])
->>>>>>> 9b15f32 (fix: preserve short position direction through DB sync via notes field)
 
         # Accumulate weights
         if alignment["cls"] == "aligned":
