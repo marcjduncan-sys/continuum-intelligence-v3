@@ -84,25 +84,68 @@ class TestParseScore:
 # ---------------------------------------------------------------------------
 
 class TestResolveSkew:
-    def test_computed_skew_preferred(self):
+    def test_upside_from_hypotheses(self):
         research = {
-            "_skew": {"direction": "upside", "score": 60},
-            "skew": {"direction": "downside", "rationale": "test"},
+            "hypotheses": [
+                {"direction": "upside", "score": "70%"},
+                {"direction": "downside", "score": "30%"},
+            ],
         }
         result = resolve_skew(research)
         assert result["direction"] == "upside"
         assert result["source"] == "computed"
 
-    def test_fallback_to_raw(self):
-        research = {"skew": {"direction": "downside", "rationale": "bear case"}}
+    def test_downside_from_hypotheses(self):
+        research = {
+            "hypotheses": [
+                {"direction": "upside", "score": "25%"},
+                {"direction": "downside", "score": "75%"},
+            ],
+        }
         result = resolve_skew(research)
         assert result["direction"] == "downside"
-        assert result["source"] == "raw"
+        assert result["source"] == "computed"
 
-    def test_no_skew(self):
+    def test_balanced_from_even_hypotheses(self):
+        research = {
+            "hypotheses": [
+                {"direction": "upside", "score": "50%"},
+                {"direction": "downside", "score": "50%"},
+            ],
+        }
+        result = resolve_skew(research)
+        assert result["direction"] == "balanced"
+        assert result["source"] == "computed"
+
+    def test_no_hypotheses(self):
         result = resolve_skew({})
         assert result["direction"] == "balanced"
         assert result["source"] == "none"
+
+    def test_ignores_stale_skew_field(self):
+        """The raw skew field is no longer consulted -- only hypotheses matter."""
+        research = {
+            "skew": {"direction": "upside", "rationale": "stale"},
+            "hypotheses": [
+                {"direction": "downside", "score": "80%"},
+                {"direction": "upside", "score": "20%"},
+            ],
+        }
+        result = resolve_skew(research)
+        assert result["direction"] == "downside"
+
+    def test_neutral_hypotheses_zero_weight(self):
+        """Neutral hypotheses contribute zero directional weight."""
+        research = {
+            "hypotheses": [
+                {"direction": "upside", "score": "40%"},
+                {"direction": "neutral", "score": "40%"},
+                {"direction": "downside", "score": "20%"},
+            ],
+        }
+        result = resolve_skew(research)
+        # neutral drops out; upside 40 vs downside 20 -> upside
+        assert result["direction"] == "upside"
 
 
 # ---------------------------------------------------------------------------

@@ -71,25 +71,121 @@ def parse_hypotheses(research: dict) -> list[dict]:
     return result
 
 
+def _compute_skew_from_hypotheses(hypotheses: list[dict]) -> dict:
+    """Compute skew from hypothesis scores using the same algorithm as the frontend's
+    computeSkewScore(): clamp each score to [5, 80], normalise proportionally to 100,
+    sum upside vs downside, derive direction from score difference (threshold +/- 5).
+    Neutral hypotheses contribute zero directional weight."""
+    FLOOR, CEILING = 5, 80
+
+    if not hypotheses:
+        return {"direction": "balanced", "score": 0, "rationale": "", "source": "computed"}
+
+    # Parse raw scores
+    raw = []
+    for h in hypotheses:
+        s = h.get("score", 0)
+        if isinstance(s, str):
+            try:
+                s = int(s.replace("%", "").strip())
+            except (ValueError, TypeError):
+                s = 0
+        raw.append(int(s) if isinstance(s, (int, float)) else 0)
+
+    # Clamp
+    clamped = [max(FLOOR, min(CEILING, v)) for v in raw]
+    total = sum(clamped)
+    if total == 0:
+        norm = [round(100 / len(clamped))] * len(clamped)
+    else:
+        norm = [round((c / total) * 100) for c in clamped]
+
+    # Iterative post-normalisation clamp (matches frontend Step 3)
+    for _ in range(20):
+        overflow = 0
+        underflow = 0
+        free_indices = []
+        for i in range(len(norm)):
+            if norm[i] > CEILING:
+                overflow += norm[i] - CEILING
+                norm[i] = CEILING
+            elif norm[i] < FLOOR:
+                underflow += FLOOR - norm[i]
+                norm[i] = FLOOR
+            else:
+                free_indices.append(i)
+        if overflow == 0 and underflow == 0:
+            break
+        net = overflow - underflow
+        if net == 0 or not free_indices:
+            break
+        if net > 0:
+            free_indices.sort(key=lambda i: norm[i])
+            remaining = net
+            for fi in free_indices:
+                if remaining <= 0:
+                    break
+                room = CEILING - norm[fi]
+                give = min(remaining, room)
+                norm[fi] += give
+                remaining -= give
+        else:
+            free_indices.sort(key=lambda i: -norm[i])
+            remaining = -net
+            for fi in free_indices:
+                if remaining <= 0:
+                    break
+                room = norm[fi] - FLOOR
+                take = min(remaining, room)
+                norm[fi] -= take
+                remaining -= take
+
+    # Fix rounding residual (matches frontend Step 4)
+    rounded_sum = sum(norm)
+    if rounded_sum != 100:
+        diff = 100 - rounded_sum
+        best_idx = -1
+        for i in range(len(norm)):
+            candidate = norm[i] + diff
+            if FLOOR <= candidate <= CEILING:
+                if best_idx == -1 or norm[i] > norm[best_idx]:
+                    best_idx = i
+        if best_idx == -1:
+            best_idx = max(range(len(norm)), key=lambda i: norm[i])
+        norm[best_idx] += diff
+
+    # Sum upside vs downside
+    bull = 0
+    bear = 0
+    for i, h in enumerate(hypotheses):
+        direction = str(h.get("direction", "downside")).lower()
+        w = norm[i] if i < len(norm) else 0
+        if direction == "upside":
+            bull += w
+        elif direction == "downside":
+            bear += w
+        # neutral contributes zero
+
+    bull = round(bull)
+    bear = round(bear)
+    score = bull - bear
+    direction = "upside" if score > 5 else "downside" if score < -5 else "balanced"
+
+    return {
+        "direction": direction,
+        "score": score,
+        "rationale": f"bull={bull} bear={bear}",
+        "source": "computed",
+    }
+
+
 def resolve_skew(research: dict) -> dict:
-    """Resolve skew from research JSON. Prefers computed _skew, falls back to raw."""
-    computed = research.get("_skew")
-    if isinstance(computed, dict) and "direction" in computed:
-        return {
-            "direction": str(computed.get("direction", "balanced")).lower(),
-            "score": float(computed.get("score", 0)) if computed.get("score") is not None else None,
-            "rationale": str(computed.get("rationale", "")),
-            "source": "computed",
-        }
-    raw = research.get("skew")
-    if isinstance(raw, dict):
-        return {
-            "direction": str(raw.get("direction", "balanced")).lower(),
-            "score": None,
-            "rationale": str(raw.get("rationale", "")),
-            "source": "raw",
-        }
-    return {"direction": "balanced", "score": None, "rationale": "", "source": "none"}
+    """Compute skew from hypothesis scores, matching the frontend algorithm exactly.
+    No longer consults the stale narrative skew field."""
+    hypotheses = research.get("hypotheses") or []
+    if not hypotheses:
+        return {"direction": "balanced", "score": None, "rationale": "", "source": "none"}
+    return _compute_skew_from_hypotheses(hypotheses)
 
 
 # ---------------------------------------------------------------------------

@@ -678,23 +678,23 @@ class TestGP14ResearchBackedAlignment:
         result = classify_alignment("long", skew["direction"])
         assert result["cls"] == "neutral"
 
-    def test_csl_upside_aligned(self):
-        """CSL has raw skew=upside, long position -> aligned."""
+    def test_csl_downside_contradicts(self):
+        """CSL computes to downside from hypothesis scores, long position -> contradicts."""
         research = load_research("CSL")
         assert research is not None
         skew = resolve_skew(research)
-        assert skew["direction"] == "upside"
+        assert skew["direction"] == "downside"
         result = classify_alignment("long", skew["direction"])
-        assert result["cls"] == "aligned"
+        assert result["cls"] == "contradicts"
 
-    def test_xro_upside_aligned(self):
-        """XRO has raw skew=upside, long position -> aligned."""
+    def test_xro_balanced_neutral(self):
+        """XRO computes to balanced from hypothesis scores, long position -> neutral."""
         research = load_research("XRO")
         assert research is not None
         skew = resolve_skew(research)
-        assert skew["direction"] == "upside"
+        assert skew["direction"] == "balanced"
         result = classify_alignment("long", skew["direction"])
-        assert result["cls"] == "aligned"
+        assert result["cls"] == "neutral"
 
     def test_mqg_upside_aligned(self):
         """MQG has raw skew=upside, long position -> aligned."""
@@ -716,22 +716,22 @@ class TestGP14ResearchBackedAlignment:
     def test_portfolio_alignment_with_covered_tickers(self):
         """Full alignment on mixed covered portfolio."""
         holdings = [
-            {"ticker": "BHP", "weight": 0.25},   # aligned
-            {"ticker": "CSL", "weight": 0.25},   # aligned
-            {"ticker": "CBA", "weight": 0.20},   # contradicts
-            {"ticker": "RIO", "weight": 0.15},   # neutral
-            {"ticker": "WOW", "weight": 0.15},   # contradicts
+            {"ticker": "BHP", "weight": 0.25},   # aligned (upside)
+            {"ticker": "CSL", "weight": 0.25},   # contradicts (downside, long)
+            {"ticker": "CBA", "weight": 0.20},   # contradicts (downside, long)
+            {"ticker": "RIO", "weight": 0.15},   # neutral (balanced)
+            {"ticker": "WOW", "weight": 0.15},   # contradicts (downside, long)
         ]
         result = compute_alignment(holdings=holdings)
         summary = result["alignment_summary"]
-        # aligned: BHP(0.25) + CSL(0.25) = 0.50
-        assert abs(summary["aligned_weight"] - 0.50) < TOL
-        # contradicts: CBA(0.20) + WOW(0.15) = 0.35
-        assert abs(summary["contradicts_weight"] - 0.35) < TOL
+        # aligned: BHP(0.25)
+        assert abs(summary["aligned_weight"] - 0.25) < TOL
+        # contradicts: CSL(0.25) + CBA(0.20) + WOW(0.15) = 0.60
+        assert abs(summary["contradicts_weight"] - 0.60) < TOL
         # neutral: RIO(0.15)
         assert abs(summary["neutral_weight"] - 0.15) < TOL
-        # alignment_score: 0.50 / 1.0 = 0.50
-        assert abs(summary["alignment_score"] - 0.50) < TOL
+        # alignment_score: 0.25 / 1.0 = 0.25
+        assert abs(summary["alignment_score"] - 0.25) < TOL
         assert summary["covered_count"] == 5
         assert summary["not_covered_weight"] == 0.0
 
