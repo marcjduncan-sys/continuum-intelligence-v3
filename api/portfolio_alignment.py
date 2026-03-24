@@ -543,8 +543,11 @@ def compute_alignment(
         hypotheses = parse_hypotheses(research) if research else []
         skew = resolve_skew(research) if research else {"direction": "", "score": None, "rationale": "", "source": "none"}
 
-        # Classify alignment (long-only assumed per Phase B constraints)
-        alignment = classify_alignment("long", skew["direction"])
+        # Derive position direction from quantity or market_value sign
+        qty = h.get("quantity", 0)
+        mv = h.get("market_value", 0)
+        direction = "short" if (qty < 0 or mv < 0) else "long"
+        alignment = classify_alignment(direction, skew["direction"])
 
         # Accumulate weights
         if alignment["cls"] == "aligned":
