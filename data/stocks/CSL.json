@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2.5,
-      "last_updated": "2026-03-19T07:17:33.137Z"
+      "last_updated": "2026-03-25T07:20:38.187Z"
     },
     "N2": {
       "label": "Managed/Base Case",
@@ -26,7 +26,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 1,
-      "last_updated": "2026-03-19T07:17:33.137Z"
+      "last_updated": "2026-03-25T07:20:38.187Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Vifor integration costs in H1 FY26 and AUD/USD exchange rate trajectory. If integration costs rise or AUD strengthens above 0.70, downside risk increases.",
       "upside": null,
       "risk_plain": "Currency headwinds alone could knock 3-5% off reported earnings, and if combined with slower Vifor synergies, the stock could de-rate.",
-      "survival_score": 0.46,
+      "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 4.2,
-      "last_updated": "2026-03-25T07:00:36.528Z"
+      "last_updated": "2026-03-25T07:20:38.187Z"
     },
     "N4": {
       "label": "Disruption",
@@ -47,10 +47,10 @@
       "what_to_watch": "Gene therapy clinical trial results targeting primary immunodeficiency conditions, and any biosimilar approvals for immunoglobulin products in major markets.",
       "upside": null,
       "risk_plain": "While this is a long-term risk, any breakthrough gene therapy result could trigger a sharp de-rating of the entire plasma sector.",
-      "survival_score": 0.44,
+      "survival_score": 0.46,
       "status": "MODERATE",
       "weighted_inconsistency": 7.1,
-      "last_updated": "2026-03-25T07:00:36.528Z"
+      "last_updated": "2026-03-25T07:20:38.187Z"
     }
   },
   "dominant": "N3",
@@ -430,6 +430,13 @@
       "severity": "AMBER",
       "message": "Single-day move of -52.9% exceeds 10% threshold — possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-03-25",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "5-day cumulative move of -52.8% exceeds 15% threshold — possible overcorrection",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -502,6 +509,16 @@
       "cumulative_20d": -52.43,
       "results_day": false,
       "overcorrection_active": true
+    },
+    {
+      "date": "2026-03-25",
+      "classification": "NOTABLE",
+      "daily_change_pct": 2.17,
+      "volume_multiplier": 1,
+      "cumulative_5d": -52.83,
+      "cumulative_20d": -52.43,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
@@ -529,7 +546,8 @@
     285.6,
     285.5,
     138,
-    134.62
+    134.62,
+    140.99
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -769,13 +787,13 @@
   },
   "_overcorrection": {
     "active": true,
-    "triggerType": "SINGLE_DAY",
-    "triggerDate": "2026-03-19",
-    "triggerPrice": 134.62,
-    "direction": "down",
-    "movePct": -52.85,
-    "reviewDate": "2026-03-26",
-    "message": "Single-day move of -52.9% exceeds 10% threshold — possible overcorrection"
+    "triggerType": "FIVE_DAY_CUMULATIVE",
+    "triggerDate": "2026-03-25",
+    "triggerPrice": 140.99,
+    "direction": "up",
+    "movePct": 2.17,
+    "reviewDate": "2026-04-01",
+    "message": "5-day cumulative move of -52.8% exceeds 15% threshold — possible overcorrection"
   },
   "price_evidence": {
     "last_run": "2026-03-25T07:00:36.528Z",
