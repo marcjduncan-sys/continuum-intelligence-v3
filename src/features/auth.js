@@ -58,6 +58,7 @@ function getCurrentUser() {
         }
         return { id: payload.sub, email: payload.email };
     } catch (e) {
+        clearToken(); // discard corrupted token rather than leaving it in localStorage
         return null;
     }
 }
