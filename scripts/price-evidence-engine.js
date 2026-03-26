@@ -2,7 +2,7 @@
 /**
  * price-evidence-engine.js
  *
- * Continuum Intelligence — Daily Price-as-Evidence Engine
+ * Continuum Intelligence – Daily Price-as-Evidence Engine
  * Per NARRATIVE_FRAMEWORK_V3.md Principle 3
  *
  * Runs after prices are updated. For each stock:
@@ -87,7 +87,7 @@ function isResultsDay(ticker, eventsDir) {
       }
     }
   } catch (e) {
-    // No events data — not a results day
+    // No events data – not a results day
   }
   return false;
 }
@@ -144,11 +144,11 @@ function checkOvercorrection(dailyChangePct, cumulative, stockData) {
   if (absDailyPct > 10) {
     result.triggered = true;
     result.triggerType = 'SINGLE_DAY';
-    result.message = `Single-day move of ${dailyChangePct > 0 ? '+' : ''}${dailyChangePct.toFixed(1)}% exceeds 10% threshold — possible overcorrection`;
+    result.message = `Single-day move of ${dailyChangePct > 0 ? '+' : ''}${dailyChangePct.toFixed(1)}% exceeds 10% threshold – possible overcorrection`;
   } else if (absFiveDayPct > 15) {
     result.triggered = true;
     result.triggerType = 'FIVE_DAY_CUMULATIVE';
-    result.message = `5-day cumulative move of ${cumulative.fiveDay > 0 ? '+' : ''}${cumulative.fiveDay.toFixed(1)}% exceeds 15% threshold — possible overcorrection`;
+    result.message = `5-day cumulative move of ${cumulative.fiveDay > 0 ? '+' : ''}${cumulative.fiveDay.toFixed(1)}% exceeds 15% threshold – possible overcorrection`;
   }
 
   // If triggered, compute review date (5 trading days from now)
@@ -168,7 +168,7 @@ function checkOvercorrection(dailyChangePct, cumulative, stockData) {
     const review = stockData._overcorrection;
     const today = new Date().toISOString().split('T')[0];
     if (today >= review.reviewDate) {
-      // 5-day review period elapsed — assess if overcorrection confirmed
+      // 5-day review period elapsed – assess if overcorrection confirmed
       const triggerPrice = review.triggerPrice;
       const currentPrice = stockData.current_price;
       const triggerDirection = review.direction; // 'up' or 'down'
@@ -184,8 +184,8 @@ function checkOvercorrection(dailyChangePct, cumulative, stockData) {
         reversal_pct: Math.round(reversal * 10) / 10,
         confirmed: Math.abs(reversal) > 50,
         message: Math.abs(reversal) > 50
-          ? `Overcorrection CONFIRMED — ${Math.abs(reversal).toFixed(0)}% reversal since trigger`
-          : `Overcorrection NOT confirmed — price ${Math.abs(reversal) < 10 ? 'held' : 'only partially reversed'}`
+          ? `Overcorrection CONFIRMED – ${Math.abs(reversal).toFixed(0)}% reversal since trigger`
+          : `Overcorrection NOT confirmed – price ${Math.abs(reversal) < 10 ? 'held' : 'only partially reversed'}`
       };
     }
   }
@@ -407,7 +407,7 @@ function processStock(ticker, stockData, livePrice) {
 function main() {
   console.log('');
   console.log('══════════════════════════════════════════════════════════════');
-  console.log('  CONTINUUM INTELLIGENCE — Price-as-Evidence Engine');
+  console.log('  CONTINUUM INTELLIGENCE – Price-as-Evidence Engine');
   console.log('══════════════════════════════════════════════════════════════');
   console.log('  Mode:', dryRun ? 'DRY RUN' : 'LIVE');
 
@@ -434,7 +434,7 @@ function main() {
   for (const ticker of tickers) {
     const stockPath = path.join(STOCKS_DIR, ticker + '.json');
     if (!fs.existsSync(stockPath)) {
-      if (verbose) console.log('  [SKIP]', ticker, '— no stock data');
+      if (verbose) console.log('  [SKIP]', ticker, '– no stock data');
       skipped++;
       continue;
     }
@@ -444,7 +444,7 @@ function main() {
 
     const result = processStock(ticker, stockData, livePrice);
     if (!result) {
-      if (verbose) console.log('  [SKIP]', ticker, '— insufficient data');
+      if (verbose) console.log('  [SKIP]', ticker, '– insufficient data');
       skipped++;
       continue;
     }
@@ -523,10 +523,10 @@ function main() {
     if (result.overcorrection.reviewResult) {
       const rr = result.overcorrection.reviewResult;
       if (rr.confirmed) {
-        // Overcorrection confirmed — scores have already self-corrected
+        // Overcorrection confirmed – scores have already self-corrected
         stockData.alert_state = 'OVERCORRECTION_CONFIRMED';
       } else {
-        // Not an overcorrection — clear the flag
+        // Not an overcorrection – clear the flag
         stockData.alert_state = 'NORMAL';
       }
       stockData._overcorrection = { ...stockData._overcorrection, active: false, reviewResult: rr };
@@ -576,7 +576,7 @@ function main() {
   console.log('  Updated:', updated, '| Skipped:', skipped);
   console.log('  NOISE:', noiseCount, '| NOTABLE:', notableCount,
     '| SIGNIFICANT:', significantCount, '| MATERIAL:', materialCount);
-  if (dryRun) console.log('  (DRY RUN — no files written)');
+  if (dryRun) console.log('  (DRY RUN – no files written)');
   console.log('══════════════════════════════════════════════════════════════');
 }
 

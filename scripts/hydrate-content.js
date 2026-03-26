@@ -2,7 +2,7 @@
 /**
  * hydrate-content.js
  *
- * Continuum Intelligence — Server-Side Content Hydration
+ * Continuum Intelligence – Server-Side Content Hydration
  *
  * After prices are updated by update-prices.js, this script:
  *   1. Reads current prices from per-ticker data/research/{ticker}.json files

@@ -1,5 +1,5 @@
 /**
- * Service Worker — Continuum Intelligence V3
+ * Service Worker – Continuum Intelligence V3
  *
  * Self-clearing: removes all caches and unregisters itself.
  * The previous caching SW caused stale asset issues after deploys

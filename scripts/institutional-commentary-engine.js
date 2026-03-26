@@ -1,7 +1,7 @@
 /**
  * Institutional Commentary Engine v2.0
  * 
- * Top 0.1% Research Quality — Dynamic Narrative Generation
+ * Top 0.1% Research Quality – Dynamic Narrative Generation
  * 
  * Generates Goldman Sachs/UBS-grade research commentary that is:
  * - 100% dynamically generated (no hardcoded text)
@@ -12,7 +12,7 @@
  */
 
 // ============================================================================
-// KNOWLEDGE GRAPH — Narrative Building Blocks
+// KNOWLEDGE GRAPH – Narrative Building Blocks
 // ============================================================================
 
 const NARRATIVE_KNOWLEDGE = {
@@ -104,12 +104,12 @@ const NARRATIVE_KNOWLEDGE = {
 };
 
 // ============================================================================
-// DYNAMIC TEXT GENERATION — Institutional Grade
+// DYNAMIC TEXT GENERATION – Institutional Grade
 // ============================================================================
 
 const TextGenerator = {
   /**
-   * Generate Executive Summary — The most important section
+   * Generate Executive Summary – The most important section
    */
   executiveSummary(ticker, company, priceData, weights, dislocation, inference) {
     const lines = [];
@@ -118,7 +118,7 @@ const TextGenerator = {
     const reviewChange = ((currentPrice - priceAtReview) / priceAtReview * 100).toFixed(1);
     const peakChange = ((currentPrice - peakPrice) / peakPrice * 100).toFixed(1);
     
-    // Opening — Price action anchor
+    // Opening – Price action anchor
     lines.push(this.generateOpening(priceData, dislocation, company));
     
     // Market narrative detection
@@ -134,7 +134,7 @@ const TextGenerator = {
   },
 
   /**
-   * Generate opening paragraph — always price-anchored
+   * Generate opening paragraph – always price-anchored
    */
   generateOpening(priceData, dislocation, company) {
     const { currentPrice, previousPrice, todayVolume, avgVolume20d } = priceData;
@@ -292,7 +292,7 @@ const TextGenerator = {
   investmentThesis(ticker, weights, dislocation, inference) {
     const lines = [];
     
-    lines.push(`## Investment Thesis — Dynamic Assessment`);
+    lines.push(`## Investment Thesis – Dynamic Assessment`);
     lines.push('');
     
     // Thesis summary based on blended weights
@@ -341,7 +341,7 @@ const TextGenerator = {
     const fromReview = ((currentPrice - priceAtReview) / priceAtReview * 100).toFixed(1);
     
     const lines = [];
-    lines.push(`## Valuation — Price-Implied Narrative`);
+    lines.push(`## Valuation – Price-Implied Narrative`);
     lines.push('');
     lines.push(`Current: A$${currentPrice} | From peak: ${fromPeak}% | From review: ${fromReview}%`);
     lines.push('');
@@ -376,7 +376,7 @@ const TextGenerator = {
     const rangePosition = ((currentPrice - low52Week) / (high52Week - low52Week) * 100).toFixed(1);
     
     const lines = [];
-    lines.push(`## Technical Structure — Price Action Analysis`);
+    lines.push(`## Technical Structure – Price Action Analysis`);
     lines.push('');
     lines.push(`Range Position: ${rangePosition}% (52-week range)`);
     lines.push(`Z-Score: ${dislocation.metrics.zScore} | Volume Ratio: ${dislocation.metrics.volumeRatio}x`);
@@ -412,7 +412,7 @@ const TextGenerator = {
    */
   evidenceCheck(weights, inference, dislocation) {
     const lines = [];
-    lines.push(`## Evidence Check — What Price Action Tells Us`);
+    lines.push(`## Evidence Check – What Price Action Tells Us`);
     lines.push('');
     
     // Evidence assessment for each hypothesis
@@ -446,7 +446,7 @@ const TextGenerator = {
    */
   catalysts(weights, dislocation) {
     const lines = [];
-    lines.push(`## Catalysts & Tripwires — What to Watch`);
+    lines.push(`## Catalysts & Tripwires – What to Watch`);
     lines.push('');
     
     // Find highest divergence hypothesis
@@ -464,7 +464,7 @@ const TextGenerator = {
     
     // Generate catalysts based on hypothesis type
     h.metrics.forEach((metric, i) => {
-      lines.push(`${i + 1}. **${metric}** — ${this.generateCatalystText(metric, primaryDivergence.tier)}`);
+      lines.push(`${i + 1}. **${metric}** – ${this.generateCatalystText(metric, primaryDivergence.tier)}`);
     });
     
     lines.push('');
@@ -680,7 +680,7 @@ const InstitutionalCommentaryEngine = {
     const maxGap = Math.max(...Object.values(weights).map(w => Math.abs(w.longTerm - w.shortTerm)));
     
     if (dislocation.severity === 'CRITICAL' || maxGap > 50) {
-      return `**UNSTABLE — REGIME CHANGE RISK:** Material divergence between research and market-implied ` +
+      return `**UNSTABLE – REGIME CHANGE RISK:** Material divergence between research and market-implied ` +
              `probabilities (${maxGap}pts) combined with ${dislocation.severity.toLowerCase()} price dislocation ` +
              `suggests potential thesis regime change. Narrative confidence is LOW.`;
     }

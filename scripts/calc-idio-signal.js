@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Continuum Intelligence — Calculate Idiosyncratic (Company) Signal
+ * Continuum Intelligence – Calculate Idiosyncratic (Company) Signal
  *
  * Reads hypothesis data from data/research/*.json, applies the v3
  * normalisation (floor 5, ceiling 80, scale to 100%), then computes:
@@ -34,8 +34,8 @@ const DRY_RUN = args.includes('--dry-run');
 
 // ── Main ─────────────────────────────────────────────────────────────
 function main() {
-  console.log('=== Continuum Intelligence — Calc Idio Signal (v3 Net Formula) ===\n');
-  if (DRY_RUN) console.log('  DRY RUN — no files will be written\n');
+  console.log('=== Continuum Intelligence – Calc Idio Signal (v3 Net Formula) ===\n');
+  if (DRY_RUN) console.log('  DRY RUN – no files will be written\n');
 
   const tickers = getActiveTickers();
   console.log(`  Active tickers: ${tickers.length}\n`);

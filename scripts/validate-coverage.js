@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * validate-coverage.js — Coverage Universe Consistency Checker
+ * validate-coverage.js – Coverage Universe Consistency Checker
  *
  * Verifies all active tickers in the central registry are properly registered
  * across all data sources: data/research/*.json, data/stocks/*.json,

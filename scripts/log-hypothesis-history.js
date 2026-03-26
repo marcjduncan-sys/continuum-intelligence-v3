@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Continuum Intelligence — Log Hypothesis History
+ * Continuum Intelligence – Log Hypothesis History
  *
  * Appends one snapshot per stock per day to data/stocks/{TICKER}-history.json.
  * Each entry captures: price, scores, ranks, skew, dominant, flip, events.
@@ -63,7 +63,7 @@ function calculateSkew(scores, directionMap) {
 function detectEvents(stock, flip, previousDominant) {
   const events = [];
 
-  // E — Earnings event (catalyst passed or imminent)
+  // E – Earnings event (catalyst passed or imminent)
   if (stock.freshness && stock.freshness.nearestCatalyst && stock.freshness.nearestCatalystDays !== undefined) {
     const catalyst = stock.freshness.nearestCatalyst;
     const days = stock.freshness.nearestCatalystDays;
@@ -72,7 +72,7 @@ function detectEvents(stock, flip, previousDominant) {
     }
   }
 
-  // P — Material price move (SIGNIFICANT or MATERIAL classification)
+  // P – Material price move (SIGNIFICANT or MATERIAL classification)
   if (stock.price_evidence && stock.price_evidence.classification) {
     const cat = stock.price_evidence.classification.category;
     if (cat === 'SIGNIFICANT' || cat === 'MATERIAL') {
@@ -82,12 +82,12 @@ function detectEvents(stock, flip, previousDominant) {
     }
   }
 
-  // O — Overcorrection detected
+  // O – Overcorrection detected
   if (stock.overcorrection && stock.overcorrection.triggered && stock.overcorrection.status === 'monitoring') {
     events.push({ type: 'O', label: 'Overcorrection detected' });
   }
 
-  // F — Narrative flip
+  // F – Narrative flip
   if (flip && previousDominant) {
     events.push({ type: 'F', label: `${previousDominant} \u2192 ${stock.dominant}` });
   }
@@ -118,7 +118,7 @@ function buildEntry(stock, today) {
   // Daily change % from price_evidence or freshness
   let changePct = null;
   if (stock.price_evidence && stock.price_evidence.classification) {
-    // The classification is based on the daily move — get it from priceHistory
+    // The classification is based on the daily move – get it from priceHistory
     const ph = stock.priceHistory;
     if (ph && ph.length >= 2) {
       const prev = ph[ph.length - 2];
@@ -164,8 +164,8 @@ function buildEntry(stock, today) {
 }
 
 function main() {
-  console.log('=== Continuum Intelligence — Log Hypothesis History ===\n');
-  if (DRY_RUN) console.log('  DRY RUN — no files will be written\n');
+  console.log('=== Continuum Intelligence – Log Hypothesis History ===\n');
+  if (DRY_RUN) console.log('  DRY RUN – no files will be written\n');
 
   const today = new Date().toISOString().slice(0, 10);
   console.log(`  Date: ${today}\n`);
@@ -188,7 +188,7 @@ function main() {
     try {
       stock = JSON.parse(fs.readFileSync(stockPath, 'utf8'));
     } catch (err) {
-      console.error(`  x ${ticker}: failed to read — ${err.message}`);
+      console.error(`  x ${ticker}: failed to read – ${err.message}`);
       continue;
     }
 
@@ -234,7 +234,7 @@ function main() {
       console.log(`  ~ ${ticker}: replaced entry for ${today}`);
     } else {
       history.entries.push(entry);
-      console.log(`  + ${ticker}: logged ${today} — ${entry.dominant} skew:${entry.skew} ${entry.classification || 'n/a'}`);
+      console.log(`  + ${ticker}: logged ${today} – ${entry.dominant} skew:${entry.skew} ${entry.classification || 'n/a'}`);
     }
 
     // Write
@@ -248,7 +248,7 @@ function main() {
   console.log(`\n=== Summary ===`);
   console.log(`  Logged: ${logged}`);
   console.log(`  Skipped: ${skipped}`);
-  if (DRY_RUN) console.log(`  (Dry run — no files written)`);
+  if (DRY_RUN) console.log(`  (Dry run – no files written)`);
   console.log('');
 }
 

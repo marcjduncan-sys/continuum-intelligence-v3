@@ -1,11 +1,11 @@
 /**
- * DYNAMIC NARRATIVE ENGINE — UI Rendering
+ * DYNAMIC NARRATIVE ENGINE – UI Rendering
  *
- * Workstream 1: Dislocation indicator — severity-graded (Minor/Moderate/Critical),
+ * Workstream 1: Dislocation indicator – severity-graded (Minor/Moderate/Critical),
  *   integrated within the RiskSkew section, institutional aesthetic.
- * Workstream 2: Competing hypotheses — full clarity overhaul with plain English
+ * Workstream 2: Competing hypotheses – full clarity overhaul with plain English
  *   descriptions, evidence support bars, "what to watch", and explanatory header.
- * Workstream 3: PDF report generation — institutional and retail formats.
+ * Workstream 3: PDF report generation – institutional and retail formats.
  *
  * Depends on: evidence.js (HYPOTHESIS_IDS), weighting.js (optional)
  */

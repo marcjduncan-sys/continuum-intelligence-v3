@@ -1,5 +1,5 @@
 /**
- * DYNAMIC NARRATIVE ENGINE — Core Scoring Engine
+ * DYNAMIC NARRATIVE ENGINE – Core Scoring Engine
  *
  * Recalculates hypothesis survival scores for a stock based on all
  * active evidence items (editorial + price signals) with time-decay weighting.
@@ -27,10 +27,10 @@ function recalculateSurvival(stock) {
   const now = new Date();
   const allEvidence = gatherActiveEvidence(stock);
 
-  if (allEvidence.length === 0) return; // No evidence — keep current scores
+  if (allEvidence.length === 0) return; // No evidence – keep current scores
 
   // Maximum possible weighted inconsistency (for normalisation).
-  // This is the sum of every evidence item's decayed weight — the theoretical
+  // This is the sum of every evidence item's decayed weight – the theoretical
   // worst case where every item is INCONSISTENT with a given hypothesis.
   const maxPossibleWeight = allEvidence.reduce(function (sum, e) {
     const diagWeight = DIAGNOSTICITY_WEIGHTS[e.diagnosticity] || 1.0;
@@ -130,7 +130,7 @@ function checkNarrativeFlip(stock) {
     if (stock.alert_state !== 'ALERT') {
       stock.alert_state = 'ALERT';
       stock.alert_started = new Date().toISOString();
-      console.log('[DNE] ALERT: ' + stock.ticker + ' — ' + currentDominant +
+      console.log('[DNE] ALERT: ' + stock.ticker + ' – ' + currentDominant +
                   ' under pressure from ' + bestAlt.id);
     }
     return;
@@ -149,7 +149,7 @@ function checkNarrativeFlip(stock) {
         return;
       }
     } else {
-      // First time seeing this condition — enter alert first
+      // First time seeing this condition – enter alert first
       stock.alert_state = 'ALERT';
       stock.alert_started = new Date().toISOString();
     }
@@ -194,7 +194,7 @@ function executeFlip(stock, fromH, toH, trigger) {
   stock.alert_state = 'NORMAL';
   stock.alert_started = null;
 
-  console.log('[DNE] FLIP: ' + stock.ticker + ' — ' + fromH + ' → ' + toH +
+  console.log('[DNE] FLIP: ' + stock.ticker + ' – ' + fromH + ' → ' + toH +
               ' | Trigger: ' + trigger);
 }
 

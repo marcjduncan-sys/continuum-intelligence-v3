@@ -2,7 +2,7 @@
 /**
  * backfill-price-history.js
  *
- * Continuum Intelligence — Historical Price Backfill
+ * Continuum Intelligence – Historical Price Backfill
  *
  * Fetches up to 252 trading days (~1 year) of daily close prices from
  * Yahoo Finance for any ticker whose priceHistory has fewer than 252 entries.
@@ -135,7 +135,7 @@ function delay(ms) {
 async function main() {
   console.log('');
   console.log('══════════════════════════════════════════════════════════════');
-  console.log('  CONTINUUM INTELLIGENCE — Price History Backfill');
+  console.log('  CONTINUUM INTELLIGENCE – Price History Backfill');
   console.log('══════════════════════════════════════════════════════════════');
   console.log('  Target length:', TARGET_LENGTH, 'trading days');
   console.log('  Mode:', dryRun ? 'DRY RUN' : 'LIVE');
@@ -157,14 +157,14 @@ async function main() {
   for (const ticker of tickers) {
     const researchPath = path.join(RESEARCH_DIR, `${ticker}.json`);
     if (!fs.existsSync(researchPath)) {
-      console.log(`  [SKIP] ${ticker} — no research file`);
+      console.log(`  [SKIP] ${ticker} – no research file`);
       continue;
     }
     const data = JSON.parse(fs.readFileSync(researchPath, 'utf8'));
     const currentLen = (data.priceHistory || []).length;
 
     if (!force && currentLen >= TARGET_LENGTH) {
-      console.log(`  [OK]   ${ticker} — ${currentLen} pts (full)`);
+      console.log(`  [OK]   ${ticker} – ${currentLen} pts (full)`);
       continue;
     }
     needsBackfill.push({ ticker, currentLen, tickerAX: ticker + '.AX' });
@@ -187,7 +187,7 @@ async function main() {
       console.log(`  [FETCH] ${ticker}: ${prices.length} daily closes retrieved (was ${currentLen})`);
 
       if (prices.length <= currentLen && !force) {
-        console.log(`  [SKIP]  ${ticker} — Yahoo returned fewer points than existing`);
+        console.log(`  [SKIP]  ${ticker} – Yahoo returned fewer points than existing`);
         continue;
       }
 
@@ -213,7 +213,7 @@ async function main() {
 
       updated++;
 
-      // Rate limit — 500ms between Yahoo requests
+      // Rate limit – 500ms between Yahoo requests
       await delay(500);
 
     } catch (err) {
@@ -226,7 +226,7 @@ async function main() {
   console.log('');
   console.log(`  Updated: ${updated} tickers`);
   console.log(`  Failed:  ${failed} tickers`);
-  if (dryRun) console.log('  (DRY RUN — no files written)');
+  if (dryRun) console.log('  (DRY RUN – no files written)');
   if (updated > 0 && !dryRun) {
     console.log('\n  Next step: run `node scripts/sync-index.js` to update _index.json');
   }

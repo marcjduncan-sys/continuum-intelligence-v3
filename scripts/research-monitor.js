@@ -2,14 +2,14 @@
 /**
  * research-monitor.js
  *
- * Continuum Intelligence — Research Freshness & Catalyst Monitor
+ * Continuum Intelligence – Research Freshness & Catalyst Monitor
  *
  * Parses all stock data from data/research/*.json and generates a priority-ranked
  * action queue based on three signals:
  *
- *   1. FRESHNESS  — Days since research was last updated
- *   2. CATALYSTS  — Upcoming events that require research revision
- *   3. DISLOCATION — Price has moved significantly since last review
+ *   1. FRESHNESS  – Days since research was last updated
+ *   2. CATALYSTS  – Upcoming events that require research revision
+ *   3. DISLOCATION – Price has moved significantly since last review
  *
  * Each stock receives an urgency score (0-100) and a recommended action.
  *

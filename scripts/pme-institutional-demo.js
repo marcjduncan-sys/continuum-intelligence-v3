@@ -2,13 +2,13 @@
  * PME Institutional-Grade Demonstration
  * 
  * Shows the top 0.1% quality commentary output for PME's price dislocation.
- * This is Goldman Sachs/UBS research desk quality — entirely dynamic.
+ * This is Goldman Sachs/UBS research desk quality – entirely dynamic.
  */
 
 const PME_INSTITUTIONAL_DEMO = {
   run() {
     console.log('╔══════════════════════════════════════════════════════════════════════════╗');
-    console.log('║  CONTINUUM INTELLIGENCE — INSTITUTIONAL RESEARCH COMMENTARY              ║');
+    console.log('║  CONTINUUM INTELLIGENCE – INSTITUTIONAL RESEARCH COMMENTARY              ║');
     console.log('║  Quality Tier: Top 0.1%  |  Engine: v2.0  |  Output: 100% Dynamic        ║');
     console.log('╚══════════════════════════════════════════════════════════════════════════╝\n');
 
@@ -121,11 +121,11 @@ const PME_INSTITUTIONAL_DEMO = {
     console.log(`business quality vs extreme valuation. At 163x trailing P/E, the stock`);
     console.log(`prices in years of flawless execution."`);
     console.log('\n❌ Issues:');
-    console.log('  • Static — same text regardless of price action');
-    console.log('  • Generic — could apply to any high-multiple stock');
-    console.log('  • No price integration — does not reference -8% move');
-    console.log('  • No hypothesis weighting — ignores N3/N4 divergence');
-    console.log('  • No action guidance — what should the analyst do?\n');
+    console.log('  • Static – same text regardless of price action');
+    console.log('  • Generic – could apply to any high-multiple stock');
+    console.log('  • No price integration – does not reference -8% move');
+    console.log('  • No hypothesis weighting – ignores N3/N4 divergence');
+    console.log('  • No action guidance – what should the analyst do?\n');
 
     console.log('INSTITUTIONAL FRAMEWORK (Current):');
     console.log('───────────────────────────────────');
@@ -137,12 +137,12 @@ const PME_INSTITUTIONAL_DEMO = {
     console.log(`(75%) exceeds research view (35%), suggesting multiple compression`);
     console.log(`concerns are acute. Secondary: competitive disruption (38% blended).`);
     console.log('\n✅ Improvements:');
-    console.log('  • Dynamic — text generated from real price data');
-    console.log('  • Specific — references actual metrics (8.36%, volume, support)');
-    console.log('  • Integrated — every sentence connects price to narrative');
-    console.log('  • Hypothesis-mapped — explicit N1-N4 weight analysis');
-    console.log('  • Action-oriented — specific next steps for analyst');
-    console.log('  • Professional tone — Goldman Sachs/UBS research quality');
+    console.log('  • Dynamic – text generated from real price data');
+    console.log('  • Specific – references actual metrics (8.36%, volume, support)');
+    console.log('  • Integrated – every sentence connects price to narrative');
+    console.log('  • Hypothesis-mapped – explicit N1-N4 weight analysis');
+    console.log('  • Action-oriented – specific next steps for analyst');
+    console.log('  • Professional tone – Goldman Sachs/UBS research quality');
   },
 
   /**

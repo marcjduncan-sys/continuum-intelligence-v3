@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Continuum Intelligence — Automated Research Update
+ * Continuum Intelligence – Automated Research Update
  *
  * Mechanical daily recalculation of research metrics from data/stocks/*.json:
  *
@@ -36,7 +36,7 @@ let taConfig = null;
 try {
   taConfig = JSON.parse(fs.readFileSync(TA_CONFIG_PATH, 'utf8'));
 } catch (err) {
-  console.warn(`  Warning: Could not load ta-config.json — ${err.message}`);
+  console.warn(`  Warning: Could not load ta-config.json – ${err.message}`);
   console.warn('  Falling back to score passthrough (no V2 engine adjustments)');
 }
 
@@ -137,7 +137,7 @@ function writeFreshnessJson(allFreshness) {
     fs.writeFileSync(path.join(dataDir, 'freshness.json'), JSON.stringify(allFreshness, null, 2));
     console.log('  ✓ Updated data/freshness.json');
   } catch (err) {
-    console.error(`  ✗ Failed to write data/freshness.json — ${err.message}`);
+    console.error(`  ✗ Failed to write data/freshness.json – ${err.message}`);
   }
 }
 
@@ -151,7 +151,7 @@ function updateResearchJson(ticker, newDate, newScores) {
   try {
     research = JSON.parse(fs.readFileSync(researchPath, 'utf8'));
   } catch (err) {
-    console.log(`  ⚠ Could not read research JSON for ${ticker} — ${err.message}`);
+    console.log(`  ⚠ Could not read research JSON for ${ticker} – ${err.message}`);
     return;
   }
 
@@ -176,7 +176,7 @@ function updateResearchJson(ticker, newDate, newScores) {
   try {
     fs.writeFileSync(researchPath, JSON.stringify(research, null, 2));
   } catch (err) {
-    console.error(`  ✗ Failed to write research JSON for ${ticker} — ${err.message}`);
+    console.error(`  ✗ Failed to write research JSON for ${ticker} – ${err.message}`);
   }
 }
 
@@ -185,15 +185,15 @@ function updateResearchJson(ticker, newDate, newScores) {
 // ══════════════════════════════════════════════════════════════════════
 
 function main() {
-  console.log('=== Continuum Intelligence — Automated Research Update ===\n');
-  if (DRY_RUN) console.log('  🏃 DRY RUN — no files will be written\n');
+  console.log('=== Continuum Intelligence – Automated Research Update ===\n');
+  if (DRY_RUN) console.log('  🏃 DRY RUN – no files will be written\n');
 
   // ── Load prices ────────────────────────────────────────────────
   const priceResult = findLatestPrices('newest');
   if (priceResult) {
     console.log(`  Prices: ${priceResult.source} (${priceResult.file}), updated ${priceResult.updated}`);
   } else {
-    console.log('  ⚠ No price data available — using existing prices');
+    console.log('  ⚠ No price data available – using existing prices');
   }
 
   // ── Load stock JSONs ───────────────────────────────────────────
@@ -224,7 +224,7 @@ function main() {
     try {
       stock = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     } catch (err) {
-      console.error(`  ✗ ${ticker}: failed to read JSON — ${err.message}`);
+      console.error(`  ✗ ${ticker}: failed to read JSON – ${err.message}`);
       continue;
     }
 
@@ -310,7 +310,7 @@ function main() {
         flips.push({ ticker, from: result.oldDominant, to: result.dominant, oldLabel, newLabel });
         flippedCount++;
 
-        console.log(`  🔄 ${ticker}: NARRATIVE FLIP — ${result.oldDominant} (${oldLabel}) → ${result.dominant} (${newLabel})`);
+        console.log(`  🔄 ${ticker}: NARRATIVE FLIP – ${result.oldDominant} (${oldLabel}) → ${result.dominant} (${newLabel})`);
       } else {
         stock.dominant = result.dominant;
         stock.confidence = result.confidence;
@@ -364,12 +364,12 @@ function main() {
     }
   }
   console.log(`  Updated date: ${dateStr}`);
-  if (DRY_RUN) console.log(`  (Dry run — no files written)`);
+  if (DRY_RUN) console.log(`  (Dry run – no files written)`);
   console.log('');
 
   // GitHub Actions summary
   if (process.env.GITHUB_STEP_SUMMARY) {
-    let summary = `## 📊 Research Update — ${dateStr}\n\n`;
+    let summary = `## 📊 Research Update – ${dateStr}\n\n`;
     summary += `| Metric | Value |\n|--------|-------|\n`;
     summary += `| Stocks updated | ${updatedCount} |\n`;
     summary += `| Narrative flips | ${flippedCount} |\n`;

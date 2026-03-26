@@ -76,7 +76,7 @@ function updatePrice(ticker, priceData) {
     year: 'numeric'
   });
 
-  // Update research/{TICKER}.json — price + date
+  // Update research/{TICKER}.json – price + date
   const researchPath = path.join(DATA_DIR, 'research', `${ticker}.json`);
   updateJsonFile(researchPath, (research) => {
     research.price = parseFloat(priceData.price.toFixed(2));
@@ -85,7 +85,7 @@ function updatePrice(ticker, priceData) {
     research.last_price_update = new Date().toISOString();
   });
 
-  // Update stocks/{TICKER}.json — price + date
+  // Update stocks/{TICKER}.json – price + date
   const stocksPath = path.join(DATA_DIR, 'stocks', `${ticker}.json`);
   if (fs.existsSync(stocksPath)) {
     updateJsonFile(stocksPath, (stock) => {

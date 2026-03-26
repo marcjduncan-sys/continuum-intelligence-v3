@@ -1,11 +1,11 @@
 /**
- * normalise.js — Shared normalisation module
+ * normalise.js – Shared normalisation module
  *
  * Extracts normaliseScores() and computeSkewScore() so that both the
  * front-end (index.html) and backend scripts produce identical numbers.
  *
  * Front-end: loaded via <script> tag (functions attach to window)
- * Backend:   require('./js/dne/normalise') — CommonJS exports
+ * Backend:   require('./js/dne/normalise') – CommonJS exports
  *
  * v3 framework: floor 5, ceiling 80, scale to 100%, iterative clamping.
  */
@@ -19,9 +19,9 @@
   /**
    * Normalise raw ACH survival scores to sum to 100%.
    *
-   * @param {Array} items — each item must have a `.score` property
+   * @param {Array} items – each item must have a `.score` property
    *                        (string or number, e.g. "45" or 45 or "45%").
-   * @returns {number[]}  — array of integers summing to 100.
+   * @returns {number[]}  – array of integers summing to 100.
    */
   function normaliseScores(items) {
     var raw = [];
@@ -123,7 +123,7 @@
    * Net = sum(upside normalised weights) - sum(downside normalised weights).
    * Neutral hypotheses contribute zero.
    *
-   * @param {Object} data — must have `.hypotheses` array where each item has
+   * @param {Object} data – must have `.hypotheses` array where each item has
    *                        `.score` (string/number) and `.direction` ('upside'|'downside'|'neutral').
    * @returns {{ bull: number, bear: number, score: number, direction: string, hypotheses: Array }}
    */

@@ -271,7 +271,7 @@ console.log(`Normal: ${summary.normal} \u{1F7E2}`);
 
 // Log critical count for GitHub Actions (use step outputs, not exit codes)
 if (summary.criticalDislocations > 0) {
-  console.log(`\n⚠ ${summary.criticalDislocations} critical dislocation(s) detected — review recommended`);
+  console.log(`\n⚠ ${summary.criticalDislocations} critical dislocation(s) detected – review recommended`);
   // Write to GITHUB_OUTPUT so downstream steps can react without failing the workflow
   if (process.env.GITHUB_OUTPUT) {
     fs.appendFileSync(process.env.GITHUB_OUTPUT, `critical_count=${summary.criticalDislocations}\n`);

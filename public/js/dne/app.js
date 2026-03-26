@@ -1,5 +1,5 @@
 /**
- * DYNAMIC NARRATIVE ENGINE — Application Bootstrap
+ * DYNAMIC NARRATIVE ENGINE – Application Bootstrap
  *
  * Initialises the DNE on a stock page:
  * 1. Loads stock evidence data and price rules config
@@ -57,12 +57,12 @@
   };
 
   /**
-   * Main initialisation — called on DOMContentLoaded.
+   * Main initialisation – called on DOMContentLoaded.
    */
   async function init() {
     var ticker = window.DNE_TICKER;
     if (!ticker) {
-      console.warn('[DNE] No DNE_TICKER set — skipping initialisation');
+      console.warn('[DNE] No DNE_TICKER set – skipping initialisation');
       return;
     }
 
@@ -114,7 +114,7 @@
     // Start 15-minute refresh loop (fetches live prices)
     startNarrativeRefresh(stock, rules);
 
-    console.log('[DNE] Ready — ' + ticker +
+    console.log('[DNE] Ready – ' + ticker +
       ' | Dominant: ' + stock.dominant +
       ' (' + stock.hypotheses[stock.dominant].label + ')' +
       ' | Confidence: ' + stock.confidence);

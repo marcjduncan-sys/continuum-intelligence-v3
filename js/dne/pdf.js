@@ -1,5 +1,5 @@
 /**
- * DYNAMIC NARRATIVE ENGINE — PDF Report Generation
+ * DYNAMIC NARRATIVE ENGINE – PDF Report Generation
  *
  * Generates institutional and retail PDF reports from stock data.
  * - Institutional Report: Full ACH analysis for portfolio managers
@@ -413,7 +413,7 @@ function buildRetailReportHTML(stock) {
     'Continuum Intelligence' +
     '</div>';
   html += '<div style="font-size: 9px; color: #888; margin-bottom: 24px;">' +
-    'Investor Briefing — Plain English Summary' +
+    'Investor Briefing – Plain English Summary' +
     '</div>';
   html += '<div style="border-bottom: 3px solid #1B2A4A; margin-bottom: 40px;"></div>';
 
@@ -554,7 +554,7 @@ function buildRetailReportHTML(stock) {
     '<p><strong>A higher percentage</strong> means stronger evidence, not a prediction of what will happen. Markets and ' +
     'companies change.</p>' +
     '<p><strong>Your job:</strong> Consider whether these scenarios match your own analysis and risk tolerance. ' +
-    'Disagree with our percentages? That\'s valuable — it might mean the market has misprice this stock.</p>' +
+    'Disagree with our percentages? That\'s valuable – it might mean the market has misprice this stock.</p>' +
     '</div>';
 
   html += '<h2 style="font-size: 14px; color: #1B2A4A; margin: 20px 0 12px 0; font-weight: 700;">' +

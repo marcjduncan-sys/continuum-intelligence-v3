@@ -1,5 +1,5 @@
 /**
- * registry.js — Central ticker registry reader
+ * registry.js – Central ticker registry reader
  *
  * Single source of truth for the Continuum Intelligence coverage universe.
  * All scripts import from here instead of maintaining hardcoded TICKERS arrays.

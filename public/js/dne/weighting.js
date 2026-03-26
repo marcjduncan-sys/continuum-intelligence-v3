@@ -1,5 +1,5 @@
 /**
- * DYNAMIC NARRATIVE ENGINE — Narrative Weighting Architecture
+ * DYNAMIC NARRATIVE ENGINE – Narrative Weighting Architecture
  *
  * Determines the Top Narrative (N1) via price-correlation analysis,
  * detects narrative inflection points, and quantifies dislocation
@@ -156,7 +156,7 @@ function calculatePriceCorrelations(stock, priceHistory) {
 }
 
 /**
- * Determine the Top Narrative (N1) — the hypothesis with the largest
+ * Determine the Top Narrative (N1) – the hypothesis with the largest
  * recent price correlation.
  *
  * @param {Object} correlationData  Output from calculatePriceCorrelations
@@ -269,7 +269,7 @@ function quantifyDislocation(stock, correlationData) {
 /**
  * Run the full narrative weighting analysis.
  *
- * This is the main entry point — call after recalculateSurvival
+ * This is the main entry point – call after recalculateSurvival
  * when price history is available.
  *
  * @param {Object}   stock              Stock evidence data object

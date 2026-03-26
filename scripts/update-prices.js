@@ -251,7 +251,7 @@ function updateStockData(ticker, priceData) {
 }
 
 async function main() {
-  console.log('=== Continuum Intelligence — Price Update ===');
+  console.log('=== Continuum Intelligence – Price Update ===');
   console.log(`Fetching prices for ${TICKERS.length} tickers...\n`);
 
   // Obtain Yahoo Finance session (cookie + crumb)

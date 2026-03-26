@@ -69,9 +69,9 @@ const SOURCES = [
  * Find and return the most recently updated price data.
  *
  * @param {'newest'|'latest'|'live'} [prefer='newest']
- *   - 'newest'  — return whichever file was updated more recently
- *   - 'latest'  — prefer latest-prices.json (event-scraper)
- *   - 'live'    — prefer live-prices.json (intraday fetcher)
+ *   - 'newest'  – return whichever file was updated more recently
+ *   - 'latest'  – prefer latest-prices.json (event-scraper)
+ *   - 'live'    – prefer live-prices.json (intraday fetcher)
  *
  * @returns {{ source: string, updated: string, prices: Object }|null}
  *   Normalised price map: ticker → { ticker, price, previousClose, change, changePercent, volume, ... }

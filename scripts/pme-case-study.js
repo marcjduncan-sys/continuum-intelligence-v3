@@ -1,5 +1,5 @@
 /**
- * PME Case Study — Price-Narrative Engine Demonstration
+ * PME Case Study – Price-Narrative Engine Demonstration
  * 
  * Shows how the framework responds to PME's dramatic price decline
  * and correctly adjusts hypothesis weights based on market-implied narrative.
@@ -79,7 +79,7 @@ const PME_CASE_STUDY = {
 // Run the analysis
 function runPMECaseStudy() {
   console.log('═══════════════════════════════════════════════════════════════');
-  console.log('  PME CASE STUDY — Price-Narrative Engine Demonstration');
+  console.log('  PME CASE STUDY – Price-Narrative Engine Demonstration');
   console.log('═══════════════════════════════════════════════════════════════\n');
 
   // Import the engine (in browser, it's already loaded)
@@ -91,7 +91,7 @@ function runPMECaseStudy() {
 
   console.log('INPUT DATA:');
   console.log('───────────');
-  console.log(`Ticker: ${stockData.ticker} — ${stockData.company}`);
+  console.log(`Ticker: ${stockData.ticker} – ${stockData.company}`);
   console.log(`Current Price: A$${priceData.currentPrice}`);
   console.log(`Price at Review: A$${priceData.priceAtReview} (${((priceData.currentPrice - priceData.priceAtReview) / priceData.priceAtReview * 100).toFixed(1)}%)`);
   console.log(`Peak Price: A$${priceData.peakPrice} (${((priceData.currentPrice - priceData.peakPrice) / priceData.peakPrice * 100).toFixed(1)}%)`);
@@ -153,7 +153,7 @@ function runPMECaseStudy() {
     const gap = Math.abs(w.longTerm - w.shortTerm);
     if (gap > 20) {
       const direction = w.shortTerm > w.longTerm ? 'market sees MORE likely' : 'market sees LESS likely';
-      console.log(`• ${tier}: ${gap} point gap — ${direction}`);
+      console.log(`• ${tier}: ${gap} point gap – ${direction}`);
     }
   });
   console.log('');
@@ -188,7 +188,7 @@ The stock has already corrected 51% from its A$336 peak."`);
 
   console.log('AFTER (Price-Narrative Engine):');
   console.log('────────────────────────────────');
-  console.log(`🔴 PRICE DISLOCATION ALERT — HIGH
+  console.log(`🔴 PRICE DISLOCATION ALERT – HIGH
 Price: -8.36% | Z-Score: 2.8 | Volume: 2.1x avg | Pattern: STEADY_DECLINE
 
 Market-Implied Narrative (75% confidence):

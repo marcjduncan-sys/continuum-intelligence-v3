@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
- * add-stock.js — Scalable Stock Addition for Continuum Intelligence
+ * add-stock.js – Scalable Stock Addition for Continuum Intelligence
  *
  * Adds a new stock to the coverage universe. Files modified:
- *   1. data/config/tickers.json  — central registry (single source of truth)
- *   2. data/stocks/TICKER.json   — per-stock hypothesis framework
- *   3. data/research/TICKER.json — full research/presentation JSON
- *   4. data/freshness.json       — freshness entry for the new stock
- *   5. data/reference.json       — reference data entry for the new stock
+ *   1. data/config/tickers.json  – central registry (single source of truth)
+ *   2. data/stocks/TICKER.json   – per-stock hypothesis framework
+ *   3. data/research/TICKER.json – full research/presentation JSON
+ *   4. data/freshness.json       – freshness entry for the new stock
+ *   5. data/reference.json       – reference data entry for the new stock
  *
  * All other registrations (script TICKERS arrays, SNAPSHOT_ORDER, FEATURED_ORDER,
  * tc-stock-cards, page-report divs, TC_DATA) are handled dynamically at runtime.

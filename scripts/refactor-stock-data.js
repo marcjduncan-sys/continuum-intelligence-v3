@@ -149,7 +149,7 @@ console.log(`\nLoader will be inserted at line ${loaderInsertLine + 1} (after RE
 // The synchronous loader code
 const loaderCode = `
 // ============================================================
-// STOCK DATA LOADER — loads lightweight index data synchronously
+// STOCK DATA LOADER – loads lightweight index data synchronously
 // for home page, then fetches full research data on demand
 // ============================================================
 

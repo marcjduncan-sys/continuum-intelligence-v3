@@ -2,7 +2,7 @@
 /**
  * fetch-live-prices.js
  *
- * Continuum Intelligence — Intraday Price Fetcher
+ * Continuum Intelligence – Intraday Price Fetcher
  *
  * Lightweight script designed to run every 10-15 minutes during ASX trading
  * hours via GitHub Actions. Fetches current prices from Yahoo Finance and
@@ -36,7 +36,7 @@ function getASXMarketStatus() {
   // Weekend check
   if (day === 0 || day === 6) return 'closed';
 
-  // Convert to AEDT (UTC+11) — approximate, doesn't handle DST transition exactly
+  // Convert to AEDT (UTC+11) – approximate, doesn't handle DST transition exactly
   const aestHour = (now.getUTCHours() + 11) % 24;
   const aestMin = now.getUTCMinutes();
   const aestTime = aestHour * 60 + aestMin;
@@ -54,7 +54,7 @@ function getASXMarketStatus() {
 }
 
 async function main() {
-  console.log('=== Continuum Intelligence — Live Price Fetch ===');
+  console.log('=== Continuum Intelligence – Live Price Fetch ===');
   console.log(`Time: ${new Date().toISOString()}`);
 
   const marketStatus = getASXMarketStatus();
@@ -67,7 +67,7 @@ async function main() {
 
   const yf = new YahooFinance({ suppressNotices: ['yahooSurvey'] });
 
-  // Batch quote — single request for all tickers
+  // Batch quote – single request for all tickers
   let results;
   try {
     results = await yf.quote(TICKERS);

@@ -1,5 +1,5 @@
 /**
- * DYNAMIC NARRATIVE ENGINE — Price Signal Generator
+ * DYNAMIC NARRATIVE ENGINE – Price Signal Generator
  *
  * Evaluates current price data against configurable price_evidence_rules
  * and creates/updates price signal evidence items on the stock.
@@ -122,7 +122,7 @@ function evaluatePriceSignals(stock, priceData, rules) {
           return_at_trigger: intradayReturn
         });
 
-        console.log('[DNE] Signal: ' + stock.ticker + ' — ' + rule.name +
+        console.log('[DNE] Signal: ' + stock.ticker + ' – ' + rule.name +
                     ' (' + (intradayReturn * 100).toFixed(1) + '%)');
       }
     }

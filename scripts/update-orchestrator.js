@@ -2,7 +2,7 @@
 /**
  * update-orchestrator.js
  *
- * Continuum Intelligence — Master Update Coordinator
+ * Continuum Intelligence – Master Update Coordinator
  *
  * Runs the full update pipeline in sequence:
  *   1. Fetch latest stock prices (update-prices.js)

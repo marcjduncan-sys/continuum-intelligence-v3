@@ -21,7 +21,7 @@
 (function(global) {
   'use strict';
 
-  // Coverage universe — dynamically derived from STOCK_DATA at runtime
+  // Coverage universe – dynamically derived from STOCK_DATA at runtime
   var COVERAGE_UNIVERSE = (typeof STOCK_DATA !== 'undefined')
     ? Object.keys(STOCK_DATA).sort()
     : [];
@@ -50,7 +50,7 @@
       if (verdictText.length > 180) verdictText = verdictText.substring(0, 177) + '...';
     }
 
-    // Hypothesis summary — top thesis direction and title
+    // Hypothesis summary – top thesis direction and title
     var hypotheses = [];
     if (stock.hypotheses) {
       for (var i = 0; i < stock.hypotheses.length; i++) {
@@ -152,7 +152,7 @@
     var severity = nfi ? nfi.severity : 'NONE';
     var config = getSeverityConfig(severity);
 
-    // Price display — prefer live price
+    // Price display – prefer live price
     var displayPrice = parseFloat(livePrice || stock.price) || 0;
     var priceStr = stock.currency + displayPrice.toFixed(2);
 

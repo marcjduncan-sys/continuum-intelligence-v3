@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Continuum Intelligence — Calculate Composite Sentiment
+ * Continuum Intelligence – Calculate Composite Sentiment
  *
  * Sets overall_sentiment = company_signal (raw idio net score).
  * External signals (macro, sector, tech) are excluded for now and
@@ -38,8 +38,8 @@ const DRY_RUN = args.includes('--dry-run');
 
 // ── Main ─────────────────────────────────────────────────────────────
 function main() {
-  console.log('=== Continuum Intelligence — Calc Composite Sentiment (Company Only) ===\n');
-  if (DRY_RUN) console.log('  DRY RUN — no files will be written\n');
+  console.log('=== Continuum Intelligence – Calc Composite Sentiment (Company Only) ===\n');
+  if (DRY_RUN) console.log('  DRY RUN – no files will be written\n');
 
   const tickers = getActiveTickers();
   console.log(`  Active tickers: ${tickers.length}\n`);
@@ -78,7 +78,7 @@ function processStock(ticker) {
   const stock = JSON.parse(fs.readFileSync(stockPath, 'utf8'));
 
   if (!stock.three_layer_signal || stock.three_layer_signal.company_signal === undefined) {
-    if (VERBOSE) console.log(`  [SKIP] ${ticker}: no company_signal — run calc-idio-signal.js first`);
+    if (VERBOSE) console.log(`  [SKIP] ${ticker}: no company_signal – run calc-idio-signal.js first`);
     return false;
   }
 

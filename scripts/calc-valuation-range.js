@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Continuum Intelligence — Calculate Valuation Range
+ * Continuum Intelligence – Calculate Valuation Range
  *
  * Uses the overall_sentiment from three_layer_signal to shift the
  * valuation centre estimate for each stock.
@@ -43,8 +43,8 @@ const RANGE_SPREAD = 0.10;   // ±10% around mid for low/high
 
 // ── Main ─────────────────────────────────────────────────────────────
 function main() {
-  console.log('=== Continuum Intelligence — Calc Valuation Range ===\n');
-  if (DRY_RUN) console.log('  DRY RUN — no files will be written\n');
+  console.log('=== Continuum Intelligence – Calc Valuation Range ===\n');
+  if (DRY_RUN) console.log('  DRY RUN – no files will be written\n');
 
   const tickers = getActiveTickers();
   console.log(`  Active tickers: ${tickers.length}\n`);
@@ -86,7 +86,7 @@ function processStock(ticker) {
   const price = parseFloat(stock.current_price);
 
   if (sentiment === undefined || sentiment === null) {
-    if (VERBOSE) console.log(`  [SKIP] ${ticker}: no overall_sentiment — run calc-composite-sentiment.js first`);
+    if (VERBOSE) console.log(`  [SKIP] ${ticker}: no overall_sentiment – run calc-composite-sentiment.js first`);
     return false;
   }
 
@@ -107,7 +107,7 @@ function processStock(ticker) {
 
   if (VERBOSE) {
     console.log(`  ${ticker}: price=$${price.toFixed(2)}, sentiment=${sentiment}, shift=${(shiftPct * 100).toFixed(1)}%`);
-    console.log(`    => range: $${low.toFixed(2)} — $${mid.toFixed(2)} — $${high.toFixed(2)}`);
+    console.log(`    => range: $${low.toFixed(2)} – $${mid.toFixed(2)} – $${high.toFixed(2)}`);
   }
 
   // ── Write valuation range ──

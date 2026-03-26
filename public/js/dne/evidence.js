@@ -1,5 +1,5 @@
 /**
- * DYNAMIC NARRATIVE ENGINE — Evidence Management
+ * DYNAMIC NARRATIVE ENGINE – Evidence Management
  *
  * Shared constants, decay calculations, and evidence item utilities
  * used by the scoring engine and price signal generator.
@@ -42,7 +42,7 @@ function calculateDecayFactor(evidenceDate, now, decayParams) {
   const daysIntoDecay = daysSince - decayParams.full_weight_days;
   const halfLife = decayParams.half_life_days;
 
-  // No decay configured — evidence persists at full weight while condition holds
+  // No decay configured – evidence persists at full weight while condition holds
   if (halfLife <= 0) return 1.0;
 
   return Math.pow(0.5, daysIntoDecay / halfLife);
@@ -81,7 +81,7 @@ function countTradingDays(startDate, endDate) {
 }
 
 /**
- * Gather all active evidence for a stock — editorial items + price signals.
+ * Gather all active evidence for a stock – editorial items + price signals.
  *
  * @param {Object} stock  Stock evidence data object
  * @returns {Array} Combined evidence items

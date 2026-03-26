@@ -1,5 +1,5 @@
 /**
- * DYNAMIC NARRATIVE ENGINE — Editorial Override
+ * DYNAMIC NARRATIVE ENGINE – Editorial Override
  *
  * Allows an analyst to lock the narrative for up to 48 hours.
  * Used during known noisy periods: index rebalance, ex-dividend, options expiry.
@@ -33,7 +33,7 @@ function setEditorialOverride(stock, reason, durationHours) {
   };
 
   console.log('[DNE] Override: ' + stock.ticker + ' locked to ' + stock.dominant +
-              ' until ' + until.toISOString() + ' — ' + reason);
+              ' until ' + until.toISOString() + ' – ' + reason);
 }
 
 /**

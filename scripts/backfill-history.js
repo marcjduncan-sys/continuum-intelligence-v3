@@ -2,7 +2,7 @@
 /**
  * backfill-history.js
  *
- * Continuum Intelligence — 60-Day Narrative History Backfill
+ * Continuum Intelligence – 60-Day Narrative History Backfill
  * Per NARRATIVE_TIMELINE_SPEC.md Option B (limited backfill from price data)
  *
  * Uses existing priceHistory arrays to retroactively calculate what
@@ -113,14 +113,14 @@ function generateTradingDates(refDate, count) {
 function backfillStock(ticker, researchData, backfillDays) {
   const priceHistory = researchData.priceHistory;
   if (!priceHistory || priceHistory.length < 10) {
-    console.log('  [SKIP]', ticker, '— insufficient priceHistory (' + (priceHistory ? priceHistory.length : 0) + ')');
+    console.log('  [SKIP]', ticker, '– insufficient priceHistory (' + (priceHistory ? priceHistory.length : 0) + ')');
     return null;
   }
 
   // Get base hypothesis data
   const hyps = researchData.hypotheses;
   if (!hyps || hyps.length !== 4) {
-    console.log('  [SKIP]', ticker, '— missing or incomplete hypotheses');
+    console.log('  [SKIP]', ticker, '– missing or incomplete hypotheses');
     return null;
   }
 
@@ -276,7 +276,7 @@ function backfillStock(ticker, researchData, backfillDays) {
 function main() {
   console.log('');
   console.log('══════════════════════════════════════════════════════════════');
-  console.log('  CONTINUUM INTELLIGENCE — 60-Day Narrative History Backfill');
+  console.log('  CONTINUUM INTELLIGENCE – 60-Day Narrative History Backfill');
   console.log('══════════════════════════════════════════════════════════════');
   console.log('  Backfill days:', backfillDays);
   console.log('  Mode:', dryRun ? 'DRY RUN' : 'LIVE');
@@ -292,7 +292,7 @@ function main() {
   for (const ticker of tickers) {
     const researchPath = path.join(RESEARCH_DIR, ticker + '.json');
     if (!fs.existsSync(researchPath)) {
-      console.log('  [SKIP]', ticker, '— no research data');
+      console.log('  [SKIP]', ticker, '– no research data');
       continue;
     }
 
@@ -335,7 +335,7 @@ function main() {
   console.log('');
   console.log('  Backfilled:', backfilled, 'stocks');
   console.log('  Total reconstructed flips:', totalFlips);
-  if (dryRun) console.log('  (DRY RUN — no files written)');
+  if (dryRun) console.log('  (DRY RUN – no files written)');
   console.log('══════════════════════════════════════════════════════════════');
 }
 

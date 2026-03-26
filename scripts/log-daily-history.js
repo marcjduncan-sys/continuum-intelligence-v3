@@ -2,7 +2,7 @@
 /**
  * log-daily-history.js
  *
- * Continuum Intelligence — Daily Narrative History Logger
+ * Continuum Intelligence – Daily Narrative History Logger
  * Per NARRATIVE_FRAMEWORK_V3.md and NARRATIVE_TIMELINE_SPEC.md
  *
  * For each stock in coverage, appends a daily snapshot to
@@ -296,7 +296,7 @@ function determineTrigger(snapshot) {
 function main() {
   console.log('');
   console.log('══════════════════════════════════════════════════════════════');
-  console.log('  CONTINUUM INTELLIGENCE — Daily History Logger');
+  console.log('  CONTINUUM INTELLIGENCE – Daily History Logger');
   console.log('══════════════════════════════════════════════════════════════');
 
   // Determine date
@@ -344,7 +344,7 @@ function main() {
     }
 
     if (!researchData && !stocksData) {
-      console.warn('  [SKIP]', ticker, '— no research or stocks data');
+      console.warn('  [SKIP]', ticker, '– no research or stocks data');
       continue;
     }
 
@@ -361,10 +361,10 @@ function main() {
       historyData = { ticker: ticker, history: [], flips: [] };
     }
 
-    // Check for duplicate date — skip if already logged today
+    // Check for duplicate date – skip if already logged today
     const alreadyLogged = historyData.history.some(h => h.date === today);
     if (alreadyLogged) {
-      console.log('  [SKIP]', ticker, '— already logged for', today);
+      console.log('  [SKIP]', ticker, '– already logged for', today);
       continue;
     }
 
@@ -396,7 +396,7 @@ function main() {
   console.log('');
   console.log('  Logged:', logged, 'stocks');
   console.log('  Narrative flips:', flips);
-  if (dryRun) console.log('  (DRY RUN — no files written)');
+  if (dryRun) console.log('  (DRY RUN – no files written)');
   console.log('══════════════════════════════════════════════════════════════');
 }
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Continuum Intelligence — Update Stock JSON Files
+ * Continuum Intelligence – Update Stock JSON Files
  *
  * Reads live prices from find-latest-prices.js and updates each
  * data/stocks/TICKER.json with:
@@ -27,8 +27,8 @@ const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 
 function main() {
-  console.log('=== Continuum Intelligence — Update Stock JSONs ===\n');
-  if (DRY_RUN) console.log('  🏃 DRY RUN — no files will be written\n');
+  console.log('=== Continuum Intelligence – Update Stock JSONs ===\n');
+  if (DRY_RUN) console.log('  🏃 DRY RUN – no files will be written\n');
 
   // ── Get latest prices ──────────────────────────────────────────────
   const priceResult = findLatestPrices('newest');
@@ -198,7 +198,7 @@ function main() {
   console.log(`  Updated: ${updated}`);
   console.log(`  Unchanged: ${skipped}`);
   console.log(`  No price data: ${noPrice}`);
-  if (DRY_RUN) console.log(`  (Dry run — no files written)`);
+  if (DRY_RUN) console.log(`  (Dry run – no files written)`);
   console.log('');
 
   // Exit with informative code for CI

@@ -29,10 +29,10 @@ const PNE_CONFIG = {
   
   // Hypothesis sensitivity to price moves
   HYPOTHESIS_SENSITIVITY: {
-    N1: { up: 0.8, down: 1.2 },  // Growth — sensitive to downside
-    N2: { up: 0.6, down: 0.9 },  // Valuation — less sensitive
-    N3: { up: 1.0, down: 1.5 },  // Competition — very sensitive to downside
-    N4: { up: 1.2, down: 1.8 }   // Moat — extremely sensitive to downside
+    N1: { up: 0.8, down: 1.2 },  // Growth – sensitive to downside
+    N2: { up: 0.6, down: 0.9 },  // Valuation – less sensitive
+    N3: { up: 1.0, down: 1.5 },  // Competition – very sensitive to downside
+    N4: { up: 1.2, down: 1.8 }   // Moat – extremely sensitive to downside
   }
 };
 
@@ -423,7 +423,7 @@ const DynamicWeightCalculator = {
 };
 
 // ============================================================================
-// COMMENTARY GENERATOR — Institutional Grade
+// COMMENTARY GENERATOR – Institutional Grade
 // ============================================================================
 
 const CommentaryGenerator = {
@@ -482,7 +482,7 @@ const CommentaryGenerator = {
 
   generateAlert(dislocation) {
     if (dislocation.severity === 'NORMAL') return '';
-    return `**${dislocation.severity} PRICE DISLOCATION** — Z: ${dislocation.metrics.zScore}, Vol: ${dislocation.metrics.volumeRatio}x`;
+    return `**${dislocation.severity} PRICE DISLOCATION** – Z: ${dislocation.metrics.zScore}, Vol: ${dislocation.metrics.volumeRatio}x`;
   },
 
   generateMarketNarrative(inference) {

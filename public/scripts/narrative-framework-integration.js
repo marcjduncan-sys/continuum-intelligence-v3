@@ -2,7 +2,7 @@
 /**
  * narrative-framework-integration.js
  *
- * Continuum Intelligence — Narrative Framework v3.0
+ * Continuum Intelligence – Narrative Framework v3.0
  *
  * Client-side integration script that:
  * 1. Loads narrative-analysis.json on init and stores data globally
@@ -18,7 +18,7 @@
 // ─── CSS STYLES ──────────────────────────────────────────────────────────────
 
 const NFI_STYLES = `
-/* Narrative Framework v3.0 — Dislocation Indicator (matches Risk Skew bar) */
+/* Narrative Framework v3.0 – Dislocation Indicator (matches Risk Skew bar) */
 .nfi-alert-banner {
   padding: var(--space-md, 12px) 0;
   font-family: var(--font-ui, system-ui, -apple-system, sans-serif);
@@ -69,7 +69,7 @@ const NFI_STYLES = `
 }
 .nfi-alert-dismiss:hover { opacity: 1; }
 
-/* Severity badge colours — mirrors .skew-badge styling */
+/* Severity badge colours – mirrors .skew-badge styling */
 .nfi-alert-negative { background: var(--bg-surface, #111827); }
 .nfi-alert-negative .nfi-alert-severity {
   background: rgba(212, 85, 85, 0.12);
@@ -370,7 +370,7 @@ function applyNarrativeAnalysis(ticker) {
   if (typeof document === 'undefined') return;
   if (!window._nfiAnalysisData || !window._nfiAnalysisData.results) return;
 
-  // Throttle guard — prevent re-processing the same ticker within 10 seconds
+  // Throttle guard – prevent re-processing the same ticker within 10 seconds
   // This stops MutationObserver infinite loops where NFI DOM changes re-trigger processing
   if (!window._nfiProcessedTickers) window._nfiProcessedTickers = {};
   if (window._nfiProcessedTickers[ticker] &&

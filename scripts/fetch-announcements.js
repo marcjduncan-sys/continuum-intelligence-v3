@@ -2,7 +2,7 @@
 /**
  * fetch-announcements.js
  *
- * Continuum Intelligence — ASX Announcements Fetcher
+ * Continuum Intelligence – ASX Announcements Fetcher
  *
  * Fetches latest ASX company announcements for all covered tickers.
  * Designed to run 1-2 times daily (pre-market and post-close) via
@@ -124,7 +124,7 @@ async function fetchYahooNews(ticker) {
 }
 
 async function main() {
-  console.log('=== Continuum Intelligence — Announcements Fetch ===');
+  console.log('=== Continuum Intelligence – Announcements Fetch ===');
   console.log(`Time: ${new Date().toISOString()}`);
 
   // Ensure data directory exists

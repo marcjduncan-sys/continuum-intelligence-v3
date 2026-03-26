@@ -5,7 +5,7 @@
 const { InstitutionalCommentaryEngine, TextGenerator } = require('./institutional-commentary-engine.js');
 
 console.log('╔══════════════════════════════════════════════════════════════════════════╗');
-console.log('║  CONTINUUM INTELLIGENCE — INSTITUTIONAL RESEARCH COMMENTARY              ║');
+console.log('║  CONTINUUM INTELLIGENCE – INSTITUTIONAL RESEARCH COMMENTARY              ║');
 console.log('║  Quality Tier: Top 0.1%  |  Engine: v2.0  |  Output: 100% Dynamic        ║');
 console.log('╚══════════════════════════════════════════════════════════════════════════╝\n');
 
