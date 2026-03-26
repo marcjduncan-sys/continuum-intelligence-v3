@@ -74,7 +74,7 @@ function seedStock(ticker, stockOverrides, refOverrides) {
 beforeEach(clearState);
 
 // ---------------------------------------------------------------------------
-// compute() — metric derivation
+// compute() – metric derivation
 // ---------------------------------------------------------------------------
 
 describe('compute() with null reference data (the bug)', () => {
@@ -125,7 +125,7 @@ describe('compute() with populated reference data (the fix)', () => {
 });
 
 // ---------------------------------------------------------------------------
-// hydrateFeaturedMetrics() — patching N/A values
+// hydrateFeaturedMetrics() – patching N/A values
 // ---------------------------------------------------------------------------
 
 describe('hydrateFeaturedMetrics()', () => {
@@ -213,7 +213,7 @@ describe('hydrate() end-to-end', () => {
 });
 
 // ---------------------------------------------------------------------------
-// renderFeaturedCard() — Analysis pending detection
+// renderFeaturedCard() – Analysis pending detection
 // ---------------------------------------------------------------------------
 
 describe('renderFeaturedCard() pending state', () => {

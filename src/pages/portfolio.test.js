@@ -177,7 +177,7 @@ describe('deriveAlignment', () => {
 });
 
 /* ------------------------------------------------------------------ */
-/*  calculateReweightingScores — scoring                              */
+/*  calculateReweightingScores – scoring                              */
 /* ------------------------------------------------------------------ */
 
 describe('calculateReweightingScores', () => {
@@ -284,7 +284,7 @@ describe('calculateReweightingScores', () => {
     });
   });
 
-  describe('action logic — long positions', () => {
+  describe('action logic – long positions', () => {
     it('downside skew => Sell with all units', () => {
       var covered = [makePosition('WOW', { skew: 'downside', weight: 25, units: 31289, currentPrice: 38 })];
       var coverageData = { WOW: makeCoverage('WOW', 'downside') };
@@ -376,7 +376,7 @@ describe('calculateReweightingScores', () => {
     });
   });
 
-  describe('action logic — short positions', () => {
+  describe('action logic – short positions', () => {
     it('upside skew => Buy to Close with all units', () => {
       var covered = [makePosition('CBA', { skew: 'upside', weight: 25, units: -500, currentPrice: 130 })];
       var coverageData = { CBA: makeCoverage('CBA', 'upside') };

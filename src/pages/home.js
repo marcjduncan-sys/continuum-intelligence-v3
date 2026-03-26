@@ -1,4 +1,4 @@
-// home.js — Home page renderers and initialization
+// home.js – Home page renderers and initialization
 // Extracted from index.html without logic changes
 
 import { STOCK_DATA, FRESHNESS_DATA, REFERENCE_DATA, FEATURED_ORDER, COMING_SOON } from '../lib/state.js';

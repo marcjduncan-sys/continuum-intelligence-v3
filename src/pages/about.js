@@ -1,4 +1,4 @@
-// about.js — About page module
+// about.js – About page module
 // Extracted from index.html without logic changes
 
 export function initAboutPage() {

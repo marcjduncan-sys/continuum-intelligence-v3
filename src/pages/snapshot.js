@@ -1,4 +1,4 @@
-// snapshot.js — Snapshot data builder and page renderers
+// snapshot.js – Snapshot data builder and page renderers
 // Extracted from index.html without logic changes
 
 import { STOCK_DATA, SNAPSHOT_DATA, SNAPSHOT_ORDER } from '../lib/state.js';

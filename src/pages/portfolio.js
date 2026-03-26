@@ -1,4 +1,4 @@
-// portfolio.js — Portfolio engine
+// portfolio.js – Portfolio engine
 // Extracted from index.html without logic changes
 
 import { STOCK_DATA, REFERENCE_DATA, TC_DATA } from '../lib/state.js';
@@ -11,7 +11,7 @@ import { API_BASE } from '../lib/api-config.js';
 var COVERAGE_DATA = null;
 
 /* ------------------------------------------------------------------ */
-/*  Pure helpers — gross-exposure alignment engine                     */
+/*  Pure helpers – gross-exposure alignment engine                     */
 /* ------------------------------------------------------------------ */
 
 /** Signed exposure: positive for longs, negative for shorts */
@@ -514,7 +514,7 @@ export function renderMandateBreaches(positions, grossExposure) {
 
 /**
  * Calculate evidence-aligned reweighting scores for portfolio positions.
- * Exported for testability. Pure function — no DOM access.
+ * Exported for testability. Pure function – no DOM access.
  *
  * @param {Array} covered - positions filtered to Continuum-covered tickers
  * @param {Object} coverageData - { [ticker]: { skew, price, company } }

@@ -1,4 +1,4 @@
-// report-sections.js — Individual report section renderers
+// report-sections.js – Individual report section renderers
 // Extracted from index.html without logic changes
 
 import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA, FEATURED_ORDER, ANNOUNCEMENTS_DATA } from '../lib/state.js';

@@ -1,4 +1,4 @@
-// data-events.js — Lightweight event bus for STOCK_DATA change propagation
+// data-events.js – Lightweight event bus for STOCK_DATA change propagation
 // Parent/dependant pattern: hydrate() emits, page modules listen.
 
 /** @type {{ [event: string]: Function[] }} */

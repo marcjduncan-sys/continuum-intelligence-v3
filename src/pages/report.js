@@ -1,4 +1,4 @@
-// report.js — Stock report page orchestrator
+// report.js – Stock report page orchestrator
 // Extracted from index.html without logic changes
 
 import { STOCK_DATA } from '../lib/state.js';

@@ -331,7 +331,7 @@ export function adjustHypothesisScores(stock, computed, ref) {
   for (var i = 0; i < stock.hypotheses.length; i++) {
     var hyp = stock.hypotheses[i];
 
-    // Save original values on first adjustment — idempotency anchor.
+    // Save original values on first adjustment – idempotency anchor.
     // All subsequent hydrate() calls adjust from the original, preventing compounding.
     if (hyp._origScore === undefined) {
       hyp._origScore = parseInt(hyp.score) || 0;

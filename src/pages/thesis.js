@@ -1,4 +1,4 @@
-// thesis.js — Thesis comparator engine and inline chat functions
+// thesis.js – Thesis comparator engine and inline chat functions
 // Extracted from index.html without logic changes
 
 import { STOCK_DATA, getTcData } from '../lib/state.js';
