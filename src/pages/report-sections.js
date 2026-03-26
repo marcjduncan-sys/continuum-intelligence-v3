@@ -243,7 +243,7 @@ export function renderReportHero(data) {
           heroAnnouncementsHtml +
           '<div class="rh-right-bottom">' +
             sparklineHtml +
-            '<div class="rh-price"><span class="rh-price-currency">' + (data.currency || '') + '</span>' + (data.price || '') + '</div>' +
+            '<div class="rh-price"><span class="rh-price-currency">' + (data.currency || '') + '</span>' + (data.price != null ? parseFloat(data.price).toFixed(2) : '') + '</div>' +
             '<div class="rh-metrics">' + metricsHtml + '</div>' +
           '</div>' +
         '</div>' +

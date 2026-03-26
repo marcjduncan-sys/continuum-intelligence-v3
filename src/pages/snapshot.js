@@ -267,7 +267,7 @@ export function renderSnapshotListCard(data) {
         '<div class="sc-company">' + data.company + '</div>' +
         '<div class="sc-sector">' + data.sector + ' &bull; ' + data.sectorSub + '</div>' +
       '</div>' +
-      '<div class="sc-price"><span class="sc-price-currency">' + data.currency + '</span>' + data.price + '</div>' +
+      '<div class="sc-price"><span class="sc-price-currency">' + data.currency + '</span>' + parseFloat(data.price).toFixed(2) + '</div>' +
     '</div>' +
     '<div class="sc-meta">' +
       data.priceMetrics.slice(0, 4).map(function(m) {
@@ -398,7 +398,7 @@ export function renderSnapshotPage(data) {
     '</div>' +
 
     '<div class="snap-price-bar">' +
-      '<div><span class="snap-price-currency">' + data.currency + '</span><span class="snap-price-main">' + data.price + '</span></div>' +
+      '<div><span class="snap-price-currency">' + data.currency + '</span><span class="snap-price-main">' + parseFloat(data.price).toFixed(2) + '</span></div>' +
       '<div class="snap-price-meta">' + priceMetricsHtml + '</div>' +
     '</div>' +
 

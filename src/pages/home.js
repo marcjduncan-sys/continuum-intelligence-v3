@@ -79,7 +79,7 @@ export function renderFeaturedCard(data) {
         '<div class="fc-sector">' + data.sector + (data.sectorSub ? ' &bull; ' + data.sectorSub : '') + '</div>' +
       '</div>' +
       '<div class="fc-price"' + priceStyle + '>' +
-        '<span style="font-size:0.8rem; color:var(--text-muted)">' + data.currency + '</span>' + (data._livePrice || data.price) +
+        '<span style="font-size:0.8rem; color:var(--text-muted)">' + data.currency + '</span>' + parseFloat(data._livePrice || data.price).toFixed(2) +
       '</div>' +
     '</div>' +
     '<div class="fc-metrics">' + metricsHtml + '</div>' +
@@ -144,7 +144,7 @@ export function renderCoverageRow(data) {
     '<td class="td-ticker">' + data.ticker + '</td>' +
     '<td>' + data.company + '</td>' +
     '<td>' + data.sector + '</td>' +
-    '<td class="td-price">' + data.currency + (data._livePrice || data.price) + '</td>' +
+    '<td class="td-price">' + data.currency + parseFloat(data._livePrice || data.price).toFixed(2) + '</td>' +
     '<td>' +
       '<div class="skew-cell">' +
         '<div class="skew-bar-track">' +
@@ -172,7 +172,7 @@ export function renderComingSoonRow(stub) {
     '<td class="td-ticker">' + stub.ticker + '</td>' +
     '<td>' + stub.company + '</td>' +
     '<td>' + stub.sector + '</td>' +
-    '<td class="td-price">' + (stub.currency || 'A$') + stub.price + '</td>' +
+    '<td class="td-price">' + (stub.currency || 'A$') + parseFloat(stub.price).toFixed(2) + '</td>' +
     '<td>' +
       '<div class="skew-cell">' +
         '<div class="skew-bar-track">' +
