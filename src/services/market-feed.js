@@ -320,6 +320,9 @@ function start() {
     // Initial fetch
     poll().then(function() {
         scheduleNext();
+    }).catch(function(e) {
+        console.warn('[MarketFeed] Poll error on start:', e);
+        scheduleNext();
     });
 
     // Update the "X seconds ago" display every 10s
@@ -339,6 +342,9 @@ function start() {
             // Resume immediately when tab becomes visible
             poll().then(function() {
                 scheduleNext();
+            }).catch(function(e) {
+                console.warn('[MarketFeed] Poll error on visibility resume:', e);
+                scheduleNext();
             });
         }
     });
@@ -349,6 +355,9 @@ function scheduleNext() {
     var interval = getPollInterval();
     _pollTimer = setTimeout(function() {
         poll().then(function() {
+            scheduleNext();
+        }).catch(function(e) {
+            console.warn('[MarketFeed] Poll error in schedule:', e);
             scheduleNext();
         });
     }, interval);
@@ -362,6 +371,13 @@ function refreshNow() {
         btn.textContent = '...';
     }
     poll().then(function() {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'REFRESH';
+        }
+        scheduleNext();
+    }).catch(function(e) {
+        console.warn('[MarketFeed] Poll error on manual refresh:', e);
         if (btn) {
             btn.disabled = false;
             btn.textContent = 'REFRESH';
