@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-19T07:17:33.146Z"
+      "last_updated": "2026-03-26T07:38:35.938Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -26,7 +26,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-19T07:17:33.146Z"
+      "last_updated": "2026-03-26T07:38:35.938Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Cost pressures, competitive threats, or macro headwinds.",
       "upside": null,
       "risk_plain": "Material downside if multiple risks crystallise simultaneously.",
-      "survival_score": 0.44,
+      "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-26T07:05:58.896Z"
+      "last_updated": "2026-03-26T07:38:35.938Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -47,15 +47,15 @@
       "what_to_watch": "Industry disruption signals and regulatory changes.",
       "upside": null,
       "risk_plain": "If disruption materialises, prior assumptions become invalid.",
-      "survival_score": 0.46,
+      "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-26T07:05:58.896Z"
+      "last_updated": "2026-03-26T07:38:35.938Z"
     }
   },
   "dominant": "N4",
   "confidence": "LOW",
-  "alert_state": "OVERCORRECTION",
+  "alert_state": "NORMAL",
   "current_price": 11.89,
   "big_picture": "Objective Corporation Limited (ASX: OCL) — coverage initiated. Full analysis pending.",
   "last_flip": {
@@ -355,6 +355,13 @@
       "severity": "AMBER",
       "message": "Single-day move of -13.2% exceeds 10% threshold — possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-03-26",
+      "type": "OVERCORRECTION_REVIEW",
+      "severity": "AMBER",
+      "message": "Overcorrection NOT confirmed — price only partially reversed",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -437,11 +444,20 @@
       "cumulative_20d": -24.53,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-26",
+      "classification": "NOTABLE",
+      "daily_change_pct": -2.86,
+      "volume_multiplier": 1,
+      "cumulative_5d": -12.83,
+      "cumulative_20d": -24.53,
+      "results_day": false,
+      "overcorrection_active": false
     }
   ],
   "editorial_override": null,
   "price_history": [
-    17.6,
     17.45,
     17.91,
     17.79,
@@ -500,7 +516,8 @@
     13.46,
     13.46,
     12.24,
-    11.69
+    11.69,
+    11.89
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -731,13 +748,18 @@
   },
   "last_research_update": "2026-03-26T07:05:58.896Z",
   "_overcorrection": {
-    "active": true,
+    "active": false,
     "triggerType": "SINGLE_DAY",
     "triggerDate": "2026-03-19",
     "triggerPrice": 11.69,
     "direction": "down",
     "movePct": -13.15,
     "reviewDate": "2026-03-26",
-    "message": "Single-day move of -13.2% exceeds 10% threshold — possible overcorrection"
+    "message": "Single-day move of -13.2% exceeds 10% threshold — possible overcorrection",
+    "reviewResult": {
+      "reversal_pct": -13,
+      "confirmed": false,
+      "message": "Overcorrection NOT confirmed — price only partially reversed"
+    }
   }
 }

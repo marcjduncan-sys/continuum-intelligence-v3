@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-25T07:20:38.205Z"
+      "last_updated": "2026-03-26T07:38:35.941Z"
     },
     "N2": {
       "label": "Traditional Energy Cash Cow",
@@ -26,7 +26,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-25T07:20:38.205Z"
+      "last_updated": "2026-03-26T07:38:35.941Z"
     },
     "N3": {
       "label": "Margin Pressure",
@@ -38,7 +38,7 @@
       "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-26T03:49:37.202Z"
+      "last_updated": "2026-03-26T07:38:35.941Z"
     },
     "N4": {
       "label": "Cyclical Downturn",
@@ -50,12 +50,12 @@
       "survival_score": 0.46,
       "status": "MODERATE",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-26T03:49:37.202Z"
+      "last_updated": "2026-03-26T07:38:35.941Z"
     }
   },
   "dominant": "N4",
   "confidence": "LOW",
-  "alert_state": "OVERCORRECTION",
+  "alert_state": "NORMAL",
   "current_price": 11.17,
   "big_picture": "Worley Limited (ASX: WOR) — coverage initiated. Full analysis pending.",
   "last_flip": {
@@ -335,6 +335,13 @@
       "severity": "AMBER",
       "message": "Single-day move of -18.5% exceeds 10% threshold — possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-03-26",
+      "type": "OVERCORRECTION_REVIEW",
+      "severity": "AMBER",
+      "message": "Overcorrection NOT confirmed — price only partially reversed",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -417,11 +424,20 @@
       "cumulative_20d": -16.95,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-03-26",
+      "classification": "SIGNIFICANT",
+      "daily_change_pct": 5.08,
+      "volume_multiplier": 1,
+      "cumulative_5d": -14.61,
+      "cumulative_20d": -15.92,
+      "results_day": false,
+      "overcorrection_active": false
     }
   ],
   "editorial_override": null,
   "price_history": [
-    11.5,
     11.2,
     10.8,
     10.5,
@@ -480,7 +496,8 @@
     10.17,
     10.47,
     10.63,
-    10.93
+    10.93,
+    11.17
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -702,13 +719,18 @@
   },
   "last_research_update": "2026-03-26T07:05:58.896Z",
   "_overcorrection": {
-    "active": true,
+    "active": false,
     "triggerType": "SINGLE_DAY",
     "triggerDate": "2026-03-19",
     "triggerPrice": 10.47,
     "direction": "down",
     "movePct": -18.52,
     "reviewDate": "2026-03-26",
-    "message": "Single-day move of -18.5% exceeds 10% threshold — possible overcorrection"
+    "message": "Single-day move of -18.5% exceeds 10% threshold — possible overcorrection",
+    "reviewResult": {
+      "reversal_pct": -36.1,
+      "confirmed": false,
+      "message": "Overcorrection NOT confirmed — price only partially reversed"
+    }
   }
 }
