@@ -2705,7 +2705,8 @@ export function fetchPriceDrivers(ticker, force) {
     .then(function(data) {
       if (data) renderPriceDriversContent(container, data);
     })
-    .catch(function() {
+    .catch(function(e) {
+      console.warn('[PriceDrivers] Fetch failed:', e);
       container.style.display = 'none';
     });
 }
