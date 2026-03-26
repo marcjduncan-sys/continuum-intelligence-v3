@@ -628,6 +628,7 @@ function sendMessage() {
         renderConversation();
     })
     .catch(function(err) {
+        console.warn('[PMChat] Request failed:', err);
         hideTyping();
         var msg = err.message || 'Something went wrong. Please try again.';
         if (msg === 'Failed to fetch') msg = 'Cannot reach the PM API. Check that the server is running.';
@@ -760,7 +761,7 @@ function _checkExistingPortfolio() {
             }
         })
         .catch(function(err) {
-            console.log('[PM] Portfolio check skipped: ' + (err.message || err));
+            console.warn('[PM] Portfolio check skipped:', err);
         });
 }
 
