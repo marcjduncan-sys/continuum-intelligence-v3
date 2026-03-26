@@ -54,6 +54,47 @@ var conversations = (function() {
 var currentPortfolioKey = '_default';
 
 // ============================================================
+// DB PERSISTENCE
+// ============================================================
+
+function _restoreFromDB() {
+    if (isFile) return Promise.resolve();
+    var token   = window.CI_AUTH && window.CI_AUTH.getToken();
+    var guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
+    if (!token && !guestId) return Promise.resolve();
+
+    var headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    var portfolioId = (typeof window.pnGetPortfolioId === 'function') ? window.pnGetPortfolioId() : null;
+    var url = apiOrigin + '/api/pm-conversations/latest';
+    var params = [];
+    if (!token && guestId) params.push('guest_id=' + encodeURIComponent(guestId));
+    if (portfolioId) params.push('portfolio_id=' + encodeURIComponent(portfolioId));
+    if (params.length > 0) url += '?' + params.join('&');
+
+    return fetch(url, { headers: headers })
+        .then(function(res) { return res.ok ? res.json() : null; })
+        .then(function(data) {
+            if (!data || !data.messages || data.messages.length === 0) return;
+            if (data.conversation_id) _pmConversationId = data.conversation_id;
+            // DB wins over sessionStorage for cross-session/cross-device history
+            conversations[currentPortfolioKey] = data.messages.map(function(m) {
+                return {
+                    role: m.role,
+                    content: m.content,
+                    timestamp: m.created_at ? new Date(m.created_at).getTime() : 0
+                };
+            });
+            try { sessionStorage.setItem('ci_pm_conversations', JSON.stringify(conversations)); } catch(e) {}
+            if (_currentMode === 'pm') renderConversation();
+        })
+        .catch(function(err) {
+            console.warn('[PM] DB restore failed:', err.message || err);
+        });
+}
+
+// ============================================================
 // RAIL MODE SWITCH
 // ============================================================
 
@@ -817,6 +858,9 @@ export function initPMChat() {
     // Check for existing portfolio on startup (handles page refresh)
     _checkExistingPortfolio();
 
+    // Restore PM conversation from DB (cross-device persistence)
+    _restoreFromDB();
+
     // Listen for "Send to PM" events from the PM dashboard (BEAD-008)
     document.addEventListener('ci:pm:ask', function(e) {
         var question = e.detail && e.detail.question;
@@ -825,6 +869,11 @@ export function initPMChat() {
         inputEl.value = question;
         updateSendButton();
         sendMessage();
+    });
+
+    // Re-fetch PM history after OTP login (identity changes from guest to authenticated)
+    window.addEventListener('ci:auth:login', function() {
+        _restoreFromDB();
     });
 
     console.log('[PM] Initialised');

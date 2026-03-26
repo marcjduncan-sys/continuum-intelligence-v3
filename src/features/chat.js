@@ -102,6 +102,7 @@ async function _ensureConversation(ticker) {
         dbConversationIds[ticker] = data.id;
         return data.id;
     } catch (e) {
+        console.warn('[Analyst] Ensure conversation failed for ' + ticker + ':', e.message || e);
         return null;
     }
 }
@@ -117,7 +118,7 @@ function _persistMessage(ticker, role, content, sources) {
             method: 'POST',
             headers: headers,
             body: JSON.stringify({ role: role, content: content, sources_json: sources || null })
-        }).catch(function() { /* silent -- no impact on UX */ });
+        }).catch(function(err) { console.warn('[Analyst] Message persist failed:', err.message || err); });
     });
 }
 
@@ -142,7 +143,31 @@ function _restoreFromDB(ticker) {
             });
             try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) {}
         })
-        .catch(function() { /* silent -- degrades to sessionStorage */ });
+        .catch(function(err) {
+            console.warn('[Analyst] DB restore failed for ' + ticker + ':', err.message || err);
+        });
+}
+
+/**
+ * When no ticker is selected (homepage), fetch the conversation list and
+ * auto-select the most recent conversation so the user sees their last
+ * discussion instead of a blank chat.
+ */
+function _restoreLatestFromDB() {
+    if (isFile) return Promise.resolve();
+    return _fetchConversationList().then(function(convos) {
+        if (!convos || convos.length === 0) return;
+        var latest = convos[0]; // already sorted newest-first by the backend
+        if (!latest.ticker) return;
+        currentTicker = latest.ticker;
+        if (tickerSelect && tickerSelect.querySelector('option[value="' + latest.ticker + '"]')) {
+            tickerSelect.value = latest.ticker;
+        }
+        updateTickerBadge();
+        return _restoreFromDB(latest.ticker);
+    }).catch(function(err) {
+        console.warn('[Analyst] Latest conversation restore failed:', err.message || err);
+    });
 }
 
 // ============================================================
@@ -828,7 +853,23 @@ export function initChat() {
 
     _setupListeners();
     populateTickerSelect();
-    _restoreFromDB(currentTicker).then(renderConversation);
+
+    // If a ticker is set from the URL hash, restore that conversation.
+    // If no ticker (homepage), fetch the most recent conversation from DB.
+    if (currentTicker) {
+        _restoreFromDB(currentTicker).then(renderConversation);
+    } else {
+        _restoreLatestFromDB().then(renderConversation);
+    }
+
+    // Re-fetch history after OTP login (identity changes from guest to authenticated)
+    window.addEventListener('ci:auth:login', function() {
+        if (currentTicker) {
+            _restoreFromDB(currentTicker).then(renderConversation);
+        } else {
+            _restoreLatestFromDB().then(renderConversation);
+        }
+    });
 
     // Auto-open at desktop widths; show FAB on mobile
     if (window.innerWidth >= 1024) {
