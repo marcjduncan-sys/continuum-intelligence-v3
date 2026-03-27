@@ -75,7 +75,7 @@
 /* --- Reset & Base --- */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 body {
     font-family: var(--font-ui);
     background: var(--bg-page);
@@ -90,6 +90,9 @@ body {
 body.analyst-panel-open {
     --_ap-body-offset: var(--analyst-panel-width);
 }
+/* Tabular figures for data tables */
+td, th { font-variant-numeric: tabular-nums; }
+
 a { color: var(--accent-teal); text-decoration: none; transition: color 0.2s; }
 a:hover { color: var(--accent-sage); }
 
