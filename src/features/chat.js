@@ -319,7 +319,16 @@ function renderConversation() {
                     '</button>';
                 html += '<div class="ap-sources-list" id="' + srcId + '">';
                 msg.sources.forEach(function(s) {
-                    html += '<div class="ap-source-item">';
+                    var isUser = s.source_origin && s.source_origin.indexOf('user:') === 0;
+                    var originClass = isUser ? ' ap-source-user' : ' ap-source-platform';
+                    html += '<div class="ap-source-item' + originClass + '">';
+                    if (isUser) {
+                        var srcName = s.source_origin.slice(5) || 'Uploaded';
+                        html += '<span class="ap-source-label ap-source-label-user">' +
+                            escapeHtml(srcName) + ' (uploaded)</span> ';
+                    } else if (s.source_origin === 'platform') {
+                        html += '<span class="ap-source-label ap-source-label-platform">Continuum Research</span> ';
+                    }
                     if (s.section || s.subsection) {
                         html += '<span class="ap-source-domain">' +
                             escapeHtml((s.section || '') + (s.subsection ? ' / ' + s.subsection : '')) +

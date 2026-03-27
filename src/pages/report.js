@@ -32,6 +32,22 @@ import {
 
 import { renderDeepContent, getDeepSectionNavItems } from './deep-report-sections.js';
 
+var SOURCES_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="6 9 12 15 18 9"/></svg>';
+
+function sourcesSection(ticker) {
+  var t = ticker.toLowerCase();
+  return '<div class="report-section" id="' + t + '-sources">' +
+    '<div class="rs-header"><div class="rs-header-text">' +
+    '<div class="rs-number">Section 12</div>' +
+    '<h2 class="rs-title">External Research</h2>' +
+    '</div><button class="rs-toggle" onclick="window.toggleSection(this)" aria-label="Toggle section">' +
+    SOURCES_CHEVRON + '</button></div>' +
+    '<div class="rs-body">' +
+    '<div id="src-upload-mount-' + ticker + '"></div>' +
+    '<div id="src-panel-mount-' + ticker + '"></div>' +
+    '</div></div>';
+}
+
 export function renderReport(data) {
   prepareHypotheses(data);
 
@@ -69,7 +85,7 @@ export function renderReport(data) {
       floatingToggle;
   }
 
-  // Standard report: existing flow (unchanged)
+  // Standard report: existing flow with sources section
   var mainContent =
     renderPriceDriversPlaceholder(data.ticker) +
     renderOvercorrectionBanner(data) +
@@ -82,7 +98,8 @@ export function renderReport(data) {
     renderDiscriminators(data) +
     renderTripwires(data) +
     renderGaps(data) +
-    renderTechnicalAnalysis(data);
+    renderTechnicalAnalysis(data) +
+    sourcesSection(data.ticker);
 
   // Trigger async price drivers fetch after render
   requestAnimationFrame(function() { fetchPriceDrivers(data.ticker); });

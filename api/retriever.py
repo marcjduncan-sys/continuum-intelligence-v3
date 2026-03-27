@@ -307,6 +307,7 @@ async def retrieve(
     ticker: str | None = None,
     thesis_alignment: str | None = None,
     max_passages: int = 12,
+    user_passages: list[dict] | None = None,
 ) -> list[dict]:
     """
     Retrieve the most relevant passages for a query using hybrid ranking.
@@ -320,52 +321,54 @@ async def retrieve(
         ticker: Stock ticker to filter by (e.g. "WOW").
         thesis_alignment: Optional thesis alignment filter.
         max_passages: Maximum number of passages to return.
+        user_passages: Optional list of user-uploaded source passage dicts.
+            Each dict should have: content, section, subsection, tags, weight,
+            embedding, source_name. These are ranked separately then merged
+            with platform passages via RRF.
 
     Returns:
-        List of passage dicts with relevance scores.
+        List of passage dicts with relevance scores and source_origin.
     """
     # Get candidate passages
     passages = get_passages(ticker)
-    if not passages:
-        return []
 
     # Build weight overrides for alignment and section boosting
     # (avoids creating new Passage copies, lets us cache the BM25 index)
     weight_overrides: dict[int, float] = {}
 
-    # Thesis alignment boosting
-    if thesis_alignment:
-        alignment_lower = thesis_alignment.lower().strip()
-        direction_map = {
-            "bullish": "upside", "bull": "upside",
-            "bearish": "downside", "bear": "downside",
-        }
-        if alignment_lower in ("t1", "t2", "t3", "t4"):
-            for p in passages:
-                if alignment_lower in p.tags:
-                    weight_overrides[id(p)] = p.weight * 1.5
-        else:
-            direction = direction_map.get(alignment_lower, alignment_lower)
-            if direction in ("upside", "downside", "neutral"):
+    if passages:
+        # Thesis alignment boosting
+        if thesis_alignment:
+            alignment_lower = thesis_alignment.lower().strip()
+            direction_map = {
+                "bullish": "upside", "bull": "upside",
+                "bearish": "downside", "bear": "downside",
+            }
+            if alignment_lower in ("t1", "t2", "t3", "t4"):
                 for p in passages:
-                    if direction in p.tags:
-                        weight_overrides[id(p)] = p.weight * 1.3
+                    if alignment_lower in p.tags:
+                        weight_overrides[id(p)] = p.weight * 1.5
+            else:
+                direction = direction_map.get(alignment_lower, alignment_lower)
+                if direction in ("upside", "downside", "neutral"):
+                    for p in passages:
+                        if direction in p.tags:
+                            weight_overrides[id(p)] = p.weight * 1.3
 
-    # Section boosting based on query type
-    boosted_sections = _detect_section_boost(query)
-    if boosted_sections:
-        for p in passages:
-            if p.section in boosted_sections:
-                base = weight_overrides.get(id(p), p.weight)
-                weight_overrides[id(p)] = base * 1.4
+        # Section boosting based on query type
+        boosted_sections = _detect_section_boost(query)
+        if boosted_sections:
+            for p in passages:
+                if p.section in boosted_sections:
+                    base = weight_overrides.get(id(p), p.weight)
+                    weight_overrides[id(p)] = base * 1.4
 
-    # BM25 scoring (cached per ticker)
-    bm25 = _get_bm25(ticker, passages)
-    bm25_ranked = bm25.score(query, weight_overrides=weight_overrides or None)
-
-    # Generate query embedding (once per call)
+    # Generate query embedding (once per call, shared by platform + user ranking)
     query_embedding = None
-    has_any_embedding = any(p.embedding is not None for p in passages)
+    all_passages = passages or []
+    has_any_embedding = any(p.embedding is not None for p in all_passages)
+    if not has_any_embedding and user_passages:
+        has_any_embedding = any(up.get("embedding") for up in user_passages)
     if has_any_embedding:
         try:
             import embeddings
@@ -373,14 +376,58 @@ async def retrieve(
         except Exception:
             pass  # Fall back to BM25-only
 
-    # Hybrid ranking via RRF
-    rrf_ranked = _rrf_score(passages, bm25_ranked, query_embedding)
+    # --- Platform passage ranking ---
+    platform_rrf: list[tuple[float, Passage]] = []
+    if passages:
+        bm25 = _get_bm25(ticker, passages)
+        bm25_ranked = bm25.score(query, weight_overrides=weight_overrides or None)
+        platform_rrf = _rrf_score(passages, bm25_ranked, query_embedding)
+
+    # --- User passage ranking (ephemeral BM25, not cached) ---
+    user_rrf: list[tuple[float, Passage]] = []
+    user_source_names: dict[int, str] = {}  # id(Passage) -> source_name
+    if user_passages:
+        user_passage_objs = []
+        for up in user_passages:
+            p = Passage(
+                ticker=ticker or "",
+                section=up.get("section", "external"),
+                subsection=up.get("subsection", "uploaded"),
+                content=up["content"],
+                tags=up.get("tags", []),
+                weight=up.get("weight", 1.0),
+                embedding=up.get("embedding"),
+            )
+            user_passage_objs.append(p)
+            if up.get("source_name"):
+                user_source_names[id(p)] = up["source_name"]
+
+        if user_passage_objs:
+            user_bm25 = BM25(user_passage_objs)
+            user_bm25_ranked = user_bm25.score(query)
+            user_rrf = _rrf_score(user_passage_objs, user_bm25_ranked, query_embedding)
+
+    # --- Merge platform + user results by RRF score ---
+    if not platform_rrf and not user_rrf:
+        return []
+
+    # Tag each result with its origin, then merge and sort
+    merged: list[tuple[float, Passage, str]] = []
+    for score, p in platform_rrf:
+        merged.append((score, p, "platform"))
+    for score, p in user_rrf:
+        sn = user_source_names.get(id(p))
+        origin = f"user:{sn}" if sn else "user"
+        merged.append((score, p, origin))
+
+    merged.sort(key=lambda x: -x[0])
 
     # Return top-k
     results = []
-    for score, passage in rrf_ranked[:max_passages]:
+    for score, passage, origin in merged[:max_passages]:
         result = passage.to_dict()
         result["relevance_score"] = round(score, 4)
+        result["source_origin"] = origin
         results.append(result)
 
     return results

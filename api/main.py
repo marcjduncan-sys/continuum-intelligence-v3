@@ -48,6 +48,7 @@ from pm_journal import router as pm_journal_router
 from handoff_api import router as handoff_router
 from portfolio_api import router as portfolio_router
 from pm_ops import router as pm_ops_router
+from source_upload import router as source_upload_router
 from ingest import ingest, embed_all_passages, get_tickers, get_passage_count
 from refresh import (
     RefreshJob, refresh_jobs, get_job, is_running, run_refresh,
@@ -55,6 +56,7 @@ from refresh import (
     run_batch_refresh, _data_dir,
 )
 from retriever import retrieve
+from source_db import get_source_passages
 from task_monitor import monitored_task, get_failure_count
 from gold_agent import run_gold_analysis, check_gold_health, get_cached_result
 from github_commit import commit_files_to_github
@@ -273,6 +275,7 @@ if os.environ.get("ENABLE_PM", "true").lower() == "true":
     app.include_router(handoff_router)
     app.include_router(portfolio_router)
     app.include_router(pm_ops_router)
+    app.include_router(source_upload_router)
     logger.info("PM endpoints enabled")
 else:
     logger.info("PM endpoints disabled (ENABLE_PM != true)")
@@ -345,6 +348,7 @@ class SourcePassage(BaseModel):
     subsection: str
     content: str
     relevance_score: float
+    source_origin: str = "platform"
 
 
 class ResearchChatResponse(BaseModel):
@@ -406,15 +410,35 @@ async def research_chat(request: Request, body: ResearchChatRequest, background_
     if not has_research and not body.custom_system_prompt:
         raise api_error(404, ErrorCode.NOT_FOUND, f"Ticker '{ticker}' not found", detail=f"Available: {', '.join(available)}")
 
-    # Retrieve relevant passages (skip if ticker not indexed)
+    # Load user-uploaded source passages for multi-source retrieval
+    _auth_header_r = request.headers.get("Authorization", "")
+    _uid_r = None
+    _gid_r = None
+    if _auth_header_r.startswith("Bearer "):
+        _payload_r = decode_token(_auth_header_r[7:])
+        if _payload_r:
+            _uid_r = _payload_r.get("sub")
+    if not _uid_r:
+        _gid_r = request.query_params.get("guest_id")
+
+    _user_source_passages = None
+    if _uid_r or _gid_r:
+        _src_pool = await db.get_pool()
+        if _src_pool:
+            _user_source_passages = await get_source_passages(
+                _src_pool, ticker=ticker, user_id=_uid_r, guest_id=_gid_r,
+            )
+
+    # Retrieve relevant passages (skip if ticker not indexed and no user sources)
     passages = []
     context = ""
-    if has_research:
+    if has_research or _user_source_passages:
         passages = await retrieve(
             query=body.question,
             ticker=ticker,
             thesis_alignment=body.thesis_alignment,
             max_passages=config.MAX_PASSAGES,
+            user_passages=_user_source_passages,
         )
         context = _build_context(passages, ticker)
 
@@ -532,6 +556,7 @@ async def research_chat(request: Request, body: ResearchChatRequest, background_
             subsection=p["subsection"],
             content=p["content"][:300],  # Truncate for response size
             relevance_score=p["relevance_score"],
+            source_origin=p.get("source_origin", "platform"),
         )
         for p in passages[:6]  # Top 6 sources
     ]

@@ -40,6 +40,8 @@ import { generatePDFReport } from './features/pdf.js';
 import { initAddStock, openAddStockModal, closeAddStockModal, submitAddStock } from './features/add-stock.js';
 import { checkForAlerts, updateAlertBadge, initAlertPanel } from './features/thesis-monitor.js';
 import { saveThesis, getThesis, inferBiasFromQuestion } from './features/thesis-capture.js';
+import { renderSourceUploadZone, initSourceUpload } from './features/source-upload.js';
+import { initSourcesPanel, appendSource } from './features/sources-panel.js';
 
 // Deep Research page
 import { initDeepResearch } from './pages/deep-research.js';
@@ -301,7 +303,20 @@ async function boot() {
     populateSidebar: populateSidebar,
     initNarrativeTimelineChart: initNarrativeTimelineChart,
     fetchAndPatchLive: fetchAndPatchLive,
-    initPersonalisationDemo: window.initPersonalisationDemo
+    initPersonalisationDemo: window.initPersonalisationDemo,
+    initSourcesOnReport: function(ticker) {
+      var uploadMount = document.getElementById('src-upload-mount-' + ticker);
+      var panelMount = document.getElementById('src-panel-mount-' + ticker);
+      if (uploadMount) {
+        uploadMount.innerHTML = renderSourceUploadZone(ticker);
+        initSourceUpload(ticker, function(sourceData) {
+          appendSource(sourceData, ticker);
+        });
+      }
+      if (panelMount) {
+        initSourcesPanel(ticker);
+      }
+    }
   });
 
   // Initialize pages (each wrapped so one failure does not block the rest)
