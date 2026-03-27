@@ -38,7 +38,7 @@ function sourcesSection(ticker) {
   var t = ticker.toLowerCase();
   return '<div class="report-section" id="' + t + '-sources">' +
     '<div class="rs-header"><div class="rs-header-text">' +
-    '<div class="rs-number">Section 12</div>' +
+    '<div class="rs-number">Section 09</div>' +
     '<h2 class="rs-title">External Research</h2>' +
     '</div><button class="rs-toggle" onclick="window.toggleSection(this)" aria-label="Toggle section">' +
     SOURCES_CHEVRON + '</button></div>' +
