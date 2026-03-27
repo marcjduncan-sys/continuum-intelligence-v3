@@ -12,6 +12,6 @@ jobs:
     steps:
       - name: Run memory batch analysis
         run: |
-          curl -s -f -X POST \
+          curl -s -f --retry 3 --retry-delay 30 --retry-all-errors \
             -H "X-Batch-Secret: ${{ secrets.BATCH_SECRET }}" \
             https://api.continuumintelligence.ai/api/batch/run

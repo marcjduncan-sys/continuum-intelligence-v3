@@ -344,31 +344,32 @@ export function prefetchAllLiveData() {
     tickers.forEach(function(ticker) {
         setTimeout(function() {
             var stock = STOCK_DATA[ticker];
-            if (stock && stock.tickerFull) {
-                LiveData.fetch(stock.tickerFull).then(function(liveData) {
-                    if (liveData) {
-                        LiveData.patchStockData(ticker, liveData);
-                        _liveFetched.add(ticker);
+            if (!stock || !stock.tickerFull) return;
+            // Skip if already fetched this session
+            if (_liveFetched.has(ticker)) return;
+            LiveData.fetch(stock.tickerFull).then(function(liveData) {
+                if (liveData) {
+                    LiveData.patchStockData(ticker, liveData);
+                    _liveFetched.add(ticker);
 
-                        // Re-hydrate with live price  --  updates metrics, narrative, everything
-                        if (REFERENCE_DATA[ticker]) {
-                            ContinuumDynamics.onPriceUpdate(ticker, liveData.currentPrice);
-                        }
+                    // Re-hydrate with live price  --  updates metrics, narrative, everything
+                    if (REFERENCE_DATA[ticker]) {
+                        ContinuumDynamics.onPriceUpdate(ticker, liveData.currentPrice);
+                    }
 
-                        // Update home card with fully hydrated data
-                        var featuredCard = document.querySelector('[data-ticker-card="' + ticker + '"]');
-                        if (featuredCard) {
-                            var newCardHtml = renderFeaturedCard(stock);
-                            var temp = document.createElement('div');
-                            temp.innerHTML = newCardHtml;
-                            if (temp.firstElementChild) {
-                                featuredCard.parentNode.replaceChild(temp.firstElementChild, featuredCard);
-                            }
+                    // Update home card with fully hydrated data
+                    var featuredCard = document.querySelector('[data-ticker-card="' + ticker + '"]');
+                    if (featuredCard) {
+                        var newCardHtml = renderFeaturedCard(stock);
+                        var temp = document.createElement('div');
+                        temp.innerHTML = newCardHtml;
+                        if (temp.firstElementChild) {
+                            featuredCard.parentNode.replaceChild(temp.firstElementChild, featuredCard);
                         }
                     }
-                }).catch(function() {});
-            }
+                }
+            }).catch(function() {});
         }, delay);
-        delay += 500; // Stagger by 500ms to avoid rate limiting
+        delay += 1000; // Stagger by 1s to stay well within rate limits
     });
 }
