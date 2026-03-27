@@ -150,7 +150,8 @@ function switchRailMode(mode) {
         if (inputEl) inputEl.focus();
     }
 
-    try { localStorage.setItem('ci_rail_mode', mode); } catch(e) {}
+    try { localStorage.setItem('ci_rail_mode', mode); } catch(e) { // Expected: localStorage may be unavailable in restricted environments
+    }
     console.log('[PM] Rail mode switched to', mode);
 }
 
@@ -593,7 +594,8 @@ function sendMessage() {
     var convo = conversations[currentPortfolioKey];
 
     convo.push({ role: 'user', content: question, timestamp: now });
-    try { sessionStorage.setItem('ci_pm_conversations', JSON.stringify(conversations)); } catch(e) {}
+    try { sessionStorage.setItem('ci_pm_conversations', JSON.stringify(conversations)); } catch(e) { // Expected: sessionStorage may be unavailable in restricted environments
+    }
     if (inputEl) { inputEl.value = ''; inputEl.style.height = 'auto'; }
     updateSendButton();
     renderConversation();
@@ -639,7 +641,8 @@ function sendMessage() {
         if (!res.ok) {
             return res.text().then(function(body) {
                 var detail = '';
-                try { detail = JSON.parse(body).detail || ''; } catch(e) {}
+                try { detail = JSON.parse(body).detail || ''; } catch(e) { // Expected: response body may not be valid JSON
+                }
                 if (res.status === 502) {
                     throw new Error('The PM service returned an error. Please try again in a moment.');
                 }
@@ -655,7 +658,8 @@ function sendMessage() {
             content: data.response,
             timestamp: Date.now()
         });
-        try { sessionStorage.setItem('ci_pm_conversations', JSON.stringify(conversations)); } catch(e) {}
+        try { sessionStorage.setItem('ci_pm_conversations', JSON.stringify(conversations)); } catch(e) { // Expected: sessionStorage may be unavailable in restricted environments
+        }
 
         // Capture PM conversation ID for persistence (Phase E)
         if (data.pm_conversation_id) _pmConversationId = data.pm_conversation_id;
@@ -718,7 +722,8 @@ function updateSendButton() {
 function clearConversation() {
     conversations[currentPortfolioKey] = [];
     _pmConversationId = null;  // Phase E: reset persisted conversation
-    try { sessionStorage.setItem('ci_pm_conversations', JSON.stringify(conversations)); } catch(e) {}
+    try { sessionStorage.setItem('ci_pm_conversations', JSON.stringify(conversations)); } catch(e) { // Expected: sessionStorage may be unavailable in restricted environments
+    }
     renderWelcome();
 }
 
@@ -836,7 +841,8 @@ export function initPMChat() {
         if (savedMode === 'pm') {
             switchRailMode('pm');
         }
-    } catch(e) {}
+    } catch(e) { // Expected: localStorage may not have this key
+    }
 
     // Listen for portfolio sync from Portfolio page
     window.addEventListener('ci:portfolio:synced', function(e) {

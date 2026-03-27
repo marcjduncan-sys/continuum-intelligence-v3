@@ -87,7 +87,8 @@ function renderStockReport(hash, ticker) {
         var scaffoldData = await scaffoldResp.json();
         scaffoldData._lastRefreshed = scaffoldData._lastRefreshed || new Date().toISOString();
         scaffoldData._cacheVersion = CACHE_VERSION;
-        try { localStorage.setItem('ci_research_' + ticker, JSON.stringify(scaffoldData)); } catch(e) {}
+        try { localStorage.setItem('ci_research_' + ticker, JSON.stringify(scaffoldData)); } catch(e) { // Expected: localStorage may be full or unavailable
+        }
         var currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00a3','EUR':'\u20ac'};
         STOCK_DATA[ticker] = scaffoldData;
         STOCK_DATA[ticker]._indexOnly = false;

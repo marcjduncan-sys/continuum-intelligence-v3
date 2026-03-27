@@ -98,9 +98,11 @@ function _saveSectionState(ticker, sectionId, isCollapsed) {
   if (!ticker) return;
   var key = 'sec-state-' + ticker;
   var state = {};
-  try { state = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) {}
+  try { state = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) { // Expected: localStorage may not have this key or value may be corrupted
+  }
   state[sectionId] = isCollapsed;
-  try { localStorage.setItem(key, JSON.stringify(state)); } catch(e) {}
+  try { localStorage.setItem(key, JSON.stringify(state)); } catch(e) { // Expected: localStorage may be full or unavailable
+  }
 }
 
 window.toggleSection = function(btn) {
@@ -120,7 +122,8 @@ window.initSectionToggles = function() {
   var ticker = page.id.replace('page-report-', '').toLowerCase();
   var key = 'sec-state-' + ticker;
   var state = {};
-  try { state = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) {}
+  try { state = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) { // Expected: localStorage may not have this key or value may be corrupted
+  }
   page.querySelectorAll('.report-section').forEach(function(section) {
     var body = section.querySelector('.rs-body');
     var btn = section.querySelector('.rs-toggle');

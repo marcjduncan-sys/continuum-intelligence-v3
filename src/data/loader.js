@@ -110,7 +110,7 @@ export function loadFullResearchData(ticker, callback) {
               if (sd.valuation_range)    STOCK_DATA[ticker].valuation_range    = sd.valuation_range;
               if (sd.price_signals && sd.price_signals.length)
                 STOCK_DATA[ticker].price_signals = sd.price_signals;
-            } catch(e) {}
+            } catch(e) { console.error('[Loader] Failed to parse signal data for ' + ticker + ':', e); }
           }
           if (callback) callback(STOCK_DATA[ticker]);
         };
@@ -165,8 +165,9 @@ export function buildSnapshotFromStock(ticker) {
 
   // 1. Clone hypotheses -- already sorted by prepareHypotheses (disconfirmation ranking)
   var hyps = [];
-  for (var i = 0; i < stock.hypotheses.length; i++) {
-    var h = stock.hypotheses[i];
+  var stockHyps = stock.hypotheses || [];
+  for (var i = 0; i < stockHyps.length; i++) {
+    var h = stockHyps[i];
     hyps.push({
       originalTier: h.tier,
       direction: h.direction,
@@ -363,7 +364,7 @@ export function buildSnapshotFromStock(ticker) {
                   skewComputed.direction === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
 
   // 13. Date formatting
-  var dateStr = stock.date;
+  var dateStr = stock.date || '';
   var dateMatch = dateStr.match(/(\d+)\s+(\w+)\s+(\d+)/);
   if (dateMatch) dateStr = dateMatch[1] + ' ' + dateMatch[2].toUpperCase().substring(0, 3) + ' ' + dateMatch[3];
 
@@ -379,8 +380,8 @@ export function buildSnapshotFromStock(ticker) {
     version: 'v1.0',
     reportId: stock.reportId,
     priceMetrics: priceMetrics,
-    riskSkew: { direction: skewComputed.direction, badge: skewBadge, rationale: stock.skew.rationale, computed: skewComputed },
-    narrative: { text: stock.narrative.theNarrative || '', verdict: stock.verdict.text || '' },
+    riskSkew: { direction: skewComputed.direction, badge: skewBadge, rationale: (stock.skew && stock.skew.rationale) || '', computed: skewComputed },
+    narrative: { text: (stock.narrative && stock.narrative.theNarrative) || '', verdict: (stock.verdict && stock.verdict.text) || '' },
     survivalBar: survivalBar,
     survivalLegend: survivalLegend,
     hypotheses: snapHyps,

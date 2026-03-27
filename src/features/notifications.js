@@ -9,6 +9,14 @@
 import { API_BASE } from '../lib/api-config.js';
 
 // ---------------------------------------------------------------------------
+// HTML escaping -- prevents XSS from server-supplied content
+// ---------------------------------------------------------------------------
+function _esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ---------------------------------------------------------------------------
 // Configuration (centralised in api-config.js)
 // ---------------------------------------------------------------------------
 
@@ -211,14 +219,14 @@ function _renderPanel(notifications) {
         const date = new Date(n.created_at).toLocaleDateString('en-AU', {
             day: 'numeric', month: 'short',
         });
-        return `<div class="ci-notif-item" data-id="${n.id}">
+        return `<div class="ci-notif-item" data-id="${_esc(n.id)}">
             <div class="ci-notif-item-header">
-                <span class="ci-notif-ticker">${n.ticker}</span>
+                <span class="ci-notif-ticker">${_esc(n.ticker)}</span>
                 <span class="ci-notif-signal ${signalClass}">${signalLabel}</span>
                 <span class="ci-notif-date">${date}</span>
             </div>
-            <p class="ci-notif-summary">${n.summary}</p>
-            <button class="ci-notif-dismiss" data-id="${n.id}">Dismiss</button>
+            <p class="ci-notif-summary">${_esc(n.summary)}</p>
+            <button class="ci-notif-dismiss" data-id="${_esc(n.id)}">Dismiss</button>
         </div>`;
     }).join('');
 

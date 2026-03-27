@@ -15,8 +15,9 @@ export function buildSnapshotFromStock(ticker) {
 
   // 1. Clone hypotheses  --  already sorted by prepareHypotheses (disconfirmation ranking)
   var hyps = [];
-  for (var i = 0; i < stock.hypotheses.length; i++) {
-    var h = stock.hypotheses[i];
+  var stockHyps = stock.hypotheses || [];
+  for (var i = 0; i < stockHyps.length; i++) {
+    var h = stockHyps[i];
     hyps.push({
       originalTier: h.tier,
       direction: h.direction,
@@ -227,8 +228,8 @@ export function buildSnapshotFromStock(ticker) {
     version: 'v1.0',
     reportId: stock.reportId,
     priceMetrics: priceMetrics,
-    riskSkew: { direction: skewComputed.direction, badge: skewBadge, rationale: stock.skew.rationale, computed: skewComputed },
-    narrative: { text: stock.narrative.theNarrative || '', verdict: stock.verdict.text || '' },
+    riskSkew: { direction: skewComputed.direction, badge: skewBadge, rationale: (stock.skew && stock.skew.rationale) || '', computed: skewComputed },
+    narrative: { text: (stock.narrative && stock.narrative.theNarrative) || '', verdict: (stock.verdict && stock.verdict.text) || '' },
     survivalBar: survivalBar,
     survivalLegend: survivalLegend,
     hypotheses: snapHyps,

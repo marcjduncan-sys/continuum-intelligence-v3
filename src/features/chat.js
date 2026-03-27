@@ -141,7 +141,8 @@ function _restoreFromDB(ticker) {
             conversations[ticker] = data.messages.map(function(m) {
                 return { role: m.role, content: m.content, sources: m.sources_json || [], timestamp: 0 };
             });
-            try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) {}
+            try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) { // Expected: sessionStorage may be unavailable in restricted environments
+            }
         })
         .catch(function(err) {
             console.warn('[Analyst] DB restore failed for ' + ticker + ':', err.message || err);
@@ -470,7 +471,8 @@ function sendMessage() {
 
     var now = Date.now();
     convo.push({ role: 'user', content: question, timestamp: now });
-    try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) {}
+    try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) { // Expected: sessionStorage may be unavailable in restricted environments
+    }
     _persistMessage(ticker, 'user', question, null);
     if (input) { input.value = ''; input.style.height = 'auto'; }
     updateSendButton();
@@ -514,7 +516,8 @@ function sendMessage() {
         if (!res.ok) {
             return res.text().then(function(body) {
                 var detail = '';
-                try { detail = JSON.parse(body).detail || ''; } catch(e) {}
+                try { detail = JSON.parse(body).detail || ''; } catch(e) { // Expected: response body may not be valid JSON
+                }
                 if (res.status === 502 && detail.indexOf('authentication_error') !== -1) {
                     throw new Error('API key error -- the server Anthropic key may be invalid.');
                 }
@@ -534,7 +537,8 @@ function sendMessage() {
             sources: data.sources || [],
             timestamp: Date.now()
         });
-        try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) {}
+        try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) { // Expected: sessionStorage may be unavailable in restricted environments
+        }
         _persistMessage(ticker, 'assistant', data.response, data.sources || null);
         renderConversation();
     })
@@ -621,7 +625,8 @@ function togglePanel() {
 
 function clearConversation() {
     conversations[currentTicker] = [];
-    try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) {}
+    try { sessionStorage.setItem('ci_conversations', JSON.stringify(conversations)); } catch(e) { // Expected: sessionStorage may be unavailable in restricted environments
+    }
     renderWelcome();
 }
 
@@ -756,7 +761,8 @@ function _setupListeners() {
         collapseBtn.addEventListener('click', function() {
             var isNowCollapsed = panel.classList.toggle('ap-user-collapsed');
             document.body.classList.toggle('ap-user-collapsed-active', isNowCollapsed);
-            try { localStorage.setItem('ci_panel_collapsed', isNowCollapsed ? '1' : '0'); } catch(e) {}
+            try { localStorage.setItem('ci_panel_collapsed', isNowCollapsed ? '1' : '0'); } catch(e) { // Expected: localStorage may be unavailable in restricted environments
+            }
             collapseBtn.style.transform = isNowCollapsed ? 'rotate(180deg)' : '';
         });
     }
@@ -844,7 +850,8 @@ export function initChat() {
             document.body.classList.add('ap-user-collapsed-active');
             if (collapseBtn) collapseBtn.style.transform = 'rotate(180deg)';
         }
-    } catch(e) {}
+    } catch(e) { // Expected: localStorage may not have this key
+    }
 
     if (!panel) {
         console.warn('[Analyst] #analyst-panel not found -- analyst panel disabled');

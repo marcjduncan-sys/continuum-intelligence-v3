@@ -714,7 +714,7 @@ export function renderReweighting(positions, grossExposure) {
    Real alerting is handled by thesis-monitor.js and api/insights.py. */
 
 export function savePortfolio(positions) {
-  try { localStorage.setItem('continuum-portfolio', JSON.stringify(positions)); } catch(e) {}
+  try { localStorage.setItem('continuum-portfolio', JSON.stringify(positions)); } catch(e) { console.error('[Portfolio] Failed to save portfolio to localStorage:', e); }
 }
 
 export function loadPortfolio() {

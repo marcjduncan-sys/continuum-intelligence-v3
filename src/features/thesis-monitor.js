@@ -582,7 +582,7 @@ export function checkForAlerts(stockDataMap) {
         }
       }
     }
-  } catch (_e) {}
+  } catch (_e) { console.error('[ThesisMonitor] Failed to scan localStorage for theses:', _e); }
 
   // 2. For portfolio tickers without a stored thesis, infer from weight
   var profile = _readProfile();

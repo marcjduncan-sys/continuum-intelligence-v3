@@ -274,7 +274,7 @@ async function poll() {
                             localStorage.removeItem(cacheKey);
                         }
                     }
-                } catch(e) {}
+                } catch(e) { console.error('[MarketFeed] Failed to expire price cache for ' + ticker + ':', e); }
             }
 
             var liveData = await LiveData.fetch(stock.tickerFull);
