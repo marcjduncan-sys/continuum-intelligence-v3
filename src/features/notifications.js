@@ -30,7 +30,7 @@ let _pollTimer = null;
 // ---------------------------------------------------------------------------
 
 function _authParams() {
-    const jwt = localStorage.getItem('ci_jwt');
+    const jwt = localStorage.getItem('ci_auth_token');
     if (jwt) {
         return { headers: { Authorization: `Bearer ${jwt}` }, qs: '' };
     }

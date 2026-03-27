@@ -17,7 +17,7 @@ let _currentDays = 7;
 // --- Fetch ---
 
 async function _fetchDashboard(days) {
-  const secret = localStorage.getItem('ci_ops_secret') || '';
+  const secret = sessionStorage.getItem('ci_ops_secret') || '';
   const resp = await fetch(`${API_BASE}/api/ops/pm-dashboard?days=${days}`, {
     headers: { 'X-Ops-Secret': secret },
   });

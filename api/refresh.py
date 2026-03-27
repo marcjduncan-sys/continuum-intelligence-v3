@@ -25,6 +25,8 @@ from pathlib import Path
 from typing import Any
 
 import config
+import re
+
 import llm
 from gemini_client import gemini_completion
 from validate_research import fix as validate_fix, validate as validate_check
@@ -34,6 +36,20 @@ from gold_agent import run_gold_analysis
 from github_commit import commit_files_to_github
 
 logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Narrative timestamp stripping
+# ---------------------------------------------------------------------------
+_TIMESTAMP_RE = re.compile(
+    r"<strong>\s*\[(Updated|Coverage Initiated)\s+[^]]*\]\s*</strong>\s*"
+)
+
+
+def _strip_narrative_timestamps(text: str) -> str:
+    """Remove [Updated ...] / [Coverage Initiated ...] prefixes from narrative text."""
+    if not text:
+        return text
+    return _TIMESTAMP_RE.sub("", text).strip()
 
 
 # ---------------------------------------------------------------------------
@@ -828,7 +844,8 @@ Reference the CURRENT price. Describe what assumptions the market is making. Pla
 
   "narrative_rewrite": "Full dominant narrative (6-10 sentences). Use HTML: <strong> for emphasis, \
 <span class='key-stat'> for key numbers. Describe what is driving the stock right now, \
-key catalysts, risks, and what the evidence says.",
+key catalysts, risks, and what the evidence says. Do NOT include any [Updated ...] or \
+[Coverage Initiated ...] timestamp prefixes -- timestamps are added automatically.",
 
   "price_implication": "HTML bullet-format content describing what the current price assumes. \
 Use <br> separators between bullets.",
@@ -988,7 +1005,8 @@ making at this level. Use plain text, no HTML.",
   "narrative_rewrite": "Full rewrite of the dominant narrative (4-8 sentences). Use HTML formatting: \
 <strong> for emphasis, <span class='key-stat'> for key numbers. Must reflect ALL recent events \
 including any results, announcements, or catalysts from the gathered data. Do NOT reference past \
-events as future events.",
+events as future events. Do NOT include any [Updated ...] or [Coverage Initiated ...] timestamp \
+prefixes -- timestamps are added automatically.",
   "price_implication": "Rewritten HTML content describing what the current price assumes. Use \
 bullet format with <br> separators. Reference the current price.",
   "evidence_check": "Rewritten HTML paragraph assessing how much evidence supports vs contradicts \
@@ -1787,7 +1805,7 @@ async def _run_hypothesis_synthesis(
 {hero.get('skew_description', 'N/A')[:300]}
 
 ## Current Narrative (theNarrative):
-{narrative.get('theNarrative', 'N/A')[:800]}
+{_strip_narrative_timestamps(narrative.get('theNarrative', 'N/A'))[:800]}
 
 ## Current Price Implication:
 {narrative.get('priceImplication', {}).get('content', 'N/A')[:500] if isinstance(narrative.get('priceImplication'), dict) else 'N/A'}
@@ -2174,9 +2192,10 @@ def _merge_updates(
     # -- Full narrative rewrite --
     if "narrative" in updated and isinstance(updated["narrative"], dict):
         if hypothesis_update.get("narrative_rewrite"):
+            cleaned = _strip_narrative_timestamps(hypothesis_update["narrative_rewrite"])
             updated["narrative"]["theNarrative"] = (
                 f"<strong>[Updated {now}]</strong> "
-                f"{hypothesis_update['narrative_rewrite']}"
+                f"{cleaned}"
             )
         elif hypothesis_update.get("narrative_update"):
             # Fallback: prepend short update if full rewrite not provided
@@ -2513,9 +2532,10 @@ def _merge_initiation(
     if "narrative" not in updated:
         updated["narrative"] = {}
     if hypothesis_update.get("narrative_rewrite"):
+        cleaned = _strip_narrative_timestamps(hypothesis_update["narrative_rewrite"])
         updated["narrative"]["theNarrative"] = (
             f"<strong>[Coverage Initiated {now}]</strong> "
-            f"{hypothesis_update['narrative_rewrite']}"
+            f"{cleaned}"
         )
     if hypothesis_update.get("price_implication"):
         updated["narrative"]["priceImplication"] = {
