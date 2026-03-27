@@ -10,7 +10,7 @@ import { computeSkewScore, normaliseScores } from '../lib/dom.js';
 // Bump this when the research JSON schema or score pipeline changes.
 // Any cached entry without a matching _cacheVersion is discarded so the
 // fresh static JSON is fetched instead, keeping the UI in sync with ingest.py.
-export var CACHE_VERSION = 'v3';
+export var CACHE_VERSION = 'v4';
 
 /**
  * Async loader for full research data (called before rendering a report page).
