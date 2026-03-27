@@ -827,7 +827,11 @@ End with 'ASX: [TICKER]' reference.",
   },
 
   "embedded_thesis": "3-5 sentence paragraph describing what the current price embeds. \
-Reference the CURRENT price. Describe what assumptions the market is making. Plain text, no HTML.",
+Reference the CURRENT price. The financial data section above provides BOTH a Forward P/E and a \
+Trailing P/E -- these are different numbers. Use them correctly: the Forward P/E reflects \
+consensus earnings estimates, the Trailing P/E reflects reported historical earnings. If the \
+Forward P/E is significantly lower than the Trailing P/E, the market expects an earnings \
+recovery. Do NOT confuse or swap these two values. Plain text, no HTML.",
 
   "skew_description": "2-3 sentence summary of the hypothesis weightings and directional skew.",
 
@@ -999,7 +1003,10 @@ Return a JSON object with ALL of the following fields:
     }
   ],
   "embedded_thesis": "Rewritten 3-5 sentence paragraph describing what the current price embeds. \
-Reference the CURRENT price (provided), not old prices. Describe what assumptions the market is \
+Reference the CURRENT price (provided), not old prices. The financial data section below provides \
+BOTH a Forward P/E and a Trailing P/E -- these are different numbers. Use them correctly: the \
+Forward P/E reflects consensus earnings estimates, the Trailing P/E reflects reported historical \
+earnings. Do NOT confuse or swap these two values. Describe what assumptions the market is \
 making at this level. Use plain text, no HTML.",
   "skew_description": "Rewritten 2-3 sentence summary of hypothesis weightings and directional skew.",
   "narrative_rewrite": "Full rewrite of the dominant narrative (4-8 sentences). Use HTML formatting: \
@@ -1791,6 +1798,13 @@ async def _run_hypothesis_synthesis(
 ## Stock: {ticker} ({research.get('company', '')})
 ## Current Price: A${price_data.get('price', 'N/A')} ({price_data.get('change_pct', 0):+.1f}%)
 ## 52-Week Range: A${price_data.get('low_52w', 'N/A')} - A${price_data.get('high_52w', 'N/A')}
+
+## Key Financial Metrics (from Yahoo Finance -- use these exact values):
+- Forward P/E: {f"{price_data['forward_pe']:.1f}x" if price_data.get('forward_pe') else 'N/A'}
+- Trailing P/E: {f"{price_data['trailing_pe']:.1f}x" if price_data.get('trailing_pe') else 'N/A'}
+- EV/EBITDA: {f"{price_data['ev_to_ebitda']:.1f}x" if price_data.get('ev_to_ebitda') else 'N/A'}
+- Dividend Yield: {f"{price_data['dividend_yield'] * 100:.1f}%" if price_data.get('dividend_yield') is not None else 'N/A'}
+- Market Cap: A${price_data.get('market_cap', 'N/A')}
 
 ## Current Hypothesis Weights:
 {json.dumps(hypotheses_summary, indent=2)}
