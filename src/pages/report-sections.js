@@ -615,7 +615,7 @@ export function renderDiscriminators(data) {
     '</table>' +
     (d.nonDiscriminating ? '<div class="callout warn">' +
       '<div class="callout-label">Non-Discriminating Evidence &mdash; Assessed &amp; Discarded</div>' +
-      '<p>' + d.nonDiscriminating + '</p>' +
+      '<div class="callout-body">' + d.nonDiscriminating + '</div>' +
     '</div>' : '') +
   '</div></div>';
 }
