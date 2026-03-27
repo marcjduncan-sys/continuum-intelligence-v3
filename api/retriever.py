@@ -329,6 +329,10 @@ async def retrieve(
     Returns:
         List of passage dicts with relevance scores and source_origin.
     """
+    # Defensive cap on user passages to prevent memory exhaustion
+    if user_passages and len(user_passages) > 200:
+        user_passages = user_passages[:200]
+
     # Get candidate passages
     passages = get_passages(ticker)
 

@@ -101,7 +101,7 @@ def extract_text(file_bytes: bytes, filename: str) -> tuple[str, int, str]:
         )
 
     if ext in (".txt", ".md"):
-        text = file_bytes.decode("utf-8")
+        text = file_bytes.decode("utf-8", errors="replace")
         text = _clean_html(text)
         text = re.sub(r"\n{3,}", "\n\n", text)
         page_estimate = max(1, len(text) // 2500)

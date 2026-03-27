@@ -14,23 +14,25 @@ from datetime import date as _date
 
 logger = logging.getLogger(__name__)
 
+
+def _safe_json(value):
+    """Parse a JSON string, returning None on failure."""
+    if not value:
+        return None
+    try:
+        return json.loads(value)
+    except (json.JSONDecodeError, TypeError):
+        return None
+
 # Maximum passages stored per (ticker, identity) to bound retrieval cost.
 _PASSAGE_CAP = 200
 
 
-def _identity_params(user_id: str | None, guest_id: str | None) -> list[Any]:
-    """Return [user_id, guest_id] for parameterised ownership queries.
-
-    All queries use the fixed clause:
-        (rs.user_id = $1 OR ($1 IS NULL AND rs.guest_id = $2))
-    This avoids dynamic SQL fragments and ensures both params are always bound.
-    """
-    return [user_id, guest_id]
 
 
-# Fixed ownership clause used by all multi-source queries. Both $1 (user_id)
-# and $2 (guest_id) are always bound; the OR logic selects the correct branch.
-_OWNER_CLAUSE = "(rs.user_id = $1 OR ($1 IS NULL AND rs.guest_id = $2))"
+# Ownership clause (literal, never interpolated from variables):
+#   (rs.user_id = $N OR ($N IS NULL AND rs.guest_id = $M))
+# Parameter positions vary per query; each call sites inlines the clause.
 
 
 async def create_source(
@@ -213,7 +215,7 @@ async def list_sources(
 
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            f"""
+            """
             SELECT
                 rs.id, rs.user_id, rs.guest_id, rs.ticker, rs.source_name,
                 rs.source_type, rs.document_date, rs.file_name, rs.page_count,
@@ -223,7 +225,8 @@ async def list_sources(
                 sv.key_evidence, sv.key_risks, sv.summary
             FROM research_sources rs
             LEFT JOIN source_views sv ON sv.source_id = rs.id
-            WHERE {_OWNER_CLAUSE} AND rs.ticker = $3 AND rs.active = TRUE
+            WHERE (rs.user_id = $1 OR ($1 IS NULL AND rs.guest_id = $2))
+              AND rs.ticker = $3 AND rs.active = TRUE
             ORDER BY rs.created_at DESC
             """,
             user_id,
@@ -254,9 +257,9 @@ async def list_sources(
                 "alignment_confidence": float(row["alignment_confidence"]) if row["alignment_confidence"] else None,
                 "direction": row["direction"],
                 "price_target": float(row["price_target"]) if row["price_target"] else None,
-                "conviction_signals": json.loads(row["conviction_signals"]) if row["conviction_signals"] else None,
-                "key_evidence": json.loads(row["key_evidence"]) if row["key_evidence"] else None,
-                "key_risks": json.loads(row["key_risks"]) if row["key_risks"] else None,
+                "conviction_signals": _safe_json(row["conviction_signals"]),
+                "key_evidence": _safe_json(row["key_evidence"]),
+                "key_risks": _safe_json(row["key_risks"]),
                 "summary": row["summary"],
             }
         results.append(source)
@@ -308,11 +311,11 @@ async def get_source(pool, *, source_id: str) -> dict | None:
             "alignment_confidence": float(row["alignment_confidence"]) if row["alignment_confidence"] else None,
             "direction": row["direction"],
             "price_target": float(row["price_target"]) if row["price_target"] else None,
-            "conviction_signals": json.loads(row["conviction_signals"]) if row["conviction_signals"] else None,
-            "key_evidence": json.loads(row["key_evidence"]) if row["key_evidence"] else None,
-            "key_risks": json.loads(row["key_risks"]) if row["key_risks"] else None,
+            "conviction_signals": _safe_json(row["conviction_signals"]),
+            "key_evidence": _safe_json(row["key_evidence"]),
+            "key_risks": _safe_json(row["key_risks"]),
             "summary": row["summary"],
-            "raw_decomposition": json.loads(row["raw_decomposition"]) if row["raw_decomposition"] else None,
+            "raw_decomposition": _safe_json(row["raw_decomposition"]),
         }
     return source
 
@@ -372,13 +375,14 @@ async def get_source_passages(
 
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            f"""
+            """
             SELECT
                 sp.content, sp.section, sp.subsection, sp.tags,
                 sp.weight, sp.embedding, rs.source_name
             FROM source_passages sp
             JOIN research_sources rs ON sp.source_id = rs.id
-            WHERE {_OWNER_CLAUSE} AND sp.ticker = $3 AND rs.active = TRUE
+            WHERE (rs.user_id = $1 OR ($1 IS NULL AND rs.guest_id = $2))
+              AND sp.ticker = $3 AND rs.active = TRUE
             """,
             user_id,
             guest_id,
