@@ -108,6 +108,7 @@ function renderStockReport(hash, ticker) {
         if (typeof window.applyNarrativeAnalysis === 'function') window.applyNarrativeAnalysis(ticker);
         if (_pageRenderers.initNarrativeTimelineChart) _pageRenderers.initNarrativeTimelineChart(ticker);
         if (_pageRenderers.fetchAndPatchLive) _pageRenderers.fetchAndPatchLive(ticker);
+        if (_pageRenderers.initSourcesOnReport) _pageRenderers.initSourcesOnReport(ticker);
         console.log('[Route] Fetched dynamically-added stock ' + ticker + ' from Railway');
       } catch(err) {
         container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Stock Not Found</div><div style="font-size:0.9rem">' + ticker + ' is not in coverage. <a href="#home" style="color:var(--brand-green)">Return to home</a></div></div></div>';
@@ -132,6 +133,7 @@ function renderStockReport(hash, ticker) {
           if (typeof window.applyNarrativeAnalysis === 'function') window.applyNarrativeAnalysis(ticker);
           if (_pageRenderers.initNarrativeTimelineChart) _pageRenderers.initNarrativeTimelineChart(ticker);
           if (_pageRenderers.fetchAndPatchLive) _pageRenderers.fetchAndPatchLive(ticker);
+          if (_pageRenderers.initSourcesOnReport) _pageRenderers.initSourcesOnReport(ticker);
         }
       });
     }
@@ -146,6 +148,7 @@ function renderStockReport(hash, ticker) {
     if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
     if (_pageRenderers.setupScrollSpy) _pageRenderers.setupScrollSpy('page-' + hash);
     if (_pageRenderers.initNarrativeTimelineChart) _pageRenderers.initNarrativeTimelineChart(ticker);
+    if (_pageRenderers.initSourcesOnReport) _pageRenderers.initSourcesOnReport(ticker);
   }
 }
 
