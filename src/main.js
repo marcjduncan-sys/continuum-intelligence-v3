@@ -305,8 +305,9 @@ async function boot() {
     fetchAndPatchLive: fetchAndPatchLive,
     initPersonalisationDemo: window.initPersonalisationDemo,
     initSourcesOnReport: function(ticker) {
-      var uploadMount = document.getElementById('src-upload-mount-' + ticker);
-      var panelMount = document.getElementById('src-panel-mount-' + ticker);
+      var t = ticker.toLowerCase();
+      var uploadMount = document.getElementById('src-upload-mount-' + t);
+      var panelMount = document.getElementById('src-panel-mount-' + t);
       if (uploadMount) {
         uploadMount.innerHTML = renderSourceUploadZone(ticker);
         initSourceUpload(ticker, function(sourceData) {

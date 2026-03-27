@@ -43,8 +43,8 @@ function sourcesSection(ticker) {
     '</div><button class="rs-toggle" onclick="window.toggleSection(this)" aria-label="Toggle section">' +
     SOURCES_CHEVRON + '</button></div>' +
     '<div class="rs-body">' +
-    '<div id="src-upload-mount-' + ticker + '"></div>' +
-    '<div id="src-panel-mount-' + ticker + '"></div>' +
+    '<div id="src-upload-mount-' + t + '"></div>' +
+    '<div id="src-panel-mount-' + t + '"></div>' +
     '</div></div>';
 }
 
