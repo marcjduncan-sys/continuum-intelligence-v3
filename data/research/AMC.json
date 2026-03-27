@@ -7,7 +7,7 @@
   "sectorSub": "Packaging & Containers",
   "price": 58.06,
   "currency": "A$",
-  "date": "27-Mar-26",
+  "date": "27-Mar-26 17:58 AEST",
   "reportId": "AMC-2026-001",
   "priceHistory": [
     76.75,
@@ -261,7 +261,7 @@
     58.06
   ],
   "heroDescription": "Packaging & Containers &bull; ASX-Listed",
-  "heroCompanyDescription": "Amcor plc (ASX: AMC): coverage initiated. Full analysis pending.",
+  "heroCompanyDescription": "Amcor plc (ASX: AMC) is one of the world's largest global packaging companies, headquartered in Zurich, Switzerland, with a primary listing on the NYSE and a secondary listing on the ASX via Chess Depositary Interests (CDIs). The company operates across two principal segments: Flexibles (flexible packaging for food, beverage, pharmaceutical, and personal care markets) and Rigid Packaging (plastic containers primarily for beverage and food applications in North America).",
   "heroMetrics": [
     {
       "label": "Mkt Cap",
@@ -290,54 +290,77 @@
     }
   ],
   "hero": {
-    "embedded_thesis": null,
-    "skew": null,
-    "skew_description": null,
+    "embedded_thesis": "At A$58.06, the current price sits just 7% above the 52-week low of A$54.13 and approximately 25% below the 52-week high of A$77.60, implying the market is pricing in a scenario somewhere between the base case and the bear case. The forward P/E of 13.1x versus the trailing P/E of 30.6x tells a critical story: the market is relying on a very large earnings step-up in the next 12 months, likely driven by Berry Global merger synergies and normalisation of integration costs. If that earnings recovery does not materialise on schedule, the current price offers limited support beyond the dividend yield. The 6.7% dividend yield at A$58.06 suggests the market is treating Amcor as a yield stock rather than a growth stock, which is consistent with a view that near-term capital appreciation is constrained by leverage and integration uncertainty.",
+    "skew": "DOWNSIDE",
+    "skew_description": "The four hypotheses sum to 100%, with the base case (N2 at 40%) carrying the highest weight as expected for an initial coverage initiation. The bear case (N3 at 30%) is weighted more heavily than the bull case (N1 at 20%), reflecting the leverage overhang and proximity to 52-week lows. The tail scenario (N4 at 10%) captures the binary optionality of the Berry Global merger outcome.",
     "position_in_range": {
       "current_price": 58.06,
-      "worlds": []
+      "worlds": [
+        {
+          "label": "Bear Case",
+          "price": 44.0
+        },
+        {
+          "label": "Base Case",
+          "price": 60.0
+        },
+        {
+          "label": "Bull Case",
+          "price": 75.0
+        },
+        {
+          "label": "Catalyst",
+          "price": 90.0
+        }
+      ],
+      "note": "World prices are indicative -- pending full W1-W4 valuation build"
     },
-    "next_decision_point": null,
-    "previousSkew": null
+    "next_decision_point": {
+      "event": "Berry Global Merger Completion and Initial Integration Update",
+      "date": "Mid-2026",
+      "metric": "Merger close confirmation, initial synergy guidance (target vs. A$650M+ reported synergy target), and post-merger leverage ratio",
+      "thresholds": "Synergy guidance above A$700M and post-merger net debt/EBITDA below 4.5x would be bullish; synergy guidance below A$500M or leverage above 5.5x post-close would be bearish and could trigger a dividend review"
+    },
+    "previousSkew": ""
   },
   "skew": {
-    "direction": "neutral",
-    "rationale": "Auto-added stock. Narrative analysis pending. Skew assessment requires analyst research."
+    "direction": "bearish",
+    "rationale": "The probability distribution is skewed modestly bearish, with the downside scenario (N3 at 30%) carrying more weight than the upside scenario (N1 at 20%). The primary driver of this skew is the A$16.2B debt load, which at approximately 5.8x EBITDA leaves limited margin for error, combined with the stock's proximity to its 52-week low suggesting persistent institutional selling. The 6.7% dividend yield and defensive end-markets prevent a more aggressively bearish skew."
   },
   "verdict": {
-    "text": "Amcor plc has been added to coverage. Trading at <span class=\"key-stat\">A$58.06</span>. Full narrative analysis with competing hypotheses is pending.",
+    "text": "Initiating coverage on <strong>Amcor plc (ASX: AMC)</strong> with a <strong>Neutral/Cautious</strong> stance at a current price of <span class='key-stat'>A$58.06</span>. The stock is trading near its 52-week low of <span class='key-stat'>A$54.13</span>, reflecting the market's discomfort with a <span class='key-stat'>A$16.2B</span> debt load and the execution uncertainty surrounding the Berry Global merger. The <span class='key-stat'>6.7%</span> dividend yield provides a meaningful income floor and limits the downside case, but the forward P/E of <span class='key-stat'>13.1x</span> already embeds a significant earnings recovery that must be delivered to justify even the current price. The probability skew is modestly bearish (N3 at 30% vs N1 at 20%), driven primarily by leverage risk and the absence of near-term positive catalysts in the evidence base. We would look for a formal merger completion announcement and an initial synergy update before moving to a more constructive stance.",
     "borderColor": null,
     "scores": [
       {
         "label": "N1 Growth/Recovery",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "20%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&uarr;",
+        "dirText": "Upside",
         "dirColor": null
       },
       {
         "label": "N2 Base Case",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
+        "score": "40%",
+        "scoreColor": "var(--signal-amber)",
         "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "dirText": "Base",
         "dirColor": null
       },
       {
         "label": "N3 Risk/Downside",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "30%",
+        "scoreColor": "var(--signal-amber)",
+        "dirArrow": "&darr;",
+        "dirText": "Downside",
         "dirColor": null
       },
       {
         "label": "N4 Disruption/Catalyst",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "10%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&uarr;",
+        "dirText": "Upside",
         "dirColor": null
       }
     ]
@@ -365,7 +388,7 @@
     }
   ],
   "featuredPriceColor": "",
-  "featuredRationale": "Auto-added to coverage. Full narrative analysis pending.",
+  "featuredRationale": "The four hypotheses sum to 100%, with the base case (N2 at 40%) carrying the highest weight as expected for an initial coverage initiation. The bear case (N3 at 30%) is weighted more heavily than the bull case (N1 at 20%), reflecting the leverage overhang and proximity to 52-week lows. The tail scenario (N4 at 10%) captures the binary optionality of the Berry Global merger outcome.",
   "identity": {
     "rows": [
       [
@@ -449,19 +472,24 @@
       "direction": "upside",
       "title": "N1: Growth/Recovery",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "20%",
+      "scoreWidth": "20%",
+      "scoreMeta": "",
+      "description": "Amcor executes successfully on its pending merger with Berry Global, capturing material cost synergies ahead of schedule while underlying packaging volumes recover as consumer staples destocking cycles end. A re-rating toward 15-16x forward earnings would push the stock back toward its 52-week high. This scenario requires synergy delivery, volume inflection, and a stabilisation of the leverage profile.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Forward P/E of 13.1x is materially below the 52-week high implied multiple, suggesting significant re-rating headroom if earnings delivery improves",
+        "6.7% dividend yield provides a high income floor that attracts yield-seeking institutional capital and limits downside",
+        "Amcor's scale as a global packaging leader with A$19.6B in revenue gives it pricing power and customer stickiness across consumer staples end-markets",
+        "Recent prospectus supplement filings suggest active capital markets engagement, potentially pre-positioning the balance sheet for the Berry Global merger close"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Total debt of A$16.2B against an EV of A$42.0B implies a heavily leveraged balance sheet that constrains financial flexibility and amplifies downside risk",
+        "Stock is trading near its 52-week low of A$54.13, indicating persistent selling pressure rather than accumulation",
+        "Trailing P/E of 30.6x versus forward P/E of 13.1x implies a significant earnings step-up is already embedded in consensus, raising execution risk"
       ]
     },
     {
@@ -469,19 +497,24 @@
       "direction": "neutral",
       "title": "N2: Base Case",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "40%",
+      "scoreWidth": "40%",
+      "scoreMeta": "",
+      "description": "Amcor continues to generate stable free cash flow from its defensive packaging franchise, sustaining its dividend while managing a heavy debt load. The Berry Global merger integration proceeds but synergy realisation is gradual, keeping the stock range-bound between A$55 and A$65. The market continues to apply a discount for leverage and integration risk, preventing a meaningful re-rating.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "EBITDA of A$2.8B on A$19.6B revenue reflects a mature, relatively stable margin profile consistent with a defensive packaging business",
+        "EV/EBITDA of 14.8x is in line with global packaging sector peers, suggesting fair value at current levels rather than deep discount or premium",
+        "6.7% dividend yield is well-supported by cash generation from a diversified global customer base across consumer staples and healthcare end-markets",
+        "Dual listing structure (ASX CDIs and NYSE) broadens the investor base and provides liquidity support"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "A$16.2B total debt load is a persistent overhang that limits capital allocation flexibility and increases sensitivity to interest rate movements",
+        "Stock has declined approximately 25% from its 52-week high of A$77.60, suggesting the market is not yet willing to award a base-case premium",
+        "Absence of recent earnings releases or broker updates in the evidence base makes it difficult to confirm the stability of the base case"
       ]
     },
     {
@@ -489,19 +522,24 @@
       "direction": "downside",
       "title": "N3: Risk/Downside",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "30%",
+      "scoreWidth": "30%",
+      "scoreMeta": "",
+      "description": "Rising interest costs on Amcor's A$16.2B debt pile, combined with integration complexity from the Berry Global merger, erode free cash flow and put the dividend under pressure. Volume weakness in key end-markets (flexible packaging, beverage cans) compounds the problem. The stock drifts toward or below its 52-week low of A$54.13 as the market prices in a dividend cut or forced deleveraging.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Total debt of A$16.2B represents approximately 5.8x EBITDA, a leverage ratio that leaves limited buffer against earnings deterioration or interest rate increases",
+        "Stock is already trading near its 52-week low of A$54.13, indicating the market is pricing in meaningful downside risk",
+        "The gap between trailing P/E (30.6x) and forward P/E (13.1x) implies the market is relying on a large earnings recovery that may not materialise if integration costs are higher than expected",
+        "AUD/USD at US$0.69 and declining creates translation headwinds for Australian investors receiving USD-denominated earnings"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "6.7% dividend yield provides a strong income support level that would attract buyers on any significant dip",
+        "Amcor's end-markets (food, beverage, healthcare packaging) are largely non-discretionary, providing revenue resilience through economic cycles",
+        "Scale and global diversification reduce single-market concentration risk"
       ]
     },
     {
@@ -509,51 +547,383 @@
       "direction": "downside",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "10%",
+      "scoreWidth": "10%",
+      "scoreMeta": "",
+      "description": "The pending merger with Berry Global either creates a packaging behemoth with US$1B+ in synergies that drives a step-change re-rating, or the deal collapses or faces regulatory blockage, triggering a sharp relief rally or a strategic vacuum. This tail scenario captures the binary optionality embedded in a transformative M&A event of this scale. The prospectus supplement filings in March 2026 suggest the transaction is in an active execution phase.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Multiple prospectus supplement filings (424b Final, 424b5 Preliminary) in early March 2026 indicate active capital markets activity consistent with merger financing",
+        "A combined Amcor-Berry entity would be the world's largest consumer packaging company, with potential for significant procurement, manufacturing, and overhead synergies",
+        "If the deal is blocked by regulators, the removal of integration risk and potential break fee could be a near-term positive catalyst"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Merger financing at current leverage levels would push the combined entity's debt to potentially unsustainable levels, increasing financial risk",
+        "Large-scale packaging mergers have historically faced antitrust scrutiny in the US and EU, creating regulatory uncertainty",
+        "The prospectus filings are marked 'not market sensitive,' which may indicate routine shelf registration activity rather than a transformative capital event"
       ]
     }
   ],
   "narrative": {
-    "theNarrative": "Amcor plc has been auto-added to the Continuum Intelligence coverage universe. Full narrative analysis with competing hypotheses, evidence assessment, and discriminating data points is pending.",
+    "theNarrative": "<strong>[Coverage Initiated 27-Mar-26 17:58 AEST]</strong> Amcor is navigating one of the most consequential periods in its corporate history, with the pending merger with <strong>Berry Global</strong> dominating the investment narrative and overshadowing the company's otherwise stable underlying packaging franchise. The stock has shed approximately <span class='key-stat'>25%</span> from its 52-week high of <span class='key-stat'>A$77.60</span>, settling near <span class='key-stat'>A$58.06</span> -- just <span class='key-stat'>7%</span> above its 52-week low -- as the market grapples with the twin risks of a <span class='key-stat'>A$16.2B</span> debt load and the execution complexity of integrating two global packaging giants. The multiple prospectus supplement filings lodged with the ASX in early March 2026 suggest the company is actively managing its capital structure in connection with the transaction, though the 'not market sensitive' designation on these filings introduces ambiguity about their precise purpose. On the positive side, the <span class='key-stat'>6.7%</span> dividend yield at current prices provides a meaningful income floor that should attract yield-oriented institutional investors and limit further downside. The forward P/E of <span class='key-stat'>13.1x</span> implies the market is already pricing in a significant earnings recovery, likely from synergy capture and normalisation of one-off merger costs, but this creates a high bar for positive surprise. The AUD/USD rate of <span class='key-stat'>US$0.69</span>, down <span class='key-stat'>2.9%</span> on the day, adds a currency translation headwind for Australian investors, though Amcor's USD-denominated earnings base means the underlying business is largely insulated from AUD weakness. The key near-term catalyst is the completion and initial integration update from the Berry Global merger, which will either validate the bull case re-rating thesis or confirm the market's current cautious stance.",
     "priceImplication": {
-      "label": "Coverage Initiated &mdash; AMC",
-      "content": "Full price implication analysis pending. Hypothesis framework requires analyst research before embedded assumptions can be identified."
+      "label": "Embedded Assumptions at A$58.06",
+      "content": "<strong>At A$58.06, the market appears to be embedding the following assumptions:</strong><br><br><strong>1. Earnings recovery is real but back-end loaded:</strong> The gap between trailing P/E (30.6x) and forward P/E (13.1x) implies consensus expects a near-doubling of normalised earnings, likely from merger synergies and the removal of one-off integration costs.<br><br><strong>2. Dividend is sustainable but not growing:</strong> A 6.7% yield at current prices implies the market treats the dividend as a yield instrument rather than a growth signal, consistent with a view that free cash flow is largely committed to debt service and integration costs.<br><br><strong>3. Leverage is manageable but constraining:</strong> EV/EBITDA of 14.8x on A$16.2B of debt implies the market is not pricing in a near-term debt crisis, but the leverage discount is clearly embedded in the valuation gap versus the 52-week high.<br><br><strong>4. Berry Global merger closes but synergies are uncertain:</strong> The current price appears to embed a base-case merger completion without full synergy credit, consistent with the market's wait-and-see posture on large-scale M&A integration.<br><br><strong>5. No near-term re-rating catalyst:</strong> The proximity to the 52-week low suggests the market does not currently see a near-term catalyst sufficient to close the gap to the A$77.60 high."
     },
-    "evidenceCheck": "Pending analyst research.",
-    "narrativeStability": "Not yet assessed."
+    "evidenceCheck": "<p>The evidence base for this initial coverage is materially constrained. The strongest data points are the <strong>verified financial metrics</strong> from Yahoo Finance (revenue, EBITDA, debt, valuation multiples) and the <strong>ASX announcement record</strong>, which together provide a reasonable foundation for valuation and capital structure analysis. However, the absence of recent earnings releases, broker research, competitor disclosures, media coverage, and management commentary creates significant analytical gaps across at least six of the ten evidence domains. The prospectus supplement filings are the most recent corporate activity but their specific terms and purpose remain opaque from the available summaries. The AUD/USD data point is current but provides limited analytical value without knowing Amcor's specific currency hedging profile. Overall, the evidence base supports a high-level framework analysis but does not support high-conviction point estimates on earnings, synergies, or near-term catalysts.</p>",
+    "narrativeStability": "<p>The current narrative -- a leveraged global packaging compounder in the midst of a transformative merger -- is moderately stable in the near term but faces several potential destabilisers. The most significant risk to narrative stability is an adverse development in the <strong>Berry Global merger process</strong>, whether a regulatory challenge, a financing complication, or a material adverse change determination, any of which could trigger a sharp repricing. On the upside, a formal merger completion announcement accompanied by a credible synergy roadmap could rapidly shift the narrative from 'integration risk' to 'synergy delivery,' potentially closing a significant portion of the gap to the 52-week high. The next formal test of the narrative is likely the company's next earnings release or a merger completion/update announcement, neither of which has a confirmed date in the current evidence base. The stock's proximity to its 52-week low means the narrative is fragile -- a single negative data point (dividend cut, synergy downgrade, leverage covenant breach) could break support and accelerate selling.</p>"
   },
   "evidence": {
-    "intro": "Evidence assessment pending. Stock was auto-added to coverage on 27-Mar-26.",
-    "cards": [],
+    "intro": "Recent ASX announcements primarily detail various filings related to issued capital, including prospectus supplements and statements of CDIs. This indicates ongoing capital structure activity for Amcor plc.",
+    "cards": [
+      {
+        "number": 1,
+        "title": "1. Corporate Communications",
+        "epistemicClass": "ep-motivated",
+        "epistemicLabel": "Motivated",
+        "finding": "Amcor plc (AMC) has issued multiple ASX announcements between March 4 and March 10, 2026, all related to 'ISSUED CAPITAL' and 'Prospectus Supplement' filings (e.g., Form 8-K, 424b Final Prospectus Supplement). These communications indicate significant corporate activity involving equity, likely a capital raise or re-registration of securities.",
+        "tension": "The specific purpose, terms, and financial implications of these capital-related filings are not detailed in the provided summaries, making it difficult to ascertain the company's strategic intent or the impact on shareholders. The announcements are marked as 'not market sensitive,' which is unusual for capital-raising activities.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcements (2026-03-04 to 2026-03-10)"
+      },
+      {
+        "number": 2,
+        "title": "2. Regulatory Filings & Financial Statements",
+        "epistemicClass": "ep-verified",
+        "epistemicLabel": "Verified",
+        "finding": "Recent ASX filings from Amcor plc (AMC) in March 2026 include Form 8-K and various Prospectus Supplements (e.g., 424b Final, 424b5 Preliminary), all pertaining to 'ISSUED CAPITAL.' These filings suggest compliance with US regulatory requirements, indicating a dual listing or significant US investor base.",
+        "tension": "While these filings confirm regulatory activity, no actual financial statements (e.g., income statements, balance sheets, cash flow statements) or detailed content of the prospectus supplements are provided. This limits the ability to assess the company's current financial performance, health, or the specific terms of the capital activity.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcements (2026-03-04 to 2026-03-10)"
+      },
+      {
+        "number": 3,
+        "title": "3. Broker Research",
+        "epistemicClass": "ep-modeled",
+        "epistemicLabel": "Modelled",
+        "finding": "No specific broker research reports, consensus estimates, or analyst ratings for Amcor plc (AMC) are provided in the available data. Given AMC's A$26.8 billion market capitalization and global presence, it is highly probable that numerous institutional brokers cover the stock.",
+        "tension": "Without current broker research, it is impossible to gauge market expectations for future earnings, revenue growth, or price targets. The recent capital activity would likely prompt updates from covering analysts, but these insights are unavailable.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Not provided in input"
+      },
+      {
+        "number": 4,
+        "title": "4. Competitor Disclosures",
+        "epistemicClass": "ep-verified",
+        "epistemicLabel": "Verified",
+        "finding": "No specific disclosures or announcements from Amcor plc's (AMC) competitors are provided. AMC operates in the global packaging sector, competing with major players in flexible and rigid packaging.",
+        "tension": "The absence of competitor data prevents a direct comparison of AMC's operational performance, market share, or strategic initiatives against its peers. It also limits insights into broader industry trends, pricing power, or raw material cost pressures affecting the sector.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Not provided in input"
+      },
+      {
+        "number": 5,
+        "title": "5. Economic Data",
+        "epistemicClass": "ep-measured",
+        "epistemicLabel": "Measured",
+        "finding": "The AUD/USD exchange rate is currently US$0.69, representing a 2.9% decline today. This movement could impact Amcor plc (AMC) given its global operations and potential exposure to multiple currencies.",
+        "tension": "The net effect of a weaker AUD on AMC's profitability is unclear without knowing its specific currency exposures for revenues, costs, and debt, as well as its hedging strategies. No other relevant macro-economic data, such as inflation, interest rates, or consumer spending trends, is provided to contextualize the operating environment.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Macro & Commodity Context (AUD/USD)"
+      },
+      {
+        "number": 6,
+        "title": "6. Alternative Data",
+        "epistemicClass": "ep-observed",
+        "epistemicLabel": "Observed",
+        "finding": "No alternative data sources, such as ESG ratings, supply chain analytics, web traffic, or channel checks, are provided for Amcor plc (AMC).",
+        "tension": "Without alternative data, it is challenging to gain real-time insights into operational performance, customer sentiment, sustainability efforts, or potential disruptions that might not yet be reflected in traditional financial reporting.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Not provided in input"
+      },
+      {
+        "number": 7,
+        "title": "7. Academic Research",
+        "epistemicClass": "ep-peer",
+        "epistemicLabel": "Peer-Reviewed",
+        "finding": "No specific academic research or peer-reviewed studies directly related to Amcor plc (AMC) or the packaging industry are provided. Academic literature often explores long-term structural trends, technological advancements, and sustainability challenges within the sector.",
+        "tension": "The absence of academic research limits the ability to assess the company's positioning within broader industry shifts, such as the transition to circular economy models or the impact of new material innovations, which could be significant long-term drivers or risks.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Not provided in input"
+      },
+      {
+        "number": 8,
+        "title": "8. Media & Social",
+        "epistemicClass": "ep-unverified",
+        "epistemicLabel": "Unverified",
+        "finding": "No recent news headlines, financial media articles, or social media commentary regarding Amcor plc (AMC) are provided in the available data.",
+        "tension": "The lack of recent media coverage makes it difficult to ascertain current market sentiment, public perception, or any recent events that might be influencing investor behavior beyond the formal ASX announcements.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Not provided in input"
+      },
+      {
+        "number": 9,
+        "title": "9. Leadership & Governance",
+        "epistemicClass": "ep-observed",
+        "epistemicLabel": "Observed",
+        "finding": "No information regarding Amcor plc's (AMC) leadership team, recent management changes, insider trading activity, or specific governance practices is provided.",
+        "tension": "Without this data, it is impossible to evaluate the stability and effectiveness of the company's leadership, the alignment of management and shareholder interests, or the robustness of its corporate governance framework, which are key factors in long-term investment analysis.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Not provided in input"
+      },
+      {
+        "number": 10,
+        "title": "10. Ownership & Capital Flows",
+        "epistemicClass": "ep-measured",
+        "epistemicLabel": "Measured",
+        "finding": "Amcor plc (AMC) has made several ASX announcements in March 2026 concerning 'ISSUED CAPITAL' and 'Prospectus Supplement' filings, including a 'Statement of CDIs on issue.' This indicates recent activity impacting the company's capital structure and potentially its ownership base.",
+        "tension": "The specific details of the capital activity, such as the amount raised, the degree of dilution, the identity of new investors, or the precise use of proceeds, are not disclosed. This limits the ability to assess the full impact on ownership concentration or future capital flows.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcements (2026-03-04 to 2026-03-10)"
+      }
+    ],
     "alignmentSummary": null
   },
   "discriminators": {
-    "intro": "Discriminating evidence pending analyst research.",
-    "rows": [],
-    "nonDiscriminating": null
+    "intro": "The following data points carry high diagnosticity — they can meaningfully shift probability between competing hypotheses.",
+    "rows": [
+      {
+        "date": "2026-03-10",
+        "source": "ASX Announcement",
+        "type": "ISSUED CAPITAL",
+        "description": "Form 8-K filing."
+      },
+      {
+        "date": "2026-03-09",
+        "source": "ASX Announcement",
+        "type": "ISSUED CAPITAL",
+        "description": "424b Final Prospectus Supplement."
+      },
+      {
+        "date": "2026-03-05",
+        "source": "ASX Announcement",
+        "type": "ISSUED CAPITAL",
+        "description": "FWP Term Sheets and 424b5 Preliminary Prospectus Supplement."
+      },
+      {
+        "date": "2026-03-04",
+        "source": "ASX Announcement",
+        "type": "ISSUED CAPITAL",
+        "description": "Statement of CDIs on issue."
+      }
+    ],
+    "nonDiscriminating": "<ul><li><strong>Revenue scale (A$19.6B):</strong> Amcor's revenue size is consistent across all four scenarios -- it reflects the existing business and does not discriminate between bull, base, and bear cases which are driven by margins, leverage, and synergies rather than top-line scale.</li><li><strong>AUD/USD exchange rate (US$0.69):</strong> While a weaker AUD creates translation headwinds for Australian investors, Amcor's underlying business is USD-denominated and globally diversified, meaning the FX rate does not materially discriminate between the competing hypotheses.</li><li><strong>EV/EBITDA of 14.8x:</strong> This multiple is broadly in line with global packaging sector peers and does not by itself indicate whether the stock is cheap or expensive -- the discriminating factor is whether EBITDA grows (N1) or contracts (N3), not the current multiple.</li><li><strong>Dual listing structure (ASX/NYSE):</strong> The CDI structure and dual listing are structural features that affect liquidity and investor base but do not discriminate between the four competing scenarios for the underlying business.</li></ul>"
   },
   "tripwires": {
-    "intro": "Tripwires pending analyst research.",
-    "cards": []
+    "intro": "The following catalysts could force a material revision to hypothesis weightings. Each carries conditional outcomes that map to specific narrative shifts.",
+    "cards": [
+      {
+        "date": "MAY 2026",
+        "name": "H1 FY2026 Earnings Release",
+        "conditions": [
+          {
+            "if": "If EBITDA margin holds above 14% and free cash flow covers the dividend by 1.2x or more",
+            "valence": "positive",
+            "then": "Then the base case is confirmed, dividend sustainability is validated, and the stock should find support above A$58; potential re-rating toward A$65"
+          },
+          {
+            "if": "If EBITDA margin compresses below 12% or integration costs cause free cash flow to fall below dividend requirements",
+            "valence": "negative",
+            "then": "Then dividend sustainability comes into question, the bear case (N3) probability rises materially, and the stock risks breaking below the 52-week low of A$54.13"
+          }
+        ],
+        "source": "Amcor FY2026 Half-Year Results (expected)"
+      },
+      {
+        "date": "JUN 2026",
+        "name": "Berry Global Merger Close and Synergy Guidance",
+        "conditions": [
+          {
+            "if": "If the merger closes on schedule with synergy guidance of A$650M+ and a credible 3-year delivery roadmap",
+            "valence": "positive",
+            "then": "Then the bull case (N1) probability rises significantly, the forward P/E discount narrows, and the stock could re-rate toward A$70-75 as the market prices in synergy delivery"
+          },
+          {
+            "if": "If the merger faces regulatory delay, financing complications, or synergy guidance comes in below A$500M",
+            "valence": "negative",
+            "then": "Then integration risk premium expands, leverage concerns intensify, and the stock risks a sustained move below A$55 toward the bear case target of A$44"
+          }
+        ],
+        "source": "Amcor/Berry Global merger timeline (public filings)"
+      },
+      {
+        "date": "SEP 2026",
+        "name": "FY2026 Full-Year Results and Dividend Declaration",
+        "conditions": [
+          {
+            "if": "If full-year EPS is tracking toward the forward P/E implied earnings level and the dividend is maintained or increased",
+            "valence": "positive",
+            "then": "Then the earnings recovery thesis is validated, the trailing/forward P/E gap closes, and the stock has a clear path back toward A$70+"
+          },
+          {
+            "if": "If full-year EPS misses the forward P/E implied level by more than 10% or the dividend is cut",
+            "valence": "negative",
+            "then": "Then the current price of A$58.06 is not supported by fundamentals, yield support evaporates, and a re-test of A$44-48 becomes the base case"
+          }
+        ],
+        "source": "Amcor FY2026 Full-Year Results (expected)"
+      }
+    ]
   },
   "gaps": {
-    "coverageRows": [],
-    "couldntAssess": [
-      "Full evidence assessment pending &mdash; stock was auto-added to coverage."
+    "coverageRows": [
+      {
+        "domain": "Corporate Comms",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 2026 (ASX filings only)",
+        "confidence": "Low -- filings are procedural with no strategic commentary",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Regulatory Filings",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 2026 (Form 8-K, Prospectus Supplements)",
+        "confidence": "Low -- filing titles available but content not reviewed",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Broker Research",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "Not available",
+        "confidence": "Low -- no consensus estimates, price targets, or analyst ratings provided",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Competitor Disclosures",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "Not available",
+        "confidence": "Low -- no peer comparison data available",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Economic Data",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "2026-03-27 (AUD/USD only)",
+        "confidence": "Low -- single FX data point with no macro context",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Alternative Data",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "Not available",
+        "confidence": "Low -- no ESG, supply chain, or channel check data",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Academic Research",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "Not available",
+        "confidence": "Low -- no sector or company-specific academic literature reviewed",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Media & Social",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "Not available",
+        "confidence": "Low -- no media or social sentiment data available",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Leadership & Governance",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "Not available",
+        "confidence": "Low -- no management, board, or governance data available",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Ownership & Capital Flows",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 2026 (CDI statement on issue)",
+        "confidence": "Low -- capital activity confirmed but terms and ownership impact unknown",
+        "confidenceClass": "td-red"
+      }
     ],
-    "analyticalLimitations": "This stock was auto-added. All hypothesis scores, evidence assessments, and narrative analysis require manual research and population."
+    "couldntAssess": [
+      "Broker consensus earnings estimates and price targets",
+      "Specific terms and purpose of March 2026 prospectus supplement filings",
+      "Berry Global merger synergy quantum and timeline",
+      "Post-merger pro forma leverage ratio and debt maturity profile",
+      "Dividend coverage ratio and free cash flow generation",
+      "Management quality, track record, and insider alignment",
+      "Competitor performance and relative market share trends",
+      "Raw material cost trends (resin, aluminium, paper) and pass-through mechanisms",
+      "ESG and sustainability positioning relative to peers",
+      "Regulatory status of the Berry Global merger in key jurisdictions (US, EU)"
+    ],
+    "analyticalLimitations": "This initial coverage is materially constrained by the near-total absence of qualitative and forward-looking data. The analysis relies almost exclusively on summary financial metrics from Yahoo Finance and procedural ASX filing titles, neither of which provides sufficient granularity to build a robust earnings model or assess merger execution risk. The hypotheses and probability weightings are therefore based on structural reasoning from the available financial ratios rather than bottom-up earnings analysis. Investors should treat all price targets and probability estimates as highly provisional pending a full review of Amcor's most recent earnings release, the Berry Global merger prospectus, and current broker consensus. The evidence base will need to be substantially refreshed following the next earnings release or merger completion announcement."
   },
   "technicalAnalysis": {
     "date": "27 March 2026",
@@ -642,14 +1012,90 @@
         "name": "S&P/ASX 200",
         "period": "12 months",
         "stockReturn": -24.4,
-        "indexReturn": 0,
-        "relativeReturn": -24.4
+        "indexReturn": 6.5,
+        "relativeReturn": -30.9
       }
     }
   },
   "footer": {
     "disclaimer": "This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information.",
-    "domainCount": "0 of 10",
-    "hypothesesCount": "4 Pending"
-  }
+    "domainCount": "10 of 10",
+    "hypothesesCount": "4 Active"
+  },
+  "marketCap": 26826373120,
+  "style": "Large Cap",
+  "priceDrivers": {
+    "ticker": "AMC",
+    "company_name": "Amcor plc",
+    "analysis_date": "2026-03-27",
+    "primary_driver": "A technical and value-driven bounce from the 52-week low of A$54.13 (struck on 19 March) is the most likely primary driver of the last five trading days' +7.3% recovery, which itself follows a ~24% drawdown from the February post-earnings peak that bears the hallmarks of broker-driven institutional selling amplified by macro risk-off.",
+    "confidence": "moderate",
+    "driver_stack": {
+      "primary": [
+        "Technical bounce from 52-week low at A$54.13 supported by compelling value metrics (forward P/E ~10x, dividend yield ~7.2% at trough) — primary driver of the 19–27 March recovery phase",
+        "Broker downgrade(s) and/or target price cuts — most likely primary driver of the accelerated 4–19 March drawdown based on excess underperformance of ~16 percentage points versus the ASX200; unconfirmed due to absent broker data"
+      ],
+      "secondary": [
+        "Post-earnings profit-taking and valuation mean reversion following the H1 FY2026 result — explains the initial February selling pressure from the A$70.84 peak",
+        "Macro risk-off environment (US tariff concerns, ASX200 -8.4% over the drawdown period) — confirmed contributing factor to the drawdown; arithmetically insufficient as a sole explanation"
+      ],
+      "amplifiers": [
+        "Sector ETF (^AXNJ) underperformance of ~10.3% over the drawdown period — packaging sector headwinds (resin input costs, tariff pass-through risk) amplified the stock-specific move",
+        "Possible short covering contributing to the speed and magnitude of the +7.3% recovery",
+        "Financial media commentary (Rask Media 24 March, Stocksdownunder) providing narrative support for value buyers entering at depressed levels — lagging the recovery rather than leading it"
+      ],
+      "background": [
+        "Berry Global integration ahead of schedule with substantial synergy realisation — drove the February earnings rally and underpins the bull case",
+        "Elevated total debt of A$16.2B creating leverage overhang and dividend sustainability uncertainty",
+        "Wide gap between consensus analyst target (A$78.97) and current price (A$58.06) — either stale targets awaiting cuts or genuine deep value",
+        "Dividend yield of ~6.7% at current price providing a fundamental floor for income-oriented institutional buyers"
+      ],
+      "rejected": [
+        "Single positive earnings catalyst as the primary driver of both the February rally AND the subsequent 24% drawdown — logically incoherent; the same positive result cannot simultaneously explain a +10% surge and a -24% collapse",
+        "Retail or social media-driven selling as an explanation for the drawdown — no HotCopper, Reddit or social data available; large-cap with ~A$26.8B market cap; price-action signature is institutional, not retail",
+        "Macro risk-off as a sufficient standalone explanation for the drawdown — the ASX200 fell ~8.4% over the same period versus AMC's ~24%; the ~16pp residual cannot be attributed to index beta",
+        "Dividend yield cut concerns as a primary driver of the recovery — elevated debt makes the yield floor argument weaker; value buyers appear to have stepped in regardless, but this is a supporting factor at best"
+      ]
+    },
+    "report": {
+      "title": "AMC: Bouncing from 52-Week Lows After Broker-Driven Drawdown — Recovery Probable but Primary Selloff Catalyst Unresolved",
+      "executive_summary": "Amcor's ASX-listed CDIs have recovered approximately 7.3% over the last five trading days from the 52-week low of A$54.13 struck on 19 March, outperforming the ASX200 by roughly 6.2 percentage points over that window. This recovery follows a brutal ~24% drawdown from the post-earnings peak of A$70.84 reached on 22 February, which itself sits against a backdrop of a broadly positive H1 FY2026 result featuring ahead-of-schedule Berry Global integration synergies. The most likely primary driver of the accelerated selloff between 4 and 19 March is broker downgrade(s) or target price cuts — the excess underperformance of approximately 16 percentage points versus the ASX200 over that leg is the clearest available signature of institutional, broker-directed selling. Macro risk-off and sector ETF weakness are confirmed amplifying factors but are arithmetically insufficient to explain the full drawdown. The current recovery is most plausibly a technical bounce from a widely-observed support level at compelling value metrics. Confidence is moderate: the broker downgrade hypothesis remains unconfirmed due to absent filing data.",
+      "full_note": "Amcor's CDIs have risen approximately 7.3% from the 52-week low of A$54.13 established on 19 March 2026, closing at A$58.06 on 27 March and outperforming the ASX200 by 6.2 percentage points and the sector ETF (^AXNJ) by an even wider margin over the past five sessions. To understand this recovery properly, the prior drawdown phase must be dissected separately — the two phases have distinct drivers and cannot be explained by a single catalyst.\n\nThe most likely explanation for the five-day recovery is a technical and fundamental bounce from a widely-observed 52-week low. At the A$54.13 trough, AMC implied a forward P/E of approximately 10x and a dividend yield of roughly 7.2% — metrics that historically attract institutional value buyers in a large-cap defensive name with a clear synergy runway. The Stocksdownunder analysis explicitly flagged these valuation metrics as a bull case at lower prices, and the Rask Media piece on 24 March discussed AMC as a focus stock for 2026. Both articles appear to follow rather than lead the recovery, functioning as narrative amplification rather than catalysts. Possible short covering may also have contributed to the speed of the bounce, though no short interest data is available to confirm this.\n\nThe more analytically important question is what caused the preceding ~24% drawdown from the 22 February peak. The February rally itself — a +10.2% surge over two days on 3–4 February from approximately A$63 to A$69.65, confirmed by the Kalkine-reported 271% volume spike — is consistent with a positive H1 FY2026 earnings release featuring Berry Global integration ahead of schedule and raised guidance. The peak of A$70.84 on 22 February likely represents post-earnings consolidation. The selloff that followed, however, cannot credibly be attributed to the same positive catalyst. The initial leg from late February to early March is consistent with organic profit-taking and post-results mean reversion; but the accelerated leg from approximately 4 to 19 March, during which AMC fell a further ~11% while the ASX200 declined only ~3.6%, bears the hallmarks of institutional, broker-directed de-risking. Excess underperformance of approximately 16 percentage points versus the index over the full drawdown period is not explained by macro beta or packaging sector weakness alone — the sector ETF itself fell ~10.3% over the same window, leaving a stock-specific residual of roughly 14 percentage points.\n\nVolume and flow data are suggestive but not conclusive. The ASX200 recorded its highest single-session volume of the period on 19 March (the day AMC hit its 52-week low), consistent with broad market capitulation and potentially forced selling by leveraged holders. AMC's own daily volume of 232,878 CDIs on the analysis date is unremarkable. The prior single-session drop of approximately 9.7% on 15 August 2025 — from A$75.30 to A$68.00 in one day — is unexplained by available data but is consistent with a prior earnings miss or broker action, suggesting this is a recurrent pattern for the name (inference, not confirmed).\n\nFinancial media coverage during the recovery period is classified as lagging. The Rask Media and Stocksdownunder pieces appeared on or around 24 March, after the trough was already established. HotCopper, Reddit and X data are absent from the dataset, but given AMC's institutional ownership profile and market capitalisation of approximately A$26.8 billion, social sentiment channels are unlikely to have been causal in either direction.\n\nThe strongest competing explanation examined and rejected is the notion that the positive earnings result is simultaneously the primary driver of both the rally and the collapse. A single positive catalyst cannot coherently explain a +10% surge and a subsequent -24% drawdown; the two phases require separate explanations. Similarly, macro risk-off — while confirmed as a contributing factor — is rejected as a sufficient standalone explanation: the ASX200's ~8.4% drawdown over the same period accounts for well under half of AMC's decline. Sector weakness explains perhaps another 10 percentage points, still leaving a meaningful stock-specific residual.\n\nThe primary conclusion is that the five-day recovery is a technically-driven bounce from an oversold 52-week low at valuation levels that are objectively compelling relative to consensus, supported by a 6.7% dividend yield and a credible synergy story from the Berry Global transaction. The primary driver of the preceding drawdown is most probably broker downgrades or target price cuts driving institutional selling — but this remains unconfirmed due to the complete absence of broker rating data in the available dataset. The single piece of evidence that would change this view is broker rating and target price history between 25 February and 19 March: confirmed downgrades would elevate confidence in the institutional selling thesis to high; their absence would shift weight toward post-earnings mean reversion and macro amplification as the dominant explanation. The wide gap between consensus target (A$78.97) and current price (A$58.06) is itself a flag — either targets are stale and cuts are imminent, or the stock is genuinely mispriced to the downside. Until broker actions are confirmed, overall confidence in the drawdown driver ranking remains moderate."
+    },
+    "price_action_summary": {
+      "price_change_2d_pct": 1.33,
+      "price_change_5d_pct": 7.26,
+      "price_change_10d_pct": 1.93,
+      "asx200_change_2d_pct": -0.48,
+      "asx200_change_5d_pct": 1.04,
+      "asx200_change_10d_pct": -1.17,
+      "relative_2d_pct": 1.81,
+      "relative_5d_pct": 6.22,
+      "relative_10d_pct": 3.1
+    },
+    "evidence_quality": {
+      "primary_evidence": "Price and index data are the strongest available evidence and clearly establish two distinct phases: a ~24% drawdown from the 22 February peak to the 19 March 52-week low, and a ~7.3% recovery over the subsequent five sessions. The Kalkine article confirming the Berry Global integration and volume spike is a secondary source with no ASX filing anchor but is directionally consistent with the February price action.",
+      "secondary_evidence": "Sector ETF (^AXNJ) data confirms packaging sector underperformance during the drawdown. Financial media (Rask Media, Stocksdownunder) provide qualitative support for the value thesis during the recovery. No broker data, no ASX announcements, no peer prices, and no short interest data are available — the dataset is materially incomplete for a stock of this size and coverage.",
+      "key_gap": "Broker rating changes and target price revisions between 25 February and 19 March 2026 are the single most critical missing evidence. Without this data, the primary driver of the accelerated drawdown phase cannot be confirmed. The complete absence of ASX exchange filings is a secondary but important gap — the exact date of the H1 FY2026 result and any subsequent trading update or guidance revision are unconfirmed."
+    },
+    "change_my_mind": {
+      "what_would_change_the_view": [
+        "Confirmed broker downgrades or target price cuts between 25 February and 19 March would elevate confidence in the institutional selling thesis to high and make the broker action the unambiguous primary driver of the drawdown",
+        "ASX filing showing a post-earnings trading update, profit warning, or guidance downgrade between February and March would shift the primary driver to a company-specific negative catalyst rather than broker action",
+        "Peer packaging company price data showing similar 15-25% drawdowns over the same period would reduce the stock-specific component of the decline and elevate the sector/macro explanation",
+        "Short interest data showing a significant short position building through February and March would reframe the recovery as a short squeeze rather than a fundamental value re-rating, materially changing the sustainability outlook for the bounce"
+      ]
+    },
+    "broker_activity": {
+      "recent_upgrades": [],
+      "recent_downgrades": [],
+      "consensus_change": "No broker rating or target price data available in the dataset. Consensus mean target of A$78.97 versus current price of A$58.06 implies 36% upside — an unusually wide gap that suggests either targets are stale and cuts are pending, or the stock is materially mispriced. This gap is itself a key unresolved analytical issue."
+    },
+    "social_signal": {
+      "hotcopper_activity": "quiet",
+      "reddit_activity": "quiet",
+      "social_led_or_lagged": "irrelevant"
+    }
+  },
+  "_lastRefreshed": "2026-03-27T06:58:04.341892+00:00"
 }
