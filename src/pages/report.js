@@ -27,7 +27,6 @@ import {
   setupScrollSpy,
   renderPriceDriversPlaceholder,
   fetchPriceDrivers,
-  renderPriceDrivers,
   renderGoldSection
 } from './report-sections.js';
 
@@ -83,8 +82,7 @@ export function renderReport(data) {
     renderDiscriminators(data) +
     renderTripwires(data) +
     renderGaps(data) +
-    renderTechnicalAnalysis(data) +
-    renderPriceDrivers(data);
+    renderTechnicalAnalysis(data);
 
   // Trigger async price drivers fetch after render
   requestAnimationFrame(function() { fetchPriceDrivers(data.ticker); });
