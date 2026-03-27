@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import logging
+from datetime import date as _date
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +51,13 @@ async def create_source(
         return None
     if not user_id and not guest_id:
         return None
+    # asyncpg requires datetime.date for DATE columns, not a string
+    parsed_date = None
+    if document_date:
+        try:
+            parsed_date = _date.fromisoformat(document_date)
+        except (ValueError, TypeError):
+            parsed_date = None
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """
@@ -64,7 +72,7 @@ async def create_source(
             ticker.upper(),
             source_name,
             source_type,
-            document_date,
+            parsed_date,
             file_name,
             page_count,
             char_count,
