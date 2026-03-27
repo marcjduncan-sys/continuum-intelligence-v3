@@ -370,8 +370,9 @@ SECTOR_COMMODITY_MAP: dict[str, dict] = {
 }
 
 
-# Shared async HTTP client
+# Shared async HTTP client — track the event loop to detect stale bindings
 _http_client: httpx.AsyncClient | None = None
+_http_client_loop: asyncio.AbstractEventLoop | None = None
 
 YAHOO_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
@@ -380,12 +381,20 @@ YAHOO_HEADERS = {
 # Yahoo crumb cache (required for quoteSummary v10 endpoint)
 _yahoo_crumb: str | None = None
 _yahoo_crumb_client: httpx.AsyncClient | None = None
+_yahoo_crumb_loop: asyncio.AbstractEventLoop | None = None
 
 
 def _get_http_client() -> httpx.AsyncClient:
-    global _http_client
-    if _http_client is None or _http_client.is_closed:
+    global _http_client, _http_client_loop
+    current_loop = asyncio.get_running_loop()
+    if _http_client is None or _http_client.is_closed or _http_client_loop is not current_loop:
+        if _http_client is not None and not _http_client.is_closed:
+            try:
+                _http_client_loop.create_task(_http_client.aclose())
+            except Exception:
+                pass
         _http_client = httpx.AsyncClient(timeout=15.0, http2=False)
+        _http_client_loop = current_loop
     return _http_client
 
 
@@ -395,11 +404,18 @@ async def _get_yahoo_crumb_client() -> tuple[httpx.AsyncClient, str | None]:
     Yahoo's v10 quoteSummary endpoint requires a crumb + session cookie.
     We fetch both once and cache them for the process lifetime.
     """
-    global _yahoo_crumb, _yahoo_crumb_client
-    if _yahoo_crumb and _yahoo_crumb_client and not _yahoo_crumb_client.is_closed:
+    global _yahoo_crumb, _yahoo_crumb_client, _yahoo_crumb_loop
+    current_loop = asyncio.get_running_loop()
+    if (
+        _yahoo_crumb
+        and _yahoo_crumb_client
+        and not _yahoo_crumb_client.is_closed
+        and _yahoo_crumb_loop is current_loop
+    ):
         return _yahoo_crumb_client, _yahoo_crumb
     try:
         _yahoo_crumb_client = httpx.AsyncClient(timeout=15.0, follow_redirects=True)
+        _yahoo_crumb_loop = current_loop
         # Step 1: hit fc.yahoo.com to establish session cookies
         await _yahoo_crumb_client.get("https://fc.yahoo.com", headers=YAHOO_HEADERS)
         # Step 2: fetch crumb
@@ -421,13 +437,14 @@ async def _get_yahoo_crumb_client() -> tuple[httpx.AsyncClient, str | None]:
 
 def _reset_http_client() -> None:
     """Close and discard the shared client (stale transport recovery)."""
-    global _http_client
+    global _http_client, _http_client_loop
     if _http_client is not None:
         try:
-            asyncio.get_event_loop().create_task(_http_client.aclose())
+            asyncio.get_running_loop().create_task(_http_client.aclose())
         except Exception:
             pass
         _http_client = None
+        _http_client_loop = None
 
 
 # ---------------------------------------------------------------------------

@@ -200,32 +200,41 @@ class BatchRefreshJob:
 
 batch_jobs: dict[str, BatchRefreshJob] = {}
 _batch_semaphore: asyncio.Semaphore | None = None
+_batch_semaphore_loop: asyncio.AbstractEventLoop | None = None
 _gather_semaphore: asyncio.Semaphore | None = None
+_gather_semaphore_loop: asyncio.AbstractEventLoop | None = None
 
 
 def _get_batch_semaphore() -> asyncio.Semaphore:
-    global _batch_semaphore
-    if _batch_semaphore is None:
+    global _batch_semaphore, _batch_semaphore_loop
+    loop = asyncio.get_running_loop()
+    if _batch_semaphore is None or _batch_semaphore_loop is not loop:
         _batch_semaphore = asyncio.Semaphore(2)
+        _batch_semaphore_loop = loop
     return _batch_semaphore
 
 
 def _get_gather_semaphore() -> asyncio.Semaphore:
     """Limit concurrent data-gathering to avoid OOM on Railway."""
-    global _gather_semaphore
-    if _gather_semaphore is None:
+    global _gather_semaphore, _gather_semaphore_loop
+    loop = asyncio.get_running_loop()
+    if _gather_semaphore is None or _gather_semaphore_loop is not loop:
         _gather_semaphore = asyncio.Semaphore(3)
+        _gather_semaphore_loop = loop
     return _gather_semaphore
 
 
 _evidence_semaphore: asyncio.Semaphore | None = None
+_evidence_semaphore_loop: asyncio.AbstractEventLoop | None = None
 
 
 def _get_evidence_semaphore() -> asyncio.Semaphore:
     """Limit concurrent structure update calls (Gemini Flash)."""
-    global _evidence_semaphore
-    if _evidence_semaphore is None:
+    global _evidence_semaphore, _evidence_semaphore_loop
+    loop = asyncio.get_running_loop()
+    if _evidence_semaphore is None or _evidence_semaphore_loop is not loop:
         _evidence_semaphore = asyncio.Semaphore(3)
+        _evidence_semaphore_loop = loop
     return _evidence_semaphore
 
 
