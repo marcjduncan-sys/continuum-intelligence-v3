@@ -22,7 +22,7 @@ import config
 
 logger = logging.getLogger(__name__)
 
-_HAIKU_MODEL = "claude-haiku-4-5"
+_HAIKU_MODEL = "claude-haiku-4-5-20251001"
 _RENOTIFY_DAYS = 7
 _CONSOLIDATE_TYPES = ["positional", "tactical"]
 _GITHUB_PAGES_BASE = (

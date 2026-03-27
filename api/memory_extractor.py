@@ -20,7 +20,7 @@ import llm
 
 logger = logging.getLogger(__name__)
 
-_HAIKU_MODEL = "claude-haiku-4-5"
+_HAIKU_MODEL = "claude-haiku-4-5-20251001"
 
 EXTRACTION_SYSTEM = (
     "You are a memory extraction system for an institutional equity research platform. "

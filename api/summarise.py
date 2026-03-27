@@ -29,7 +29,7 @@ _SUMMARISE_PROMPT = (
     "or views expressed. This will be used as context for future turns."
 )
 
-_HAIKU_MODEL = "claude-haiku-4-5"
+_HAIKU_MODEL = "claude-haiku-4-5-20251001"
 
 
 async def summarise_if_needed(

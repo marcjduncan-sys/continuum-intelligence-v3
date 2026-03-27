@@ -25,7 +25,7 @@ import pm_db
 
 logger = logging.getLogger(__name__)
 
-_HAIKU_MODEL = "claude-haiku-4-5"
+_HAIKU_MODEL = "claude-haiku-4-5-20251001"
 
 # ---------------------------------------------------------------------------
 # Decision extraction prompt
