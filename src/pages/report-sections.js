@@ -677,8 +677,12 @@ export function renderGaps(data) {
 
   var couldntAssess = g.couldntAssess || [];
   var calloutsHtml = '';
-  for (var j = 0; j < couldntAssess.length; j++) {
-    calloutsHtml += '<div class="callout"><p>' + couldntAssess[j] + '</p></div>';
+  if (couldntAssess.length) {
+    var listItems = '';
+    for (var j = 0; j < couldntAssess.length; j++) {
+      listItems += '<li>' + couldntAssess[j] + '</li>';
+    }
+    calloutsHtml = '<div class="callout"><ul class="gaps-list">' + listItems + '</ul></div>';
   }
 
   return '<div class="report-section" id="' + t + '-gaps">' +

@@ -180,6 +180,16 @@ a:hover { color: var(--accent-sage); }
 }
 .callout li { margin-bottom: var(--space-xs); }
 .callout li strong { color: var(--text-primary); }
+.gaps-list {
+    list-style: none; padding-left: 0; margin: 0;
+}
+.gaps-list li {
+    font-size: 0.82rem; line-height: 1.5;
+    color: var(--text-secondary);
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(128,128,128,0.08);
+}
+.gaps-list li:last-child { border-bottom: none; }
 .callout .callout-body {
     font-size: 0.82rem; line-height: 1.6;
     color: var(--text-secondary); margin: 0;
