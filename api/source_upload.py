@@ -8,6 +8,8 @@ research documents.
 
 import asyncio
 import logging
+import os
+import re
 import time
 
 from fastapi import APIRouter, Form, HTTPException, Request, UploadFile
@@ -21,6 +23,31 @@ from decompose import decompose_document, _load_hypotheses
 from embeddings import generate_embedding
 from ingest import get_tickers
 from text_extract import extract_text, validate_upload
+
+# Abbreviations that should not be treated as sentence boundaries
+_ABBREV_PATTERN = re.compile(
+    r'\b(?:Dr|Mr|Mrs|Ms|Prof|Inc|Ltd|Corp|vs|etc|approx|est|no|vol'
+    r'|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec'
+    r'|U\.S|U\.K|A\.S|E\.U)\.\s',
+    re.IGNORECASE,
+)
+
+_ABBREV_PLACEHOLDER = '\x00ABBR\x00'
+
+
+def _sanitise_filename(name: str) -> str:
+    """Strip path components and non-safe characters from a filename."""
+    # Take only the basename (no directory traversal)
+    name = os.path.basename(name)
+    # Split name and extension
+    base, ext = os.path.splitext(name)
+    # Keep only alphanumeric, hyphens, underscores, spaces in base
+    base = re.sub(r'[^a-zA-Z0-9_\- ]', '', base)
+    if not base:
+        base = 'upload'
+    # Keep extension alphanumeric only
+    ext = re.sub(r'[^a-zA-Z0-9.]', '', ext)
+    return base + ext
 
 logger = logging.getLogger(__name__)
 
@@ -75,8 +102,12 @@ def chunk_text(text: str, target_size: int = 1500, max_size: int = 2500) -> list
                 if len(sub) <= max_size:
                     split_paragraphs.append(sub)
                 else:
-                    # Split on sentence boundaries
-                    sentences = sub.split(". ")
+                    # Split on sentence boundaries, protecting abbreviations
+                    protected = _ABBREV_PATTERN.sub(
+                        lambda m: m.group().replace('. ', _ABBREV_PLACEHOLDER), sub
+                    )
+                    sentences = protected.split(". ")
+                    sentences = [s.replace(_ABBREV_PLACEHOLDER, '. ') for s in sentences]
                     current = ""
                     for sent in sentences:
                         candidate = (current + ". " + sent).strip() if current else sent
@@ -157,7 +188,7 @@ async def upload_source(
 
     # Read file bytes
     file_bytes = await file.read()
-    filename = file.filename or "unknown"
+    filename = _sanitise_filename(file.filename or "unknown")
 
     # Validate file
     try:
@@ -193,16 +224,28 @@ async def upload_source(
             logger.exception("Decomposition failed for %s upload", ticker)
             raise HTTPException(
                 status_code=500,
-                detail="Analysis failed. Please try again.",
+                detail="DECOMPOSITION_FAILED: Analysis failed. Please try again.",
             )
 
-        # Chunk text into passages
-        chunks = chunk_text(extracted_text)
+        # Chunk text into passages, filtering low-quality chunks
+        raw_chunks = chunk_text(extracted_text)
+        chunks = [
+            c for c in raw_chunks
+            if sum(1 for ch in c if ch.isalpha()) / max(len(c), 1) >= 0.30
+        ]
 
-        # Compute embeddings for each chunk
+        # Batch embedding computation (5 concurrent)
+        _EMBED_CONCURRENCY = 5
+        _embed_sem = asyncio.Semaphore(_EMBED_CONCURRENCY)
+
+        async def _embed_one(chunk_text_: str):
+            async with _embed_sem:
+                return await generate_embedding(chunk_text_)
+
+        embeddings = await asyncio.gather(*[_embed_one(c) for c in chunks])
+
         passage_data: list[dict] = []
-        for chunk in chunks:
-            embedding = await generate_embedding(chunk)
+        for chunk, embedding in zip(chunks, embeddings):
             passage_data.append({
                 "ticker": ticker,
                 "section": "external",
@@ -213,13 +256,24 @@ async def upload_source(
                 "embedding": embedding,
             })
 
-    # Store in DB (source_db functions from Stream A)
-    # This import is deferred because source_db.py is built by Stream A
+    # Store in DB
+    from source_db import create_source, create_view, insert_passages, check_duplicate
+
+    pool = await db.get_pool()
+    if not pool:
+        raise HTTPException(
+            status_code=503, detail="STORAGE_UNAVAILABLE: Database unavailable.",
+        )
+
+    # M-014: duplicate check (file_name + ticker + identity)
+    if await check_duplicate(pool, ticker=ticker, file_name=filename,
+                             user_id=user_id, guest_id=guest_id):
+        raise HTTPException(
+            status_code=409,
+            detail=f"A source with filename '{filename}' already exists for {ticker}.",
+        )
+
     try:
-        from source_db import create_source, create_view, insert_passages
-
-        pool = await db.get_pool()
-
         source_row = await create_source(
             pool,
             user_id=user_id,
@@ -235,7 +289,7 @@ async def upload_source(
         source_id = source_row["id"] if source_row else None
         if not source_id:
             raise HTTPException(
-                status_code=503, detail="Database unavailable.",
+                status_code=503, detail="STORAGE_UNAVAILABLE: Database unavailable.",
             )
 
         await create_view(
@@ -257,17 +311,13 @@ async def upload_source(
             ticker=ticker,
             passages=passage_data,
         )
-
-    except ImportError:
-        logger.warning("source_db not available; returning view without persistence")
-        source_id = "preview-no-db"
     except HTTPException:
         raise
     except Exception:
         logger.exception("DB storage failed for %s upload", ticker)
         raise HTTPException(
             status_code=500,
-            detail="Storage failed. Please try again.",
+            detail="STORAGE_FAILED: Storage failed. Please try again.",
         )
 
     elapsed_ms = int((time.time() - start) * 1000)
@@ -312,13 +362,12 @@ async def list_sources(
         return sources
 
     except ImportError:
-        logger.warning("source_db not available; returning empty list")
-        return []
+        raise HTTPException(status_code=503, detail="STORAGE_UNAVAILABLE: Database module unavailable.")
     except Exception:
         logger.exception("Failed to list sources for %s", ticker)
         raise HTTPException(
             status_code=500,
-            detail="Failed to retrieve sources.",
+            detail="LIST_FAILED: Failed to retrieve sources.",
         )
 
 
@@ -354,13 +403,12 @@ async def delete_source(
         return {"deleted": True, "source_id": source_id}
 
     except ImportError:
-        logger.warning("source_db not available")
-        raise HTTPException(status_code=503, detail="Database unavailable.")
+        raise HTTPException(status_code=503, detail="STORAGE_UNAVAILABLE: Database module unavailable.")
     except HTTPException:
         raise
     except Exception:
         logger.exception("Failed to delete source %s", source_id)
         raise HTTPException(
             status_code=500,
-            detail="Failed to delete source.",
+            detail="DELETE_FAILED: Failed to delete source.",
         )

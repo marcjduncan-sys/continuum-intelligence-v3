@@ -49,7 +49,7 @@ export function validateFile(file) {
  * @returns {string} HTML string
  */
 export function renderSourceUploadZone(ticker) {
-  const id = ticker.toLowerCase();
+  const id = ticker.toLowerCase().replace(/[^a-z0-9]/g, '');
   return (
     '<div class="src-upload-zone" id="src-upload-' + id + '">' +
 
@@ -123,7 +123,7 @@ function buildAuthHeaders() {
  * @param {function} onUploadComplete - Callback with (sourceData) on success
  */
 export function initSourceUpload(ticker, onUploadComplete) {
-  const id = ticker.toLowerCase();
+  const id = ticker.toLowerCase().replace(/[^a-z0-9]/g, '');
   const zone = document.getElementById('src-upload-' + id);
   if (!zone) return;
 

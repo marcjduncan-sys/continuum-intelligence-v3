@@ -425,3 +425,34 @@ async def migrate_guest_sources(pool, *, guest_id: str, user_id: str) -> int:
             return int(result.split()[-1])
         except (ValueError, IndexError):
             return 0
+
+
+async def check_duplicate(
+    pool,
+    *,
+    ticker: str,
+    file_name: str,
+    user_id: str | None,
+    guest_id: str | None,
+) -> bool:
+    """Check if a source with the same filename + ticker + identity already exists."""
+    if pool is None:
+        return False
+    if not user_id and not guest_id:
+        return False
+    ticker = ticker.upper()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            """
+            SELECT id FROM research_sources
+            WHERE (user_id = $1 OR ($1 IS NULL AND guest_id = $2))
+              AND ticker = $3
+              AND file_name = $4
+              AND active = TRUE
+            """,
+            user_id,
+            guest_id,
+            ticker,
+            file_name,
+        )
+        return row is not None

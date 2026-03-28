@@ -148,7 +148,7 @@ export function renderSourceCard(source) {
  * @returns {string}
  */
 export function renderSourcesPanel(sources, ticker) {
-  const id = ticker.toLowerCase();
+  const id = ticker.toLowerCase().replace(/[^a-z0-9]/g, '');
   const hasSources = sources && sources.length > 0;
 
   let html = '<div class="src-panel" id="src-panel-' + id + '">';
@@ -216,10 +216,11 @@ function bindDeleteHandlers(container, ticker) {
       })
       .then(function(res) {
         if (!res.ok) throw new Error('Delete failed');
-        const card = container.querySelector('.src-card[data-source-id="' + sourceId + '"]');
+        const escapedId = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(sourceId) : sourceId;
+        const card = container.querySelector('.src-card[data-source-id="' + escapedId + '"]');
         if (card) card.remove();
         // Update count
-        const panel = document.getElementById('src-panel-' + ticker.toLowerCase());
+        const panel = document.getElementById('src-panel-' + ticker.toLowerCase().replace(/[^a-z0-9]/g, ''));
         if (panel) {
           const remaining = panel.querySelectorAll('.src-card').length;
           const countEl = panel.querySelector('.src-panel-count');
@@ -249,7 +250,7 @@ function bindDeleteHandlers(container, ticker) {
  * @param {string} ticker
  */
 export async function initSourcesPanel(ticker) {
-  const mountEl = document.getElementById('src-panel-mount-' + ticker.toLowerCase());
+  const mountEl = document.getElementById('src-panel-mount-' + ticker.toLowerCase().replace(/[^a-z0-9]/g, ''));
   if (!mountEl) return;
 
   const auth = buildAuth();
@@ -274,7 +275,7 @@ export async function initSourcesPanel(ticker) {
  * @param {string} ticker
  */
 export function appendSource(source, ticker) {
-  const panel = document.getElementById('src-panel-' + ticker.toLowerCase());
+  const panel = document.getElementById('src-panel-' + ticker.toLowerCase().replace(/[^a-z0-9]/g, ''));
   if (!panel) return;
 
   const listEl = panel.querySelector('.src-panel-list');
