@@ -296,9 +296,13 @@ export function buildSnapshotFromStock(ticker) {
   var discRows = stock.discriminators && stock.discriminators.rows ? stock.discriminators.rows : [];
   for (var d = 0; d < Math.min(discRows.length, 4); d++) {
     var disc = discRows[d];
+    if (typeof disc === 'string') {
+      snapDiscrim.push({ level: 'Medium', cls: 'medium', text: snapRemapN(disc) });
+      continue;
+    }
     snapDiscrim.push({
       level: disc.diagnosticity,
-      cls: disc.diagnosticityClass.replace('disc-', ''),
+      cls: (disc.diagnosticityClass || '').replace('disc-', ''),
       text: snapRemapN(disc.evidence)
     });
   }
