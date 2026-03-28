@@ -382,7 +382,7 @@ def build_structured_research_context(ticker: str) -> str:
 
     # -- Discriminators (top 5 by diagnosticity)
     disc = data.get("discriminators", {})
-    disc_rows = disc.get("rows", [])
+    disc_rows = [r for r in disc.get("rows", []) if isinstance(r, dict)]
     if disc_rows:
         diag_order = {"HIGH": 0, "MEDIUM": 1, "LOW": 2}
         sorted_rows = sorted(disc_rows, key=lambda r: diag_order.get(r.get("diagnosticity", "LOW"), 2))
