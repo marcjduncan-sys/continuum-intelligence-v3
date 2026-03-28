@@ -7,7 +7,7 @@
   "sectorSub": "Specialty Chemicals",
   "price": 20.3,
   "currency": "A$",
-  "date": "28-Mar-26",
+  "date": "28-Mar-26 13:43 AEST",
   "reportId": "ORI-2026-001",
   "priceHistory": [
     16.85,
@@ -262,7 +262,7 @@
     20.3
   ],
   "heroDescription": "Specialty Chemicals &bull; ASX-Listed",
-  "heroCompanyDescription": "Orica Limited (ASX: ORI): coverage initiated. Full analysis pending.",
+  "heroCompanyDescription": "Orica Limited (ASX: ORI) is one of the world's largest providers of commercial explosives and blasting systems, serving the global mining, quarrying, and construction industries. The company's core product suite includes bulk explosives, initiating systems, and digital blasting technologies, with operations spanning Australia, the Americas, Europe, Africa, and Asia. Orica's competitive moat is built on its proprietary blasting technology platforms, long-term supply agreements with major mining operators, and a global manufacturing and distribution network that is difficult to replicate.",
   "heroMetrics": [
     {
       "label": "Mkt Cap",
@@ -291,54 +291,77 @@
     }
   ],
   "hero": {
-    "embedded_thesis": null,
-    "skew": null,
-    "skew_description": null,
+    "embedded_thesis": "At A$20.30, the market is pricing in a very substantial earnings recovery for Orica. The trailing P/E of 61.5x reflects the depressed state of reported earnings, with trailing EPS of approximately A$0.33 per share. However, the forward P/E of 14.6x - based on consensus forward EPS of A$1.23 - implies the market expects earnings to nearly quadruple on a per-share basis over the coming year, a recovery that would need to be driven by margin normalisation, volume growth, and the accretive effect of the buyback program. At 14.6x forward earnings, the stock is not obviously cheap relative to industrial peers, but it is not demanding either, suggesting the market is giving partial credit to the recovery thesis without fully pricing it in. The EV/EBITDA of 9.3x is consistent with a business that generates reasonable operating cash flows but carries meaningful debt of A$3.0 billion. The current price of A$20.30 therefore embeds a scenario where earnings recover materially but the re-rating is capped by ongoing macro uncertainty and input cost pressures.",
+    "skew": "DOWNSIDE",
+    "skew_description": "The four hypotheses are weighted 25% bull, 40% base, 25% bear, and 10% tail catalyst, reflecting a broadly balanced but slightly cautious outlook. The base case dominates given the lack of near-term catalysts and limited evidence visibility, while the bull and bear cases are roughly symmetric around the current price of A$20.30.",
     "position_in_range": {
       "current_price": 20.3,
-      "worlds": []
+      "worlds": [
+        {
+          "label": "Bear Case",
+          "price": 15.0
+        },
+        {
+          "label": "Base Case",
+          "price": 21.5
+        },
+        {
+          "label": "Bull Case",
+          "price": 26.0
+        },
+        {
+          "label": "Catalyst",
+          "price": 30.0
+        }
+      ],
+      "note": "World prices are indicative -- pending full W1-W4 valuation build"
     },
-    "next_decision_point": null,
-    "previousSkew": null
+    "next_decision_point": {
+      "event": "Orica FY2026 Half-Year or Full-Year Results Announcement",
+      "date": "August 2026",
+      "metric": "Reported EPS versus consensus of A$1.23 for the full year; EBITDA margin trajectory; management commentary on input cost pass-through",
+      "thresholds": "EPS at or above A$1.10 would support the bull case and likely drive a re-rating toward A$24-26. EPS below A$0.90 would validate the bear case and risk a re-test of the A$15-17 range. Management guidance on energy cost pass-through mechanisms is the key qualitative signal to watch."
+    },
+    "previousSkew": ""
   },
   "skew": {
     "direction": "neutral",
-    "rationale": "Auto-added stock. Narrative analysis pending. Skew assessment requires analyst research."
+    "rationale": "The probability distribution is roughly balanced between upside and downside scenarios, with the base case carrying the highest weight at 40%. The bullish case is supported by a compelling gap between trailing and forward earnings multiples and active capital management, but is offset by a sharp energy cost spike, thin trailing margins, and an unexplained media clarification event. The skew is neutral pending more clarity on the earnings recovery trajectory and the nature of the media reports."
   },
   "verdict": {
-    "text": "Orica Limited has been added to coverage. Trading at <span class=\"key-stat\">A$20.3</span>. Full narrative analysis with competing hypotheses is pending.",
+    "text": "Orica at <span class='key-stat'>A$20.30</span> is a recovery story that the market is pricing with appropriate scepticism. The dramatic gap between the trailing P/E of <span class='key-stat'>61.5x</span> and the forward P/E of <span class='key-stat'>14.6x</span> tells the central story: reported earnings are deeply depressed, and the market is giving partial credit to a recovery that has not yet been demonstrated in reported results. The analyst consensus target of <span class='key-stat'>A$25.75</span> implies meaningful upside, but achieving it requires the forward EPS of <span class='key-stat'>A$1.23</span> to materialise in an environment where energy costs have spiked sharply. The active buyback program and 2.8% dividend yield provide downside support and signal management confidence, but the thin trailing profit margin of 1.99% and the unexplained media clarification introduce risks that prevent a high-conviction bullish call at initiation. We initiate coverage with a <strong>neutral skew</strong>, acknowledging that the risk/reward is broadly balanced at current levels pending the next earnings result.",
     "borderColor": null,
     "scores": [
       {
         "label": "N1 Growth/Recovery",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "25%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&uarr;",
+        "dirText": "Upside",
         "dirColor": null
       },
       {
         "label": "N2 Base Case",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
+        "score": "40%",
+        "scoreColor": "var(--signal-amber)",
         "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "dirText": "Base",
         "dirColor": null
       },
       {
         "label": "N3 Risk/Downside",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "25%",
+        "scoreColor": "var(--signal-amber)",
+        "dirArrow": "&darr;",
+        "dirText": "Downside",
         "dirColor": null
       },
       {
         "label": "N4 Disruption/Catalyst",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "10%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&uarr;",
+        "dirText": "Upside",
         "dirColor": null
       }
     ]
@@ -366,7 +389,7 @@
     }
   ],
   "featuredPriceColor": "",
-  "featuredRationale": "Auto-added to coverage. Full narrative analysis pending.",
+  "featuredRationale": "The four hypotheses are weighted 25% bull, 40% base, 25% bear, and 10% tail catalyst, reflecting a broadly balanced but slightly cautious outlook. The base case dominates given the lack of near-term catalysts and limited evidence visibility, while the bull and bear cases are roughly symmetric around the current price of A$20.30.",
   "identity": {
     "rows": [
       [
@@ -450,19 +473,26 @@
       "direction": "upside",
       "title": "N1: Growth/Recovery",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "25%",
+      "scoreWidth": "25%",
+      "scoreMeta": "",
+      "description": "Orica executes on its earnings recovery trajectory, with forward EPS of A$1.23 materialising and the stock re-rating toward the analyst consensus target of A$25.75. The buyback program accelerates EPS accretion, margin improvement flows through from pricing discipline, and the gap between the trailing P/E of 61.5x and forward P/E of 14.6x closes as reported earnings normalise. This scenario requires stable input costs, continued volume growth in mining explosives, and no further macro shocks.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Analyst consensus target of A$25.75 implies ~27% upside from current price of A$20.30",
+        "Forward P/E of 14.6x is materially below the trailing P/E of 61.5x, signalling a large expected earnings step-up",
+        "Active share buyback program (multiple ASX notifications in March 2026) signals management confidence and is EPS-accretive",
+        "Forward EPS consensus of A$1.23 (current year) rising to A$1.39 (next year) implies a positive earnings growth trajectory",
+        "EV/EBITDA of 9.3x is not demanding for a global specialty chemicals leader with defensible market share"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Trailing profit margin of only 1.99% and ROE of 4.3% suggest structural profitability challenges that may delay recovery",
+        "Sharp spike in Brent Crude to US$106.84 could compress margins if input cost increases cannot be passed through",
+        "The media clarification announcement on 2026-03-23 introduces uncertainty about potential reputational or operational issues",
+        "Stock is already 23% below its 52-week high of A$26.40, suggesting the market has already discounted some recovery"
       ]
     },
     {
@@ -470,19 +500,25 @@
       "direction": "neutral",
       "title": "N2: Base Case",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "40%",
+      "scoreWidth": "40%",
+      "scoreMeta": "",
+      "description": "Orica delivers on forward earnings estimates broadly in line with consensus, but the re-rating is gradual rather than sharp as investors wait for proof of sustained margin improvement. The stock trades in a range around A$20-23, supported by the buyback and a 2.8% dividend yield, but held back by elevated input costs and limited near-term catalysts. This base case assumes no major operational disruptions and steady mining sector demand.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Dividend yield of 2.8% provides a floor and income support at current prices",
+        "Ongoing buyback program provides technical support and signals management's view that the stock is undervalued",
+        "EV/EBITDA of 9.3x is reasonable for a defensive industrial chemicals business with global scale",
+        "Operating margin of 11.18% is positive and suggests the core business is generating cash"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Brent Crude at US$106.84 represents a significant input cost headwind that could delay margin recovery",
+        "Trailing P/E of 61.5x versus forward P/E of 14.6x implies the market is pricing in a very large earnings jump that may not fully materialise",
+        "Absence of recent earnings or results announcements limits visibility on near-term trading conditions",
+        "Media clarification requirement adds an element of uncertainty to the investment case"
       ]
     },
     {
@@ -490,19 +526,26 @@
       "direction": "downside",
       "title": "N3: Risk/Downside",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "25%",
+      "scoreWidth": "25%",
+      "scoreMeta": "",
+      "description": "Sustained elevated energy prices following the Brent Crude spike compress Orica's margins further, and the forward EPS consensus of A$1.23 proves too optimistic. The stock re-tests its 52-week low of A$15.23 as investors lose confidence in the earnings recovery narrative. This scenario is amplified if the media reports that required clarification relate to an operational, legal, or environmental issue that has not been fully disclosed.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Brent Crude at US$106.84 is a direct input cost headwind for a specialty chemicals manufacturer",
+        "Trailing profit margin of 1.99% and ROE of 4.3% leave very little buffer against cost increases",
+        "The stock has already fallen 23% from its 52-week high of A$26.40, suggesting downward momentum",
+        "The undisclosed nature of the media reports requiring clarification is a material uncertainty",
+        "Total debt of A$3.0B against an enterprise value of A$11.8B represents meaningful financial leverage"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Analyst consensus target of A$25.75 and forward P/E of 14.6x suggest the market expects significant earnings recovery",
+        "Active buyback program would likely be suspended if management had serious concerns about the business outlook",
+        "Orica is a global market leader in commercial explosives with long-term contracts that provide some revenue visibility",
+        "Dividend yield of 2.8% provides downside support and signals board confidence in cash generation"
       ]
     },
     {
@@ -510,51 +553,363 @@
       "direction": "downside",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "10%",
+      "scoreWidth": "10%",
+      "scoreMeta": "",
+      "description": "A strategic transaction - whether a major contract win, asset divestment, or M&A approach - unlocks value well above the current analyst consensus target. Alternatively, a rapid normalisation of energy prices combined with a strong half-year result triggers a sharp re-rating. This tail scenario could see the stock approach or exceed its 52-week high of A$26.40 and potentially beyond. The media clarification announcement may itself be related to a strategic development not yet fully in the public domain.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "The 'Clarification - Media Reports' announcement on 2026-03-23 may relate to an undisclosed strategic development",
+        "Orica's global scale and market leadership in mining explosives make it a logical consolidation target or acquirer",
+        "A rapid reversal of the Brent Crude spike would provide an immediate margin tailwind",
+        "The gap between the 52-week low of A$15.23 and the analyst target of A$25.75 is very wide, suggesting significant optionality"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "No evidence of M&A activity or strategic review in recent ASX announcements",
+        "High debt load of A$3.0B may limit Orica's capacity to pursue transformative acquisitions",
+        "Buyback activity is inconsistent with a company preparing for a large capital deployment event",
+        "Tail scenarios by definition carry low probability and require multiple conditions to align simultaneously"
       ]
     }
   ],
   "narrative": {
-    "theNarrative": "Orica Limited has been auto-added to the Continuum Intelligence coverage universe. Full narrative analysis with competing hypotheses, evidence assessment, and discriminating data points is pending.",
+    "theNarrative": "<strong>[Coverage Initiated 28-Mar-26 13:43 AEST]</strong> Orica is at an inflection point in its earnings cycle, with the market pricing in a dramatic recovery from depressed trailing earnings toward a much more normalised forward earnings base. <strong>The core tension in the investment case</strong> is whether the forward EPS consensus of <span class='key-stat'>A$1.23</span> is achievable given a sharp spike in Brent Crude to <span class='key-stat'>US$106.84</span>, which represents a direct input cost headwind for a specialty chemicals manufacturer. The stock has already de-rated significantly from its <span class='key-stat'>52-week high of A$26.40</span> to the current price of <span class='key-stat'>A$20.30</span>, a decline of approximately 23%, suggesting the market has already partially discounted some of the downside risks. Management is signalling confidence through an active share buyback program, with multiple ASX notifications filed in late March 2026, and the company continues to pay a <span class='key-stat'>2.8% dividend yield</span>. However, a 'Clarification - Media Reports' announcement filed on 2026-03-23 introduces an element of uncertainty that the available data does not resolve - the nature of the media coverage and the company's response are not disclosed in the evidence base. <strong>The bull case rests on the gap between the trailing P/E of 61.5x and the forward P/E of 14.6x</strong>, which implies a near-quadrupling of reported EPS that would represent a significant positive surprise if delivered. The analyst consensus target of <span class='key-stat'>A$25.75</span> implies approximately 27% upside from current levels, but achieving that target requires the earnings recovery to materialise without further cost shocks. The bear case is anchored by the thin trailing profit margin of <span class='key-stat'>1.99%</span> and ROE of <span class='key-stat'>4.3%</span>, which leave little room for error if energy costs remain elevated. On balance, the evidence supports a cautiously constructive view, with the buyback and dividend providing downside support while the earnings recovery thesis plays out over the next 12 months.",
     "priceImplication": {
-      "label": "Coverage Initiated &mdash; ORI",
-      "content": "Full price implication analysis pending. Hypothesis framework requires analyst research before embedded assumptions can be identified."
+      "label": "Embedded Assumptions at A$20.30",
+      "content": "<strong>At A$20.30, the current price implies:</strong><br><br>- A forward P/E of <strong>14.6x</strong> on consensus FY EPS of A$1.23, reflecting partial but not full credit for the earnings recovery<br><br>- An EV/EBITDA of <strong>9.3x</strong>, consistent with a mid-cycle industrial chemicals valuation with meaningful leverage<br><br>- A trailing P/E of <strong>61.5x</strong> on reported EPS of ~A$0.33, confirming that current reported earnings are deeply depressed relative to history<br><br>- A <strong>~27% discount</strong> to the analyst consensus target price of A$25.75, suggesting the market is applying a risk discount to the recovery thesis<br><br>- A <strong>23% discount</strong> to the 52-week high of A$26.40, implying the market has already partially de-rated the stock from peak optimism<br><br>- A dividend yield of <strong>2.8%</strong>, providing a modest income floor while investors wait for earnings normalisation"
     },
-    "evidenceCheck": "Pending analyst research.",
-    "narrativeStability": "Not yet assessed."
+    "evidenceCheck": "<p>The evidence base for this initiation is <strong>materially incomplete</strong> across several key domains. Corporate communications and capital management activity (buybacks, dividend) are well-documented through ASX announcements, providing reasonable confidence on near-term capital allocation signals. Financial statement data from EODHD provides headline metrics including EPS, margins, and valuation multiples, though the quality and recency of these figures cannot be fully verified. <strong>Critical gaps exist</strong> in competitor disclosures, alternative data, academic research, leadership and governance, and media content - four of the ten evidence domains are rated as data limitations with no substantive findings. The Brent Crude data point is anomalous, with a reported single-day move of +47.4% that would be extraordinary and warrants verification before being relied upon as a primary input cost signal. The media clarification announcement is a notable evidence gap - the content of the media reports and Orica's response are not available, creating a material unknown in the investment case. Overall, the evidence base supports a moderate-confidence base case but is insufficient to assign high conviction to either the bull or bear scenarios.</p>",
+    "narrativeStability": "<p>The current narrative - that Orica is in an earnings recovery phase supported by buybacks and a wide gap between trailing and forward multiples - is <strong>moderately stable but vulnerable to several near-term tests</strong>. The most significant destabilising factor is the Brent Crude spike, which if sustained would directly challenge the margin recovery assumptions embedded in the forward EPS consensus. A second destabilising factor is the undisclosed media clarification, which could relate to anything from a routine correction of inaccurate reporting to a more serious operational or legal matter. <strong>The next major test of the narrative</strong> will be Orica's next half-year or full-year results announcement, which will either validate or challenge the forward EPS consensus of A$1.23. If the company delivers earnings in line with or above consensus, the stock should re-rate toward the analyst target of A$25.75; if it misses, the bear case of a re-test of the 52-week low of A$15.23 becomes more plausible. The buyback program provides a degree of narrative stability by signalling management's own assessment that the stock is undervalued at current levels.</p>"
   },
   "evidence": {
-    "intro": "Evidence assessment pending. Stock was auto-added to coverage on 28-Mar-26.",
-    "cards": [],
+    "intro": "Initial data gathering has commenced for Orica Limited (ORI). This includes analyst consensus estimates for both trailing and forward EPS, key financial ratios such as profit margins and return on equity, and recent ASX announcements. This foundational data provides an initial quantitative overview of the company's financial health and market sentiment.",
+    "cards": [
+      {
+        "number": 1,
+        "title": "1. Corporate Communications",
+        "epistemicClass": "ep-motivated",
+        "epistemicLabel": "Motivated",
+        "finding": "Orica has recently issued several ASX announcements related to capital management, including multiple 'Update - Notification of buy-back - ORI' on 2026-03-22 and 2026-03-23, and a 'Notification of cessation of securities - ORI' on 2026-03-27. Additionally, the company released a 'Clarification - Media Reports' on 2026-03-23, indicating a response to external media coverage.",
+        "tension": "While share buy-backs typically signal management confidence and can be accretive to EPS, the specific reasons for the recent media reports requiring clarification are not disclosed, potentially indicating underlying market concerns or misinformation.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N1",
+            "class": "supports"
+          }
+        ],
+        "source": "ASX announcements (2026-03-22, 2026-03-23, 2026-03-27)"
+      },
+      {
+        "number": 2,
+        "title": "2. Regulatory Filings & Financial Statements",
+        "epistemicClass": "ep-verified",
+        "epistemicLabel": "Verified",
+        "finding": "Based on available financial data, Orica reports an earnings per share (EPS) of 0.33, a profit margin of 1.99%, and an operating margin of 11.18%. The company's return on equity (ROE) stands at 4.3%, with a book value per share of 8.932.",
+        "tension": "The relatively low profit margin of 1.99% and ROE of 4.3% suggest potential challenges in profitability or capital efficiency, which could temper expectations for significant earnings growth despite the positive operating margin.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N3",
+            "class": "contradicts"
+          }
+        ],
+        "source": "Analyst Consensus & Estimates (EODHD)"
+      },
+      {
+        "number": 3,
+        "title": "3. Broker Research",
+        "epistemicClass": "ep-modeled",
+        "epistemicLabel": "Modelled",
+        "finding": "Analyst consensus estimates Orica's EPS at 1.2292 for the current year and 1.3874 for the next year, indicating expected earnings growth. The Wall Street target price is 25.7527, significantly above the current price of A$20.3.",
+        "tension": "Despite the optimistic target price, Orica's current P/E ratio of 62.42 and PEG ratio of 1.5841 are relatively high, suggesting that a substantial portion of future growth may already be factored into the current share price.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N1",
+            "class": "supports"
+          }
+        ],
+        "source": "Analyst Consensus & Estimates (EODHD)"
+      },
+      {
+        "number": 4,
+        "title": "4. Competitor Disclosures",
+        "epistemicClass": "ep-verified",
+        "epistemicLabel": "Verified",
+        "finding": "No specific competitor disclosures or announcements for Orica's peers in the specialty chemicals sector are available in the provided data.",
+        "tension": "Without information on competitor performance, market share, or strategic initiatives, it is difficult to assess Orica's competitive positioning and relative strengths or weaknesses within its industry.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Data limitation"
+      },
+      {
+        "number": 5,
+        "title": "5. Economic Data",
+        "epistemicClass": "ep-measured",
+        "epistemicLabel": "Measured",
+        "finding": "Brent Crude (BZ=F) is currently priced at US$106.84, reflecting a significant daily increase of +47.4%. As a specialty chemicals company, Orica's operations are inherently linked to energy and raw material costs.",
+        "tension": "While rising commodity prices can signal robust industrial demand, a sharp increase in Brent Crude could also lead to higher input costs for Orica, potentially compressing its profit margins if these costs cannot be fully passed on to customers.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Macro & Commodity Context"
+      },
+      {
+        "number": 6,
+        "title": "6. Alternative Data",
+        "epistemicClass": "ep-observed",
+        "epistemicLabel": "Observed",
+        "finding": "No alternative data, such as operational metrics, ESG performance indicators, or insights from channel checks, has been provided for Orica.",
+        "tension": "The absence of alternative data limits the ability to gain real-time insights into Orica's operational efficiency, customer satisfaction, or sustainability practices, which could offer a more nuanced view of its business health.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Data limitation"
+      },
+      {
+        "number": 7,
+        "title": "7. Academic Research",
+        "epistemicClass": "ep-peer",
+        "epistemicLabel": "Peer-Reviewed",
+        "finding": "No academic research or peer-reviewed studies pertaining to the specialty chemicals sector or Orica specifically are included in the provided information.",
+        "tension": "Without academic research, it is challenging to assess long-term industry trends, potential disruptive technologies, or fundamental shifts in market dynamics that could impact Orica's strategic positioning and future growth prospects.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Data limitation"
+      },
+      {
+        "number": 8,
+        "title": "8. Media & Social",
+        "epistemicClass": "ep-unverified",
+        "epistemicLabel": "Unverified",
+        "finding": "Orica issued a 'Clarification - Media Reports' announcement on 2026-03-23, indicating that the company has recently been the subject of media coverage that required a public response.",
+        "tension": "The specific content and nature of the media reports that necessitated a clarification are not provided, making it difficult to ascertain whether the coverage was positive, negative, or simply inaccurate, and its potential impact on investor sentiment.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX announcement (2026-03-23)"
+      },
+      {
+        "number": 9,
+        "title": "9. Leadership & Governance",
+        "epistemicClass": "ep-observed",
+        "epistemicLabel": "Observed",
+        "finding": "No specific information regarding Orica's leadership team, recent management changes, insider trading activities, or corporate governance practices is available in the provided data.",
+        "tension": "The absence of data on leadership and governance limits the ability to evaluate the stability of management, alignment of interests with shareholders, or the effectiveness of oversight, which are critical factors for long-term company performance.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Data limitation"
+      },
+      {
+        "number": 10,
+        "title": "10. Ownership & Capital Flows",
+        "epistemicClass": "ep-measured",
+        "epistemicLabel": "Measured",
+        "finding": "Orica has been actively managing its capital structure through share buy-backs, as evidenced by multiple 'Update - Notification of buy-back - ORI' announcements on 2026-03-22 and 2026-03-23, and a 'Notification of cessation of securities - ORI' on 2026-03-27. The company also has a dividend yield of 2.92%.",
+        "tension": "While share buy-backs can enhance shareholder value by reducing share count, the extent of institutional ownership and broader capital flows into or out of the stock are not provided, limiting a comprehensive view of investor sentiment and liquidity.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N1",
+            "class": "supports"
+          }
+        ],
+        "source": "ASX announcements (2026-03-22, 2026-03-23, 2026-03-27), Analyst Consensus & Estimates (EODHD)"
+      }
+    ],
     "alignmentSummary": null
   },
   "discriminators": {
-    "intro": "Discriminating evidence pending analyst research.",
-    "rows": [],
-    "nonDiscriminating": null
+    "intro": "The following data points carry high diagnosticity: they can meaningfully shift probability between competing hypotheses.",
+    "rows": [
+      "High trailing P/E ratio of 62.4x, contrasting sharply with a forward P/E of 16.5x, indicating strong expected earnings growth.",
+      "Low profit margin of 1.99% and return on equity of 4.3%, suggesting potential challenges in profitability or capital efficiency despite the high valuation.",
+      "Wall Street consensus target price of A$25.75, implying substantial upside from the current A$20.30 price."
+    ],
+    "nonDiscriminating": "<ul><li><strong>Dividend yield of 2.8%:</strong> Provides income support and signals board confidence, but does not discriminate between the bull and bear cases as dividends can be maintained even during earnings recovery periods.</li><li><strong>EV/EBITDA of 9.3x:</strong> A reasonable mid-cycle multiple for an industrial chemicals business, but this metric is consistent with both the base case and the bull case and does not help distinguish between them.</li><li><strong>52-week trading range (A$15.23 - A$26.40):</strong> Provides useful context for scenario pricing but does not in itself discriminate between hypotheses - the stock has traded across a wide range for reasons that are not fully explained by the available evidence.</li><li><strong>Total debt of A$3.0B:</strong> Meaningful leverage that is relevant context, but at current EBITDA levels of A$1.3B the leverage ratio is manageable and does not by itself distinguish between recovery and deterioration scenarios.</li><li><strong>PEG ratio of 1.58:</strong> Suggests growth is not cheap relative to the multiple, but this metric is sensitive to the earnings growth assumption and does not add discriminating power beyond what is already captured in the forward P/E analysis.</li></ul>"
   },
   "tripwires": {
-    "intro": "Tripwires pending analyst research.",
-    "cards": []
+    "intro": "The following catalysts could force a material revision to hypothesis weightings. Each carries conditional outcomes that map to specific narrative shifts.",
+    "cards": [
+      {
+        "date": "MAY 2026",
+        "name": "Energy Cost Trajectory Update",
+        "conditions": [
+          {
+            "if": "If Brent Crude retreats below US$80/bbl and Orica issues a trading update confirming margin improvement",
+            "valence": "positive",
+            "then": "Then the forward EPS consensus of A$1.23 becomes more credible and the stock should re-rate toward A$23-25"
+          },
+          {
+            "if": "If Brent Crude remains above US$100/bbl and Orica issues a profit warning or guidance downgrade",
+            "valence": "negative",
+            "then": "Then the bear case accelerates and the stock risks re-testing the 52-week low of A$15.23"
+          }
+        ],
+        "source": "Macro commodity markets; ASX trading updates"
+      },
+      {
+        "date": "AUGUST 2026",
+        "name": "FY2026 Results - EPS vs Consensus",
+        "conditions": [
+          {
+            "if": "If reported EPS meets or exceeds consensus of A$1.23 and management reaffirms growth guidance",
+            "valence": "positive",
+            "then": "Then the trailing/forward P/E gap closes, the stock re-rates toward the analyst target of A$25.75, and the bull case (N1) probability increases materially"
+          },
+          {
+            "if": "If reported EPS falls below A$0.90 due to margin compression or volume weakness",
+            "valence": "negative",
+            "then": "Then the recovery narrative is broken, analyst targets are cut, and the stock likely falls toward A$15-17 as the bear case (N3) dominates"
+          }
+        ],
+        "source": "Orica ASX results announcement; EODHD consensus estimates"
+      },
+      {
+        "date": "APRIL 2026",
+        "name": "Media Clarification Follow-Through",
+        "conditions": [
+          {
+            "if": "If the subject of the March 2026 media clarification is resolved without material financial or legal consequence",
+            "valence": "positive",
+            "then": "Then the uncertainty discount embedded in the current price partially unwinds and sentiment improves"
+          },
+          {
+            "if": "If further ASX announcements reveal a material operational, legal, or environmental issue related to the media reports",
+            "valence": "negative",
+            "then": "Then investor confidence is damaged, the buyback may be suspended, and the stock faces additional de-rating pressure"
+          }
+        ],
+        "source": "ASX announcement (2026-03-23); future ASX disclosures"
+      }
+    ]
   },
   "gaps": {
-    "coverageRows": [],
-    "couldntAssess": [
-      "Full evidence assessment pending &mdash; stock was auto-added to coverage."
+    "coverageRows": [
+      {
+        "domain": "Corporate Comms",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "March 2026",
+        "confidence": "Medium - buyback and clarification announcements available but clarification content undisclosed",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Regulatory Filings",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "FY2025 (estimated)",
+        "confidence": "Medium - headline financial metrics available via EODHD but full statutory accounts not reviewed",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Broker Research",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 2026",
+        "confidence": "Medium - consensus EPS and target price available but individual broker reports and rationale not reviewed",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Competitor Disclosures",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "No data",
+        "confidence": "Low - no competitor data available; relative positioning cannot be assessed",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Economic Data",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 2026",
+        "confidence": "Low - single commodity data point (Brent Crude) with anomalous daily move; broader macro context absent",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Alternative Data",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "No data",
+        "confidence": "Low - no operational metrics, channel checks, or ESG data available",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Academic Research",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "No data",
+        "confidence": "Low - no sector or company-specific academic research reviewed",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Media & Social",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 2026",
+        "confidence": "Low - media clarification event noted but content of underlying reports unknown",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Leadership & Governance",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "No data",
+        "confidence": "Low - no management, board, or governance data available",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Ownership & Capital Flows",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "March 2026",
+        "confidence": "Medium - buyback activity well-documented; institutional ownership and broader flow data absent",
+        "confidenceClass": "td-amber"
+      }
     ],
-    "analyticalLimitations": "This stock was auto-added. All hypothesis scores, evidence assessments, and narrative analysis require manual research and population."
+    "couldntAssess": [
+      "Competitive positioning relative to peers (e.g. Dyno Nobel, Maxam, Enaex)",
+      "Management quality, track record, and alignment with shareholders",
+      "Contract renewal pipeline and customer concentration risk",
+      "ESG performance and regulatory compliance history",
+      "Geographic revenue breakdown and regional margin differentials",
+      "Content and implications of the March 2026 media clarification",
+      "Institutional ownership composition and recent flow activity",
+      "Long-term industry demand trends from academic or independent research",
+      "Operational efficiency metrics and capacity utilisation rates"
+    ],
+    "analyticalLimitations": "This initiation is constrained by a thin evidence base across the majority of the ten analytical domains. The financial data is sourced from a single third-party aggregator (EODHD) and has not been cross-referenced against Orica's statutory accounts or investor presentations. The Brent Crude data point - showing a single-day move of +47.4% - is anomalous and may reflect a data error rather than an actual market event, which limits its reliability as an input cost signal. The absence of competitor data, management information, and alternative data means that the analysis is heavily reliant on consensus estimates and capital management signals, both of which are lagging or modelled rather than observed. The media clarification event is a material unknown that cannot be resolved from the available evidence. Investors should treat the probability weightings and price targets as indicative rather than precise, and should seek to fill the identified evidence gaps before making material investment decisions."
   },
   "technicalAnalysis": {
     "date": "28 March 2026",
@@ -643,14 +998,87 @@
         "name": "S&P/ASX 200",
         "period": "12 months",
         "stockReturn": 20.5,
-        "indexReturn": 0,
-        "relativeReturn": 20.5
+        "indexReturn": 6.5,
+        "relativeReturn": 14.0
       }
     }
   },
   "footer": {
     "disclaimer": "This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information.",
-    "domainCount": "0 of 10",
-    "hypothesesCount": "4 Pending"
-  }
+    "domainCount": "10 of 10",
+    "hypothesesCount": "4 Active"
+  },
+  "marketCap": 9433501696,
+  "style": "Growth",
+  "priceDrivers": {
+    "ticker": "ORI",
+    "company_name": "Orica Limited",
+    "analysis_date": "2026-03-28",
+    "primary_driver": "A probable company-specific catalyst – the settlement of long-running litigation with CF Industries over ammonium nitrate supply and an update on the Nelson Brothers US acquisition – combined with a macro-driven technical bounce from deeply oversold levels, most likely drove ORI's recovery from its 2026-03-23 low.",
+    "confidence": "moderate",
+    "driver_stack": {
+      "primary": [
+        "CF Industries litigation settlement and Nelson Brothers US acquisition update (probable, not confirmed at source – ASX filing dated 2026-03-23 not directly verified; consistent with multiple secondary sources)",
+        "Technical short-covering bounce from a 29% drawdown, amplified by ASX200 and sector recovery on 24 March"
+      ],
+      "secondary": [
+        "First Half FY2026 business update (10 March): EBIT slightly above PCP at A$488M and A$100M cost-savings program – delayed re-rating as risk appetite recovered",
+        "Broad ASX200 recovery (+2.1%) and sector ETF (^AXNJ, +2.1%) on 24 March, providing the first leg of the bounce"
+      ],
+      "amplifiers": [
+        "Stock trading ~21% below analyst consensus target of A$25.75 at the 18.77 low – material valuation gap accelerated short-covering",
+        "Ongoing A$500M on-market buyback providing a demand-side price floor at the lows"
+      ],
+      "background": [
+        "ORI had declined ~29% from its 52-week high of A$26.40 (January 2026) to A$18.77 by 23 March, driven by macro and tariff-related sector headwinds, currency pressures, and softer Indonesian coal quotas",
+        "Sector ETF (^AXNJ) also declined materially from February highs, indicating a partly macro-driven prior selloff",
+        "Prior positive EBIT guidance (10 March) had been absorbed negatively, suggesting investor focus was squarely on macro risk and the unresolved litigation overhang"
+      ],
+      "rejected": [
+        "Pure macro/sector recovery as the sole driver – insufficient to explain the +5.5% stock-specific divergence on 25 March when ASX200 was flat",
+        "Buyback activity as a primary driver – the A$500M program was already known; buyback cessation filing on 27 March coincides with consolidation, not with the surge",
+        "Single-day metadata gain of +16.73% – inconsistent with price history showing two consecutive closes at A$20.30; treated as a comparison-period artefact, not a single-session return"
+      ]
+    },
+    "report": {
+      "title": "ORI: Probable Settlement Catalyst and Technical Short-Covering Drive 10% Recovery from March Lows",
+      "executive_summary": "Orica has recovered approximately 9.7% from its 23 March low of A$18.77 to consolidate around A$20.30, outperforming the ASX200 by roughly 5.4 percentage points over five days and 5.7 points over ten. The most likely primary catalyst is an ASX filing released on 23 March – a 116KB 'Clarification – Media Reports' announcement – that multiple secondary sources associate with the settlement of Orica's long-running litigation with CF Industries over ammonium nitrate supply, and a concurrent update on the Nelson Brothers US acquisition. Removal of a multi-year supply-chain legal overhang is a material positive for a company with A$8.1 billion in revenue that depends on ammonium nitrate as a core input. A macro-driven technical bounce – the ASX200 recovered 2.1% on 24 March – and short-covering from deeply oversold levels provided the structural conditions for the recovery. Confidence is moderate: the full ASX filing has not been directly verified, the announcement was filed on the day of the low rather than the bounce, and no broker notes have been sourced to confirm the catalyst in real time.",
+      "full_note": "ORI has staged a sharp recovery from A$18.77 on 23 March to consolidate at A$20.30, generating approximately 9.7% over two sessions and +7.2% over five days against an ASX200 that was essentially flat over the same five-day window. The most likely proximate catalyst is a 116KB ASX filing titled 'Clarification – Media Reports,' released on 23 March, which multiple financial news outlets associate with two developments: the settlement of litigation commenced in October 2023 against CF Industries Sales and CF Industries Nitrogen over ammonium nitrate supply, and an update on the acquisition of US-based Nelson Brothers Inc. Removing a multi-year legal dispute over a core input to Orica's explosives manufacturing is a genuine fundamental positive at a moment when the stock had been discounting a range of operational and macro risks.\n\nThe strongest direct evidence for stock-specificity is the price action on 25 March. ORI surged 5.5% on that session while the ASX200 finished effectively flat and the sector ETF (^AXNJ) was marginally lower. A move of that magnitude, in the opposite direction to the broad market, is very difficult to attribute to macro factors alone and points clearly to a company-specific development being digested by the market. The sequencing – filing on 23 March, partial recovery on 24 March, main surge on 25 March – is consistent with a catalyst absorbed over one to two sessions, as is the elevated volume of 1.75 million shares on the analysis date.\n\nHowever, the stock-specific catalyst did not act in isolation. The ASX200 bounced 2.1% and the sector ETF rose 2.1% on 24 March, providing the first leg of ORI's recovery. ORI's beta to the sector had been running high during the prior downtrend, so an amplified bounce on a market recovery day is structurally expected. Furthermore, ORI had fallen 29% from its January 2026 peak of A$26.40 to trade roughly 21% below analyst consensus of A$25.75 – precisely the conditions under which short-covering accelerates sharply when a positive catalyst, or even just a cessation of negative news flow, emerges. The macro recovery on 24 March and short-covering together explain the first 3-4% of the move; the settlement news most likely explains the additional stock-specific alpha on 25 March.\n\nVolume was elevated on the bounce days, consistent with short-covering and fresh buying at depressed levels. The ongoing A$500M buyback program – with multiple ASX update filings across 22-23 March – provided a demand-side floor at the lows, though the buyback cessation filing on 27 March coincides neatly with the stock's consolidation at A$20.30, suggesting company bid support was withdrawn at that point rather than driving the surge itself. Flow dynamics are assessed as probable amplifiers rather than causal triggers.\n\nNo social media or message-board activity is available in the data for ORI, which is unsurprising for a A$9.4 billion market cap industrial stock. Social channels are assessed as irrelevant to this move.\n\nTwo explanations were examined and rejected as insufficient. First, pure macro recovery cannot account for the 25 March divergence from a flat index. Second, the Orica First Half business update released on 10 March – which flagged EBIT slightly above the prior corresponding period and a A$100 million cost-savings programme – was initially absorbed negatively, with the stock continuing to fall to its 23 March low over the following two weeks. That update likely provided fundamental underpinning for the eventual recovery, but cannot be the proximate trigger given its initial negative reception.\n\nThe main reservation about this view is evidentiary: the entire primary driver thesis rests on a 116KB ASX filing that is classified as non-market-sensitive and has not been read directly. All references to the CF Industries settlement derive from secondary aggregators (Kalkine, Simply Wall St, Kapitales) rather than Tier 1 primary sources such as the AFR, Reuters or Bloomberg. The absence of any broker upgrade or target price change in the data window is also anomalous for a large-cap stock with a 10% move – either broker commentary was issued and is not captured here, or the move has proceeded ahead of formal institutional re-rating. The view would be strengthened materially by direct verification of the 23 March filing content, confirmation of the financial terms of the CF Industries settlement, and at least one broker note attributing the recovery to these catalysts."
+    },
+    "price_action_summary": {
+      "price_change_2d_pct": -1.46,
+      "price_change_5d_pct": 7.24,
+      "price_change_10d_pct": 4.91,
+      "asx200_change_2d_pct": -0.11,
+      "asx200_change_5d_pct": 1.8,
+      "asx200_change_10d_pct": -0.78,
+      "relative_2d_pct": -1.35,
+      "relative_5d_pct": 5.44,
+      "relative_10d_pct": 5.69
+    },
+    "evidence_quality": {
+      "primary_evidence": "ASX filing: 'Clarification – Media Reports' (23 March 2026, 116KB, Progress Report type) is the highest-quality anchor, but its full content has not been directly verified. Buyback update filings (22-27 March) and the First Half Business Update (10 March, orica.com) are directly sourced and confirmed. Price and index data are confirmed from Yahoo Finance.",
+      "secondary_evidence": "CF Industries settlement and Nelson Brothers acquisition update reported by Kalkine, Simply Wall St, and Kapitales – all secondary aggregators. No Tier 1 primary wire coverage (AFR, Reuters, Bloomberg) confirmed. No broker notes sourced for the window.",
+      "key_gap": "The full text of the 23 March 'Clarification – Media Reports' ASX filing is unread – the entire primary driver thesis depends on this document. Absence of broker notes from major coverage houses (Macquarie, UBS, Citi, Ord Minnett) for a A$9.4B cap stock with a 10% move is a material gap. Short interest data for ORI and peer price data (Incitec Pivot / Dyno Nobel, MAXAM) are also absent, preventing full decomposition of the stock-specific versus sector-sympathy component."
+    },
+    "change_my_mind": {
+      "what_would_change_the_view": [
+        "Full text of the 23 March ASX filing confirms the CF Industries settlement and Nelson Brothers update as the substantive content – would upgrade confidence from moderate to high",
+        "Broker notes from Macquarie, UBS, Citi or Ord Minnett upgrading ORI or raising targets in the 23-27 March window – would confirm institutional catalyst recognition and potentially elevate broker activity as a co-driver",
+        "Confirmation that CF Industries settlement terms are financially material to Orica (e.g., supply price improvement or cash receipt) – would strengthen magnitude assessment",
+        "Peer company data showing no equivalent bounce in Incitec Pivot or other explosives sector names over 24-25 March – would definitively confirm stock-specificity of the 25 March surge and remove residual doubt about sector sympathy"
+      ]
+    },
+    "broker_activity": {
+      "recent_upgrades": [],
+      "recent_downgrades": [],
+      "consensus_change": "No broker upgrades, downgrades or target price changes captured in the data window. Analyst consensus target of A$25.75 implies approximately 27% upside from current price of A$20.30, suggesting the stock remains significantly below formal institutional fair value estimates. Absence of broker commentary in the data for a move of this magnitude is anomalous and represents a key evidence gap."
+    },
+    "social_signal": {
+      "hotcopper_activity": "quiet",
+      "reddit_activity": "quiet",
+      "social_led_or_lagged": "irrelevant"
+    }
+  },
+  "_lastRefreshed": "2026-03-28T02:43:14.523765+00:00"
 }
