@@ -443,6 +443,19 @@ def _chunk_stock(ticker: str, data: dict, ref: dict | None = None, fresh: dict |
     disc = data.get("discriminators", {})
     if disc:
         for i, row in enumerate(disc.get("rows", [])):
+            if isinstance(row, str):
+                # Data quality: sometimes rows contain plain strings
+                passages.append(Passage(
+                    ticker=ticker,
+                    section="discriminator",
+                    subsection=f"disc_{i+1}",
+                    content=f"Discriminator for {ticker}: {_clean_html(row)}",
+                    tags=["discriminator"],
+                    weight=1.2,
+                ))
+                continue
+            if not isinstance(row, dict):
+                continue
             passages.append(Passage(
                 ticker=ticker,
                 section="discriminator",
