@@ -91,12 +91,14 @@ def _strip_currency(val: Any) -> float | None:
 
 
 def _recursive_fix_strings(obj: Any) -> Any:
-    """Recursively fix mojibake and strip emoji from all strings in a structure."""
+    """Recursively fix mojibake, strip emoji, and replace em-dashes from all strings."""
     if isinstance(obj, str):
         s = obj
         # Fix mojibake
         for bad, good in _MOJIBAKE_MAP.items():
             s = s.replace(bad, good)
+        # Replace em-dashes with en-dashes (style rule: no em-dashes)
+        s = s.replace("\u2014", "\u2013")
         # Strip emoji
         s = _EMOJI_PATTERN.sub("", s)
         return s
