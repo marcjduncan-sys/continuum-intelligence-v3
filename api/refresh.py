@@ -745,16 +745,16 @@ Return a JSON object with this exact structure:
 }
 
 You MUST create exactly 10 cards with these domains:
-1. Corporate Communications (ep-motivated, Motivated) — company press releases, investor presentations
-2. Regulatory Filings & Financial Statements (ep-verified, Verified) — financial results, ASIC filings
-3. Broker Research (ep-modeled, Modelled) — consensus estimates, broker views (infer from news)
-4. Competitor Disclosures (ep-verified, Verified) — peer company announcements, market position
-5. Economic Data (ep-measured, Measured) — macro indicators, commodity prices, rates
-6. Alternative Data (ep-observed, Observed) — operational indicators, ESG, channel checks
-7. Academic Research (ep-peer, Peer-Reviewed) — industry studies, structural trends
-8. Media & Social (ep-unverified, Unverified) — financial media coverage, market commentary
-9. Leadership & Governance (ep-observed, Observed) — management changes, insider trades, governance
-10. Ownership & Capital Flows (ep-measured, Measured) — institutional holders, fund flows, capital structure
+1. Corporate Communications (ep-motivated, Motivated) - company press releases, investor presentations
+2. Regulatory Filings & Financial Statements (ep-verified, Verified) - financial results, ASIC filings
+3. Broker Research (ep-modeled, Modelled) - consensus estimates, broker views (infer from news)
+4. Competitor Disclosures (ep-verified, Verified) - peer company announcements, market position
+5. Economic Data (ep-measured, Measured) - macro indicators, commodity prices, rates
+6. Alternative Data (ep-observed, Observed) - operational indicators, ESG, channel checks
+7. Academic Research (ep-peer, Peer-Reviewed) - industry studies, structural trends
+8. Media & Social (ep-unverified, Unverified) - financial media coverage, market commentary
+9. Leadership & Governance (ep-observed, Observed) - management changes, insider trades, governance
+10. Ownership & Capital Flows (ep-measured, Measured) - institutional holders, fund flows, capital structure
 
 Tag rules for cards:
 - Use "Supports N1" (class "supports") if the finding favours the growth/upside hypothesis
@@ -764,7 +764,10 @@ Tag rules for cards:
 - Use "Ambiguous" (class "") if the evidence is mixed
 
 Be specific. Cite real data from the provided inputs. If you lack data for a domain, state what is \
-known from the available inputs and note the data limitation in the tension field."""
+known from the available inputs and note the data limitation in the tension field.
+CRITICAL FORMATTING: Do not use em-dashes (the long dash character) anywhere in your response. \
+Use en-dashes, hyphens, or restructure the sentence instead. Do not use emoji characters. \
+Use only ASCII text, HTML entities, and standard punctuation."""
 
 
 FULL_INITIATION_SYSTEM = """\
@@ -772,7 +775,7 @@ You are a senior equity research analyst at Continuum Intelligence initiating co
 ASX-listed stock. You use the Analysis of Competing Hypotheses (ACH) framework.
 
 Given the company overview, sector, recent data, evidence cards, and commodity/macro context, \
-create a COMPLETE research analysis from scratch. This is initial coverage — there is no existing \
+create a COMPLETE research analysis from scratch. This is initial coverage; there is no existing \
 analysis to update.
 
 Return a JSON object with ALL of the following fields:
@@ -924,7 +927,7 @@ CRITICAL RULES:
 - Create 3 discriminator rows and at least 2 tripwire cards.
 - Gaps should cover all 10 evidence domains.
 - Reference the current price throughout.
-- CRITICAL: Do not use emoji characters anywhere in your response. Use only ASCII text, HTML entities, and standard punctuation.
+- CRITICAL: Do not use emoji characters anywhere in your response. Do not use em-dashes (the long dash character) anywhere. Use en-dashes, hyphens, or restructure the sentence instead. Use only ASCII text, HTML entities, and standard punctuation.
 - position_in_range.worlds prices MUST be plain numbers (e.g. 35.00), NOT dollar-sign strings.
 - position_in_range.worlds labels must be descriptive (e.g. "Bear Case", "Bull Case"), NOT "N1 Bull" or "N2 Base".
 - Each gap coverageRow must have confidenceClass set to one of: "td-green", "td-amber", "td-red".
@@ -960,9 +963,13 @@ set material_change to false and keep the finding unchanged.
 Be specific. Cite dates, numbers, and sources from the provided data.
 
 You may also receive commodity prices and sector-relevant macro headlines. Use these to assess \
-how external market conditions affect the company's evidence cards — particularly the Economic \
+how external market conditions affect the company's evidence cards, particularly the Economic \
 Data domain. For example, commodity price moves are material for miners and energy producers, \
-interest rate expectations matter for banks and REITs, and FX moves affect offshore earners."""
+interest rate expectations matter for banks and REITs, and FX moves affect offshore earners.
+
+CRITICAL FORMATTING: Do not use em-dashes (the long dash character) anywhere in your response. \
+Use en-dashes, hyphens, or restructure the sentence instead. Do not use emoji characters. \
+Use only ASCII text, HTML entities, and standard punctuation."""
 
 REQUIRED_REFRESH_FIELDS = [
     "hypotheses", "embedded_thesis", "skew_description",
@@ -986,7 +993,7 @@ hypotheses for ASX-listed companies using structured evidence.
 
 Given the current hypothesis weights, updated evidence cards, new market data, and the \
 existing narrative sections, perform a FULL research update. You must rewrite all narrative \
-content to reflect current reality — do not leave stale references to past events as if \
+content to reflect current reality. Do not leave stale references to past events as if \
 they are future events.
 
 Return a JSON object with ALL of the following fields:
@@ -1063,7 +1070,7 @@ Use <strong> for company name and key facts. End with ASX ticker reference."
 MACRO & COMMODITY CONTEXT:
 You may receive commodity prices and sector macro headlines alongside company-specific data. \
 For commodity-exposed companies (miners, energy producers), commodity price movements are MATERIAL \
-to hypothesis weighting — a 10%+ move in iron ore, oil, or copper directly affects earnings and \
+to hypothesis weighting: a 10%+ move in iron ore, oil, or copper directly affects earnings and \
 should shift narrative emphasis. For rate-sensitive companies (banks, REITs), interest rate \
 expectations matter. For software/healthcare companies, AUD/USD affects earnings translation. \
 Incorporate these external factors where relevant. If a geopolitical event (war, sanctions, supply \
@@ -1093,7 +1100,8 @@ say "Event occurred [date]; outcome details pending data update."
 - position_in_range.worlds labels must be descriptive (e.g. "Bear Case", "Bull Case"), NOT "N1 Bull" or "N2 Base".
 - position_in_range MUST reflect the current price and updated hypothesis weights. Recalculate world prices based on current evidence.
 - company_description MUST reference the CURRENT price and any material recent events. Do not leave stale price references.
-- You MUST return ALL fields listed in the schema above. Omitting fields causes stale content on the platform."""
+- You MUST return ALL fields listed in the schema above. Omitting fields causes stale content on the platform.
+- CRITICAL FORMATTING: Do not use em-dashes (the long dash character) anywhere in your response. Use en-dashes, hyphens, or restructure the sentence instead. Do not use emoji characters. Use only ASCII text, HTML entities, and standard punctuation."""
 
 
 # ---------------------------------------------------------------------------
@@ -1630,7 +1638,7 @@ async def _run_coverage_initiation(
         _fc("enterprise_value", "Enterprise Value", "big"),
     ])
 
-    user_prompt = f"""## INITIATING COVERAGE — TODAY'S DATE: {today}
+    user_prompt = f"""## INITIATING COVERAGE - TODAY'S DATE: {today}
 
 ## Stock: {ticker} ({research.get('company', '')})
 ## Sector: {research.get('sector', 'N/A')} / {research.get('sectorSub', 'N/A')}
@@ -2057,7 +2065,9 @@ Return a JSON object with exactly these keys:
 
 Only update fields where the new data provides a meaningful improvement. If a section is already \
 high quality and the new data does not change it, return null for that field.
-Do not use emoji characters. Use only ASCII text, HTML entities, and standard punctuation."""
+Do not use emoji characters. Do not use em-dashes (the long dash character) anywhere. \
+Use en-dashes, hyphens, or restructure the sentence instead. \
+Use only ASCII text, HTML entities, and standard punctuation."""
 
 
 async def _run_structure_update(
@@ -2526,8 +2536,8 @@ def _merge_initiation(
         updated["evidence"]["cards"] = evidence_cards
         updated["evidence"]["intro"] = (
             "Evidence is assessed across ten epistemic domains, ranked by reliability. "
-            "Each domain carries a distinct epistemic quality — from verified regulatory filings "
-            "to unverified media commentary — ensuring the analyst understands what the evidence "
+            "Each domain carries a distinct epistemic quality, from verified regulatory filings "
+            "to unverified media commentary, ensuring the analyst understands what the evidence "
             "is before assessing what it means."
         )
         updated["evidence"]["alignmentSummary"] = None
@@ -2688,7 +2698,7 @@ def _merge_initiation(
     if discriminators_data:
         updated["discriminators"] = {
             "intro": (
-                "The following data points carry high diagnosticity — they can meaningfully "
+                "The following data points carry high diagnosticity: they can meaningfully "
                 "shift probability between competing hypotheses."
             ),
             "rows": discriminators_data,
