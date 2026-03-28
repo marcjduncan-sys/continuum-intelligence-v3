@@ -33,7 +33,7 @@ async def commit_files_to_github(
     files: Dict[str, Path],
     commit_message: str,
     token: str,
-) -> None:
+) -> bool:
     """
     Commit a batch of files to the GitHub repo.
 
@@ -43,18 +43,24 @@ async def commit_files_to_github(
         commit_message: Git commit message.
         token: GitHub personal access token with repo write scope.
 
-    Each file is committed individually. Failures are logged but do not
-    raise -- the caller (add_stock) treats this as non-fatal.
+    Returns True if every file was committed successfully, False otherwise.
+    Failures are always logged. The caller decides whether to treat failure
+    as fatal (add_stock scaffold phase) or non-fatal (background refresh).
     """
     if not token:
         logger.warning("[GitHubCommit] GITHUB_TOKEN not set -- skipping commit to GitHub")
-        return
+        return False
 
     headers = {**_HEADERS_BASE, "Authorization": f"Bearer {token}"}
+    all_ok = True
 
     async with httpx.AsyncClient(timeout=30.0) as client:
         for github_path, local_path in files.items():
-            await _commit_single(client, headers, github_path, local_path, commit_message)
+            ok = await _commit_single(client, headers, github_path, local_path, commit_message)
+            if not ok:
+                all_ok = False
+
+    return all_ok
 
 
 async def _commit_single(
@@ -63,13 +69,14 @@ async def _commit_single(
     github_path: str,
     local_path: Path,
     commit_message: str,
-) -> None:
+) -> bool:
+    """Commit a single file. Returns True on success, False on any failure."""
     url = f"{_API_BASE}/{github_path}"
     try:
         content_b64 = base64.b64encode(local_path.read_bytes()).decode()
     except OSError as e:
         logger.error("[GitHubCommit] Cannot read %s: %s", local_path, e)
-        return
+        return False
 
     # Fetch current SHA (required for updates; absent for new files)
     sha: str | None = None
@@ -94,6 +101,7 @@ async def _commit_single(
         r = await client.put(url, headers=headers, json=body)
         if r.status_code in (200, 201):
             logger.info("[GitHubCommit] Committed %s", github_path)
+            return True
         else:
             logger.error(
                 "[GitHubCommit] Failed to commit %s: HTTP %s -- %s",
@@ -101,5 +109,7 @@ async def _commit_single(
                 r.status_code,
                 r.text[:300],
             )
+            return False
     except httpx.HTTPError as e:
         logger.error("[GitHubCommit] Request error committing %s: %s", github_path, e)
+        return False

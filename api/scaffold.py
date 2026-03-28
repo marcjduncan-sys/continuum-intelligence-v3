@@ -1079,3 +1079,120 @@ def build_freshness_entry(ticker: str, price: float) -> dict:
         "status": "OK",
         "badge": "ok",
     }
+
+
+def build_stocks_entry(
+    ticker: str,
+    company: str,
+    sector: str,
+    market_data: dict,
+) -> dict:
+    """
+    Build a data/stocks/{TICKER}.json scaffold for a new stock.
+
+    This is the Python equivalent of createStockJSON() in scripts/add-stock.js.
+    The loader (src/data/loader.js) fetches this file to merge signal fields
+    (three_layer_signal, valuation_range, price_signals) into STOCK_DATA.
+    Without it, those fields are silently absent for API-added tickers.
+
+    Parameters
+    ----------
+    ticker : str
+        Uppercase ASX ticker code.
+    company : str
+        Company name.
+    sector : str
+        Primary sector.
+    market_data : dict
+        Output from fetch_yahoo_price().
+    """
+    price = market_data.get("price", 0)
+    price_history_raw = market_data.get("price_history", [])
+    if price_history_raw and isinstance(price_history_raw[0], dict):
+        price_history = [p["close"] for p in price_history_raw[-60:]]
+    elif price_history_raw:
+        price_history = price_history_raw[-60:]
+    else:
+        price_history = [price]
+
+    market_cap = market_data.get("market_cap")
+    shares = market_data.get("shares_outstanding")
+    if market_cap and market_cap > 0:
+        market_cap_str = f"{market_data.get('currency', 'A$')}{market_cap / 1e9:.1f}B"
+    elif shares and price:
+        market_cap_str = f"{market_data.get('currency', 'A$')}{shares * price / 1e9:.1f}B"
+    else:
+        market_cap_str = None
+
+    now_iso = datetime.now(ZoneInfo("Australia/Sydney")).isoformat()
+
+    return {
+        "ticker": f"{ticker}.AX",
+        "company": company,
+        "sector": sector,
+        "market_cap": market_cap_str,
+        "hypotheses": {
+            "N1": {
+                "label": "Growth/Recovery",
+                "description": f"{company} executes on growth strategy; earnings accelerate",
+                "plain_english": f"The bull case -- {company} delivers on its key initiatives and the market rewards it.",
+                "what_to_watch": "Next earnings result and forward guidance.",
+                "upside": "Material re-rating if execution surprises to the upside.",
+                "risk_plain": "If growth disappoints, this narrative weakens.",
+                "survival_score": 0.50,
+                "status": "MODERATE",
+                "weighted_inconsistency": 3.0,
+                "last_updated": now_iso,
+            },
+            "N2": {
+                "label": "Base Case/Managed",
+                "description": f"{company} delivers steady-state results; valuation holds",
+                "plain_english": "The company continues on its current trajectory -- neither surprising positively nor negatively.",
+                "what_to_watch": "Margin trends and competitive dynamics.",
+                "upside": None,
+                "risk_plain": "If the base case is already priced in, limited upside from here.",
+                "survival_score": 0.60,
+                "status": "MODERATE",
+                "weighted_inconsistency": 2.0,
+                "last_updated": now_iso,
+            },
+            "N3": {
+                "label": "Risk/Downside",
+                "description": f"{company} faces headwinds; earnings or multiples compress",
+                "plain_english": "The bear case -- something goes wrong and the stock de-rates.",
+                "what_to_watch": "Cost pressures, competitive threats, or macro headwinds.",
+                "upside": None,
+                "risk_plain": "Material downside if multiple risks crystallise simultaneously.",
+                "survival_score": 0.30,
+                "status": "LOW",
+                "weighted_inconsistency": 4.0,
+                "last_updated": now_iso,
+            },
+            "N4": {
+                "label": "Disruption/Catalyst",
+                "description": f"A structural shift changes the investment case for {company}",
+                "plain_english": "An external force -- technology, regulation, or competition -- fundamentally alters the business.",
+                "what_to_watch": "Industry disruption signals and regulatory changes.",
+                "upside": None,
+                "risk_plain": "If disruption materialises, prior assumptions become invalid.",
+                "survival_score": 0.15,
+                "status": "LOW",
+                "weighted_inconsistency": 5.0,
+                "last_updated": now_iso,
+            },
+        },
+        "dominant": "N2",
+        "confidence": "LOW",
+        "alert_state": "NORMAL",
+        "current_price": price,
+        "big_picture": f"{company} (ASX: {ticker}) -- coverage initiated. Full analysis pending.",
+        "last_flip": None,
+        "narrative_history": [],
+        "evidence_items": [],
+        "price_signals": [],
+        "editorial_override": None,
+        "price_history": price_history,
+        "weighting": None,
+        "three_layer_signal": None,
+        "valuation_range": None,
+    }

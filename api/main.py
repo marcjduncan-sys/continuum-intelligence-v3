@@ -1064,6 +1064,7 @@ async def add_stock(
         build_index_entry,
         build_reference_entry,
         build_freshness_entry,
+        build_stocks_entry,
     )
     from web_search import fetch_yahoo_price
 
@@ -1112,13 +1113,14 @@ async def add_stock(
 
     # ---- Build scaffold + config entries ----
     research_data = build_research_scaffold(ticker, company, sector, industry, price_data)
+    stocks_data = build_stocks_entry(ticker, company, sector, price_data)
     tickers_entry = build_tickers_entry(ticker, company, sector, industry, price_data)
     index_entry = build_index_entry(ticker, company, sector, industry, price_data)
     reference_entry = build_reference_entry(ticker, price_data, sector, industry)
     freshness_entry = build_freshness_entry(ticker, price_data.get("price", 0))
 
     # ---- Write files ----
-    # 1. Research JSON — write to BOTH data/ (static serve) and dist/data/ (refresh pipeline)
+    # 1. Research JSON
     research_dir.mkdir(parents=True, exist_ok=True)
     with open(research_dir / f"{ticker}.json", "w") as f:
         json.dump(research_data, f, indent=2, ensure_ascii=False)
@@ -1169,6 +1171,16 @@ async def add_stock(
     with open(freshness_path, "w") as f:
         json.dump(freshness, f, indent=2, ensure_ascii=False)
 
+    # 6. data/stocks/{TICKER}.json — required by the frontend loader for signal fields.
+    # Without this file, src/data/loader.js silently omits three_layer_signal,
+    # valuation_range, and price_signals for every API-added ticker.
+    stocks_dir = data_dir / "stocks"
+    stocks_dir.mkdir(parents=True, exist_ok=True)
+    stocks_path = stocks_dir / f"{ticker}.json"
+    with open(stocks_path, "w") as f:
+        json.dump(stocks_data, f, indent=2, ensure_ascii=False)
+    logger.info(f"[AddStock] Saved data/stocks/{ticker}.json")
+
     # ---- Re-ingest so chat API sees the new ticker ----
     try:
         ingest()
@@ -1177,22 +1189,42 @@ async def add_stock(
     except Exception as e:
         logger.warning(f"[AddStock] Re-ingest failed (non-fatal): {e}")
 
-    # ---- Commit scaffold files to GitHub (persists across Railway redeployments) ----
+    # ---- Commit scaffold files to GitHub ----
+    # CRITICAL: Fly.io has an ephemeral filesystem. Files written above survive
+    # only until the next redeploy. The GitHub repo is the only durable store.
+    # commit_files_to_github() now returns False when any file fails to commit,
+    # allowing us to surface a clear error rather than silently losing the data.
     _scaffold_files = {
         f"data/research/{ticker}.json": research_dir / f"{ticker}.json",
         "data/research/_index.json": index_path,
         "data/reference.json": reference_path,
         "data/freshness.json": freshness_path,
         "data/config/tickers.json": tickers_path,
+        f"data/stocks/{ticker}.json": stocks_path,
     }
     try:
-        await commit_files_to_github(
+        commit_ok = await commit_files_to_github(
             _scaffold_files,
             f"Add {ticker}: scaffold ({company})",
             config.GITHUB_TOKEN,
         )
     except Exception as e:
-        logger.warning(f"[AddStock] GitHub commit failed (non-fatal): {e}")
+        logger.error(f"[AddStock] GitHub commit raised exception: {e}")
+        commit_ok = False
+
+    if not commit_ok:
+        # Roll back the 409 guard: remove the research file we just wrote so
+        # the client can retry without hitting a false "already exists" conflict.
+        try:
+            (research_dir / f"{ticker}.json").unlink(missing_ok=True)
+        except OSError:
+            pass
+        raise api_error(
+            503,
+            ErrorCode.UPSTREAM_ERROR,
+            f"Could not persist {ticker} to GitHub. The ticker was not added. "
+            f"Check GITHUB_TOKEN in the Fly.io dashboard and retry.",
+        )
 
     # ---- Kick off coverage initiation as a tracked background task ----
     # IMPORTANT: Railway's proxy timeout is ~60s. The coverage initiation
