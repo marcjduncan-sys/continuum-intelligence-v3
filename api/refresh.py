@@ -1475,7 +1475,7 @@ Please assess each evidence card against this new data and return the updated as
             system=EVIDENCE_UPDATE_SYSTEM,
             messages=[{"role": "user", "content": user_prompt}],
             json_mode=True,
-            max_tokens=8192,
+            max_tokens=16384,
             feature="evidence-update",
             ticker=ticker,
         )
@@ -1541,7 +1541,7 @@ Please create all 10 evidence domain cards for this stock based on the available
             system=EVIDENCE_CREATION_SYSTEM,
             messages=[{"role": "user", "content": user_prompt}],
             json_mode=True,
-            max_tokens=6144,
+            max_tokens=16384,
             max_retries=4,
             feature="evidence-creation",
             ticker=ticker,
@@ -1670,7 +1670,7 @@ sections, verdict, tripwires, discriminators, and gaps assessment. Be thorough a
             model=config.ANTHROPIC_MODEL,
             system=FULL_INITIATION_SYSTEM,
             messages=[{"role": "user", "content": user_prompt}],
-            max_tokens=8192,
+            max_tokens=16384,
             temperature=0,
             json_mode=True,
             feature="coverage-init",
@@ -2869,3 +2869,4 @@ def _merge_initiation(
     updated["_lastRefreshed"] = datetime.now(timezone.utc).isoformat()
 
     return updated
+   
