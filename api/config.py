@@ -48,6 +48,23 @@ EMBEDDING_MODEL = "gemini-embedding-001"
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 
 # ---------------------------------------------------------------------------
+# External data providers (Phase: Data Source Expansion)
+# ---------------------------------------------------------------------------
+
+# EODHD — financial statements, analyst estimates, insider transactions (paid)
+EODHD_API_KEY = os.getenv("EODHD_API_KEY", "").strip()
+EODHD_BASE_URL = "https://eodhd.com/api"
+
+# Alpha Vantage — financial statement cross-validation (free, 25 req/day)
+ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY", "").strip()
+
+# Finnhub — US peer analyst estimates, insider sentiment (free tier, US only)
+FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY", "").strip()
+
+# Twelve Data — pre-calculated technical indicators (free, 800 req/day)
+TWELVE_DATA_API_KEY = os.getenv("TWELVE_DATA_API_KEY", "").strip()
+
+# ---------------------------------------------------------------------------
 # Gold agent -- hybrid: NotebookLM primary, Gemini local corpus fallback.
 # NotebookLM requires NOTEBOOKLM_AUTH_JSON (browser cookies, expire ~2 weeks)
 # and NOTEBOOKLM_GOLD_NOTEBOOK_ID. When auth expires, the agent falls back

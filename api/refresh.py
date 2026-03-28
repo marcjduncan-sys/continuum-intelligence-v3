@@ -1305,6 +1305,105 @@ async def run_refresh(ticker: str) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Helper: format expanded data-provider sections for LLM prompts
+# ---------------------------------------------------------------------------
+
+def _format_expanded_data(gathered: dict, *, compact: bool = False) -> str:
+    """Build prompt sections for data-provider fields in *gathered*.
+
+    Parameters
+    ----------
+    gathered : dict
+        Output of ``gather_all_data()``.
+    compact : bool
+        If True, truncate large sections for the structure-update prompt
+        which has a tighter token budget.
+
+    Returns a string ready to append to the user_prompt. Empty string if
+    no expanded data is present (all providers unconfigured / errored).
+    """
+    parts: list[str] = []
+
+    # --- EODHD Fundamentals ---
+    fundamentals = gathered.get("fundamentals", {})
+    if fundamentals:
+        fin_stmts = fundamentals.get("financial_statements", {})
+        if fin_stmts:
+            # Compact mode: latest quarter only; full: up to 4 quarters
+            income = fin_stmts.get("income_quarterly", [])
+            balance = fin_stmts.get("balance_quarterly", [])
+            cashflow = fin_stmts.get("cashflow_quarterly", [])
+            limit = 1 if compact else 4
+            if income:
+                parts.append(f"\n## Financial Statements -- Income (quarterly, latest {limit}):")
+                parts.append(json.dumps(income[:limit], indent=2))
+            if balance:
+                parts.append(f"\n## Financial Statements -- Balance Sheet (quarterly, latest {limit}):")
+                parts.append(json.dumps(balance[:limit], indent=2))
+            if cashflow:
+                parts.append(f"\n## Financial Statements -- Cash Flow (quarterly, latest {limit}):")
+                parts.append(json.dumps(cashflow[:limit], indent=2))
+
+        analyst_est = fundamentals.get("analyst_estimates", {})
+        if analyst_est:
+            parts.append("\n## Analyst Consensus & Estimates (EODHD):")
+            parts.append(json.dumps(analyst_est, indent=2))
+
+        insider_txns = fundamentals.get("insider_transactions", [])
+        if insider_txns:
+            limit = 5 if compact else 15
+            parts.append(f"\n## Insider Transactions (latest {limit}):")
+            parts.append(json.dumps(insider_txns[:limit], indent=2))
+
+        analyst_ratings = fundamentals.get("analyst_ratings", {})
+        if analyst_ratings:
+            parts.append("\n## Analyst Ratings Summary:")
+            parts.append(json.dumps(analyst_ratings, indent=2))
+
+    # --- Alpha Vantage (cross-validation, lower priority) ---
+    av = gathered.get("alpha_vantage", {})
+    if av and not compact:
+        av_income = av.get("income_statement", {})
+        av_overview = av.get("company_overview", {})
+        if av_income:
+            parts.append("\n## Alpha Vantage Income Statement (cross-validation):")
+            reports = av_income.get("quarterlyReports", [])[:2]
+            parts.append(json.dumps(reports, indent=2))
+        if av_overview:
+            parts.append("\n## Alpha Vantage Company Overview:")
+            parts.append(json.dumps(av_overview, indent=2))
+
+    # --- RBA Yields ---
+    rba = gathered.get("rba_yields", {})
+    if rba:
+        parts.append("\n## RBA Yield Curve:")
+        parts.append(json.dumps(rba, indent=2))
+
+    # --- US Peer Comparables (Finnhub) ---
+    peers = gathered.get("us_peers", {})
+    if peers:
+        parts.append("\n## US Peer Analyst Sentiment (Finnhub):")
+        parts.append(json.dumps(peers, indent=2))
+
+    # --- Technical Indicators (Twelve Data) ---
+    ta = gathered.get("technical_indicators", {})
+    if ta:
+        parts.append("\n## Technical Indicators (Twelve Data):")
+        parts.append(json.dumps(ta, indent=2))
+
+    # --- Structured ASX Announcements ---
+    asx_json = gathered.get("asx_announcements_structured", [])
+    if asx_json and not compact:
+        limit = 10
+        parts.append(f"\n## ASX Announcements -- Structured (latest {limit}):")
+        parts.append(json.dumps(asx_json[:limit], indent=2))
+
+    if not parts:
+        return ""
+    return "\n".join(parts)
+
+
+# ---------------------------------------------------------------------------
 # Stage 2: Evidence specialists (Gemini)
 # ---------------------------------------------------------------------------
 
@@ -1358,6 +1457,7 @@ async def _run_evidence_specialists(
 ## Recent News Headlines:
 {json.dumps(news[:8], indent=2)}
 {macro_section}
+{_format_expanded_data(gathered)}
 
 Please assess each evidence card against this new data and return the updated assessment as JSON."""
 
@@ -1423,6 +1523,7 @@ async def _run_evidence_creation(
 ## Earnings/Results News:
 {json.dumps(earnings_news[:8], indent=2)}
 {macro_section}
+{_format_expanded_data(gathered)}
 
 Please create all 10 evidence domain cards for this stock based on the available data."""
 
@@ -2004,6 +2105,7 @@ async def _run_structure_update(
 
 ## Recent ASX Announcements:
 {json.dumps(gathered.get('announcements', [])[:5], indent=2)}
+{_format_expanded_data(gathered, compact=True)}
 
 Please provide updated structural sections as JSON."""
 

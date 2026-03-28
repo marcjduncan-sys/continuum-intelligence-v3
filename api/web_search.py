@@ -16,6 +16,8 @@ from xml.etree import ElementTree
 
 import httpx
 
+import data_providers
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -1079,7 +1081,9 @@ async def gather_all_data(
     Returns
     -------
     dict with keys: price_data, announcements, news, earnings_news,
-                    macro_context (or None).
+                    macro_context (or None), fundamentals,
+                    asx_announcements_structured, rba_yields, us_peers,
+                    technical_indicators, alpha_vantage, gathered_at.
     """
     # Core tasks (always run)
     price_task = fetch_yahoo_price(ticker)
@@ -1110,11 +1114,24 @@ async def gather_all_data(
     ]
     macro_task = web_search_macro(macro_queries) if macro_queries else None
 
+    # --- External data-provider tasks (graceful: skip if API key missing) ---
+    eodhd_task = data_providers.fetch_eodhd_fundamentals(ticker)
+    asx_json_task = data_providers.fetch_asx_announcements_json(ticker)
+    rba_task = data_providers.fetch_rba_yields()
+    finnhub_task = data_providers.fetch_finnhub_peers(ticker)
+    twelve_task = data_providers.fetch_twelve_data_ta(ticker)
+    # Alpha Vantage has tight rate limits (25/day). The function itself
+    # returns {} when the key is empty or the daily budget is exhausted.
+    av_task = data_providers.fetch_alpha_vantage(ticker)
+
+    provider_tasks = [eodhd_task, asx_json_task, rba_task, finnhub_task, twelve_task, av_task]
+
     # Gather everything in parallel
     all_tasks = [price_task, announcements_task, news_task, earnings_task]
     all_tasks.extend(commodity_tasks)
     if macro_task:
         all_tasks.append(macro_task)
+    all_tasks.extend(provider_tasks)
 
     results = await asyncio.gather(*all_tasks, return_exceptions=True)
 
@@ -1148,7 +1165,7 @@ async def gather_all_data(
             commodity_prices.append(r)
     offset += len(commodity_tasks)
 
-    # Unpack macro news result (last index, if present)
+    # Unpack macro news result (if present)
     macro_news: list = []
     if macro_task:
         r = results[offset]
@@ -1156,6 +1173,7 @@ async def gather_all_data(
             logger.error(f"Macro news fetch failed: {r}")
         elif isinstance(r, list):
             macro_news = r
+        offset += 1
 
     # Build macro_context block (None if no data available)
     macro_context = None
@@ -1166,11 +1184,39 @@ async def gather_all_data(
             "macro_news": macro_news[:8],
         }
 
+    # --- Unpack external data-provider results ---
+    # Order matches provider_tasks: eodhd, asx_json, rba, finnhub, twelve, av
+    _provider_labels = ["EODHD", "ASX JSON", "RBA yields", "Finnhub peers",
+                        "Twelve Data TA", "Alpha Vantage"]
+    _provider_defaults: list[dict | list] = [{}, [], {}, {}, {}, {}]
+    provider_results: list = []
+    for i, label in enumerate(_provider_labels):
+        r = results[offset + i]
+        if isinstance(r, Exception):
+            logger.error(f"{label} fetch failed for {ticker}: {r}")
+            provider_results.append(_provider_defaults[i])
+        else:
+            provider_results.append(r)
+
+    fundamentals = provider_results[0]          # dict from EODHD
+    asx_announcements_json = provider_results[1] # list from ASX direct
+    rba_yields = provider_results[2]            # dict from RBA
+    us_peers = provider_results[3]              # dict from Finnhub
+    technical_indicators = provider_results[4]  # dict from Twelve Data
+    alpha_vantage = provider_results[5]         # dict from Alpha Vantage
+
     return {
         "price_data": price_data,
         "announcements": announcements,
         "news": news,
         "earnings_news": earnings_news,
         "macro_context": macro_context,
+        # --- Phase: Data Source Expansion ---
+        "fundamentals": fundamentals,
+        "asx_announcements_structured": asx_announcements_json,
+        "rba_yields": rba_yields,
+        "us_peers": us_peers,
+        "technical_indicators": technical_indicators,
+        "alpha_vantage": alpha_vantage,
         "gathered_at": datetime.now(timezone.utc).isoformat(),
     }
