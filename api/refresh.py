@@ -2869,4 +2869,3 @@ def _merge_initiation(
     updated["_lastRefreshed"] = datetime.now(timezone.utc).isoformat()
 
     return updated
-   
