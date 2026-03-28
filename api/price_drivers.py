@@ -555,7 +555,7 @@ Your goal is to build the strongest possible evidence pack explaining what most 
 Do not write the final client note. Your job here is to gather, sort, challenge and rank candidate explanations.
 
 Focus on six buckets:
-1. company-specific catalysts (broker upgrades/downgrades are the HIGHEST PRIORITY signal -- a single broker action can move a mid-cap stock 5-10% in a session)
+1. company-specific catalysts (broker upgrades/downgrades are the HIGHEST PRIORITY signal; a single broker action can move a mid-cap stock 5-10% in a session)
 2. sector and peer sympathy
 3. macro drivers
 4. flow and microstructure
@@ -597,7 +597,8 @@ Return valid JSON only with:
 - missing evidence
 - conflicting evidence
 
-Do not write like a client note yet. Build the evidence pack only."""
+Do not write like a client note yet. Build the evidence pack only.
+Never use em-dashes (—) or double hyphens (--) in any prose. Use en-dashes, commas, colons, semicolons, or restructured sentences instead."""
 
 
 # ---------------------------------------------------------------------------
@@ -638,7 +639,8 @@ Return valid JSON only:
   "key_missing_evidence": []
 }
 
-Be direct, sceptical and evidence-led."""
+Be direct, sceptical and evidence-led.
+Never use em-dashes (—) or double hyphens (--) in any prose. Use en-dashes, commas, colons, semicolons, or restructured sentences instead."""
 
 
 # ---------------------------------------------------------------------------
@@ -658,6 +660,7 @@ Required style:
 - No mention of prompts, layers, schemas, workflows or scoring models
 - No generic company background
 - No filler or repeated caveats
+- Never use em-dashes or double hyphens (--). Use en-dashes, commas, colons, semicolons, or restructured sentences instead
 - Distinguish Data, Calculation, Inference and Speculation where material
 - Sound like a strategist or PM writing to a client
 
@@ -746,6 +749,7 @@ The note must:
 - sound commercial, precise and sceptical
 - distinguish evidence from inference
 - avoid jargon where plain English is better
+- never use em-dashes (—) or double hyphens (--); use en-dashes, commas, colons, semicolons, or restructured sentences instead
 
 Do not:
 - mention the workflow, prompts, layers, JSON, schema, scoring engine, or internal process
