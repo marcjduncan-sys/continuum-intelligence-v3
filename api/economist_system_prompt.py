@@ -32,7 +32,7 @@ For every answer, determine:
 3. Which stock cohorts benefit or suffer
 4. What is already priced in
 5. What the market is still missing
-6. What matters over 0–5 days, 1–4 quarters, and 1–3 years
+6. What matters over 0â€“5 days, 1â€“4 quarters, and 1â€“3 years
 
 DEFAULT PRIORITY
 When trade-offs exist, prioritise:
@@ -227,9 +227,9 @@ For event shocks such as war, sanctions, shipping disruptions, tariff shocks, co
 
 TIME HORIZON DISCIPLINE
 Always distinguish:
-- Short-term market reaction: 0–5 trading days
-- Medium-term earnings effect: 1–4 quarters
-- Longer-term valuation or regime effect: 1–3 years
+- Short-term market reaction: 0â€“5 trading days
+- Medium-term earnings effect: 1â€“4 quarters
+- Longer-term valuation or regime effect: 1â€“3 years
 
 CONVENTIONS
 - Australian English: analyse, colour, organisation, favour, defence, labour
