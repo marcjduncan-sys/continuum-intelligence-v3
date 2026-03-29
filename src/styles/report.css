@@ -1353,9 +1353,9 @@
 .tw-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 8px 12px;
-    margin-bottom: 6px;
+    border-radius: 4px;
+    padding: 12px var(--space-lg);
+    margin-bottom: 10px;
 }
 .tw-card.tw-resolved {
     opacity: 0.6;
@@ -1368,44 +1368,44 @@
 .tw-header {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 4px;
+    align-items: center;
+    margin-bottom: var(--space-sm);
 }
 .tw-date {
     font-family: var(--font-data);
-    font-size: 0.65rem; font-weight: 700;
+    font-size: 0.72rem; font-weight: 700;
     color: var(--text-secondary);
 }
 .tw-name {
-    font-size: 0.6rem; font-weight: 600;
+    font-size: 0.68rem; font-weight: 600;
     color: var(--text-muted);
     text-transform: uppercase; letter-spacing: 0.04em;
 }
 .tw-conditions {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
+    gap: 10px;
 }
 .tw-condition {
     background: var(--bg-elevated);
-    border-radius: 2px;
-    padding: 4px 8px;
+    border-radius: 3px;
+    padding: 6px 12px;
 }
 .tw-cond-if {
-    font-size: 0.65rem; font-weight: 600;
-    margin-bottom: 2px;
+    font-size: 0.68rem; font-weight: 600;
+    margin-bottom: 3px;
 }
 .tw-cond-if.positive { color: var(--signal-green); }
 .tw-cond-if.negative { color: var(--signal-red); }
 .tw-cond-if.resolved { color: var(--text-muted); font-style: italic; }
 .tw-cond-then {
-    font-size: 0.7rem; color: var(--text-secondary);
-    line-height: 1.35;
+    font-size: 0.72rem; color: var(--text-secondary);
+    line-height: 1.4;
 }
 .tw-source {
-    font-size: 0.55rem; color: var(--text-muted);
+    font-size: 0.6rem; color: var(--text-muted);
     font-style: italic;
-    margin-top: 3px;
+    margin-top: 6px;
 }
 
 /* --- Gaps Table --- */
