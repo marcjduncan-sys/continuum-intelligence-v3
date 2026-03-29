@@ -1,7 +1,7 @@
 /* ============================================================
    STRATEGIST CHAT -- Docked right-rail panel (mode-switched with Analyst/PM)
    All classes use econ- prefix. Zero overlap with ap- or pm- classes.
-   Accent: muted blue-grey (#6B8FA3)
+   Accent: muted blue-grey (var(--accent-strat))
    ============================================================ */
 
 /* --- Panel positioning (mirrors .pm-panel) --- */
@@ -53,7 +53,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6B8FA3;
+    color: var(--accent-strat);
     flex-shrink: 0;
 }
 .econ-header-icon svg {
@@ -68,7 +68,7 @@
     font-size: 0.62rem;
     font-weight: 700;
     letter-spacing: 0.12em;
-    color: #6B8FA3;
+    color: var(--accent-strat);
     line-height: 1;
 }
 .econ-header-actions {
@@ -251,7 +251,7 @@
     transition: background 0.12s;
 }
 .econ-conversation-item:hover {
-    background: rgba(107, 143, 163, 0.06);
+    background: rgba(91, 141, 239, 0.06);
 }
 .econ-conv-title {
     font-size: 0.75rem;
@@ -304,7 +304,7 @@
     font-weight: 700;
     letter-spacing: 0.10em;
     text-transform: uppercase;
-    color: #6B8FA3;
+    color: var(--accent-strat);
     margin-bottom: 10px;
 }
 .econ-welcome-text {
@@ -319,8 +319,8 @@
     color: var(--text-muted);
     margin-bottom: 24px;
     padding: 10px 14px;
-    background: rgba(107, 143, 163, 0.05);
-    border-left: 2px solid rgba(107, 143, 163, 0.3);
+    background: rgba(91, 141, 239, 0.05);
+    border-left: 2px solid rgba(91, 141, 239, 0.3);
     border-radius: 0 4px 4px 0;
 }
 .econ-suggestions {
@@ -342,8 +342,8 @@
     width: 100%;
 }
 .econ-suggestion:hover {
-    background: rgba(107, 143, 163, 0.08);
-    border-color: rgba(107, 143, 163, 0.25);
+    background: rgba(91, 141, 239, 0.08);
+    border-color: rgba(91, 141, 239, 0.25);
     color: var(--text-primary);
 }
 
@@ -372,7 +372,7 @@
     color: var(--text-muted);
 }
 .econ-msg-role.economist {
-    color: #6B8FA3;
+    color: var(--accent-strat);
 }
 .econ-msg-time {
     font-family: var(--font-data);
@@ -440,7 +440,7 @@
     font-weight: 700;
     letter-spacing: 0.10em;
     text-transform: uppercase;
-    color: #6B8FA3;
+    color: var(--accent-strat);
 }
 .econ-typing-dots {
     display: flex;
@@ -451,7 +451,7 @@
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    background: #6B8FA3;
+    background: var(--accent-strat);
     animation: econ-dot-pulse 1.4s infinite ease-in-out;
 }
 .econ-typing-dot:nth-child(1) { animation-delay: 0s; }
@@ -500,7 +500,7 @@
     overflow-y: auto;
 }
 .econ-input:focus {
-    border-color: rgba(107, 143, 163, 0.5);
+    border-color: rgba(91, 141, 239, 0.5);
 }
 .econ-input::placeholder {
     color: rgba(255, 255, 255, 0.20);
@@ -525,7 +525,7 @@
     align-items: center;
     justify-content: center;
     border: none;
-    background: #6B8FA3;
+    background: var(--accent-strat);
     border-radius: 4px;
     cursor: pointer;
     color: #0B1220;
@@ -580,7 +580,7 @@
     color: #A0AEC0;
 }
 [data-theme="light"] .econ-input:focus {
-    border-color: #6B8FA3;
+    border-color: var(--accent-strat);
 }
 [data-theme="light"] .econ-msg-row {
     border-bottom-color: #F0F1F4;
@@ -606,8 +606,8 @@
     color: #4A5568;
 }
 [data-theme="light"] .econ-suggestion:hover {
-    background: rgba(107, 143, 163, 0.06);
-    border-color: rgba(107, 143, 163, 0.25);
+    background: rgba(91, 141, 239, 0.06);
+    border-color: rgba(91, 141, 239, 0.25);
     color: #1A1F2E;
 }
 [data-theme="light"] .econ-shortcut-hint {
@@ -627,7 +627,7 @@
     border-bottom-color: #F0F1F4;
 }
 [data-theme="light"] .econ-conversation-item:hover {
-    background: rgba(107, 143, 163, 0.04);
+    background: rgba(91, 141, 239, 0.04);
 }
 [data-theme="light"] .econ-policy-path {
     color: #718096;
@@ -652,7 +652,7 @@
    ============================================================ */
 
 .econ-streaming {
-    border-left: 2px solid #6B8FA3;
+    border-left: 2px solid var(--accent-strat);
     padding-left: 12px;
 }
 
@@ -660,7 +660,7 @@
     content: '\25AE';
     display: inline;
     animation: econ-cursor-blink 0.8s step-end infinite;
-    color: #6B8FA3;
+    color: var(--accent-strat);
     font-weight: bold;
     margin-left: 1px;
 }
@@ -671,9 +671,9 @@
 }
 
 [data-theme="light"] .econ-streaming {
-    border-left-color: #4A6F82;
+    border-left-color: var(--accent-strat);
 }
 
 [data-theme="light"] .econ-streaming::after {
-    color: #4A6F82;
+    color: var(--accent-strat);
 }
