@@ -191,10 +191,16 @@ async def debug_sources() -> dict:
     )
 
     # RBA
+    _rba_headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,*/*;q=0.8",
+        "Accept-Language": "en-AU,en;q=0.9",
+    }
     await _probe(
         "rba",
         "https://www.rba.gov.au/statistics/tables/csv/a02hist.csv",
-        headers=_ua,
+        headers=_rba_headers,
     )
 
     # ABS
@@ -208,7 +214,7 @@ async def debug_sources() -> dict:
     # BIS
     await _probe(
         "bis",
-        "https://stats.bis.org/api/v2/data/WS_CBPOL/M.AU",
+        "https://stats.bis.org/api/v1/data/WS_CBPOL/D..",
         params={"format": "csv", "detail": "dataonly"},
         headers={"Accept": "text/csv", **_ua},
     )
@@ -334,17 +340,20 @@ async def macro_snapshot() -> dict:
                 "us_yield_curve_2s10s_bps": _sv("FRED", "T10Y2Y"),
                 "vix": _sv("FRED", "VIXCLS"),
                 "us_hy_spread_bps": _sv("FRED", "BAMLH0A0HYM2"),
-                "aud_usd": _pv("AUD/USD") or _sv("RBA", "AUDUSD"),
+                "aud_usd": _pv("AUD/USD") or _sv("RBA", "AUDUSD") or _sv("FRED", "DEXUSAL"),
                 "nzd_usd": _pv("NZD/USD"),
                 "aud_nzd": _pv("AUD/NZD"),
                 "gold_usd": _pv("XAU/USD") or _sv("RBA", "GOLD"),
                 "wti_usd": _sv("EIA", "WTI_SPOT"),
                 "brent_usd": _sv("EIA", "BRENT_SPOT"),
-                "iron_ore_usd_tonne": _sv("RBA", "IRON_ORE"),
-                "copper_usd_lb": _sv("RBA", "COPPER"),
+                "iron_ore_usd_tonne": _sv("RBA", "IRON_ORE") or _sv("FRED", "PIORECRUSDM"),
+                "copper_usd_lb": _sv("RBA", "COPPER") or (
+                    round(_sv("FRED", "PCOPPUSDM") / 2204.62, 4)
+                    if _sv("FRED", "PCOPPUSDM") else None
+                ),
             },
             "central_banks": {
-                "rba_cash_rate": _sv("RBA", "CASH_RATE"),
+                "rba_cash_rate": _sv("RBA", "CASH_RATE") or _sv("FRED", "IRSTCI01AUM156N"),
                 "rba_last_decision_date": None,
                 "rba_last_action": None,
                 "rbnz_ocr": _sv("BIS", "CBPOL_NZ"),
@@ -358,7 +367,7 @@ async def macro_snapshot() -> dict:
             "yield_curves": {
                 "au_2y": _sv("RBA", "AU_2Y"),
                 "au_5y": _sv("RBA", "AU_5Y"),
-                "au_10y": _sv("RBA", "AU_10Y"),
+                "au_10y": _sv("RBA", "AU_10Y") or _sv("FRED", "IRLTLT01AUM156N"),
                 "us_2y": _sv("FRED", "DGS2"),
                 "us_5y": _sv("FRED", "DGS5"),
                 "us_10y": _sv("FRED", "DGS10"),
@@ -367,6 +376,7 @@ async def macro_snapshot() -> dict:
             },
             "australia_macro": {
                 "cpi_yoy": _sv("ABS", "CPI_YOY") or _sv("RBA", "CPI_YOY"),
+                "cpi_index": _sv("FRED", "AUSCPIALLQINMEI"),
                 "unemployment": _sv("ABS", "UNEMPLOYMENT"),
                 "gdp_growth": _sv("ABS", "GDP_GROWTH"),
                 "credit_growth": _sv("RBA", "CREDIT_GROWTH"),

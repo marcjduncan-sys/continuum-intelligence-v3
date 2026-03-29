@@ -43,6 +43,9 @@ SERIES_IDS: list[str] = [
     "DTWEXBGS",
     # Housing and consumer
     "MORTGAGE30US", "HOUST", "RSXFS",
+    # Australia (RBA fallback via FRED)
+    "DEXUSAL", "IRLTLT01AUM156N", "PIORECRUSDM",
+    "PCOPPUSDM", "AUSCPIALLQINMEI", "IRSTCI01AUM156N",
 ]
 
 # Frequency hints for metadata
@@ -58,6 +61,8 @@ _FREQUENCY_MAP: dict[str, str] = {
     "DTWEXBGS": "D",
     "MORTGAGE30US": "W", "HOUST": "M", "RSXFS": "M",
     "INDPRO": "M",
+    "DEXUSAL": "D", "IRLTLT01AUM156N": "M", "PIORECRUSDM": "M",
+    "PCOPPUSDM": "M", "AUSCPIALLQINMEI": "Q", "IRSTCI01AUM156N": "M",
 }
 
 _UNIT_MAP: dict[str, str] = {
@@ -72,6 +77,8 @@ _UNIT_MAP: dict[str, str] = {
     "DTWEXBGS": "index",
     "MORTGAGE30US": "%", "HOUST": "thousands", "RSXFS": "USD_mn",
     "INDPRO": "index",
+    "DEXUSAL": "USD", "IRLTLT01AUM156N": "%", "PIORECRUSDM": "USD/tonne",
+    "PCOPPUSDM": "USD/tonne", "AUSCPIALLQINMEI": "index", "IRSTCI01AUM156N": "%",
 }
 
 _DESCRIPTION_MAP: dict[str, str] = {
@@ -98,6 +105,12 @@ _DESCRIPTION_MAP: dict[str, str] = {
     "HOUST": "US Housing Starts",
     "RSXFS": "US Retail Sales ex Food Services",
     "INDPRO": "US Industrial Production",
+    "DEXUSAL": "AUD/USD Exchange Rate (Fed)",
+    "IRLTLT01AUM156N": "Australia 10Y Government Bond Yield (OECD)",
+    "PIORECRUSDM": "Iron Ore Price USD/tonne (IMF)",
+    "PCOPPUSDM": "Copper Price USD/tonne (IMF)",
+    "AUSCPIALLQINMEI": "Australia CPI All Items Index (OECD)",
+    "IRSTCI01AUM156N": "Australia Short-Term Interest Rate (OECD)",
 }
 
 

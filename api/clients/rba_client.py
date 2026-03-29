@@ -7,6 +7,12 @@ Stores results in macro_series (source='RBA') and economic_calendar.
 RBA publishes CSV/XLS files at known URLs. No API key required.
 Uses defensive column-name-based parsing as the RBA occasionally
 changes table format.
+
+NOTE: RBA website (www.rba.gov.au) is blocked from Fly.io cloud IPs
+by Akamai WAF (HTTP 403 / timeouts on CSV, XLS, HTML, and RSS endpoints).
+Australian macro data is sourced via FRED fallback series until a proxy
+solution is implemented. The refresh function skips gracefully with a
+log warning when the RBA is unreachable.
 """
 
 import asyncio
@@ -484,7 +490,34 @@ async def refresh_all_rba(pool: Any) -> dict[str, int]:
     start = datetime.now(timezone.utc)
     results: dict[str, int] = {}
 
+    # Pre-flight check: detect Akamai WAF block (common on cloud provider IPs)
     async with httpx.AsyncClient(timeout=TIMEOUT, follow_redirects=True) as client:
+        try:
+            probe = await client.get(
+                "https://www.rba.gov.au/statistics/tables/csv/a02hist.csv",
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/122.0.0.0 Safari/537.36",
+                    "Accept": "text/html,application/xhtml+xml,*/*;q=0.8",
+                    "Accept-Language": "en-AU,en;q=0.9",
+                },
+            )
+            if probe.status_code == 403 or "Access Denied" in probe.text[:500]:
+                logger.warning(
+                    "RBA refresh skipped: Akamai WAF blocking this IP (HTTP %d). "
+                    "Australian data will be sourced from FRED fallback series.",
+                    probe.status_code,
+                )
+                return {}
+        except (httpx.TimeoutException, httpx.ConnectError) as exc:
+            logger.warning(
+                "RBA refresh skipped: connectivity failure (%s). "
+                "Australian data will be sourced from FRED fallback series.",
+                type(exc).__name__,
+            )
+            return {}
+
         for table in _TABLES:
             try:
                 count = await _fetch_rba_table(table, pool, client)

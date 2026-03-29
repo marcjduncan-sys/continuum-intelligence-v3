@@ -27,11 +27,20 @@ BASE_URL = "https://data.api.abs.gov.au/rest/data"
 TIMEOUT = httpx.Timeout(30.0, connect=15.0)
 
 # Dataflow configurations
-# Each entry maps to an ABS dataflow with a key filter and output mapping
+# Each entry maps to an ABS dataflow with a key filter and output mapping.
+#
+# Dimension structures per dataflow (from ABS SDMX structure queries):
+#   CPI v2.0.0:    MEASURE.INDEX.TSEST.REGION.FREQ (5 dims)
+#   LF v1.0.0:     MEASURE.SEX.AGE.TSEST.REGION.FREQ (6 dims)
+#   RT v1.0.0:     MEASURE.INDUSTRY.TSEST.REGION.FREQ (5 dims, dataset CEASED but still serving)
+#   MERCH_EXP:     COMMODITY_SITC.COUNTRY_DEST.STATE_ORIGIN.FREQ (4 dims)
+#   ANA_AGG:       MEASURE.DATA_ITEM.TSEST.REGION.FREQ (5 dims)
 _DATAFLOWS: list[dict[str, Any]] = [
     {
-        "dataflow": "ABS,CPI,1.1.0",
-        "key": "..10001.10.Q",
+        # CPI YoY: Measure=1 (% change from corresponding quarter of previous year),
+        # Index=10001 (All groups), TSEST=10 (Original), Region=50 (Weighted avg 8 capitals), Freq=Q
+        "dataflow": "ABS,CPI,2.0.0",
+        "key": "1.10001.10.50.Q",
         "series_id": "CPI_YOY",
         "description": "Australia CPI - All Groups YoY",
         "frequency": "Q",
@@ -39,8 +48,9 @@ _DATAFLOWS: list[dict[str, Any]] = [
         "format": "csv",
     },
     {
-        "dataflow": "ABS,CPI,1.1.0",
-        "key": "..10001.20.Q",
+        # CPI QoQ: Measure=2 (% change from previous quarter)
+        "dataflow": "ABS,CPI,2.0.0",
+        "key": "2.10001.10.50.Q",
         "series_id": "CPI_QOQ",
         "description": "Australia CPI - All Groups QoQ",
         "frequency": "Q",
@@ -48,8 +58,10 @@ _DATAFLOWS: list[dict[str, Any]] = [
         "format": "csv",
     },
     {
+        # Unemployment rate: Measure=M13, Sex=3 (Persons), Age=1599 (15+),
+        # TSEST=20 (Seasonally adjusted), Region=AUS, Freq=M
         "dataflow": "ABS,LF,1.0.0",
-        "key": "..M13.20.Q",
+        "key": "M13.3.1599.20.AUS.M",
         "series_id": "UNEMPLOYMENT",
         "description": "Australia Unemployment Rate",
         "frequency": "M",
@@ -57,8 +69,9 @@ _DATAFLOWS: list[dict[str, Any]] = [
         "format": "csv",
     },
     {
+        # Participation rate: Measure=M14, Sex=3, Age=1599, TSEST=20, Region=AUS, Freq=M
         "dataflow": "ABS,LF,1.0.0",
-        "key": "..M13.10.Q",
+        "key": "M14.3.1599.20.AUS.M",
         "series_id": "PARTICIPATION_RATE",
         "description": "Australia Labour Force Participation Rate",
         "frequency": "M",
@@ -66,8 +79,11 @@ _DATAFLOWS: list[dict[str, Any]] = [
         "format": "csv",
     },
     {
+        # Retail MoM: Measure=M2 (% change from prev period), Industry=20 (Total),
+        # TSEST=20 (SA), Region=AUS, Freq=M
+        # Note: RT dataset is marked CEASED but still serving historical data
         "dataflow": "ABS,RT,1.0.0",
-        "key": "..20.Q",
+        "key": "M2.20.20.AUS.M",
         "series_id": "RETAIL_MOM",
         "description": "Australia Retail Turnover MoM",
         "frequency": "M",
@@ -75,21 +91,25 @@ _DATAFLOWS: list[dict[str, Any]] = [
         "format": "csv",
     },
     {
-        "dataflow": "ABS,BA,1.0.0",
-        "key": "..1.TOT.Q",
-        "series_id": "BUILDING_APPROVALS",
-        "description": "Australia Building Approvals",
-        "frequency": "M",
-        "unit": "number",
+        # GDP growth QoQ: Measure=M2 (% change from prev quarter),
+        # Data item=GPM (GDP at market prices), TSEST=20 (SA), Region=AUS, Freq=Q
+        "dataflow": "ABS,ANA_AGG,1.0.0",
+        "key": "M2.GPM.20.AUS.Q",
+        "series_id": "GDP_GROWTH",
+        "description": "Australia GDP Growth QoQ",
+        "frequency": "Q",
+        "unit": "%",
         "format": "csv",
     },
     {
+        # Total merchandise exports: COMMODITY_SITC=TOT, COUNTRY_DEST=TOT,
+        # STATE_ORIGIN=TOT (national), Freq=M
         "dataflow": "ABS,MERCH_EXP,1.0.0",
-        "key": "..TOT..Q",
+        "key": "TOT.TOT.TOT.M",
         "series_id": "MERCH_EXPORTS",
         "description": "Australia Merchandise Exports",
         "frequency": "M",
-        "unit": "AUD_mn",
+        "unit": "AUD",
         "format": "csv",
     },
 ]

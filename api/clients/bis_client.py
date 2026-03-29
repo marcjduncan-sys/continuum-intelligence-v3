@@ -18,7 +18,7 @@ from clients.sdmx_parser import parse_sdmx_csv, extract_latest_from_csv
 
 logger = logging.getLogger(__name__)
 
-BASE_URL = "https://stats.bis.org/api/v2"
+BASE_URL = "https://stats.bis.org/api/v1"
 TIMEOUT = httpx.Timeout(30.0, connect=15.0)
 
 # ISO country codes used in BIS key dimensions
@@ -54,7 +54,7 @@ _DATASETS: list[dict[str, Any]] = [
     },
     {
         "dataset": "WS_CREDIT_GAP",
-        "key": "Q..B.CG",
+        "key": "Q..",
         "description_prefix": "Credit-to-GDP Gap",
         "series_prefix": "CREDIT_GAP",
         "unit": "pp",
@@ -84,7 +84,7 @@ _DATASETS: list[dict[str, Any]] = [
     },
     {
         "dataset": "WS_EER",
-        "key": "M..R.B",
+        "key": "M.R.B.",
         "description_prefix": "Real Effective Exchange Rate",
         "series_prefix": "REER",
         "unit": "index",
