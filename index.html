@@ -53,7 +53,6 @@
             <a href="#personalisation" data-nav="personalisation">Personalisation</a>
             <a href="#memory" data-nav="memory">Journal</a>
             <a href="#pm" data-nav="pm">PM</a>
-            <a href="#economist" data-nav="economist">Economist</a>
             <a href="#about" data-nav="about">About</a>
         </div>
         <div class="nav-actions">
@@ -592,12 +591,7 @@
      ============================================================ -->
 <div class="page" id="page-pm"></div>
 
-<!-- PAGE: Economist Chat -->
-<div class="page" id="page-economist">
-    <div class="econ-chat-container" id="econChatContainer">
-        <!-- Economist Chat UI rendered by src/features/economist-chat.js -->
-    </div>
-</div>
+<!-- Strategist Chat: docked in right rail panel (see #econ-panel below) -->
 
 <!-- PAGE: Ops Dashboard (URL-only, no nav link) -->
 <div class="page" id="page-ops"></div>
@@ -805,6 +799,13 @@
         </div>
     </div>
 
+</aside>
+
+<!-- Strategist (Macro) Panel -->
+<aside id="econ-panel" class="econ-panel" aria-label="Macro Strategist" role="complementary" style="display:none">
+    <div class="econ-chat-container" id="econChatContainer">
+        <!-- Strategist Chat UI rendered by src/features/economist-chat.js -->
+    </div>
 </aside>
 
 <!-- Mobile PM FAB -->

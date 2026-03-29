@@ -1,16 +1,33 @@
 /* ============================================================
-   ECONOMIST CHAT -- Full-page macro chat within #page-economist
+   STRATEGIST CHAT -- Docked right-rail panel (mode-switched with Analyst/PM)
    All classes use econ- prefix. Zero overlap with ap- or pm- classes.
    Accent: muted blue-grey (#6B8FA3)
    ============================================================ */
 
-/* --- Container (fills the page) --- */
-#page-economist .econ-chat-container {
+/* --- Panel positioning (mirrors .pm-panel) --- */
+.econ-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--analyst-panel-width);
+    z-index: var(--analyst-panel-z);
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 56px);
-    max-width: 860px;
-    margin: 0 auto;
+    background: var(--analyst-panel-bg);
+    border-left: 1px solid var(--analyst-panel-border);
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+}
+.econ-panel.econ-panel-open {
+    transform: translateX(0);
+}
+
+/* --- Container (fills the panel) --- */
+.econ-panel .econ-chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     position: relative;
 }
 
@@ -74,13 +91,28 @@
     border-radius: 4px;
     transition: color 0.15s, background 0.15s;
 }
+.econ-collapse-btn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-muted);
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
 .econ-history-btn:hover,
-.econ-clear-btn:hover {
+.econ-clear-btn:hover,
+.econ-collapse-btn:hover {
     color: var(--text-primary);
     background: rgba(255, 255, 255, 0.06);
 }
 .econ-history-btn svg,
-.econ-clear-btn svg {
+.econ-clear-btn svg,
+.econ-collapse-btn svg {
     width: 14px;
     height: 14px;
 }
@@ -517,10 +549,15 @@
    ============================================================ */
 
 @media (max-width: 768px) {
-    #page-economist .econ-chat-container {
+    .econ-panel .econ-chat-container {
         max-width: 100%;
     }
     .econ-sidebar {
+        width: 100%;
+    }
+}
+@media (max-width: 1024px) {
+    .econ-panel {
         width: 100%;
     }
 }

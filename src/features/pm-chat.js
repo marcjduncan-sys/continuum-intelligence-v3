@@ -99,8 +99,9 @@ function _restoreFromDB() {
 // ============================================================
 
 var _analystPanel  = null;
-var _modeSwitches  = [];   // all mode-switch containers (analyst + pm header)
-var _currentMode   = 'analyst'; // 'analyst' | 'pm'
+var _econPanel     = null;
+var _modeSwitches  = [];   // all mode-switch containers (analyst + pm + strat header)
+var _currentMode   = 'analyst'; // 'analyst' | 'pm' | 'strategist'
 
 function _getRailMode() { return _currentMode; }
 
@@ -121,34 +122,46 @@ function switchRailMode(mode) {
 
     _syncAllModeSwitches(mode);
 
+    // Hide all panels first
+    if (_analystPanel) {
+        _analystPanel.classList.remove('ap-open');
+        _analystPanel.style.display = 'none';
+    }
+    if (panel) {
+        panel.classList.remove('pm-open');
+        panel.style.display = 'none';
+    }
+    if (_econPanel) {
+        _econPanel.classList.remove('econ-panel-open');
+        _econPanel.style.display = 'none';
+    }
+
+    // Show the selected panel
     if (mode === 'analyst') {
-        // Show analyst, hide PM
         if (_analystPanel) {
             _analystPanel.style.display = '';
             _analystPanel.classList.add('ap-open');
         }
-        if (panel) {
-            panel.classList.remove('pm-open');
-            panel.style.display = 'none';
-        }
-        document.body.classList.add('analyst-panel-open');
-        // Show PM FAB on mobile when analyst is active (allows quick switch)
         if (fab) fab.style.display = window.innerWidth < 1024 ? '' : 'none';
-    } else {
-        // Show PM, hide analyst
-        if (_analystPanel) {
-            _analystPanel.classList.remove('ap-open');
-            _analystPanel.style.display = 'none';
-        }
+    } else if (mode === 'pm') {
         if (panel) {
             panel.style.display = '';
             panel.classList.add('pm-open');
         }
-        document.body.classList.add('analyst-panel-open');
         if (fab) fab.style.display = 'none';
         renderConversation();
         if (inputEl) inputEl.focus();
+    } else if (mode === 'strategist') {
+        if (_econPanel) {
+            _econPanel.style.display = '';
+            _econPanel.classList.add('econ-panel-open');
+        }
+        if (fab) fab.style.display = 'none';
+        // Trigger strategist init if not yet done
+        if (window._initStrategistPanel) window._initStrategistPanel();
     }
+
+    document.body.classList.add('analyst-panel-open');
 
     try { localStorage.setItem('ci_rail_mode', mode); } catch(e) { // Expected: localStorage may be unavailable in restricted environments
     }
@@ -162,7 +175,8 @@ function _createModeSwitch(activeMode) {
     sw.setAttribute('aria-label', 'Panel mode');
     sw.innerHTML =
         '<button class="rail-mode-btn" data-mode="analyst" role="tab">Analyst</button>' +
-        '<button class="rail-mode-btn" data-mode="pm" role="tab">PM</button>';
+        '<button class="rail-mode-btn" data-mode="pm" role="tab">PM</button>' +
+        '<button class="rail-mode-btn" data-mode="strategist" role="tab">Strat</button>';
 
     // Set initial active state
     sw.querySelectorAll('.rail-mode-btn').forEach(function(btn) {
@@ -208,6 +222,7 @@ function _createModeSwitch(activeMode) {
 
 function _injectModeSwitch() {
     _analystPanel = document.getElementById('analyst-panel');
+    _econPanel = document.getElementById('econ-panel');
     if (!_analystPanel) return;
 
     // Inject into analyst header
@@ -229,6 +244,9 @@ function _injectModeSwitch() {
             pmHeader.insertBefore(pmSw, pmHeaderLeft.nextSibling);
         }
     }
+
+    // Expose switchRailMode globally for the Strategist panel collapse button
+    window.switchRailMode = switchRailMode;
 }
 
 // ============================================================

@@ -54,7 +54,7 @@ _DATASETS: list[dict[str, Any]] = [
     },
     {
         "dataset": "WS_CREDIT_GAP",
-        "key": "Q..",
+        "key": "Q..B",
         "description_prefix": "Credit-to-GDP Gap",
         "series_prefix": "CREDIT_GAP",
         "unit": "pp",

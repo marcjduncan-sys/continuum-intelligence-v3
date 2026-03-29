@@ -319,6 +319,28 @@ async def macro_snapshot() -> dict:
                 return float(rec["last_value"])
             return None
 
+        def _spv(source: str, sid: str) -> float | None:
+            """Get previous_value for a source/series_id pair."""
+            rec = series.get((source, sid))
+            if rec and rec.get("previous_value") is not None:
+                return float(rec["previous_value"])
+            return None
+
+        def _yoy_pct(source: str, sid: str) -> float | None:
+            """Compute y/y percentage change from last and previous index values."""
+            curr = _sv(source, sid)
+            prev = _spv(source, sid)
+            if curr is not None and prev is not None and prev != 0:
+                return round((curr - prev) / prev * 100, 2)
+            return None
+
+        def _to_bps(source: str, sid: str) -> float | None:
+            """Convert a percentage value to basis points (* 100)."""
+            val = _sv(source, sid)
+            if val is not None:
+                return round(val * 100, 1)
+            return None
+
         def _pv(symbol: str) -> float | None:
             """Get latest price for a symbol."""
             rec = prices.get(symbol)
@@ -337,13 +359,13 @@ async def macro_snapshot() -> dict:
             "timestamp": now.isoformat(),
             "data_staleness_warnings": stale_warnings[:10],
             "regime_signals": {
-                "us_yield_curve_2s10s_bps": _sv("FRED", "T10Y2Y"),
+                "us_yield_curve_2s10s_bps": _to_bps("FRED", "T10Y2Y"),
                 "vix": _sv("FRED", "VIXCLS"),
-                "us_hy_spread_bps": _sv("FRED", "BAMLH0A0HYM2"),
+                "us_hy_spread_bps": _to_bps("FRED", "BAMLH0A0HYM2"),
                 "aud_usd": _pv("AUD/USD") or _sv("RBA", "AUDUSD") or _sv("FRED", "DEXUSAL"),
                 "nzd_usd": _pv("NZD/USD"),
                 "aud_nzd": _pv("AUD/NZD"),
-                "gold_usd": _pv("XAU/USD") or _sv("RBA", "GOLD"),
+                "gold_usd": _pv("XAU/USD") or _sv("RBA", "GOLD") or _pv("XAU"),
                 "wti_usd": _sv("EIA", "WTI_SPOT"),
                 "brent_usd": _sv("EIA", "BRENT_SPOT"),
                 "iron_ore_usd_tonne": _sv("RBA", "IRON_ORE") or _sv("FRED", "PIORECRUSDM"),
@@ -375,8 +397,8 @@ async def macro_snapshot() -> dict:
                 "us_10y_breakeven": _sv("FRED", "T10YIE"),
             },
             "australia_macro": {
-                "cpi_yoy": _sv("ABS", "CPI_YOY") or _sv("RBA", "CPI_YOY"),
-                "cpi_index": _sv("FRED", "AUSCPIALLQINMEI"),
+                "cpi_yoy_pct": _yoy_pct("ABS", "CPI_YOY") or _sv("RBA", "CPI_YOY"),
+                "cpi_index": _sv("ABS", "CPI_YOY") or _sv("FRED", "AUSCPIALLQINMEI"),
                 "unemployment": _sv("ABS", "UNEMPLOYMENT"),
                 "gdp_growth": _sv("ABS", "GDP_GROWTH"),
                 "credit_growth": _sv("RBA", "CREDIT_GROWTH"),
@@ -385,8 +407,8 @@ async def macro_snapshot() -> dict:
                 "housing_starts": _sv("FRED", "HOUST"),
             },
             "credit_conditions": {
-                "us_hy_oas_bps": _sv("FRED", "BAMLH0A0HYM2"),
-                "us_ig_oas_bps": _sv("FRED", "BAMLC0A0CM"),
+                "us_hy_oas_bps": _to_bps("FRED", "BAMLH0A0HYM2"),
+                "us_ig_oas_bps": _to_bps("FRED", "BAMLC0A0CM"),
                 "au_credit_to_gdp_gap": _sv("BIS", "CREDIT_GAP_AU"),
                 "au_debt_service_ratio": _sv("BIS", "DSR_AU"),
                 "nz_credit_to_gdp_gap": _sv("BIS", "CREDIT_GAP_NZ"),

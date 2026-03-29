@@ -17,10 +17,10 @@ beforeEach(() => {
 describe('VALID_STATIC_PAGES', () => {
   it('is a Set with 10 entries', () => {
     expect(VALID_STATIC_PAGES).toBeInstanceOf(Set);
-    expect(VALID_STATIC_PAGES.size).toBe(10);
+    expect(VALID_STATIC_PAGES.size).toBe(9);
   });
   it('contains all static page names', () => {
-    ['home', 'deep-research', 'portfolio', 'comparator', 'personalisation', 'memory', 'pm', 'economist', 'ops', 'about']
+    ['home', 'deep-research', 'portfolio', 'comparator', 'personalisation', 'memory', 'pm', 'ops', 'about']
       .forEach(page => expect(VALID_STATIC_PAGES.has(page)).toBe(true));
   });
   it('rejects unknown pages', () => {

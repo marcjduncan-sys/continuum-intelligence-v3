@@ -31,6 +31,7 @@ FX_PAIRS: list[tuple[str, str]] = [
     ("USD", "JPY"),
     ("GBP", "USD"),
     ("USD", "CNY"),
+    ("XAU", "USD"),
 ]
 
 _av_macro_call_count = 0

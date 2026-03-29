@@ -223,10 +223,10 @@ function renderWelcome() {
     if (!messagesEl) return;
     var html =
         '<div class="econ-welcome">' +
-            '<div class="econ-welcome-title">Economist Ready</div>' +
+            '<div class="econ-welcome-title">Strategist Ready</div>' +
             '<div class="econ-welcome-text">Macro regime analysis, central bank policy, and economic indicators grounded in official data sources.</div>' +
             '<div class="econ-welcome-descriptor">' +
-                'The Economist synthesises RBA, RBNZ, Fed, ABS, BIS, and EIA data ' +
+                'The Strategist synthesises RBA, RBNZ, Fed, ABS, BIS, and EIA data ' +
                 'to provide regime-aware macro analysis and policy path guidance.' +
             '</div>' +
             '<div class="econ-suggestions">' +
@@ -256,7 +256,7 @@ function renderConversation() {
     var html = '';
     convo.forEach(function(msg) {
         var role      = msg.role === 'user' ? 'user' : 'economist';
-        var roleLabel = msg.role === 'user' ? 'YOU' : 'ECONOMIST';
+        var roleLabel = msg.role === 'user' ? 'YOU' : 'STRATEGIST';
         var timeStr   = formatTime(msg.timestamp);
 
         html += '<div class="econ-msg-row">';
@@ -289,7 +289,7 @@ function showTyping() {
     el.className = 'econ-typing';
     el.id = 'econTypingIndicator';
     el.innerHTML =
-        '<span class="econ-typing-label">ECONOMIST</span>' +
+        '<span class="econ-typing-label">STRATEGIST</span>' +
         '<div class="econ-typing-dots">' +
             '<div class="econ-typing-dot"></div>' +
             '<div class="econ-typing-dot"></div>' +
@@ -322,7 +322,7 @@ function _appendStreamingBubble() {
     row.className = 'econ-msg-row';
     row.innerHTML =
         '<div class="econ-msg-meta">' +
-            '<span class="econ-msg-role economist">ECONOMIST</span>' +
+            '<span class="econ-msg-role economist">STRATEGIST</span>' +
             '<span class="econ-msg-time"></span>' +
         '</div>' +
         '<div class="econ-msg-body econ-streaming"></div>';
@@ -379,7 +379,7 @@ function sendMessage() {
 
     if (isFile) {
         hideTyping();
-        appendError('Economist Chat requires the hosted version.');
+        appendError('Strategist Chat requires the hosted version.');
         isLoading = false;
         updateSendButton();
         return;
@@ -432,7 +432,7 @@ function sendMessage() {
                 var detail = '';
                 try { detail = JSON.parse(body).detail || ''; } catch(e) { /* not JSON */ }
                 if (res.status === 502) {
-                    throw new Error('The Economist service returned an error. Please try again in a moment.');
+                    throw new Error('The Strategist service returned an error. Please try again in a moment.');
                 }
                 if (res.status === 429) {
                     throw new Error('Rate limited. Please wait a moment before trying again.');
@@ -532,7 +532,7 @@ function sendMessage() {
             appendError('Request timed out or was cancelled. Please try again.');
         } else {
             var msg = err.message || 'Something went wrong. Please try again.';
-            if (msg === 'Failed to fetch') msg = 'Cannot reach the Economist API. Check that the server is running.';
+            if (msg === 'Failed to fetch') msg = 'Cannot reach the Strategist API. Check that the server is running.';
             appendError(msg);
         }
         isLoading = false;
@@ -699,7 +699,7 @@ function _buildDOM() {
                     '</svg>' +
                 '</div>' +
                 '<div class="econ-header-text">' +
-                    '<div class="econ-header-title">ECONOMIST</div>' +
+                    '<div class="econ-header-title">STRATEGIST</div>' +
                     '<div class="econ-regime-badge" id="econRegimeBadge"></div>' +
                 '</div>' +
             '</div>' +
@@ -714,6 +714,11 @@ function _buildDOM() {
                         '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>' +
                     '</svg>' +
                 '</button>' +
+                '<button class="econ-collapse-btn" id="econCollapseBtn" title="Switch to Analyst" aria-label="Switch to Analyst panel">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+                        '<polyline points="9 18 15 12 9 6"/>' +
+                    '</svg>' +
+                '</button>' +
             '</div>' +
         '</div>' +
 
@@ -725,11 +730,11 @@ function _buildDOM() {
             '<div class="econ-sidebar-list"></div>' +
         '</div>' +
 
-        '<div class="econ-messages" id="econMessages" aria-live="polite" role="log" aria-label="Economist conversation"></div>' +
+        '<div class="econ-messages" id="econMessages" aria-live="polite" role="log" aria-label="Strategist conversation"></div>' +
 
         '<div class="econ-input-area">' +
-            '<label for="econInput" class="sr-only">Ask the economist a question</label>' +
-            '<textarea class="econ-input" id="econInput" placeholder="Ask about macro conditions, central bank policy, economic indicators..." rows="1" aria-label="Ask the economist a question"></textarea>' +
+            '<label for="econInput" class="sr-only">Ask the strategist a question</label>' +
+            '<textarea class="econ-input" id="econInput" placeholder="Ask about macro regime, rates outlook, sector positioning..." rows="1" aria-label="Ask the strategist a question"></textarea>' +
             '<div class="econ-input-actions">' +
                 '<span class="econ-shortcut-hint">&#8984;&#8629;</span>' +
                 '<button class="econ-send-btn" id="econSend" disabled aria-label="Send message">' +
@@ -769,6 +774,21 @@ function _setupListeners() {
         sidebarClose.addEventListener('click', closeSidebar);
     }
 
+    var collapseBtn = document.getElementById('econCollapseBtn');
+    if (collapseBtn) {
+        collapseBtn.addEventListener('click', function() {
+            // Import switchRailMode from pm-chat.js (available globally after init)
+            if (typeof window.switchRailMode === 'function') {
+                window.switchRailMode('analyst');
+            } else {
+                // Fallback: import dynamically
+                import('./pm-chat.js').then(function(mod) {
+                    mod.switchRailMode('analyst');
+                });
+            }
+        });
+    }
+
     if (inputEl) {
         inputEl.addEventListener('input', function() {
             autoResize();
@@ -793,9 +813,19 @@ function _setupListeners() {
 // ============================================================
 
 export function initEconomistChat() {
+    // Register lazy-init hook for panel mode switch
+    window._initStrategistPanel = function() {
+        if (_initialised) return;
+        _doInit();
+    };
+
+    // Also attempt immediate init if container already exists
+    _doInit();
+}
+
+function _doInit() {
     container = document.getElementById('econChatContainer');
     if (!container) {
-        console.warn('[Economist] #econChatContainer not found -- economist chat disabled');
         return;
     }
 
@@ -819,7 +849,7 @@ export function initEconomistChat() {
         fetchRegimeState();
     });
 
-    console.log('[Economist] Initialised');
+    console.log('[Economist] Strategist panel initialised');
 }
 
 // ============================================================
