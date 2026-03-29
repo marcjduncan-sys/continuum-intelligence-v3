@@ -59,7 +59,7 @@ EODHD_BASE_URL = "https://eodhd.com/api"
 ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY", "").strip()
 
 # Finnhub — US peer analyst estimates, insider sentiment (free tier, US only)
-FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY", "").strip()
+FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY", os.getenv("FINNHUB_API", "")).strip()
 
 # Twelve Data — pre-calculated technical indicators (free, 800 req/day)
 TWELVE_DATA_API_KEY = os.getenv("TWELVE_DATA_API_KEY", "").strip()
