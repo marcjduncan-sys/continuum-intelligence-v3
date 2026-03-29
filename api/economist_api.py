@@ -568,7 +568,7 @@ async def _stream_anthropic_sse(
         try:
             with client.messages.stream(
                 model=config.ANTHROPIC_MODEL,
-                max_tokens=getattr(config, "CHAT_MAX_TOKENS", 2048),
+                max_tokens=12000,
                 temperature=0.0,
                 system=system_prompt,
                 messages=messages,
@@ -916,3 +916,92 @@ async def get_economist_state() -> dict:
     except Exception as exc:
         logger.error("Failed to get economist state: %s", exc)
         return {"state": None, "message": "Failed to retrieve economist state"}
+
+
+# ---------------------------------------------------------------------------
+# POST /api/economist/ingest-rba - accept RBA data from external push
+# ---------------------------------------------------------------------------
+
+class RBASeriesItem(BaseModel):
+    series_id: str = Field(..., min_length=1, max_length=100)
+    description: str = Field(..., min_length=1, max_length=500)
+    value: float
+    date: str = Field(..., min_length=1, max_length=20)
+    unit: str = Field(default="%", max_length=50)
+    frequency: str = Field(default="D", max_length=10)
+
+
+class IngestRBARequest(BaseModel):
+    source: str = Field(..., description="Must be 'RBA'")
+    series: list[RBASeriesItem] = Field(..., min_length=1)
+
+
+@router.post("/ingest-rba")
+async def ingest_rba(body: IngestRBARequest) -> dict:
+    """Accept RBA data pushed from an external source (local scraper).
+
+    Validates the request, upserts each series into macro_series with
+    source='RBA', and returns the count of ingested series.
+
+    Auth: protected by verify_api_key via the router dependency in main.py.
+    """
+    if body.source != "RBA":
+        return JSONResponse(
+            status_code=400,
+            content={"status": "error", "message": "source must be 'RBA'"},
+        )
+
+    pool = await db.get_pool()
+    if pool is None:
+        return JSONResponse(
+            status_code=503,
+            content={"status": "error", "message": "Database unavailable"},
+        )
+
+    ingested = 0
+    errors: list[str] = []
+
+    try:
+        async with pool.acquire() as conn:
+            for item in body.series:
+                try:
+                    await conn.execute(
+                        """
+                        INSERT INTO macro_series
+                            (source, series_id, description, frequency,
+                             last_value, last_date, unit, updated_at)
+                        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+                        ON CONFLICT (source, series_id) DO UPDATE SET
+                            description = EXCLUDED.description,
+                            frequency = EXCLUDED.frequency,
+                            previous_value = macro_series.last_value,
+                            previous_date = macro_series.last_date,
+                            last_value = EXCLUDED.last_value,
+                            last_date = EXCLUDED.last_date,
+                            unit = EXCLUDED.unit,
+                            updated_at = NOW()
+                        """,
+                        "RBA",
+                        item.series_id,
+                        item.description,
+                        item.frequency,
+                        item.value,
+                        item.date,
+                        item.unit,
+                    )
+                    ingested += 1
+                except Exception as exc:
+                    logger.error("RBA ingest failed for %s: %s", item.series_id, exc)
+                    errors.append(f"{item.series_id}: {exc}")
+    except Exception as exc:
+        logger.error("RBA ingest DB error: %s", exc)
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": "Database error during ingest"},
+        )
+
+    result: dict[str, Any] = {"status": "ok", "series_ingested": ingested}
+    if errors:
+        result["errors"] = errors
+    logger.info("RBA ingest: %d series ingested, %d errors", ingested, len(errors))
+    return result
