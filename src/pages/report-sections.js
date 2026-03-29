@@ -339,6 +339,7 @@ export function renderSectionNav(data) {
     sections.push(['price-drivers', 'Price Drivers']);
   }
 
+  sections.push(['sources', 'Ext. Research']);
   sections.push(['chat', 'Research Chat']);
 
   var linksHtml = '';

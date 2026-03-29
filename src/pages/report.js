@@ -63,6 +63,7 @@ export function renderReport(data) {
 
     // Build custom section nav for deep content
     var deepNavItems = getDeepSectionNavItems(data);
+    deepNavItems.push(['sources', 'Ext. Research']);
     var t = data.ticker.toLowerCase();
     var deepNavHtml = '';
     for (var i = 0; i < deepNavItems.length; i++) {
@@ -77,7 +78,7 @@ export function renderReport(data) {
       renderVerdict(data) +
       deepSectionNav +
       '<div class="report-content">' +
-        '<div class="report-main deep-report-main">' + deepMainContent + '</div>' +
+        '<div class="report-main deep-report-main">' + deepMainContent + sourcesSection(data.ticker) + '</div>' +
         renderHypSidebar(data) +
       '</div>' +
       renderPDFDownload(data) +

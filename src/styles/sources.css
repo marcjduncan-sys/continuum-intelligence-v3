@@ -8,10 +8,11 @@
 .src-upload-zone {
     border: 2px dashed var(--border-light);
     border-radius: 8px;
-    padding: var(--space-lg);
+    padding: var(--space-xl) var(--space-lg);
     text-align: center;
     transition: border-color 0.2s, background 0.2s;
     margin-bottom: var(--space-lg);
+    background: rgba(255, 255, 255, 0.02);
 }
 
 .src-upload-zone:hover,
@@ -30,6 +31,7 @@
 .src-upload-icon {
     color: var(--text-muted);
     margin-bottom: var(--space-xs);
+    opacity: 0.8;
 }
 
 .src-upload-text {
@@ -39,7 +41,7 @@
 }
 
 .src-upload-primary {
-    font-size: var(--font-size-sm);
+    font-size: 0.88rem;
     font-weight: 500;
     color: var(--text-secondary);
 }
