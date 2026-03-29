@@ -49,6 +49,7 @@ from handoff_api import router as handoff_router
 from portfolio_api import router as portfolio_router
 from pm_ops import router as pm_ops_router
 from source_upload import router as source_upload_router
+from economist_api import router as economist_router
 from ingest import ingest, embed_all_passages, get_tickers, get_passage_count
 from refresh import (
     RefreshJob, refresh_jobs, get_job, is_running, run_refresh,
@@ -219,7 +220,23 @@ async def lifespan(app: FastAPI):
 
     health_task = monitored_task(_db_health_loop(), name="db_health_loop")
 
+    # Start Economist data refresh scheduler
+    try:
+        from clients.scheduler import start_scheduler, stop_scheduler
+        pool = await db.get_pool()
+        await start_scheduler(pool)
+        logger.info("Economist scheduler started")
+    except Exception as exc:
+        logger.warning("Economist scheduler failed to start: %s", exc)
+
     yield
+
+    # Stop Economist scheduler
+    try:
+        from clients.scheduler import stop_scheduler
+        await stop_scheduler()
+    except Exception:
+        pass
 
     health_task.cancel()
     try:
@@ -277,6 +294,8 @@ if os.environ.get("ENABLE_PM", "true").lower() == "true":
     app.include_router(pm_ops_router)
     app.include_router(source_upload_router)
     logger.info("PM endpoints enabled")
+
+# Economist endpoints registered below after verify_api_key is defined
 else:
     logger.info("PM endpoints disabled (ENABLE_PM != true)")
 
@@ -299,6 +318,10 @@ async def verify_api_key(api_key: str | None = Depends(_api_key_header)):
         return
     if not api_key or api_key != config.CI_API_KEY:
         raise api_error(401, ErrorCode.AUTH_ERROR, "Invalid or missing API key")
+
+
+# Economist endpoints (always enabled, auth-gated except /health)
+app.include_router(economist_router, dependencies=[Depends(verify_api_key)])
 
 
 # Anthropic client (delegates to shared singleton in config)

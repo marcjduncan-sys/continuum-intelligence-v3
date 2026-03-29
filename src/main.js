@@ -34,6 +34,7 @@ import { setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineCha
 import { initAuth, showAuthModal, hideAuthModal } from './features/auth.js';
 import { initChat } from './features/chat.js';
 import { initPMChat } from './features/pm-chat.js';
+import { initEconomistChat } from './features/economist-chat.js';
 import { initNotifications } from './features/notifications.js';
 import { initBatchRefresh, closeBatchModal } from './features/batch-refresh.js';
 import { generatePDFReport } from './features/pdf.js';
@@ -330,6 +331,7 @@ async function boot() {
     ['Notifications', initNotifications],
     ['Chat', initChat],
     ['PMChat', initPMChat],
+    ['EconomistChat', initEconomistChat],
     ['About', initAboutPage],
     ['AddStock', initAddStock],
     ['DeepResearch', function() { initDeepResearch('deep-research-container'); }],

@@ -9,6 +9,7 @@ Assembles the full PM system prompt from:
 5. Alignment diagnostics (evidence vs portfolio)
 6. Safe-failure warnings (stale data, missing portfolio, etc.)
 7. Optional Analyst summary for a referenced ticker
+8. Economist macro context (via integration bridge)
 
 The prompt builder is the single place where PM context is assembled.
 No other module should construct PM system prompts.
@@ -17,7 +18,8 @@ No other module should construct PM system prompts.
 from __future__ import annotations
 
 import logging
-from datetime import date
+import os
+from datetime import date, datetime, timedelta, timezone
 from typing import Any
 
 from pm_constitution import build_constitution_text, RECOMMENDATION_SCHEMA
@@ -124,6 +126,129 @@ Reweighting signals from the alignment diagnostics are EVIDENCE INPUTS, not inst
 
 
 # ---------------------------------------------------------------------------
+# Economist macro context bridge (BEAD-005)
+# ---------------------------------------------------------------------------
+
+# Toggle via environment variable; default enabled
+_BRIDGE_ENABLED = os.getenv("ECONOMIST_PM_BRIDGE_ENABLED", "true").lower() in (
+    "true", "1", "yes",
+)
+
+
+def _build_macro_context_section(
+    state_data: dict, updated_at: str
+) -> str | None:
+    """Format economist state into a [MACRO CONTEXT] block for PM injection.
+
+    Args:
+        state_data: Validated economist_state dict.
+        updated_at: ISO timestamp of the state.
+
+    Returns:
+        Formatted block string, or None if data is insufficient.
+    """
+    if not state_data:
+        return None
+
+    regime = state_data.get("macro_regime", "TRANSITION")
+    au_policy = state_data.get("policy_path_au", "UNCERTAIN")
+    nz_policy = state_data.get("policy_path_nz", "UNCERTAIN")
+    us_policy = state_data.get("policy_path_us", "UNCERTAIN")
+
+    fx = state_data.get("fx_state") or {}
+    aud_level = fx.get("aud_usd")
+    fx_direction = fx.get("direction", "RANGE_BOUND")
+    aud_str = f"{aud_level}" if aud_level else "N/A"
+
+    sim = state_data.get("sector_impact_map") or {}
+    sector_parts = []
+    for label, key in [
+        ("Banks", "banks"),
+        ("REITs", "reits"),
+        ("Resources", "resources"),
+        ("Energy", "energy"),
+        ("Discretionary", "consumer_discretionary"),
+    ]:
+        val = sim.get(key, "NEUTRAL")
+        sector_parts.append(f"{label} {val}")
+    sector_line = ", ".join(sector_parts)
+
+    # Event risks as one-liner
+    events = state_data.get("event_risk_state") or []
+    if events:
+        event_parts = []
+        for evt in events[:3]:
+            sev = evt.get("severity", "LOW")
+            name = evt.get("event", "unknown")
+            event_parts.append(f"{name} ({sev})")
+        event_line = ", ".join(event_parts)
+    else:
+        event_line = "None flagged"
+
+    # Summary truncated to 200 chars
+    summary = state_data.get("summary") or ""
+    key_view = summary[:200].rstrip()
+    if len(summary) > 200:
+        key_view += "..."
+
+    lines = [
+        f"[MACRO CONTEXT from Economist, as at {updated_at}]",
+        f"Regime: {regime}",
+        f"AU Policy Path: {au_policy} | NZ: {nz_policy} | US: {us_policy}",
+        f"FX: AUD/USD {aud_str} ({fx_direction})",
+        f"Sector Bias: {sector_line}",
+        f"Event Risks: {event_line}",
+        f"Key View: {key_view}",
+        "[/MACRO CONTEXT]",
+    ]
+    return "\n".join(lines)
+
+
+async def fetch_economist_macro_context() -> str | None:
+    """Fetch the latest economist state and format it for PM injection.
+
+    Returns the formatted [MACRO CONTEXT] block, or None if:
+    - Bridge is disabled via ECONOMIST_PM_BRIDGE_ENABLED env var
+    - No state exists in the database
+    - State is older than 24 hours
+    - Database is unavailable
+
+    This function is async because it queries the database. It should be
+    called by the PM Chat endpoint before invoking build_pm_system_prompt().
+    """
+    if not _BRIDGE_ENABLED:
+        return None
+
+    try:
+        from economist_state_service import get_latest_state
+        state_data, updated_at = await get_latest_state()
+
+        if state_data is None or updated_at is None:
+            return None
+
+        # Check staleness (24 hours)
+        try:
+            state_time = datetime.fromisoformat(updated_at)
+            if state_time.tzinfo is None:
+                state_time = state_time.replace(tzinfo=timezone.utc)
+            now = datetime.now(timezone.utc)
+            if now - state_time > timedelta(hours=24):
+                logger.debug("Economist state is >24h old, skipping PM injection")
+                return None
+        except (ValueError, TypeError):
+            return None
+
+        return _build_macro_context_section(state_data, updated_at)
+
+    except ImportError:
+        logger.debug("economist_state_service not available, skipping bridge")
+        return None
+    except Exception as exc:
+        logger.warning("Economist PM bridge failed (non-fatal): %s", exc)
+        return None
+
+
+# ---------------------------------------------------------------------------
 # Main builder
 # ---------------------------------------------------------------------------
 
@@ -136,6 +261,7 @@ def build_pm_system_prompt(
     candidate_security: str | None = None,
     personalisation: PersonalisationContext | None = None,
     alignment_diagnostics: dict | None = None,
+    economist_macro_context: str | None = None,
 ) -> str:
     """
     Build the full PM system prompt.
@@ -162,6 +288,10 @@ def build_pm_system_prompt(
 
     # 2. Voice rules
     sections.append(PM_VOICE_RULES)
+
+    # 2b. Economist macro context (BEAD-005 bridge)
+    if economist_macro_context:
+        sections.append(economist_macro_context)
 
     # 3. Constitution (hard constraints -- may use mandate thresholds)
     sections.append(build_constitution_text(thresholds))

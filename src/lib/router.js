@@ -55,7 +55,7 @@ export function initRouter(pageRenderers) {
     } else if (hash.startsWith('snapshot-')) {
       pageName = hash.replace('snapshot-', '') + ' Snapshot';
     } else {
-      var names = { home: 'Research Home', 'deep-research': 'Deep Research', portfolio: 'Portfolio Intelligence', comparator: 'Investment Thesis Comparator', personalisation: 'Personalisation', memory: 'Analyst Journal', pm: 'Portfolio Manager', about: 'About' };
+      var names = { home: 'Research Home', 'deep-research': 'Deep Research', portfolio: 'Portfolio Intelligence', comparator: 'Investment Thesis Comparator', personalisation: 'Personalisation', memory: 'Analyst Journal', pm: 'Portfolio Manager', economist: 'Economist', about: 'About' };
       pageName = names[hash] || hash;
     }
     announcePageChange('Navigated to ' + pageName);

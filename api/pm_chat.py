@@ -23,7 +23,7 @@ import portfolio_db
 import portfolio_analytics
 from auth import decode_token
 from errors import api_error, ErrorCode
-from pm_prompt_builder import build_pm_system_prompt
+from pm_prompt_builder import build_pm_system_prompt, fetch_economist_macro_context
 from personalisation_context import parse_personalisation_context
 import portfolio_alignment
 import pm_memory_extractor
@@ -245,6 +245,9 @@ async def pm_chat(
             except Exception as exc:
                 logger.warning("Analyst summary fetch failed for %s: %s", ticker_for_analyst, exc)
 
+    # Fetch economist macro context for PM bridge (BEAD-005)
+    economist_macro = await fetch_economist_macro_context()
+
     # Build full system prompt with Constitution + mandate + context
     system_prompt = build_pm_system_prompt(
         portfolio_state=portfolio_state,
@@ -255,6 +258,7 @@ async def pm_chat(
         candidate_security=body.candidate_security,
         personalisation=pctx,
         alignment_diagnostics=alignment_diagnostics,
+        economist_macro_context=economist_macro,
     )
 
     # Build messages from history + current question
