@@ -134,6 +134,107 @@ async def economist_refresh(background_tasks: BackgroundTasks):
     )
 
 
+@router.get("/debug-sources")
+async def debug_sources() -> dict:
+    """Diagnostic endpoint: test connectivity to each external data source.
+
+    Makes a single lightweight request to each source with a 10s timeout
+    and reports the result.  For debugging only.
+    """
+    import os
+    import httpx
+    import traceback
+
+    _ua = {"User-Agent": "ContinuumIntelligence/1.0 (macro-data-service)"}
+    results: dict[str, dict] = {}
+
+    async def _probe(name: str, url: str, **kwargs):
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as c:
+                resp = await c.get(url, **kwargs)
+                if resp.status_code == 200:
+                    results[name] = {"status": "ok", "code": 200, "url": url}
+                else:
+                    results[name] = {
+                        "status": "error",
+                        "code": resp.status_code,
+                        "url": url,
+                        "body_preview": resp.text[:500],
+                    }
+        except Exception as exc:
+            results[name] = {
+                "status": "error",
+                "url": url,
+                "exception": f"{type(exc).__name__}: {exc}",
+                "traceback": traceback.format_exc()[-500:],
+            }
+
+    # FRED
+    fred_key = os.getenv("FRED_API_KEY", "")
+    await _probe(
+        "fred",
+        "https://api.stlouisfed.org/fred/series/observations",
+        params={"series_id": "DGS10", "api_key": fred_key, "file_type": "json",
+                "sort_order": "desc", "limit": 1},
+        headers=_ua,
+    )
+
+    # EIA
+    eia_key = os.getenv("EIA_API_KEY", os.getenv("EIA_API", ""))
+    await _probe(
+        "eia",
+        "https://api.eia.gov/v2/petroleum/pri/spt/data/",
+        params={"api_key": eia_key, "frequency": "daily", "data[0]": "value",
+                "facets[product][]": "EPCBRENT", "sort[0][column]": "period",
+                "sort[0][direction]": "desc", "length": 1},
+        headers=_ua,
+    )
+
+    # RBA
+    await _probe(
+        "rba",
+        "https://www.rba.gov.au/statistics/tables/csv/a02hist.csv",
+        headers=_ua,
+    )
+
+    # ABS
+    await _probe(
+        "abs",
+        "https://data.api.abs.gov.au/rest/data/ABS,CPI,1.1.0/1.10001.10.Q",
+        params={"format": "csv", "detail": "dataonly"},
+        headers={"Accept": "text/csv", **_ua},
+    )
+
+    # BIS
+    await _probe(
+        "bis",
+        "https://stats.bis.org/api/v2/data/WS_CBPOL/M.AU",
+        params={"format": "csv", "detail": "dataonly"},
+        headers={"Accept": "text/csv", **_ua},
+    )
+
+    # Finnhub
+    fh_key = os.getenv("FINNHUB_API_KEY", os.getenv("FINNHUB_API", ""))
+    await _probe(
+        "finnhub",
+        "https://finnhub.io/api/v1/calendar/economic",
+        params={"from": "2026-03-29", "to": "2026-03-30", "token": fh_key},
+        headers=_ua,
+    )
+
+    # Alpha Vantage
+    av_key = os.getenv("ALPHA_VANTAGE_API_KEY", os.getenv("ALPHA_VANTAGE", ""))
+    await _probe(
+        "alpha_vantage",
+        "https://www.alphavantage.co/query",
+        params={"function": "CURRENCY_EXCHANGE_RATE",
+                "from_currency": "AUD", "to_currency": "USD", "apikey": av_key},
+        headers=_ua,
+    )
+
+    return results
+
+
 @router.get("/macro-snapshot")
 async def macro_snapshot() -> dict:
     """Assemble the full macro data snapshot for LLM context injection.
