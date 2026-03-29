@@ -284,7 +284,6 @@ export function renderSkewBar(data) {
 export function renderVerdict(data) {
   var v = data.verdict;
   if (!v || !v.scores || !v.scores.length) return '';
-  var borderStyle = v.borderColor ? ' style="border-color: ' + v.borderColor + '"' : '';
   var skewDir = (data.skew && data.skew.direction) || '';
   var vtCls = skewDir === 'upside' ? ' vt-positive' : skewDir === 'downside' ? ' vt-negative' : '';
   var hyps = data.hypotheses || [];
@@ -295,17 +294,17 @@ export function renderVerdict(data) {
   var scoresHtml = '';
   for (var i = 0; i < v.scores.length; i++) {
     var s = v.scores[i];
-    var dirStyle = s.dirColor ? ' style="color:' + s.dirColor + '"' : '';
-    var dirAttr = hyps[i] ? ' data-dir="' + (hyps[i].dirClass || 'dir-neutral') + '"' : '';
-    scoresHtml += '<div class="vs-item"' + dirAttr + '>' +
+    var dirCls = hyps[i] ? hyps[i].dirClass || 'dir-neutral' : 'dir-neutral';
+    var dirAttr = hyps[i] ? ' data-dir="' + dirCls + '"' : '';
+    scoresHtml += '<div class="vs-item ' + dirCls + '"' + dirAttr + '>' +
       '<div class="vs-label">' + (s.label || '') + '</div>' +
-      '<div class="vs-score" style="color:' + (s.scoreColor || '') + '">' + (norm[i] != null ? norm[i] : 0) + '%</div>' +
-      '<div class="vs-direction"' + dirStyle + '>' + (s.dirArrow || '') + ' ' + (s.dirText || '') + '</div>' +
+      '<div class="vs-score">' + (norm[i] != null ? norm[i] : 0) + '%</div>' +
+      '<div class="vs-direction">' + (s.dirArrow || '') + ' ' + (s.dirText || '') + '</div>' +
     '</div>';
   }
 
   return '<div class="verdict-section">' +
-    '<div class="verdict-inner"' + borderStyle + '>' +
+    '<div class="verdict-inner">' +
       '<div class="verdict-text' + vtCls + '">' + (v.text || '') + '</div>' +
       '<div class="verdict-scores">' + scoresHtml + '</div>' +
     '</div>' +
