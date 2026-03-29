@@ -289,11 +289,18 @@ async def _fetch_rba_table(
     upserted = 0
 
     try:
-        resp = await client.get(url)
+        resp = await client.get(
+            url, headers={"User-Agent": "ContinuumIntelligence/1.0 (macro-data-service)"}
+        )
+        if resp.status_code != 200:
+            logger.error(
+                "RBA fetch failed for %s: HTTP %d from %s -- %s",
+                table["table_name"], resp.status_code, url, resp.text[:500],
+            )
+            return 0
         resp.raise_for_status()
     except Exception as exc:
-        logger.error("RBA fetch failed for %s: %s", table["table_name"], exc)
-        return 0
+        logger.error("RBA fetch failed for %s (%s): %s", table["table_name"], url, exc)
 
     headers, data_rows = _parse_rba_csv(resp.text)
 
@@ -382,10 +389,18 @@ async def _fetch_rba_calendar(pool: Any, client: httpx.AsyncClient) -> int:
     stored = 0
 
     try:
-        resp = await client.get(url)
+        resp = await client.get(
+            url, headers={"User-Agent": "ContinuumIntelligence/1.0 (macro-data-service)"}
+        )
+        if resp.status_code != 200:
+            logger.error(
+                "RBA calendar fetch failed: HTTP %d from %s -- %s",
+                resp.status_code, url, resp.text[:500],
+            )
+            return 0
         resp.raise_for_status()
     except Exception as exc:
-        logger.error("RBA calendar fetch failed: %s", exc)
+        logger.error("RBA calendar fetch failed (%s): %s", url, exc)
         return 0
 
     html = resp.text

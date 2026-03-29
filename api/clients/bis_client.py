@@ -109,18 +109,25 @@ async def _fetch_bis_dataset(
     url = f"{BASE_URL}/data/{dataset}/{key}"
     upserted = 0
 
+    _ua = {"User-Agent": "ContinuumIntelligence/1.0 (macro-data-service)"}
     try:
         resp = await client.get(
             url,
             params={"format": "csv", "detail": "dataonly"},
-            headers={"Accept": "text/csv"},
+            headers={"Accept": "text/csv", **_ua},
         )
         if resp.status_code == 404:
-            logger.warning("BIS dataset %s returned 404, skipping", dataset)
+            logger.warning("BIS dataset %s returned 404 from %s", dataset, url)
+            return 0
+        if resp.status_code != 200:
+            logger.error(
+                "BIS fetch failed for %s: HTTP %d from %s -- %s",
+                dataset, resp.status_code, url, resp.text[:500],
+            )
             return 0
         resp.raise_for_status()
     except Exception as exc:
-        logger.error("BIS fetch failed for %s: %s", dataset, exc)
+        logger.error("BIS fetch failed for %s (%s): %s", dataset, url, exc)
         return 0
 
     rows = parse_sdmx_csv(resp.text)

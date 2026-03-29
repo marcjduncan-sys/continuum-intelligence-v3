@@ -14,7 +14,7 @@ from decimal import Decimal
 from typing import Any, AsyncGenerator
 
 from fastapi import APIRouter, BackgroundTasks, Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 import config
@@ -106,19 +106,32 @@ async def economist_health() -> dict:
 
 
 @router.post("/refresh")
-async def economist_refresh() -> dict:
-    """Trigger an immediate refresh of all economist data sources."""
+async def economist_refresh(background_tasks: BackgroundTasks):
+    """Trigger an immediate refresh of all economist data sources.
+
+    Returns 202 immediately; the actual refresh runs in the background
+    so that Fly.io proxy timeouts do not kill the request.
+    """
     pool = await db.get_pool()
     if pool is None:
-        return {"status": "error", "message": "Database unavailable"}
+        return JSONResponse(
+            status_code=503,
+            content={"status": "error", "message": "Database unavailable"},
+        )
 
-    try:
-        from clients.scheduler import run_all_now
-        results = await run_all_now(pool)
-        return {"status": "ok", "results": str(results)}
-    except Exception as exc:
-        logger.exception("Economist refresh failed: %s", exc)
-        return {"status": "error", "message": "Data refresh encountered an internal error"}
+    async def _run_full_refresh():
+        try:
+            from clients.scheduler import run_all_now
+            results = await run_all_now(pool)
+            logger.info("Economist refresh completed: %s", results)
+        except Exception as exc:
+            logger.exception("Economist background refresh failed: %s", exc)
+
+    background_tasks.add_task(_run_full_refresh)
+    return JSONResponse(
+        status_code=202,
+        content={"status": "accepted", "message": "Refresh started in background"},
+    )
 
 
 @router.get("/macro-snapshot")

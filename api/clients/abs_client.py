@@ -115,29 +115,36 @@ async def _fetch_abs_dataflow(
     fmt = df.get("format", "csv")
     url = f"{BASE_URL}/{dataflow}/{key}"
 
+    _ua = {"User-Agent": "ContinuumIntelligence/1.0 (macro-data-service)"}
     try:
         if fmt == "csv":
             resp = await client.get(
                 url,
                 params={"format": "csv", "detail": "dataonly"},
-                headers={"Accept": "text/csv"},
+                headers={"Accept": "text/csv", **_ua},
             )
         else:
             resp = await client.get(
                 url,
                 params={"format": "jsondata"},
-                headers={"Accept": "application/vnd.sdmx.data+json;version=1.0.0"},
+                headers={"Accept": "application/vnd.sdmx.data+json;version=1.0.0", **_ua},
             )
 
         if resp.status_code == 404:
-            logger.warning("ABS dataflow %s returned 404", dataflow)
+            logger.warning("ABS dataflow %s returned 404 from %s", dataflow, url)
             return False
         if resp.status_code == 204:
-            logger.warning("ABS dataflow %s returned no content", dataflow)
+            logger.warning("ABS dataflow %s returned no content from %s", dataflow, url)
+            return False
+        if resp.status_code != 200:
+            logger.error(
+                "ABS fetch failed for %s: HTTP %d from %s -- %s",
+                dataflow, resp.status_code, url, resp.text[:500],
+            )
             return False
         resp.raise_for_status()
     except Exception as exc:
-        logger.error("ABS fetch failed for %s: %s", dataflow, exc)
+        logger.error("ABS fetch failed for %s (%s): %s", dataflow, url, exc)
         return False
 
     # Parse response

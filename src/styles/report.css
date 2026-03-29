@@ -2114,3 +2114,41 @@
 /* Gold Analysis: Peer Comparison */
 .ga-peer-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 4px 0; }
 .ga-peer-group { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* --- Report Callout Density (Bloomberg/FactSet-style compact rows) --- */
+.report-section .callout {
+    padding: var(--space-sm) var(--space-md);
+    margin: var(--space-sm) 0;
+}
+.report-section .callout p {
+    line-height: 1.4;
+    margin: 0 0 var(--space-xs) 0;
+}
+.report-section .callout p:last-child {
+    margin-bottom: 0;
+}
+.report-section .callout ol,
+.report-section .callout ul {
+    line-height: 1.4;
+    padding-left: 18px;
+    margin: 0;
+}
+.report-section .callout li {
+    margin-bottom: 3px;
+    padding: 2px 0;
+}
+.report-section .callout li:last-child {
+    margin-bottom: 0;
+}
+.report-section .callout-label {
+    margin-bottom: 4px;
+}
+/* Tighter narrative body text in report sections */
+.report-section .rs-text {
+    line-height: 1.45;
+    margin-bottom: var(--space-sm);
+}
+.report-section .rs-subtitle {
+    margin-top: var(--space-md);
+    margin-bottom: var(--space-xs);
+}
