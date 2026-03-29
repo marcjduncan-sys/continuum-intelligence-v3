@@ -56,7 +56,7 @@ async def fetch_fx_rate(
     """
     global _av_macro_call_count, _av_macro_call_date
 
-    api_key = os.getenv("ALPHA_VANTAGE_API_KEY", "").strip()
+    api_key = os.getenv("ALPHA_VANTAGE_API_KEY", os.getenv("ALPHA_VANTAGE", "")).strip()
     if not api_key:
         return False
 
@@ -156,7 +156,7 @@ async def refresh_all_fx(pool: Any) -> dict[str, bool]:
         logger.warning("AV FX refresh skipped: no database pool")
         return {}
 
-    api_key = os.getenv("ALPHA_VANTAGE_API_KEY", "").strip()
+    api_key = os.getenv("ALPHA_VANTAGE_API_KEY", os.getenv("ALPHA_VANTAGE", "")).strip()
     if not api_key:
         logger.warning("AV FX refresh skipped: ALPHA_VANTAGE_API_KEY not set")
         return {}

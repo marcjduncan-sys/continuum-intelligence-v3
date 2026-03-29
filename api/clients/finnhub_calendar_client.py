@@ -45,7 +45,7 @@ async def fetch_economic_calendar(
     Returns:
         Number of events stored.
     """
-    api_key = os.getenv("FINNHUB_API_KEY", "").strip()
+    api_key = os.getenv("FINNHUB_API_KEY", os.getenv("FINNHUB_API", "")).strip()
     if not api_key:
         logger.warning("Finnhub calendar: FINNHUB_API_KEY not set")
         return 0
@@ -167,7 +167,7 @@ async def refresh_finnhub_calendar(pool: Any) -> int:
         logger.warning("Finnhub calendar refresh skipped: no database pool")
         return 0
 
-    api_key = os.getenv("FINNHUB_API_KEY", "").strip()
+    api_key = os.getenv("FINNHUB_API_KEY", os.getenv("FINNHUB_API", "")).strip()
     if not api_key:
         logger.warning("Finnhub calendar refresh skipped: FINNHUB_API_KEY not set")
         return 0
