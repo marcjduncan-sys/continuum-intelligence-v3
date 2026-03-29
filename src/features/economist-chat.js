@@ -835,6 +835,11 @@ function _doInit() {
     _buildDOM();
     _setupListeners();
 
+    // Inject mode switch tab bar into strategist header
+    if (typeof window._injectStratModeSwitch === 'function') {
+        window._injectStratModeSwitch();
+    }
+
     // Restore conversation from DB, then render
     _restoreFromDB().then(function() {
         renderConversation();

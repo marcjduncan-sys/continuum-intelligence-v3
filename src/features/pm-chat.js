@@ -245,8 +245,21 @@ function _injectModeSwitch() {
         }
     }
 
-    // Expose switchRailMode globally for the Strategist panel collapse button
+    // Expose switchRailMode and mode switch injector globally
     window.switchRailMode = switchRailMode;
+    window._injectStratModeSwitch = function() {
+        if (!_econPanel) _econPanel = document.getElementById('econ-panel');
+        if (!_econPanel) return;
+        var econHeader = _econPanel.querySelector('.econ-header');
+        if (!econHeader) return;
+        // Only inject once
+        if (econHeader.querySelector('.rail-mode-switch')) return;
+        var econHeaderLeft = econHeader.querySelector('.econ-header-left');
+        if (econHeaderLeft) {
+            var econSw = _createModeSwitch('strategist');
+            econHeader.insertBefore(econSw, econHeaderLeft.nextSibling);
+        }
+    };
 }
 
 // ============================================================

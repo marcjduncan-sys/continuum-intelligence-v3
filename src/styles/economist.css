@@ -595,7 +595,8 @@
     color: #A0AEC0;
 }
 [data-theme="light"] .econ-history-btn:hover,
-[data-theme="light"] .econ-clear-btn:hover {
+[data-theme="light"] .econ-clear-btn:hover,
+[data-theme="light"] .econ-collapse-btn:hover {
     background: rgba(0, 0, 0, 0.05);
     color: #1A1F2E;
 }
@@ -637,6 +638,13 @@
 [data-theme="light"] .econ-msg-body th,
 [data-theme="light"] .econ-msg-body td {
     border-color: #E2E8F0;
+}
+/* Panel background: match Analyst/PM light mode overrides */
+[data-theme="light"] .econ-panel {
+    --analyst-panel-bg: #FFFFFF;
+    --analyst-panel-border: #E2E8F0;
+    background: var(--analyst-panel-bg);
+    border-left-color: var(--analyst-panel-border);
 }
 
 /* ============================================================
