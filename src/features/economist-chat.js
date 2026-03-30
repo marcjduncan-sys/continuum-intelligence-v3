@@ -699,11 +699,6 @@ function _buildDOM() {
                 '</div>' +
             '</div>' +
             '<div class="econ-header-actions">' +
-                '<button class="econ-history-btn" id="econHistoryBtn" title="Conversation history" aria-label="Conversation history">' +
-                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-                        '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>' +
-                    '</svg>' +
-                '</button>' +
                 '<button class="econ-clear-btn" id="econClearBtn" title="Clear conversation" aria-label="Clear conversation">' +
                     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
                         '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>' +
@@ -715,14 +710,6 @@ function _buildDOM() {
                     '</svg>' +
                 '</button>' +
             '</div>' +
-        '</div>' +
-
-        '<div class="econ-sidebar" id="econSidebar">' +
-            '<div class="econ-sidebar-head">' +
-                '<h3>History</h3>' +
-                '<button class="econ-sidebar-close" id="econSidebarClose" aria-label="Close history">&times;</button>' +
-            '</div>' +
-            '<div class="econ-sidebar-list"></div>' +
         '</div>' +
 
         '<div class="econ-messages" id="econMessages" aria-live="polite" role="log" aria-label="Strategist conversation"></div>' +
@@ -746,8 +733,6 @@ function _buildDOM() {
     inputEl       = document.getElementById('econInput');
     sendBtn       = document.getElementById('econSend');
     clearBtn      = document.getElementById('econClearBtn');
-    historyBtn    = document.getElementById('econHistoryBtn');
-    sidebarEl     = document.getElementById('econSidebar');
     regimeBadgeEl = document.getElementById('econRegimeBadge');
 }
 
