@@ -97,6 +97,7 @@ async def _scheduled_loop(
     target_minute: int = 0,
     weekday_only: bool = False,
     weekly_day: int | None = None,
+    run_detection: bool = False,
 ) -> None:
     """Run a refresh job at a specific UTC hour each day (or week).
 
@@ -108,6 +109,7 @@ async def _scheduled_loop(
         target_minute: UTC minute to run (0-59).
         weekday_only: If True, skip weekends.
         weekly_day: If set, only run on this weekday (0=Mon).
+        run_detection: If True, run regime detection after successful refresh.
     """
     while True:
         try:
@@ -146,6 +148,19 @@ async def _scheduled_loop(
 
             await _run_with_semaphore(name, coro_fn, pool)
 
+            # Run regime detection after macro data refresh
+            if run_detection:
+                try:
+                    from regime_detector import run_detection_cycle
+                    events = await run_detection_cycle(pool)
+                    if events:
+                        logger.info(
+                            "Scheduler: regime detection after %s: %d event(s)",
+                            name, len(events),
+                        )
+                except Exception as det_exc:
+                    logger.warning("Scheduler: regime detection failed after %s: %s", name, det_exc)
+
         except asyncio.CancelledError:
             logger.info("Scheduler: %s cancelled", name)
             break
@@ -163,6 +178,18 @@ async def _fx_price_loop(pool: Any) -> None:
         try:
             if _is_trading_hours():
                 await _run_with_semaphore("fx_prices", refresh_all_fx, pool)
+
+                # Run regime detection after FX refresh
+                try:
+                    from regime_detector import run_detection_cycle
+                    events = await run_detection_cycle(pool)
+                    if events:
+                        logger.info(
+                            "Scheduler: regime detection after fx_prices: %d event(s)",
+                            len(events),
+                        )
+                except Exception as det_exc:
+                    logger.warning("Scheduler: regime detection failed after fx_prices: %s", det_exc)
             else:
                 logger.debug("Scheduler: fx_prices skipped (markets closed)")
 
@@ -199,11 +226,11 @@ async def start_scheduler(pool: Any) -> None:
     from clients.acled_client import refresh_acled
 
     jobs: list[tuple[str, Callable, dict]] = [
-        ("fred", refresh_all_fred, {"target_hour": 6, "target_minute": 0}),
-        ("eia", refresh_all_eia, {"target_hour": 6, "target_minute": 15}),
+        ("fred", refresh_all_fred, {"target_hour": 6, "target_minute": 0, "run_detection": True}),
+        ("eia", refresh_all_eia, {"target_hour": 6, "target_minute": 15, "run_detection": True}),
         ("bis", refresh_all_bis, {"target_hour": 6, "target_minute": 0, "weekly_day": 0}),
         ("abs", refresh_all_abs, {"target_hour": 2, "target_minute": 0}),
-        ("rba", refresh_all_rba, {"target_hour": 7, "target_minute": 0}),
+        ("rba", refresh_all_rba, {"target_hour": 7, "target_minute": 0, "run_detection": True}),
         ("finnhub_calendar", refresh_finnhub_calendar, {"target_hour": 0, "target_minute": 0}),
         ("acled", refresh_acled, {"target_hour": 4, "target_minute": 0}),
     ]
