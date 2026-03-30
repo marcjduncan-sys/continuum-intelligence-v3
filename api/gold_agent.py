@@ -77,6 +77,14 @@ def cache_result(ticker: str, result: Dict[str, Any]) -> None:
 _nlm_auth_ok: bool = True  # optimistic; flipped on first auth failure
 _nlm_last_error: Optional[str] = None
 
+
+def reset_auth() -> None:
+    """Reset NotebookLM auth state. Called by the unified reset-auth endpoint."""
+    global _nlm_auth_ok, _nlm_last_error
+    _nlm_auth_ok = True
+    _nlm_last_error = None
+
+
 # ---------------------------------------------------------------------------
 # Corpus directory -- local document fallback when NotebookLM is unavailable
 # ---------------------------------------------------------------------------

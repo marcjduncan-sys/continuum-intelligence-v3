@@ -101,6 +101,10 @@ except Exception:
 # Merge: file is the base, env var takes precedence (allows Railway overrides).
 NOTEBOOKLM_TICKER_NOTEBOOKS: dict = {**_nlm_file_map, **_nlm_env_map}
 
+# NotebookLM query limits for Analyst Chat integration
+NOTEBOOKLM_CONTEXT_MAX_CHARS = int(os.getenv("NOTEBOOKLM_CONTEXT_MAX_CHARS", "2000"))
+NOTEBOOKLM_QUERY_TIMEOUT_SECONDS = int(os.getenv("NOTEBOOKLM_QUERY_TIMEOUT_SECONDS", "10"))
+
 # ---------------------------------------------------------------------------
 # Auth
 # ---------------------------------------------------------------------------

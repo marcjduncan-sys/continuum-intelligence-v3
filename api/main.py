@@ -59,8 +59,10 @@ from refresh import (
 from retriever import retrieve
 from source_db import get_source_passages
 from task_monitor import monitored_task, get_failure_count
+import gold_agent
 from gold_agent import run_gold_analysis, check_gold_health, get_cached_result
 from github_commit import commit_files_to_github
+import notebook_context
 from price_drivers import (
     run_price_driver_analysis, run_price_driver_scan,
     get_latest_report as get_latest_driver_report,
@@ -465,6 +467,9 @@ async def research_chat(request: Request, body: ResearchChatRequest, background_
         )
         context = _build_context(passages, ticker)
 
+    # Query NotebookLM corpus (supplementary context, silent failure)
+    nlm_context = await notebook_context.query_notebook(ticker, body.question)
+
     # Build messages for Claude
     messages = []
 
@@ -497,12 +502,20 @@ async def research_chat(request: Request, body: ResearchChatRequest, background_
 
     # Add the current question with structured research + passage context
     structured_ctx = prompt_builder.build_structured_research_context(ticker)
-    if structured_ctx or context:
+    if structured_ctx or context or nlm_context:
         user_message = ""
         if structured_ctx:
             user_message += structured_ctx + "\n\n"
         if context:
             user_message += f"<research_context>\n{context}\n</research_context>\n\n"
+        if nlm_context:
+            user_message += (
+                f"<notebook_context>\n"
+                f"## Supplementary Corpus Context for {ticker}\n"
+                f"Source: NotebookLM corpus (curated research documents)\n\n"
+                f"{nlm_context}\n"
+                f"</notebook_context>\n\n"
+            )
         user_message += f"**Stock:** {ticker}\n"
     else:
         user_message = f"**Stock:** {ticker}\n"
@@ -704,14 +717,24 @@ async def gold_agent_health():
 
 @app.post("/api/agents/gold/reset-auth", dependencies=[Depends(verify_api_key)])
 async def gold_agent_reset_auth():
-    """Reset NotebookLM auth flag after updating NOTEBOOKLM_AUTH_JSON in Railway.
+    """Reset NotebookLM auth flag for the gold agent only.
 
-    Call this after refreshing cookies to avoid needing a full redeploy.
+    Prefer POST /api/notebooklm/reset-auth to reset all modules at once.
     """
-    import gold_agent
-    gold_agent._nlm_auth_ok = True
-    gold_agent._nlm_last_error = None
+    gold_agent.reset_auth()
     return {"status": "ok", "nlm_auth_ok": True}
+
+
+@app.post("/api/notebooklm/reset-auth", dependencies=[Depends(verify_api_key)])
+async def notebooklm_reset_auth():
+    """Reset NotebookLM auth flags in both notebook_context and gold_agent modules.
+
+    Call this after refreshing cookies and updating NOTEBOOKLM_AUTH_JSON in Fly.io
+    to avoid needing a full redeploy.
+    """
+    notebook_context.reset_auth()
+    gold_agent.reset_auth()
+    return {"status": "ok", "notebook_context_auth_ok": True, "gold_agent_auth_ok": True}
 
 
 @app.get("/api/agents/gold/{ticker}", dependencies=[Depends(verify_api_key)])
