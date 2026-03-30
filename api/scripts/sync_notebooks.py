@@ -32,16 +32,16 @@ async def sync_registry() -> None:
     for nb in notebooks:
         # Extract ticker from name: "CBA - Commonwealth Bank" -> "CBA"
         # Matches 2-4 uppercase letters at the start of the name
-        match = re.match(r"^([A-Z]{2,4})\b", nb.name.strip())
+        match = re.match(r"^([A-Z]{2,4})\b", nb.title.strip())
         if match:
             ticker = match.group(1)
             if ticker in mapping:
                 print(f"  WARNING: Duplicate ticker {ticker} (notebooks: {mapping[ticker]}, {nb.id}). Keeping first.")
-                skipped.append(f"{nb.name} ({nb.id})")
+                skipped.append(f"{nb.title} ({nb.id})")
             else:
                 mapping[ticker] = nb.id
         else:
-            skipped.append(f"{nb.name} ({nb.id})")
+            skipped.append(f"{nb.title} ({nb.id})")
 
     # Preserve _-prefixed metadata keys from existing registry
     existing: dict = {}
