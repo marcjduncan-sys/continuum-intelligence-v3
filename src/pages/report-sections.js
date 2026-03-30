@@ -230,6 +230,7 @@ export function renderReportHero(data) {
             '<button class="btn-refresh" id="refresh-btn-' + data.ticker + '" onclick="triggerRefresh(\'' + data.ticker + '\')">' +
               '<span class="refresh-icon">&#8635;</span> Update' +
             '</button>' +
+            '<span id="staleness-mount-' + (data.ticker || '').toLowerCase() + '"></span>' +
             '<span class="refresh-timestamp" id="refresh-ts-' + data.ticker + '">' +
               (data.date ? 'Last updated: ' + formatDateAEST(data.date) : '') +
             '</span>' +

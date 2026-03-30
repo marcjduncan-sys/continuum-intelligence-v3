@@ -26,6 +26,7 @@ import { initAboutPage } from './pages/about.js';
 import { renderMemoryPage } from './pages/memory.js';
 import { renderPMPage, fetchDiagnostics } from './pages/pm.js';
 import { renderOpsPage } from './pages/ops.js';
+import { initStalenessBadge } from './features/staleness-badge.js';
 
 // Report sections (needed for router callbacks)
 import { setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineChart } from './pages/report-sections.js';
@@ -318,6 +319,7 @@ async function boot() {
       if (panelMount) {
         initSourcesPanel(ticker);
       }
+      initStalenessBadge(ticker, STOCK_DATA[ticker.toUpperCase()] || STOCK_DATA[ticker]);
     }
   });
 
