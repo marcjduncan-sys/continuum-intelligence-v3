@@ -42,15 +42,20 @@ function _findCurrentPrice(macroState, driverKey, driverTicker) {
   // Then try matching by series_id in macro_series (FRED/EIA/RBA)
   var symbolMap = {
     brent_crude: 'BRENT_SPOT',
-    gold: 'XAU/USD',
-    copper: null,
-    iron_ore: null,
+    gold: 'GOLD',
+    copper: 'COPPER',
+    iron_ore: 'IRON_ORE',
     natural_gas: null,
   };
 
   var seriesId = symbolMap[driverKey];
   if (seriesId && macroState[seriesId]) {
     return macroState[seriesId].current;
+  }
+
+  // Gold: try XAU/USD from macro_prices as fallback
+  if (driverKey === 'gold' && macroState['XAU/USD']) {
+    return macroState['XAU/USD'].current;
   }
 
   // Fallback: iterate looking for a matching symbol or key
