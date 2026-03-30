@@ -744,7 +744,7 @@ async def macro_state():
     Used by the frontend staleness badge (BEAD-005) and regime detector (BEAD-004).
     No auth required -- read-only, non-sensitive aggregate data.
     """
-    pool = getattr(app.state, "pool", None)
+    pool = await db.get_pool()
     if pool is None:
         return {"error": "database not available", "variables": {}}
 
