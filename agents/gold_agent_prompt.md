@@ -92,14 +92,15 @@ risk more heavily than AISC (which is not yet applicable).
 
 ---
 
-## Pilot Universe (Phase 3 Validation)
+## Coverage Universe
 
 | Ticker | Company | Thesis type | Notes |
 |--------|---------|-------------|-------|
-| NST | Northern Star Resources | Tier-1 producer, cost discipline | Australian operations only; largest ASX gold miner by production |
+| NST | Northern Star Resources | Tier-1 producer, cost discipline | Largest ASX gold miner by production; KCGM expansion anchor thesis |
 | EVN | Evolution Mining | Multi-asset producer, balance sheet stress | Net debt recovery trajectory is the key variable |
-| RRL | Regis Resources | Mid-tier producer, margin risk | AISC pressure at current gold price; McPhillamys permitting still unresolved |
 | WAF | West African Resources | Jurisdiction risk thesis | Burkina Faso sovereign demands on Kiaka JV; AISC above A$2,000/oz equivalent |
-| SBM | St Barbara | Turnaround / value trap | Leonora restart thesis; balance sheet now critical path |
+| HRZ | Horizon Minerals | Developer, hub-and-spoke | Boorara toll treatment; Eastern Goldfields multi-deposit platform |
+| OBM | Ora Banda Mining | Emerging producer, Davyhurst | Record production ramp; third-party processing cost drag |
+| WIA | Wia Gold | Developer, single asset | Kokoseb 2.93 Moz resource; DFS targeted H2 2026; Namibia jurisdiction |
 
-**Not in pilot** (original list): DEG (acquired by NST, May 2025), GOR (acquired and delisted, Nov 2025).
+**Removed:** DEG (acquired by NST, May 2025), GOR (acquired and delisted, Nov 2025), RRL, SBM, SNX.

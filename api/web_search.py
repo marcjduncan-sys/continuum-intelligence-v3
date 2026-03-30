@@ -347,17 +347,6 @@ SECTOR_COMMODITY_MAP: dict[str, dict] = {
             "LNG demand Asia energy markets",
         ],
     },
-    # === Technology / Software (cont.) ===
-    "SNX": {
-        "label": "Cloud Security SaaS",
-        "commodities": [
-            {"ticker": "AUDUSD=X", "name": "AUD/USD"},
-        ],
-        "macro_queries": [
-            "cloud security cybersecurity spending enterprise",
-            "SaaS ARR growth technology outlook",
-        ],
-    },
     # === Real Estate / Property (cont.) ===
     "REA": {
         "label": "Online Property Portal",

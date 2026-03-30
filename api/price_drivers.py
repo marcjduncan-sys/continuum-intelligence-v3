@@ -116,7 +116,7 @@ PEER_MAP: dict[str, list[str]] = {
     "MIN": ["BHP", "FMG", "PLS.AX"],
     "OBM": ["NST", "EVN", "WAF"],
     "REA": ["DHG.AX", "CAR.AX", "SEK.AX"],
-    "SNX": ["XRO", "WTC", "OCL"],
+
     "STO": ["WDS", "BPT.AX", "KAR.AX"],
     "WIA": ["NST", "EVN", "ASB"],
 }
