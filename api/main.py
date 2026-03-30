@@ -760,8 +760,9 @@ async def macro_state():
                 FROM macro_series
                 WHERE series_id IN (
                     'DGS10', 'BRENT_SPOT', 'WTI_SPOT',
-                    'RBA_CASH_RATE', 'RBA_AUD_USD', 'VIXCLS',
-                    'RBA_AU_10Y', 'FEDFUNDS'
+                    'CASH_RATE', 'AUDUSD', 'VIXCLS',
+                    'AU_10Y', 'FEDFUNDS',
+                    'IRON_ORE', 'GOLD', 'COPPER'
                 )
                 """
             )
