@@ -737,6 +737,82 @@ async def notebooklm_reset_auth():
     return {"status": "ok", "notebook_context_auth_ok": True, "gold_agent_auth_ok": True}
 
 
+@app.get("/api/notebooks/pending", dependencies=[Depends(verify_api_key)])
+async def notebooks_pending():
+    """List tickers where notebook provisioning is not complete."""
+    pool = await db.get_pool()
+    if pool is None:
+        return {"pending": []}
+    try:
+        async with pool.acquire() as conn:
+            rows = await conn.fetch(
+                """
+                SELECT ticker, status, error_message, notebook_id, updated_at
+                FROM notebook_registry
+                WHERE status NOT IN ('active', 'manual')
+                ORDER BY updated_at DESC
+                """
+            )
+            return {"pending": [dict(r) for r in rows]}
+    except Exception as exc:
+        return {"error": str(exc), "pending": []}
+
+
+@app.post("/api/notebooks/retry/{ticker}", dependencies=[Depends(verify_api_key)])
+async def notebooks_retry(ticker: str):
+    """Re-attempt notebook provisioning for a specific ticker."""
+    ticker = ticker.upper()
+    pool = await db.get_pool()
+
+    # Look up company name from registry or research data
+    company_name = ticker
+    if pool:
+        try:
+            async with pool.acquire() as conn:
+                row = await conn.fetchrow(
+                    "SELECT company_name FROM notebook_registry WHERE ticker = $1", ticker
+                )
+                if row and row["company_name"]:
+                    company_name = row["company_name"]
+        except Exception:
+            pass
+
+    # If no company name in registry, try research data
+    if company_name == ticker:
+        data_path = Path(config.PROJECT_ROOT) / "data" / "research" / f"{ticker}.json"
+        if data_path.exists():
+            try:
+                with open(data_path) as f:
+                    research = json.load(f)
+                    company_name = research.get("company", ticker)
+            except Exception:
+                pass
+
+    nb_id = await notebook_context.provision_notebook(ticker, company_name, pool=pool)
+    return {
+        "ticker": ticker,
+        "notebook_id": nb_id,
+        "status": "active" if nb_id else "failed",
+    }
+
+
+@app.get("/api/notebooks/status", dependencies=[Depends(verify_api_key)])
+async def notebooks_status():
+    """Return full notebook registry for operational overview."""
+    pool = await db.get_pool()
+    if pool is None:
+        return {"registry": []}
+    try:
+        async with pool.acquire() as conn:
+            rows = await conn.fetch(
+                "SELECT ticker, notebook_id, status, company_name, created_at, updated_at, error_message "
+                "FROM notebook_registry ORDER BY ticker"
+            )
+            return {"registry": [dict(r) for r in rows]}
+    except Exception as exc:
+        return {"error": str(exc), "registry": []}
+
+
 @app.get("/api/macro/state")
 async def macro_state():
     """Return current macro variable values with rolling 30-day statistics.
@@ -1502,6 +1578,16 @@ async def add_stock(
                 logger.info("[AddStock] Populated research committed for %s", ticker)
             except Exception as commit_err:
                 logger.warning("[AddStock] GitHub commit of populated research failed: %s", commit_err)
+
+            # Auto-provision NotebookLM notebook (fire-and-forget, non-blocking)
+            try:
+                nb_id = await notebook_context.provision_notebook(ticker, company)
+                if nb_id:
+                    logger.info("[AddStock] NotebookLM notebook provisioned for %s: %s", ticker, nb_id)
+                else:
+                    logger.warning("[AddStock] NotebookLM provisioning returned None for %s (check /api/notebooks/pending)", ticker)
+            except Exception as nlm_err:
+                logger.warning("[AddStock] NotebookLM provisioning failed for %s (non-fatal): %s", ticker, nlm_err)
 
         except Exception as e:
             logger.error("[AddStock] Coverage initiation FAILED for %s: %s", ticker, e, exc_info=True)
