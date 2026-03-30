@@ -109,14 +109,25 @@ function _restoreFromDB() {
     var guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
     if (!token && !guestId) return Promise.resolve();
 
-    var headers = _getAuthHeaders();
-    var url = apiOrigin + '/api/economist/conversations/latest' + _getGuestParam();
+    // Fetch conversation list (sorted newest-first by backend), then load the latest
+    return _fetchConversationList().then(function(convos) {
+        if (!convos || convos.length === 0) return;
+        var latest = convos[0];
+        if (!latest.conversation_id) return;
+        return _loadConversationFromDB(latest.conversation_id);
+    }).catch(function(err) {
+        console.warn('[Economist] DB restore failed:', err.message || err);
+    });
+}
 
+function _loadConversationFromDB(conversationId) {
+    var headers = _getAuthHeaders();
+    var url = apiOrigin + '/api/economist/conversations/' + encodeURIComponent(conversationId) + _getGuestParam();
     return fetch(url, { headers: headers })
         .then(function(res) { return res.ok ? res.json() : null; })
         .then(function(data) {
             if (!data || !data.messages || data.messages.length === 0) return;
-            if (data.conversation_id) _econConversationId = data.conversation_id;
+            _econConversationId = data.conversation_id || conversationId;
             conversations[currentConversationKey] = data.messages.map(function(m) {
                 return {
                     role: m.role,
@@ -125,9 +136,6 @@ function _restoreFromDB() {
                 };
             });
             _persistToLocalStorage();
-        })
-        .catch(function(err) {
-            console.warn('[Economist] DB restore failed:', err.message || err);
         });
 }
 
@@ -642,7 +650,8 @@ function _refreshSidebar() {
         convos.forEach(function(c) {
             var item = document.createElement('div');
             item.className = 'econ-conversation-item';
-            var title = c.title || ('Conversation ' + (c.id || '').slice(0, 8));
+            var convId = c.conversation_id || '';
+            var title = c.macro_context_summary || ('Conversation ' + convId.slice(0, 8));
             item.innerHTML =
                 '<span class="econ-conv-title">' + escapeHtml(title) + '</span>' +
                 '<div class="econ-conv-meta">' +
@@ -659,25 +668,11 @@ function _refreshSidebar() {
 }
 
 function _loadConversation(convMeta) {
-    if (!convMeta || !convMeta.id) return;
-    var headers = _getAuthHeaders();
-    var url = apiOrigin + '/api/economist/conversations/' + encodeURIComponent(convMeta.id) + _getGuestParam();
+    var convId = convMeta && convMeta.conversation_id;
+    if (!convId) return;
 
-    fetch(url, { headers: headers })
-        .then(function(res) { return res.ok ? res.json() : null; })
-        .then(function(data) {
-            if (!data || !data.messages) return;
-            _econConversationId = convMeta.id;
-            conversations[currentConversationKey] = data.messages.map(function(m) {
-                return {
-                    role: m.role,
-                    content: m.content,
-                    timestamp: m.created_at ? new Date(m.created_at).getTime() : 0
-                };
-            });
-            _persistToLocalStorage();
-            renderConversation();
-        })
+    _loadConversationFromDB(convId)
+        .then(function() { renderConversation(); })
         .catch(function(err) {
             console.warn('[Economist] Load conversation failed:', err.message || err);
         });
