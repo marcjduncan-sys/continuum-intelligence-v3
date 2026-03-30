@@ -104,6 +104,7 @@ from web_search import gather_all_data
 from price_drivers import run_price_driver_analysis
 from gold_agent import run_gold_analysis
 from github_commit import commit_files_to_github
+import notebook_context
 
 logger = logging.getLogger(__name__)
 
@@ -471,13 +472,24 @@ async def _run_single_in_batch(
                     job.stage_errors.append(f"Track 5 (gold): {e}")
                 return None
 
+        async def _batch_notebook_corpus():
+            """Track 6: NotebookLM corpus context (parallel)."""
+            try:
+                corpus = await notebook_context.query_notebook_batch(ticker)
+                if corpus:
+                    gathered["notebook_corpus"] = corpus
+                    logger.info(f"[BATCH][{ticker}] Track 6: NotebookLM corpus retrieved ({len([v for v in corpus.values() if v])} dimensions)")
+            except Exception as e:
+                logger.warning(f"[BATCH][{ticker}] Track 6 notebook corpus failed (non-fatal): {e}")
+
         # Run all tracks in parallel
-        (ev_hyp_result, structure_result, pd_result, gold_result) = (
+        (ev_hyp_result, structure_result, pd_result, gold_result, _nlm_result) = (
             await asyncio.gather(
                 _batch_evidence_and_synthesis(),
                 _run_structure_update(ticker, research, gathered),
                 _batch_price_drivers(),
                 _batch_gold_overlay(),
+                _batch_notebook_corpus(),
                 return_exceptions=True,
             )
         )
@@ -494,6 +506,8 @@ async def _run_single_in_batch(
             pd_result = None
         if isinstance(gold_result, Exception):
             gold_result = None
+        if isinstance(_nlm_result, Exception):
+            logger.warning(f"[BATCH][{ticker}] Track 6 notebook corpus exception (non-fatal): {_nlm_result}")
 
         # ---- Stage 4: Write Results (no semaphore) ----
         job.status = "writing_results"
@@ -1307,14 +1321,26 @@ async def run_refresh(ticker: str, regime_context: dict | None = None) -> dict:
                     job.stage_errors.append(f"Track 5 (gold): {e}")
                 return None
 
+        # ---- Track 6: NotebookLM corpus context (parallel) ----
+        async def _track_notebook_corpus():
+            """Track 6: query NotebookLM for corpus context to enrich generation."""
+            try:
+                corpus = await notebook_context.query_notebook_batch(ticker)
+                if corpus:
+                    gathered["notebook_corpus"] = corpus
+                    logger.info(f"[{ticker}] Track 6: NotebookLM corpus retrieved ({len([v for v in corpus.values() if v])} dimensions)")
+            except Exception as e:
+                logger.warning(f"[{ticker}] Track 6 notebook corpus failed (non-fatal): {e}")
+
         # ---- Run all tracks in parallel ----
-        logger.info(f"[{ticker}] Launching parallel tracks (2+3, 3-structure, 4-drivers, 5-gold)...")
-        (ev_hyp_result, structure_result, price_driver_result, gold_result) = (
+        logger.info(f"[{ticker}] Launching parallel tracks (2+3, 3-structure, 4-drivers, 5-gold, 6-nlm)...")
+        (ev_hyp_result, structure_result, price_driver_result, gold_result, _nlm_result) = (
             await asyncio.gather(
                 _track_evidence_and_synthesis(),
                 _run_structure_update(ticker, research, gathered),
                 _track_price_drivers(),
                 _track_gold_overlay(),
+                _track_notebook_corpus(),
                 return_exceptions=True,
             )
         )
@@ -1335,6 +1361,8 @@ async def run_refresh(ticker: str, regime_context: dict | None = None) -> dict:
         if isinstance(gold_result, Exception):
             logger.warning(f"[{ticker}] Track 5 gold overlay exception (non-fatal): {gold_result}")
             gold_result = None
+        if isinstance(_nlm_result, Exception):
+            logger.warning(f"[{ticker}] Track 6 notebook corpus exception (non-fatal): {_nlm_result}")
 
         # ---- Stage 4: Write Results ----
         job.status = "writing_results"
@@ -1740,6 +1768,7 @@ async def _run_coverage_initiation(
 {json.dumps(earnings_news[:5], indent=2)}
 {macro_section}
 {_build_regime_section(gathered)}
+{notebook_context.build_corpus_section(ticker, gathered.get("notebook_corpus", {}))}
 
 This is INITIAL COVERAGE. Create a complete research analysis with all hypotheses, narrative \
 sections, verdict, tripwires, discriminators, and gaps assessment. Be thorough and specific."""
@@ -2044,6 +2073,7 @@ async def _run_hypothesis_synthesis(
 {json.dumps(gathered.get('earnings_news', [])[:5], indent=2)}
 {macro_section}
 {_build_regime_section(gathered)}
+{notebook_context.build_corpus_section(ticker, gathered.get("notebook_corpus", {}))}
 
 ## Current Tripwires (catalysts being watched):
 {json.dumps(tripwires_summary, indent=2)}

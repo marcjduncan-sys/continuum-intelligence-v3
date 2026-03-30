@@ -113,3 +113,118 @@ async def _ask_notebook(notebook_id: str, query: str) -> str:
             message=query,
         )
         return response.text if hasattr(response, "text") else str(response)
+
+
+# ---------------------------------------------------------------------------
+# Generation pipeline: batch query + corpus formatter
+# ---------------------------------------------------------------------------
+
+GENERATION_QUERIES: list[tuple[str, str]] = [
+    ("operations", "What are the core business operations, key assets, production metrics, and operational performance?"),
+    ("financials", "What are the key financial metrics, recent results, earnings guidance, and balance sheet position?"),
+    ("risks", "What are the main risks, regulatory issues, controversies, or operational challenges?"),
+    ("catalysts", "What are the upcoming catalysts, strategic initiatives, expansion plans, or corporate actions?"),
+]
+
+
+async def query_notebook_batch(ticker: str) -> dict[str, str | None]:
+    """Query the ticker's NotebookLM notebook with the generation battery.
+
+    Runs all GENERATION_QUERIES in parallel within a single client session.
+    Returns a dict keyed by dimension name. Dimensions that fail or return
+    minimal content are None. Returns empty dict if no notebook, auth expired,
+    or library not installed.
+    """
+    global _nlm_auth_ok, _nlm_last_error
+
+    notebook_id = config.NOTEBOOKLM_TICKER_NOTEBOOKS.get(ticker.upper(), "")
+    if not notebook_id:
+        return {}
+
+    if not _HAS_NOTEBOOKLM:
+        return {}
+
+    if not _nlm_auth_ok:
+        return {}
+
+    if not config.NOTEBOOKLM_AUTH_JSON:
+        return {}
+
+    results: dict[str, str | None] = {}
+
+    try:
+        async with await NotebookLMClient.from_storage() as client:
+
+            async def _query_one(dimension: str, question: str) -> tuple[str, str | None]:
+                query = f"Regarding {ticker}: {question}"
+                try:
+                    response = await asyncio.wait_for(
+                        client.chat.ask(notebook_id=notebook_id, message=query),
+                        timeout=config.NOTEBOOKLM_QUERY_TIMEOUT_SECONDS,
+                    )
+                    text = response.text if hasattr(response, "text") else str(response)
+                    if not text or len(text) < 20:
+                        logger.info("NotebookLM batch: empty response for %s/%s", ticker, dimension)
+                        return dimension, None
+                    if len(text) > config.NOTEBOOKLM_CONTEXT_MAX_CHARS:
+                        text = text[:config.NOTEBOOKLM_CONTEXT_MAX_CHARS]
+                    return dimension, text
+                except asyncio.TimeoutError:
+                    logger.warning("NotebookLM batch timeout for %s/%s", ticker, dimension)
+                    return dimension, None
+                except Exception as exc:
+                    err_str = str(exc).lower()
+                    if any(marker in err_str for marker in _AUTH_ERROR_MARKERS):
+                        if _nlm_auth_ok:
+                            _nlm_auth_ok = False
+                            _nlm_last_error = f"NotebookLM auth expired: {exc}"
+                            logger.warning("NotebookLM auth expired during batch for %s: %s", ticker, exc)
+                    else:
+                        logger.warning("NotebookLM batch query failed for %s/%s: %s", ticker, dimension, exc)
+                    return dimension, None
+
+            pairs = await asyncio.gather(
+                *[_query_one(dim, q) for dim, q in GENERATION_QUERIES]
+            )
+            results = dict(pairs)
+
+    except Exception as exc:
+        err_str = str(exc).lower()
+        if any(marker in err_str for marker in _AUTH_ERROR_MARKERS):
+            _nlm_auth_ok = False
+            _nlm_last_error = f"NotebookLM auth expired: {exc}"
+            logger.warning("NotebookLM auth expired during batch session for %s: %s", ticker, exc)
+        else:
+            logger.warning("NotebookLM batch session failed for %s: %s", ticker, exc)
+        return {}
+
+    return results
+
+
+def build_corpus_section(ticker: str, corpus: dict[str, str | None]) -> str:
+    """Format notebook corpus responses into a prompt section.
+
+    Returns empty string if no dimension has content.
+    """
+    _LABELS = {
+        "operations": "Operations & Assets",
+        "financials": "Financials & Guidance",
+        "risks": "Risks & Controversies",
+        "catalysts": "Catalysts & Strategy",
+    }
+    parts = [
+        f"\n## Source Document Context for {ticker}",
+        "The following is grounded in curated research documents (annual reports, "
+        "filings, presentations). Use it to anchor your analysis with specific "
+        "facts, figures, and operational detail. Do not reproduce verbatim.",
+    ]
+    has_content = False
+    for key, label in _LABELS.items():
+        text = corpus.get(key)
+        if text:
+            parts.append(f"\n### {label}")
+            parts.append(text)
+            has_content = True
+    if not has_content:
+        return ""
+    return "\n".join(parts)
