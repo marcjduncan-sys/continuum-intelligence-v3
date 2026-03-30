@@ -316,6 +316,42 @@ async def get_conversation_by_ticker(
 
 
 # ---------------------------------------------------------------------------
+# Guest-to-user migration (runs once at login)
+# ---------------------------------------------------------------------------
+
+async def migrate_guest_conversations(pool, *, guest_id: str, user_id: str) -> int:
+    """Transfer analyst conversations from guest_id to user_id on auth conversion."""
+    if pool is None:
+        return 0
+    async with pool.acquire() as conn:
+        result = await conn.execute(
+            "UPDATE conversations SET user_id = $1, guest_id = NULL "
+            "WHERE guest_id = $2 AND user_id IS NULL",
+            user_id, guest_id,
+        )
+        try:
+            return int(result.split()[-1])
+        except (ValueError, IndexError):
+            return 0
+
+
+async def migrate_guest_pm_conversations(pool, *, guest_id: str, user_id: str) -> int:
+    """Transfer PM conversations from guest_id to user_id on auth conversion."""
+    if pool is None:
+        return 0
+    async with pool.acquire() as conn:
+        result = await conn.execute(
+            "UPDATE pm_conversations SET user_id = $1, guest_id = NULL "
+            "WHERE guest_id = $2 AND user_id IS NULL",
+            user_id, guest_id,
+        )
+        try:
+            return int(result.split()[-1])
+        except (ValueError, IndexError):
+            return 0
+
+
+# ---------------------------------------------------------------------------
 # Summarisation helpers (Phase 3b)
 # ---------------------------------------------------------------------------
 

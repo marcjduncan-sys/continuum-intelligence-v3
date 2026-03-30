@@ -186,7 +186,7 @@ async function _handleVerifyCode() {
         const res = await fetch(AUTH_API_BASE + '/verify-otp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, code })
+            body: JSON.stringify({ email, code, guest_id: getGuestId() })
         });
         if (!res.ok) {
             const data = await res.json().catch(() => ({}));

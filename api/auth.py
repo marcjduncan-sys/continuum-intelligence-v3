@@ -57,6 +57,7 @@ class OTPRequest(BaseModel):
 class OTPVerify(BaseModel):
     email: str
     code: str = Field(..., min_length=6, max_length=6)
+    guest_id: str | None = Field(None, description="Guest device UUID for conversation migration")
 
 
 # ---------------------------------------------------------------------------
@@ -103,6 +104,14 @@ async def verify_otp(body: OTPVerify, request: Request):
     user_id = await db.upsert_user(pool, email)
     if not user_id:
         raise HTTPException(status_code=503, detail="Could not create user record")
+
+    # Migrate guest data to authenticated user (idempotent, safe to re-run)
+    if body.guest_id:
+        try:
+            await db.migrate_guest_conversations(pool, guest_id=body.guest_id, user_id=user_id)
+            await db.migrate_guest_pm_conversations(pool, guest_id=body.guest_id, user_id=user_id)
+        except Exception as exc:
+            logger.warning("Guest conversation migration failed for %s: %s", email, exc)
 
     token = create_token(user_id, email)
     return {"token": token, "user": {"id": user_id, "email": email}}
