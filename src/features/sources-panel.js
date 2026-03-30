@@ -151,30 +151,23 @@ export function renderSourcesPanel(sources, ticker) {
   const id = ticker.toLowerCase().replace(/[^a-z0-9]/g, '');
   const hasSources = sources && sources.length > 0;
 
-  let html = '<div class="src-panel" id="src-panel-' + id + '">';
-  if (hasSources) {
-    html += '<div class="src-panel-header">';
-    html += '<span class="src-panel-count">' + sources.length + ' source' + (sources.length === 1 ? '' : 's') + '</span>';
-    html += '</div>';
-  }
+  // When no sources exist the upload zone (src-upload-mount) already serves
+  // as the empty state, so we render nothing here to avoid a duplicate block.
+  if (!hasSources) return '';
 
-  // Empty state
-  html += '<div class="src-panel-empty"' + (hasSources ? ' style="display:none"' : '') + '>';
-  html += '<p>No external research uploaded yet.</p>';
-  html += '<p class="src-panel-empty-hint">Add broker research, internal notes, or other analysis to compare against Continuum\'s hypotheses.</p>';
+  let html = '<div class="src-panel" id="src-panel-' + id + '">';
+  html += '<div class="src-panel-header">';
+  html += '<span class="src-panel-count">' + sources.length + ' source' + (sources.length === 1 ? '' : 's') + '</span>';
   html += '</div>';
 
   // Source cards
-  html += '<div class="src-panel-list"' + (!hasSources ? ' style="display:none"' : '') + '>';
-  if (hasSources) {
-    // Newest first
-    const sorted = sources.slice().sort(function(a, b) {
-      return new Date(b.created_at || 0) - new Date(a.created_at || 0);
-    });
-    sorted.forEach(function(source) {
-      html += renderSourceCard(source);
-    });
-  }
+  html += '<div class="src-panel-list">';
+  const sorted = sources.slice().sort(function(a, b) {
+    return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+  });
+  sorted.forEach(function(source) {
+    html += renderSourceCard(source);
+  });
   html += '</div>';
 
   html += '</div>';
@@ -274,16 +267,20 @@ export async function initSourcesPanel(ticker) {
  * @param {string} ticker
  */
 export function appendSource(source, ticker) {
-  const panel = document.getElementById('src-panel-' + ticker.toLowerCase().replace(/[^a-z0-9]/g, ''));
-  if (!panel) return;
+  const id = ticker.toLowerCase().replace(/[^a-z0-9]/g, '');
+  let panel = document.getElementById('src-panel-' + id);
+
+  // If the panel doesn't exist yet (first upload), create it in the mount point.
+  if (!panel) {
+    const mountEl = document.getElementById('src-panel-mount-' + id);
+    if (!mountEl) return;
+    mountEl.innerHTML = renderSourcesPanel([source], ticker);
+    bindDeleteHandlers(mountEl, ticker);
+    return;
+  }
 
   const listEl = panel.querySelector('.src-panel-list');
-  const emptyEl = panel.querySelector('.src-panel-empty');
   const countEl = panel.querySelector('.src-panel-count');
-
-  // Show list, hide empty state
-  if (emptyEl) emptyEl.style.display = 'none';
-  if (listEl) listEl.style.display = '';
 
   // Prepend new card
   if (listEl) {

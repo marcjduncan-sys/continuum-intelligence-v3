@@ -43,16 +43,14 @@ var MOCK_SOURCE_MINIMAL = {
 describe('sources-panel', function() {
 
   describe('renderSourcesPanel', function() {
-    it('shows empty state when sources array is empty', function() {
+    it('returns empty string when sources array is empty', function() {
       var html = renderSourcesPanel([], 'ASB');
-      expect(html).toContain('src-panel-empty');
-      expect(html).toContain('No external research uploaded yet');
-      expect(html).not.toContain('src-card');
+      expect(html).toBe('');
     });
 
-    it('shows empty state when sources is null', function() {
+    it('returns empty string when sources is null', function() {
       var html = renderSourcesPanel(null, 'ASB');
-      expect(html).toContain('src-panel-empty');
+      expect(html).toBe('');
     });
 
     it('renders correct number of source cards', function() {
@@ -69,14 +67,9 @@ describe('sources-panel', function() {
       expect(html2).toContain('2 sources');
     });
 
-    it('hides empty state when sources exist', function() {
-      var html = renderSourcesPanel([MOCK_SOURCE], 'ASB');
-      expect(html).toContain('src-panel-empty" style="display:none"');
-    });
-
     it('uses correct ticker in panel ID', function() {
-      var html = renderSourcesPanel([], 'WDS');
-      expect(html).toContain('id="src-panel-wds"');
+      var html = renderSourcesPanel([MOCK_SOURCE], 'ASB');
+      expect(html).toContain('id="src-panel-asb"');
     });
   });
 
