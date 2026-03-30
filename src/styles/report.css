@@ -436,6 +436,15 @@
     flex: 1;
 }
 
+/* Report-scoped skew score override (home page uses 0.72rem) */
+.risk-skew-bar .skew-score { font-size: var(--report-metric-size); }
+
+/* Technical section footer */
+.ta-footer { font-size: 0.6rem; color: var(--text-muted); margin-top: var(--space-md); padding-top: var(--space-sm); border-top: 1px solid var(--border); }
+
+/* Gold agent stage badge override */
+.ga-score-value.ga-stage-value { font-size: 13px; }
+
 /* --- Report Page: Verdict --- */
 .verdict-section {
     background: var(--bg-surface);

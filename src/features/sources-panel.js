@@ -152,12 +152,11 @@ export function renderSourcesPanel(sources, ticker) {
   const hasSources = sources && sources.length > 0;
 
   let html = '<div class="src-panel" id="src-panel-' + id + '">';
-  html += '<div class="src-panel-header">';
-  html += '<h3 class="src-panel-title">External Research</h3>';
   if (hasSources) {
+    html += '<div class="src-panel-header">';
     html += '<span class="src-panel-count">' + sources.length + ' source' + (sources.length === 1 ? '' : 's') + '</span>';
+    html += '</div>';
   }
-  html += '</div>';
 
   // Empty state
   html += '<div class="src-panel-empty"' + (hasSources ? ' style="display:none"' : '') + '>';

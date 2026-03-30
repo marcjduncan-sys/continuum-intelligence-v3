@@ -275,7 +275,7 @@ export function renderSkewBar(data) {
         '<div class="skew-bar-bull" style="width:' + skew.bull + '%"></div>' +
         '<div class="skew-bar-bear" style="width:' + skew.bear + '%"></div>' +
       '</div>' +
-      '<span class="skew-score ' + scoreCls + '" style="font-size:0.82rem">' + scoreLabel + '</span>' +
+      '<span class="skew-score ' + scoreCls + '">' + scoreLabel + '</span>' +
       '<span class="rsb-rationale">' + rationale + '</span>' +
     '</div>' +
   '</div>';
@@ -457,7 +457,7 @@ export function renderNarrative(data) {
     (pi.label || pi.content ? '<div class="rs-subtitle">The Price Implication</div>' +
     '<div class="callout">' +
       '<div class="callout-label">' + (pi.label || '') + '</div>' +
-      '<p>' + (pi.content || '') + '</p>' +
+      '<p class="rs-text">' + (pi.content || '') + '</p>' +
     '</div>' : '') +
     (n.evidenceCheck ? '<div class="rs-subtitle">The Evidence Check</div>' +
     '<p class="rs-text">' + n.evidenceCheck + '</p>' : '') +
@@ -726,7 +726,11 @@ export function renderTAChart(data) {
     hlBand: isLight ? '#1A1F2E' : '#E8EDF4',
     legendText: isLight ? '#4A5568' : '#8B9AB8',
     dot: isLight ? '#1A1F2E' : '#E8EDF4',
-    dotStroke: isLight ? '#FFFFFF' : '#0D1726'
+    dotStroke: isLight ? '#FFFFFF' : '#0D1726',
+    support: '#3DAA6D',
+    resistance: '#D45555',
+    ma50: '#D4A03C',
+    ma200: '#4A8ECC'
   };
 
   var useLive = live && live.bars && live.bars.length > 100;
@@ -791,13 +795,13 @@ export function renderTAChart(data) {
 
   if (supportPrice && supportPrice >= pMin && supportPrice <= pMax) {
     var sy = yPos(supportPrice);
-    svg += '<line x1="' + padL + '" y1="' + sy.toFixed(1) + '" x2="' + (padL + cW) + '" y2="' + sy.toFixed(1) + '" stroke="#3DAA6D" stroke-width="0.8" stroke-dasharray="6,4" opacity="0.6"/>';
-    svg += '<text x="' + (padL + 4) + '" y="' + (sy - 4).toFixed(1) + '" fill="#3DAA6D" font-family="JetBrains Mono, monospace" font-size="7.5" opacity="0.8">S ' + cur + supportPrice.toFixed(2) + '</text>';
+    svg += '<line x1="' + padL + '" y1="' + sy.toFixed(1) + '" x2="' + (padL + cW) + '" y2="' + sy.toFixed(1) + '" stroke="' + C.support + '" stroke-width="0.8" stroke-dasharray="6,4" opacity="0.6"/>';
+    svg += '<text x="' + (padL + 4) + '" y="' + (sy - 4).toFixed(1) + '" fill="' + C.support + '" font-family="JetBrains Mono, monospace" font-size="7.5" opacity="0.8">S ' + cur + supportPrice.toFixed(2) + '</text>';
   }
   if (resistPrice && resistPrice >= pMin && resistPrice <= pMax) {
     var ry = yPos(resistPrice);
-    svg += '<line x1="' + padL + '" y1="' + ry.toFixed(1) + '" x2="' + (padL + cW) + '" y2="' + ry.toFixed(1) + '" stroke="#D45555" stroke-width="0.8" stroke-dasharray="6,4" opacity="0.6"/>';
-    svg += '<text x="' + (padL + 4) + '" y="' + (ry - 4).toFixed(1) + '" fill="#D45555" font-family="JetBrains Mono, monospace" font-size="7.5" opacity="0.8">R ' + cur + resistPrice.toFixed(2) + '</text>';
+    svg += '<line x1="' + padL + '" y1="' + ry.toFixed(1) + '" x2="' + (padL + cW) + '" y2="' + ry.toFixed(1) + '" stroke="' + C.resistance + '" stroke-width="0.8" stroke-dasharray="6,4" opacity="0.6"/>';
+    svg += '<text x="' + (padL + 4) + '" y="' + (ry - 4).toFixed(1) + '" fill="' + C.resistance + '" font-family="JetBrains Mono, monospace" font-size="7.5" opacity="0.8">R ' + cur + resistPrice.toFixed(2) + '</text>';
   }
 
   if (highs && lows) {
@@ -818,14 +822,14 @@ export function renderTAChart(data) {
     if (ma200Arr[i] === null) continue;
     ma200Path += (ma200Path === '' ? 'M' : 'L') + xPos(i).toFixed(1) + ',' + yPos(ma200Arr[i]).toFixed(1);
   }
-  if (ma200Path) svg += '<path d="' + ma200Path + '" fill="none" stroke="#4A8ECC" stroke-width="1.3" opacity="0.8"/>';
+  if (ma200Path) svg += '<path d="' + ma200Path + '" fill="none" stroke="' + C.ma200 + '" stroke-width="1.3" opacity="0.8"/>';
 
   var ma50Path = '';
   for (var i = 0; i < n; i++) {
     if (ma50Arr[i] === null) continue;
     ma50Path += (ma50Path === '' ? 'M' : 'L') + xPos(i).toFixed(1) + ',' + yPos(ma50Arr[i]).toFixed(1);
   }
-  if (ma50Path) svg += '<path d="' + ma50Path + '" fill="none" stroke="#D4A03C" stroke-width="1.3" opacity="0.8"/>';
+  if (ma50Path) svg += '<path d="' + ma50Path + '" fill="none" stroke="' + C.ma50 + '" stroke-width="1.3" opacity="0.8"/>';
 
   var pricePath = 'M' + xPos(0).toFixed(1) + ',' + yPos(closes[0]).toFixed(1);
   for (var i = 1; i < n; i++) pricePath += 'L' + xPos(i).toFixed(1) + ',' + yPos(closes[i]).toFixed(1);
@@ -884,13 +888,13 @@ export function renderTAChart(data) {
     svg += '<text x="' + (lx0+64) + '" y="17" fill="' + C.legendText + '" font-family="Inter, sans-serif" font-size="8">High/Low</text>';
     lx0 += 56;
   }
-  svg += '<line x1="' + (lx0+52) + '" y1="14" x2="' + (lx0+68) + '" y2="14" stroke="#D4A03C" stroke-width="1.5"/>';
+  svg += '<line x1="' + (lx0+52) + '" y1="14" x2="' + (lx0+68) + '" y2="14" stroke="' + C.ma50 + '" stroke-width="1.5"/>';
   svg += '<text x="' + (lx0+72) + '" y="17" fill="' + C.legendText + '" font-family="Inter, sans-serif" font-size="8">50d MA</text>';
-  svg += '<line x1="' + (lx0+112) + '" y1="14" x2="' + (lx0+128) + '" y2="14" stroke="#4A8ECC" stroke-width="1.5"/>';
+  svg += '<line x1="' + (lx0+112) + '" y1="14" x2="' + (lx0+128) + '" y2="14" stroke="' + C.ma200 + '" stroke-width="1.5"/>';
   svg += '<text x="' + (lx0+132) + '" y="17" fill="' + C.legendText + '" font-family="Inter, sans-serif" font-size="8">200d MA</text>';
-  svg += '<line x1="' + (lx0+182) + '" y1="14" x2="' + (lx0+198) + '" y2="14" stroke="#3DAA6D" stroke-width="1" stroke-dasharray="4,3"/>';
+  svg += '<line x1="' + (lx0+182) + '" y1="14" x2="' + (lx0+198) + '" y2="14" stroke="' + C.support + '" stroke-width="1" stroke-dasharray="4,3"/>';
   svg += '<text x="' + (lx0+202) + '" y="17" fill="' + C.legendText + '" font-family="Inter, sans-serif" font-size="8">Support</text>';
-  svg += '<line x1="' + (lx0+242) + '" y1="14" x2="' + (lx0+258) + '" y2="14" stroke="#D45555" stroke-width="1" stroke-dasharray="4,3"/>';
+  svg += '<line x1="' + (lx0+242) + '" y1="14" x2="' + (lx0+258) + '" y2="14" stroke="' + C.resistance + '" stroke-width="1" stroke-dasharray="4,3"/>';
   svg += '<text x="' + (lx0+262) + '" y="17" fill="' + C.legendText + '" font-family="Inter, sans-serif" font-size="8">Resistance</text>';
 
   svg += '</svg>';
@@ -1064,7 +1068,7 @@ export function renderTechnicalAnalysis(data) {
     (ftw52Low.price != null ? '<tr><td class="ta-label-cell">52-Week Low</td><td>' + (price.currency || '') + ftw52Low.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + (ftw52Low.date || '') + '</td></tr>' : '') +
     '</tbody></table>' : '';
 
-  var footerHtml = '<div style="font-size:0.6rem;color:var(--text-muted);margin-top:var(--space-md);padding-top:var(--space-sm);border-top:1px solid var(--border)">' +
+  var footerHtml = '<div class="ta-footer">' +
     'Analysis period: ' + (ta.period || '') + ' &bull; Generated: ' + (ta.date || '') + ' &bull; Source: ' + (ta.source || 'Continuum Technical Intelligence') +
   '</div>';
 
@@ -1234,12 +1238,12 @@ export function renderHypSidebar(data) {
     '<div class="hs-env-row">' +
       '<div class="hs-dot ' + macCls + '"></div>' +
       '<span class="hs-env-label">Macro</span>' +
-      '<span class="hs-env-score">' + (macSig > 0 ? '+' : '') + macSig + '</span>' +
+      '<span class="hs-env-score">' + (macSig > 0 ? '+' : '') + Math.round(macSig) + '</span>' +
     '</div>' +
     '<div class="hs-env-row">' +
       '<div class="hs-dot ' + secCls + '"></div>' +
       '<span class="hs-env-label">Sector</span>' +
-      '<span class="hs-env-score">' + (secSig > 0 ? '+' : '') + secSig + '</span>' +
+      '<span class="hs-env-score">' + (secSig > 0 ? '+' : '') + Math.round(secSig) + '</span>' +
     '</div>';
 
   inner += '<div class="hs-subhead">Company</div>' +
@@ -1402,13 +1406,13 @@ export function renderNarrativeTimeline(data) {
 var NT_COLORS = {
   price: '#8B95A5',
   hypotheses: [
-    { bg: 'rgba(72, 199, 142, 0.15)', border: '#48C78E', label: '#48C78E' },
-    { bg: 'rgba(79, 140, 255, 0.12)', border: '#4F8CFF', label: '#4F8CFF' },
-    { bg: 'rgba(255, 183, 77, 0.12)', border: '#FFB74D', label: '#FFB74D' },
-    { bg: 'rgba(239, 83, 80, 0.10)', border: '#EF5350', label: '#EF5350' }
+    { bg: 'rgba(61, 170, 109, 0.15)', border: '#3DAA6D', label: '#3DAA6D' },
+    { bg: 'rgba(74, 142, 204, 0.12)', border: '#4A8ECC', label: '#4A8ECC' },
+    { bg: 'rgba(212, 160, 60, 0.12)', border: '#D4A03C', label: '#D4A03C' },
+    { bg: 'rgba(224, 93, 93, 0.10)', border: '#E05D5D', label: '#E05D5D' }
   ],
-  flip: '#FFB74D',
-  overcorrection: '#EF5350',
+  flip: '#D4A03C',
+  overcorrection: '#E05D5D',
   grid: 'rgba(139, 149, 165, 0.1)'
 };
 
@@ -1815,8 +1819,8 @@ export function renderSignalBars(data) {
         '<span class="sb-row-label">Macro Environment</span>' +
         '<span class="sb-badge ' + macCls + '">' + macLabel + '</span>' +
         '<div class="sb-items">' +
-          '<span class="sb-item">Signal ' + (macSig > 0 ? '+' : '') + macSig + '</span>' +
-          (tls.external_weight ? '<span class="sb-sep">|</span><span class="sb-item">Weight ' + tls.external_weight + '%</span>' : '') +
+          '<span class="sb-item">Signal ' + (macSig > 0 ? '+' : '') + Math.round(macSig) + '</span>' +
+          (tls.external_weight ? '<span class="sb-sep">|</span><span class="sb-item">Weight ' + Math.round(tls.external_weight) + '%</span>' : '') +
         '</div>' +
       '</div>';
   }
@@ -1835,9 +1839,9 @@ export function renderSignalBars(data) {
         '<span class="sb-badge ' + secCls + '">' + secLabel + '</span>' +
         '<div class="sb-items">' +
           (secName ? '<span class="sb-item">' + secName + '</span><span class="sb-sep">|</span>' : '') +
-          '<span class="sb-item">Signal ' + (secSig > 0 ? '+' : '') + secSig + '</span>' +
+          '<span class="sb-item">Signal ' + (secSig > 0 ? '+' : '') + Math.round(secSig) + '</span>' +
           '<span class="sb-sep">|</span>' +
-          '<span class="sb-item">Weight ' + secWeight + '%</span>' +
+          '<span class="sb-item">Weight ' + Math.round(secWeight) + '%</span>' +
           '<span class="sb-sep">|</span>' +
           '<span class="sb-item">Contribs 0</span>' +
         '</div>' +
@@ -1881,7 +1885,7 @@ export function renderSignalBars(data) {
     chipsHtml +=
       '<span class="sb-hyp-chip ' + chipCls + '">' +
         nCode + (keyWord ? ' ' + keyWord.toUpperCase() : '') +
-        '<span class="chip-pct">' + (sh.weight || 0) + '%</span>' +
+        '<span class="chip-pct">' + Math.round(sh.weight || 0) + '%</span>' +
       '</span>';
   }
 
@@ -2097,7 +2101,7 @@ function _renderGoldDiscoveryInner(data) {
   var skewColor = skew >= 55 ? 'var(--signal-green)' : skew <= 45 ? 'var(--signal-red)' : 'var(--signal-amber)';
   var stageBadge = ga.company_stage
     ? '<div class="ga-score-card"><div class="ga-score-label">Stage</div>' +
-        '<div class="ga-score-value" style="font-size:13px">' + ga.company_stage.replace(/_/g, ' ') + '</div></div>'
+        '<div class="ga-score-value ga-stage-value">' + ga.company_stage.replace(/_/g, ' ') + '</div></div>'
     : '';
 
   var scorecardHtml =
@@ -2373,7 +2377,7 @@ export function renderGoldSection(data) {
         '</tbody>' +
       '</table>';
     if (iv.monitoring_trigger) {
-      viewHtml += '<div class="callout"><div class="callout-label">Monitoring Trigger</div><p>' + iv.monitoring_trigger + '</p></div>';
+      viewHtml += '<div class="callout"><div class="callout-label">Monitoring Trigger</div><p class="rs-text">' + iv.monitoring_trigger + '</p></div>';
     }
   }
 
@@ -2466,7 +2470,7 @@ export function renderGoldSection(data) {
     recoHtml =
       '<div class="callout">' +
         '<div class="callout-label">Recommendation</div>' +
-        '<p>' + ga.recommendation + '</p>' +
+        '<p class="rs-text">' + ga.recommendation + '</p>' +
       '</div>';
   }
 

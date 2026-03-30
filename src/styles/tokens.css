@@ -54,6 +54,12 @@
     --max-width: 1240px;
     --nav-height: 56px;
 
+    /* Report Typography */
+    --report-heading-size: 1.1rem;
+    --report-body-size: 0.88rem;
+    --report-caption-size: 0.72rem;
+    --report-metric-size: 0.82rem;
+
     /* Analyst Panel */
     --analyst-panel-width: 640px;
     --analyst-panel-bg: #0E1624;
@@ -83,6 +89,13 @@
     --signal-green: #2F855A;
     --signal-blue: #2B6CB0;
 }
+
+/* Signal colour utility classes */
+.signal-positive { color: var(--signal-green); }
+.signal-negative { color: var(--signal-red); }
+.signal-neutral  { color: var(--signal-amber); }
+.signal-info     { color: var(--signal-blue); }
+
 /* Light theme  --  component overrides */
 [data-theme="light"] .site-nav {
     background: rgba(245, 246, 248, 0.95);
