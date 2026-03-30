@@ -35,10 +35,10 @@
       "what_to_watch": "Vifor integration costs in H1 FY26 and AUD/USD exchange rate trajectory. If integration costs rise or AUD strengthens above 0.70, downside risk increases.",
       "upside": null,
       "risk_plain": "Currency headwinds alone could knock 3-5% off reported earnings, and if combined with slower Vifor synergies, the stock could de-rate.",
-      "survival_score": 0.44,
+      "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 4.2,
-      "last_updated": "2026-03-30T21:32:40.410Z"
+      "last_updated": "2026-03-30T23:57:33.227Z"
     },
     "N4": {
       "label": "Disruption",
@@ -47,26 +47,26 @@
       "what_to_watch": "Gene therapy clinical trial results targeting primary immunodeficiency conditions, and any biosimilar approvals for immunoglobulin products in major markets.",
       "upside": null,
       "risk_plain": "While this is a long-term risk, any breakthrough gene therapy result could trigger a sharp de-rating of the entire plasma sector.",
-      "survival_score": 0.46,
+      "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 7.1,
-      "last_updated": "2026-03-30T21:32:40.410Z"
+      "last_updated": "2026-03-30T23:57:33.227Z"
     }
   },
-  "dominant": "N4",
+  "dominant": "N3",
   "confidence": "LOW",
   "alert_state": "OVERCORRECTION",
   "alert_started": null,
-  "current_price": 140.82,
+  "current_price": 142.68,
   "big_picture": "CSL is a global biotech leader specialising in plasma-derived therapies and vaccines. It is one of only three companies worldwide that can collect and process blood plasma at scale, giving it an extremely strong competitive position.",
   "last_flip": {
     "date": "2026-03-30",
-    "from": "N3",
-    "to": "N4",
-    "trigger": "Automated: survival score shift (Risk/Downside → Disruption)",
-    "price_at_flip": 140.82,
-    "from_survival": 0.44,
-    "to_survival": 0.46
+    "from": "N4",
+    "to": "N3",
+    "trigger": "Automated: survival score shift (Disruption → Risk/Downside)",
+    "price_at_flip": 142.68,
+    "from_survival": 0.45,
+    "to_survival": 0.45
   },
   "narrative_history": [
     {
@@ -455,6 +455,15 @@
       "price_at_flip": 140.82,
       "from_survival": 0.45,
       "to_survival": 0.45
+    },
+    {
+      "date": "2026-03-30",
+      "from": "N3",
+      "to": "N4",
+      "trigger": "Automated: survival score shift (Risk/Downside → Disruption)",
+      "price_at_flip": 140.82,
+      "from_survival": 0.44,
+      "to_survival": 0.46
     }
   ],
   "evidence_items": [
@@ -809,15 +818,16 @@
     143.19,
     139.6,
     140.73,
-    140.82
+    140.82,
+    142.68
   ],
   "freshness": {
-    "pricePctChange": 0.1,
+    "pricePctChange": 1.3,
     "urgency": 0,
     "status": "OK",
     "badge": "ok"
   },
-  "last_price_update": "2026-03-30T05:38:08.483Z",
+  "last_price_update": "2026-03-30T23:57:33.076Z",
   "technicalAnalysis": {
     "date": "30 March 2026",
     "period": "1 Year",
@@ -825,16 +835,16 @@
     "regime": "Downtrend",
     "clarity": "Mixed",
     "price": {
-      "current": 140.82,
+      "current": 142.68,
       "currency": "A$"
     },
     "movingAverages": {
       "ma50": {
-        "value": 160.1,
+        "value": 155.3,
         "date": "30 Mar 2026"
       },
       "ma200": {
-        "value": 210.2,
+        "value": 206,
         "date": "30 Mar 2026"
       },
       "crossover": {
@@ -842,8 +852,8 @@
         "date": "March 2026",
         "description": "50-day MA crossed below 200-day MA (death cross)"
       },
-      "priceVsMa50": -12.2,
-      "priceVsMa200": -33.1
+      "priceVsMa50": -9.3,
+      "priceVsMa200": -31.6
     },
     "trend": {
       "direction": "Down",
@@ -857,7 +867,7 @@
         "price": 134.62,
         "date": "Recent"
       },
-      "drawdown": -48.3
+      "drawdown": -48.2
     },
     "keyLevels": {
       "support": {
@@ -865,7 +875,7 @@
         "method": "Recent low / swing support"
       },
       "resistance": {
-        "price": 147.3,
+        "price": 146.49,
         "method": "Recent high / swing resistance"
       },
       "fiftyTwoWeekHigh": {
@@ -884,17 +894,17 @@
     },
     "volatility": {
       "latestDailyRange": {
-        "high": 144.35,
-        "low": 143.19,
+        "high": 140.82,
+        "low": 140.58,
         "date": "30 March 2026"
       },
-      "latestRangePercent": 1.7,
-      "avgDailyRangePercent30": 1.7,
-      "avgDailyRangePercent90": 1.7
+      "latestRangePercent": 1.3,
+      "avgDailyRangePercent30": 1.3,
+      "avgDailyRangePercent90": 1.3
     },
     "meanReversion": {
-      "vsMa50": -12.2,
-      "vsMa200": -33.1,
+      "vsMa50": -9.3,
+      "vsMa200": -31.6,
       "rangePosition": 4,
       "rangeHigh": 272,
       "rangeLow": 134.62
@@ -904,9 +914,9 @@
       "vsIndex": {
         "name": "S&P/ASX 200",
         "period": "12 months",
-        "stockReturn": -44.9,
+        "stockReturn": -44.4,
         "indexReturn": 6.5,
-        "relativeReturn": -51.4
+        "relativeReturn": -50.9
       }
     }
   },
@@ -921,8 +931,8 @@
     "message": "5-day cumulative move of -50.6% exceeds 15% threshold – possible overcorrection"
   },
   "price_evidence": {
-    "last_run": "2026-03-30T21:32:40.410Z",
+    "last_run": "2026-03-30T23:57:33.227Z",
     "classification": "NOISE"
   },
-  "last_research_update": "2026-03-30T21:32:40.410Z"
+  "last_research_update": "2026-03-30T23:57:33.227Z"
 }
