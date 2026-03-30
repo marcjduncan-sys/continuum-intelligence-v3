@@ -163,6 +163,15 @@ function switchRailMode(mode) {
 
     document.body.classList.add('analyst-panel-open');
 
+    // Clear collapsed state so the active panel always shows at full width
+    if (_analystPanel && _analystPanel.classList.contains('ap-user-collapsed')) {
+        _analystPanel.classList.remove('ap-user-collapsed');
+        document.body.classList.remove('ap-user-collapsed-active');
+        var _cb = document.getElementById('apCollapseBtn');
+        if (_cb) _cb.style.transform = '';
+        try { localStorage.setItem('ci_panel_collapsed', '0'); } catch(e) { /* storage unavailable */ }
+    }
+
     try { localStorage.setItem('ci_rail_mode', mode); } catch(e) { // Expected: localStorage may be unavailable in restricted environments
     }
     console.log('[PM] Rail mode switched to', mode);
