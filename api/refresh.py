@@ -28,6 +28,76 @@ import config
 import re
 
 import llm
+
+
+def _build_generation_meta(gathered: dict | None) -> dict:
+    """Capture macro driver snapshot at narrative generation time.
+
+    Stored as research["_generation_meta"] so the frontend can compare
+    current macro values against the conditions when the narrative was written.
+    Used by the staleness badge (BEAD-005) and regime detector (BEAD-004).
+    """
+    meta: dict = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "drivers": {},
+    }
+    if not gathered:
+        return meta
+
+    macro_ctx = gathered.get("macro_context")
+    if not macro_ctx:
+        return meta
+
+    for cp in macro_ctx.get("commodity_prices", []):
+        price = cp.get("price")
+        if price is None:
+            continue
+        key = cp.get("name", cp.get("ticker", "unknown"))
+        key = key.lower().replace(" ", "_")
+        meta["drivers"][key] = {
+            "value": price,
+            "change_pct": cp.get("change_pct"),
+            "ticker": cp.get("ticker", ""),
+        }
+
+    return meta
+
+
+def _build_regime_section(gathered: dict | None) -> str:
+    """Build a regime break context block for LLM prompt injection.
+
+    If gathered["regime_context"] exists (set by the regime refresh endpoint),
+    returns a formatted section alerting the LLM to a material macro shift.
+    Otherwise returns empty string (no change to existing prompt flow).
+    """
+    if not gathered:
+        return ""
+    rc = gathered.get("regime_context")
+    if not rc:
+        return ""
+
+    parts = [
+        "\n## REGIME BREAK ALERT",
+        "A material macro regime change has been detected since the last analysis:",
+        f"- Variable: {rc.get('variable', 'unknown')}",
+        f"- Previous (30d mean): {rc.get('baseline', 'N/A')}",
+        f"- Current: {rc.get('current', 'N/A')}",
+    ]
+    change_pct = rc.get("change_pct")
+    sigma = rc.get("sigma")
+    if change_pct is not None and sigma is not None:
+        parts.append(f"- Move: {change_pct:+.1f}% ({sigma:.1f} sigma)")
+    elif change_pct is not None:
+        parts.append(f"- Move: {change_pct:+.1f}%")
+
+    parts.append(
+        "\nCRITICAL: Your hypothesis reweighting and narrative MUST explicitly address "
+        "this regime change. Do not treat this as incremental drift -- it is a structural "
+        "shift in the operating environment."
+    )
+    return "\n".join(parts)
+
+
 from gemini_client import gemini_completion
 from validate_research import fix as validate_fix, validate as validate_check
 from web_search import gather_all_data
@@ -1108,7 +1178,7 @@ say "Event occurred [date]; outcome details pending data update."
 # Main refresh pipeline
 # ---------------------------------------------------------------------------
 
-async def run_refresh(ticker: str) -> dict:
+async def run_refresh(ticker: str, regime_context: dict | None = None) -> dict:
     """
     Execute the full 4-stage refresh pipeline for a single stock.
 
@@ -1120,6 +1190,9 @@ async def run_refresh(ticker: str) -> dict:
     ----------
     ticker : str
         ASX ticker code (uppercase).
+    regime_context : dict, optional
+        If provided (from regime refresh endpoint), injected into gathered data
+        so LLM prompts address the macro regime shift explicitly.
 
     Returns
     -------
@@ -1150,6 +1223,10 @@ async def run_refresh(ticker: str) -> dict:
             sector=research.get("sector"),
             sector_sub=research.get("sectorSub"),
         )
+
+        # Inject regime context if this refresh was triggered by a regime break
+        if regime_context:
+            gathered["regime_context"] = regime_context
 
         # ---- Track 2: Evidence + Synthesis (sequential within track) ----
         async def _track_evidence_and_synthesis():
@@ -1465,6 +1542,7 @@ async def _run_evidence_specialists(
 ## Recent News Headlines:
 {json.dumps(news[:8], indent=2)}
 {macro_section}
+{_build_regime_section(gathered)}
 {_format_expanded_data(gathered)}
 
 Please assess each evidence card against this new data and return the updated assessment as JSON."""
@@ -1531,6 +1609,7 @@ async def _run_evidence_creation(
 ## Earnings/Results News:
 {json.dumps(earnings_news[:8], indent=2)}
 {macro_section}
+{_build_regime_section(gathered)}
 {_format_expanded_data(gathered)}
 
 Please create all 10 evidence domain cards for this stock based on the available data."""
@@ -1660,6 +1739,7 @@ async def _run_coverage_initiation(
 ## Earnings/Results News:
 {json.dumps(earnings_news[:5], indent=2)}
 {macro_section}
+{_build_regime_section(gathered)}
 
 This is INITIAL COVERAGE. Create a complete research analysis with all hypotheses, narrative \
 sections, verdict, tripwires, discriminators, and gaps assessment. Be thorough and specific."""
@@ -1963,6 +2043,7 @@ async def _run_hypothesis_synthesis(
 ## Recent Earnings/Results News:
 {json.dumps(gathered.get('earnings_news', [])[:5], indent=2)}
 {macro_section}
+{_build_regime_section(gathered)}
 
 ## Current Tripwires (catalysts being watched):
 {json.dumps(tripwires_summary, indent=2)}
@@ -2438,6 +2519,9 @@ def _merge_updates(
     updated["date"] = now
     updated["_lastRefreshed"] = datetime.now(timezone.utc).isoformat()
 
+    # -- Generation metadata (macro driver snapshot for staleness detection) --
+    updated["_generation_meta"] = _build_generation_meta(gathered)
+
     return updated
 
 
@@ -2867,5 +2951,8 @@ def _merge_initiation(
     # -- Timestamp --
     updated["date"] = now
     updated["_lastRefreshed"] = datetime.now(timezone.utc).isoformat()
+
+    # -- Generation metadata (macro driver snapshot for staleness detection) --
+    updated["_generation_meta"] = _build_generation_meta(gathered)
 
     return updated

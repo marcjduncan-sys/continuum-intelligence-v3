@@ -138,6 +138,11 @@ async def fetch_fx_rate(
                 "AV",
             )
         logger.info("AV macro: upserted %s = %s", symbol, price)
+
+        # Append to unified history for rolling stats (regime detection)
+        from clients.macro_history import append_history
+        await append_history(pool, "AV", symbol, float(price), today)
+
         return True
     except Exception as exc:
         logger.error("AV macro: DB insert failed for %s: %s", symbol, exc)
@@ -184,4 +189,9 @@ async def refresh_all_fx(pool: Any) -> dict[str, bool]:
         "AV FX refresh complete: %d/%d pairs in %.1fs",
         success_count, len(FX_PAIRS), elapsed,
     )
+
+    # Prune old history rows (90-day retention)
+    from clients.macro_history import prune_history
+    await prune_history(pool)
+
     return results

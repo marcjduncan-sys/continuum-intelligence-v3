@@ -1,0 +1,118 @@
+{
+    "_comment": "Directional sensitivity of each ticker to macro variables. Used by regime detector (BEAD-004) and staleness badge (BEAD-005). direction: positive/negative/mixed. magnitude: high/medium/low. macro_key must match keys used in macro_series_history and the macro state endpoint.",
+
+    "BHP": {
+        "iron_ore": {"direction": "positive", "magnitude": "high"},
+        "copper": {"direction": "positive", "magnitude": "medium"},
+        "gold": {"direction": "positive", "magnitude": "low"}
+    },
+    "FMG": {
+        "iron_ore": {"direction": "positive", "magnitude": "high"},
+        "copper": {"direction": "positive", "magnitude": "low"}
+    },
+    "RIO": {
+        "iron_ore": {"direction": "positive", "magnitude": "high"},
+        "copper": {"direction": "positive", "magnitude": "medium"},
+        "gold": {"direction": "positive", "magnitude": "low"}
+    },
+    "MIN": {
+        "iron_ore": {"direction": "positive", "magnitude": "high"},
+        "copper": {"direction": "positive", "magnitude": "low"}
+    },
+    "HRZ": {
+        "gold": {"direction": "positive", "magnitude": "high"}
+    },
+    "NST": {
+        "gold": {"direction": "positive", "magnitude": "high"}
+    },
+    "EVN": {
+        "gold": {"direction": "positive", "magnitude": "high"}
+    },
+    "WAF": {
+        "gold": {"direction": "positive", "magnitude": "high"}
+    },
+    "ASB": {
+        "gold": {"direction": "positive", "magnitude": "high"}
+    },
+    "OBM": {
+        "gold": {"direction": "positive", "magnitude": "high"}
+    },
+    "WIA": {
+        "gold": {"direction": "positive", "magnitude": "high"}
+    },
+    "WDS": {
+        "brent_crude": {"direction": "positive", "magnitude": "high"},
+        "natural_gas": {"direction": "positive", "magnitude": "medium"},
+        "audusd": {"direction": "negative", "magnitude": "low"}
+    },
+    "STO": {
+        "brent_crude": {"direction": "positive", "magnitude": "high"},
+        "natural_gas": {"direction": "positive", "magnitude": "medium"}
+    },
+    "RMC": {
+        "brent_crude": {"direction": "positive", "magnitude": "high"},
+        "natural_gas": {"direction": "positive", "magnitude": "medium"}
+    },
+    "WOR": {
+        "brent_crude": {"direction": "positive", "magnitude": "medium"},
+        "natural_gas": {"direction": "positive", "magnitude": "medium"}
+    },
+    "CBA": {
+        "us10y": {"direction": "positive", "magnitude": "medium"},
+        "rba_cash_rate": {"direction": "positive", "magnitude": "high"},
+        "audusd": {"direction": "mixed", "magnitude": "medium"}
+    },
+    "NAB": {
+        "us10y": {"direction": "positive", "magnitude": "medium"},
+        "rba_cash_rate": {"direction": "positive", "magnitude": "high"},
+        "audusd": {"direction": "mixed", "magnitude": "medium"}
+    },
+    "MQG": {
+        "us10y": {"direction": "mixed", "magnitude": "medium"},
+        "audusd": {"direction": "negative", "magnitude": "medium"},
+        "gold": {"direction": "positive", "magnitude": "low"}
+    },
+    "CSL": {
+        "audusd": {"direction": "negative", "magnitude": "high"}
+    },
+    "SIG": {
+        "audusd": {"direction": "negative", "magnitude": "medium"}
+    },
+    "PME": {
+        "audusd": {"direction": "negative", "magnitude": "high"}
+    },
+    "XRO": {
+        "audusd": {"direction": "negative", "magnitude": "high"}
+    },
+    "WTC": {
+        "audusd": {"direction": "negative", "magnitude": "medium"},
+        "brent_crude": {"direction": "negative", "magnitude": "low"}
+    },
+    "OCL": {
+        "audusd": {"direction": "negative", "magnitude": "medium"}
+    },
+    "DXS": {
+        "rba_cash_rate": {"direction": "negative", "magnitude": "high"},
+        "audusd": {"direction": "mixed", "magnitude": "low"}
+    },
+    "GMG": {
+        "rba_cash_rate": {"direction": "negative", "magnitude": "medium"},
+        "audusd": {"direction": "mixed", "magnitude": "low"}
+    },
+    "WOW": {
+        "audusd": {"direction": "negative", "magnitude": "low"}
+    },
+    "GYG": {
+        "audusd": {"direction": "negative", "magnitude": "low"}
+    },
+    "RFG": {
+        "audusd": {"direction": "negative", "magnitude": "low"}
+    },
+    "DRO": {
+        "audusd": {"direction": "negative", "magnitude": "medium"}
+    },
+    "REA": {
+        "rba_cash_rate": {"direction": "negative", "magnitude": "high"},
+        "audusd": {"direction": "mixed", "magnitude": "low"}
+    }
+}

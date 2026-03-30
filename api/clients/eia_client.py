@@ -198,6 +198,11 @@ async def _fetch_eia_path(
                     meta["unit"],
                 )
             logger.info("EIA: upserted %s = %s", meta["id"], last_value)
+
+            # Append to history for rolling stats (regime detection)
+            from clients.macro_history import append_history
+            await append_history(pool, "EIA", meta["id"], last_value, last_date)
+
             upserted += 1
         except Exception as exc:
             logger.error("EIA: DB upsert failed for %s: %s", meta["id"], exc)
@@ -299,6 +304,11 @@ async def _fetch_steo(pool: Any, client: httpx.AsyncClient) -> int:
                     unit,
                 )
             logger.info("EIA STEO: upserted %s = %s", sid, last_val)
+
+            # Append to history for rolling stats (regime detection)
+            from clients.macro_history import append_history
+            await append_history(pool, "EIA", sid, last_val, last_dt)
+
             upserted += 1
         except Exception as exc:
             logger.error("EIA STEO: DB upsert failed for %s: %s", sid, exc)
@@ -349,4 +359,9 @@ async def refresh_all_eia(pool: Any) -> dict[str, int]:
     elapsed = (datetime.now(timezone.utc) - start).total_seconds()
     total = sum(results.values())
     logger.info("EIA refresh complete: %d series in %.1fs", total, elapsed)
+
+    # Prune old history rows (90-day retention)
+    from clients.macro_history import prune_history
+    await prune_history(pool)
+
     return results

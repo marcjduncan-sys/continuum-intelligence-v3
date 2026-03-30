@@ -376,6 +376,11 @@ async def _fetch_rba_table(
                 "RBA: upserted %s = %s (%s)",
                 series_cfg["series_id"], last_val, last_dt,
             )
+
+            # Append to history for rolling stats (regime detection)
+            from clients.macro_history import append_history
+            await append_history(pool, "RBA", series_cfg["series_id"], last_val, last_dt)
+
             upserted += 1
         except Exception as exc:
             logger.error(
@@ -538,4 +543,9 @@ async def refresh_all_rba(pool: Any) -> dict[str, int]:
     elapsed = (datetime.now(timezone.utc) - start).total_seconds()
     total = sum(results.values())
     logger.info("RBA refresh complete: %d items in %.1fs", total, elapsed)
+
+    # Prune old history rows (90-day retention)
+    from clients.macro_history import prune_history
+    await prune_history(pool)
+
     return results

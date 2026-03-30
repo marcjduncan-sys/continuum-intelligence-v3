@@ -213,6 +213,11 @@ async def fetch_series(
                 _UNIT_MAP.get(series_id, ""),
             )
         logger.info("FRED: upserted %s = %s (%s)", series_id, last_value, last_date)
+
+        # Append to history for rolling stats (regime detection)
+        from clients.macro_history import append_history
+        await append_history(pool, "FRED", series_id, last_value, last_date)
+
         return True
     except Exception as exc:
         logger.error("FRED: DB upsert failed for %s: %s", series_id, exc)
@@ -258,4 +263,9 @@ async def refresh_all_fred(pool: Any) -> dict[str, bool]:
         "FRED refresh complete: %d/%d series in %.1fs",
         success_count, len(SERIES_IDS), elapsed,
     )
+
+    # Prune old history rows (90-day retention)
+    from clients.macro_history import prune_history
+    await prune_history(pool)
+
     return results

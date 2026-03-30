@@ -737,6 +737,177 @@ async def notebooklm_reset_auth():
     return {"status": "ok", "notebook_context_auth_ok": True, "gold_agent_auth_ok": True}
 
 
+@app.get("/api/macro/state")
+async def macro_state():
+    """Return current macro variable values with rolling 30-day statistics.
+
+    Used by the frontend staleness badge (BEAD-005) and regime detector (BEAD-004).
+    No auth required -- read-only, non-sensitive aggregate data.
+    """
+    pool = getattr(app.state, "pool", None)
+    if pool is None:
+        return {"error": "database not available", "variables": {}}
+
+    variables: dict = {}
+
+    try:
+        async with pool.acquire() as conn:
+            # Key macro series from FRED/EIA/RBA (latest values)
+            series_rows = await conn.fetch(
+                """
+                SELECT source, series_id, last_value, last_date, previous_value,
+                       previous_date, unit, updated_at
+                FROM macro_series
+                WHERE series_id IN (
+                    'DGS10', 'BRENT_SPOT', 'WTI_SPOT',
+                    'RBA_CASH_RATE', 'RBA_AUD_USD', 'VIXCLS',
+                    'RBA_AU_10Y', 'FEDFUNDS'
+                )
+                """
+            )
+            for row in series_rows:
+                sid = row["series_id"]
+                current = float(row["last_value"]) if row["last_value"] is not None else None
+                previous = float(row["previous_value"]) if row["previous_value"] is not None else None
+                change_pct = None
+                if current is not None and previous is not None and previous != 0:
+                    change_pct = ((current - previous) / abs(previous)) * 100
+
+                variables[sid] = {
+                    "source": row["source"],
+                    "current": current,
+                    "previous": previous,
+                    "change_pct": round(change_pct, 2) if change_pct is not None else None,
+                    "unit": row["unit"],
+                    "last_date": row["last_date"],
+                    "updated_at": row["updated_at"].isoformat() if row["updated_at"] else None,
+                }
+
+            # Key FX/commodity prices from macro_prices (latest per symbol)
+            price_rows = await conn.fetch(
+                """
+                SELECT DISTINCT ON (symbol) symbol, price, change_pct, source, fetched_at
+                FROM macro_prices
+                WHERE symbol IN ('AUD/USD', 'XAU/USD', 'NZD/USD', 'EUR/USD')
+                ORDER BY symbol, fetched_at DESC
+                """
+            )
+            for row in price_rows:
+                symbol = row["symbol"]
+                variables[symbol] = {
+                    "source": row["source"],
+                    "current": float(row["price"]) if row["price"] is not None else None,
+                    "previous": None,
+                    "change_pct": round(float(row["change_pct"]), 2) if row["change_pct"] is not None else None,
+                    "unit": "rate",
+                    "last_date": None,
+                    "updated_at": row["fetched_at"].isoformat() if row["fetched_at"] else None,
+                }
+
+            # Rolling 30-day stats from macro_series_history
+            rolling_rows = await conn.fetch(
+                """
+                SELECT source, series_id,
+                       AVG(value) AS mean_30d,
+                       STDDEV(value) AS stddev_30d,
+                       COUNT(*) AS sample_count
+                FROM macro_series_history
+                WHERE recorded_at >= NOW() - INTERVAL '30 days'
+                GROUP BY source, series_id
+                """
+            )
+            rolling_map: dict = {}
+            for row in rolling_rows:
+                key = row["series_id"]
+                rolling_map[key] = {
+                    "mean_30d": round(float(row["mean_30d"]), 4) if row["mean_30d"] is not None else None,
+                    "stddev_30d": round(float(row["stddev_30d"]), 4) if row["stddev_30d"] is not None else None,
+                    "sample_count": row["sample_count"],
+                }
+
+            # Merge rolling stats into variables
+            for key, var in variables.items():
+                stats = rolling_map.get(key, {})
+                var["rolling_30d_mean"] = stats.get("mean_30d")
+                var["rolling_30d_stddev"] = stats.get("stddev_30d")
+                var["rolling_30d_samples"] = stats.get("sample_count", 0)
+
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).error("macro_state: query failed: %s", exc)
+        return {"error": str(exc), "variables": {}}
+
+    return {"variables": variables}
+
+
+@app.post("/api/regime/refresh", dependencies=[Depends(verify_api_key)])
+@limiter.limit("6/minute")
+async def regime_refresh(request: Request, background_tasks: BackgroundTasks):
+    """Trigger narrative refresh for tickers affected by a macro regime break.
+
+    Accepts a regime event context and list of tickers. Queues refreshes
+    through the existing pipeline with regime_context injected into the
+    gathered data so the LLM prompts address the macro shift explicitly.
+
+    Throttle: max 3 concurrent, max 24 per hour.
+    """
+    body = await request.json()
+    tickers = body.get("tickers", [])
+    regime_context = body.get("regime_context", {})
+
+    if not tickers:
+        raise api_error(400, ErrorCode.VALIDATION_ERROR, "No tickers provided")
+    if not regime_context:
+        raise api_error(400, ErrorCode.VALIDATION_ERROR, "No regime_context provided")
+
+    # Validate tickers exist
+    data_dir = Path(config.PROJECT_ROOT) / "data" / "research"
+    queued = []
+    unknown = []
+    already_running = []
+
+    for t in tickers:
+        t = t.upper().replace(".AX", "")
+        if not (data_dir / f"{t}.json").exists():
+            unknown.append(t)
+            continue
+        if is_running(t):
+            already_running.append(t)
+            continue
+        queued.append(t)
+
+    # Hourly cap: 24 regime refreshes per hour
+    if not hasattr(app.state, "_regime_refresh_times"):
+        app.state._regime_refresh_times = []
+
+    import time as _time
+    now = _time.time()
+    app.state._regime_refresh_times = [
+        ts for ts in app.state._regime_refresh_times if now - ts < 3600
+    ]
+    remaining_budget = 24 - len(app.state._regime_refresh_times)
+
+    rate_limited = []
+    if len(queued) > remaining_budget:
+        rate_limited = queued[remaining_budget:]
+        queued = queued[:remaining_budget]
+
+    # Queue each ticker refresh with regime_context
+    for t in queued:
+        app.state._regime_refresh_times.append(now)
+        background_tasks.add_task(_run_refresh_background, t, regime_context)
+        if not get_job(t) or get_job(t).status in ("completed", "failed"):
+            refresh_jobs[t] = RefreshJob(ticker=t)
+
+    return {
+        "queued": queued,
+        "already_running": already_running,
+        "rate_limited": rate_limited,
+        "unknown": unknown,
+        "hourly_budget_remaining": max(0, remaining_budget - len(queued)),
+    }
+
+
 @app.get("/api/agents/gold/{ticker}", dependencies=[Depends(verify_api_key)])
 @limiter.limit("2/minute")
 async def gold_agent_endpoint(ticker: str, request: Request, force: bool = False, notebook_id: str = ""):
@@ -1354,11 +1525,11 @@ async def add_stock(
 # Refresh endpoints
 # ---------------------------------------------------------------------------
 
-def _run_refresh_background(ticker: str):
+def _run_refresh_background(ticker: str, regime_context: dict | None = None):
     """Run refresh in a new event loop (for BackgroundTasks)."""
     loop = asyncio.new_event_loop()
     try:
-        loop.run_until_complete(run_refresh(ticker))
+        loop.run_until_complete(run_refresh(ticker, regime_context=regime_context))
     finally:
         loop.close()
 
