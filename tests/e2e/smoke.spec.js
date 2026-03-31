@@ -51,3 +51,74 @@ test('invalid route falls back to home', async ({ page }) => {
   const homePage = page.locator('#page-home');
   await expect(homePage).toHaveClass(/active/, { timeout: 5000 });
 });
+
+test('home page loads without console errors', async ({ page }) => {
+  const errors = [];
+  page.on('console', msg => {
+    if (msg.type() === 'error') errors.push(msg.text());
+  });
+  page.on('pageerror', err => errors.push(err.message));
+
+  await page.goto('#home');
+  await page.waitForTimeout(3000); // allow boot sequence to complete
+
+  // Filter out expected errors when running without backend
+  const unexpected = errors.filter(e =>
+    !e.includes('Failed to fetch') &&
+    !e.includes('net::ERR_') &&
+    !e.includes('NetworkError') &&
+    !e.includes('api.continuumintelligence.ai') &&
+    !e.includes('500') &&
+    !e.includes('Internal Server Error') &&
+    !e.includes('Content Security Policy') &&
+    !e.includes('frame-ancestors')
+  );
+  expect(unexpected).toHaveLength(0);
+});
+
+test('analyst chat panel opens', async ({ page }) => {
+  await page.goto('#home');
+  await page.waitForTimeout(2000);
+
+  // The analyst panel should exist in the DOM
+  const panel = page.locator('#analyst-panel');
+  await expect(panel).toBeAttached({ timeout: 10000 });
+
+  // The FAB or panel header should be visible
+  const fab = page.locator('#apFab');
+  const header = page.locator('.ap-header');
+  const panelVisible = await panel.isVisible();
+  const fabVisible = await fab.isVisible();
+  const headerVisible = await header.isVisible();
+
+  // Either the panel is visible (desktop) or the FAB is visible (mobile)
+  expect(panelVisible || fabVisible || headerVisible).toBe(true);
+});
+
+test('portfolio page shows upload zone', async ({ page }) => {
+  await page.goto('#portfolio');
+  await expect(page.locator('#page-portfolio')).toBeVisible({ timeout: 10000 });
+
+  // Upload zone should be present for file upload
+  const uploadZone = page.locator('#uploadZone, .upload-zone, input[type="file"]');
+  await expect(uploadZone.first()).toBeAttached({ timeout: 10000 });
+});
+
+test('report page has no critical encoding contamination', async ({ page }) => {
+  await page.goto('#home');
+  await page.waitForTimeout(2000);
+  await page.goto('#report-BHP');
+  await expect(page.locator('#page-report-BHP')).toBeAttached({ timeout: 15000 });
+  await page.waitForTimeout(2000);
+
+  // Check rendered text for encoding contamination (Family 1 regression gate)
+  const text = await page.locator('#page-report-BHP').textContent();
+  // Null bytes must never appear (caused platform-wide outage in commit 8ceebc77)
+  expect(text).not.toContain('\u0000');
+  // Double-encoded mojibake patterns must not appear
+  expect(text).not.toContain('\u00e2\u0080\u0093'); // double-encoded en-dash
+  expect(text).not.toContain('\u00e2\u0080\u0094'); // double-encoded em-dash
+  // Smart quotes should not appear in data content
+  expect(text).not.toContain('\u201c'); // left double smart quote
+  expect(text).not.toContain('\u201d'); // right double smart quote
+});
