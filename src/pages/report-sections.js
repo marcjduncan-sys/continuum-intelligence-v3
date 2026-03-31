@@ -283,18 +283,32 @@ export function renderSkewBar(data) {
 }
 
 /**
- * Derive direction CSS class from dirText momentum label.
- * Rising/Upside/Building/Confirmed = gaining weight = green (dir-up).
- * Falling/Downside/Declining = losing weight = red (dir-down).
- * Steady/Contained/Stable = unchanged = amber (dir-neutral).
+ * Compute direction colour class from dirText AND narrative polarity.
+ * Colour tells the investor: "is this change good or bad for the stock?"
+ *
+ * Bullish narratives (upside): Rising = good = green, Falling = bad = red.
+ * Bearish narratives (downside): Rising = bad = red, Falling = good = green.
+ * Steady/Contained/Stable = always amber regardless of polarity.
+ *
+ * @param {string} dirText  - "Rising", "Falling", "Steady", etc.
+ * @param {string} polarity - hypothesis direction: "upside", "downside", or "neutral"
+ * @returns {string|null} CSS class or null if dirText is unrecognised
  */
-function _dirTextToCls(text) {
-  if (!text) return null;
-  const t = text.toLowerCase();
-  if (t.indexOf('rising') >= 0 || t.indexOf('upside') >= 0 || t.indexOf('building') >= 0 || t.indexOf('confirmed') >= 0) return 'dir-up';
-  if (t.indexOf('falling') >= 0 || t.indexOf('downside') >= 0 || t.indexOf('declining') >= 0) return 'dir-down';
+function _dirTextToCls(dirText, polarity) {
+  if (!dirText) return null;
+  var t = dirText.toLowerCase();
+
+  // Steady states are always amber
   if (t.indexOf('steady') >= 0 || t.indexOf('contained') >= 0 || t.indexOf('stable') >= 0 || t.indexOf('base') >= 0 || t.indexOf('awaiting') >= 0 || t.indexOf('watching') >= 0 || t.indexOf('priced') >= 0) return 'dir-neutral';
-  return null;
+
+  var isRising = t.indexOf('rising') >= 0 || t.indexOf('upside') >= 0 || t.indexOf('building') >= 0 || t.indexOf('confirmed') >= 0;
+  var isFalling = t.indexOf('falling') >= 0 || t.indexOf('downside') >= 0 || t.indexOf('declining') >= 0;
+  if (!isRising && !isFalling) return null;
+
+  // For bearish narratives, invert: rising risk = bad (red), falling risk = good (green)
+  var isBearish = polarity === 'downside';
+  if (isBearish) return isRising ? 'dir-down' : 'dir-up';
+  return isRising ? 'dir-up' : 'dir-down';
 }
 
 export function renderVerdict(data) {
@@ -310,16 +324,16 @@ export function renderVerdict(data) {
   let scoresHtml = '';
   for (let i = 0; i < v.scores.length; i++) {
     const s = v.scores[i];
-    // Use explicit dirColor-derived class first, then derive from dirText momentum,
-    // then fall back to hypothesis direction class.
     let dirCls;
     if (s.dirColor) {
-      // Explicit colour in data: map back to CSS class
+      // Explicit colour in data: backend already applied composite logic
       if (s.dirColor.indexOf('green') >= 0) dirCls = 'dir-up';
       else if (s.dirColor.indexOf('red') >= 0) dirCls = 'dir-down';
       else dirCls = 'dir-neutral';
     } else {
-      dirCls = _dirTextToCls(s.dirText) || (hyps[i] ? hyps[i].dirClass || 'dir-neutral' : 'dir-neutral');
+      // Derive from dirText + hypothesis polarity
+      var polarity = hyps[i] ? hyps[i].direction || 'neutral' : 'neutral';
+      dirCls = _dirTextToCls(s.dirText, polarity) || (hyps[i] ? hyps[i].dirClass || 'dir-neutral' : 'dir-neutral');
     }
     const dirAttr = ' data-dir="' + dirCls + '"';
     scoresHtml += '<div class="vs-item ' + dirCls + '"' + dirAttr + '>' +
