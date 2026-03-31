@@ -21,6 +21,8 @@ from typing import Any
 
 import httpx
 
+import config
+
 logger = logging.getLogger(__name__)
 
 TOKEN_URL = "https://acleddata.com/oauth/token"
@@ -49,8 +51,8 @@ class ACLEDClient:
 
     def __init__(self) -> None:
         """Initialise credentials from environment. Never stores plaintext."""
-        self._username: str = os.getenv("ACLED_USERNAME", "").strip()
-        self._password: str = os.getenv("ACLED_PASSWORD", "").strip()
+        self._username: str = config.ACLED_USERNAME
+        self._password: str = config.ACLED_PASSWORD
         self._access_token: str | None = None
         self._refresh_token: str | None = None
         self._token_expiry: datetime | None = None

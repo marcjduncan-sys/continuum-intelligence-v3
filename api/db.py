@@ -11,6 +11,8 @@ import logging
 import os
 from pathlib import Path
 
+import config
+
 logger = logging.getLogger(__name__)
 
 _pool = None
@@ -22,7 +24,7 @@ async def get_pool():
     if _pool is not None:
         return _pool
 
-    database_url = os.getenv("DATABASE_URL", "").strip()
+    database_url = config.DATABASE_URL.strip()
     if not database_url:
         logger.warning("DATABASE_URL not set -- database features disabled")
         return None
@@ -96,7 +98,7 @@ async def health_check() -> str:
     """
     global _pool
     if _pool is None:
-        database_url = os.getenv("DATABASE_URL", "").strip()
+        database_url = config.DATABASE_URL.strip()
         if not database_url:
             return "no_database"
         # Pool was previously lost; trigger recreation

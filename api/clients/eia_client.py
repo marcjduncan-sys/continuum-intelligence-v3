@@ -15,6 +15,8 @@ from typing import Any
 
 import httpx
 
+import config
+
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://api.eia.gov/v2"
@@ -90,7 +92,7 @@ async def _fetch_eia_path(
 
     Returns the number of series successfully upserted.
     """
-    api_key = os.getenv("EIA_API_KEY", os.getenv("EIA_API", "")).strip()
+    api_key = config.EIA_API_KEY
     if not api_key:
         return 0
 
@@ -215,7 +217,7 @@ async def _fetch_steo(pool: Any, client: httpx.AsyncClient) -> int:
 
     Returns the number of series upserted.
     """
-    api_key = os.getenv("EIA_API_KEY", os.getenv("EIA_API", "")).strip()
+    api_key = config.EIA_API_KEY
     if not api_key:
         return 0
 
@@ -331,7 +333,7 @@ async def refresh_all_eia(pool: Any) -> dict[str, int]:
         logger.warning("EIA refresh skipped: no database pool")
         return {}
 
-    api_key = os.getenv("EIA_API_KEY", os.getenv("EIA_API", "")).strip()
+    api_key = config.EIA_API_KEY
     if not api_key:
         logger.warning("EIA refresh skipped: EIA_API_KEY / EIA_API not set")
         return {}
