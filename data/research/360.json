@@ -7,7 +7,7 @@
   "sectorSub": "Software - Application",
   "price": 18.77,
   "currency": "A$",
-  "date": "31-Mar-26",
+  "date": "31-Mar-26 19:12 AEST",
   "reportId": "360-2026-001",
   "priceHistory": [
     16.74,
@@ -261,7 +261,7 @@
     18.77
   ],
   "heroDescription": "Software - Application &bull; ASX-Listed",
-  "heroCompanyDescription": "Life360, Inc. (ASX: 360): coverage initiated. Full analysis pending.",
+  "heroCompanyDescription": "Life360, Inc. (ASX: 360) is a US-headquartered family safety and location-sharing platform that operates one of the world's largest consumer networks focused on family connectivity, safety, and peace of mind. The company's core product is a mobile application that enables real-time location sharing, driving safety monitoring, and emergency response features for families, with a freemium model that converts users to paid subscription tiers. Life360 acquired Tile, the Bluetooth tracking device business, in 2021, adding a hardware and device-tracking dimension to its predominantly software-driven revenue base.",
   "heroMetrics": [
     {
       "label": "Mkt Cap",
@@ -290,54 +290,77 @@
     }
   ],
   "hero": {
-    "embedded_thesis": null,
-    "skew": null,
-    "skew_description": null,
+    "embedded_thesis": "At A$18.77, the market is embedding a scenario of persistent margin disappointment and scepticism about the earnings recovery that consensus analysts are projecting. The Trailing P/E of 21.8x reflects historical earnings that were modest relative to the company's revenue scale, while the Forward P/E of 9.6x reflects consensus expectations of a significant step-up in earnings power - a gap that implies the market either doubts the consensus estimates will be achieved or is applying a risk discount for the A$311M debt burden and execution risk. The EV/EBITDA of 39.5x on only A$32M of EBITDA further confirms that the current price is not cheap on a cash earnings basis, and the market is demanding proof of margin expansion before re-rating the stock. The stock trading near its 52-week low of A$16.74 - down from a high of A$55.44 - suggests a significant de-rating has already occurred, and the current price embeds a scenario where the earnings recovery is delayed or only partially delivered. For the stock to re-rate materially, Life360 needs to demonstrate that the gap between the Trailing P/E of 21.8x and the Forward P/E of 9.6x is real and achievable, not a function of overly optimistic sell-side modelling.",
+    "skew": "DOWNSIDE",
+    "skew_description": "The four hypotheses are weighted with the base case (N2, 40%) carrying the highest probability, reflecting genuine uncertainty about the pace of earnings delivery. The bull case (N1, 25%) and bear case (N3, 25%) are equally weighted, reflecting symmetric risk around the base case, while the tail catalyst scenario (N4, 10%) captures low-probability but high-impact strategic optionality. The overall skew is modestly bullish given the depth of the valuation discount relative to consensus.",
     "position_in_range": {
       "current_price": 18.77,
-      "worlds": []
+      "worlds": [
+        {
+          "label": "Bear Case",
+          "price": 12.0
+        },
+        {
+          "label": "Base Case",
+          "price": 22.0
+        },
+        {
+          "label": "Bull Case",
+          "price": 35.0
+        },
+        {
+          "label": "Catalyst",
+          "price": 50.0
+        }
+      ],
+      "note": "World prices are indicative -- pending full W1-W4 valuation build"
     },
-    "next_decision_point": null,
-    "previousSkew": null
+    "next_decision_point": {
+      "event": "Life360 Q1 2026 / Half-Year Earnings Release",
+      "date": "May 2026",
+      "metric": "EBITDA margin trajectory, subscriber growth, and any guidance update on the path to the consensus EPS of A$1.55 for the full year",
+      "thresholds": "EBITDA margin expansion above current implied levels and subscriber growth above 10% year-on-year would support N1 re-rating toward A$35. A miss on EBITDA or downward guidance revision would confirm N3 and likely push the stock below A$16.74."
+    },
+    "previousSkew": ""
   },
   "skew": {
-    "direction": "neutral",
-    "rationale": "Auto-added stock. Narrative analysis pending. Skew assessment requires analyst research."
+    "direction": "bullish",
+    "rationale": "The probability skew is modestly bullish, driven primarily by the extreme disconnect between the Forward P/E of 9.6x and the consensus analyst target implying 89% upside from A$18.77. The key driver of the skew is the embedded earnings recovery in consensus estimates, which if delivered, would make the current valuation appear deeply discounted. However, the skew is tempered by the elevated debt load, thin EBITDA margins, and the absence of near-term catalysts visible in the current evidence base."
   },
   "verdict": {
-    "text": "Life360, Inc. has been added to coverage. Trading at <span class=\"key-stat\">A$18.77</span>. Full narrative analysis with competing hypotheses is pending.",
+    "text": "Life360 (ASX: 360) is initiating coverage at a current price of <span class='key-stat'>A$18.77</span>, which represents a <span class='key-stat'>66%</span> decline from the 52-week high of <span class='key-stat'>A$55.44</span> and sits just <span class='key-stat'>12%</span> above the 52-week low of <span class='key-stat'>A$16.74</span>. The market is pricing in persistent margin disappointment and scepticism about the consensus earnings recovery, embedding a scenario where the Forward P/E of <span class='key-stat'>9.6x</span> proves optimistic relative to the Trailing P/E of <span class='key-stat'>21.8x</span>. The sell-side consensus disagrees sharply, with an average target of <span class='key-stat'>A$35.48</span> implying 89% upside, anchored by projected EPS growth from A$1.55 to A$1.95. The key risk is the A$311M debt load against only A$32M in EBITDA, which creates a debt/EBITDA ratio of approximately 9.7x and limits financial flexibility. The skew is modestly bullish given the depth of the valuation discount, but conviction is low pending the next earnings release and clearer evidence of margin expansion.",
     "borderColor": null,
     "scores": [
       {
         "label": "N1 Growth/Recovery",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "25%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&uarr;",
+        "dirText": "Upside",
         "dirColor": null
       },
       {
         "label": "N2 Base Case",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
+        "score": "40%",
+        "scoreColor": "var(--signal-amber)",
         "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "dirText": "Base",
         "dirColor": null
       },
       {
         "label": "N3 Risk/Downside",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "25%",
+        "scoreColor": "var(--signal-amber)",
+        "dirArrow": "&darr;",
+        "dirText": "Downside",
         "dirColor": null
       },
       {
         "label": "N4 Disruption/Catalyst",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "10%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&uarr;",
+        "dirText": "Upside",
         "dirColor": null
       }
     ]
@@ -365,7 +388,7 @@
     }
   ],
   "featuredPriceColor": "",
-  "featuredRationale": "Auto-added to coverage. Full narrative analysis pending.",
+  "featuredRationale": "The four hypotheses are weighted with the base case (N2, 40%) carrying the highest probability, reflecting genuine uncertainty about the pace of earnings delivery. The bull case (N1, 25%) and bear case (N3, 25%) are equally weighted, reflecting symmetric risk around the base case, while the tail catalyst scenario (N4, 10%) captures low-probability but high-impact strategic optionality. The overall skew is modestly bullish given the depth of the valuation discount relative to consensus.",
   "identity": {
     "rows": [
       [
@@ -449,19 +472,25 @@
       "direction": "upside",
       "title": "N1: Growth/Recovery",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "25%",
+      "scoreWidth": "25%",
+      "scoreMeta": "",
+      "description": "Life360 executes on its earnings growth trajectory, with forward EPS of A$1.55 expanding to A$1.95 next year, compressing the Forward P/E from 9.6x toward a more normalised software multiple. Subscriber monetisation accelerates, the Tile hardware integration delivers incremental revenue, and the market re-rates the stock toward the consensus target of A$35.48. This scenario requires sustained top-line growth, margin expansion, and a stabilisation of macro headwinds.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Analyst consensus target of A$35.48 implies approximately 89% upside from the current price of A$18.77",
+        "Forward P/E of 9.6x is deeply discounted relative to the Trailing P/E of 21.8x, embedding a significant earnings recovery already in consensus estimates",
+        "Revenue of A$489M demonstrates meaningful scale for a consumer software platform",
+        "AUD/USD weakness at US$0.69 provides a tailwind for USD-denominated revenues when converted to AUD for reporting"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Current price near 52-week low of A$16.74 suggests the market is not yet pricing in the recovery narrative",
+        "EV/EBITDA of 39.5x remains elevated relative to the low absolute EBITDA of A$32M, indicating thin margins",
+        "Total debt of A$311M against an EV of A$1.3B represents meaningful leverage for a company with A$32M EBITDA",
+        "No recent market-sensitive corporate communications to confirm management confidence in the growth trajectory"
       ]
     },
     {
@@ -469,19 +498,24 @@
       "direction": "neutral",
       "title": "N2: Base Case",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "40%",
+      "scoreWidth": "40%",
+      "scoreMeta": "",
+      "description": "Life360 continues to grow its subscriber base and revenue at a moderate pace but struggles to convert top-line growth into meaningful EBITDA expansion, keeping the EV/EBITDA multiple elevated and the stock range-bound. The market remains cautious about the path to profitability given A$311M in debt and only A$32M in EBITDA. The stock trades in the A$17-A$22 range as investors wait for a clearer inflection in free cash flow.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "EV/EBITDA of 39.5x with only A$32M EBITDA suggests the market is already pricing in significant future earnings improvement that has not yet materialised",
+        "Stock is trading near its 52-week low of A$16.74, consistent with a market that is sceptical of near-term catalysts",
+        "Absence of recent market-sensitive ASX announcements suggests no imminent positive catalyst from management",
+        "Debt load of A$311M constrains financial flexibility and limits the ability to accelerate growth investment"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Consensus EPS growth from A$1.55 to A$1.95 would represent approximately 27% year-on-year growth, which is not consistent with a stagnation scenario",
+        "Forward P/E of 9.6x is low enough that even modest earnings delivery could trigger a re-rating",
+        "AUD weakness provides a passive earnings tailwind without requiring operational improvement"
       ]
     },
     {
@@ -489,19 +523,24 @@
       "direction": "downside",
       "title": "N3: Risk/Downside",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "25%",
+      "scoreWidth": "25%",
+      "scoreMeta": "",
+      "description": "Life360 fails to expand EBITDA margins meaningfully, with the A$311M debt burden consuming cash flow and limiting investment capacity. A deterioration in subscriber growth or average revenue per user, combined with rising interest costs, pushes the stock toward or below its 52-week low of A$16.74. The gap between the Trailing P/E of 21.8x and the Forward P/E of 9.6x proves overly optimistic as consensus earnings estimates are revised downward.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Total debt of A$311M against only A$32M EBITDA implies a debt/EBITDA ratio of approximately 9.7x, which is extremely high and leaves little margin for error",
+        "Current price of A$18.77 is only 12% above the 52-week low of A$16.74, suggesting limited downside buffer",
+        "EV/EBITDA of 39.5x leaves significant room for multiple compression if growth disappoints",
+        "No dividend yield and no recent positive corporate communications reduce near-term support for the stock"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Analyst consensus target of A$35.48 with strong EPS growth projections suggests the sell-side does not see a deterioration scenario as the base case",
+        "Revenue of A$489M provides a substantial base from which to grow, reducing the risk of a sudden revenue collapse",
+        "AUD/USD tailwind partially offsets operational headwinds for a USD-revenue business"
       ]
     },
     {
@@ -509,51 +548,385 @@
       "direction": "downside",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "10%",
+      "scoreWidth": "10%",
+      "scoreMeta": "",
+      "description": "A major technology platform, telecom operator, or strategic acquirer recognises Life360's unique family safety data network and subscriber base as a strategic asset, triggering a takeover bid or transformative partnership at a significant premium to the current price. Alternatively, a major product expansion into adjacent markets (insurance, financial services, or connected devices) materially expands the total addressable market and drives a rapid re-rating. This tail scenario is low probability but would likely see the stock trade well above the consensus target of A$35.48.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Current market cap of approximately A$4.6B and depressed valuation make Life360 a more affordable acquisition target than at its 52-week high of A$55.44",
+        "The SEC Schedule 13G filing on 2026-03-29 indicates a significant institutional ownership change, which could signal strategic interest",
+        "Life360's family safety platform and location data network represent a unique and difficult-to-replicate asset",
+        "Analyst consensus target of A$35.48 already implies the market is undervaluing the business, creating a potential arbitrage for a strategic buyer"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "No media reports, corporate announcements, or verified intelligence suggesting an active M&A process",
+        "Debt of A$311M would need to be absorbed by any acquirer, increasing the effective acquisition cost",
+        "Dual-listed structure (ASX and NASDAQ) adds complexity to any takeover process"
       ]
     }
   ],
   "narrative": {
-    "theNarrative": "Life360, Inc. has been auto-added to the Continuum Intelligence coverage universe. Full narrative analysis with competing hypotheses, evidence assessment, and discriminating data points is pending.",
+    "theNarrative": "<strong>[Coverage Initiated 31-Mar-26 19:12 AEST]</strong> Life360 is a family safety platform that has undergone a dramatic de-rating, with its ASX-listed shares falling from a 52-week high of <strong>A$55.44</strong> to a current price of <strong>A$18.77</strong> - a decline of approximately <span class='key-stat'>66%</span> from peak. The market's primary concern appears to be the disconnect between the company's revenue scale (<span class='key-stat'>A$489M</span>) and its thin EBITDA margin, with only <span class='key-stat'>A$32M</span> in EBITDA against a debt load of <span class='key-stat'>A$311M</span>, implying a debt/EBITDA ratio of approximately <span class='key-stat'>9.7x</span> that leaves very little room for operational error. Despite this, the sell-side consensus remains constructive, with an average target price of <strong>A$35.48</strong> implying approximately <span class='key-stat'>89%</span> upside, anchored by projected EPS growth from <span class='key-stat'>A$1.55</span> in the current year to <span class='key-stat'>A$1.95</span> next year. The Forward P/E of <span class='key-stat'>9.6x</span> is strikingly low for a consumer software platform with a large and growing subscriber base, suggesting the market is either deeply sceptical of the consensus earnings trajectory or is applying a significant risk premium for the leverage and execution risk. A weaker AUD at <span class='key-stat'>US$0.69</span> provides a passive tailwind for USD-denominated revenues when translated back to AUD, which could provide a modest earnings boost without requiring operational improvement. The most recent ASX announcements are limited to SEC Form 4 insider filings and a Schedule 13G institutional ownership disclosure, providing no direct insight into management's current strategic posture or near-term guidance. The key question for investors is whether the earnings recovery embedded in the Forward P/E of 9.6x is achievable, or whether the Trailing P/E of 21.8x is a more accurate reflection of the company's true earnings power - the resolution of this question will likely determine whether the stock recovers toward A$35 or tests new lows below A$16.74.",
     "priceImplication": {
-      "label": "Coverage Initiated &mdash; 360",
-      "content": "Full price implication analysis pending. Hypothesis framework requires analyst research before embedded assumptions can be identified."
+      "label": "Embedded Assumptions at A$18.77",
+      "content": "<strong>At A$18.77, the current price appears to embed:</strong><br><br>- Significant scepticism about the consensus EPS recovery from A$1.55 to A$1.95, with the market likely pricing in a downward revision to estimates<br><br>- A risk premium for the A$311M debt load relative to only A$32M in EBITDA, reflecting concern about financial flexibility and interest coverage<br><br>- Continued margin compression or at best flat EBITDA margins, with no near-term catalyst to drive operating leverage<br><br>- A discount for the dual-listed structure and the complexity of a US-headquartered company listed on the ASX, which may reduce liquidity and institutional coverage<br><br>- Limited strategic premium, with the market not pricing in any M&A optionality despite the stock trading at a significant discount to its 52-week high of A$55.44<br><br>- A scenario where the gap between the Trailing P/E of 21.8x and the Forward P/E of 9.6x is only partially closed, with earnings delivery falling short of consensus"
     },
-    "evidenceCheck": "Pending analyst research.",
-    "narrativeStability": "Not yet assessed."
+    "evidenceCheck": "<p>The evidence base for this initial coverage is <strong>materially limited</strong> across most domains. The strongest evidence comes from the verified financial data (Forward P/E of 9.6x, Trailing P/E of 21.8x, revenue of A$489M, EBITDA of A$32M, debt of A$311M) and the analyst consensus target of A$35.48, which together provide a reasonable foundation for valuation analysis. However, the absence of recent earnings releases, investor presentations, or market-sensitive corporate communications on the ASX means that management's current strategic outlook and near-term guidance are entirely opaque. The regulatory filings (SEC Form 4s and Schedule 13G) confirm insider and institutional activity but provide no directional signal without the underlying transaction details. Alternative data, competitor disclosures, media coverage, and academic research are entirely absent from the evidence set, creating significant blind spots around subscriber growth trends, competitive dynamics, and real-time operational performance. The overall evidence quality is <strong>amber</strong> - sufficient to frame the hypotheses and identify the key valuation tension, but insufficient to assign high confidence to any single scenario.</p>",
+    "narrativeStability": "<p>The current narrative - that Life360 is a deeply discounted consumer software platform awaiting an earnings recovery - is <strong>moderately fragile</strong> and dependent on the delivery of consensus EPS estimates that the market is clearly not yet willing to price in. The narrative could be destabilised in either direction: a strong quarterly earnings result demonstrating EBITDA margin expansion and subscriber growth acceleration would likely trigger a sharp re-rating toward the A$35 consensus target, while a miss on earnings or a downward revision to guidance would likely push the stock below its 52-week low of A$16.74. The debt load of A$311M is a persistent overhang that limits the narrative's upside stability, as any deterioration in cash generation would quickly shift the conversation from growth to balance sheet risk. The next material test of the narrative is the company's next earnings release, which will either validate or invalidate the Forward P/E of 9.6x as a genuine value signal. Until that catalyst arrives, the stock is likely to remain range-bound near its current lows.</p>"
   },
   "evidence": {
-    "intro": "Evidence assessment pending. Stock was auto-added to coverage on 31-Mar-26.",
-    "cards": [],
+    "intro": "Initial data gathering has commenced, incorporating analyst consensus estimates, key financial metrics, and recent regulatory filings. The RBA yield curve provides a macro backdrop for valuation considerations.",
+    "cards": [
+      {
+        "number": 1,
+        "title": "1. Corporate Communications",
+        "epistemicClass": "ep-motivated",
+        "epistemicLabel": "Motivated",
+        "finding": "Life360 has not released any market-sensitive corporate communications such as earnings updates, strategic announcements, or investor presentations on the ASX recently. The latest announcements on 2026-03-29 were all SEC Form 4s and a Schedule 13G, which are regulatory filings related to security holder details rather than direct corporate messaging.",
+        "tension": "The absence of recent market-sensitive corporate communications on the ASX could indicate a quiet period or that significant updates are primarily released via SEC filings or investor calls not captured in the provided ASX data. This lack of direct communication makes it difficult to gauge management's current strategic focus or outlook.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcements (2026-03-29)"
+      },
+      {
+        "number": 2,
+        "title": "2. Regulatory Filings & Financial Statements",
+        "epistemicClass": "ep-verified",
+        "epistemicLabel": "Verified",
+        "finding": "On 2026-03-29, Life360 filed multiple SEC Form 4s for individuals (Haro, Burke, Hulls, Antonoff) and an SEC Schedule 13G. These filings indicate changes in beneficial ownership or insider transactions, which are mandatory disclosures for US-listed entities and their significant shareholders.",
+        "tension": "While these filings confirm compliance with regulatory requirements, the specific details of the transactions (e.g., buys/sells, amounts) are not provided in the summary. Without knowing the nature of these insider transactions, it is difficult to interpret their implications for management's confidence or institutional interest.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcements (2026-03-29): 'SEC Form 4 Haro', 'SEC Form 4 Burke', 'SEC Form 4 Hulls', 'SEC Form 4 Antonoff', 'SEC Schedule 13G'"
+      },
+      {
+        "number": 3,
+        "title": "3. Broker Research",
+        "epistemicClass": "ep-modeled",
+        "epistemicLabel": "Modelled",
+        "finding": "Analyst consensus estimates project strong EPS growth for Life360, with current year EPS estimated at 1.5417 and next year at 1.9549. The average Wall Street target price is A$35.4836, representing a significant upside of approximately 89% from the current price of A$18.77.",
+        "tension": "While the target price suggests substantial upside, the current share price of A$18.77 is near the lower end of its 52-week range (A$16.74 - A$55.44), indicating that the market may not fully agree with or has concerns not reflected in the consensus target. The absence of a PEG ratio and current year revenue estimate limits a full valuation comparison.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N1",
+            "class": "supports"
+          }
+        ],
+        "source": "Analyst Consensus & Estimates (EODHD)"
+      },
+      {
+        "number": 4,
+        "title": "4. Competitor Disclosures",
+        "epistemicClass": "ep-verified",
+        "epistemicLabel": "Verified",
+        "finding": "No specific competitor disclosures or news were provided in the input data. Therefore, direct comparisons of Life360's market position, recent performance, or strategic moves against its peers cannot be made from the available information.",
+        "tension": "The lack of competitor data makes it challenging to assess Life360's relative performance, competitive advantages, or market share dynamics within the Software-Application sector. Without this context, the company's individual financial metrics are harder to benchmark.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Data limitation: No competitor disclosures provided."
+      },
+      {
+        "number": 5,
+        "title": "5. Economic Data",
+        "epistemicClass": "ep-measured",
+        "epistemicLabel": "Measured",
+        "finding": "The Australian dollar (AUD) has depreciated against the US dollar (USD), with AUD/USD at US$0.69 and experiencing a -3.3% decline today. The RBA yield curve as of 28-Feb-2026 shows a positive slope with the 10-year yield at 4.758% and the 2-year yield at 4.23%, indicating normal economic expectations.",
+        "tension": "A weaker AUD could benefit Life360 if a significant portion of its revenue is generated in USD and then converted to AUD for reporting, potentially boosting reported earnings. However, a rapidly depreciating currency can also signal broader economic uncertainty or impact the cost of US-based operations if expenses are primarily in USD.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Macro & Commodity Context (AUDUSD=X), RBA Yield Curve (28-Feb-2026)"
+      },
+      {
+        "number": 6,
+        "title": "6. Alternative Data",
+        "epistemicClass": "ep-observed",
+        "epistemicLabel": "Observed",
+        "finding": "No alternative data such as operational indicators (e.g., subscriber growth, engagement metrics), ESG reports, or channel checks were provided in the input. This limits the ability to assess real-time operational performance or non-financial aspects of the business.",
+        "tension": "The absence of alternative data means that the analysis relies solely on financial estimates and regulatory filings, without the benefit of real-world operational insights that could confirm or contradict reported trends or market sentiment.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Data limitation: No alternative data provided."
+      },
+      {
+        "number": 7,
+        "title": "7. Academic Research",
+        "epistemicClass": "ep-peer",
+        "epistemicLabel": "Peer-Reviewed",
+        "finding": "No specific academic research or industry studies related to the Software-Application sector or Life360's specific market segment were provided. Therefore, insights into structural trends, long-term market dynamics, or validated industry models are not available from the given data.",
+        "tension": "Without academic research, it is difficult to contextualize Life360's business model within broader, peer-reviewed industry trends or to identify potential long-term disruptors or opportunities supported by rigorous studies.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Data limitation: No academic research provided."
+      },
+      {
+        "number": 8,
+        "title": "8. Media & Social",
+        "epistemicClass": "ep-unverified",
+        "epistemicLabel": "Unverified",
+        "finding": "No recent news headlines, financial media coverage, or social media commentary regarding Life360 were provided in the input. This means there is no readily available public sentiment or unverified market commentary to consider.",
+        "tension": "The absence of media and social commentary makes it challenging to gauge public perception, recent market narratives, or potential catalysts/risks that might be circulating outside of official company disclosures.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Data limitation: No media or social data provided."
+      },
+      {
+        "number": 9,
+        "title": "9. Leadership & Governance",
+        "epistemicClass": "ep-observed",
+        "epistemicLabel": "Observed",
+        "finding": "On 2026-03-29, SEC Form 4 filings were made for key individuals including Haro, Burke, Hulls, and Antonoff. These filings typically relate to changes in ownership by company insiders (officers, directors) or significant shareholders, indicating activity among the leadership or governance structure.",
+        "tension": "While the filings indicate insider activity, the specific nature of these transactions (e.g., purchases, sales, option exercises) is not detailed in the provided summary. Without this information, it is impossible to determine if insiders are increasing or decreasing their stake, which would have different implications for their confidence in the company's future.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcements (2026-03-29): 'SEC Form 4 Haro', 'SEC Form 4 Burke', 'SEC Form 4 Hulls', 'SEC Form 4 Antonoff'"
+      },
+      {
+        "number": 10,
+        "title": "10. Ownership & Capital Flows",
+        "epistemicClass": "ep-measured",
+        "epistemicLabel": "Measured",
+        "finding": "An SEC Schedule 13G filing was made on 2026-03-29, which typically discloses beneficial ownership of 5% or more of a company's stock by institutional investors. This indicates significant institutional interest or changes in major shareholdings.",
+        "tension": "The summary does not provide the identity of the filer or the specific percentage of ownership disclosed in the Schedule 13G. Without these details, it is difficult to ascertain whether a new major investor has emerged, an existing one has changed their stake, or the implications for capital flows and shareholder structure.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcement (2026-03-29): 'SEC Schedule 13G'"
+      }
+    ],
     "alignmentSummary": null
   },
   "discriminators": {
-    "intro": "Discriminating evidence pending analyst research.",
-    "rows": [],
-    "nonDiscriminating": null
+    "intro": "The following data points carry high diagnosticity: they can meaningfully shift probability between competing hypotheses.",
+    "rows": [
+      {
+        "metric": "PE Ratio",
+        "value": "21.83x",
+        "context": "Valuation multiple, indicating market expectations for future earnings."
+      },
+      {
+        "metric": "EPS Growth (Next Year vs Current Year)",
+        "value": "1.95 vs 1.54",
+        "context": "Analyst estimates suggest strong earnings per share growth for the next fiscal year."
+      },
+      {
+        "metric": "Wall Street Target Price",
+        "value": "A$35.48",
+        "context": "Significantly above the current price of A$18.77, indicating substantial analyst upside potential."
+      },
+      {
+        "metric": "Profit Margin",
+        "value": "30.82%",
+        "context": "Strong profitability metric, reflecting efficient operations."
+      },
+      {
+        "metric": "Return on Equity (ROE)",
+        "value": "33.27%",
+        "context": "High ROE indicates effective use of shareholder capital to generate profits."
+      }
+    ],
+    "nonDiscriminating": "<ul><li><strong>Revenue scale (A$489M):</strong> While impressive for a consumer app platform, the absolute revenue figure does not discriminate between the bull and bear cases because the key question is margin, not top-line size.</li><li><strong>AUD/USD rate (US$0.69):</strong> The currency tailwind is a passive factor that applies equally across all scenarios and does not change the fundamental earnings recovery thesis.</li><li><strong>52-week high of A$55.44:</strong> The historical peak price is not analytically relevant to forward valuation; it reflects a prior market environment and does not constrain or anchor the current fair value range.</li><li><strong>Dual-listed structure (ASX and NASDAQ):</strong> The listing structure is a structural feature that affects liquidity and disclosure timing but does not discriminate between the growth and deterioration scenarios.</li><li><strong>Absence of dividend yield:</strong> Expected for a growth-stage software company reinvesting in the platform; the lack of a dividend does not differentiate between the competing hypotheses.</li></ul>"
   },
   "tripwires": {
-    "intro": "Tripwires pending analyst research.",
-    "cards": []
+    "intro": "The following catalysts could force a material revision to hypothesis weightings. Each carries conditional outcomes that map to specific narrative shifts.",
+    "cards": [
+      {
+        "date": "MAY 2026",
+        "name": "Earnings Release - EBITDA Margin Test",
+        "conditions": [
+          {
+            "if": "If EBITDA margin expands materially and management reaffirms full-year EPS guidance of approximately A$1.55",
+            "valence": "positive",
+            "then": "Then the Forward P/E of 9.6x is validated as a genuine value signal and the stock likely re-rates toward A$25-A$30, supporting N1"
+          },
+          {
+            "if": "If EBITDA comes in below expectations or management downgrades full-year guidance",
+            "valence": "negative",
+            "then": "Then consensus EPS estimates are revised downward, the Forward P/E re-rates higher, and the stock likely tests or breaks below the 52-week low of A$16.74, supporting N3"
+          }
+        ],
+        "source": "Analyst Consensus Estimates (EODHD); Yahoo Finance Financial Data"
+      },
+      {
+        "date": "JUNE 2026",
+        "name": "Debt Refinancing or Capital Structure Update",
+        "conditions": [
+          {
+            "if": "If Life360 announces a refinancing of its A$311M debt at favourable terms or a reduction in gross debt",
+            "valence": "positive",
+            "then": "Then balance sheet risk is reduced, the debt/EBITDA overhang diminishes, and the stock re-rates toward the base case of A$22, supporting N2 transitioning to N1"
+          },
+          {
+            "if": "If debt covenants are breached or refinancing occurs at materially higher interest rates",
+            "valence": "negative",
+            "then": "Then financial flexibility is severely constrained, free cash flow is further pressured, and the stock de-rates sharply below A$15, supporting N3"
+          }
+        ],
+        "source": "Yahoo Finance Financial Data (Total Debt: A$311M, EBITDA: A$32M)"
+      },
+      {
+        "date": "ONGOING 2026",
+        "name": "SEC Schedule 13G Follow-Through - Strategic Investor Activity",
+        "conditions": [
+          {
+            "if": "If the Schedule 13G filer is identified as a strategic investor or activist and subsequently increases their stake or engages management",
+            "valence": "positive",
+            "then": "Then strategic optionality increases materially, supporting N4 and potentially triggering a re-rating toward or above the consensus target of A$35.48"
+          },
+          {
+            "if": "If the Schedule 13G represents a passive institutional investor reducing their position or a routine disclosure with no strategic intent",
+            "valence": "negative",
+            "then": "Then the filing provides no positive catalyst and the stock remains range-bound near current lows, consistent with N2 or N3"
+          }
+        ],
+        "source": "ASX Announcement (2026-03-29): SEC Schedule 13G"
+      }
+    ]
   },
   "gaps": {
-    "coverageRows": [],
-    "couldntAssess": [
-      "Full evidence assessment pending &mdash; stock was auto-added to coverage."
+    "coverageRows": [
+      {
+        "domain": "Corporate Comms",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "2026-03-29 (regulatory filings only, no market-sensitive communications)",
+        "confidence": "Low - no earnings releases, investor presentations, or strategic updates available",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Regulatory Filings",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "2026-03-29",
+        "confidence": "Medium - filings confirmed but transaction details (buy/sell/amounts) not available",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Broker Research",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "Current (EODHD consensus)",
+        "confidence": "Medium - consensus target and EPS estimates available but individual broker reports and rationale not provided",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Competitor Disclosures",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "No data available",
+        "confidence": "Low - no competitor data provided, benchmarking not possible",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Economic Data",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "2026-03-31 (AUD/USD); 2026-02-28 (RBA yield curve)",
+        "confidence": "Medium - macro data available but sector-specific economic indicators absent",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Alternative Data",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "No data available",
+        "confidence": "Low - no subscriber metrics, app store rankings, engagement data, or channel checks available",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Academic Research",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "No data available",
+        "confidence": "Low - no peer-reviewed research on family safety software market dynamics provided",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Media and Social",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "No data available",
+        "confidence": "Low - no news headlines, social sentiment, or media coverage provided",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Leadership and Governance",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "2026-03-29 (Form 4 filings)",
+        "confidence": "Low - insider filing activity confirmed but transaction direction and amounts unknown",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Ownership and Capital Flows",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "2026-03-29 (Schedule 13G)",
+        "confidence": "Low - institutional ownership change confirmed but filer identity and stake size unknown",
+        "confidenceClass": "td-red"
+      }
     ],
-    "analyticalLimitations": "This stock was auto-added. All hypothesis scores, evidence assessments, and narrative analysis require manual research and population."
+    "couldntAssess": [
+      "Subscriber count and growth rate trends",
+      "Average revenue per user (ARPU) by tier (free vs paid)",
+      "Tile hardware revenue contribution and margin profile",
+      "Competitive positioning relative to Google Family Link, Apple Family Sharing, and other location-sharing platforms",
+      "Interest coverage ratio and debt covenant details",
+      "Management guidance and forward outlook from most recent earnings call",
+      "Free cash flow generation and cash conversion from EBITDA",
+      "Geographic revenue breakdown (US vs international)",
+      "Customer acquisition cost and lifetime value metrics",
+      "ESG profile and any regulatory risk from location data privacy concerns"
+    ],
+    "analyticalLimitations": "This analysis is constrained by a very thin evidence base at initiation. The financial data from Yahoo Finance provides the core valuation anchors, but the absence of recent earnings releases, management commentary, subscriber data, and competitive intelligence means that the hypothesis weightings are based primarily on valuation signals rather than operational evidence. The dual-listed structure (ASX and NASDAQ) means that material information may be released via SEC filings or US investor calls that are not captured in the ASX announcement feed used here. The analyst consensus target of A$35.48 is a key input but without access to individual broker models and assumptions, it is impossible to assess how robust or stale that estimate is. Investors should treat the hypothesis probabilities as indicative rather than precise, and should update them materially upon the next earnings release."
   },
   "technicalAnalysis": {
     "date": "31 March 2026",
@@ -642,14 +1015,100 @@
         "name": "S&P/ASX 200",
         "period": "12 months",
         "stockReturn": 12.1,
-        "indexReturn": 0,
-        "relativeReturn": 12.1
+        "indexReturn": 6.5,
+        "relativeReturn": 5.6
       }
     }
   },
   "footer": {
     "disclaimer": "This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information.",
-    "domainCount": "0 of 10",
-    "hypothesesCount": "4 Pending"
+    "domainCount": "10 of 10",
+    "hypothesesCount": "4 Active"
+  },
+  "marketCap": 4618920960,
+  "marketCapCategory": "Mid-Cap",
+  "style": "Growth",
+  "priceDrivers": {
+    "ticker": "360",
+    "company_name": "Life360, Inc.",
+    "analysis_date": "2026-03-31",
+    "primary_driver": "A fundamental de-rating event around 2 March 2026, most likely an earnings miss or guidance cut that produced an approximately 17% single-session collapse, has reset the market's valuation anchor and the acute 5-day weakness reflects continuation selling amplified by stop-loss and forced-selling flows as the stock grinds toward its 52-week low.",
+    "confidence": "low",
+    "driver_stack": {
+      "primary": [
+        "Post-earnings or post-guidance-cut fundamental re-rating originating on or around 2 March 2026, which produced a single-session drop of approximately 17% from A$24.57 to A$20.36 and from which the stock has never recovered",
+        "Stop-loss cascade and forced institutional selling triggered by proximity to the 52-week low of A$16.74, amplifying the acute 29 to 31 March sessions"
+      ],
+      "secondary": [
+        "ASX technology sector (AXNJ) declined approximately 7.7% across March 2026, providing a persistent sectoral headwind",
+        "Absence of any positive broker re-rating catalyst to arrest the downtrend in the analysis window"
+      ],
+      "amplifiers": [
+        "Structural downtrend from the October 2025 peak of A$55.44, creating a technical vacuum with no support levels holding",
+        "Elevated volume on 31 March, the highest single session in the available dataset, consistent with capitulatory or forced selling near multi-month lows",
+        "Broad ASX200 weakness across March 2026 (down approximately 7.5%) providing a risk-off backdrop"
+      ],
+      "background": [
+        "Stock is 66% below its 52-week high and only 12% above its 52-week low, positioning it in a zone where systematic stop-losses and mandate-breach reviews are likely active",
+        "Consensus analyst target of A$35.48 implies 89% upside, but with no recent upgrades visible in the data, targets appear stale and are not providing market support",
+        "Multiple sharp single-session drops between October 2025 and February 2026 (including approximately 13% on 11 November 2025 and approximately 17% on 2 March 2026) suggest the fundamental de-rating has been an ongoing multi-month process"
+      ],
+      "rejected": [
+        "SEC Form 4 insider filings on 29 March 2026 as the primary causal driver: small file sizes (11-15KB), non-market-sensitive flags, and the pattern of four simultaneous filings are all consistent with routine RSU vesting and tax-withholding sales rather than discretionary open-market selling; they cannot explain the 31 March drop at all since no filings appear on that date",
+        "Macro weakness (ASX200) as a proximate driver: on the two sharpest down-days for 360, the ASX200 was down only 0.65% and up 0.24% respectively, ruling out broad market selling as the proximate cause of the acute sessions",
+        "Sector sympathy (AXNJ) as the proximate driver: AXNJ was actually positive on 31 March (+0.24%) while 360 fell 5.25%, confirming stock-specific pressure dominated on the most acute day",
+        "Social media and retail sentiment as a driver or amplifier: no data available across HotCopper, Reddit, or X; cannot be assessed and should not be assumed"
+      ]
+    },
+    "report": {
+      "title": "360 (Life360): Post-Earnings De-Rating Continues as Stock Grinds Toward 52-Week Low",
+      "executive_summary": "Life360 has fallen approximately 3.4% over the past five trading days and 66% from its October 2025 peak of A$55.44, with the stock now sitting only 12% above its 52-week low of A$16.74. The acute weakness in the 29 to 31 March window is best understood not as a fresh catalyst-driven event but as the continuation of a fundamental de-rating that most likely crystallised on or around 2 March 2026, when the stock fell approximately 17% in a single session from A$24.57 to A$20.36. That event, almost certainly an earnings miss or guidance cut given its magnitude and discreteness, reset the market's valuation anchor. No positive catalyst has since emerged to challenge it. The acute sessions are consistent with stop-loss and forced-selling flows near the 52-week low, amplified by sector weakness and elevated volume. The four SEC Form 4 insider filings lodged on 29 March are most likely routine vesting events and should not be treated as the proximate cause. Confidence in any single driver remains low given several critical data gaps.",
+      "full_note": "Life360 fell 5.25% on 31 March 2026 to close at A$18.77, its second sharp single-session decline in three trading days following a 5.97% drop on 29 March. Over the five-day window the stock lost 3.35% while the ASX200 gained 1.22%, a relative underperformance of 4.57 percentage points. The stock is trading within 12% of its 52-week low and has lost approximately two-thirds of its value since the October 2025 peak of A$55.44. The most credible explanation for the current price level is a fundamental de-rating event that occurred on or around 2 March 2026, and the recent acute sessions are its trailing consequence.\n\nThe 2 March event is the single most important unconfirmed piece of evidence in this analysis. The stock fell from A$24.57 on 26 February to A$20.36 on 2 March, a decline of approximately 17% in one session. Moves of that magnitude in a mid-cap technology name are almost never macro or sector-driven; they are overwhelmingly the product of earnings releases, trading updates, or guidance cuts. The stock has not recovered above A$22.63 since that date. This is the originating driver of the current price level and must be confirmed before any precise attribution of the recent weakness can be made. The research data lacks earnings news and media coverage, which is the most significant gap in this analysis.\n\nThe secondary observation is that 360 is behaving like a stock in a forced-selling regime near a technical floor. With the 52-week low at A$16.74 and the current price at A$18.77, systematic stop-loss thresholds, risk-limit reviews, and potential index composition decisions are active considerations for institutional holders. Volume on 31 March was the highest single-session figure in the available dataset, which is consistent with capitulatory selling rather than orderly distribution. This dynamic is self-reinforcing and does not require a new fundamental catalyst to sustain itself once proximity to a key technical level is established. The sector ETF (AXNJ) declined approximately 7.7% across March and the ASX200 fell approximately 7.5%, providing a consistent headwind throughout the month, but on 31 March specifically the sector was flat-to-positive, confirming that 360's acute underperformance was stock-specific rather than sympathy-driven.\n\nVolume and flow dynamics appear to be amplifying rather than causing the move. The elevated volume on 31 March is consistent with either stop-loss triggering or broader institutional mandate-breach selling, but without a confirmed average daily volume baseline or order-flow data, the precise mechanism cannot be established. The observation is best labelled as probable forced-selling amplification rather than a confirmed characterisation.\n\nNo social or sentiment data is available for this period across HotCopper, Reddit, or X. Given the stock's size and its dual-listing structure, retail social channels may be a secondary amplifier, but without data this cannot be assessed and should not be assumed.\n\nThe four SEC Form 4 insider transaction filings lodged on 29 March warrant examination but should not be elevated to the status of primary driver. Their small file sizes (11-15KB), routine simultaneous-filing pattern, and non-market-sensitive flags are all consistent with scheduled RSU vesting and automatic tax-withholding sales rather than discretionary open-market block sales by insiders. More decisively, they provide no logical explanation for the 31 March decline, on which date no new filings appear. The Schedule 13G may be worth reading for the identity and direction of a large holder crossing a reporting threshold, but the market reaction on 29 March is equally consistent with continuation selling independent of the filings. The insider hypothesis has been examined and ranked lower accordingly. Similarly, the consensus analyst target of A$35.48, implying 89% upside, appears stale rather than supportive; no broker upgrades or target revisions are visible in the data to act as a catalyst.\n\nConfidence in this assessment is low, reflecting several critical data gaps: the content of the 2 March catalyst is unconfirmed; the 30 March closing price is missing and creates an arithmetic inconsistency in the reported 31 March change figure; the Form 4 and 13G content has not been reviewed; no broker notes are available; and no volume baseline exists. The view would change if: (a) the 2 March event proves to be a broader macro or sector dislocation rather than a company-specific result, reducing the fundamental re-rating thesis; (b) the Form 4 filings reveal material open-market insider selling at scale, elevating their causal significance; (c) the Schedule 13G discloses a large institutional holder reducing below a reporting threshold, which would represent an additional bearish flow catalyst; or (d) broker downgrades or target cuts are identified in the window that are not currently visible in the data."
+    },
+    "price_action_summary": {
+      "price_change_2d_pct": -2.7,
+      "price_change_5d_pct": -3.35,
+      "price_change_10d_pct": -0.9,
+      "asx200_change_2d_pct": -0.41,
+      "asx200_change_5d_pct": 1.22,
+      "asx200_change_10d_pct": -1.54,
+      "relative_2d_pct": -2.29,
+      "relative_5d_pct": -4.57,
+      "relative_10d_pct": 0.64
+    },
+    "evidence_quality": {
+      "primary_evidence": "Price and volume data from Yahoo Finance confirmed via computed returns; ASX filings listing confirmed (Form 4 x4, Schedule 13G on 29 March); sector ETF and ASX200 index data confirmed. These are high-quality primary sources.",
+      "secondary_evidence": "Inference from price history that the approximately 17% single-session drop on 2 March 2026 represents a fundamental catalyst event; inferred stop-loss dynamics from proximity to 52-week low and elevated volume. Both are inferences from price data, not confirmed by news or filing content.",
+      "key_gap": "The identity and content of the 2 March 2026 catalyst (most likely an earnings release or guidance cut) is the single most important missing piece. Without it, the root cause of the current price level cannot be confirmed. The missing 30 March closing price creates a data integrity issue for the 31 March return calculation. The actual content of all five ASX filings on 29 March and any broker actions in the window are also critical gaps."
+    },
+    "change_my_mind": {
+      "what_would_change_the_view": [
+        "Confirmation that the 2 March 2026 event was macro or sector-driven rather than a company-specific earnings or guidance release would weaken the fundamental re-rating thesis and elevate sector and macro factors as primary drivers",
+        "Review of the four SEC Form 4 filings revealing material open-market insider selling at scale, rather than routine RSU vesting, would elevate the insider selling hypothesis from probable-coincidence to probable-contributor for the 29 March session",
+        "The Schedule 13G disclosing a significant institutional holder reducing below a reporting threshold would represent an additional confirmed bearish flow catalyst and materially strengthen the stock-specific selling narrative",
+        "Identification of broker downgrades or target price cuts in the 10 trading days to 31 March, not currently visible in the data feed, would provide a cleaner proximate catalyst for the acute underperformance"
+      ]
+    },
+    "broker_activity": {
+      "recent_upgrades": [],
+      "recent_downgrades": [],
+      "consensus_change": "No broker actions visible in the data. Consensus target mean price of A$35.48 implies 89% upside to current price of A$18.77, suggesting targets are likely stale and have not been updated to reflect post-2 March trading levels."
+    },
+    "social_signal": {
+      "hotcopper_activity": "quiet",
+      "reddit_activity": "quiet",
+      "social_led_or_lagged": "irrelevant"
+    }
+  },
+  "_lastRefreshed": "2026-03-31T08:12:24.221662+00:00",
+  "_generation_meta": {
+    "generated_at": "2026-03-31T08:12:24.221675+00:00",
+    "drivers": {
+      "aud/usd": {
+        "value": 0.69,
+        "change_pct": -3.32,
+        "ticker": "AUDUSD=X"
+      }
+    }
   }
 }
