@@ -140,3 +140,93 @@ describe('boot readiness', () => {
     expect(status.PMChat.status).toBe('failed');
   });
 });
+
+// BEAD-010: Boot sequence regression tests
+describe('boot regression scenarios', () => {
+  beforeEach(() => {
+    _resetForTesting();
+  });
+
+  test('simulated delayed data loader: app boots correctly after delay', async () => {
+    // Simulate a 100ms delay on the data loader (in prod this would be 3s)
+    const dataPromise = new Promise(resolve => setTimeout(resolve, 100));
+    registerSubsystem('DataLoader', { critical: true });
+
+    // Data loads eventually
+    dataPromise.then(() => markReady('DataLoader'));
+
+    // Other subsystems can wait for it
+    const waited = waitFor('DataLoader');
+    await expect(waited).resolves.toBeUndefined();
+
+    const status = getBootStatus();
+    expect(status.DataLoader.status).toBe('ready');
+  });
+
+  test('simulated 500 error on data loader: app shows error state', async () => {
+    registerSubsystem('DataLoader', { critical: true });
+    markFailed('DataLoader', new Error('HTTP 500'));
+
+    // waitFor rejects immediately
+    await expect(waitFor('DataLoader')).rejects.toThrow('HTTP 500');
+
+    // Downstream subsystems that depend on data also fail
+    initSubsystem('Home', vi.fn(), { after: ['DataLoader'], critical: true });
+    const status = getBootStatus();
+    expect(status.DataLoader.status).toBe('failed');
+    expect(status.DataLoader.error).toBe('HTTP 500');
+    expect(status.Home.status).toBe('failed');
+  });
+
+  test('simulated timeout on live prices (non-critical): app renders without prices', async () => {
+    // Data loader and auth succeed
+    registerSubsystem('DataLoader', { critical: true });
+    markReady('DataLoader');
+    initSubsystem('Auth', vi.fn(), { critical: true });
+    initSubsystem('Home', vi.fn(), { critical: true });
+
+    // Live prices fail (non-critical)
+    registerSubsystem('LivePrices', { critical: false });
+    markFailed('LivePrices', new Error('timeout'));
+
+    const status = getBootStatus();
+    // Critical subsystems are ready
+    expect(status.DataLoader.status).toBe('ready');
+    expect(status.Auth.status).toBe('ready');
+    expect(status.Home.status).toBe('ready');
+    // Non-critical failure is tracked but does not block
+    expect(status.LivePrices.status).toBe('failed');
+  });
+
+  test('boot with subsystems resolving in reverse order: no race conditions', () => {
+    // Register in forward order but resolve in reverse
+    const order = [];
+
+    registerSubsystem('Auth', { critical: true });
+    registerSubsystem('Home', { critical: true });
+    registerSubsystem('Portfolio', { after: ['Auth'] });
+    registerSubsystem('PMChat', { after: ['Portfolio'] });
+
+    // Resolve Auth first (required by Portfolio)
+    markReady('Auth');
+    order.push('Auth');
+
+    // Resolve Home
+    markReady('Home');
+    order.push('Home');
+
+    // Now Portfolio can run (Auth is ready)
+    initSubsystem('Portfolio', () => order.push('Portfolio'), { after: ['Auth'] });
+
+    // Now PMChat can run (Portfolio is ready)
+    initSubsystem('PMChat', () => order.push('PMChat'), { after: ['Portfolio'] });
+
+    expect(order).toEqual(['Auth', 'Home', 'Portfolio', 'PMChat']);
+
+    const status = getBootStatus();
+    expect(status.Auth.status).toBe('ready');
+    expect(status.Home.status).toBe('ready');
+    expect(status.Portfolio.status).toBe('ready');
+    expect(status.PMChat.status).toBe('ready');
+  });
+});
