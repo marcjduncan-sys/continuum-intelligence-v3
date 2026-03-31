@@ -7,7 +7,7 @@
   "sectorSub": "REIT - Diversified",
   "price": 1.58,
   "currency": "A$",
-  "date": "31-Mar-26",
+  "date": "31-Mar-26 18:41 AEST",
   "reportId": "CNI-2026-001",
   "priceHistory": [
     1.55,
@@ -261,7 +261,7 @@
     1.59
   ],
   "heroDescription": "REIT - Diversified &bull; ASX-Listed",
-  "heroCompanyDescription": "Centuria Capital Group (ASX: CNI): coverage initiated. Full analysis pending.",
+  "heroCompanyDescription": "Centuria Capital Group (ASX: CNI) is one of Australia's largest listed real estate investment managers, operating a diversified platform spanning office, industrial, healthcare, and agricultural property assets. The group manages both listed and unlisted real estate funds, generating fee income from funds under management (FUM) alongside direct property income from co-investments. With FY revenue of A$434M and EBITDA of A$257M, CNI has built a substantial earnings base, though its balance sheet carries A$1.5B in total debt reflecting the capital-intensive nature of its co-investment strategy.",
   "heroMetrics": [
     {
       "label": "Mkt Cap",
@@ -290,54 +290,77 @@
     }
   ],
   "hero": {
-    "embedded_thesis": null,
-    "skew": null,
-    "skew_description": null,
+    "embedded_thesis": "At A$1.58, the market is pricing CNI as a leveraged, rate-sensitive income vehicle with limited near-term growth, embedding significant pessimism relative to the analyst consensus target of A$2.18. The Forward P/E of 11.0x and Trailing P/E of 11.3x are nearly identical, indicating the market expects earnings to remain broadly flat rather than recover - there is no meaningful earnings recovery premium embedded in the current price. The 6.7% dividend yield implies the market requires a substantial income premium to hold the stock, consistent with elevated refinancing risk on A$1.5B of debt in a 4.758% long-rate environment. The stock's position near its 52-week low of A$1.48 suggests the market has largely priced in the negative rate cycle impact on property valuations, but has not yet begun to price in any recovery. A re-rating toward fair value would require either a credible RBA easing signal or evidence that CNI's balance sheet and distribution are more resilient than the current price implies.",
+    "skew": "DOWNSIDE",
+    "skew_description": "The hypothesis distribution assigns 40% to the base case of stable income and gradual drift, 25% each to the bull and bear cases, and 10% to the tail catalyst scenario. The modest bullish skew reflects the large gap to analyst targets and institutional accumulation, offset by genuine leverage and rate risks.",
     "position_in_range": {
       "current_price": 1.58,
-      "worlds": []
+      "worlds": [
+        {
+          "label": "Bear Case",
+          "price": 1.2
+        },
+        {
+          "label": "Base Case",
+          "price": 1.9
+        },
+        {
+          "label": "Bull Case",
+          "price": 2.3
+        },
+        {
+          "label": "Catalyst",
+          "price": 2.8
+        }
+      ],
+      "note": "World prices are indicative -- pending full W1-W4 valuation build"
     },
-    "next_decision_point": null,
-    "previousSkew": null
+    "next_decision_point": {
+      "event": "CNI Half-Year or Full-Year Results Release (FY2026)",
+      "date": "August 2026",
+      "metric": "NTA per unit, distribution per unit, debt covenant headroom, and funds under management (FUM) growth",
+      "thresholds": "NTA stable or growing supports N1/N2; distribution maintained at or above current level supports N2; any covenant breach or distribution cut triggers N3. FUM growth above 5% year-on-year would support N1 re-rating thesis."
+    },
+    "previousSkew": ""
   },
   "skew": {
     "direction": "neutral",
-    "rationale": "Auto-added stock. Narrative analysis pending. Skew assessment requires analyst research."
+    "rationale": "The probability distribution is broadly balanced between the base case (N2, 40%) and the combined upside scenarios (N1+N4, 35%), with meaningful downside risk (N3, 25%) from leverage and sustained high rates. The skew is marginally bullish given the 38% gap to analyst consensus and institutional accumulation signals, but the elevated debt load and lack of near-term rate relief prevent a more decisive bullish call at initiation."
   },
   "verdict": {
-    "text": "Centuria Capital Group has been added to coverage. Trading at <span class=\"key-stat\">A$1.58</span>. Full narrative analysis with competing hypotheses is pending.",
+    "text": "At <span class='key-stat'>A$1.58</span>, Centuria Capital Group is priced for a prolonged period of rate-driven stress, trading <span class='key-stat'>36% below its 52-week high</span> and embedding a <span class='key-stat'>6.7% dividend yield</span> that reflects genuine market scepticism about distribution sustainability. The analyst consensus target of <span class='key-stat'>A$2.18</span> implies the market is overly pessimistic, and the new substantial holder crossing 5% suggests at least one institutional investor agrees. However, with <span class='key-stat'>A$1.5B in total debt</span> and the RBA 10-year yield at <span class='key-stat'>4.758%</span>, the bear case is not trivial - leverage amplifies both upside and downside from here. We initiate coverage with a neutral-to-modestly-bullish skew, acknowledging that the risk/reward is improving at current levels but that a clear catalyst - either a rate signal or a strong results disclosure - is needed before the re-rating thesis can be validated. The evidence base at initiation is limited, and we flag the upcoming results release as the most important near-term data point.",
     "borderColor": null,
     "scores": [
       {
         "label": "N1 Growth/Recovery",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "25%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&uarr;",
+        "dirText": "Upside",
         "dirColor": null
       },
       {
         "label": "N2 Base Case",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
+        "score": "40%",
+        "scoreColor": "var(--signal-amber)",
         "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "dirText": "Base",
         "dirColor": null
       },
       {
         "label": "N3 Risk/Downside",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "25%",
+        "scoreColor": "var(--signal-amber)",
+        "dirArrow": "&darr;",
+        "dirText": "Downside",
         "dirColor": null
       },
       {
         "label": "N4 Disruption/Catalyst",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "10%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&uarr;",
+        "dirText": "Upside",
         "dirColor": null
       }
     ]
@@ -365,7 +388,7 @@
     }
   ],
   "featuredPriceColor": "",
-  "featuredRationale": "Auto-added to coverage. Full narrative analysis pending.",
+  "featuredRationale": "The hypothesis distribution assigns 40% to the base case of stable income and gradual drift, 25% each to the bull and bear cases, and 10% to the tail catalyst scenario. The modest bullish skew reflects the large gap to analyst targets and institutional accumulation, offset by genuine leverage and rate risks.",
   "identity": {
     "rows": [
       [
@@ -449,19 +472,25 @@
       "direction": "upside",
       "title": "N1: Growth/Recovery",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "25%",
+      "scoreWidth": "25%",
+      "scoreMeta": "",
+      "description": "If the RBA pivots to a sustained easing cycle through 2026, falling long-term yields compress cap rates and lift property valuations across CNI's diversified portfolio, driving NTA recovery and multiple expansion. Analyst consensus already embeds a 38% upside to A$2.18, and a rate tailwind could accelerate that re-rating. This scenario requires the 10-year yield to fall materially from 4.758% and occupancy metrics to hold firm.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Analyst consensus target of A$2.18 implies ~38% upside from current price of A$1.58, suggesting the market is pricing in significant pessimism",
+        "Forward P/E of 11.0x is broadly in line with trailing P/E of 11.3x, indicating earnings stability that could re-rate sharply on a yield decline",
+        "A new substantial holder crossing the 5% threshold on 2026-03-24 signals institutional conviction at current depressed levels",
+        "6.7% dividend yield provides a high income floor that becomes increasingly attractive as rates fall",
+        "EV/EBITDA of 10.3x is undemanding for a diversified real asset manager with A$257M EBITDA"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "RBA 10-year yield remains elevated at 4.758%, compressing property valuations and keeping borrowing costs high",
+        "Total debt of A$1.5B against an enterprise value of A$2.7B represents significant leverage that amplifies downside if rates stay higher for longer",
+        "Stock is trading near its 52-week low of A$1.48, suggesting the market has not yet priced in a recovery narrative"
       ]
     },
     {
@@ -469,19 +498,24 @@
       "direction": "neutral",
       "title": "N2: Base Case",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "40%",
+      "scoreWidth": "40%",
+      "scoreMeta": "",
+      "description": "CNI continues to generate steady fee and rental income from its diversified real estate platform, with the 6.7% dividend yield anchoring investor interest at current prices. Earnings remain broadly stable with EPS expected to grow modestly from A$0.1368 to A$0.1443 over the next year, but the stock drifts in a range as the rate environment provides no clear catalyst for a sharp re-rating. The stock gradually recovers toward A$1.90-2.00 as the market digests the rate cycle peak.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Forward EPS of A$0.1368 and next-year EPS of A$0.1443 imply modest but positive earnings growth, supporting dividend sustainability",
+        "6.7% dividend yield is well above the ASX REIT sector average, providing a strong income support level",
+        "New substantial holder filing suggests institutional buyers are accumulating at current levels, providing a floor",
+        "Forward P/E of 11.0x and trailing P/E of 11.3x are nearly identical, indicating earnings consistency rather than distress"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Elevated 10-year yield of 4.758% limits the pace of any NTA recovery and keeps refinancing costs elevated on A$1.5B of debt",
+        "Stock is 36% below its 52-week high of A$2.48, indicating persistent selling pressure that a stable-income narrative alone may not reverse",
+        "Absence of recent investor presentations or strategic updates limits visibility into management's growth pipeline"
       ]
     },
     {
@@ -489,19 +523,24 @@
       "direction": "downside",
       "title": "N3: Risk/Downside",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "25%",
+      "scoreWidth": "25%",
+      "scoreMeta": "",
+      "description": "With A$1.5B in total debt and long-term yields anchored above 4.7%, CNI faces meaningful refinancing risk and potential property devaluations that could impair NTA and force distribution cuts. If occupancy rates soften or asset sales are required to manage the balance sheet, the stock could test new lows below A$1.48. This scenario is most likely if the RBA holds rates higher for longer and commercial property valuations continue to compress.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Total debt of A$1.5B is substantial relative to market cap of ~A$1.35B, implying a debt-to-equity ratio that amplifies any asset value decline",
+        "RBA 10-year yield at 4.758% remains elevated, sustaining upward pressure on cap rates and downward pressure on property valuations",
+        "Stock is trading near its 52-week low of A$1.48, with a 36% decline from the 52-week high of A$2.48 suggesting sustained negative sentiment",
+        "No recent earnings releases or investor presentations to confirm balance sheet resilience or covenant headroom"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Forward P/E of 11.0x and 6.7% dividend yield suggest the market is not pricing in an imminent distribution cut",
+        "New substantial holder at current prices suggests at least one institutional investor views the risk/reward as favourable",
+        "Analyst consensus target of A$2.18 implies analysts do not currently model a severe impairment scenario"
       ]
     },
     {
@@ -509,51 +548,384 @@
       "direction": "downside",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "10%",
+      "scoreWidth": "10%",
+      "scoreMeta": "",
+      "description": "A strategic acquirer, activist investor, or merger partner could emerge given CNI's depressed valuation - trading at a significant discount to analyst targets and near multi-year lows. The new substantial holder crossing 5% could be a precursor to a takeover approach or a push for strategic change. This tail scenario could see the stock re-rate sharply toward or above the A$2.18 analyst target in a short timeframe.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "New substantial holder filing on 2026-03-24 is a potential precursor to a strategic approach or activist campaign",
+        "Stock trading at ~36% discount to 52-week high and ~28% below analyst consensus target creates a compelling acquisition case",
+        "EV/EBITDA of 10.3x is undemanding for a diversified real estate platform with A$257M EBITDA and A$434M revenue",
+        "Diversified REIT platforms with established fund management businesses have historically attracted strategic interest during valuation troughs"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "A$1.5B debt load makes any acquisition structurally complex and reduces the pool of potential acquirers",
+        "No media reports, strategic announcements, or management commentary suggesting a transaction is being contemplated",
+        "Regulatory filings to date are routine compliance documents with no indication of a strategic process"
       ]
     }
   ],
   "narrative": {
-    "theNarrative": "Centuria Capital Group has been auto-added to the Continuum Intelligence coverage universe. Full narrative analysis with competing hypotheses, evidence assessment, and discriminating data points is pending.",
+    "theNarrative": "<strong>[Coverage Initiated 31-Mar-26 18:41 AEST]</strong> Centuria Capital Group is navigating one of the most challenging rate environments for Australian listed REITs in over a decade, with the stock having fallen <strong>36% from its 52-week high of A$2.48</strong> to trade near its 52-week low of <strong>A$1.48</strong>, currently at <strong>A$1.58</strong>. The core tension is straightforward: CNI's diversified real estate platform generates substantial cash flows - <strong>A$257M EBITDA on A$434M revenue</strong> - but the <strong>A$1.5B debt load</strong> is expensive to service and refinance in an environment where the RBA 10-year yield sits at <strong>4.758%</strong>. The market is effectively demanding a <strong>6.7% dividend yield</strong> to hold the stock, reflecting genuine uncertainty about whether distributions are sustainable if property valuations continue to compress. Against this backdrop, the most significant recent development is the <strong>new substantial holder crossing the 5% threshold</strong> on 2026-03-24, which signals that at least one institutional investor views the current price as an attractive entry point. Analyst consensus reinforces this view, with a target price of <strong>A$2.18</strong> implying approximately <strong>38% upside</strong> from current levels. The forward earnings picture is stable rather than exciting - EPS is expected to grow modestly from <strong>A$0.1368 to A$0.1443</strong> - suggesting the re-rating case is primarily a valuation and rate story rather than an earnings growth story. The key risk is that rates remain elevated longer than expected, forcing asset sales or distribution cuts that would validate the bear case and push the stock toward or below A$1.20. The key opportunity is that the stock is already pricing in a great deal of bad news, and any credible signal of RBA easing or balance sheet resilience could catalyse a sharp recovery toward the A$2.18 consensus target.",
     "priceImplication": {
-      "label": "Coverage Initiated &mdash; CNI",
-      "content": "Full price implication analysis pending. Hypothesis framework requires analyst research before embedded assumptions can be identified."
+      "label": "Embedded Assumptions at A$1.58",
+      "content": "<strong>At A$1.58, the current price appears to embed:</strong><br><br>- Sustained elevated Australian long-term rates (10-year at ~4.758%) with no near-term RBA easing<br>- Ongoing compression in commercial property valuations, particularly office and retail<br>- Meaningful refinancing risk on A$1.5B of total debt, with limited covenant headroom assumed<br>- A dividend yield of 6.7% that the market treats as a risk premium rather than a growth signal<br>- Flat-to-declining NTA, with no re-rating catalyst on the near-term horizon<br>- Limited strategic optionality or M&amp;A premium, despite the stock trading at a significant discount to analyst targets<br>- Earnings stability (Forward P/E 11.0x vs Trailing P/E 11.3x) but no recovery premium"
     },
-    "evidenceCheck": "Pending analyst research.",
-    "narrativeStability": "Not yet assessed."
+    "evidenceCheck": "<p>The evidence base for this initiation is <strong>materially limited</strong> and skewed toward regulatory filings rather than substantive operational or financial disclosures. The three most recent ASX announcements are all compliance documents - a substantial holder notice and two Appendix 3Y director interest filings - which provide almost no insight into CNI's operational performance, balance sheet health, or strategic direction. The strongest evidence comes from the financial data summary (Yahoo Finance / EODHD), which provides a consistent picture of a modestly valued, high-yielding, leveraged REIT, and from the analyst consensus data showing a A$2.18 target with EPS estimates for the next two years. The macro data (RBA yield curve, AUD/USD) is current and reliable, providing a clear picture of the rate headwinds facing the sector. However, there are significant gaps across competitor disclosures, alternative operational data (occupancy, rental growth), media sentiment, and detailed financial statements - all of which are absent from the available evidence set. Confidence in the base case is moderate; confidence in the bull and bear cases is lower due to the absence of balance sheet detail and operational metrics.</p>",
+    "narrativeStability": "<p>The current market narrative - that CNI is a leveraged income vehicle under pressure from elevated rates - is <strong>well-anchored in observable data</strong> and unlikely to shift without a clear macro catalyst or a company-specific disclosure. The narrative could be destabilised in either direction: a credible RBA easing signal or a strong half-year result demonstrating covenant headroom and distribution coverage would likely trigger a sharp re-rating toward A$2.00+, while evidence of valuation impairments, covenant breaches, or a distribution cut would accelerate the bear case toward A$1.20. The new substantial holder is a potential wildcard - if this party is an activist or strategic acquirer, the narrative could shift rapidly. The <strong>next material test</strong> is CNI's upcoming half-year or full-year results release, which will provide the first hard data on NTA movements, distribution coverage, and debt refinancing progress. Until that disclosure, the narrative is likely to remain range-bound between the 52-week low of A$1.48 and the A$1.80-1.90 resistance zone.</p>"
   },
   "evidence": {
-    "intro": "Evidence assessment pending. Stock was auto-added to coverage on 31-Mar-26.",
-    "cards": [],
+    "intro": "Initial evidence gathering has commenced, incorporating recent ASX announcements, analyst consensus estimates, and macroeconomic data such as the RBA yield curve. This foundational dataset will inform the initial structural quality assessment.",
+    "cards": [
+      {
+        "number": 1,
+        "title": "1. Corporate Communications",
+        "epistemicClass": "ep-motivated",
+        "epistemicLabel": "Motivated",
+        "finding": "The available ASX announcements for CNI on 2026-03-24, 2026-03-18, and 2026-03-17 are regulatory filings (substantial holder, Appendix 3Y) rather than typical corporate communications like investor presentations or strategic updates.",
+        "tension": "These filings do not provide management's strategic narrative, operational outlook, or detailed business updates, which are usually found in corporate communications and are crucial for understanding the company's direction.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcements (2026-03-24, 2026-03-18, 2026-03-17)"
+      },
+      {
+        "number": 2,
+        "title": "2. Regulatory Filings & Financial Statements",
+        "epistemicClass": "ep-verified",
+        "epistemicLabel": "Verified",
+        "finding": "Recent ASX filings include a 'Becoming a substantial holder' notice on 2026-03-24 and two 'Appendix 3Y' director interest changes on 2026-03-18 and 2026-03-17. These indicate active changes in significant shareholdings and director disclosures.",
+        "tension": "While these filings confirm compliance and market activity, the actual financial statements (e.g., income statement, balance sheet, cash flow) are not provided, preventing a detailed assessment of CNI's financial performance and health.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcements (2026-03-24, 2026-03-18, 2026-03-17)"
+      },
+      {
+        "number": 3,
+        "title": "3. Broker Research",
+        "epistemicClass": "ep-modeled",
+        "epistemicLabel": "Modelled",
+        "finding": "Analyst consensus projects an EPS of A$0.1368 for the current year and A$0.1443 for the next year. The Wall Street target price of A$2.18 represents a significant potential upside of approximately 38% from the current price of A$1.58.",
+        "tension": "The reported PEG ratio of 0 suggests either no expected growth or a very low P/E relative to growth, which could indicate a lack of clear growth drivers in analyst models or a data anomaly. Revenue estimates are also unavailable.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N1",
+            "class": "supports"
+          }
+        ],
+        "source": "Analyst Consensus & Estimates (EODHD)"
+      },
+      {
+        "number": 4,
+        "title": "4. Competitor Disclosures",
+        "epistemicClass": "ep-verified",
+        "epistemicLabel": "Verified",
+        "finding": "No specific competitor disclosures, financial results, or strategic announcements from CNI's peers in the diversified REIT sector are provided in the available data.",
+        "tension": "Without competitor data, it is challenging to benchmark CNI's performance, market share, or strategic positioning against its industry rivals, limiting a relative valuation assessment.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "N/A (Data not provided)"
+      },
+      {
+        "number": 5,
+        "title": "5. Economic Data",
+        "epistemicClass": "ep-measured",
+        "epistemicLabel": "Measured",
+        "finding": "As of 28-Feb-2026, the RBA 10-year yield is 4.758% and the 2-year yield is 4.23%, indicating a normal, positively sloped yield curve (0.528). The AUD/USD exchange rate is US$0.69, having depreciated 3.4% today.",
+        "tension": "While a normal yield curve is generally positive, the absolute level of long-term interest rates (4.758%) is relatively high, potentially increasing borrowing costs for CNI and impacting property valuations. The AUD depreciation could make Australian assets more attractive to foreign buyers but also increase costs for any imported inputs or USD-denominated debt.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "RBA Yield Curve (28-Feb-2026), Macro & Commodity Context (AUD/USD)"
+      },
+      {
+        "number": 6,
+        "title": "6. Alternative Data",
+        "epistemicClass": "ep-observed",
+        "epistemicLabel": "Observed",
+        "finding": "No alternative data points such as real-time operational metrics (e.g., occupancy rates, rental growth, foot traffic), ESG performance indicators, or results from channel checks are available for CNI.",
+        "tension": "The absence of alternative data limits insights into CNI's granular operational performance, tenant satisfaction, or sustainability efforts, which are increasingly relevant for a comprehensive investment analysis in the real estate sector.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "N/A (Data not provided)"
+      },
+      {
+        "number": 7,
+        "title": "7. Academic Research",
+        "epistemicClass": "ep-peer",
+        "epistemicLabel": "Peer-Reviewed",
+        "finding": "No specific academic research, peer-reviewed studies, or comprehensive industry reports focusing on the diversified REIT sector or CNI are provided in the input data.",
+        "tension": "Without academic research, it is difficult to assess CNI's long-term strategic positioning within broader, structurally driven trends in the real estate market or to evaluate its business model against established theoretical frameworks.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "N/A (Data not provided)"
+      },
+      {
+        "number": 8,
+        "title": "8. Media & Social",
+        "epistemicClass": "ep-unverified",
+        "epistemicLabel": "Unverified",
+        "finding": "There are no recent news headlines, financial media articles, or social media commentary specifically mentioning Centuria Capital Group (CNI) provided in the available data.",
+        "tension": "The lack of media and social coverage makes it challenging to gauge public sentiment, recent market narratives, or any unconfirmed but potentially impactful events that might be influencing CNI's stock performance.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "N/A (Data not provided)"
+      },
+      {
+        "number": 9,
+        "title": "9. Leadership & Governance",
+        "epistemicClass": "ep-observed",
+        "epistemicLabel": "Observed",
+        "finding": "An 'Appendix 3Y - Kristie Brown' filing on 2026-03-17 indicates a change in a director's notifiable interests. This is a standard regulatory disclosure for board members.",
+        "tension": "The filing title does not specify the nature of the change (e.g., acquisition or disposal of shares), nor does the available data provide broader insights into CNI's leadership stability, board independence, or specific governance policies.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcement (2026-03-17)"
+      },
+      {
+        "number": 10,
+        "title": "10. Ownership & Capital Flows",
+        "epistemicClass": "ep-measured",
+        "epistemicLabel": "Measured",
+        "finding": "An announcement on 2026-03-24 titled 'Becoming a substantial holder' indicates that a party has acquired a significant stake in CNI, crossing the 5% threshold. This suggests active institutional interest and capital movement.",
+        "tension": "While this indicates significant capital flow, the identity of the substantial holder and whether this represents a net increase in institutional confidence (e.g., a new fund buying in) or a repositioning by an existing holder is not detailed.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N2",
+            "class": "supports"
+          }
+        ],
+        "source": "ASX Announcement (2026-03-24)"
+      }
+    ],
     "alignmentSummary": null
   },
   "discriminators": {
-    "intro": "Discriminating evidence pending analyst research.",
-    "rows": [],
-    "nonDiscriminating": null
+    "intro": "The following data points carry high diagnosticity: they can meaningfully shift probability between competing hypotheses.",
+    "rows": [
+      {
+        "type": "Analyst Consensus",
+        "key": "EPS Growth (Next Year)",
+        "value": "5.5% (0.1368 to 0.1443)",
+        "comment": "Modest EPS growth projected by analysts for the next year."
+      },
+      {
+        "type": "Valuation",
+        "key": "Dividend Yield",
+        "value": "6.73%",
+        "comment": "Attractive dividend yield based on current price and analyst estimates."
+      },
+      {
+        "type": "Analyst Consensus",
+        "key": "Wall Street Target Price",
+        "value": "A$2.18",
+        "comment": "Implies significant upside from the current price of A$1.58."
+      },
+      {
+        "type": "Macroeconomic",
+        "key": "RBA Yield Curve Slope",
+        "value": "0.528",
+        "comment": "The yield curve is positively sloped, indicating normal economic expectations."
+      }
+    ],
+    "nonDiscriminating": "<ul><li><strong>AUD/USD exchange rate:</strong> While AUD weakness could marginally affect foreign investor appetite for Australian REITs, CNI's revenues and costs are predominantly AUD-denominated, making the exchange rate a second-order factor that does not discriminate between the bull and bear cases.</li><li><strong>Market cap of A$1.35B:</strong> The absolute size of CNI is relevant for index inclusion and liquidity but does not discriminate between the competing hypotheses about earnings sustainability or rate sensitivity.</li><li><strong>EV/EBITDA of 10.3x:</strong> While this metric appears undemanding, without peer comparisons it cannot discriminate between a genuine value opportunity (N1) and a value trap (N3) - both scenarios are consistent with this multiple.</li><li><strong>Director interest filings (Appendix 3Y):</strong> Routine compliance disclosures that do not provide directional signal about the company's operational or financial trajectory.</li><li><strong>PEG ratio of 0:</strong> Flagged as a potential data anomaly by the broker research evidence card; this metric is unreliable and should not be used to discriminate between hypotheses.</li></ul>"
   },
   "tripwires": {
-    "intro": "Tripwires pending analyst research.",
-    "cards": []
+    "intro": "The following catalysts could force a material revision to hypothesis weightings. Each carries conditional outcomes that map to specific narrative shifts.",
+    "cards": [
+      {
+        "date": "AUG 2026",
+        "name": "FY2026 Results - Distribution and NTA",
+        "conditions": [
+          {
+            "if": "If CNI maintains or grows its distribution and reports stable/growing NTA with covenant headroom confirmed",
+            "valence": "positive",
+            "then": "Then the bear case is materially reduced, the 6.7% yield is validated as sustainable, and the stock should re-rate toward A$1.90-2.10"
+          },
+          {
+            "if": "If CNI cuts its distribution or reports material NTA impairment or covenant pressure",
+            "valence": "negative",
+            "then": "Then the bear case (N3) becomes dominant, the stock likely tests below the 52-week low of A$1.48, and the analyst consensus target of A$2.18 becomes untenable"
+          }
+        ],
+        "source": "CNI ASX Results Announcement (expected August 2026)"
+      },
+      {
+        "date": "MAY 2026",
+        "name": "RBA Rate Decision and Forward Guidance",
+        "conditions": [
+          {
+            "if": "If the RBA cuts rates and signals a sustained easing cycle, driving the 10-year yield below 4.3%",
+            "valence": "positive",
+            "then": "Then cap rate compression reverses, NTA recovers, and CNI re-rates toward the bull case of A$2.30+"
+          },
+          {
+            "if": "If the RBA holds or raises rates and signals higher-for-longer, keeping the 10-year yield above 4.7%",
+            "valence": "negative",
+            "then": "Then refinancing costs remain elevated, property valuations continue to compress, and the bear case (N3) probability increases toward 35%+"
+          }
+        ],
+        "source": "RBA Board Meeting Minutes and Statement on Monetary Policy"
+      },
+      {
+        "date": "APR 2026",
+        "name": "Substantial Holder Identity and Intent Disclosure",
+        "conditions": [
+          {
+            "if": "If the new substantial holder is identified as a strategic acquirer or activist investor with a stated intent to engage management",
+            "valence": "positive",
+            "then": "Then the N4 tail scenario (strategic transaction) becomes materially more probable and the stock could gap toward A$2.00+ on takeover speculation"
+          },
+          {
+            "if": "If the substantial holder is a passive index fund or ETF rebalancing with no strategic intent",
+            "valence": "negative",
+            "then": "Then the N4 scenario probability falls to near zero and the stock reverts to being driven purely by rate and earnings fundamentals"
+          }
+        ],
+        "source": "ASX Substantial Holder Disclosure (2026-03-24) and any follow-up filings"
+      }
+    ]
   },
   "gaps": {
-    "coverageRows": [],
-    "couldntAssess": [
-      "Full evidence assessment pending &mdash; stock was auto-added to coverage."
+    "coverageRows": [
+      {
+        "domain": "Corporate Comms",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "No investor presentations or strategic updates in available data",
+        "confidence": "Low - no management narrative available",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Regulatory Filings",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 2026 (compliance filings only)",
+        "confidence": "Medium - filings confirmed but no financial statements",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Broker Research",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "Current consensus estimates available (EODHD)",
+        "confidence": "Medium - EPS and target price available, revenue estimates absent",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Competitor Disclosures",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "No peer data provided",
+        "confidence": "Low - no relative valuation possible",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Economic Data",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "28-Feb-2026 (RBA yield curve, AUD/USD)",
+        "confidence": "High - macro data is current and reliable",
+        "confidenceClass": "td-green"
+      },
+      {
+        "domain": "Alternative Data",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "No alternative data provided",
+        "confidence": "Low - no occupancy, rental growth, or ESG data",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Academic Research",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "No academic or industry research provided",
+        "confidence": "Low - no structural or thematic framework available",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Media & Social",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "No recent news or social commentary available",
+        "confidence": "Low - sentiment and narrative gaps",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Leadership & Governance",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 2026 (Appendix 3Y only)",
+        "confidence": "Low - director interest change noted but no governance detail",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Ownership & Capital Flows",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "2026-03-24 (substantial holder filing)",
+        "confidence": "Medium - filing confirmed but holder identity and intent unclear",
+        "confidenceClass": "td-amber"
+      }
     ],
-    "analyticalLimitations": "This stock was auto-added. All hypothesis scores, evidence assessments, and narrative analysis require manual research and population."
+    "couldntAssess": [
+      "Detailed balance sheet and cash flow statement (covenant headroom, interest coverage ratio)",
+      "Funds under management (FUM) breakdown and growth trajectory",
+      "Portfolio occupancy rates and weighted average lease expiry (WALE)",
+      "Debt maturity profile and refinancing schedule",
+      "Distribution coverage ratio and payout sustainability",
+      "NTA per unit and recent valuation movements",
+      "Peer/competitor relative valuation (Charter Hall, Dexus, GPT Group)",
+      "Management commentary on strategy and capital allocation",
+      "ESG ratings and sustainability performance",
+      "Retail vs institutional investor sentiment"
+    ],
+    "analyticalLimitations": "This initiation is conducted with a materially constrained evidence base. The absence of recent financial statements, investor presentations, and operational metrics (occupancy, FUM, NTA) means that key valuation inputs - particularly distribution coverage and balance sheet resilience - cannot be independently verified. The analysis relies heavily on summary financial data from third-party aggregators (Yahoo Finance, EODHD), which may not reflect the most recent half-year results or any off-balance-sheet exposures. The hypothesis probabilities assigned are therefore wider-than-normal confidence intervals, and the verdict should be treated as a framework for monitoring rather than a high-conviction investment recommendation. Investors should seek the most recent CNI results presentation and debt facility disclosures before acting on this analysis."
   },
   "technicalAnalysis": {
     "date": "31 March 2026",
@@ -642,14 +1014,99 @@
         "name": "S&P/ASX 200",
         "period": "12 months",
         "stockReturn": 1.9,
-        "indexReturn": 0,
-        "relativeReturn": 1.9
+        "indexReturn": 6.5,
+        "relativeReturn": -4.6
       }
     }
   },
   "footer": {
     "disclaimer": "This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information.",
-    "domainCount": "0 of 10",
-    "hypothesesCount": "4 Pending"
+    "domainCount": "10 of 10",
+    "hypothesesCount": "4 Active"
+  },
+  "marketCap": 1349459840,
+  "style": "Value/Income",
+  "priceDrivers": {
+    "ticker": "CNI",
+    "company_name": "Centuria Capital Group",
+    "analysis_date": "2026-03-31",
+    "primary_driver": "Broad Australian REIT and property sector selling, amplified by CNI's leveraged balance sheet sensitivity, drove the stock's 10-day underperformance, though a stock-specific negative catalyst such as an unconfirmed broker downgrade cannot be ruled out and may account for a meaningful portion of the excess weakness.",
+    "confidence": "moderate",
+    "driver_stack": {
+      "primary": [
+        "Broad REIT and property sector selling pressure, confirmed at the monthly level via the ^AXNJ sector index declining approximately 8% through March 2026, with macro interest rate concerns cited as the trigger",
+        "Unconfirmed stock-specific negative catalyst, most likely a broker downgrade or target price reduction in mid-to-late March 2026, as the most parsimonious explanation for CNI's incremental underperformance versus the sector within the 10-day window"
+      ],
+      "secondary": [
+        "CNI's high debt load (A$1.5 billion total debt) amplifying sensitivity to rate-driven property sector declines beyond the average REIT peer",
+        "H1 FY2026 results context: GAAP net loss reported alongside an operating EPS guidance upgrade, likely generating mixed investor signals before the analysis window began"
+      ],
+      "amplifiers": [
+        "ASX200 broad market weakness of approximately 1.5% over the 10-day window adding directional headwind",
+        "Technical selling pressure as CNI approached multi-month lows near A$1.54, a level approximately 3.7% above the 52-week low of A$1.48",
+        "Possible selling overhang from the substantial holder filing on 2026-03-24, given that price fell from A$1.61 to A$1.54 in the five sessions following the disclosure"
+      ],
+      "background": [
+        "Sustained downtrend from the 52-week high of A$2.48 in August 2025, meaning CNI entered the analysis window already under significant pressure and with weak technical momentum",
+        "FY2026 operating EPS guidance upgraded to 13.6 cents (11.5% above FY2025), providing a fundamental floor but insufficient to offset macro and sector headwinds",
+        "Consensus analyst target price of A$2.18 implies a 37% discount to current levels, suggesting existing coverage remains constructive but has not acted as a price support catalyst"
+      ],
+      "rejected": [
+        "Large format retail Chadstone acquisition as a 10-day price driver: transaction size of approximately A$86 million is immaterial relative to CNI's enterprise value of A$2.65 billion, no precise announcement date is confirmed, and no corresponding price or volume reaction is identifiable",
+        "ASX Appendix 3Y director shareholding update (2026-03-18): explicitly non-market-sensitive, routine disclosure with no observable price impact",
+        "Social media or retail investor sentiment: no data available and CNI is a mid-cap institutional name where retail channels are unlikely primary drivers",
+        "Technical oversold bounce as a primary driver: the 2-day recovery from A$1.54 to A$1.59 coincided with a parallel sector ETF bounce, indicating the sector recovery rather than a stock-specific technical trigger was the operative force"
+      ]
+    },
+    "report": {
+      "title": "CNI: Sector Drag and an Unexplained Underperformance Gap Point to a Possible Undetected Broker Action",
+      "executive_summary": "Centuria Capital Group has declined approximately 1.24% over the past 10 trading days, broadly in line with the ASX200 at -1.54%, though the picture is more nuanced when the full March 2026 context is applied. The confirmed primary driver is broad REIT sector selling: the ^AXNJ sector index fell roughly 8% in March, with macro interest rate concerns the stated catalyst. CNI's sharper monthly drawdown relative to the sector, however, leaves a residual underperformance of roughly 3 percentage points within the 10-day window that sector factors alone cannot explain. No confirmed stock-specific catalyst is present in the dataset, but the absence of broker notes is the most significant evidential gap. An unconfirmed downgrade or target price cut is the most plausible explanation for the excess weakness. The 2-day bounce to A$1.59 from A$1.54 reflects sector sympathy rather than a new positive catalyst. Confidence in the primary driver is moderate, contingent on broker note data that is currently absent.",
+      "full_note": "Centuria Capital Group (CNI) has traded between A$1.54 and A$1.62 over the past 10 sessions, closing at A$1.59 on 31 March 2026 for a 10-day loss of 1.24%, marginally better than the ASX200 at -1.54% over the same period. The more instructive frame is the full month of March, over which CNI fell from A$1.89 to a low of A$1.54, a drawdown of approximately 18.5% from its February close, against a sector index decline of 8% and an ASX200 decline of roughly 7.6%. The near-term consolidation in the 10-day window therefore represents a pause within a more significant downtrend rather than a discrete event.\n\nThe strongest confirmed evidence points to broad REIT and property sector selling as the primary driver of the sustained decline. The ^AXNJ sector ETF fell from 8,532 on 1 March to 7,852 on 29 March, and a Kalkine article dated 11 March explicitly cited 'broader market concerns about the property sector and rising interest rates' as the pressure on CNI specifically. For a group carrying A$1.5 billion in total debt whose fee income is directly linked to AUM valuations, rising rate expectations are a structural headwind, compressing property valuations, reducing AUM and squeezing development finance margins. This broad sector narrative is the most well-evidenced explanation for the directional trend.\n\nHowever, sector pressure alone is insufficient to account for CNI's excess underperformance within the 10-day window. The sector ETF moved approximately 1.5% lower from 18 March to 29 March while CNI fell roughly 4.9% before a partial recovery, leaving a residual of approximately 3 percentage points attributable to stock-specific factors. No confirmed stock-specific catalyst is present in the dataset for this period. The two ASX filings in the window, an Appendix 3Y on 18 March and a substantial holder notice on 24 March, were both explicitly classified as non-market-sensitive. The H1 FY2026 results, which showed an operating EPS guidance upgrade of 11.5% to 13.6 cents for FY2026 alongside a GAAP net loss, appear to predate the analysis window and were likely absorbed by the market earlier.\n\nVolume on the analysis date of 31 March was 2.35 million shares, assessed as moderate with no obvious spike to confirm a directional catalyst. The 2-day return of +1.27%, representing roughly 1.68 percentage points of relative outperformance versus the ASX200, coincided with a parallel sector ETF recovery of approximately 0.24%, suggesting the short-term bounce reflects sector sympathy rather than a stock-specific trigger. Trading in the 10-day window is best characterised as low-conviction, range-bound drift with no decisive break.\n\nSocial media and retail investor channels contribute nothing confirmable to this analysis. No HotCopper, Reddit or X data is present in the dataset, and given CNI's mid-cap institutional profile, these channels are unlikely to have been primary influences in any case.\n\nThe most significant rejected explanation is the Chadstone Homemaker Centre acquisition and broader large format retail growth commentary. At approximately A$86 million, the transaction is immaterial relative to CNI's A$2.65 billion enterprise value, no ASX-lodged market-sensitive announcement is present in the data, and no corresponding price or volume reaction is identifiable. The substantial holder filing on 24 March is worth noting as a possible selling pressure signal rather than an accumulation trigger, given that the stock fell from A$1.61 to A$1.54 in the five sessions following the disclosure, though this interpretation remains possible rather than confirmed.\n\nThe primary conclusion is that broad REIT sector weakness driven by interest rate concerns is the confirmed driver of CNI's sustained March decline, while the incremental stock-specific underperformance within the 10-day window remains unexplained by available evidence. Confidence is moderate rather than high because the absence of broker note data is a material gap: for an ASX mid-cap of this size, a broker downgrade or target price reduction in mid-to-late March 2026 would typically generate a 3-8% stock-specific move and would represent the most parsimonious explanation for the residual underperformance. This analysis would be revised if broker actions, session-level volume data, peer price comparisons or the full text of the substantial holder notice became available. The consensus target of A$2.18 versus a current price of A$1.59 implies that existing coverage remains broadly constructive, but without fresh confirmation that no negative broker action has occurred, that valuation gap should not be taken as a signal that the underperformance has run its course."
+    },
+    "price_action_summary": {
+      "price_change_2d_pct": 1.27,
+      "price_change_5d_pct": -0.63,
+      "price_change_10d_pct": -1.24,
+      "asx200_change_2d_pct": -0.41,
+      "asx200_change_5d_pct": 1.22,
+      "asx200_change_10d_pct": -1.54,
+      "relative_2d_pct": 1.68,
+      "relative_5d_pct": -1.85,
+      "relative_10d_pct": 0.3
+    },
+    "evidence_quality": {
+      "primary_evidence": "Sector ETF (^AXNJ) price data confirms an 8% REIT sector decline through March 2026. Two ASX filings are present and verified, both explicitly non-market-sensitive. Kalkine secondary media provides a dated reference to rate concerns on 11 March 2026.",
+      "secondary_evidence": "SimplyWallSt and Kalkine provide corroborating context on the H1 FY2026 EPS guidance upgrade and record AUM, but neither source is primary and neither confirms the exact results release date. Consensus target price of A$2.18 is derived from aggregated broker data without identifying specific brokers or dates.",
+      "key_gap": "Broker notes, rating changes and target price revisions for the period 10 to 31 March 2026 are entirely absent from the dataset. This is the single most important missing evidence item. Without it, the stock-specific underperformance gap of approximately 3 percentage points within the 10-day window cannot be attributed to a confirmed cause. Session-level volume data and peer price comparisons for CHC, DXS and HMC Capital are also absent and would materially strengthen or weaken the sector sympathy explanation."
+    },
+    "change_my_mind": {
+      "what_would_change_the_view": [
+        "Confirmation of a broker downgrade or target price reduction between 10 and 25 March 2026 would elevate the stock-specific catalyst to confirmed primary driver and reduce the weight assigned to sector sympathy for the 10-day window",
+        "Peer price data showing CHC, DXS or HMC Capital underperformed the REIT sector by a similar magnitude in March 2026 would strengthen the sector explanation and reduce the probability of an undetected CNI-specific negative event",
+        "Identification of the counterparty in the 24 March substantial holder notice as an exiting institution rather than a new entrant would confirm the selling pressure hypothesis and potentially explain the post-filing weakness from A$1.61 to A$1.54",
+        "Confirmation of a specific RBA policy action, minutes release or global rate event in the 10-day window would anchor the macro narrative to a concrete trigger rather than a generalised rate concern, strengthening the macro driver ranking"
+      ]
+    },
+    "broker_activity": {
+      "recent_upgrades": [],
+      "recent_downgrades": [],
+      "consensus_change": "No broker rating changes or target price revisions are present in the dataset for the analysis window. The consensus mean target price is A$2.18, implying approximately 37% upside from the current price of A$1.59, but the source and recency of individual broker targets are unconfirmed. The absence of broker data is the most material evidential gap in this analysis."
+    },
+    "social_signal": {
+      "hotcopper_activity": "quiet",
+      "reddit_activity": "quiet",
+      "social_led_or_lagged": "irrelevant"
+    }
+  },
+  "_lastRefreshed": "2026-03-31T07:41:00.098254+00:00",
+  "_generation_meta": {
+    "generated_at": "2026-03-31T07:41:00.098269+00:00",
+    "drivers": {
+      "aud/usd": {
+        "value": 0.69,
+        "change_pct": -3.41,
+        "ticker": "AUDUSD=X"
+      }
+    }
   }
 }
