@@ -16,6 +16,8 @@ from typing import Any
 
 import httpx
 
+import config
+
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://api.stlouisfed.org/fred"
@@ -129,7 +131,7 @@ async def fetch_series(
     Returns:
         True if the upsert succeeded, False otherwise.
     """
-    api_key = os.getenv("FRED_API_KEY", "").strip()
+    api_key = config.FRED_API_KEY
     if not api_key:
         logger.warning("FRED_API_KEY not set, skipping %s", series_id)
         return False
@@ -237,7 +239,7 @@ async def refresh_all_fred(pool: Any) -> dict[str, bool]:
         logger.warning("FRED refresh skipped: no database pool")
         return {}
 
-    api_key = os.getenv("FRED_API_KEY", "").strip()
+    api_key = config.FRED_API_KEY
     if not api_key:
         logger.warning("FRED refresh skipped: FRED_API_KEY not set")
         return {}

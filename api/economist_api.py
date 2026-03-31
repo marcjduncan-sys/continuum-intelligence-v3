@@ -170,7 +170,7 @@ async def debug_sources() -> dict:
             }
 
     # FRED
-    fred_key = os.getenv("FRED_API_KEY", "")
+    fred_key = config.FRED_API_KEY
     await _probe(
         "fred",
         "https://api.stlouisfed.org/fred/series/observations",
@@ -180,7 +180,7 @@ async def debug_sources() -> dict:
     )
 
     # EIA
-    eia_key = os.getenv("EIA_API_KEY", os.getenv("EIA_API", ""))
+    eia_key = config.EIA_API_KEY
     await _probe(
         "eia",
         "https://api.eia.gov/v2/petroleum/pri/spt/data/",
@@ -220,7 +220,7 @@ async def debug_sources() -> dict:
     )
 
     # Finnhub
-    fh_key = os.getenv("FINNHUB_API_KEY", os.getenv("FINNHUB_API", ""))
+    fh_key = config.FINNHUB_API_KEY
     await _probe(
         "finnhub",
         "https://finnhub.io/api/v1/calendar/economic",
@@ -229,7 +229,7 @@ async def debug_sources() -> dict:
     )
 
     # Alpha Vantage
-    av_key = os.getenv("ALPHA_VANTAGE_API_KEY", os.getenv("ALPHA_VANTAGE", ""))
+    av_key = config.ALPHA_VANTAGE_API_KEY
     await _probe(
         "alpha_vantage",
         "https://www.alphavantage.co/query",

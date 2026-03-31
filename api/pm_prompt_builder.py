@@ -22,6 +22,7 @@ import os
 from datetime import date, datetime, timedelta, timezone
 from typing import Any
 
+import config
 from pm_constitution import build_constitution_text, RECOMMENDATION_SCHEMA
 from pm_context import (
     build_portfolio_context,
@@ -130,9 +131,7 @@ Reweighting signals from the alignment diagnostics are EVIDENCE INPUTS, not inst
 # ---------------------------------------------------------------------------
 
 # Toggle via environment variable; default enabled
-_BRIDGE_ENABLED = os.getenv("ECONOMIST_PM_BRIDGE_ENABLED", "true").lower() in (
-    "true", "1", "yes",
-)
+_BRIDGE_ENABLED = config.ECONOMIST_PM_BRIDGE_ENABLED
 
 
 def _build_macro_context_section(

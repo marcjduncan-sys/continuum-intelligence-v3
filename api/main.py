@@ -279,7 +279,7 @@ async def lifespan(app: FastAPI):
 # Sentry error monitoring (Phase 5)
 # ---------------------------------------------------------------------------
 
-_sentry_dsn = os.environ.get("SENTRY_DSN", "")
+_sentry_dsn = config.SENTRY_DSN
 if _sentry_dsn:
     import sentry_sdk
     sentry_sdk.init(dsn=_sentry_dsn, traces_sample_rate=0.1)
@@ -313,7 +313,7 @@ app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
 app.include_router(auth_router)
 app.include_router(conversations_router)
 app.include_router(profiles_router)
-if os.environ.get("ENABLE_PM", "true").lower() == "true":
+if config.ENABLE_PM:
     app.include_router(pm_chat_router)
     app.include_router(pm_conversations_router)
     app.include_router(pm_journal_router)
