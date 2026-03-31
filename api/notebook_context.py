@@ -92,7 +92,7 @@ async def get_notebook_id(ticker: str) -> str:
 # Provisioning: create notebook + seed research sources
 # ---------------------------------------------------------------------------
 
-_PROVISION_TIMEOUT = 120  # seconds
+_PROVISION_TIMEOUT = 300  # seconds (deep research takes longer)
 
 _RESEARCH_QUERY_TEMPLATE = (
     "{company_name} ASX:{ticker} annual report quarterly results "
@@ -195,7 +195,7 @@ async def _do_provision(ticker: str, company_name: str) -> str | None:
                 notebook_id=notebook_id,
                 query=query,
                 source="web",
-                mode="fast",
+                mode="deep",
             )
             if result:
                 logger.info(
