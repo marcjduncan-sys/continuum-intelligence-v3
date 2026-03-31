@@ -12,11 +12,13 @@ You are a senior engineer maintaining a production equity research platform used
 npm run dev          # Dev server on port 5000, proxies /api -> localhost:8000
 npm run build        # Vite build -> dist/; copies data/ -> dist/data/
 npm run test         # Jest suite (tests/, src/**/*.test.js) -- 61 tests
-npm run test:unit    # Vitest suite -- what CI runs; must pass before pushing -- 234 tests
+npm run test:unit    # Vitest suite -- what CI runs; must pass before pushing -- 308 tests
 # Python tests: 427 sync passing + 28 async (require pytest-asyncio, not installed locally)
 npm run test:all     # Jest + Vitest combined -- 263 tests total
 npm run lint         # ESLint over scripts/, src/, and public/js/
 npm run validate     # lint + test:all -- run before any push
+bash scripts/check-config-drift.sh  # Verify no os.getenv outside config.py
+bash scripts/check-css-tokens.sh    # Verify no hardcoded layout px >= 400
 ```
 
 **Never run** `npm run test:e2e` without a local server running (Playwright requires a live page).
@@ -38,6 +40,66 @@ npm run validate     # lint + test:all -- run before any push
 - **`window.CI_API_KEY` injection is undocumented.** It is not set in `index.html`. Do not modify anything related to `CI_API_KEY` without first grepping the entire repo for all references and tracing the injection point.
 - **GitHub Actions secrets are not documented in the repo.** Do not rename or delete secrets without checking every workflow file for references first.
 - **Canonical personalisation file is `public/js/personalisation.js`** (~1,800 lines, untested by CI). The root-level `js/personalisation.js` was deleted 2026-03-08. Do not recreate it.
+
+### Boot readiness system (`src/lib/boot.js`)
+
+The app boot sequence uses an explicit readiness registry. Each subsystem registers with `initSubsystem(name, fn, options)` and declares dependencies via `{ after: ['Auth'] }`. If a dependency has failed, the dependent subsystem is skipped (not crashed).
+
+Key API:
+- `initSubsystem(name, fn, { critical, after })` -- register, check deps, run, track state
+- `waitFor(name)` -- returns a Promise; resolves when that subsystem is ready
+- `markReady(name)` / `markFailed(name, error)` -- for async subsystems (data loader)
+- `getBootStatus()` -- returns all subsystem states (for dev logging)
+
+Dependency chain: Auth -> Portfolio -> PMChat. If Auth fails, Portfolio and PMChat are both skipped with clear error logging. Non-critical failures (Chat, EconomistChat, AddStock) do not block boot.
+
+To add a new subsystem to boot: add an `initSubsystem()` call in `main.js` after the router init block. If it depends on another subsystem, declare it: `{ after: ['Auth'] }`. Add a test in `src/lib/boot.test.js`.
+
+### Design token system (`src/styles/tokens.css`)
+
+All layout dimensions >= 400px must use CSS custom properties defined in `tokens.css`. The following property families are controlled:
+
+- **Content max-widths:** `--content-width-narrow` (600px) through `--content-width-wide` (880px)
+- **Modal widths:** `--modal-width-sm` (420px) through `--modal-width-lg` (680px)
+- **Panel widths:** `--analyst-panel-width` (640px), `--panel-collapsed-width` (52px)
+- **Page max:** `--max-width` (1240px)
+
+To add a new layout dimension: add the token to `tokens.css` under the appropriate group, then reference it as `var(--token-name)` in the component CSS. Run `bash scripts/check-css-tokens.sh` to verify no hardcoded values remain.
+
+Element-level sizing (icon widths, dot sizes, table column widths < 400px) does not require tokens. The linter only flags values >= 400px.
+
+### Config centralisation (`api/config.py`)
+
+`api/config.py` is the single source of truth for all environment variables. No `os.getenv()` or `os.environ` calls are permitted outside this file. The linter `scripts/check-config-drift.sh` enforces this.
+
+To add a new env var:
+1. Add it to `api/config.py` with a descriptive comment and `[R]` (required) or `[O]` (optional)
+2. For required vars, add to the `required` dict in `validate_config()`
+3. For legacy name fallbacks, use `_getenv_with_deprecation(primary, legacy)`
+4. Import as `config.VAR_NAME` in the consuming module
+5. Run `bash scripts/check-config-drift.sh` to verify
+
+`validate_config()` runs on import. In production (Fly.io), missing required vars cause `sys.exit(1)`. In dev, they log warnings.
+
+`IS_PRODUCTION` is True when `FLY_ALLOC_ID`, `RAILWAY_ENVIRONMENT`, or `RAILWAY_SERVICE_NAME` is set.
+
+### Recurring issues registry (`docs/recurring-issues-registry.md`)
+
+Read this file at the start of every session. It catalogues 9 bug families identified from 60 days of git history. Before fixing any bug, check if it matches a family. If it does, apply the permanent fix, not a point fix.
+
+After fixing a bug, log it using this format:
+```
+### [Date] BEAD-NNN: [Title]
+- **Family:** [1-9 or NEW]
+- **Symptom:** [what was observed]
+- **Root cause:** [where the defect entered]
+- **Fix:** [what was changed, file:line]
+- **Fix layer:** BOUNDARY
+- **Regression gate:** [test name or CI check]
+- **Recurrence risk:** LOW [because the boundary now enforces]
+```
+
+The iron rule: every fix must be a boundary fix, not a symptom fix. A boundary fix intercepts the defect where it enters the system (the sanitiser, the schema loader, the config validator). A symptom fix patches the rendering or display. Symptom fixes do not prevent recurrence.
 
 ### Portfolio system frozen design decisions
 
