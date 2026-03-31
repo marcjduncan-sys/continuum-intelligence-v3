@@ -324,7 +324,7 @@
     "previousSkew": "DOWNSIDE"
   },
   "skew": {
-    "direction": "bearish",
+    "direction": "downside",
     "rationale": "The probability-weighted skew is modestly bearish at initiation, driven by the combination of extreme price dislocation (66% below the 52-week high), elevated leverage (debt/EBITDA above 9x), and a lack of near-term catalysts visible in the evidence base. While the Forward P/E of 9.6x and analyst consensus target of A$35.48 provide a credible bull case, the absence of market-sensitive communications and the structural tension between the EV/EBITDA of 39.5x and the low EBITDA base of A$32M tilt the risk/reward toward caution at the current price of A$18.77."
   },
   "verdict": {
@@ -337,7 +337,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&darr;",
         "dirText": "Falling",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -345,7 +346,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Falling",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -353,7 +355,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&uarr;",
         "dirText": "Rising",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -361,7 +364,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&rarr;",
         "dirText": "Steady",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -546,7 +550,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",

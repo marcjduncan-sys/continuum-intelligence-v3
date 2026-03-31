@@ -294,7 +294,7 @@
   ],
   "hero": {
     "embedded_thesis": "At A$56.29, the market is pricing Amcor as a leveraged compounder that has delivered early proof of its recovery thesis but remains discounted due to balance sheet complexity and capital structure uncertainty following the Berry Global merger. The forward P/E of 29.6x against a trailing P/E of 30.2x implies the market expects a substantial earnings uplift - consistent with the raised FY2026 guidance of US$4.00-$4.15 EPS and the next-year consensus of US$4.44 - but is not yet willing to award a premium multiple until leverage visibly declines. The 6.7% dividend yield at current prices signals the market is treating the stock primarily as an income vehicle, with capital appreciation contingent on demonstrated deleveraging and sustained integration execution. The -24.2% decline from the 52-week high, despite positive operational news, suggests the market is pricing in meaningful execution risk and potential dilution from the March 2026 capital market activity.",
-    "skew": "DOWNSIDE",
+    "skew": "BALANCED",
     "skew_description": "The four hypotheses are weighted 25% bull, 38% base, 27% bear, and 10% tail catalyst, reflecting a modestly bearish skew that has improved marginally from initiation. The base case remains the modal outcome, but the bull case has gained weight following confirmed Berry Global integration progress and raised FY2026 guidance. The bear case remains elevated given the unexplained gap between positive operational news and the stock's sharp price decline.",
     "position_in_range": {
       "current_price": 58.06,
@@ -326,7 +326,7 @@
     "previousSkew": "DOWNSIDE"
   },
   "skew": {
-    "direction": "bearish",
+    "direction": "balanced",
     "rationale": "The probability distribution is skewed modestly bearish at initiation, reflecting the combination of a heavily leveraged balance sheet (approximately 5.8x EBITDA), a stock already down approximately 25% from its 52-week high, and a wide gap between trailing and forward earnings that embeds a significant recovery assumption. While the 6.7% dividend yield and low forward multiple provide a valuation floor, the weight of evidence -- particularly the debt load and absence of positive operational catalysts -- tilts the near-term risk to the downside."
   },
   "verdict": {
@@ -339,7 +339,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
         "dirText": "Rising",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -347,7 +348,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Falling",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -355,7 +357,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Falling",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -363,7 +366,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&rarr;",
         "dirText": "Steady",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -550,7 +554,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",

@@ -291,7 +291,7 @@
     }
   ],
   "skew": {
-    "direction": "bullish",
+    "direction": "balanced",
     "rationale": "The probability distribution is skewed modestly to the upside, driven by the combination of a transformational resource upgrade, an active exploration pipeline, and a record gold price environment that materially improves project economics. The primary constraint on a more aggressive bullish skew is the absence of financial disclosure, which prevents assessment of balance sheet capacity to fund development and introduces meaningful dilution risk."
   },
   "verdict": {
@@ -304,7 +304,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&darr;",
         "dirText": "Falling",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -312,7 +313,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&uarr;",
         "dirText": "Rising",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -320,7 +322,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&uarr;",
         "dirText": "Rising",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -328,7 +331,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&darr;",
         "dirText": "Falling",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -501,7 +505,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",

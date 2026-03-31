@@ -323,7 +323,7 @@
     "previousSkew": "DOWNSIDE"
   },
   "skew": {
-    "direction": "bullish",
+    "direction": "downside",
     "rationale": "The probability distribution is modestly skewed to the upside, driven by a 32.6% gap between the current price of A$7.16 and the analyst consensus target of A$9.495, combined with a forward earnings growth profile that implies an 18% EPS uplift. The key risk to this skew is the undisclosed financial terms of the Railtrain acquisition and the acute commodity cost shock from Brent Crude, which together create meaningful downside optionality that prevents a more aggressive bullish weighting."
   },
   "verdict": {
@@ -336,7 +336,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&darr;",
         "dirText": "Falling",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -344,7 +345,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&rarr;",
         "dirText": "Steady",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -352,7 +354,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&uarr;",
         "dirText": "Rising",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -360,7 +363,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&rarr;",
         "dirText": "Steady",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -547,7 +551,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",

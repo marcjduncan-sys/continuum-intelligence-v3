@@ -178,11 +178,28 @@ def _normalise_scores(raw_scores: list[int]) -> list[int]:
     return norm
 
 
+def _infer_polarity(label: str) -> str:
+    """Infer polarity from narrative label when explicit direction field is absent.
+    Default is neutral -- only classify as upside/downside with clear keyword evidence.
+    Keyword list must stay in sync with _inferPolarity() in src/lib/dom.js."""
+    if not label:
+        return "neutral"
+    l = label.lower()
+    upside_kw = ["growth", "recovery", "turnaround", "franchise", "quality", "moat"]
+    downside_kw = ["risk", "downside", "erosion", "pressure", "decline",
+                   "competition", "credit", "regulatory", "threat"]
+    if any(k in l for k in upside_kw):
+        return "upside"
+    if any(k in l for k in downside_kw):
+        return "downside"
+    return "neutral"
+
+
 def _compute_skew_from_hypotheses(hypotheses: list[dict]) -> dict:
     """Compute skew from hypothesis scores using the same algorithm as the frontend's
-    computeSkewScore(): normalise scores, sum upside vs downside, derive direction
-    from score difference (threshold +/- 5).
-    Neutral hypotheses contribute zero directional weight."""
+    computeSkewScore(): normalise scores to 100 via _normalise_scores(), resolve polarity,
+    sum upside vs downside. Neutral weight moderates by not contributing to either side.
+    Direction threshold +/- 5."""
     if not hypotheses:
         return {"direction": "balanced", "score": 0, "rationale": "", "source": "computed"}
 
@@ -199,17 +216,18 @@ def _compute_skew_from_hypotheses(hypotheses: list[dict]) -> dict:
 
     norm = _normalise_scores(raw)
 
-    # Sum upside vs downside
+    # Sum upside vs downside using polarity resolution
     bull = 0
     bear = 0
     for i, h in enumerate(hypotheses):
-        direction = str(h.get("direction", "downside")).lower()
+        direction = h.get("direction") or _infer_polarity(h.get("title", ""))
+        direction = str(direction).lower()
         w = norm[i] if i < len(norm) else 0
         if direction == "upside":
             bull += w
         elif direction == "downside":
             bear += w
-        # neutral contributes zero
+        # neutral contributes zero -- its normalised weight moderates the signal
 
     bull = round(bull)
     bear = round(bear)

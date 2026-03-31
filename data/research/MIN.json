@@ -152,7 +152,7 @@
     }
   ],
   "skew": {
-    "direction": "neutral",
+    "direction": "balanced",
     "rationale": "Given the extreme lack of company-specific data, it is challenging to establish a strong directional skew. While recent commodity price movements are positive, the absence of MIN's financial health, operational performance, or strategic initiatives prevents a confident bullish or bearish stance. The base case (N2) carries the highest weight, reflecting this uncertainty."
   },
   "verdict": {
@@ -165,7 +165,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
         "dirText": "Watching",
-        "dirColor": "var(--signal-green)"
+        "dirColor": "var(--signal-green)",
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -173,7 +174,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&rarr;",
         "dirText": "Base",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -181,7 +183,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Watching",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -189,7 +192,8 @@
         "scoreColor": "var(--text-muted)",
         "dirArrow": "&darr;",
         "dirText": "Tail",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -394,7 +398,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",
@@ -804,7 +808,8 @@
       "date": "August 2026 (assuming typical ASX reporting schedule)",
       "metric": "Revenue growth, EBITDA margins, free cash flow, and contract backlog updates",
       "thresholds": "Significant deviation from sector averages in growth or profitability; specific guidance on new projects or capital expenditure plans."
-    }
+    },
+    "skew": "BALANCED"
   },
   "_lastRefreshed": "2026-03-02T09:53:21.238962+00:00",
   "technicalAnalysis": {

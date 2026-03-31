@@ -3,7 +3,7 @@
 
 import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA, FEATURED_ORDER, ANNOUNCEMENTS_DATA } from '../lib/state.js';
 import { renderSparkline, formatDateAEST, fmtPE } from '../lib/format.js';
-import { normaliseScores, computeSkewScore } from '../lib/dom.js';
+import { normaliseScores, computeSkewScore, _inferPolarity } from '../lib/dom.js';
 import { API_BASE } from '../lib/api-config.js';
 
 const RS_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
@@ -304,6 +304,9 @@ function _dirTextToCls(dirText, polarity) {
   var isRising = t.indexOf('rising') >= 0 || t.indexOf('upside') >= 0 || t.indexOf('building') >= 0 || t.indexOf('confirmed') >= 0;
   var isFalling = t.indexOf('falling') >= 0 || t.indexOf('downside') >= 0 || t.indexOf('declining') >= 0;
   if (!isRising && !isFalling) return null;
+
+  // Neutral polarity: direction is informational only, always amber
+  if (polarity === 'neutral' || !polarity) return 'dir-neutral';
 
   // For bearish narratives, invert: rising risk = bad (red), falling risk = good (green)
   var isBearish = polarity === 'downside';
@@ -1349,7 +1352,7 @@ export function prepareHypotheses(data) {
         else if (vs.dirColor.indexOf('red') >= 0) vs._dirCls = 'dir-down';
         else vs._dirCls = 'dir-neutral';
       } else {
-        var polarity = hyps[i] ? hyps[i].direction || 'neutral' : 'neutral';
+        var polarity = vs.polarity || (hyps[i] ? hyps[i].direction : null) || _inferPolarity(vs.label) || 'neutral';
         vs._dirCls = _dirTextToCls(vs.dirText, polarity) || (hyps[i] ? hyps[i].dirClass || 'dir-neutral' : 'dir-neutral');
       }
     }

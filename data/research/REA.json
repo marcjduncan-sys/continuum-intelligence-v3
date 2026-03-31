@@ -152,7 +152,7 @@
     }
   ],
   "skew": {
-    "direction": "bearish",
+    "direction": "balanced",
     "rationale": "The probability-weighted skew is modestly bearish at initiation, driven by the stock's proximity to 52-week lows, the absence of a clear near-term catalyst to reverse the de-rating, and the structural headwinds facing Australian housing volumes. While REA's franchise quality is not in question, the base case (N2 at 45%) and bear case (N3 at 25%) together account for 70% of probability mass, and the downside scenario carries a larger price gap than the upside scenario relative to current levels."
   },
   "verdict": {
@@ -165,7 +165,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
         "dirText": "Watching",
-        "dirColor": "var(--signal-green)"
+        "dirColor": "var(--signal-green)",
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -173,7 +174,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&rarr;",
         "dirText": "Base",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -181,7 +183,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Watching",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -189,7 +192,8 @@
         "scoreColor": "var(--text-muted)",
         "dirArrow": "&darr;",
         "dirText": "Tail",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -408,7 +412,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",
@@ -832,7 +836,8 @@
       "date": "August 2026",
       "metric": "Australian residential listing volume growth (YoY%), depth product revenue per listing, and group EBITDA margin",
       "thresholds": "Listing volume growth >5% YoY and EBITDA margin expansion would support N1 re-rating; flat volumes with stable margins confirm N2 base case; listing volume decline >5% or margin compression >200bps would trigger N3 bear case reassessment"
-    }
+    },
+    "skew": "BALANCED"
   },
   "_lastRefreshed": "2026-03-02T10:44:25.567874+00:00",
   "technicalAnalysis": {

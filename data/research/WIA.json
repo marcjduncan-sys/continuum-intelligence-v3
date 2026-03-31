@@ -292,7 +292,7 @@
     }
   ],
   "skew": {
-    "direction": "neutral",
+    "direction": "upside",
     "rationale": "The probability skew is modestly neutral-to-cautious at initiation. While the gold price environment is exceptionally supportive at US$5,027, the near-total absence of operational disclosures, broker coverage, and financial data prevents a confident bullish skew. The base case (N2) carries the highest weight at 45%, reflecting the most likely scenario of an early-stage explorer consolidating after a capital raise, with the bear case (N3) carrying meaningful weight at 28% given the information vacuum."
   },
   "verdict": {
@@ -305,7 +305,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
         "dirText": "Rising",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -313,7 +314,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Falling",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -321,7 +323,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Falling",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -329,7 +332,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&rarr;",
         "dirText": "Steady",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -499,7 +503,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",

@@ -294,7 +294,7 @@
   ],
   "hero": {
     "embedded_thesis": "At A$30.65, the market appears to be pricing FPH as a quality compounder delivering on its upgraded FY26 guidance (NPAT NZD 450-470M) but with limited near-term re-rating potential. The forward P/E of 32.9x implies the market expects sustained mid-to-high single-digit earnings growth beyond FY26, consistent with continued hospital product adoption but not a step-change acceleration. The stock's proximity to its 52-week low of A$29.72 suggests investors are cautious about the Section 122 regulatory expiry in July 2026 and the sustainability of the currency tailwind that drove the February guidance upgrade. The current price does not appear to embed a meaningful probability of either a transformative M&A event or a significant guidance miss – it reflects a 'show me' stance pending FY26 full-year results and regulatory clarity.",
-    "skew": "DOWNSIDE",
+    "skew": "BALANCED",
     "skew_description": "The four hypotheses are weighted N2 (40%), N3 (28%), N1 (25%), and N4 (7%), reflecting a modestly cautious stance at initiation. The base case carries the highest weight given the verified guidance upgrade and FPH's track record, but the downside scenario is weighted nearly as heavily as the bull case due to the unresolved Section 122 risk and valuation sensitivity at 32.9x forward earnings.",
     "position_in_range": {
       "current_price": 30,
@@ -327,7 +327,7 @@
     "previousSkew": ""
   },
   "skew": {
-    "direction": "neutral",
+    "direction": "balanced",
     "rationale": "The probability distribution is modestly skewed toward the base case (N2, 40%) with meaningful downside risk (N3, 28%) from the Section 122 regulatory overhang and valuation sensitivity. The bullish scenario (N1, 25%) is plausible given the guidance upgrade momentum, but the current price of A$30.65 – near the 52-week low – suggests the market has already partially priced in near-term uncertainty rather than the growth upside."
   },
   "verdict": {
@@ -340,7 +340,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
         "dirText": "Upside",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -348,7 +349,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&rarr;",
         "dirText": "Base",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -356,7 +358,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Downside",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -364,7 +367,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
         "dirText": "Upside",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -535,7 +539,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { normaliseScores, computeSkewScore, escapeHtml } from './dom.js';
+import { normaliseScores, computeSkewScore, _inferPolarity, escapeHtml } from './dom.js';
 
 // --- normaliseScores ---
 
@@ -142,6 +142,109 @@ describe('computeSkewScore', () => {
     };
     const result = computeSkewScore(data);
     expect(result.score).toBe(result.bull - result.bear);
+  });
+  it('scaffold defaults produce zero skew', () => {
+    const data = {
+      hypotheses: [
+        { score: 25, direction: 'upside', title: 'N1: Growth/Recovery', tier: 'n1' },
+        { score: 25, direction: 'neutral', title: 'N2: Base Case', tier: 'n2' },
+        { score: 25, direction: 'downside', title: 'N3: Risk/Downside', tier: 'n3' },
+        { score: 25, direction: 'neutral', title: 'N4: Disruption/Catalyst', tier: 'n4' },
+      ]
+    };
+    const result = computeSkewScore(data);
+    expect(result.score).toBe(0);
+    expect(result.direction).toBe('balanced');
+  });
+
+  it('CBA-like all classified produces -30', () => {
+    const data = {
+      hypotheses: [
+        { score: 35, direction: 'upside', title: 'N1 Franchise', tier: 'n1' },
+        { score: 28, direction: 'downside', title: 'N2 NIM Pressure', tier: 'n2' },
+        { score: 21, direction: 'downside', title: 'N3 Competition', tier: 'n3' },
+        { score: 16, direction: 'downside', title: 'N4 Credit Risk', tier: 'n4' },
+      ]
+    };
+    const result = computeSkewScore(data);
+    expect(result.score).toBe(-30);
+    expect(result.direction).toBe('downside');
+  });
+
+  it('strong bull with neutral N2 produces positive skew', () => {
+    const data = {
+      hypotheses: [
+        { score: 50, direction: 'upside', title: 'N1 Growth', tier: 'n1' },
+        { score: 20, direction: 'neutral', title: 'N2 Base Case', tier: 'n2' },
+        { score: 20, direction: 'downside', title: 'N3 Risk', tier: 'n3' },
+        { score: 10, direction: 'neutral', title: 'N4 Catalyst', tier: 'n4' },
+      ]
+    };
+    const result = computeSkewScore(data);
+    expect(result.score).toBeGreaterThan(0);
+    expect(result.direction).toBe('upside');
+  });
+
+  it('infers polarity from title when direction is absent', () => {
+    const data = {
+      hypotheses: [
+        { score: 30, title: 'N1 Growth/Recovery' },
+        { score: 30, title: 'N2 Base Case' },
+        { score: 25, title: 'N3 Risk/Downside' },
+        { score: 15, title: 'N4 Disruption/Catalyst' },
+      ]
+    };
+    const result = computeSkewScore(data);
+    // Only N1 (upside=30) vs N3 (downside=25) contribute
+    // bull = 30, bear = 25, score = 5 -> balanced (within +/-5 threshold)
+    expect(result.score).toBe(5);
+    expect(result.direction).toBe('balanced');
+  });
+
+  it('missing direction defaults to neutral (not downside)', () => {
+    const data = {
+      hypotheses: [
+        { score: 25, direction: 'upside', title: 'Growth' },
+        { score: 25, title: 'Unknown Narrative' },
+        { score: 25, direction: 'downside', title: 'Risk' },
+        { score: 25, title: 'Another Unknown' },
+      ]
+    };
+    const result = computeSkewScore(data);
+    // N1 upside, N2 neutral (no keyword match), N3 downside, N4 neutral
+    expect(result.score).toBe(0);
+    expect(result.direction).toBe('balanced');
+  });
+});
+
+// --- _inferPolarity ---
+
+describe('_inferPolarity', () => {
+  it('classifies bullish keywords', () => {
+    expect(_inferPolarity('N1 Growth/Recovery')).toBe('upside');
+    expect(_inferPolarity('Turnaround')).toBe('upside');
+    expect(_inferPolarity('Franchise')).toBe('upside');
+    expect(_inferPolarity('Quality Premium')).toBe('upside');
+    expect(_inferPolarity('Moat Advantage')).toBe('upside');
+  });
+
+  it('classifies bearish keywords', () => {
+    expect(_inferPolarity('N3 Risk/Downside')).toBe('downside');
+    expect(_inferPolarity('NIM Pressure')).toBe('downside');
+    expect(_inferPolarity('Competition')).toBe('downside');
+    expect(_inferPolarity('Credit Risk')).toBe('downside');
+    expect(_inferPolarity('Margin Erosion')).toBe('downside');
+    expect(_inferPolarity('Regulatory Threat')).toBe('downside');
+    expect(_inferPolarity('Decline')).toBe('downside');
+  });
+
+  it('defaults to neutral for ambiguous or generic labels', () => {
+    expect(_inferPolarity('N2 Base Case')).toBe('neutral');
+    expect(_inferPolarity('N4 Disruption/Catalyst')).toBe('neutral');
+    expect(_inferPolarity('Catalyst')).toBe('neutral');
+    expect(_inferPolarity('')).toBe('neutral');
+    expect(_inferPolarity(null)).toBe('neutral');
+    expect(_inferPolarity(undefined)).toBe('neutral');
   });
 });
 

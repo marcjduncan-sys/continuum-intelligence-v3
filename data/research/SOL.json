@@ -326,7 +326,7 @@
     "previousSkew": "DOWNSIDE"
   },
   "skew": {
-    "direction": "bearish",
+    "direction": "upside",
     "rationale": "The probability-weighted skew is modestly bearish at initiation. The analyst consensus target of A$39.075 sits below the current price of A$40.40, and the extreme divergence between the trailing P/E of 6.3x and the forward P/E of 6.3x strongly implies that historical earnings were inflated by non-recurring items. Until the 1H26 results are fully digested and the composition of trailing earnings is clarified, the risk of earnings normalisation pressure outweighs the upside from portfolio re-rating."
   },
   "verdict": {
@@ -339,7 +339,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
         "dirText": "Rising",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -347,7 +348,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Falling",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -355,7 +357,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Falling",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -363,7 +366,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&darr;",
         "dirText": "Falling",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -549,7 +553,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",

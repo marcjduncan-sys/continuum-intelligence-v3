@@ -149,11 +149,28 @@ export function normaliseScores(items) {
  */
 
 /**
+ * Infer polarity from narrative label when explicit direction field is absent.
+ * Default is NEUTRAL -- only classify as upside/downside with clear keyword evidence.
+ * @param {string|null|undefined} label
+ * @returns {'upside'|'downside'|'neutral'}
+ */
+export function _inferPolarity(label) {
+  if (!label) return 'neutral';
+  const l = label.toLowerCase();
+  if (['growth', 'recovery', 'turnaround', 'franchise', 'quality', 'moat'].some(function(k) { return l.indexOf(k) >= 0; })) return 'upside';
+  if (['risk', 'downside', 'erosion', 'pressure', 'decline', 'competition', 'credit', 'regulatory', 'threat'].some(function(k) { return l.indexOf(k) >= 0; })) return 'downside';
+  return 'neutral';
+}
+
+/**
  * Compute skew score from hypothesis weights (v3 framework)
- * Principle 5: Thesis Skew is derived mechanically from hypothesis scores and sentiment tags.
+ * Principle 5: Thesis Skew is derived mechanically from hypothesis scores and polarity.
  * NEUTRAL hypotheses contribute zero directional weight.
+ * Polarity resolved: hypothesis.direction -> _inferPolarity(title) -> 'neutral'.
+ * Scores normalised to 100 via normaliseScores(), then summed by polarity.
+ * Neutral hypotheses contribute zero -- their normalised weight moderates the signal.
  * Direction thresholds: >+5 = upside, <-5 = downside, else balanced.
- * @param {{ hypotheses?: Array<{ score: string|number, direction: string, title?: string, tier?: string }> }} data
+ * @param {{ hypotheses?: Array<{ score: string|number, direction?: string, title?: string, tier?: string }> }} data
  * @returns {SkewResult}
  */
 export function computeSkewScore(data) {
@@ -166,23 +183,18 @@ export function computeSkewScore(data) {
   const breakdown = [];
   for (let i = 0; i < hyps.length; i++) {
     const w = norm[i] || 0;
-    const dir = hyps[i].direction || 'downside';
+    const dir = hyps[i].direction || _inferPolarity(hyps[i].title);
     if (dir === 'upside') {
       bull += w;
     } else if (dir === 'downside') {
       bear += w;
-    } else {
-      // Neutral hypotheses contribute zero directional weight.
-      // Bull+bear represents genuine directional conviction only.
-      // Convention adopted 2026-03-07 -- see docs/decisions/
     }
+    // Neutral contributes zero -- its normalised weight implicitly moderates the signal
     breakdown.push({ title: hyps[i].title || hyps[i].tier, direction: dir, weight: w });
   }
-  // Round to avoid floating point display issues
   bull = Math.round(bull);
   bear = Math.round(bear);
   const score = bull - bear;
-  // Derive direction mechanically from score -- never from static data
   /** @type {'upside'|'downside'|'balanced'} */
   const direction = score > 5 ? 'upside' : score < -5 ? 'downside' : 'balanced';
   return { bull: bull, bear: bear, score: score, direction: direction, hypotheses: breakdown };
