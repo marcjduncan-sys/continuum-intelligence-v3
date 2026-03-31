@@ -1226,9 +1226,9 @@
     padding: 3px 10px; border-radius: 3px;
     white-space: nowrap;
 }
-.hc-status.priced { background: rgba(61,170,109,0.1); color: var(--signal-green); }
-.hc-status.accumulating { background: rgba(212,160,60,0.1); color: var(--signal-amber); }
-.hc-status.active { background: rgba(212,85,85,0.1); color: var(--signal-red); }
+.hc-status.priced { background: color-mix(in srgb, var(--signal-green) 12%, transparent); color: var(--signal-green); }
+.hc-status.accumulating { background: color-mix(in srgb, var(--signal-amber) 12%, transparent); color: var(--signal-amber); }
+.hc-status.active { background: color-mix(in srgb, var(--signal-red) 12%, transparent); color: var(--signal-red); }
 .hc-status.minimal { background: var(--bg-elevated); color: var(--text-muted); }
 .hc-score-row {
     display: flex;
@@ -1314,6 +1314,13 @@
     background: rgba(72, 199, 142, 0.06);
 }
 .overcorrection-banner.confirmed .oc-label { color: var(--signal-green); }
+
+[data-theme="light"] .overcorrection-banner {
+    background: color-mix(in srgb, var(--signal-amber) 8%, transparent);
+}
+[data-theme="light"] .overcorrection-banner.confirmed {
+    background: color-mix(in srgb, var(--signal-green) 8%, transparent);
+}
 
 /* --- Narrative Timeline Chart --- */
 .narrative-timeline-section {
