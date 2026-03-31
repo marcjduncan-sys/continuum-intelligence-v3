@@ -16,7 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Encoding contamination check
+        run: bash scripts/check-encoding.sh
+      - uses: superfly/flyctl-actions/setup-flyctl@1.5
       - name: Clear stale VM leases
         run: |
           for id in $(flyctl machines list -a ci-api --json | jq -r '.[].id'); do
@@ -27,3 +29,39 @@ jobs:
       - run: flyctl deploy --remote-only --app ci-api --lease-timeout=120s --wait-timeout=600
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+  post-deploy-health-check:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for deploy propagation
+        run: sleep 30
+
+      - name: Check backend health
+        run: |
+          RESPONSE=$(curl -sf --max-time 15 https://api.continuumintelligence.ai/api/health)
+          STATUS=$(echo "$RESPONSE" | jq -r '.status')
+          echo "Backend response: $RESPONSE"
+          if [ "$STATUS" = "unhealthy" ]; then
+            echo "FAIL: Backend health check returned status=$STATUS"
+            exit 1
+          fi
+          echo "Backend: OK (status=$STATUS)"
+
+      - name: Check frontend serves
+        run: |
+          HTTP_CODE=$(curl -sf -o /dev/null -w "%{http_code}" --max-time 15 https://continuumintelligence.ai/)
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "FAIL: Frontend returned HTTP $HTTP_CODE"
+            exit 1
+          fi
+          echo "Frontend: OK (HTTP $HTTP_CODE)"
+
+      - name: Check frontend content
+        run: |
+          BODY=$(curl -sf --max-time 15 https://continuumintelligence.ai/)
+          if ! echo "$BODY" | grep -q "Continuum Intelligence"; then
+            echo "FAIL: Frontend content check failed -- page does not contain expected text"
+            exit 1
+          fi
+          echo "Frontend content: OK"
