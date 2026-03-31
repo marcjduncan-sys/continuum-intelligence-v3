@@ -83,6 +83,7 @@ window.renderReportPage = renderReport;
 window.destroyNarrativeTimelineChart = destroyNarrativeTimelineChart;
 window.setupScrollSpy = setupScrollSpy;
 window.initNarrativeTimelineChart = initNarrativeTimelineChart;
+window.initSourcesOnReport = null; // set in initRouter callback
 
 // Helper: find the active report page container
 function _activeReportPage() {
@@ -311,7 +312,11 @@ async function boot() {
       const uploadMount = document.getElementById('src-upload-mount-' + t);
       const panelMount = document.getElementById('src-panel-mount-' + t);
       if (uploadMount) {
-        uploadMount.innerHTML = renderSourceUploadZone(ticker);
+        // Upload zone HTML is now embedded in sourcesSection() at render time.
+        // Only re-inject if the mount is somehow empty (defensive fallback).
+        if (!uploadMount.querySelector('.src-upload-zone')) {
+          uploadMount.innerHTML = renderSourceUploadZone(ticker);
+        }
         initSourceUpload(ticker, function(sourceData) {
           appendSource(sourceData, ticker);
         });
@@ -322,6 +327,25 @@ async function boot() {
       initStalenessBadge(ticker, STOCK_DATA[ticker.toUpperCase()] || STOCK_DATA[ticker]);
     }
   });
+
+  // Expose initSourcesOnReport globally so batch-refresh re-renders can re-bind listeners
+  window.initSourcesOnReport = function(ticker) {
+    const t = ticker.toLowerCase();
+    const uploadMount = document.getElementById('src-upload-mount-' + t);
+    if (uploadMount) {
+      if (!uploadMount.querySelector('.src-upload-zone')) {
+        uploadMount.innerHTML = renderSourceUploadZone(ticker);
+      }
+      initSourceUpload(ticker, function(sourceData) {
+        appendSource(sourceData, ticker);
+      });
+    }
+    const panelMount = document.getElementById('src-panel-mount-' + t);
+    if (panelMount) {
+      initSourcesPanel(ticker);
+    }
+    initStalenessBadge(ticker, STOCK_DATA[ticker.toUpperCase()] || STOCK_DATA[ticker]);
+  };
 
   // Initialize pages (each wrapped so one failure does not block the rest)
   const _inits = [

@@ -134,6 +134,7 @@ function _pollRefreshStatus(ticker) {
                             if (typeof window.setupScrollSpy === 'function') window.setupScrollSpy('page-report-' + ticker);
                             if (typeof window.initNarrativeTimelineChart === 'function') window.initNarrativeTimelineChart(ticker);
                             if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
+                            if (typeof window.initSourcesOnReport === 'function') window.initSourcesOnReport(ticker);
                             // Trigger fresh price driver analysis after re-render
                             requestAnimationFrame(function() { fetchPriceDrivers(ticker, true); });
                         }
@@ -421,6 +422,7 @@ async function _fetchAndCacheSingleTicker(ticker) {
                 if (typeof window.setupScrollSpy === 'function') window.setupScrollSpy('page-report-' + ticker);
                 if (typeof window.initNarrativeTimelineChart === 'function') window.initNarrativeTimelineChart(ticker);
                 if (typeof window.initInlineChat === 'function') window.initInlineChat(ticker);
+                if (typeof window.initSourcesOnReport === 'function') window.initSourcesOnReport(ticker);
             }
         }
     } catch (e) {
@@ -499,6 +501,7 @@ async function _fetchAndMergeBatchResults() {
                     if (typeof window.setupScrollSpy === 'function') window.setupScrollSpy('page-report-' + currentTicker);
                     if (typeof window.initNarrativeTimelineChart === 'function') window.initNarrativeTimelineChart(currentTicker);
                     if (typeof window.initInlineChat === 'function') window.initInlineChat(currentTicker);
+                    if (typeof window.initSourcesOnReport === 'function') window.initSourcesOnReport(currentTicker);
                 }
             }
         }

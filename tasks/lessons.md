@@ -16,6 +16,24 @@
 
 1. **Always identify which file Vite actually serves before editing.** Vite's `publicDir: 'public'` means only files under `public/` are copied verbatim to `dist/`. A root-level `js/` directory is NOT copied. Editing `js/personalisation.js` at the repo root has zero effect on production -- `public/js/personalisation.js` is the file that matters. Before editing any classic-script file, confirm its path resolves under `publicDir`. Rule: grep `index.html` for the `<script src="...">` tag, then trace that path through `vite.config.js` `publicDir` and plugin config to verify it lands in `dist/`. (Learned: 2026-03-08)
 
+7. **Before fixing any bug, check `docs/recurring-issues-registry.md` for matching bug families.** 43% of March 2026 development effort was rework on 8 recurring bug patterns. Point fixes do not stick; the fix must be applied at the boundary where the defect enters the system. If the bug matches a known family, implement the permanent fix described in the registry, not another downstream patch. If it is a new pattern, add it to the registry. (Learned: 2026-03-31, 30-day retrospective)
+
+8. **Sanitise all LLM output at the ingestion boundary, not downstream.** Em-dashes (U+2014) and Windows-1252 characters were fixed 12 times in 30 days across research JSONs, prompts, and source files. Every fix was downstream. The permanent fix is a single `sanitise_text()` function called at every point where LLM output enters the data pipeline: refresh, scaffold, gold agent, price drivers, chat responses. (Learned: 2026-03-31, Bug Family 1)
+
+9. **Every data file the frontend fetches must be enumerated in a schema manifest.** Backend onboarding created 5 files but the frontend expected 6. This pattern recurred for 14 tickers before being caught. A `data/config/schema-manifest.json` listing every expected file and its required fields would have prevented all 15+ schema mismatch commits. (Learned: 2026-03-31, Bug Family 4)
+
+10. **Never widen/resize a UI element without setting the value in `tokens.css`.** The analyst panel was widened 4 times (380 to 640px) because each fix hardcoded a new pixel value. Lock dimensions in design tokens. Reference tokens in CSS. No hardcoded pixel values for any panel, modal, or sidebar width. (Learned: 2026-03-31, Bug Family 6)
+
+11. **State that crosses component boundaries must use explicit readiness signals.** Boot order races caused 8+ crashes where PM Chat, personalisation, or ContinuumDynamics accessed globals before they were defined. Null guards are band-aids. The fix is readiness events: each boot phase emits a signal, downstream consumers await it. (Learned: 2026-03-31, Bug Family 7)
+
+12. **When a file accumulates 10+ fix commits in a month, it needs decomposition, not more patches.** `report-sections.js` had 26 fix commits in March. `portfolio.js` had 19. These files are too large and too coupled. The next fix to either file should include a plan to extract sections/concerns into smaller modules. (Learned: 2026-03-31, Bug Families 2 and 3)
+
+13. **Any score/metric displayed on multiple surfaces must be computed once, cached, and read from cache.** Skew scores were computed independently on 4 surfaces (featured card, coverage table, report hero, report section 02) plus the backend alignment engine. They diverged because each used a different source (live computation vs stale narrative field vs stale verdict.scores copy). The idempotent pattern is: compute once in `hydrate()`, cache as `stock._skew`, read everywhere as `data._skew || computeSkewScore(data)`. Backend must mirror the frontend algorithm exactly. If a new display surface is added, it must read from the cache, not recompute. (Learned: 2026-03-31, Bug Family 8 -- 60-day retrospective)
+
+14. **When frontend and backend both compute the same value, the algorithm must be identical and tested cross-platform.** `computeSkewScore()` in `src/lib/dom.js:159-189` and `_compute_skew_from_hypotheses()` in `api/portfolio_alignment.py` use identical logic: clamp [5,80], normalise to 100, sum upside vs downside, threshold +/-5. Before commit `2cb57ea9`, the backend read a stale `narrative.skew` field instead of computing live, causing 19/38 tickers to diverge. Rule: if both sides compute the same value, write a cross-platform test asserting identical output for a shared test fixture. (Learned: 2026-03-31, Bug Family 8)
+
+15. **Silent failures in data loading are the most expensive bugs.** `src/data/loader.js:102` fetches `data/stocks/{TICKER}.json` and swallows 404s silently. 14 tickers went unnoticed missing signal data. `notebook_context.py` called `ask(message=...)` instead of `ask(question=...)` and silently returned nothing. These silent failures compound over weeks. Rule: every data fetch must log an error on failure, even if the caller continues with a fallback. (Learned: 2026-03-31, Bug Family 4)
+
 <!--
 Example format:
 

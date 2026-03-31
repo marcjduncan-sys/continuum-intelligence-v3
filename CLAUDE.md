@@ -68,7 +68,14 @@ These were set during Phase B and must not be changed without explicit instructi
 
 **Test counts (as of last sweep):** 234 Vitest, 427 sync pytest, 28 async pytest.
 
-**NOTEBOOKLM_AUTH_JSON** credentials expire every 1-2 weeks. When gold endpoint returns 503, re-run `Get NotebookLM Auth.bat` from Desktop and update the Fly.io variable.
+**NOTEBOOKLM_AUTH_JSON** credentials expire every 1-2 weeks. Run `Get NotebookLM Auth.bat` from Desktop (OneDrive Desktop). It auto-deploys to Fly.io via `flyctl`, resets auth, and retries pending notebooks. The only manual step is the Google sign-in.
+
+**NotebookLM integration -- known issues and history:**
+- `notebooklm-py` `ChatAPI.ask()` uses `question=` not `message=`. Fixed in commit `3d17c92e` (2026-03-31). Prior to this fix, all Analyst Chat and refresh Track 6 corpus queries were silently failing for every ticker. All 22 original notebooks had research generated without corpus context.
+- Auto-provisioning runs inside `_tracked_coverage_initiation()`. The `_retry_incomplete_coverage()` startup path was missing provisioning until commit `5aa61e01`. If a stock is added and the initial coverage is interrupted (Fly.io restart, timeout), the auto-retry will now provision the notebook.
+- Provisioning uses `mode="deep"` (commit `c30cc6f4`). Fast research yields too few documents. Timeout is 300s.
+- After adding source documents to a NotebookLM notebook, trigger a refresh (`POST /api/refresh/TICKER`) to re-synthesise the research report with the new corpus context. Analyst Chat picks up new sources immediately without a refresh.
+- After any change to `notebook_context.py`, verify the fix works end-to-end: check Fly.io logs for `Track 6: NotebookLM corpus retrieved` during a refresh, and test Analyst Chat with a question only answerable from NotebookLM sources.
 
 **SNX NotebookLM notebook** (`c5470e1a`) currently contains RMS documents. Must be repopulated with SNX-specific source material before re-running the gold agent.
 
@@ -89,6 +96,7 @@ These were set during Phase B and must not be changed without explicit instructi
 - **`npm run build` copies `data/` via a Vite plugin, not `publicDir`.** Verify new data files land in `dist/data/` after build.
 - **SheetJS is lazy-loaded on portfolio upload interaction only** from a CDN URL in a `data-src` attribute.
 - **`marked` and `DOMPurify` are bundled npm dependencies.** `chat.js` imports them as ES modules. CDN script tags and regex fallback parser were removed.
+- **NotebookLM queries fail silently by design.** `notebook_context.py` catches all exceptions and returns `None`. If Track 6 stops producing corpus context, check Fly.io logs for `NotebookLM query failed` warnings. The most common failures are: auth expiry (cookie rotation), wrong API parameter names (library updates), and missing notebook registry entries.
 
 ---
 

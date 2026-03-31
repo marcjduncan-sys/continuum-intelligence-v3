@@ -2,6 +2,7 @@
 // Extracted from index.html without logic changes
 
 import { STOCK_DATA } from '../lib/state.js';
+import { renderSourceUploadZone } from '../features/source-upload.js';
 
 import {
   renderReportHero,
@@ -43,7 +44,7 @@ function sourcesSection(ticker) {
     '</div><button class="rs-toggle" onclick="window.toggleSection(this)" aria-label="Toggle section">' +
     SOURCES_CHEVRON + '</button></div>' +
     '<div class="rs-body">' +
-    '<div id="src-upload-mount-' + t + '"></div>' +
+    '<div id="src-upload-mount-' + t + '">' + renderSourceUploadZone(ticker) + '</div>' +
     '<div id="src-panel-mount-' + t + '"></div>' +
     '</div></div>';
 }

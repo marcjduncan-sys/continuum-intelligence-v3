@@ -17,6 +17,9 @@ import { renderedPages } from '../lib/router.js';
 import { renderFeaturedCard } from '../pages/home.js';
 import { renderTAChart, setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineChart } from '../pages/report-sections.js';
 import { renderReport } from '../pages/report.js';
+import { renderSourceUploadZone, initSourceUpload } from '../features/source-upload.js';
+import { initSourcesPanel, appendSource } from '../features/sources-panel.js';
+import { initStalenessBadge } from '../features/staleness-badge.js';
 import ContinuumDynamics from '../data/dynamics.js';
 import { API_BASE } from '../lib/api-config.js';
 
@@ -263,6 +266,24 @@ export function showDataStatus(ticker, status) {
     }
 }
 
+function _initSourcesAfterRerender(ticker) {
+    const t = ticker.toLowerCase();
+    const uploadMount = document.getElementById('src-upload-mount-' + t);
+    if (uploadMount) {
+        if (!uploadMount.querySelector('.src-upload-zone')) {
+            uploadMount.innerHTML = renderSourceUploadZone(ticker);
+        }
+        initSourceUpload(ticker, function(sourceData) {
+            appendSource(sourceData, ticker);
+        });
+    }
+    const panelMount = document.getElementById('src-panel-mount-' + t);
+    if (panelMount) {
+        initSourcesPanel(ticker);
+    }
+    initStalenessBadge(ticker, STOCK_DATA[ticker.toUpperCase()] || STOCK_DATA[ticker]);
+}
+
 export function updateLiveUI(ticker) {
     const stock = STOCK_DATA[ticker];
     if (!stock || stock._indexOnly) return;
@@ -288,6 +309,8 @@ export function updateLiveUI(ticker) {
                 }
                 // Init narrative timeline chart after DOM render
                 initNarrativeTimelineChart(ticker);
+                // Re-init external research upload zone and sources panel
+                _initSourcesAfterRerender(ticker);
             }
             renderedPages.add(ticker);
         }
