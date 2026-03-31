@@ -8,7 +8,7 @@
 // ============================================================
 
 import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA } from '../lib/state.js';
-import { fmtB, fmtPrice, fmtPct, fmtPE, signPct } from '../lib/format.js';
+import { fmtB, fmtPrice, fmtPct, fmtPE, signPct, formatPercent, formatPrice } from '../lib/format.js';
 import { computeSkewScore } from '../lib/dom.js';
 import { emit } from '../lib/data-events.js';
 
@@ -87,7 +87,7 @@ export function compute(ticker) {
       marketCap: marketCap ? currency + fmtB(marketCap) : null,
       trailingPE: fmtPE(trailingPE),
       forwardPE: fmtPE(forwardPE),
-      divYield: divYield ? divYield.toFixed(1) + '%' : null,
+      divYield: divYield ? formatPercent(divYield) : null,
       drawdown: drawdownFromHigh != null ? '&darr;' + fmtPct(drawdownFromHigh) : null,
       drawdownClean: drawdownFromHigh != null ? fmtPct(drawdownFromHigh) : null,
       upsideToTarget: upsideToTarget != null ? signPct(upsideToTarget) : null,
@@ -213,8 +213,8 @@ export function hydrateText(text, ref, computed) {
 
   // Replace price: "A$77.87" -> new price
   if (anchors.price && computed.price !== anchors.price) {
-    const oldPrice = parseFloat(anchors.price).toFixed(2);
-    const newPrice = parseFloat(computed.price).toFixed(2);
+    const oldPrice = formatPrice(anchors.price);
+    const newPrice = formatPrice(computed.price);
     text = text.split(currency + oldPrice).join(currency + newPrice);
   }
 

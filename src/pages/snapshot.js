@@ -7,7 +7,7 @@ import { renderPDFDownload } from './report-sections.js';
 import { prepareHypotheses } from './report-sections.js';
 import { on } from '../lib/data-events.js';
 import { renderedSnapshots } from '../lib/router.js';
-import { formatDateAEST } from '../lib/format.js';
+import { formatDateAEST, formatPrice, formatPercent } from '../lib/format.js';
 
 export function buildSnapshotFromStock(ticker) {
   const stock = STOCK_DATA[ticker];
@@ -253,12 +253,12 @@ export function buildSnapshotFromStock(ticker) {
       return {
         regime:        ta.regime || null,
         trend:         taT.direction ? taT.direction + ' (' + (taT.duration || '') + ')' : null,
-        ma50:          (ma50.value  != null) ? (taP.currency || '') + ma50.value.toFixed(2)  : null,
-        ma200:         (ma200.value != null) ? (taP.currency || '') + ma200.value.toFixed(2) : null,
-        vsMa50:        (taMA.priceVsMa50  != null) ? taMA.priceVsMa50.toFixed(1)  + '%' : null,
-        vsMa200:       (taMA.priceVsMa200 != null) ? taMA.priceVsMa200.toFixed(1) + '%' : null,
-        support:       (taSup.price != null) ? (taP.currency || '') + taSup.price.toFixed(2) : null,
-        resistance:    (taRes.price != null) ? (taP.currency || '') + taRes.price.toFixed(2) : null,
+        ma50:          (ma50.value  != null) ? (taP.currency || '') + formatPrice(ma50.value)  : null,
+        ma200:         (ma200.value != null) ? (taP.currency || '') + formatPrice(ma200.value) : null,
+        vsMa50:        (taMA.priceVsMa50  != null) ? formatPercent(taMA.priceVsMa50)  : null,
+        vsMa200:       (taMA.priceVsMa200 != null) ? formatPercent(taMA.priceVsMa200) : null,
+        support:       (taSup.price != null) ? (taP.currency || '') + formatPrice(taSup.price) : null,
+        resistance:    (taRes.price != null) ? (taP.currency || '') + formatPrice(taRes.price) : null,
         rangePosition: (taMR.rangePosition != null) ? 'Lower ' + taMR.rangePosition + '%' : null,
         crossover:     taCO ? taCO.type + ' (' + taCO.date + ')' : null
       };
@@ -280,7 +280,7 @@ export function renderSnapshotListCard(data) {
         '<div class="sc-company">' + data.company + '</div>' +
         '<div class="sc-sector">' + data.sector + ' &bull; ' + data.sectorSub + '</div>' +
       '</div>' +
-      '<div class="sc-price"><span class="sc-price-currency">' + data.currency + '</span>' + parseFloat(data.price).toFixed(2) + '</div>' +
+      '<div class="sc-price"><span class="sc-price-currency">' + data.currency + '</span>' + formatPrice(data.price) + '</div>' +
     '</div>' +
     '<div class="sc-meta">' +
       data.priceMetrics.slice(0, 4).map(function(m) {
@@ -411,7 +411,7 @@ export function renderSnapshotPage(data) {
     '</div>' +
 
     '<div class="snap-price-bar">' +
-      '<div><span class="snap-price-currency">' + data.currency + '</span><span class="snap-price-main">' + parseFloat(data.price).toFixed(2) + '</span></div>' +
+      '<div><span class="snap-price-currency">' + data.currency + '</span><span class="snap-price-main">' + formatPrice(data.price) + '</span></div>' +
       '<div class="snap-price-meta">' + priceMetricsHtml + '</div>' +
     '</div>' +
 
