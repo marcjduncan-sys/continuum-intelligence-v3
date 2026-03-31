@@ -454,16 +454,16 @@ export function renderNarrative(data) {
     RS_HDR('Section 03', 'Dominant Narrative') +
     '<div class="rs-body">' +
     '<div class="rs-subtitle">The Narrative</div>' +
-    '<p class="rs-text">' + (n.theNarrative || 'Pending analysis.') + '</p>' +
+    '<div class="rs-text">' + (n.theNarrative || 'Pending analysis.') + '</div>' +
     (pi.label || pi.content ? '<div class="rs-subtitle">The Price Implication</div>' +
     '<div class="callout">' +
       '<div class="callout-label">' + (pi.label || '') + '</div>' +
-      '<p class="rs-text">' + (pi.content || '') + '</p>' +
+      '<div class="rs-text">' + (pi.content || '') + '</div>' +
     '</div>' : '') +
     (n.evidenceCheck ? '<div class="rs-subtitle">The Evidence Check</div>' +
-    '<p class="rs-text">' + n.evidenceCheck + '</p>' : '') +
+    '<div class="rs-text">' + n.evidenceCheck + '</div>' : '') +
     (n.narrativeStability ? '<div class="rs-subtitle">Narrative Stability</div>' +
-    '<p class="rs-text">' + n.narrativeStability + '</p>' : '') +
+    '<div class="rs-text">' + n.narrativeStability + '</div>' : '') +
   '</div></div>';
 }
 
@@ -493,7 +493,7 @@ export function renderEvidenceCard(card) {
   if (card.tension) {
     tensionHtml = '<div class="ec-tension">' +
       '<div class="ec-tension-label">Key Tension</div>' +
-      '<p class="rs-text">' + card.tension + '</p>' +
+      '<div class="rs-text">' + card.tension + '</div>' +
     '</div>';
   }
 
@@ -584,7 +584,7 @@ export function renderEvidence(data) {
   return '<div class="report-section" id="' + t + '-evidence">' +
     RS_HDR('Section 04', 'Cross-Domain Evidence Synthesis') +
     '<div class="rs-body">' +
-    '<p class="rs-text">' + (ev.intro || '') + '</p>' +
+    '<div class="rs-text">' + (ev.intro || '') + '</div>' +
     cardsHtml +
     alignmentHtml +
   '</div></div>';
@@ -609,7 +609,7 @@ export function renderDiscriminators(data) {
   return '<div class="report-section" id="' + t + '-discriminates">' +
     RS_HDR('Section 05', 'What Discriminates') +
     '<div class="rs-body">' +
-    '<p class="rs-text">' + (d.intro || '') + '</p>' +
+    '<div class="rs-text">' + (d.intro || '') + '</div>' +
     '<table class="disc-table">' +
       '<thead><tr><th>Diagnosticity</th><th>Evidence</th><th>Discriminates Between</th><th>Current Reading</th></tr></thead>' +
       '<tbody>' + rowsHtml + '</tbody>' +
@@ -654,7 +654,7 @@ export function renderTripwires(data) {
   return '<div class="report-section" id="' + t + '-tripwires">' +
     RS_HDR('Section 06', 'What We\'re Watching') +
     '<div class="rs-body">' +
-    '<p class="rs-text">' + tw.intro + '</p>' +
+    '<div class="rs-text">' + tw.intro + '</div>' +
     cardsHtml +
   '</div></div>';
 }
@@ -697,7 +697,7 @@ export function renderGaps(data) {
     '<div class="rs-subtitle">What We Couldn\'t Assess</div>' +
     calloutsHtml +
     (g.analyticalLimitations ? '<div class="rs-subtitle">Analytical Limitations</div>' +
-    '<p class="rs-text">' + g.analyticalLimitations + '</p>' : '') +
+    '<div class="rs-text">' + g.analyticalLimitations + '</div>' : '') +
   '</div></div>';
 }
 
@@ -2360,7 +2360,7 @@ export function renderGoldSection(data) {
   if (ga.executive_summary) {
     execHtml =
       '<div class="rs-subtitle">Executive Summary</div>' +
-      '<p class="rs-text">' + ga.executive_summary + '</p>';
+      '<div class="rs-text">' + ga.executive_summary + '</div>';
   }
 
   // Investment view: bull/base/bear scenario table
@@ -2378,7 +2378,7 @@ export function renderGoldSection(data) {
         '</tbody>' +
       '</table>';
     if (iv.monitoring_trigger) {
-      viewHtml += '<div class="callout"><div class="callout-label">Monitoring Trigger</div><p class="rs-text">' + iv.monitoring_trigger + '</p></div>';
+      viewHtml += '<div class="callout"><div class="callout-label">Monitoring Trigger</div><div class="rs-text">' + iv.monitoring_trigger + '</div></div>';
     }
   }
 
@@ -2471,7 +2471,7 @@ export function renderGoldSection(data) {
     recoHtml =
       '<div class="callout">' +
         '<div class="callout-label">Recommendation</div>' +
-        '<p class="rs-text">' + ga.recommendation + '</p>' +
+        '<div class="rs-text">' + ga.recommendation + '</div>' +
       '</div>';
   }
 
