@@ -324,17 +324,8 @@ export function renderVerdict(data) {
   let scoresHtml = '';
   for (let i = 0; i < v.scores.length; i++) {
     const s = v.scores[i];
-    let dirCls;
-    if (s.dirColor) {
-      // Explicit colour in data: backend already applied composite logic
-      if (s.dirColor.indexOf('green') >= 0) dirCls = 'dir-up';
-      else if (s.dirColor.indexOf('red') >= 0) dirCls = 'dir-down';
-      else dirCls = 'dir-neutral';
-    } else {
-      // Derive from dirText + hypothesis polarity
-      var polarity = hyps[i] ? hyps[i].direction || 'neutral' : 'neutral';
-      dirCls = _dirTextToCls(s.dirText, polarity) || (hyps[i] ? hyps[i].dirClass || 'dir-neutral' : 'dir-neutral');
-    }
+    // _dirCls is pre-computed by prepareHypotheses -- single source of truth
+    const dirCls = s._dirCls || 'dir-neutral';
     const dirAttr = ' data-dir="' + dirCls + '"';
     scoresHtml += '<div class="vs-item ' + dirCls + '"' + dirAttr + '>' +
       '<div class="vs-label">' + (s.label || '') + '</div>' +
@@ -1343,14 +1334,23 @@ export function prepareHypotheses(data) {
   }
 
   // Apply direction colours to verdict scores without renaming labels.
+  // Also compute _dirCls (composite direction class) once for all rendering surfaces.
   if (data.verdict && data.verdict.scores) {
-    for (var i = 0; i < hyps.length; i++) {
-      const rawScore = hyps[i].score;
-      for (let j = 0; j < data.verdict.scores.length; j++) {
-        if (data.verdict.scores[j] && data.verdict.scores[j].score === rawScore) {
-          data.verdict.scores[j].scoreColor = colorMap[hyps[i].dirClass] || data.verdict.scores[j].scoreColor;
-          break;
-        }
+    for (var i = 0; i < data.verdict.scores.length; i++) {
+      var vs = data.verdict.scores[i];
+      // scoreColor: match by raw score value to hypothesis polarity
+      if (hyps[i]) {
+        vs.scoreColor = colorMap[hyps[i].dirClass] || vs.scoreColor;
+      }
+      // _dirCls: composite direction class (good/bad for the stock)
+      if (vs.dirColor) {
+        // Explicit colour set by backend -- map to CSS class
+        if (vs.dirColor.indexOf('green') >= 0) vs._dirCls = 'dir-up';
+        else if (vs.dirColor.indexOf('red') >= 0) vs._dirCls = 'dir-down';
+        else vs._dirCls = 'dir-neutral';
+      } else {
+        var polarity = hyps[i] ? hyps[i].direction || 'neutral' : 'neutral';
+        vs._dirCls = _dirTextToCls(vs.dirText, polarity) || (hyps[i] ? hyps[i].dirClass || 'dir-neutral' : 'dir-neutral');
       }
     }
   }
