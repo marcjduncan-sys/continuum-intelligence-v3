@@ -9,7 +9,7 @@ export default defineConfig({
   reporter: 'list',
 
   use: {
-    baseURL: 'http://localhost:4173/continuum-intelligence-v3/',
+    baseURL: 'http://localhost:4173/',
     headless: true,
     screenshot: 'only-on-failure',
     trace: 'off',
@@ -18,7 +18,7 @@ export default defineConfig({
   // Start vite preview (requires a prior `npm run build`)
   webServer: {
     command: 'npm run preview',
-    url: 'http://localhost:4173/continuum-intelligence-v3/',
+    url: 'http://localhost:4173/',
     reuseExistingServer: !process.env.CI,
     timeout: 30000,
   },
