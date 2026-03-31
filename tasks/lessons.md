@@ -34,6 +34,22 @@
 
 15. **Silent failures in data loading are the most expensive bugs.** `src/data/loader.js:102` fetches `data/stocks/{TICKER}.json` and swallows 404s silently. 14 tickers went unnoticed missing signal data. `notebook_context.py` called `ask(message=...)` instead of `ask(question=...)` and silently returned nothing. These silent failures compound over weeks. Rule: every data fetch must log an error on failure, even if the caller continues with a fallback. (Learned: 2026-03-31, Bug Family 4)
 
+16. **Every fix must be a boundary fix, not a symptom fix.** A boundary fix intercepts the defect where it enters the system (the LLM sanitiser, the schema loader, the config validator, the state machine transition). A symptom fix patches the rendering or display where the defect is visible. Symptom fixes do not prevent recurrence; they are why the rework ratio was 28% over 60 days. Before writing any fix, answer: "Am I fixing where the defect enters, or where it manifests?" If the latter, find the entry point and fix there. (Learned: 2026-03-31, platform hardening retrospective)
+
+17. **All environment variables must be read in `api/config.py` and nowhere else.** 25 `os.getenv()` calls were scattered across 10 client files using 3 naming conventions, causing intermittent failures hard to reproduce. The permanent fix: a single canonical config module with `validate_config()` at startup, `_getenv_with_deprecation()` for legacy names, and `scripts/check-config-drift.sh` as a CI gate. To add a new env var: add to config.py, import as `config.VAR_NAME`. (Learned: 2026-03-31, BEAD-004 Bug Family 5)
+
+18. **Layout widths >= 400px must use CSS custom properties from `tokens.css`.** The analyst panel was widened 4 times (380 to 640px) in a month because each fix hardcoded a new pixel value. Token enforcement: define the value once in `src/styles/tokens.css`, reference as `var(--token-name)` everywhere. Run `scripts/check-css-tokens.sh` to verify. Element-level sizing (< 400px) is exempt. (Learned: 2026-03-31, BEAD-007 Bug Family 6)
+
+19. **Boot subsystems must declare explicit dependencies, not rely on array position.** Three production incidents came from implicit ordering: Auth initialised after Portfolio (guest_id null), chat listeners bound before DOM ready, hydrateAll called on malformed data. The fix: `src/lib/boot.js` provides `initSubsystem(name, fn, { after: ['Auth'] })`. If Auth fails, Portfolio is skipped. `waitFor(name)` lets consumer modules explicitly await upstream readiness. (Learned: 2026-03-31, BEAD-009 Bug Family 7)
+
+20. **Sanitise all LLM output at the ingestion boundary, not in each consumer.** Em-dashes were cleaned 15 times in downstream files over 30 days. The function `_recursive_fix_strings()` existed but was called post-merge (after the defect was already in the data) and was missing from 6 of 7 LLM pipelines. The permanent fix: a shared `sanitise_llm_output()` called at every point where LLM text enters the data pipeline, before any merge or storage. (Learned: 2026-03-31, Bug Family 1)
+
+21. **Every data file the frontend expects must be enumerated in a schema manifest.** Backend onboarding created 5 files but the frontend fetched 6. This mismatch went unnoticed for 14 tickers because the loader swallowed 404s silently. The permanent fix: a manifest listing every expected file and its required fields, validated by the backend before committing and by the frontend with error logging on failure. (Learned: 2026-03-31, Bug Family 4)
+
+22. **When a file accumulates 10+ fix commits in 30 days, decompose it.** `report-sections.js` (2,726 lines, 26 fix commits) and `portfolio.js` (19 fix commits) are structural time bombs. The next fix to either file must include a plan to extract sections into smaller modules (< 800 lines each). Point fixes on monoliths compound, not resolve. (Learned: 2026-03-31, Bug Families 2 and 3)
+
+23. **Run the hardening linter suite before any push.** Three linter scripts now gate regressions: `scripts/check-config-drift.sh` (no os.getenv outside config.py), `scripts/check-css-tokens.sh` (no hardcoded layout px >= 400), and `scripts/check-encoding.sh` (no em-dashes or null bytes in data/source). A clean lint run prevents the three most common rework families. (Learned: 2026-03-31, BEADs 005, 008, hardening programme)
+
 <!--
 Example format:
 
