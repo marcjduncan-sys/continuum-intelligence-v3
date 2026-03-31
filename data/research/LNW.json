@@ -291,7 +291,7 @@
   ],
   "hero": {
     "embedded_thesis": "At A$119.01, the market is pricing LNW on a forward P/E of 12.9x against consensus EPS estimates of approximately A$7.61 for the current year - a significant discount to the trailing P/E of 25.2x based on reported EPS of A$4.73. This gap between the trailing and forward multiples tells a clear story: the market expects a substantial earnings recovery or acceleration, but is not yet willing to pay a premium multiple for it, likely reflecting scepticism about execution, leverage risk, or macro uncertainty. The EV/EBITDA of 12.2x on A$1.2B of EBITDA is consistent with a mid-cycle gaming technology valuation, suggesting the enterprise value is not obviously cheap or expensive in isolation. The 35% drawdown from the 52-week high of A$182.50 implies the market has already de-rated the stock from a growth premium to a show-me valuation, where the burden of proof now sits with management to deliver the consensus EPS ramp. The current price therefore embeds a scenario where earnings growth is real but uncertain, leverage is a constraint, and no near-term catalyst is imminent.",
-    "skew": "BALANCED",
+    "skew": "UPSIDE",
     "skew_description": "The four hypotheses are weighted 30% bull, 40% base, 22% bear, and 8% tail catalyst, reflecting a modestly bullish skew anchored by a strong base case. The dominant weight on N2 reflects the absence of near-term catalysts and the need for earnings delivery to shift the narrative, while the meaningful N3 weight acknowledges the leverage risk and the stock's significant drawdown from recent highs.",
     "position_in_range": {
       "current_price": 119.01,
@@ -324,7 +324,7 @@
     "previousSkew": ""
   },
   "skew": {
-    "direction": "bullish",
+    "direction": "upside",
     "rationale": "The probability skew is modestly bullish, driven by the significant gap between the current price of A$119.01 and the consensus analyst target of approximately A$200, combined with a PEG ratio of 0.51 that signals undervaluation relative to growth. However, the bullish skew is tempered by elevated leverage of approximately 4x net debt/EBITDA and the absence of recent earnings confirmation, which keeps the base case as the modal outcome."
   },
   "verdict": {
@@ -337,7 +337,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
         "dirText": "Upside",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -345,7 +346,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&rarr;",
         "dirText": "Base",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -353,7 +355,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Downside",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -361,7 +364,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
         "dirText": "Upside",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -547,7 +551,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",

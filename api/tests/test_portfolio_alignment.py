@@ -14,6 +14,8 @@ from portfolio_alignment import (
     _parse_score,
     parse_hypotheses,
     resolve_skew,
+    _compute_skew_from_hypotheses,
+    _infer_polarity,
     compute_hypothesis_dna,
     compute_hedge_gaps,
     compute_reweighting_deltas,
@@ -146,6 +148,112 @@ class TestResolveSkew:
         result = resolve_skew(research)
         # neutral drops out; upside 40 vs downside 20 -> upside
         assert result["direction"] == "upside"
+
+
+# ---------------------------------------------------------------------------
+# _infer_polarity (parity with JS _inferPolarity)
+# ---------------------------------------------------------------------------
+
+class TestInferPolarity:
+    def test_bullish_keywords(self):
+        assert _infer_polarity("N1 Growth/Recovery") == "upside"
+        assert _infer_polarity("Turnaround") == "upside"
+        assert _infer_polarity("Franchise") == "upside"
+        assert _infer_polarity("Quality Premium") == "upside"
+        assert _infer_polarity("Moat Advantage") == "upside"
+
+    def test_bearish_keywords(self):
+        assert _infer_polarity("N3 Risk/Downside") == "downside"
+        assert _infer_polarity("NIM Pressure") == "downside"
+        assert _infer_polarity("Competition") == "downside"
+        assert _infer_polarity("Credit Risk") == "downside"
+        assert _infer_polarity("Margin Erosion") == "downside"
+        assert _infer_polarity("Regulatory Threat") == "downside"
+        assert _infer_polarity("Decline") == "downside"
+
+    def test_neutral_defaults(self):
+        assert _infer_polarity("N2 Base Case") == "neutral"
+        assert _infer_polarity("N4 Disruption/Catalyst") == "neutral"
+        assert _infer_polarity("Catalyst") == "neutral"
+        assert _infer_polarity("") == "neutral"
+        assert _infer_polarity(None) == "neutral"
+
+
+# ---------------------------------------------------------------------------
+# _compute_skew_from_hypotheses (parity with JS computeSkewScore)
+# ---------------------------------------------------------------------------
+
+class TestComputeSkewParity:
+    """Cross-platform parity fixtures: must produce identical results to JS."""
+
+    def test_scaffold_defaults_zero_skew(self):
+        hyps = [
+            {"score": "25%", "direction": "upside", "title": "N1: Growth/Recovery"},
+            {"score": "25%", "direction": "neutral", "title": "N2: Base Case"},
+            {"score": "25%", "direction": "downside", "title": "N3: Risk/Downside"},
+            {"score": "25%", "direction": "neutral", "title": "N4: Disruption/Catalyst"},
+        ]
+        result = _compute_skew_from_hypotheses(hyps)
+        assert result["score"] == 0
+        assert result["direction"] == "balanced"
+
+    def test_cba_like_all_classified(self):
+        hyps = [
+            {"score": "35%", "direction": "upside", "title": "N1 Franchise"},
+            {"score": "28%", "direction": "downside", "title": "N2 NIM Pressure"},
+            {"score": "21%", "direction": "downside", "title": "N3 Competition"},
+            {"score": "16%", "direction": "downside", "title": "N4 Credit Risk"},
+        ]
+        result = _compute_skew_from_hypotheses(hyps)
+        assert result["score"] == -30
+        assert result["direction"] == "downside"
+
+    def test_strong_bull_neutral_n2(self):
+        hyps = [
+            {"score": "50%", "direction": "upside", "title": "N1 Growth"},
+            {"score": "20%", "direction": "neutral", "title": "N2 Base Case"},
+            {"score": "20%", "direction": "downside", "title": "N3 Risk"},
+            {"score": "10%", "direction": "neutral", "title": "N4 Catalyst"},
+        ]
+        result = _compute_skew_from_hypotheses(hyps)
+        assert result["score"] > 0
+        assert result["direction"] == "upside"
+
+    def test_all_neutral_zero_skew(self):
+        hyps = [
+            {"score": "25%", "direction": "neutral", "title": "Base Case"},
+            {"score": "25%", "direction": "neutral", "title": "Catalyst"},
+            {"score": "25%", "direction": "neutral", "title": "Trend"},
+            {"score": "25%", "direction": "neutral", "title": "Other"},
+        ]
+        result = _compute_skew_from_hypotheses(hyps)
+        assert result["score"] == 0
+        assert result["direction"] == "balanced"
+
+    def test_infers_polarity_from_title(self):
+        hyps = [
+            {"score": "30%", "title": "N1 Growth/Recovery"},
+            {"score": "30%", "title": "N2 Base Case"},
+            {"score": "25%", "title": "N3 Risk/Downside"},
+            {"score": "15%", "title": "N4 Disruption/Catalyst"},
+        ]
+        result = _compute_skew_from_hypotheses(hyps)
+        # Only N1 (upside=30) vs N3 (downside=25) contribute
+        # bull = 30, bear = 25, score = 5 -> balanced (within +/-5 threshold)
+        assert result["score"] == 5
+        assert result["direction"] == "balanced"
+
+    def test_missing_direction_defaults_neutral(self):
+        hyps = [
+            {"score": "25%", "direction": "upside", "title": "Growth"},
+            {"score": "25%", "title": "Unknown Narrative"},
+            {"score": "25%", "direction": "downside", "title": "Risk"},
+            {"score": "25%", "title": "Another Unknown"},
+        ]
+        result = _compute_skew_from_hypotheses(hyps)
+        # N1 upside=25, N3 downside=25, others neutral
+        assert result["score"] == 0
+        assert result["direction"] == "balanced"
 
 
 # ---------------------------------------------------------------------------

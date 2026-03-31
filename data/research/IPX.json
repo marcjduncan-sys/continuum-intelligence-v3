@@ -326,7 +326,7 @@
     }
   ],
   "skew": {
-    "direction": "bearish",
+    "direction": "downside",
     "rationale": "The probability distribution is skewed bearish at initiation, with N3 (downside) and N2 (neutral grind) together accounting for 70% of the probability mass. The accounting correction, accelerating cash burn, Spruce Point overhang, and heavy institutional selling volume in the week of March 16-19, 2026 represent a cluster of negative signals that outweigh the structural onshoring tailwind in the near term. The bull case (N1 at 20%) requires multiple simultaneous positive outcomes that are not yet in evidence."
   },
   "verdict": {
@@ -339,7 +339,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&rarr;",
         "dirText": "Steady",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -347,7 +348,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&rarr;",
         "dirText": "Steady",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -355,7 +357,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&rarr;",
         "dirText": "Steady",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -363,7 +366,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&rarr;",
         "dirText": "Steady",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -541,7 +545,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",

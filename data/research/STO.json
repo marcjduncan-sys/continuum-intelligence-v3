@@ -123,7 +123,7 @@
     }
   ],
   "skew": {
-    "direction": "neutral",
+    "direction": "upside",
     "rationale": "The probability skew is neutral, primarily due to the conflicting signals from the commodity market &ndash; a significant daily increase in Brent Crude is offset by a notable daily decline in Natural Gas. This mixed environment, combined with a severe lack of company-specific data, prevents a strong directional conviction at this initial coverage stage."
   },
   "verdict": {
@@ -136,7 +136,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
         "dirText": "Watching",
-        "dirColor": "var(--signal-green)"
+        "dirColor": "var(--signal-green)",
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -144,7 +145,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&rarr;",
         "dirText": "Base",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -152,7 +154,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Watching",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -160,7 +163,8 @@
         "scoreColor": "var(--text-muted)",
         "dirArrow": "&darr;",
         "dirText": "Tail",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -370,7 +374,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",
@@ -768,7 +772,8 @@
       "date": "August 2026 (for Half-Year results)",
       "metric": "Production volumes, realized commodity prices, project capital expenditure, and free cash flow.",
       "thresholds": "Significant deviation from expected production guidance, material changes in capital allocation, or unexpected project delays/advancements would shift the thesis."
-    }
+    },
+    "skew": "UPSIDE"
   },
   "_lastRefreshed": "2026-03-02T09:56:01.292189+00:00",
   "technicalAnalysis": {

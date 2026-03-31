@@ -293,7 +293,7 @@
     }
   ],
   "skew": {
-    "direction": "bullish",
+    "direction": "upside",
     "rationale": "The probability skew is modestly bullish, driven by the extraordinary gold price environment (US$5,024/oz) and confirmed A$567M NPAT that together suggest the current A$3.20 price embeds an unusually large risk premium. The combined N1 and N4 upside scenarios carry 42% probability versus 18% for the bear case, with the base case (N2) at 40% reflecting genuine uncertainty around jurisdictional risk and capital allocation. The key risk to this skew is a gold price reversal or Burkina Faso security deterioration."
   },
   "verdict": {
@@ -306,7 +306,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
         "dirText": "Upside",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -314,7 +315,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&rarr;",
         "dirText": "Base",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -322,7 +324,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Downside",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -330,7 +333,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
         "dirText": "Upside",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -500,7 +504,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",

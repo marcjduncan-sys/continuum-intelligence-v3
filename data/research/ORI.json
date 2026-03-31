@@ -293,7 +293,7 @@
   ],
   "hero": {
     "embedded_thesis": "At A$20.06, the market is pricing Orica on a forward P/E of 60.8x against consensus EPS of approximately A$1.23, implying the stock is valued on the assumption that a substantial earnings recovery from the reported trailing EPS of A$0.33 (which generated the elevated trailing P/E of 61.5x) is already underway and will be delivered within the next 12 months. The current price therefore embeds a near-complete normalisation of margins from the current 1.99% profit margin toward something closer to historical norms, with no material disruption from input cost inflation or operational setbacks. The 23% discount to the 52-week high of A$26.40 and the 27% discount to the consensus target of A$25.75 suggest the market is applying a risk discount to this recovery - either doubting the pace of earnings normalisation, pricing in the crude oil cost shock risk, or reflecting uncertainty from the unresolved media report clarification. The EV/EBITDA of 9.3x is broadly consistent with a mid-cycle specialty chemicals valuation, suggesting the market is not pricing in either a deep distress scenario or a premium growth re-rating.",
-    "skew": "DOWNSIDE",
+    "skew": "BALANCED",
     "skew_description": "The four hypotheses are weighted with the base case (N2) carrying the highest probability at 40%, reflecting the most likely outcome of a gradual and incomplete earnings recovery. The bear case (N3) carries a meaningful 28% weight given the crude oil cost shock risk and thin current margins, while the bull case (N1) at 25% reflects the genuine upside if the recovery executes cleanly. The tail catalyst scenario (N4) at 7% is low probability but asymmetrically positive. The combined downside weight of 28% versus the combined upside weight of 32% produces a marginally bullish skew that is tempered by near-term cost uncertainty.",
     "position_in_range": {
       "current_price": 20.3,
@@ -326,7 +326,7 @@
     "previousSkew": ""
   },
   "skew": {
-    "direction": "neutral",
+    "direction": "balanced",
     "rationale": "The probability distribution is skewed modestly toward the base case and bear case combined, reflecting the significant uncertainty introduced by the crude oil price spike and the unknown media report content. While the consensus target and buyback activity provide upside anchors, the thin trailing margin and high leverage mean the earnings recovery embedded in the forward P/E of 60.8x must be delivered without material cost disruption - a condition that is currently in doubt."
   },
   "verdict": {
@@ -339,7 +339,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
         "dirText": "Upside",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -347,7 +348,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&rarr;",
         "dirText": "Base",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -355,7 +357,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Downside",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -363,7 +366,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&uarr;",
         "dirText": "Upside",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -551,7 +555,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",

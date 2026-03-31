@@ -13,6 +13,7 @@ from typing import Any
 
 from web_search import _get_http_client, YAHOO_HEADERS, SECTOR_COMMODITY_MAP
 from refresh import _generate_technical_analysis
+from text_sanitise import sanitise_text
 
 logger = logging.getLogger(__name__)
 
@@ -457,13 +458,13 @@ async def fetch_company_metadata(ticker: str) -> dict[str, Any]:
 
             logger.info(f"[YahooMeta] {ticker}: sector={sector}, industry={industry}")
 
-            return {
+            return sanitise_text({
                 "sector": sector,
                 "industry": industry,
                 "description": description[:500] if description else "",
                 "website": website,
                 "employees": employees,
-            }
+            })
 
         except Exception as e:
             logger.error(f"Yahoo quoteSummary error for {ticker}: {e}")
@@ -717,21 +718,25 @@ def build_research_scaffold(
             "scores": [
                 {
                     "label": "N1 Growth/Recovery", "score": "?",
+                    "polarity": "upside",
                     "scoreColor": "var(--text-muted)",
                     "dirArrow": "&rarr;", "dirText": "Pending", "dirColor": None,
                 },
                 {
                     "label": "N2 Base Case", "score": "?",
+                    "polarity": "neutral",
                     "scoreColor": "var(--text-muted)",
                     "dirArrow": "&rarr;", "dirText": "Pending", "dirColor": None,
                 },
                 {
                     "label": "N3 Risk/Downside", "score": "?",
+                    "polarity": "downside",
                     "scoreColor": "var(--text-muted)",
                     "dirArrow": "&rarr;", "dirText": "Pending", "dirColor": None,
                 },
                 {
                     "label": "N4 Disruption/Catalyst", "score": "?",
+                    "polarity": "neutral",
                     "scoreColor": "var(--text-muted)",
                     "dirArrow": "&rarr;", "dirText": "Pending", "dirColor": None,
                 },
@@ -839,7 +844,7 @@ def build_research_scaffold(
                 "contradicting": ["Pending analysis"],
             },
             {
-                "tier": "n4", "direction": "downside",
+                "tier": "n4", "direction": "neutral",
                 "title": "N4: Disruption/Catalyst",
                 "statusClass": "watching",
                 "statusText": "Watching &mdash; Pending Analysis",

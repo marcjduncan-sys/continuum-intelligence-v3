@@ -28,6 +28,7 @@ import config
 import re
 
 import llm
+from text_sanitise import sanitise_text
 
 
 def _build_generation_meta(gathered: dict | None) -> dict:
@@ -1585,7 +1586,7 @@ Please assess each evidence card against this new data and return the updated as
             feature="evidence-update",
             ticker=ticker,
         )
-        return result.json if isinstance(result.json, dict) else {}
+        return sanitise_text(result.json if isinstance(result.json, dict) else {})
     except Exception as e:
         logger.error(f"[{ticker}] Evidence specialist failed: {e}")
         return {"cards": [], "summary": f"Evidence update failed: {e}"}
@@ -1660,7 +1661,7 @@ Please create all 10 evidence domain cards for this stock based on the available
             f"keys={list(raw_json.keys()) if isinstance(raw_json, dict) else 'N/A'}, "
             f"text_preview={result.text[:200] if result.text else 'empty'}"
         )
-        parsed = raw_json if isinstance(raw_json, dict) else {}
+        parsed = sanitise_text(raw_json if isinstance(raw_json, dict) else {})
         cards = parsed.get("cards", [])
         logger.info(f"[{ticker}] Evidence creation returned {len(cards)} cards")
         if not cards:
@@ -1794,7 +1795,7 @@ sections, verdict, tripwires, discriminators, and gaps assessment. Be thorough a
             f"keys={list(raw_json.keys()) if isinstance(raw_json, dict) else 'N/A'}, "
             f"text_preview={resp.text[:300] if resp.text else 'empty'}"
         )
-        result = raw_json if isinstance(raw_json, dict) else {}
+        result = sanitise_text(raw_json if isinstance(raw_json, dict) else {})
     except Exception as e:
         logger.error(f"[{ticker}] Coverage initiation failed (all providers): {e}", exc_info=True)
         return {
@@ -2098,7 +2099,7 @@ Please provide the FULL updated JSON with all narrative rewrites and tripwire up
             fallback_model=config.GEMINI_MODEL,
             max_retries=2,
         )
-        result = resp.json if isinstance(resp.json, dict) else {}
+        result = sanitise_text(resp.json if isinstance(resp.json, dict) else {})
     except Exception as e:
         logger.error(f"[{ticker}] Hypothesis synthesis failed (all providers): {e}")
         return {
@@ -2132,7 +2133,7 @@ Please provide the FULL updated JSON with all narrative rewrites and tripwire up
                 ticker=ticker,
                 max_retries=1,
             )
-            result2 = resp2.json if isinstance(resp2.json, dict) else {}
+            result2 = sanitise_text(resp2.json if isinstance(resp2.json, dict) else {})
             # Backfill only the missing fields from retry response
             for fld in missing:
                 if result2.get(fld):
@@ -2241,7 +2242,7 @@ Please provide updated structural sections as JSON."""
                 feature="structure-update",
                 ticker=ticker,
             )
-            parsed = result.json if isinstance(result.json, dict) else {}
+            parsed = sanitise_text(result.json if isinstance(result.json, dict) else {})
             if parsed:
                 logger.info(f"[{ticker}] Track 3 structure update: keys={list(parsed.keys())}")
             return parsed or None
@@ -2254,10 +2255,28 @@ Please provide updated structural sections as JSON."""
 # Stage 4: Merge updates into research JSON
 # ---------------------------------------------------------------------------
 
+def _infer_polarity_refresh(label: str) -> str:
+    """Infer polarity from narrative label. Mirrors _infer_polarity in
+    portfolio_alignment.py and _inferPolarity in src/lib/dom.js.
+    Keep keyword lists in sync across all three locations."""
+    if not label:
+        return "neutral"
+    l = label.lower()
+    upside_kw = ["growth", "recovery", "turnaround", "franchise", "quality", "moat"]
+    downside_kw = ["risk", "downside", "erosion", "pressure", "decline",
+                   "competition", "credit", "regulatory", "threat"]
+    if any(k in l for k in upside_kw):
+        return "upside"
+    if any(k in l for k in downside_kw):
+        return "downside"
+    return "neutral"
+
+
 def _compute_skew_from_hypotheses(hypotheses: list) -> str:
     """
     Compute skew direction from hypothesis scores.
-    Mirrors JS normaliseScores() (floor=5, ceiling=80) + computeSkewScore().
+    Mirrors JS computeSkewScore(): normalise to 100, resolve polarity,
+    sum upside vs downside, threshold +/-5.
     Returns 'upside', 'downside', or 'balanced'.
     """
     if not hypotheses:
@@ -2273,7 +2292,9 @@ def _compute_skew_from_hypotheses(hypotheses: list) -> str:
     norm = [r / total * 100 for r in raw]
     net = 0.0
     for i, h in enumerate(hypotheses):
-        direction = (h.get("direction") or "neutral").lower()
+        direction = h.get("direction") or _infer_polarity_refresh(
+            h.get("title", ""))
+        direction = str(direction).lower()
         if direction == "upside":
             net += norm[i]
         elif direction == "downside":

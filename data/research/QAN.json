@@ -325,7 +325,7 @@
     "previousSkew": "DOWNSIDE"
   },
   "skew": {
-    "direction": "bearish",
+    "direction": "downside",
     "rationale": "The probability distribution is skewed bearish at initiation, with N3 (downside) and N4 (tail downside) together carrying 35% weight versus N1 (upside) at 25%. The primary driver of this skew is the extraordinary 42.8% surge in Brent Crude to US$102.44, which represents a severe and immediate headwind to airline unit economics that the H1 FY26 results -- reported before the full impact of this move -- do not yet reflect. The stock's proximity to its 52-week low of A$8.02 suggests the market is already pricing meaningful risk, but the fuel shock may not be fully discounted."
   },
   "verdict": {
@@ -338,7 +338,8 @@
         "scoreColor": "var(--signal-green)",
         "dirArrow": "&darr;",
         "dirText": "Falling",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "upside"
       },
       {
         "label": "N2 Base Case",
@@ -346,7 +347,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&darr;",
         "dirText": "Falling",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       },
       {
         "label": "N3 Risk/Downside",
@@ -354,7 +356,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&uarr;",
         "dirText": "Rising",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "downside"
       },
       {
         "label": "N4 Disruption/Catalyst",
@@ -362,7 +365,8 @@
         "scoreColor": "var(--signal-amber)",
         "dirArrow": "&uarr;",
         "dirText": "Rising",
-        "dirColor": null
+        "dirColor": null,
+        "polarity": "neutral"
       }
     ]
   },
@@ -538,7 +542,7 @@
     },
     {
       "tier": "n4",
-      "direction": "downside",
+      "direction": "neutral",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
       "statusText": "Active Coverage",
