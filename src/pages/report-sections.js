@@ -295,8 +295,14 @@ export function renderVerdict(data) {
   let scoresHtml = '';
   for (let i = 0; i < v.scores.length; i++) {
     const s = v.scores[i];
-    const dirCls = hyps[i] ? hyps[i].dirClass || 'dir-neutral' : 'dir-neutral';
-    const dirAttr = hyps[i] ? ' data-dir="' + dirCls + '"' : '';
+    let dirCls = hyps[i] ? hyps[i].dirClass || 'dir-neutral' : 'dir-neutral';
+    if (s.dirText) {
+      const dt = s.dirText.toLowerCase();
+      if (dt.indexOf('up') >= 0 || dt.indexOf('positive') >= 0) dirCls = 'dir-positive';
+      else if (dt.indexOf('down') >= 0 || dt.indexOf('negative') >= 0) dirCls = 'dir-negative';
+      else if (dt.indexOf('base') >= 0 || dt.indexOf('neutral') >= 0) dirCls = 'dir-neutral';
+    }
+    const dirAttr = ' data-dir="' + dirCls + '"';
     scoresHtml += '<div class="vs-item ' + dirCls + '"' + dirAttr + '>' +
       '<div class="vs-label">' + (s.label || '') + '</div>' +
       '<div class="vs-score">' + (norm[i] != null ? norm[i] : 0) + '%</div>' +
