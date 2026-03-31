@@ -328,7 +328,7 @@ async def _ask_notebook(notebook_id: str, query: str) -> str:
     async with await NotebookLMClient.from_storage() as client:
         response = await client.chat.ask(
             notebook_id=notebook_id,
-            message=query,
+            question=query,
         )
         return response.text if hasattr(response, "text") else str(response)
 
@@ -377,7 +377,7 @@ async def query_notebook_batch(ticker: str) -> dict[str, str | None]:
                 query = f"Regarding {ticker}: {question}"
                 try:
                     response = await asyncio.wait_for(
-                        client.chat.ask(notebook_id=notebook_id, message=query),
+                        client.chat.ask(notebook_id=notebook_id, question=query),
                         timeout=config.NOTEBOOKLM_QUERY_TIMEOUT_SECONDS,
                     )
                     text = response.text if hasattr(response, "text") else str(response)
