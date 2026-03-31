@@ -1,5 +1,8 @@
 import './styles/index.css';
 
+// Boot readiness (BEAD-009)
+import { initSubsystem, markReady, getBootStatus } from './lib/boot.js';
+
 // State management
 import {
   STOCK_DATA, initStockData, initReferenceData, initFreshnessData, initTcData, initAnnouncementsData,
@@ -347,25 +350,28 @@ async function boot() {
     initStalenessBadge(ticker, STOCK_DATA[ticker.toUpperCase()] || STOCK_DATA[ticker]);
   };
 
-  // Initialize pages (each wrapped so one failure does not block the rest)
-  const _inits = [
-    ['Auth', initAuth],
-    ['Home', initHomePage],
-    ['BatchRefresh', initBatchRefresh],
-    ['Portfolio', initPortfolioPage],
-    ['Thesis', initThesisPage],
-    ['Notifications', initNotifications],
-    ['Chat', initChat],
-    ['PMChat', initPMChat],
-    ['EconomistChat', initEconomistChat],
-    ['About', initAboutPage],
-    ['AddStock', initAddStock],
-    ['DeepResearch', function() { initDeepResearch('deep-research-container'); }],
-    ['AlertPanel', initAlertPanel]
-  ];
-  for (let _i = 0; _i < _inits.length; _i++) {
-    try { _inits[_i][1](); }
-    catch (e) { console.error('[Boot] init' + _inits[_i][0] + ' failed:', e); }
+  // Mark data loading as ready (succeeded if we got here)
+  markReady('DataLoader');
+
+  // Initialize pages with explicit dependency tracking (BEAD-009).
+  // Auth MUST be first; Portfolio depends on Auth; PMChat depends on Portfolio.
+  // Non-critical subsystem failures are logged but do not block boot.
+  initSubsystem('Auth', initAuth, { critical: true });
+  initSubsystem('Home', initHomePage, { critical: true });
+  initSubsystem('BatchRefresh', initBatchRefresh);
+  initSubsystem('Portfolio', initPortfolioPage, { after: ['Auth'] });
+  initSubsystem('Thesis', initThesisPage);
+  initSubsystem('Notifications', initNotifications);
+  initSubsystem('Chat', initChat);
+  initSubsystem('PMChat', initPMChat, { after: ['Portfolio'] });
+  initSubsystem('EconomistChat', initEconomistChat);
+  initSubsystem('About', initAboutPage);
+  initSubsystem('AddStock', initAddStock);
+  initSubsystem('DeepResearch', function() { initDeepResearch('deep-research-container'); });
+  initSubsystem('AlertPanel', initAlertPanel);
+
+  if (import.meta.env && import.meta.env.DEV) {
+    console.log('[Boot] Subsystem status:', getBootStatus());
   }
 
   // Re-check thesis alerts after batch refresh completes

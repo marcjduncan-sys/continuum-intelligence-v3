@@ -47,7 +47,7 @@
     gap: var(--space-xl);
     flex-wrap: wrap;
 }
-.rh-left { flex: 1; min-width: 280px; max-width: 540px; display: flex; flex-direction: column; }
+.rh-left { flex: 1; min-width: 280px; max-width: var(--content-width-report-col); display: flex; flex-direction: column; }
 .rh-type {
     font-size: 0.6rem; font-weight: 600;
     letter-spacing: 0.1em; text-transform: uppercase;
@@ -81,7 +81,7 @@
     font-size: 0.92rem;
     color: var(--text-secondary);
     line-height: 1.55;
-    max-width: 640px;
+    max-width: var(--analyst-panel-width);
     margin-top: var(--space-sm);
 }
 .rh-right {

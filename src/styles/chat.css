@@ -22,8 +22,8 @@
     transform: translateX(0);
 }
 .analyst-panel.ap-user-collapsed {
-    width: 52px !important;
-    min-width: 52px !important;
+    width: var(--panel-collapsed-width) !important;
+    min-width: var(--panel-collapsed-width) !important;
     overflow: hidden;
     transition: width 0.25s ease, min-width 0.25s ease;
 }
@@ -46,11 +46,11 @@
 
 /* Shrink body offset when panel is user-collapsed */
 body.analyst-panel-open:has(.analyst-panel.ap-user-collapsed) {
-    --_ap-body-offset: 52px;
+    --_ap-body-offset: var(--panel-collapsed-width);
 }
 /* Class-based fallback for browsers without :has() support */
 body.analyst-panel-open.ap-user-collapsed-active {
-    --_ap-body-offset: 52px;
+    --_ap-body-offset: var(--panel-collapsed-width);
 }
 
 /* --- Header --- */
@@ -772,7 +772,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
 @media (max-width: 1023px) {
     .analyst-panel {
         width: 100%;
-        max-width: 420px;
+        max-width: var(--modal-width-sm);
         left: 50%;
         right: auto;
         top: auto;
