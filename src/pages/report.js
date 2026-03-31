@@ -4,30 +4,16 @@
 import { STOCK_DATA } from '../lib/state.js';
 import { renderSourceUploadZone } from '../features/source-upload.js';
 
-import {
-  renderReportHero,
-  renderSkewBar,
-  renderVerdict,
-  renderHypotheses,
-  renderEvidence,
-  renderDiscriminators,
-  renderTripwires,
-  renderGaps,
-  renderTechnicalAnalysis,
-  renderGoldDiscovery,
-  renderHypSidebar,
-  prepareHypotheses,
-  renderOvercorrectionBanner,
-  renderNarrativeTimeline,
-  renderSignalBars,
-  renderPriceDriversPlaceholder,
-  fetchPriceDrivers,
-  renderGoldSection
-} from './report-sections.js';
-
-import { renderSectionNav, renderIdentity } from '../features/report/identity.js';
-import { renderNarrative } from '../features/report/narrative.js';
-import { renderReportFooter, renderPDFDownload, setupScrollSpy } from '../features/report/footer.js';
+import { renderReportHero } from '../features/report/hero.js';
+import { renderSkewBar, renderVerdict, renderHypotheses, prepareHypotheses, renderOvercorrectionBanner } from '../features/report/hypothesis.js';
+import { renderEvidence, renderDiscriminators, renderTripwires, renderGaps } from '../features/report/evidence.js';
+import { renderTechnicalAnalysis } from '../features/report/technical.js';
+import { renderSignalBars } from '../features/report/signal-bars.js';
+import { renderHypSidebar } from '../features/report/sidebar.js';
+import { renderGoldDiscovery, renderGoldSection } from '../features/report/gold.js';
+import { renderNarrativeTimeline } from '../features/report/narrative-timeline.js';
+import { renderPriceDriversPlaceholder, fetchPriceDrivers } from '../features/report/price-drivers.js';
+import { renderSectionNav, renderIdentity, renderNarrative, renderReportFooter, renderPDFDownload, setupScrollSpy } from './report-sections.js';
 
 import { renderDeepContent, getDeepSectionNavItems } from './deep-report-sections.js';
 

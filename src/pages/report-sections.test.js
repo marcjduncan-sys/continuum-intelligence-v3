@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { computeMA } from './report-sections.js';
+import { computeMA } from '../features/report/technical.js';
 import { renderReport } from './report.js';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
