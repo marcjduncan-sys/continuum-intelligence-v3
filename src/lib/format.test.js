@@ -1,4 +1,8 @@
-import { fmtB, fmtPrice, fmtPct, fmtPE, signPct, formatNum, renderSparkline } from './format.js';
+import {
+  fmtB, fmtPrice, fmtPct, fmtPE, signPct, formatNum, renderSparkline,
+  formatPrice, formatPriceWithCurrency, formatPercent, formatSignedPercent,
+  formatChange, formatRatio, formatVolume, formatMarketCap, formatInteger, svgCoord
+} from './format.js';
 
 describe('fmtB', () => {
   it('formats sub-billion as millions', () => {
@@ -152,4 +156,92 @@ describe('renderSparkline', () => {
     const id2 = svg2.match(/id="(sp[a-z0-9]+)"/)[1];
     expect(id1).not.toBe(id2);
   });
+});
+
+// --- BEAD-013: Standardised formatting library tests ---
+
+const SENTINEL = '--';
+
+describe('formatPrice (BEAD-013)', () => {
+  it('formats normal value to 2 decimals', () => expect(formatPrice(42.567)).toBe('42.57'));
+  it('formats string number', () => expect(formatPrice('42.567')).toBe('42.57'));
+  it('formats zero', () => expect(formatPrice(0)).toBe('0.00'));
+  it('formats negative', () => expect(formatPrice(-5.1)).toBe('-5.10'));
+  it('returns sentinel for null', () => expect(formatPrice(null)).toBe(SENTINEL));
+  it('returns sentinel for undefined', () => expect(formatPrice(undefined)).toBe(SENTINEL));
+  it('returns sentinel for NaN', () => expect(formatPrice(NaN)).toBe(SENTINEL));
+  it('respects custom decimals', () => expect(formatPrice(42.567, 0)).toBe('43'));
+  it('respects 1 decimal', () => expect(formatPrice(42.567, 1)).toBe('42.6'));
+});
+
+describe('formatPriceWithCurrency (BEAD-013)', () => {
+  it('formats with default currency', () => expect(formatPriceWithCurrency(31.41)).toBe('A$31.41'));
+  it('formats with custom currency', () => expect(formatPriceWithCurrency(31.41, 'US$')).toBe('US$31.41'));
+  it('returns sentinel for null', () => expect(formatPriceWithCurrency(null)).toBe(SENTINEL));
+  it('formats zero', () => expect(formatPriceWithCurrency(0)).toBe('A$0.00'));
+});
+
+describe('formatPercent (BEAD-013)', () => {
+  it('formats normal value', () => expect(formatPercent(12.34)).toBe('12.3%'));
+  it('formats zero', () => expect(formatPercent(0)).toBe('0.0%'));
+  it('formats negative', () => expect(formatPercent(-3.456)).toBe('-3.5%'));
+  it('returns sentinel for null', () => expect(formatPercent(null)).toBe(SENTINEL));
+  it('returns sentinel for undefined', () => expect(formatPercent(undefined)).toBe(SENTINEL));
+  it('returns sentinel for NaN', () => expect(formatPercent(NaN)).toBe(SENTINEL));
+  it('respects custom decimals', () => expect(formatPercent(12.34, 0)).toBe('12%'));
+});
+
+describe('formatSignedPercent (BEAD-013)', () => {
+  it('adds + for positive', () => expect(formatSignedPercent(12.34)).toBe('+12.3%'));
+  it('no prefix for negative', () => expect(formatSignedPercent(-5.67)).toBe('-5.7%'));
+  it('no prefix for zero', () => expect(formatSignedPercent(0)).toBe('0.0%'));
+  it('returns sentinel for null', () => expect(formatSignedPercent(null)).toBe(SENTINEL));
+  it('returns sentinel for NaN', () => expect(formatSignedPercent(NaN)).toBe(SENTINEL));
+});
+
+describe('formatChange (BEAD-013)', () => {
+  it('adds + for positive', () => expect(formatChange(1.5)).toBe('+1.50'));
+  it('no prefix for negative', () => expect(formatChange(-1.5)).toBe('-1.50'));
+  it('no prefix for zero', () => expect(formatChange(0)).toBe('0.00'));
+  it('returns sentinel for null', () => expect(formatChange(null)).toBe(SENTINEL));
+  it('returns sentinel for undefined', () => expect(formatChange(undefined)).toBe(SENTINEL));
+});
+
+describe('formatRatio (BEAD-013)', () => {
+  it('formats with x suffix', () => expect(formatRatio(1.5)).toBe('1.5x'));
+  it('formats zero', () => expect(formatRatio(0)).toBe('0.0x'));
+  it('returns sentinel for null', () => expect(formatRatio(null)).toBe(SENTINEL));
+  it('returns sentinel for NaN', () => expect(formatRatio(NaN)).toBe(SENTINEL));
+});
+
+describe('formatVolume (BEAD-013)', () => {
+  it('abbreviates billions', () => expect(formatVolume(1500000000)).toBe('1.5B'));
+  it('abbreviates millions', () => expect(formatVolume(1500000)).toBe('1.5M'));
+  it('abbreviates thousands', () => expect(formatVolume(1500)).toBe('1.5K'));
+  it('formats small numbers', () => expect(formatVolume(42)).toBe('42'));
+  it('returns sentinel for null', () => expect(formatVolume(null)).toBe(SENTINEL));
+});
+
+describe('formatMarketCap (BEAD-013)', () => {
+  it('abbreviates trillions', () => expect(formatMarketCap(2500000000000)).toBe('$2.50T'));
+  it('abbreviates billions', () => expect(formatMarketCap(2500000000)).toBe('$2.50B'));
+  it('abbreviates millions', () => expect(formatMarketCap(2500000)).toBe('$2.5M'));
+  it('formats small numbers', () => expect(formatMarketCap(500)).toBe('$500'));
+  it('returns sentinel for null', () => expect(formatMarketCap(null)).toBe(SENTINEL));
+});
+
+describe('formatInteger (BEAD-013)', () => {
+  it('formats with locale separators', () => {
+    const result = formatInteger(1234567);
+    expect(result).toMatch(/1[,.]?234[,.]?567/);
+  });
+  it('rounds decimals', () => expect(formatInteger(42.7)).toBe('43'));
+  it('returns sentinel for null', () => expect(formatInteger(null)).toBe(SENTINEL));
+  it('returns sentinel for NaN', () => expect(formatInteger(NaN)).toBe(SENTINEL));
+});
+
+describe('svgCoord (BEAD-013)', () => {
+  it('formats to 1 decimal', () => expect(svgCoord(42.567)).toBe('42.6'));
+  it('formats integer', () => expect(svgCoord(42)).toBe('42.0'));
+  it('formats zero', () => expect(svgCoord(0)).toBe('0.0'));
 });

@@ -3,6 +3,79 @@
 // Used by ContinuumDynamics and rendering functions throughout
 // ============================================================
 
+// --- BEAD-013: Standardised number formatting library ---
+// Single source of truth for all numeric display in the platform.
+// All .toFixed() calls outside this file and SVG coordinate helpers are bugs.
+
+const SENTINEL = '--';
+
+function _isValid(val) {
+  return val !== null && val !== undefined && !Number.isNaN(Number(val));
+}
+
+export function formatPrice(val, decimals = 2) {
+  if (!_isValid(val)) return SENTINEL;
+  return Number(val).toFixed(decimals);
+}
+
+export function formatPriceWithCurrency(val, currency = 'A$', decimals = 2) {
+  if (!_isValid(val)) return SENTINEL;
+  return currency + Number(val).toFixed(decimals);
+}
+
+export function formatPercent(val, decimals = 1) {
+  if (!_isValid(val)) return SENTINEL;
+  return Number(val).toFixed(decimals) + '%';
+}
+
+export function formatSignedPercent(val, decimals = 1) {
+  if (!_isValid(val)) return SENTINEL;
+  const num = Number(val);
+  const prefix = num > 0 ? '+' : '';
+  return prefix + num.toFixed(decimals) + '%';
+}
+
+export function formatChange(val, decimals = 2) {
+  if (!_isValid(val)) return SENTINEL;
+  const num = Number(val);
+  const prefix = num > 0 ? '+' : '';
+  return prefix + num.toFixed(decimals);
+}
+
+export function formatRatio(val, decimals = 1) {
+  if (!_isValid(val)) return SENTINEL;
+  return Number(val).toFixed(decimals) + 'x';
+}
+
+export function formatVolume(val) {
+  if (!_isValid(val)) return SENTINEL;
+  const num = Number(val);
+  if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
+  if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+  if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+  return num.toFixed(0);
+}
+
+export function formatMarketCap(val) {
+  if (!_isValid(val)) return SENTINEL;
+  const num = Number(val);
+  if (num >= 1e12) return '$' + (num / 1e12).toFixed(2) + 'T';
+  if (num >= 1e9) return '$' + (num / 1e9).toFixed(2) + 'B';
+  if (num >= 1e6) return '$' + (num / 1e6).toFixed(1) + 'M';
+  return '$' + num.toFixed(0);
+}
+
+export function formatInteger(val) {
+  if (!_isValid(val)) return SENTINEL;
+  return Math.round(Number(val)).toLocaleString();
+}
+
+export function svgCoord(val) {
+  return Number(val).toFixed(1);
+}
+
+// --- End BEAD-013 additions ---
+
 /**
  * Format billions: 12.05 -> "12.1B", 0.95 -> "950M", 79.3 -> "79B"
  * @param {number|string} val
