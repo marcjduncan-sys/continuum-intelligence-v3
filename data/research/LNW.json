@@ -7,7 +7,7 @@
   "sectorSub": "Gambling",
   "price": 119.01,
   "currency": "A$",
-  "date": "31-Mar-26",
+  "date": "31-Mar-26 19:02 AEST",
   "reportId": "LNW-2026-001",
   "priceHistory": [
     128.65,
@@ -261,7 +261,7 @@
     119.01
   ],
   "heroDescription": "Gambling &bull; ASX-Listed",
-  "heroCompanyDescription": "Light & Wonder, Inc. (ASX: LNW): coverage initiated. Full analysis pending.",
+  "heroCompanyDescription": "Light &amp; Wonder, Inc. (ASX: LNW) is a global gaming technology company that designs, manufactures, and distributes gaming machines, systems, and digital gaming content to casinos and gaming operators worldwide. The company operates across three primary segments: Gaming (land-based slot machines and gaming systems), SciPlay (social casino mobile games), and iGaming (online real-money gaming content), giving it exposure to both physical and digital gambling ecosystems.",
   "heroMetrics": [
     {
       "label": "Mkt Cap",
@@ -290,54 +290,77 @@
     }
   ],
   "hero": {
-    "embedded_thesis": null,
-    "skew": null,
-    "skew_description": null,
+    "embedded_thesis": "At A$119.01, LNW is trading on a Forward P/E of 12.9x against a Trailing P/E of 25.2x - a gap that implies the market is pricing in a near-doubling of earnings power on a per-share basis relative to reported history. The current price embeds consensus EPS growth of approximately 21% year-on-year (from US$7.61 to US$9.23), suggesting the market accepts the growth story but applies a meaningful discount for the A$5.2B debt load and execution risk. The EV/EBITDA of 12.2x is consistent with a leveraged gaming technology business where the enterprise is fairly valued but the equity is discounted for financial risk. The stock's 35% drawdown from its 52-week high of A$182.50 suggests the market has already repriced from a growth-premium multiple to a value-with-leverage multiple, and the current price essentially requires earnings delivery without any negative surprises to hold. If consensus estimates are met and the balance sheet trajectory improves, the embedded thesis is too pessimistic; if earnings disappoint or debt costs rise, the current price offers limited protection.",
+    "skew": "BALANCED",
+    "skew_description": "The four hypotheses are weighted 30% bull, 40% base, 22% bear, and 8% tail catalyst, reflecting a modestly bullish skew driven by the compelling valuation gap between forward and trailing earnings multiples. The dominant risk is leverage, which caps the upside re-rating and creates asymmetric downside if earnings disappoint.",
     "position_in_range": {
       "current_price": 119.01,
-      "worlds": []
+      "worlds": [
+        {
+          "label": "Bear Case",
+          "price": 90.0
+        },
+        {
+          "label": "Base Case",
+          "price": 125.0
+        },
+        {
+          "label": "Bull Case",
+          "price": 165.0
+        },
+        {
+          "label": "Catalyst",
+          "price": 195.0
+        }
+      ],
+      "note": "World prices are indicative -- pending full W1-W4 valuation build"
     },
-    "next_decision_point": null,
-    "previousSkew": null
+    "next_decision_point": {
+      "event": "LNW Next Earnings Release (Q1 or Q2 FY2026 Results)",
+      "date": "May 2026",
+      "metric": "EPS delivery vs. consensus of US$9.23 for the forward year; EBITDA margin trajectory; debt reduction progress",
+      "thresholds": "EPS above US$9.00 and EBITDA growth above 10% YoY would support N1 re-rating thesis. EPS below US$7.50 or any guidance downgrade would trigger N3 leverage trap scenario. Any announcement of debt refinancing or asset sale would be a positive catalyst for N4."
+    },
+    "previousSkew": ""
   },
   "skew": {
-    "direction": "neutral",
-    "rationale": "Auto-added stock. Narrative analysis pending. Skew assessment requires analyst research."
+    "direction": "bullish",
+    "rationale": "The probability-weighted skew is modestly bullish, driven by the significant gap between the Forward P/E of 12.9x and the Trailing P/E of 25.2x, which implies the market is already pricing in a large earnings step-up that, if delivered, would validate the current price. The PEG ratio of 0.51 and the Wall Street consensus target of US$199.90 provide additional upside anchors. However, the A$5.2B debt load and the stock's proximity to its 52-week low of A$109.47 temper conviction, keeping the skew modest rather than aggressive."
   },
   "verdict": {
-    "text": "Light & Wonder, Inc. has been added to coverage. Trading at <span class=\"key-stat\">A$119.01</span>. Full narrative analysis with competing hypotheses is pending.",
+    "text": "The market is pricing LNW as a <strong>leveraged value play</strong> at <span class='key-stat'>A$119.01</span>, applying a Forward P/E of <span class='key-stat'>12.9x</span> that reflects both the expected earnings step-up and a meaningful discount for the <span class='key-stat'>A$5.2B debt load</span>. In our view, this pricing is broadly fair but skewed modestly to the upside: the PEG ratio of <span class='key-stat'>0.51</span> and the Wall Street consensus target of <span class='key-stat'>US$199.90</span> suggest the sell-side sees significant unpriced value, and the Forward vs. Trailing P/E gap implies the market is already embedding the earnings recovery rather than ignoring it. The key risk is that the <span class='key-stat'>35% drawdown</span> from the 52-week high reflects informed selling rather than indiscriminate de-rating, and that the consensus earnings estimates may prove optimistic. We initiate with a modestly bullish skew (N1 at 30%, N2 at 40%) but flag that conviction is limited by the thin evidence base at this stage of coverage.",
     "borderColor": null,
     "scores": [
       {
         "label": "N1 Growth/Recovery",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "30%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&uarr;",
+        "dirText": "Upside",
         "dirColor": null
       },
       {
         "label": "N2 Base Case",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
+        "score": "40%",
+        "scoreColor": "var(--signal-amber)",
         "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "dirText": "Base",
         "dirColor": null
       },
       {
         "label": "N3 Risk/Downside",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "22%",
+        "scoreColor": "var(--signal-amber)",
+        "dirArrow": "&darr;",
+        "dirText": "Downside",
         "dirColor": null
       },
       {
         "label": "N4 Disruption/Catalyst",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "8%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&uarr;",
+        "dirText": "Upside",
         "dirColor": null
       }
     ]
@@ -365,7 +388,7 @@
     }
   ],
   "featuredPriceColor": "",
-  "featuredRationale": "Auto-added to coverage. Full narrative analysis pending.",
+  "featuredRationale": "The four hypotheses are weighted 30% bull, 40% base, 22% bear, and 8% tail catalyst, reflecting a modestly bullish skew driven by the compelling valuation gap between forward and trailing earnings multiples. The dominant risk is leverage, which caps the upside re-rating and creates asymmetric downside if earnings disappoint.",
   "identity": {
     "rows": [
       [
@@ -449,19 +472,26 @@
       "direction": "upside",
       "title": "N1: Growth/Recovery",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "30%",
+      "scoreWidth": "30%",
+      "scoreMeta": "",
+      "description": "Analyst consensus projects ~21% EPS growth from US$7.61 to US$9.23 in the next fiscal year, and the PEG ratio of 0.51 implies the market is not yet pricing this growth. If LNW delivers on consensus estimates and the Forward P/E of 12.9x re-rates toward sector peers, the stock could close the gap to the Wall Street target of US$199.90. This scenario requires sustained gaming systems demand, stable regulatory conditions, and continued debt reduction to ease balance sheet concerns.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Analyst consensus EPS growth of ~21% year-on-year (US$7.61 to US$9.23) is well above typical sector growth rates",
+        "PEG ratio of 0.51 suggests meaningful undervaluation relative to earnings growth trajectory",
+        "Wall Street consensus target of US$199.90 implies substantial upside from current ASX price of A$119.01",
+        "Forward P/E of 12.9x is materially below the Trailing P/E of 25.2x, signalling the market expects a significant earnings step-up",
+        "EV/EBITDA of 12.2x is reasonable for a scaled gaming technology platform with recurring revenue streams"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Total debt of A$5.2B against a market cap of A$9.6B creates meaningful financial leverage risk that could suppress re-rating",
+        "Stock is already 35% below its 52-week high of A$182.50, suggesting the market has already de-rated the growth story",
+        "No recent market-sensitive announcements or earnings updates to confirm the growth trajectory is on track",
+        "AUD/USD weakness at US$0.69 (-3.3% today) adds currency translation noise for ASX-listed investors"
       ]
     },
     {
@@ -469,19 +499,24 @@
       "direction": "neutral",
       "title": "N2: Base Case",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "40%",
+      "scoreWidth": "40%",
+      "scoreMeta": "",
+      "description": "LNW continues to grow its gaming systems and digital businesses at a moderate pace, generating solid EBITDA of ~A$1.2B annually, but the A$5.2B debt load limits financial flexibility and suppresses the equity multiple. The stock trades in a range consistent with the market pricing in earnings growth but discounting it for leverage risk. This base case sees the stock consolidating near current levels until a clear debt reduction pathway or earnings beat provides a re-rating catalyst.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Revenue of A$3.3B and EBITDA of A$1.2B demonstrate a scaled, cash-generative business capable of servicing its debt",
+        "EV/EBITDA of 12.2x is consistent with a mature gaming technology company with moderate growth expectations",
+        "Forward P/E of 12.9x reflects a market that acknowledges earnings growth but applies a leverage discount",
+        "Routine ASX filings (director interest notices, securities quotation) suggest normal corporate operations without distress signals"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Consensus EPS growth of ~21% is inconsistent with a pure base-case steady-state outcome - if delivered, it would likely trigger a re-rating",
+        "The 35% drawdown from the 52-week high suggests the market may be pricing in more risk than a simple base case implies",
+        "Absence of any recent earnings or operational updates makes it difficult to confirm the base case trajectory"
       ]
     },
     {
@@ -489,19 +524,25 @@
       "direction": "downside",
       "title": "N3: Risk/Downside",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "22%",
+      "scoreWidth": "22%",
+      "scoreMeta": "",
+      "description": "With A$5.2B in total debt against a A$9.6B market cap and an enterprise value of A$14.1B, LNW's equity is effectively a leveraged residual claim on its gaming assets. If EBITDA growth disappoints, interest coverage deteriorates, or refinancing conditions tighten, the equity could face significant downside pressure. The stock's 35% decline from its 52-week high of A$182.50 may reflect early-stage recognition of this risk, and further de-rating is possible if earnings miss consensus.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Total debt of A$5.2B is approximately 54% of enterprise value, creating significant financial leverage",
+        "The gap between Trailing P/E (25.2x) and Forward P/E (12.9x) implies the market is banking on a large earnings step-up - a miss would be severely punished",
+        "Stock is trading near its 52-week low of A$109.47, suggesting ongoing selling pressure",
+        "No dividend yield provides no income floor for investors during a period of uncertainty",
+        "Absence of recent market-sensitive communications leaves investors without management reassurance"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "EBITDA of A$1.2B provides meaningful debt service capacity at current levels",
+        "Analyst consensus remains constructive with a US$199.90 target price, suggesting the sell-side does not view the leverage as existential",
+        "EV/EBITDA of 12.2x implies the enterprise is not distressed at the asset level"
       ]
     },
     {
@@ -509,51 +550,363 @@
       "direction": "downside",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "8%",
+      "scoreWidth": "8%",
+      "scoreMeta": "",
+      "description": "Given the significant discount to the Wall Street consensus target and the stock's 35% drawdown from its 52-week high, LNW could attract strategic interest from a larger gaming conglomerate or private equity, which would view the A$14.1B enterprise value as attractive for a scaled gaming technology platform. Alternatively, an activist investor could push for balance sheet restructuring, asset sales, or a buyback program to unlock value. This tail scenario is low probability but would represent a step-change re-rating event.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "35% discount to 52-week high and PEG of 0.51 make LNW an attractive target on a relative value basis",
+        "Recent 'Application for quotation of securities' filing on March 29, 2026, could indicate preparatory capital activity",
+        "Multiple director interest changes on March 25, 2026, may signal internal restructuring or incentive realignment",
+        "Gaming technology platforms with recurring revenue streams are highly sought-after M&A targets globally"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "A$5.2B debt load makes a clean acquisition structurally complex and expensive for any acquirer",
+        "No media reports, news headlines, or market-sensitive announcements indicate any active M&A process",
+        "LNW's dual listing structure (ASX and US) adds complexity to any potential transaction"
       ]
     }
   ],
   "narrative": {
-    "theNarrative": "Light & Wonder, Inc. has been auto-added to the Continuum Intelligence coverage universe. Full narrative analysis with competing hypotheses, evidence assessment, and discriminating data points is pending.",
+    "theNarrative": "<strong>[Coverage Initiated 31-Mar-26 19:02 AEST]</strong> Light &amp; Wonder is a <strong>leveraged gaming technology compounder</strong> at an inflection point: the market has de-rated the stock <span class='key-stat'>35% from its 52-week high of A$182.50</span> to a current price of <span class='key-stat'>A$119.01</span>, pricing in execution risk on a large consensus earnings step-up while simultaneously discounting the stock for its <span class='key-stat'>A$5.2B debt load</span>. The core tension is straightforward - analyst consensus projects <span class='key-stat'>~21% EPS growth</span> from US$7.61 to US$9.23, and the <strong>PEG ratio of 0.51</strong> implies the market is not paying for that growth, creating a potential value opportunity if delivery is achieved. The Forward P/E of <span class='key-stat'>12.9x</span> versus the Trailing P/E of <span class='key-stat'>25.2x</span> is the single most important valuation signal: it tells us the market expects a significant earnings recovery, and the current price is essentially a bet on whether management can execute. The Wall Street consensus target of <span class='key-stat'>US$199.90</span> sits well above the current ASX price, suggesting the sell-side remains constructive on the medium-term outlook. The primary risk is that the debt load - representing approximately <strong>54% of enterprise value</strong> - limits financial flexibility and creates a leverage trap if EBITDA growth stalls or interest rates remain elevated. Recent ASX filings are routine in nature (director interest notices, securities quotation), providing no new operational signal. The next material catalyst will be the company's next earnings release, where delivery against the consensus EPS step-up will either validate the re-rating thesis or confirm the market's caution was warranted.",
     "priceImplication": {
-      "label": "Coverage Initiated &mdash; LNW",
-      "content": "Full price implication analysis pending. Hypothesis framework requires analyst research before embedded assumptions can be identified."
+      "label": "Embedded Assumptions at A$119.01",
+      "content": "<strong>At A$119.01, the current price implies:</strong><br><br>- Consensus EPS delivery of approximately US$9.23 in the forward year, representing ~21% growth on reported earnings<br><br>- A Forward P/E of 12.9x, reflecting a leverage discount relative to unlevered gaming technology peers<br><br>- No re-rating premium for the digital (SciPlay, iGaming) segments, which typically command higher multiples than land-based gaming hardware<br><br>- Continued debt servicing without material deleveraging, keeping the EV/EBITDA at approximately 12.2x<br><br>- No strategic premium (M&amp;A, buyback, or capital return), consistent with the absence of any market-sensitive announcements<br><br>- AUD/USD of approximately US$0.69, with the current -3.3% daily move adding short-term noise for ASX investors but not changing the fundamental USD earnings story"
     },
-    "evidenceCheck": "Pending analyst research.",
-    "narrativeStability": "Not yet assessed."
+    "evidenceCheck": "<p>The evidence base for this initial coverage is <strong>materially constrained</strong>. The strongest data points are the financial metrics sourced from Yahoo Finance (Forward P/E, Trailing P/E, EV/EBITDA, revenue, EBITDA, debt) and the analyst consensus estimates (EPS trajectory, PEG ratio, target price), which together provide a reasonable valuation framework. However, the absence of recent earnings releases, management commentary, or market-sensitive ASX announcements means there is no fresh operational signal to anchor the financial model. The competitor disclosure domain is entirely absent, making relative benchmarking impossible at this stage. Alternative data, academic research, and media/social sentiment are all empty, which is unusual for a company of LNW's scale and likely reflects data sourcing limitations rather than genuine market silence. The regulatory filing evidence is limited to routine director interest notices and a securities quotation application, which are informative about capital structure activity but not about business performance. Overall, the evidence base is sufficient to frame the hypotheses and identify the key discriminating variables, but a full conviction view requires the next earnings release and management guidance update.</p>",
+    "narrativeStability": "<p>The current narrative - <strong>leveraged compounder awaiting earnings validation</strong> - is moderately stable but vulnerable to a single catalyst: the next earnings result. If LNW delivers EPS in line with or above the US$9.23 consensus estimate, the narrative shifts decisively toward N1 (re-rating) and the stock has a clear path toward the Wall Street target. If earnings disappoint, the narrative collapses toward N3 (leverage trap) and the stock's proximity to its 52-week low of A$109.47 provides limited technical support. The narrative is also sensitive to any change in the interest rate environment, given the A$5.2B debt load, and to any regulatory developments in key gaming markets (US, Australia, Europe). The absence of recent media coverage or management communications means the narrative is currently being driven entirely by valuation metrics and consensus estimates, with no qualitative anchors - this makes it fragile to any new information. The next test is the upcoming earnings release, expected in the next one to two quarters.</p>"
   },
   "evidence": {
-    "intro": "Evidence assessment pending. Stock was auto-added to coverage on 31-Mar-26.",
-    "cards": [],
-    "alignmentSummary": null
+    "intro": "Initial quantitative data, including analyst consensus estimates and key valuation multiples, is now available. Recent corporate activity primarily consists of director interest disclosures and routine capital adjustments, providing a foundational view of the company's recent operational context.",
+    "cards": [
+      {
+        "number": 1,
+        "title": "1. Corporate Communications",
+        "epistemicClass": "ep-motivated",
+        "epistemicLabel": "Motivated",
+        "finding": "Based on ASX announcements, LNW filed an 'Application for quotation of securities' on March 29, 2026, indicating recent capital activity. Additionally, multiple 'Change of Director's Interest Notice' filings were made on March 25, 2026, for Matthew Wilson, S. Lane, and V. Kalabic, detailing changes in their security holdings. These announcements were marked as not market sensitive.",
+        "tension": "While these filings provide transparency on capital structure and director holdings, they are not accompanied by any market-sensitive operational updates or strategic announcements. The lack of recent market-moving corporate communications makes it difficult to gauge management's current narrative or strategic focus beyond routine disclosures.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcements (2026-03-25, 2026-03-29)"
+      },
+      {
+        "number": 2,
+        "title": "2. Regulatory Filings & Financial Statements",
+        "epistemicClass": "ep-verified",
+        "epistemicLabel": "Verified",
+        "finding": "LNW's recent ASX filings include 'Change of Director's Interest Notice' for Matthew Wilson, S. Lane, and V. Kalabic on March 25, 2026, along with corresponding Form 4s, detailing changes in their security holdings. An 'Application for quotation of securities' was also filed on March 29, 2026, indicating a verified capital event. These are mandatory regulatory disclosures.",
+        "tension": "While these filings are verified regulatory disclosures, the provided data does not include full financial statements, annual reports, or quarterly results. Therefore, a comprehensive analysis of the company's financial health, operational performance, and balance sheet strength cannot be performed solely based on these capital and director interest notices.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcements (2026-03-25, 2026-03-29)"
+      },
+      {
+        "number": 3,
+        "title": "3. Broker Research",
+        "epistemicClass": "ep-modeled",
+        "epistemicLabel": "Modelled",
+        "finding": "Analyst consensus estimates project strong earnings growth for LNW, with EPS expected to increase from US$7.6097 in the current year to US$9.2274 in the next year, representing approximately 21.26% growth. The Wall Street target price is US$199.9018, significantly above the current ASX price of A$119.01. The PEG ratio of 0.5071 suggests the stock may be undervalued relative to its expected earnings growth.",
+        "tension": "While the target price and growth estimates are positive, the provided data does not include the number of analysts contributing to the consensus, the recency of these estimates, or any specific broker reports detailing their assumptions or potential risks. The absence of revenue estimates also limits the completeness of the financial model view.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N1",
+            "class": "supports"
+          }
+        ],
+        "source": "Analyst Consensus & Estimates (EODHD)"
+      },
+      {
+        "number": 4,
+        "title": "4. Competitor Disclosures",
+        "epistemicClass": "ep-verified",
+        "epistemicLabel": "Verified",
+        "finding": "The provided data does not include any specific competitor disclosures, announcements, or financial results. LNW operates in the Consumer Cyclical / Gambling sector, which is known for its competitive landscape.",
+        "tension": "Without information on key competitors' recent performance, market share changes, or strategic initiatives, it is difficult to assess LNW's competitive positioning or relative performance within the gambling industry. This lack of data limits the ability to benchmark LNW's operational or financial metrics against its peers.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "N/A (Data not provided)"
+      },
+      {
+        "number": 5,
+        "title": "5. Economic Data",
+        "epistemicClass": "ep-measured",
+        "epistemicLabel": "Measured",
+        "finding": "The AUD/USD exchange rate is US$0.69, experiencing a -3.3% decline today. As LNW is a US-based company listed on the ASX, a weaker AUD against the USD could mean that its USD-denominated earnings, when converted to AUD for Australian investors, would appear higher, potentially benefiting ASX-listed share price performance for local investors.",
+        "tension": "While the AUD/USD movement impacts the reported value for ASX investors, the primary operational and financial performance of LNW is driven by its US-dollar denominated revenues and costs. The provided data does not include broader economic indicators relevant to the gambling sector, such as consumer discretionary spending trends, tourism numbers, or regulatory changes in key markets, which are more direct drivers of LNW's business.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Macro & Commodity Context (Gambling)"
+      },
+      {
+        "number": 6,
+        "title": "6. Alternative Data",
+        "epistemicClass": "ep-observed",
+        "epistemicLabel": "Observed",
+        "finding": "The provided data does not contain any alternative data points such as operational indicators (e.g., gaming machine utilization rates, online gaming traffic), ESG metrics, or channel checks. This limits the ability to gain real-time insights into the company's performance.",
+        "tension": "The absence of alternative data limits the ability to gain real-time insights into LNW's operational performance, customer engagement, or sustainability efforts, which could provide a more granular view beyond traditional financial metrics. Without this, it is harder to identify emerging trends or potential disruptions.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "N/A (Data not provided)"
+      },
+      {
+        "number": 7,
+        "title": "7. Academic Research",
+        "epistemicClass": "ep-peer",
+        "epistemicLabel": "Peer-Reviewed",
+        "finding": "The provided information does not include any specific academic research or industry studies related to the gambling sector or LNW specifically. This means there is no peer-reviewed analysis of long-term trends or structural shifts available.",
+        "tension": "Without peer-reviewed academic research, it is challenging to assess long-term structural trends, technological disruptions, or the broader societal impacts influencing the gambling industry, which could have significant implications for LNW's business model and future growth prospects.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "N/A (Data not provided)"
+      },
+      {
+        "number": 8,
+        "title": "8. Media & Social",
+        "epistemicClass": "ep-unverified",
+        "epistemicLabel": "Unverified",
+        "finding": "The provided data explicitly states 'Recent News Headlines: []' and 'Earnings/Results News: []', indicating a complete absence of recent media coverage or social commentary regarding LNW. There are no unverified news items or public sentiment to consider.",
+        "tension": "The lack of recent media or social commentary means there is no readily available public sentiment, market buzz, or unverified news to consider. This could imply a period of low public interest or a lack of significant recent events, making it harder to gauge market perception or potential catalysts/risks outside of official filings.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Recent News Headlines, Earnings/Results News (explicitly empty)"
+      },
+      {
+        "number": 9,
+        "title": "9. Leadership & Governance",
+        "epistemicClass": "ep-observed",
+        "epistemicLabel": "Observed",
+        "finding": "On March 25, 2026, multiple 'Change of Director's Interest Notice' filings were made for directors Matthew Wilson, S. Lane, and V. Kalabic. These notices, along with corresponding Form 4s, indicate changes in their security holdings, which are routine disclosures for corporate governance and transparency.",
+        "tension": "While these filings provide transparency on director shareholdings, the provided data does not offer details on the nature of these changes (e.g., purchases, sales, option exercises), the overall composition of the board, recent management changes, or any specific governance issues. Without this context, it is difficult to assess the implications of these interest changes or the broader strength of the company's leadership and governance framework.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcements (2026-03-25)"
+      },
+      {
+        "number": 10,
+        "title": "10. Ownership & Capital Flows",
+        "epistemicClass": "ep-measured",
+        "epistemicLabel": "Measured",
+        "finding": "An 'Application for quotation of securities' was filed on March 29, 2026, indicating recent capital activity. The company has a substantial market capitalization of A$9.61 billion. Additionally, 'Change of Director's Interest Notice' filings on March 25, 2026, for Matthew Wilson, S. Lane, and V. Kalabic, reflect changes in individual security holdings, which are a component of capital flows.",
+        "tension": "While there is evidence of recent capital activity and director interest changes, the provided data lacks specific details on the nature and size of the securities quotation (e.g., new issuance, conversion), institutional ownership percentages, fund flows, or the full capital structure (e.g., debt levels, share buybacks). This limits a comprehensive understanding of the company's ownership base and capital allocation strategies.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcements (2026-03-25, 2026-03-29), Market Cap data"
+      }
+    ],
+    "alignmentSummary": "Analyst consensus points to strong earnings growth and a significant upside to the target price, supported by healthy profitability metrics. Recent corporate announcements are routine and do not contradict this positive quantitative outlook."
   },
   "discriminators": {
-    "intro": "Discriminating evidence pending analyst research.",
-    "rows": [],
-    "nonDiscriminating": null
+    "intro": "The following data points carry high diagnosticity: they can meaningfully shift probability between competing hypotheses.",
+    "rows": [
+      "Analyst consensus indicates a significant upside potential of approximately 68% to the Wall Street target price of A$199.90.",
+      "The company exhibits a very strong Return on Equity (ROE) of 62.66%, suggesting highly efficient capital utilization.",
+      "A PEG ratio of 0.51 suggests the stock may be undervalued relative to its earnings growth prospects.",
+      "Operating margins are robust at 29.1%, indicating strong operational efficiency."
+    ],
+    "nonDiscriminating": "<ul><li><strong>Market capitalisation (A$9.6B):</strong> Confirms LNW is a large-cap gaming company but does not discriminate between growth, base, or bear scenarios - it is an output of the price, not an input to the thesis.</li><li><strong>EV/EBITDA of 12.2x:</strong> Consistent with multiple scenarios; a leveraged compounder, a value trap, and a re-rating candidate can all trade at similar EV/EBITDA multiples depending on the growth and leverage trajectory.</li><li><strong>AUD/USD rate (US$0.69, -3.3% today):</strong> Affects the ASX price translation of USD earnings but does not change the underlying business fundamentals or discriminate between the four hypotheses.</li><li><strong>Director interest notice filings (March 25, 2026):</strong> Routine governance disclosures that are not market-sensitive and do not provide directional signal on business performance or strategic intent.</li><li><strong>No dividend yield:</strong> Consistent with a growth-and-deleveraging capital allocation strategy, but does not discriminate between bull and bear scenarios - both a growing compounder and a distressed leveraged company may pay no dividend.</li></ul>"
   },
   "tripwires": {
-    "intro": "Tripwires pending analyst research.",
-    "cards": []
+    "intro": "The following catalysts could force a material revision to hypothesis weightings. Each carries conditional outcomes that map to specific narrative shifts.",
+    "cards": [
+      {
+        "date": "MAY 2026",
+        "name": "Q1/Q2 FY2026 Earnings Release",
+        "conditions": [
+          {
+            "if": "If EPS meets or exceeds US$9.00 and management reaffirms full-year guidance",
+            "valence": "positive",
+            "then": "Then N1 re-rating thesis is validated; stock likely re-rates toward A$140-165 range as Forward P/E expands"
+          },
+          {
+            "if": "If EPS misses consensus by more than 10% or management issues a guidance downgrade",
+            "valence": "negative",
+            "then": "Then N3 leverage trap scenario becomes dominant; stock risks testing the 52-week low of A$109.47 or breaking below it"
+          }
+        ],
+        "source": "Analyst Consensus Estimates (EODHD); Yahoo Finance Forward P/E 12.9x"
+      },
+      {
+        "date": "JUNE 2026",
+        "name": "Debt Refinancing or Capital Structure Update",
+        "conditions": [
+          {
+            "if": "If LNW announces a material debt reduction, refinancing at lower rates, or asset monetisation",
+            "valence": "positive",
+            "then": "Then the leverage discount embedded in the 12.9x Forward P/E compresses; equity re-rates toward N4 catalyst scenario near A$195"
+          },
+          {
+            "if": "If refinancing terms deteriorate (higher rates, covenant tightening) or no debt reduction progress is evident",
+            "valence": "negative",
+            "then": "Then N3 bear case probability increases; the A$5.2B debt load becomes a more acute overhang on the equity"
+          }
+        ],
+        "source": "ASX Announcements; Yahoo Finance Total Debt A$5.2B; EV/EBITDA 12.2x"
+      },
+      {
+        "date": "AUGUST 2026",
+        "name": "Full-Year FY2026 Results and Guidance",
+        "conditions": [
+          {
+            "if": "If full-year EPS is at or above US$9.23 and FY2027 guidance implies continued double-digit growth",
+            "valence": "positive",
+            "then": "Then the bull case becomes the base case; Wall Street target of US$199.90 comes into view and ASX price could approach A$165+"
+          },
+          {
+            "if": "If full-year results disappoint and FY2027 guidance is flat or negative",
+            "valence": "negative",
+            "then": "Then the Trailing P/E of 25.2x becomes the relevant anchor and the stock de-rates further; bear case price of A$90 becomes plausible"
+          }
+        ],
+        "source": "Analyst Consensus Estimates (EODHD); Yahoo Finance Trailing P/E 25.2x, Forward P/E 12.9x"
+      }
+    ]
   },
   "gaps": {
-    "coverageRows": [],
-    "couldntAssess": [
-      "Full evidence assessment pending &mdash; stock was auto-added to coverage."
+    "coverageRows": [
+      {
+        "domain": "Corporate Comms",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 2026 (routine filings only)",
+        "confidence": "Low - no market-sensitive operational updates",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Regulatory Filings",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 2026 (director notices, securities quotation)",
+        "confidence": "Medium - filings are verified but lack financial statement detail",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Broker Research",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "Current consensus estimates (EODHD)",
+        "confidence": "Medium - consensus available but analyst count and report recency unknown",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Competitor Disclosures",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "N/A - no data provided",
+        "confidence": "Low - no peer benchmarking possible",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Economic Data",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 31, 2026 (AUD/USD only)",
+        "confidence": "Low - only FX rate available; no consumer spending or gaming market data",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Alternative Data",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "N/A - no data provided",
+        "confidence": "Low - no operational or ESG metrics available",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Academic Research",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "N/A - no data provided",
+        "confidence": "Low - no peer-reviewed industry analysis available",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Media & Social",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "N/A - no recent headlines",
+        "confidence": "Low - complete absence of media coverage or sentiment data",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Leadership & Governance",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 25, 2026 (director interest notices)",
+        "confidence": "Low - nature of director interest changes not disclosed",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Ownership & Capital Flows",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 29, 2026 (securities quotation application)",
+        "confidence": "Low - size and nature of capital event not disclosed; no institutional ownership data",
+        "confidenceClass": "td-red"
+      }
     ],
-    "analyticalLimitations": "This stock was auto-added. All hypothesis scores, evidence assessments, and narrative analysis require manual research and population."
+    "couldntAssess": [
+      "Competitive positioning vs. Aristocrat Leisure, IGT, and Everi - no peer financial data available",
+      "Gaming machine unit shipment volumes and market share trends",
+      "SciPlay and iGaming segment revenue and margin breakdown",
+      "Debt maturity profile and refinancing risk",
+      "Management guidance and forward outlook commentary",
+      "Institutional ownership concentration and recent fund flow activity",
+      "Regulatory pipeline in key US state gaming markets",
+      "Consumer discretionary spending trends affecting casino operator capex budgets",
+      "Nature and size of the March 29, 2026 securities quotation application"
+    ],
+    "analyticalLimitations": "This initial coverage is materially constrained by the absence of recent earnings releases, management commentary, and competitor data. The financial metrics sourced from Yahoo Finance provide a valuation framework, but without segment-level revenue data, debt maturity schedules, or management guidance, the confidence intervals around all four hypotheses are wide. The evidence base is dominated by routine regulatory filings that carry no operational signal. Investors should treat the hypothesis probabilities as indicative rather than precise, and should update their views materially upon the next earnings release. The AUD/USD translation effect adds an additional layer of complexity for ASX-based investors assessing USD-denominated earnings."
   },
   "technicalAnalysis": {
     "date": "31 March 2026",
@@ -642,14 +995,97 @@
         "name": "S&P/ASX 200",
         "period": "12 months",
         "stockReturn": -7.5,
-        "indexReturn": 0,
-        "relativeReturn": -7.5
+        "indexReturn": 6.5,
+        "relativeReturn": -14.0
       }
     }
   },
   "footer": {
     "disclaimer": "This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information.",
-    "domainCount": "0 of 10",
-    "hypothesesCount": "4 Pending"
+    "domainCount": "10 of 10",
+    "hypothesesCount": "4 Active"
+  },
+  "marketCap": 9613752320,
+  "style": "Growth",
+  "priceDrivers": {
+    "ticker": "LNW",
+    "company_name": "Light & Wonder, Inc.",
+    "analysis_date": "2026-03-31",
+    "primary_driver": "A two-stage de-rating driven first by an earnings disappointment in February 2026 (weaker profitability despite revenue growth, plus buyback completion removing structural demand support) and then by macro and sector risk-off pressure through March, with LNW's high financial leverage amplifying both legs of the decline.",
+    "confidence": "moderate",
+    "driver_stack": {
+      "primary": [
+        "Q4 2025 / FY2025 earnings disappointment: revenue grew 12% YoY to US$891M but profitability deteriorated, triggering a sharp de-rating with the sharpest drops in mid-February ahead of the official 24 February call",
+        "Macro and sector risk-off compression through March 2026: ASX200 fell 8.7% and the Consumer Cyclical sector ETF (AXNJ) fell 9.3% from 1 March to 22 March, with LNW's high debt load amplifying the multiple compression"
+      ],
+      "secondary": [
+        "Buyback completion (US$1,164M program confirmed complete at the February earnings call) removed systematic demand support at the worst possible time",
+        "Financial leverage sensitivity: total debt of approximately A$5.2B against a market cap near A$9.6B means any earnings miss or risk-off episode hits equity value disproportionately hard"
+      ],
+      "amplifiers": [
+        "Macquarie bullish broker note published approximately 27 March (characterising shares as cheap with profit growth ahead) probable amplifier of the recovery bounce, though the note's details are unverified",
+        "Technical bounce from 52-week low support zone: 110.90 on 19 March approached the prior 52-week low of 109.47, attracting technical buyers and likely short-covering"
+      ],
+      "background": [
+        "Stock had already de-rated sharply from the 52-week high of A$182.50 set on 11 January 2026, entering the window structurally fragile",
+        "Mean analyst price target of A$199.37 implies around 67% upside from current levels, suggesting consensus had not been revised down to match market pricing",
+        "Nasdaq delisting and ASX concentration strategy: structural reduction in the institutional investor universe is a background risk to liquidity and index inclusion, though timing is unclear"
+      ],
+      "rejected": [
+        "Director RSU vesting activity (CEO acquired 51,978 shares via RSU conversion, 20,454 withheld for tax): routine compensation event, immaterial to price",
+        "Social media or retail forum activity: no evidence and company size makes this channel irrelevant as a driver",
+        "Application for quotation of securities filed 29 March: routine employee share plan issuance, not a price catalyst"
+      ]
+    },
+    "report": {
+      "title": "LNW: Earnings De-rating, Leverage Amplification and a Macro Headwind Explain the 32% Decline from Peak; Recovery Bounce Technical in Character",
+      "executive_summary": "Light and Wonder's shares have fallen approximately 32% from their January 2026 peak of A$182.50 to a trough of A$110.90 on 19 March, before partially recovering to around A$119 by end of March. Over the most recent 10 trading days, the stock has outperformed the ASX200 by 5.5 percentage points, consistent with a bounce from deeply oversold levels. The primary cause of the broader sell-off is a two-stage de-rating: an earnings-driven shock in mid to late February, where Q4 2025 results showed solid revenue growth but weaker profitability and confirmed the completion of the US$1,164M buyback program, followed by a macro-driven compression through March as the ASX200 and the Consumer Cyclical sector fell sharply. LNW's high financial leverage amplified both legs of the decline. The recovery from the trough appears principally technical, with a probable contribution from Macquarie's bullish note around 27 March. Key causal gaps remain, and confidence in the precise ordering of events is moderate.",
+      "full_note": "Light and Wonder has lost roughly 32% from its January 2026 peak of A$182.50 to the 19 March trough of A$110.90, before partially recovering to close at A$119.01 on 31 March. Over the last 10 trading days the stock has returned approximately +4.0%, outperforming the ASX200 by 5.5 percentage points, which reflects a bounce off deeply oversold levels rather than any fundamental re-rating. The 2-day return of -4.0% with 3.6 points of relative underperformance at the tail end of the window suggests the bounce is losing momentum.\n\nThe strongest available evidence points to the Q4 2025 and FY2025 earnings release as the initial trigger for the de-rating. Light and Wonder reported quarterly revenue of US$891M, up 12% year-on-year, at its 24 February earnings call, but the release was accompanied by weaker profitability and confirmation that the US$1,164M buyback program had been fully completed. The revenue beat provided little protection once the market absorbed the margin deterioration and the removal of the buyback as a structural demand floor. Critically, the sharpest single-session drops occurred on 11 and 12 February, some 12 to 13 days before the official earnings call date, suggesting either an early release of results, a guidance pre-announcement, or a broker downgrade event that has not been captured in the available data. This timing ambiguity is the single most important unresolved question in the causal chain and prevents a high-confidence attribution to earnings alone.\n\nThe second stage of the decline, from late February through to the 19 March trough, is more plausibly explained by macro and sector headwinds amplified by leverage than by a sustained earnings reaction. The ASX200 fell approximately 8.7% between 1 March and 22 March, and the Consumer Cyclical sector ETF (AXNJ) fell roughly 9.3% over the same period. LNW's excess underperformance relative to the sector over this window was real but not as dominant as the full drawdown from peak implies. With total debt of approximately A$5.2B against a market cap near A$9.6B, LNW is a highly geared name in a cyclical sector: in a risk-off, multiple-compression environment, such a balance sheet structure means the equity absorbs losses at a rate materially faster than the broader index. An unexplained 7.1% single-session drop on 1 March with no corresponding ASX announcement reinforces the probability that macro selling, rather than a new company-specific event, was the dominant force through this phase.\n\nVolume data across individual sessions is not available, which limits the ability to distinguish institutional liquidation events from macro drift days. The single volume data point on the analysis date (182,838 shares) is insufficient to draw conclusions about flow patterns. The absence of volume confirmation means the flow dimension of this note must be treated as probable inference rather than confirmed observation. What can be said is that the price pattern, two sharp event-driven drops followed by a grinding decline toward 52-week support, is consistent with initial institutional selling on news followed by a broader de-risking of a leveraged cyclical position.\n\nSocial media and retail forum channels appear irrelevant as drivers for a stock of LNW's size (market cap approximately A$9.6B). No HotCopper, Reddit, or X data was available or referenced in the sourcing, and there is no reason to believe sentiment channels led or amplified the move in any material way at this capitalisation level.\n\nSeveral explanations were examined and rejected or downgraded. Director RSU vesting activity, including the CEO's conversion of 51,978 shares with 20,454 withheld for tax on 20 March, is a routine compensation event and carries no informational content as a price driver. The Nasdaq delisting and ASX concentration strategy is a real structural risk to the institutional investor universe and index inclusion over time, but the timing of this strategic decision does not map cleanly onto the specific price moves in the window, and the sourcing (a gaming industry trade site) does not carry the evidential weight needed to elevate it to a primary driver. The mean analyst price target of A$199.37, approximately 67% above the current price, suggests the broker community had not revised targets down to match market pricing at the time the data was gathered, which is itself a signal of how abrupt the de-rating was.\n\nThe recovery from the 110.90 trough beginning 22 March is most parsimoniously explained by proximity to the prior 52-week low of A$109.47 attracting technical buyers and likely short-covering. A Macquarie note published approximately 27 March, characterising the stock as cheap with earnings growth ahead, is a probable secondary contributor to the bounce, but the note's precise rating action, price target, and publication date have not been directly confirmed in the available data and should be verified before being assigned primary credit for the recovery. The view here carries moderate confidence. It would be revised materially upward if the February catalyst (broker downgrade or guidance pre-announcement around 11 to 12 February) were identified, if the 1 March drop were explained, and if the Macquarie note details were confirmed. It would be revised toward a macro-primary attribution if the February drops were shown to coincide with a broad US market event or sector-wide catalyst rather than anything company-specific."
+    },
+    "price_action_summary": {
+      "price_change_2d_pct": -3.99,
+      "price_change_5d_pct": 1.72,
+      "price_change_10d_pct": 4.0,
+      "asx200_change_2d_pct": -0.41,
+      "asx200_change_5d_pct": 1.22,
+      "asx200_change_10d_pct": -1.54,
+      "relative_2d_pct": -3.58,
+      "relative_5d_pct": 0.5,
+      "relative_10d_pct": 5.54
+    },
+    "evidence_quality": {
+      "primary_evidence": "Q4 2025 earnings call confirmed via MarketScreener transcript reference (24 February 2026); revenue of US$891M (+12% YoY) and buyback completion confirmed via SimplyWallSt earnings summary and InvestGame earnings presentation. ASX Form 4 filings confirm CEO RSU vesting on 20 March. ASX200 and sector ETF (AXNJ) price data provided directly.",
+      "secondary_evidence": "Macquarie bullish note referenced via Motley Fool Australia article dated approximately 27 March 2026; note characterised shares as cheap with earnings growth ahead. Mean analyst price target of A$199.37 from Yahoo Finance data. SimplyWallSt summary describes weaker profitability alongside revenue growth.",
+      "key_gap": "Three critical gaps remain: (1) the specific catalyst for the sharp drops on 11 and 12 February, which predate the official earnings call by nearly two weeks and could be a broker downgrade, guidance pre-announcement, or US-listed selling event; (2) the specific catalyst for the unexplained 7.1% single-session drop on 1 March with no corresponding ASX announcement; and (3) the exact details of the Macquarie research note including rating action, price target, and confirmed publication date. Without resolving these, the precise causal ordering between earnings-specific and macro-specific factors in the February to March decline cannot be confirmed with high confidence."
+    },
+    "change_my_mind": {
+      "what_would_change_the_view": [
+        "Confirmation that a broker downgrade (or guidance pre-announcement) caused the 11 to 12 February drops would elevate earnings-as-primary-driver to high confidence and resolve the most significant timing ambiguity in the analysis",
+        "Identification of a US macro event (Federal Reserve commentary, tariff escalation, or global risk-off trigger) coinciding with 11 to 12 February would shift the primary attribution toward macro contagion and demote earnings to a secondary amplifier",
+        "Confirmation of the Macquarie note details (rating upgrade, specific price target well above current levels, and publication on or around 27 March) would elevate the broker note to a confirmed rather than probable contributor to the recovery phase",
+        "Short interest data showing material short-side accumulation between January and March would add a covering-driven component to the recovery explanation and further support the technical bounce narrative"
+      ]
+    },
+    "broker_activity": {
+      "recent_upgrades": [],
+      "recent_downgrades": [],
+      "consensus_change": "Macquarie published a bullish note approximately 27 March 2026 characterising LNW shares as cheap with earnings growth on track; rating action and price target not directly confirmed in available data. Mean analyst consensus target of A$199.37 implies approximately 67% upside from current levels, though it is unclear whether targets have been revised following the February earnings release."
+    },
+    "social_signal": {
+      "hotcopper_activity": "quiet",
+      "reddit_activity": "quiet",
+      "social_led_or_lagged": "irrelevant"
+    }
+  },
+  "_lastRefreshed": "2026-03-31T08:02:00.519665+00:00",
+  "_generation_meta": {
+    "generated_at": "2026-03-31T08:02:00.519691+00:00",
+    "drivers": {
+      "aud/usd": {
+        "value": 0.69,
+        "change_pct": -3.34,
+        "ticker": "AUDUSD=X"
+      }
+    }
   }
 }
