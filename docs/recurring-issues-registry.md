@@ -619,3 +619,21 @@ When fixing any bug, use this checklist:
 - **Fix layer:** REGRESSION-GATE
 - **Regression gate:** `npx playwright test` in CI; encoding contamination test blocks if null bytes or mojibake detected in rendered report content
 - **Recurrence risk:** LOW -- automated browser rendering verification catches regressions invisible to unit tests
+
+### 2026-04-01 BEAD-018: Portfolio State Machine
+- **Family:** 3 (Portfolio/PM state instability)
+- **Symptom:** Portfolio state split across frontend globals, localStorage, and DB with no formalised transitions. 25 fix commits over 60 days. Short positions encoded in notes field because DB schema enforced positive-only quantities.
+- **Root cause:** No state machine; implicit state derived from DOM visibility. Short position direction smuggled through notes field (`direction:short`) because `013_portfolios.sql` has `CHECK (quantity > 0)`.
+- **Fix:** Created `src/features/portfolio-state.js` with explicit state machine (EMPTY, LOADING, READY, EDITING, SYNCING, ERROR). All transitions validated; invalid transitions throw. Observer pattern for consumers. Created migration `022_portfolio_signed_quantities.sql` to drop positive-only constraint and backfill shorts from notes. Updated `portfolio.js` to send signed quantities. Updated `portfolio_alignment.py` to read signed quantities with legacy notes fallback. Updated `portfolio_validation.py` to accept non-zero quantities.
+- **Fix layer:** BOUNDARY
+- **Regression gate:** 13 Vitest tests in `src/features/portfolio-state.test.js`
+- **Recurrence risk:** LOW -- state machine enforces valid transitions; DB natively supports short positions
+
+### 2026-04-01 BEAD-019: PM Chat State Integration
+- **Family:** 3 (Portfolio/PM state instability)
+- **Symptom:** PM Chat relied on multiple CustomEvent listeners (`ci:portfolio:synced`, `ci:portfolio:cleared`) and a startup HTTP check to track portfolio state. Events could be missed or arrive out of order.
+- **Root cause:** No centralised state observation. PM Chat independently queried portfolio state through different mechanisms at different times.
+- **Fix:** PM Chat now imports and observes portfolio state machine via `onStateChange()`. READY triggers badge refresh, EMPTY resets badge, ERROR shows error state. Legacy event listeners retained as backward compatibility during migration.
+- **Fix layer:** BOUNDARY
+- **Regression gate:** 4 Vitest tests in `src/features/pm-chat-state.test.js`
+- **Recurrence risk:** LOW -- single observer pattern replaces multiple independent event listeners

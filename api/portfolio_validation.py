@@ -49,12 +49,12 @@ def validate_snapshot(
         price = h.get("price")
         mv = h.get("market_value")
 
-        if qty is None or qty <= 0:
-            errors.append(f"{prefix} ({ticker}): quantity must be positive")
+        if qty is None or qty == 0:
+            errors.append(f"{prefix} ({ticker}): quantity must be non-zero")
         if price is None or price <= 0:
             errors.append(f"{prefix} ({ticker}): price must be positive")
-        if mv is None or mv <= 0:
-            errors.append(f"{prefix} ({ticker}): market_value must be positive")
+        if mv is None or mv == 0:
+            errors.append(f"{prefix} ({ticker}): market_value must be non-zero")
 
         # Cross-check: market_value should be close to quantity * price
         if qty and price and mv:

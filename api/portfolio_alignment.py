@@ -702,16 +702,15 @@ def compute_alignment(
         hypotheses = parse_hypotheses(research) if research else []
         skew = resolve_skew(research) if research else {"direction": "", "score": None, "rationale": "", "source": "none"}
 
-        # Derive position direction from multiple signals:
-        # 1. Explicit notes field (set by portfolio sync: "direction:short")
-        # 2. Negative quantity or market_value (if DB constraints are relaxed)
+        # Derive position direction from signed quantities (BEAD-018).
+        # Primary: negative quantity = short. Fallback: legacy notes field.
         notes = str(h.get("notes", "") or "")
-        qty = h.get("quantity", h.get("units", 0))
-        mv = h.get("market_value", 0)
-        if "direction:short" in notes:
+        qty = float(h.get("quantity", h.get("units", 0)) or 0)
+        mv = float(h.get("market_value", 0) or 0)
+        if qty < 0 or mv < 0:
             pos_direction = "short"
-        elif float(qty or 0) < 0 or float(mv or 0) < 0:
-            pos_direction = "short"
+        elif "direction:short" in notes:
+            pos_direction = "short"  # legacy fallback for pre-migration data
         else:
             pos_direction = "long"
 

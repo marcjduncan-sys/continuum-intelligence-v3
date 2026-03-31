@@ -7,6 +7,7 @@ import { buildCoverageData } from './home.js';
 import { on } from '../lib/data-events.js';
 import { API_BASE } from '../lib/api-config.js';
 import { formatPrice, formatPercent, formatSignedPercent } from '../lib/format.js';
+import { STATES, transition, getState, onStateChange } from '../features/portfolio-state.js';
 
 // Coverage data matching portal reports (built dynamically from STOCK_DATA)
 let COVERAGE_DATA = null;
@@ -148,6 +149,8 @@ export function getCol(row, names) {
 }
 
 export function processPortfolioData(rows) {
+  transition(STATES.LOADING);
+
   const coverageData = getCoverageData();
   const positions = [];
   for (let ri = 0; ri < rows.length; ri++) {
@@ -173,6 +176,7 @@ export function processPortfolioData(rows) {
 
   if (positions.length === 0) {
     alert('No valid positions found. Expected columns: Ticker, Units, Avg Cost');
+    transition(STATES.ERROR);
     return;
   }
 
@@ -187,6 +191,7 @@ export function processPortfolioData(rows) {
 
   savePortfolio(positions);
   renderPortfolio(positions, grossExposure);
+  transition(STATES.READY);
   _syncPortfolioToPMDatabase(positions, grossExposure);
 }
 
@@ -723,6 +728,9 @@ export function loadPortfolio() {
 }
 
 export function clearPortfolio() {
+  if (getState() !== STATES.EMPTY) {
+    transition(STATES.EMPTY);
+  }
   localStorage.removeItem('continuum-portfolio');
   _pmPortfolioId = null;
   if (typeof window.pnSetPortfolioId === 'function') {
@@ -782,9 +790,9 @@ function _syncPortfolioToPMDatabase(positions, grossExposure) {
   const totalValue = totalMV + cashValue;
 
   // Build holdings array for the API
+  // BEAD-018: signed quantities, no notes workaround
   const holdingsPayload = validPositions.map(function(p) {
-    const mv = Math.abs(p.units * p.currentPrice);
-    const isShort = p.units < 0;
+    const mv = p.units * p.currentPrice; // signed: negative for shorts
     const coverageData = getCoverageData();
     let sector = null;
     if (coverageData[p.ticker] && coverageData[p.ticker].sector) {
@@ -792,12 +800,12 @@ function _syncPortfolioToPMDatabase(positions, grossExposure) {
     }
     return {
       ticker: p.ticker,
-      quantity: Math.abs(p.units),
+      quantity: p.units,         // signed: negative = short
       price: p.currentPrice,
-      market_value: mv,
+      market_value: mv,          // signed: negative = short
       sector: sector,
       asset_class: 'equity',
-      notes: isShort ? 'direction:short' : null
+      notes: null
     };
   });
 
@@ -1037,7 +1045,14 @@ export function initPortfolioPage() {
   setupUploadZone();
   const savedPortfolio = loadPortfolio();
   if (savedPortfolio && savedPortfolio.length > 0) {
-    renderPortfolioFromSaved(savedPortfolio);
+    transition(STATES.LOADING);
+    try {
+      renderPortfolioFromSaved(savedPortfolio);
+      transition(STATES.READY);
+    } catch (err) {
+      console.error('[Portfolio] Failed to restore saved portfolio:', err);
+      transition(STATES.ERROR);
+    }
   }
 
   // Listen for STOCK_DATA changes to refresh portfolio with live prices
