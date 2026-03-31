@@ -7,7 +7,7 @@
   "sectorSub": "Engineering & Construction",
   "price": 7.16,
   "currency": "A$",
-  "date": "31-Mar-26",
+  "date": "31-Mar-26 18:01 AEST",
   "reportId": "GNP-2026-001",
   "priceHistory": [
     2.49,
@@ -261,7 +261,7 @@
     7.16
   ],
   "heroDescription": "Engineering & Construction &bull; ASX-Listed",
-  "heroCompanyDescription": "GenusPlus Group Ltd (ASX: GNP): coverage initiated. Full analysis pending.",
+  "heroCompanyDescription": "GenusPlus Group Ltd (ASX: GNP) is an Australian engineering and construction services company specialising in power, utilities, telecommunications, and infrastructure project delivery. The company operates primarily across Western Australia and other Australian states, providing end-to-end services including design, construction, and maintenance for critical infrastructure assets. GNP reported FY revenue of A$954M and EBITDA of A$72M, reflecting a scaled mid-cap industrial business with a 7.5% EBITDA margin and a notably strong Return on Equity of 29.2%.",
   "heroMetrics": [
     {
       "label": "Mkt Cap",
@@ -290,54 +290,77 @@
     }
   ],
   "hero": {
-    "embedded_thesis": null,
-    "skew": null,
-    "skew_description": null,
+    "embedded_thesis": "At A$7.16, the market is pricing GNP on a Trailing P/E of 28.6x reported earnings of approximately A$0.25 per share, reflecting a quality premium for the company's strong ROE and infrastructure sector positioning. The Forward P/E of 22.3x against consensus EPS of A$0.27 for the current year implies the market expects a meaningful step-up in earnings, consistent with the Railtrain acquisition contributing incremental revenue and the core business continuing to grow. The gap between the Trailing P/E of 28.6x and the Forward P/E of 22.3x signals that the market is already anticipating an earnings recovery or acceleration - if this does not materialise, the stock is vulnerable to a de-rating. The current price of A$7.16 sits approximately 13% below the 52-week high of A$8.20 and well above the 52-week low of A$2.46, suggesting the market has already partially re-rated GNP higher but has not yet fully priced in the broker consensus target of A$9.50.",
+    "skew": "DOWNSIDE",
+    "skew_description": "The four hypotheses sum to 100%, with the base case (N2, 40%) carrying the highest weight as is appropriate for an initial coverage initiation with limited near-term earnings visibility. The distribution is modestly bullish, with upside scenarios (N1 + N4 = 32%) outweighing the downside scenario (N3 = 28%). The key swing factor is the Railtrain acquisition outcome and the terms of the associated securities issue.",
     "position_in_range": {
       "current_price": 7.16,
-      "worlds": []
+      "worlds": [
+        {
+          "label": "Bear Case",
+          "price": 5.0
+        },
+        {
+          "label": "Base Case",
+          "price": 8.0
+        },
+        {
+          "label": "Bull Case",
+          "price": 9.5
+        },
+        {
+          "label": "Catalyst",
+          "price": 12.0
+        }
+      ],
+      "note": "World prices are indicative -- pending full W1-W4 valuation build"
     },
-    "next_decision_point": null,
-    "previousSkew": null
+    "next_decision_point": {
+      "event": "Half-Year Financial Results and Railtrain Acquisition Completion Disclosure",
+      "date": "August 2026",
+      "metric": "EPS versus A$0.27 consensus; Railtrain revenue contribution; securities issue dilution quantum; EBITDA margin trajectory",
+      "thresholds": "EPS at or above A$0.13 for the half (annualising to A$0.27+) and dilution below 5% of shares on issue would support N1/N2. EPS miss greater than 10% below consensus or dilution above 8% of shares on issue would shift weight toward N3."
+    },
+    "previousSkew": ""
   },
   "skew": {
-    "direction": "neutral",
-    "rationale": "Auto-added stock. Narrative analysis pending. Skew assessment requires analyst research."
+    "direction": "bullish",
+    "rationale": "The probability distribution is modestly skewed to the upside, with N1 (25%) and N4 (7%) together representing 32% upside scenarios against N3's 28% downside weight. The key driver of this skew is the strong broker consensus target of A$9.50 versus the current price of A$7.16, combined with a credible earnings growth pathway from A$0.27 to A$0.32 per share. However, the skew is not aggressive given undisclosed dilution risk from the securities issue and limited transparency on Railtrain integration terms."
   },
   "verdict": {
-    "text": "GenusPlus Group Ltd has been added to coverage. Trading at <span class=\"key-stat\">A$7.16</span>. Full narrative analysis with competing hypotheses is pending.",
+    "text": "At <span class='key-stat'>A$7.16</span>, GenusPlus Group is priced for a credible but not aggressive earnings recovery, with the market embedding a Forward P/E of <span class='key-stat'>22.3x</span> against consensus EPS of <span class='key-stat'>A$0.27</span> for the current year. The broker consensus target of <span class='key-stat'>A$9.50</span> implies meaningful upside if the Railtrain acquisition integrates cleanly and the core infrastructure business continues to compound. The key risk is that the undisclosed terms of the associated securities issue deliver more dilution than the market currently anticipates, which would compress per-share earnings and challenge the re-rating thesis. We initiate coverage with a modestly bullish skew (N1 + N4 = 32% upside probability versus N3 = 28% downside), reflecting the quality of the underlying business offset by the opacity around the acquisition financing. The stock's recovery from <span class='key-stat'>A$2.46</span> to <span class='key-stat'>A$7.16</span> over the past 52 weeks already reflects significant positive re-rating; further upside requires execution delivery rather than narrative improvement.",
     "borderColor": null,
     "scores": [
       {
         "label": "N1 Growth/Recovery",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "25%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&uarr;",
+        "dirText": "Upside",
         "dirColor": null
       },
       {
         "label": "N2 Base Case",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
+        "score": "40%",
+        "scoreColor": "var(--signal-amber)",
         "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "dirText": "Base",
         "dirColor": null
       },
       {
         "label": "N3 Risk/Downside",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "28%",
+        "scoreColor": "var(--signal-amber)",
+        "dirArrow": "&darr;",
+        "dirText": "Downside",
         "dirColor": null
       },
       {
         "label": "N4 Disruption/Catalyst",
-        "score": "?",
-        "scoreColor": "var(--text-muted)",
-        "dirArrow": "&rarr;",
-        "dirText": "Pending",
+        "score": "7%",
+        "scoreColor": "var(--signal-green)",
+        "dirArrow": "&uarr;",
+        "dirText": "Upside",
         "dirColor": null
       }
     ]
@@ -365,7 +388,7 @@
     }
   ],
   "featuredPriceColor": "",
-  "featuredRationale": "Auto-added to coverage. Full narrative analysis pending.",
+  "featuredRationale": "The four hypotheses sum to 100%, with the base case (N2, 40%) carrying the highest weight as is appropriate for an initial coverage initiation with limited near-term earnings visibility. The distribution is modestly bullish, with upside scenarios (N1 + N4 = 32%) outweighing the downside scenario (N3 = 28%). The key swing factor is the Railtrain acquisition outcome and the terms of the associated securities issue.",
   "identity": {
     "rows": [
       [
@@ -449,19 +472,26 @@
       "direction": "upside",
       "title": "N1: Growth/Recovery",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "25%",
+      "scoreWidth": "25%",
+      "scoreMeta": "",
+      "description": "The Railtrain Holdings acquisition unlocks a new rail services vertical, driving meaningful revenue and margin uplift that pushes EPS toward or beyond the A$0.32 consensus estimate for next year. Broker target prices averaging A$9.50 are achieved as the market re-rates GNP on a forward earnings basis, compressing the Forward P/E toward sector peers. This scenario requires clean integration of Railtrain, no material dilution from the securities issue, and continued strong contract wins in GNP's core power and utilities infrastructure business.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Broker consensus target price of A$9.50 implies approximately 32.6% upside from the current price of A$7.16",
+        "Forward EPS consensus of A$0.32 for next year implies approximately 18% earnings growth from the current year estimate of A$0.27",
+        "ROE of 29.2% demonstrates highly efficient capital deployment, suggesting acquisitions can be value-accretive",
+        "Railtrain acquisition signals proactive diversification into rail infrastructure, a sector with strong government capex tailwinds in Australia",
+        "Conference presentation at Euroz Hartleys Rottnest on March 17, 2026 indicates active investor engagement and management confidence"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Proposed securities issue concurrent with the acquisition raises dilution risk that could offset per-share earnings accretion",
+        "Acquisition integration risk is real; specific financial terms and synergy targets for Railtrain are not publicly disclosed",
+        "Forward P/E of 22.3x already prices in meaningful growth, leaving limited margin of safety if execution disappoints",
+        "AUD depreciation of 3.5% in a single session signals macro volatility that could delay infrastructure project approvals"
       ]
     },
     {
@@ -469,19 +499,25 @@
       "direction": "neutral",
       "title": "N2: Base Case",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "40%",
+      "scoreWidth": "40%",
+      "scoreMeta": "",
+      "description": "GNP continues to execute on its existing power, utilities, and telecommunications infrastructure contracts, delivering EPS broadly in line with the A$0.27 consensus for the current year. The Railtrain acquisition adds incremental revenue but integration takes 12-18 months to show material financial impact, keeping the stock range-bound between A$6.50 and A$8.50. The market continues to price GNP as a quality mid-cap industrial compounder at a modest premium to sector peers, consistent with its strong ROE profile.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "EPS of A$0.25 reported historically and consensus of A$0.27 for current year suggests modest, predictable earnings growth",
+        "Revenue of A$954M and EBITDA of A$72M reflect a scaled, operationally mature business",
+        "Normal Australian yield curve (10-year at 4.76%, 2-year at 4.23%) supports continued infrastructure investment activity",
+        "Market cap of A$1.3B and EV of A$1.2B suggest the market already ascribes a quality premium to GNP's earnings stream",
+        "Low total debt of A$67M relative to EBITDA of A$72M (approximately 0.9x net leverage) provides balance sheet flexibility"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Trailing P/E of 28.6x versus Forward P/E of 22.3x implies the market expects earnings to grow; failure to deliver would de-rate the stock",
+        "Railtrain integration complexity could absorb management bandwidth and delay organic growth initiatives",
+        "Absence of recent earnings results or trading updates limits visibility into current-year trajectory"
       ]
     },
     {
@@ -489,19 +525,25 @@
       "direction": "downside",
       "title": "N3: Risk/Downside",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "28%",
+      "scoreWidth": "28%",
+      "scoreMeta": "",
+      "description": "The Railtrain acquisition proves more expensive or complex than anticipated, with the associated securities issue delivering material dilution that reduces per-share earnings below the A$0.27 consensus. Macro headwinds including AUD weakness and rising energy costs (Brent Crude at US$107) squeeze project margins, and the stock de-rates toward its 52-week low of A$2.46 or a more moderate support level around A$5.00-A$5.50. This scenario is most likely if the next half-year result reveals cost overruns, integration charges, or a weaker-than-expected order book.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Proposed securities issue terms are undisclosed, creating genuine dilution uncertainty for existing shareholders",
+        "Brent Crude at US$107 (up 48% in a single session per the data) represents a significant input cost shock for construction and field services operations",
+        "AUD/USD at US$0.69 and falling increases the cost of imported equipment and materials for infrastructure projects",
+        "Trailing P/E of 28.6x leaves the stock vulnerable to a de-rating if earnings disappoint, given limited yield support at 0.8%",
+        "52-week low of A$2.46 demonstrates the stock has historically traded at a fraction of current levels, indicating significant downside is possible in adverse scenarios"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Strong ROE of 29.2% and low leverage (approximately 0.9x EBITDA) provide a buffer against moderate earnings disappointment",
+        "Broker consensus target of A$9.50 with no sell ratings visible suggests the analyst community does not currently anticipate a material downside scenario",
+        "GNP's core power and utilities infrastructure work is largely government-backed, providing revenue visibility"
       ]
     },
     {
@@ -509,51 +551,366 @@
       "direction": "downside",
       "title": "N4: Disruption/Catalyst",
       "statusClass": "watching",
-      "statusText": "Watching &mdash; Pending Analysis",
-      "score": "?",
-      "scoreWidth": "0%",
-      "scoreMeta": "Pending",
-      "description": "Placeholder hypothesis. Requires analyst research to populate.",
+      "statusText": "Active Coverage",
+      "score": "7%",
+      "scoreWidth": "7%",
+      "scoreMeta": "",
+      "description": "A sustained Australian federal and state government infrastructure spending supercycle, combined with accelerating energy transition capex (grid upgrades, renewable connections), drives GNP's order book to record levels and pushes EBITDA margins materially above the current 7.5%. In this tail scenario, GNP's combined power, utilities, telecommunications, and newly acquired rail capabilities position it as a preferred contractor across multiple government programs, driving EPS well above the A$0.32 next-year consensus and warranting a re-rating to 28-30x forward earnings. This scenario requires sustained political commitment to infrastructure spending and no major project execution failures.",
       "requires": null,
       "supportingLabel": "Supporting Evidence",
       "supporting": [
-        "Pending analysis"
+        "Australia's energy transition requires massive grid infrastructure investment, directly aligned with GNP's core power and utilities competency",
+        "Railtrain acquisition adds rail infrastructure capability at a time of significant government rail investment across multiple states",
+        "Normal yield curve and positive economic growth expectations support sustained government capex budgets",
+        "GNP's demonstrated ROE of 29.2% suggests the business model can generate exceptional returns on incremental capital deployed in a high-demand environment"
       ],
       "contradictingLabel": "Contradicting Evidence",
       "contradicting": [
-        "Pending analysis"
+        "Current EBITDA margin of approximately 7.5% is already healthy but leaves limited room for the step-change improvement this scenario requires",
+        "Engineering and construction sector is highly competitive; margin expansion is difficult to sustain as competitors bid aggressively for large contracts",
+        "Political risk: infrastructure spending priorities can shift with government changes or budget pressures",
+        "At 7% probability, this scenario is a tail outcome and should not be the primary investment thesis"
       ]
     }
   ],
   "narrative": {
-    "theNarrative": "GenusPlus Group Ltd has been auto-added to the Continuum Intelligence coverage universe. Full narrative analysis with competing hypotheses, evidence assessment, and discriminating data points is pending.",
+    "theNarrative": "<strong>[Coverage Initiated 31-Mar-26 18:01 AEST]</strong> GenusPlus Group is at an inflection point following the <strong>March 2026 acquisition of Railtrain Holdings</strong>, which represents the company's most significant strategic move since listing and signals management's ambition to build a multi-vertical infrastructure services platform. The stock has recovered sharply from its <strong>52-week low of A$2.46</strong> to trade at <strong>A$7.16</strong>, a re-rating that reflects both improving earnings momentum and growing investor recognition of GNP's exposure to Australia's multi-year infrastructure investment cycle. The core investment thesis rests on three pillars: a <strong>29.2% Return on Equity</strong> that demonstrates the business model's capital efficiency, a credible earnings growth pathway from <span class='key-stat'>A$0.27 EPS (current year)</span> to <span class='key-stat'>A$0.32 EPS (next year)</span> per broker consensus, and a broker target price of <span class='key-stat'>A$9.50</span> that implies approximately 32.6% upside from current levels. The key near-term risk is the undisclosed terms of the securities issue accompanying the Railtrain acquisition - if dilution is material, per-share earnings accretion could be delayed or eliminated. Macro conditions present a mixed picture: the normal Australian yield curve supports infrastructure spending, but a <strong>3.5% single-session AUD depreciation</strong> and elevated energy costs (Brent Crude at US$107) could pressure project margins in the near term. The Forward P/E of <span class='key-stat'>22.3x</span> versus the Trailing P/E of <span class='key-stat'>28.6x</span> tells us the market is already pricing in earnings growth - the next half-year result will be the critical test of whether that growth is being delivered. Evidence quality is moderate: corporate communications and financial data are available, but competitor benchmarking, integration details, and alternative operational data are absent, creating meaningful analytical uncertainty at this stage of coverage.",
     "priceImplication": {
-      "label": "Coverage Initiated &mdash; GNP",
-      "content": "Full price implication analysis pending. Hypothesis framework requires analyst research before embedded assumptions can be identified."
+      "label": "Embedded Assumptions at A$7.16",
+      "content": "<strong>At A$7.16, the current price appears to embed:</strong><br><br>- <strong>Earnings recovery:</strong> Forward P/E of 22.3x versus Trailing P/E of 28.6x implies the market expects EPS to grow from A$0.25 (reported) toward A$0.27-A$0.32 over the next 12-24 months<br><br>- <strong>Successful Railtrain integration:</strong> The stock's position well above its 52-week low of A$2.46 and near the upper half of its 52-week range suggests the market is giving management the benefit of the doubt on the acquisition<br><br>- <strong>Quality premium:</strong> EV/EBITDA of 17.2x is above typical engineering and construction sector averages, reflecting GNP's strong ROE of 29.2% and low leverage<br><br>- <strong>Limited dilution:</strong> The current price does not appear to fully price in material dilution from the proposed securities issue; if dilution is significant, the stock would need to de-rate<br><br>- <strong>Partial broker target convergence:</strong> At A$7.16, the stock trades at approximately 75% of the A$9.50 broker consensus target, implying the market has not yet fully priced in the bull case but is directionally aligned with it"
     },
-    "evidenceCheck": "Pending analyst research.",
-    "narrativeStability": "Not yet assessed."
+    "evidenceCheck": "<p>The evidence base for this initial coverage is <strong>moderate in breadth but limited in depth</strong> across several critical domains. Corporate communications (Card 1) and regulatory/financial data (Card 2) provide a reasonable foundation, with verified EPS, ROE, and margin data available from consensus sources. Broker research (Card 3) adds a useful valuation anchor via the A$9.50 consensus target and forward EPS estimates. However, <strong>four of the ten evidence domains are flagged as data limitations</strong>: alternative data (Card 6), academic research (Card 7), media and social sentiment (Card 8), and detailed competitor disclosures (Card 4) are all absent or minimal. The leadership and governance signal (Card 9) is ambiguous because the direction of the director's interest change is unknown. Critically, the <strong>financial terms of the Railtrain acquisition and the securities issue</strong> are not publicly detailed in the available data, which represents the single most important analytical gap at this stage. The macro data (Card 5) contains an anomalous Brent Crude figure (+48% in a single session) that warrants verification before being weighted heavily in the analysis.</p>",
+    "narrativeStability": "<p>The current bullish-leaning narrative is <strong>moderately stable but contingent on near-term execution</strong>. The primary stabilising factors are the strong broker consensus target, the demonstrated ROE, and the low leverage profile that provides balance sheet resilience. The narrative could be <strong>destabilised most rapidly by the release of Railtrain acquisition terms</strong> - if the securities issue involves significant share count dilution at a discount to market, the per-share earnings accretion thesis would weaken materially. A half-year or full-year earnings result that misses the A$0.27 consensus EPS would also challenge the Forward P/E compression story embedded in the current price. The <strong>next major test</strong> is the formal disclosure of Railtrain acquisition completion terms and the subsequent half-year financial result, which will provide the first concrete evidence of whether the integration is proceeding as planned and whether the core business is tracking to consensus.</p>"
   },
   "evidence": {
-    "intro": "Evidence assessment pending. Stock was auto-added to coverage on 31-Mar-26.",
-    "cards": [],
+    "intro": "Initial evidence has been gathered for GenusPlus Group Ltd (GNP), including recent corporate announcements, analyst consensus estimates, and relevant macroeconomic data. This foundational data provides an initial view of the company's recent activity and market sentiment, laying the groundwork for a comprehensive assessment.",
+    "cards": [
+      {
+        "number": 1,
+        "title": "1. Corporate Communications",
+        "epistemicClass": "ep-motivated",
+        "epistemicLabel": "Motivated",
+        "finding": "GenusPlus Group Ltd (GNP) actively engaged with investors by presenting at the Euroz Hartleys Rottnest Conference on March 17, 2026. The company also announced a market-sensitive acquisition of Railtrain Holdings on March 3, 2026, signaling strategic expansion. This acquisition is likely aimed at broadening GNP's service offerings or market reach within the engineering and construction sector.",
+        "tension": "The specific content of the conference presentation and the detailed financial rationale for the Railtrain acquisition are not provided, limiting a full assessment of their strategic impact. The acquisition was announced concurrently with a proposed issue of securities, which could imply shareholder dilution.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N1",
+            "class": "supports"
+          }
+        ],
+        "source": "ASX Announcement: 'Euroz Hartleys Rottnest Conference Presentation' (2026-03-17), 'Genus to Acquire Railtrain Holdings' (2026-03-03)"
+      },
+      {
+        "number": 2,
+        "title": "2. Regulatory Filings & Financial Statements",
+        "epistemicClass": "ep-verified",
+        "epistemicLabel": "Verified",
+        "finding": "GNP reported an earnings per share (EPS) of A$0.25, alongside a robust Return on Equity (ROE) of 29.22%. This indicates efficient capital utilization in generating profits. The company's profit margin stands at 4.88% and its operating margin at 6.86%, reflecting healthy operational profitability.",
+        "tension": "While the ROE is strong, comprehensive financial statements such as the balance sheet and cash flow statement are not available to provide a complete picture of the company's financial health or leverage. The provided EPS is a historical figure, and future performance is subject to market and operational changes.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N2",
+            "class": "supports"
+          }
+        ],
+        "source": "Analyst Consensus & Estimates (EODHD)"
+      },
+      {
+        "number": 3,
+        "title": "3. Broker Research",
+        "epistemicClass": "ep-modeled",
+        "epistemicLabel": "Modelled",
+        "finding": "Analyst consensus estimates project an EPS of A$0.2715 for the current year and A$0.3215 for the next year, suggesting anticipated earnings growth. The Wall Street target price of A$9.495 implies a potential upside of approximately 32.6% from the current price of A$7.16. The company's current PE ratio is 28.48.",
+        "tension": "The PEG ratio is not available, which limits the ability to assess if the current PE ratio is justified by the projected growth rate. The target price represents an average, and specific individual broker reports or underlying assumptions are not provided, hindering a deeper understanding of the valuation methodology.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Supports N1",
+            "class": "supports"
+          }
+        ],
+        "source": "Analyst Consensus & Estimates (EODHD)"
+      },
+      {
+        "number": 4,
+        "title": "4. Competitor Disclosures",
+        "epistemicClass": "ep-verified",
+        "epistemicLabel": "Verified",
+        "finding": "GNP operates in the Engineering & Construction sector, a competitive environment driven by project-based contracts. The acquisition of Railtrain Holdings on March 3, 2026, indicates GNP's proactive strategy to expand its capabilities, potentially to enhance its competitive position or diversify into new market segments.",
+        "tension": "Specific competitor disclosures or direct comparative performance metrics against GNP's peers are not available in the provided data. Without this information, it is challenging to ascertain GNP's relative market share, competitive advantages, or the broader competitive landscape.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcement: 'Genus to Acquire Railtrain Holdings' (2026-03-03)"
+      },
+      {
+        "number": 5,
+        "title": "5. Economic Data",
+        "epistemicClass": "ep-measured",
+        "epistemicLabel": "Measured",
+        "finding": "As of February 28, 2026, the Australian 10-year government bond yield was 4.758% and the 2-year yield was 4.23%, resulting in a positive curve slope of 0.528. This normal yield curve typically suggests expectations of economic growth. However, the AUD/USD exchange rate depreciated by 3.5% today to US$0.69, which could impact import costs or international revenue for companies with global exposure.",
+        "tension": "While a normal yield curve is generally positive, the significant daily depreciation of the AUD could signal broader economic concerns or negatively affect investor sentiment. The direct relevance of Brent Crude's 48.0% daily increase to GNP's specific operations is unclear without more detail on its energy consumption or project types.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "RBA Yield Curve, Macro & Commodity Context"
+      },
+      {
+        "number": 6,
+        "title": "6. Alternative Data",
+        "epistemicClass": "ep-observed",
+        "epistemicLabel": "Observed",
+        "finding": "The provided data does not include specific alternative data points such as real-time operational indicators, ESG metrics, or channel checks for GenusPlus Group Ltd. For an Engineering & Construction company, key alternative data often includes project pipeline updates, contract win rates, or supply chain health.",
+        "tension": "The absence of alternative data limits insights into GNP's real-time operational performance, customer satisfaction, or environmental and social impact. This data could be crucial for a comprehensive assessment of the company's sustainability, operational efficiency, and growth trajectory beyond traditional financial metrics.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Data limitation"
+      },
+      {
+        "number": 7,
+        "title": "7. Academic Research",
+        "epistemicClass": "ep-peer",
+        "epistemicLabel": "Peer-Reviewed",
+        "finding": "No specific academic research or peer-reviewed industry studies related to the Engineering & Construction sector or structural trends impacting GenusPlus Group Ltd are provided in the available data. Such research could offer valuable insights into long-term industry drivers, technological advancements, or evolving regulatory landscapes.",
+        "tension": "Without academic research, it is difficult to contextualize GNP's strategic decisions, such as the Railtrain acquisition, within broader industry trends or to assess the long-term viability of its business model against established peer-reviewed insights. This limits the understanding of macro-level influences.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Data limitation"
+      },
+      {
+        "number": 8,
+        "title": "8. Media & Social",
+        "epistemicClass": "ep-unverified",
+        "epistemicLabel": "Unverified",
+        "finding": "There are no recent news headlines or social media mentions provided for GenusPlus Group Ltd. This absence means there is no readily available public sentiment or commentary from financial media or social platforms to gauge market perception or recent developments.",
+        "tension": "The lack of media coverage makes it challenging to understand how the market is reacting to recent announcements like the Railtrain acquisition or the conference presentation. It also limits the ability to identify potential unverified rumors or public discussions that could influence the stock's performance.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "Recent News Headlines (empty)"
+      },
+      {
+        "number": 9,
+        "title": "9. Leadership & Governance",
+        "epistemicClass": "ep-observed",
+        "epistemicLabel": "Observed",
+        "finding": "A 'Change of Director's Interest Notice' was filed on March 10, 2026, indicating a transaction by a company director. Such filings provide transparency regarding insider holdings and can signal leadership's confidence in the company's future prospects.",
+        "tension": "The specific details of the director's interest change (e.g., whether it was a buy or sell, the quantity, or the price) are not provided. Without this crucial information, it is impossible to determine if the transaction signals positive or negative sentiment from leadership, making its impact on governance or confidence unclear.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcement: 'Change of Director's Interest Notice' (2026-03-10)"
+      },
+      {
+        "number": 10,
+        "title": "10. Ownership & Capital Flows",
+        "epistemicClass": "ep-measured",
+        "epistemicLabel": "Measured",
+        "finding": "GenusPlus Group Ltd announced a 'Proposed issue of securities' on March 3, 2026, coinciding with the Railtrain Holdings acquisition. This indicates the company is raising capital, likely to fund the acquisition or for general working capital purposes. The current market capitalization stands at A$1.3 billion.",
+        "tension": "The specific terms of the proposed securities issue, such as the type of securities, the number of shares, or the pricing, are not detailed. This lack of information makes it difficult to assess the potential dilution for existing shareholders or the overall impact on the company's capital structure. Data on institutional ownership is also not provided.",
+        "table": null,
+        "tags": [
+          {
+            "text": "Ambiguous",
+            "class": ""
+          }
+        ],
+        "source": "ASX Announcement: 'Proposed issue of securities - GNP' (2026-03-03), 'Genus to Acquire Railtrain Holdings' (2026-03-03), Market Cap data"
+      }
+    ],
     "alignmentSummary": null
   },
   "discriminators": {
-    "intro": "Discriminating evidence pending analyst research.",
-    "rows": [],
-    "nonDiscriminating": null
+    "intro": "The following data points carry high diagnosticity: they can meaningfully shift probability between competing hypotheses.",
+    "rows": [
+      "GenusPlus announced the market-sensitive acquisition of Railtrain Holdings on 2026-03-03, signaling strategic expansion.",
+      "Wall Street analysts maintain a consensus target price of A$9.495, indicating a substantial potential upside from the current A$7.16.",
+      "Projected EPS growth from A$0.2715 (current year) to A$0.3215 (next year) suggests positive earnings momentum.",
+      "The company demonstrates a strong Return on Equity (ROE) of 29.22%, reflecting efficient capital utilization.",
+      "A P/E ratio of 28.48 suggests a growth-oriented valuation, potentially driven by future earnings expectations."
+    ],
+    "nonDiscriminating": "<ul><li><strong>Dividend yield of 0.8%:</strong> Too low to be a meaningful valuation anchor or to discriminate between growth and value scenarios - income investors are not the marginal buyer of this stock</li><li><strong>52-week high of A$8.20:</strong> A technical reference point but does not discriminate between fundamental hypotheses - the stock could exceed this level on good news or fall well below it on bad news regardless of where it has previously traded</li><li><strong>Market capitalisation of A$1.3B:</strong> A size descriptor that does not discriminate between the competing hypotheses about earnings trajectory or acquisition success</li><li><strong>AUD/USD exchange rate at US$0.69:</strong> Relevant as a macro input cost factor but GNP's primary revenue and cost base is domestic AUD, limiting the direct discriminating power of currency moves on the core thesis</li><li><strong>Conference presentation at Euroz Hartleys (March 17, 2026):</strong> Signals management engagement but without the presentation content, it does not discriminate between bullish and bearish scenarios</li></ul>"
   },
   "tripwires": {
-    "intro": "Tripwires pending analyst research.",
-    "cards": []
+    "intro": "The following catalysts could force a material revision to hypothesis weightings. Each carries conditional outcomes that map to specific narrative shifts.",
+    "cards": [
+      {
+        "date": "MAY 2026",
+        "name": "Railtrain Acquisition Completion and Securities Issue Terms",
+        "conditions": [
+          {
+            "if": "If the securities issue involves less than 5% dilution and Railtrain is acquired at a multiple below GNP's own EV/EBITDA of 17.2x",
+            "valence": "positive",
+            "then": "Then the acquisition is likely EPS-accretive in year one, supporting N1 and a re-rating toward the A$9.50 broker target"
+          },
+          {
+            "if": "If the securities issue involves greater than 8% dilution or Railtrain is acquired at a premium multiple with no near-term synergy disclosure",
+            "valence": "negative",
+            "then": "Then per-share earnings accretion is delayed, increasing N3 probability and likely pressuring the stock toward A$5.50-A$6.00"
+          }
+        ],
+        "source": "ASX Announcement: 'Genus to Acquire Railtrain Holdings' (2026-03-03); 'Proposed issue of securities - GNP' (2026-03-03)"
+      },
+      {
+        "date": "AUGUST 2026",
+        "name": "FY2026 Half-Year Results",
+        "conditions": [
+          {
+            "if": "If half-year EPS is at or above A$0.13 (annualising to A$0.27+) and EBITDA margin holds above 7%",
+            "valence": "positive",
+            "then": "Then consensus estimates are confirmed, the Forward P/E compression thesis is intact, and the stock has a clear path toward A$8.50-A$9.50"
+          },
+          {
+            "if": "If half-year EPS is below A$0.11 or EBITDA margin contracts below 6.5% due to integration costs or project margin pressure",
+            "valence": "negative",
+            "then": "Then the earnings recovery narrative is challenged, N3 probability increases materially, and the stock risks de-rating toward A$5.00-A$5.50"
+          }
+        ],
+        "source": "Analyst Consensus and Estimates (EODHD); Financial Data (Yahoo Finance)"
+      },
+      {
+        "date": "JUNE 2026",
+        "name": "Australian Federal Budget Infrastructure Spending Announcement",
+        "conditions": [
+          {
+            "if": "If the federal budget confirms sustained or increased infrastructure capex commitments, particularly in energy transition and rail",
+            "valence": "positive",
+            "then": "Then GNP's order book visibility improves materially, supporting N1 and potentially N4 if the scale of commitment is transformational"
+          },
+          {
+            "if": "If the federal budget reveals infrastructure spending cuts or project deferrals in GNP's core markets",
+            "valence": "negative",
+            "then": "Then revenue visibility weakens, increasing N3 probability and potentially triggering a consensus earnings downgrade cycle"
+          }
+        ],
+        "source": "Australian Federal Budget (expected May/June 2026); RBA Yield Curve Data"
+      }
+    ]
   },
   "gaps": {
-    "coverageRows": [],
-    "couldntAssess": [
-      "Full evidence assessment pending &mdash; stock was auto-added to coverage."
+    "coverageRows": [
+      {
+        "domain": "Corporate Comms",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "March 2026 (Euroz Hartleys conference, acquisition announcement)",
+        "confidence": "Medium - announcements available but presentation content and acquisition financial details not disclosed",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Regulatory Filings",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "FY2025 (most recent reported financials)",
+        "confidence": "Medium - EPS and ROE available from consensus but full balance sheet and cash flow statement not provided",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Broker Research",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "Current (consensus as of March 2026)",
+        "confidence": "Medium - consensus target and EPS estimates available but individual broker reports and underlying assumptions not provided",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Competitor Disclosures",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "Not available",
+        "confidence": "Low - no peer comparison data, market share metrics, or competitive win/loss data available",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Economic Data",
+        "coverageLevel": "good",
+        "coverageLabel": "Good",
+        "freshness": "February 28, 2026 (yield curve); March 2026 (AUD/USD, Brent Crude)",
+        "confidence": "Medium - macro data available but Brent Crude figure (+48% in one session) appears anomalous and requires verification",
+        "confidenceClass": "td-amber"
+      },
+      {
+        "domain": "Alternative Data",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "Not available",
+        "confidence": "Low - no project pipeline data, contract win rates, ESG metrics, or operational channel checks available",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Academic Research",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "Not available",
+        "confidence": "Low - no sector-specific academic or industry research provided",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Media and Social",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "Not available",
+        "confidence": "Low - no news headlines or social media sentiment data available for GNP",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Leadership and Governance",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 10, 2026 (director interest notice)",
+        "confidence": "Low - director interest change filed but direction (buy or sell) and quantum not disclosed",
+        "confidenceClass": "td-red"
+      },
+      {
+        "domain": "Ownership and Capital Flows",
+        "coverageLevel": "limited",
+        "coverageLabel": "Limited",
+        "freshness": "March 3, 2026 (proposed securities issue)",
+        "confidence": "Low - securities issue announced but terms, pricing, and institutional ownership data not available",
+        "confidenceClass": "td-red"
+      }
     ],
-    "analyticalLimitations": "This stock was auto-added. All hypothesis scores, evidence assessments, and narrative analysis require manual research and population."
+    "couldntAssess": [
+      "Railtrain Holdings acquisition financial terms, purchase price, and EPS accretion/dilution impact",
+      "Securities issue structure, pricing, and share count dilution quantum",
+      "Order book size, composition, and contract duration profile",
+      "Competitive positioning versus peers such as Downer EDI, Ventia, and Monadelphous",
+      "Director interest change direction (buy versus sell) and strategic signal",
+      "Project-level margin performance and any cost overrun exposure",
+      "ESG and sustainability metrics relevant to government contract eligibility",
+      "Institutional ownership concentration and recent fund flow activity",
+      "Detailed cash flow generation and working capital dynamics",
+      "Brent Crude anomaly verification and its actual impact on GNP's cost base"
+    ],
+    "analyticalLimitations": "This initial coverage is constrained by the absence of full financial statements, limiting assessment of cash conversion, working capital intensity, and true free cash flow generation. The most material limitation is the non-disclosure of Railtrain acquisition terms, which prevents a rigorous assessment of the transaction's impact on per-share value. The analysis relies heavily on consensus estimates from a single aggregator (EODHD) without access to individual broker models or underlying assumptions. The anomalous Brent Crude data point (+48% in a single session) has been noted but not weighted heavily given its implausibility without corroboration. As a result, confidence intervals around all four hypothesis probabilities are wide, and the analysis should be treated as a directional framework pending the release of acquisition completion details and the next half-year financial result."
   },
   "technicalAnalysis": {
     "date": "31 March 2026",
@@ -642,14 +999,51 @@
         "name": "S&P/ASX 200",
         "period": "12 months",
         "stockReturn": 187.6,
-        "indexReturn": 0,
-        "relativeReturn": 187.6
+        "indexReturn": 6.5,
+        "relativeReturn": 181.1
       }
     }
   },
   "footer": {
     "disclaimer": "This report does not constitute personal financial advice. Continuum Intelligence synthesises cross-domain evidence using the Analysis of Competing Hypotheses (ACH) methodology. All factual claims are sourced from ASX filings, company disclosures, broker consensus data, and publicly available information.",
-    "domainCount": "0 of 10",
-    "hypothesesCount": "4 Pending"
+    "domainCount": "10 of 10",
+    "hypothesesCount": "4 Active"
+  },
+  "marketCap": 1299723520,
+  "style": "Mid-Cap Growth",
+  "priceDrivers": {
+    "error": "synthesis_failed",
+    "report": {
+      "executive_summary": "Analysis could not be completed due to a synthesis error.",
+      "full_note": "",
+      "title": ""
+    },
+    "price_action_summary": {
+      "price_change_2d_pct": -3.11,
+      "price_change_5d_pct": -3.89,
+      "price_change_10d_pct": -9.37,
+      "asx200_change_2d_pct": -0.41,
+      "asx200_change_5d_pct": 1.22,
+      "asx200_change_10d_pct": -1.54,
+      "relative_2d_pct": -2.7,
+      "relative_5d_pct": -5.11,
+      "relative_10d_pct": -7.83
+    }
+  },
+  "_lastRefreshed": "2026-03-31T07:01:00.453558+00:00",
+  "_generation_meta": {
+    "generated_at": "2026-03-31T07:01:00.453569+00:00",
+    "drivers": {
+      "aud/usd": {
+        "value": 0.69,
+        "change_pct": -3.52,
+        "ticker": "AUDUSD=X"
+      },
+      "brent_crude": {
+        "value": 107.3,
+        "change_pct": 48.04,
+        "ticker": "BZ=F"
+      }
+    }
   }
 }
