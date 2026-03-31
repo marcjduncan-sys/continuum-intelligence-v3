@@ -539,7 +539,7 @@ When fixing any bug, use this checklist:
 | # | Bug Family | Fix Commits | Top File(s) | Status |
 |---|---|---|---|---|
 | 1 | Encoding contamination | 15 | refresh.py, validate_research.py, 58 data JSONs | **FIXED** (BEAD-001: all 7 pipelines sanitised at boundary) |
-| 2 | Report rendering | 15 specific + 26 total | report-sections.js (2,726 lines) | IN PROGRESS (BEAD-012: plan, BEAD-013: format library, BEAD-014: null guards; extraction pending) |
+| 2 | Report rendering | 15 specific + 26 total | report-sections.js (2,726 lines) | UNFIXED (no validation, no tests) |
 | 3 | Portfolio/PM state | 25 | portfolio.js, pm-chat.js, portfolio_alignment.py | PARTIAL (races fixed, no state machine) |
 | 4 | Schema mismatches | 10 major | scaffold.py, loader.js, main.py | **FIXED** (BEAD-003: full manifest, field validation, error logging on all fetch paths) |
 | 5 | API config chaos | 8 + 25 scattered | config.py + 25 client os.getenv() calls | **FIXED** (BEAD-004/005: centralised + linter) |
@@ -597,14 +597,14 @@ When fixing any bug, use this checklist:
 - **Family:** 9 (CI pipeline fragility)
 - **Symptom:** npm, Python, Docker, and GitHub Actions dependencies used range specifiers (`^`, `~`, `>=`, `@master`), allowing silent version drift between builds
 - **Root cause:** No pinning discipline. 12 npm deps used `^`, 8 Python deps used `>=`, Dockerfile used `python:3.11-slim` (floating tag), fly-deploy.yml used `@master` for flyctl-actions
-- **Fix:** Pinned all npm deps to exact resolved versions in package.json (12 packages). Pinned all Python deps to exact versions in api/requirements.txt (8 packages: fastapi, asyncpg, PyJWT, notebooklm-py, sentry-sdk, yfinance, PyMuPDF, python-docx, python-multipart). Pinned Dockerfile base to `python:3.11.15-slim`. Pinned `superfly/flyctl-actions/setup-flyctl@1.5` in fly-deploy.yml.
+- **Fix:** Pinned all npm deps to exact resolved versions in package.json (12 packages). Pinned all Python deps to exact versions in api/requirements.txt (8 packages). Pinned Dockerfile base to `python:3.11.15-slim`. Pinned `superfly/flyctl-actions/setup-flyctl@1.5` in fly-deploy.yml.
 - **Fix layer:** BOUNDARY
 - **Regression gate:** `npm ci` validates lockfile matches pinned versions; any `^` or `~` in package.json is a visible diff
 - **Recurrence risk:** LOW -- exact versions prevent silent upgrades; upgrades require explicit version bump
 
 ### 2026-03-31 BEAD-022: Post-Deploy Health Checks
 - **Family:** 9 (CI pipeline fragility)
-- **Symptom:** Fly.io deploys succeeded in CI without verifying the application was actually healthy. Broken deploys (e.g. null byte injection in api/main.py) passed CI silently.
+- **Symptom:** Fly.io deploys succeeded in CI without verifying the application was actually healthy. Broken deploys passed CI silently.
 - **Root cause:** fly-deploy.yml had no post-deploy verification step. Deploy success meant only that `flyctl deploy` exited 0, not that the application was serving correctly.
 - **Fix:** Added `post-deploy-health-check` job to fly-deploy.yml with `needs: deploy`. Three checks: (1) backend `/api/health` JSON status != "unhealthy", (2) frontend HTTP 200, (3) frontend content contains "Continuum Intelligence". 30s propagation delay. 15s timeouts per check.
 - **Fix layer:** REGRESSION-GATE
@@ -619,30 +619,3 @@ When fixing any bug, use this checklist:
 - **Fix layer:** REGRESSION-GATE
 - **Regression gate:** `npx playwright test` in CI; encoding contamination test blocks if null bytes or mojibake detected in rendered report content
 - **Recurrence risk:** LOW -- automated browser rendering verification catches regressions invisible to unit tests
-
-### 2026-03-31 BEAD-012: Report Renderer Audit and Decomposition Plan
-- **Family:** 2 (Report rendering regressions)
-- **Symptom:** 2,762-line monolith with 32 exports, 15 null guard styles, 22 `.toFixed()` precisions generates 26+ fix commits per month
-- **Root cause:** No domain boundaries, no shared formatting, no section registry. Each section assumes its own data shape; guards added reactively.
-- **Fix:** Read-only audit. Produced `docs/report-decomposition-plan.md` mapping all 32 exports, 12 internal functions, 5 consumer files, 6 domain boundaries. Proposed 14 modules across 5 extraction waves. Identified zero circular dependencies.
-- **Fix layer:** INFRASTRUCTURE
-- **Regression gate:** NONE (planning artefact)
-- **Recurrence risk:** N/A -- plan, not code
-
-### 2026-03-31 BEAD-013: Number Formatting Library
-- **Family:** 2 (Report rendering regressions)
-- **Symptom:** 22 inconsistent `.toFixed()` precisions, 4 different decimal strategies, null values displayed as '0.0' instead of sentinel
-- **Root cause:** No shared formatting utility. Each rendering function invented its own `.toFixed()` call with its own decimals and null handling.
-- **Fix:** Added 10 standardised format functions to `src/lib/format.js` (formatPrice, formatPriceWithCurrency, formatPercent, formatSignedPercent, formatChange, formatRatio, formatVolume, formatMarketCap, formatInteger, svgCoord). Replaced all 133 `.toFixed()` calls across 13 source files. Zero `.toFixed()` calls remain outside format.js.
-- **Fix layer:** BOUNDARY
-- **Regression gate:** 57 new tests in `src/lib/format.test.js` (90 total). All 366 Vitest pass. Build passes. `grep -rn ".toFixed(" src/ | grep -v format.js | grep -v .test.js` returns zero.
-- **Recurrence risk:** LOW -- all numeric display routes through single library; new `.toFixed()` calls are immediately visible as violations
-
-### 2026-03-31 BEAD-014: Null Guard Standardisation
-- **Family:** 2 (Report rendering regressions)
-- **Symptom:** 15 different null guard patterns (!=, !==, typeof, &&, ||, ??, ternary)
-- **Root cause:** Guards added reactively after production crashes, each developer using their preferred style
-- **Fix:** BEAD-013 eliminated all numeric null guards by routing through format functions with built-in null handling. The remaining 88 `|| ''` guards are correct HTML-safe string interpolation patterns (preventing 'undefined' in DOM). No `|| '0.0'` fallbacks remain. The `|| 0` guards (22 instances) are legitimate numeric defaults for computation inputs (not display values).
-- **Fix layer:** BOUNDARY (via BEAD-013)
-- **Regression gate:** Format library tests cover all null/undefined/NaN paths
-- **Recurrence risk:** LOW -- new numeric display must use format functions
