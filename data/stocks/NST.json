@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result, operational update, and macro developments.",
       "upside": "Material re-rating if scenario plays out.",
       "risk_plain": "Monitor for change in probability weight.",
-      "survival_score": 0.39,
-      "status": "LOW",
+      "survival_score": 0.43,
+      "status": "MODERATE",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-31T07:47:01.919Z"
+      "last_updated": "2026-03-31T23:55:58.448Z"
     },
     "N2": {
       "label": "Base Case",
@@ -23,10 +23,10 @@
       "what_to_watch": "Next earnings result, operational update, and macro developments.",
       "upside": null,
       "risk_plain": "Monitor for change in probability weight.",
-      "survival_score": 0.39,
-      "status": "LOW",
+      "survival_score": 0.44,
+      "status": "MODERATE",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-31T07:47:01.919Z"
+      "last_updated": "2026-03-31T23:55:58.448Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Next earnings result, operational update, and macro developments.",
       "upside": null,
       "risk_plain": "Significant downside if this scenario crystallises.",
-      "survival_score": 0.17,
-      "status": "LOW",
+      "survival_score": 0.08,
+      "status": "VERY_LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-31T07:47:01.919Z"
+      "last_updated": "2026-03-31T23:55:58.448Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -53,19 +53,19 @@
       "last_updated": "2026-03-31T07:47:01.919Z"
     }
   },
-  "dominant": "N1",
+  "dominant": "N2",
   "confidence": "LOW",
   "alert_state": "NORMAL",
-  "current_price": 20.36,
+  "current_price": 21.83,
   "big_picture": "Northern Star Resources at A$18.55 – following a +16.2% single-session surge – is beginning to close the gap to its 52-week high of A$31.73, but the stock still embeds a 35% discount that implies the market is not yet fully crediting gold at US$5,023/oz as sustainable or NST's operational delivery a",
   "last_flip": {
     "date": "2026-03-31",
-    "from": "N3",
-    "to": "N1",
-    "trigger": "Automated: survival score shift (Risk/Downside → Growth/Recovery)",
-    "price_at_flip": 20.32,
-    "from_survival": 0.26,
-    "to_survival": 0.3
+    "from": "N1",
+    "to": "N2",
+    "trigger": "Automated: survival score shift (Growth/Recovery → Base Case)",
+    "price_at_flip": 21.83,
+    "from_survival": 0.43,
+    "to_survival": 0.44
   },
   "narrative_history": [
     {
@@ -76,6 +76,15 @@
       "price_at_flip": 19.35,
       "from_survival": 0.27,
       "to_survival": 0.29
+    },
+    {
+      "date": "2026-03-31",
+      "from": "N3",
+      "to": "N1",
+      "trigger": "Automated: survival score shift (Risk/Downside → Growth/Recovery)",
+      "price_at_flip": 20.32,
+      "from_survival": 0.26,
+      "to_survival": 0.3
     }
   ],
   "evidence_items": [],
@@ -255,16 +264,17 @@
     19.75,
     20.32,
     20.4,
-    20.36
+    20.36,
+    21.83
   ],
   "freshness": {
-    "pricePctChange": -0.2,
-    "urgency": 0,
-    "status": "OK",
-    "badge": "ok"
+    "pricePctChange": 7.2,
+    "urgency": 20,
+    "status": "MODERATE",
+    "badge": "moderate"
   },
-  "last_price_update": "2026-03-31T07:11:56.461Z",
-  "last_research_update": "2026-03-31T21:28:49.168Z",
+  "last_price_update": "2026-03-31T23:55:58.323Z",
+  "last_research_update": "2026-03-31T23:55:58.448Z",
   "technicalAnalysis": {
     "date": "17 March 2026",
     "period": "1 Year",
@@ -272,7 +282,7 @@
     "regime": "Downtrend",
     "clarity": "Clear",
     "price": {
-      "current": 20.36,
+      "current": 21.83,
       "currency": "A$"
     },
     "movingAverages": {
@@ -358,7 +368,7 @@
     }
   },
   "price_evidence": {
-    "last_run": "2026-03-31T21:28:49.168Z",
-    "classification": "NOTABLE"
+    "last_run": "2026-03-31T23:55:58.448Z",
+    "classification": "MATERIAL"
   }
 }
