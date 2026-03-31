@@ -3,7 +3,7 @@
 
 import { STOCK_DATA, SNAPSHOT_DATA, SNAPSHOT_ORDER } from '../lib/state.js';
 import { normaliseScores, computeSkewScore } from '../lib/dom.js';
-import { renderPDFDownload } from './report-sections.js';
+import { renderPDFDownload } from '../features/report/footer.js';
 import { prepareHypotheses } from './report-sections.js';
 import { on } from '../lib/data-events.js';
 import { renderedSnapshots } from '../lib/router.js';

@@ -5,14 +5,7 @@ import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA, FEATURED_ORDER, ANNOUNCEMEN
 import { renderSparkline, formatDateAEST, fmtPE, formatPrice, formatPriceWithCurrency, formatPercent, formatSignedPercent, formatRatio, svgCoord } from '../lib/format.js';
 import { normaliseScores, computeSkewScore, _inferPolarity } from '../lib/dom.js';
 import { API_BASE } from '../lib/api-config.js';
-
-const RS_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
-function RS_HDR(num, title) {
-  return '<div class="rs-header"><div class="rs-header-text">' +
-    '<div class="rs-number">' + num + '</div>' +
-    '<h2 class="rs-title">' + title + '</h2>' +
-    '</div><button class="rs-toggle" onclick="window.toggleSection(this)" aria-label="Toggle section">' + RS_CHEVRON + '</button></div>';
-}
+import { RS_CHEVRON, RS_HDR } from '../features/report/shared.js';
 
 export function renderReportHero(data) {
   if (!data.heroMetrics || !data.heroMetrics.length) return '';
@@ -345,76 +338,6 @@ export function renderVerdict(data) {
   '</div>';
 }
 
-export function renderSectionNav(data) {
-  const t = data.ticker.toLowerCase();
-  const sections = [
-    ['identity', 'Identity'],
-    ['hypotheses', 'Hypotheses']
-  ];
-
-  if (data.goldAgent || data.goldAnalysis) {
-    sections.push(['gold-analysis', 'Gold']);
-  }
-
-  sections.push(
-    ['narrative-timeline', 'Timeline'],
-    ['narrative', 'Narrative'],
-    ['evidence', 'Evidence'],
-    ['discriminates', 'Discriminates'],
-    ['tripwires', 'Tripwires'],
-    ['gaps', 'Gaps']
-  );
-
-  if (data.technicalAnalysis) {
-    sections.push(['technical', 'Technical']);
-  }
-
-  if (data.priceDrivers) {
-    sections.push(['price-drivers', 'Price Drivers']);
-  }
-
-  sections.push(['sources', 'Ext. Research']);
-  sections.push(['chat', 'Research Chat']);
-
-  let linksHtml = '';
-  for (let i = 0; i < sections.length; i++) {
-    const activeClass = i === 0 ? ' class="active"' : '';
-    linksHtml += '<a href="#' + t + '-' + sections[i][0] + '"' + activeClass + '>' + sections[i][1] + '</a>';
-  }
-
-  return '<div class="section-nav">' +
-    '<div class="section-nav-inner">' + linksHtml + '</div>' +
-  '</div>';
-}
-
-export function renderIdentity(data) {
-  const id = data.identity;
-  if (!id || !id.rows || !id.rows.length) return '';
-  const t = data.ticker.toLowerCase();
-
-  let rowsHtml = '';
-  for (let i = 0; i < id.rows.length; i++) {
-    const row = id.rows[i];
-    const left = row[0];
-    const right = row[1];
-    rowsHtml += '<tr>' +
-      '<td class="td-label">' + left[0] + '</td>' +
-      '<td' + (left[2] ? ' class="' + left[2] + '"' : '') + '>' + left[1] + '</td>' +
-      '<td class="td-label">' + right[0] + '</td>' +
-      '<td' + (right[2] ? ' class="' + right[2] + '"' : '') + '>' + right[1] + '</td>' +
-    '</tr>';
-  }
-
-  return '<div class="report-section" id="' + t + '-identity">' +
-    RS_HDR('Section 01', 'Identity &amp; Snapshot') +
-    '<div class="rs-body">' +
-    '<table class="identity-table">' +
-      '<thead><tr><th>Metric</th><th>Value</th><th>Metric</th><th>Value</th></tr></thead>' +
-      '<tbody>' + rowsHtml + '</tbody>' +
-    '</table>' +
-  '</div></div>';
-}
-
 export function renderHypotheses(data) {
   if (!data.hypotheses || !data.hypotheses.length) return '';
   const t = data.ticker.toLowerCase();
@@ -474,29 +397,6 @@ export function renderHypotheses(data) {
     RS_HDR('Section 02', 'Competing Hypotheses') +
     '<div class="rs-body">' +
     cardsHtml +
-  '</div></div>';
-}
-
-export function renderNarrative(data) {
-  const n = data.narrative;
-  if (!n) return '';
-  const t = data.ticker.toLowerCase();
-  const pi = n.priceImplication || {};
-
-  return '<div class="report-section" id="' + t + '-narrative">' +
-    RS_HDR('Section 03', 'Dominant Narrative') +
-    '<div class="rs-body">' +
-    '<div class="rs-subtitle">The Narrative</div>' +
-    '<div class="rs-text">' + (n.theNarrative || 'Pending analysis.') + '</div>' +
-    (pi.label || pi.content ? '<div class="rs-subtitle">The Price Implication</div>' +
-    '<div class="callout">' +
-      '<div class="callout-label">' + (pi.label || '') + '</div>' +
-      '<div class="rs-text">' + (pi.content || '') + '</div>' +
-    '</div>' : '') +
-    (n.evidenceCheck ? '<div class="rs-subtitle">The Evidence Check</div>' +
-    '<div class="rs-text">' + n.evidenceCheck + '</div>' : '') +
-    (n.narrativeStability ? '<div class="rs-subtitle">Narrative Stability</div>' +
-    '<div class="rs-text">' + n.narrativeStability + '</div>' : '') +
   '</div></div>';
 }
 
@@ -1120,43 +1020,6 @@ export function renderTechnicalAnalysis(data) {
     relHtml +
     footerHtml +
   '</div></div>';
-}
-
-export function renderReportFooter(data) {
-  const footer = data.footer || {};
-  return '<div class="report-footer-section">' +
-    '<div class="rf-inner">' +
-      '<div class="rf-disclaimer-text">' + (footer.disclaimer || '') + '</div>' +
-      '<div class="rf-meta-row">' +
-        '<div class="rf-brand">Contin<span class="brand-green">uu</span>m Inte<span class="brand-green">ll</span>igence</div>' +
-        '<div class="rf-meta-item">ID: ' + (data.reportId || '') + '</div>' +
-        '<div class="rf-meta-item">Mode: Narrative Intelligence</div>' +
-        '<div class="rf-meta-item">Domains: ' + (footer.domainCount || 0) + '</div>' +
-        '<div class="rf-meta-item">Hypotheses: ' + (footer.hypothesesCount || 0) + '</div>' +
-        '<div class="rf-meta-item">' + (data.date ? formatDateAEST(data.date) : '') + '</div>' +
-      '</div>' +
-    '</div>' +
-  '</div>';
-}
-
-export function renderPDFDownload(data) {
-  const t = data.ticker;
-  return '<div class="report-download-section">' +
-    '<div class="report-download-inner">' +
-      '<div class="report-download-title">Download Research Report</div>' +
-      '<div class="report-download-subtitle">' + data.company + ' (' + data.ticker + '.AX) &mdash; ' + formatDateAEST(data.date) + '</div>' +
-      '<div class="report-download-buttons">' +
-        '<button class="btn-pdf-download institutional" onclick="generatePDFReport(\'' + t + '\', \'institutional\')">' +
-          '<span class="btn-pdf-label">Institutional Report <span class="btn-pdf-spinner"></span></span>' +
-          '<span class="btn-pdf-sub">Full ACH analysis with evidence matrix</span>' +
-        '</button>' +
-        '<button class="btn-pdf-download retail" onclick="generatePDFReport(\'' + t + '\', \'retail\')">' +
-          '<span class="btn-pdf-label">Investor Briefing <span class="btn-pdf-spinner"></span></span>' +
-          '<span class="btn-pdf-sub">2-page briefing: ranges, narrative &amp; analysis</span>' +
-        '</button>' +
-      '</div>' +
-    '</div>' +
-  '</div>';
 }
 
 export function renderHypSidebar(data) {
@@ -2527,38 +2390,6 @@ export function renderGoldSection(data) {
       risksHtml +
       recoHtml +
     '</div></div>';
-}
-
-
-export function setupScrollSpy(pageId) {
-  const page = document.getElementById(pageId);
-  if (!page) return;
-  const navLinks = page.querySelectorAll('.section-nav a');
-  const sections = [];
-  navLinks.forEach(link => {
-    const targetId = link.getAttribute('href');
-    if (targetId && targetId.startsWith('#')) {
-      const section = document.getElementById(targetId.slice(1));
-      if (section) sections.push({ link, section });
-    }
-  });
-
-  if (sections.length === 0) return;
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        navLinks.forEach(l => l.classList.remove('active'));
-        const match = sections.find(s => s.section === entry.target);
-        if (match) match.link.classList.add('active');
-      }
-    });
-  }, {
-    rootMargin: '-20% 0px -70% 0px',
-    threshold: 0
-  });
-
-  sections.forEach(s => observer.observe(s.section));
 }
 
 

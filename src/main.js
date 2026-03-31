@@ -32,7 +32,8 @@ import { renderOpsPage } from './pages/ops.js';
 import { initStalenessBadge } from './features/staleness-badge.js';
 
 // Report sections (needed for router callbacks)
-import { setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineChart } from './pages/report-sections.js';
+import { setupScrollSpy } from './features/report/footer.js';
+import { initNarrativeTimelineChart, destroyNarrativeTimelineChart } from './pages/report-sections.js';
 
 // Features
 import { initAuth, showAuthModal, hideAuthModal } from './features/auth.js';
@@ -252,21 +253,29 @@ async function boot() {
           }
         }
       } catch (e) { /* localStorage may be unavailable (private browsing, quota) */ }
+    } else {
+      console.error('[Schema Loader] CRITICAL: data/research/_index.json failed: HTTP ' + indexResponse.status + ' -- home page will have no tickers');
     }
 
     if (refResponse.ok) {
       const refData = await refResponse.json();
       initReferenceData(refData);
+    } else {
+      console.error('[Schema Loader] CRITICAL: data/reference.json failed: HTTP ' + refResponse.status + ' -- price metrics will be null');
     }
 
     if (freshResponse.ok) {
       const freshData = await freshResponse.json();
       initFreshnessData(freshData);
+    } else {
+      console.warn('[Schema Loader] data/freshness.json failed: HTTP ' + freshResponse.status + ' -- freshness badges unavailable');
     }
 
     if (tcResponse.ok) {
       const tcData = await tcResponse.json();
       initTcData(tcData);
+    } else {
+      console.warn('[Schema Loader] data/tc.json failed: HTTP ' + tcResponse.status + ' -- thesis comparator unavailable');
     }
 
     if (annResponse.ok) {
@@ -274,6 +283,8 @@ async function boot() {
       if (annData && annData.announcements) {
         initAnnouncementsData(annData.announcements);
       }
+    } else {
+      console.warn('[Schema Loader] data/announcements.json failed: HTTP ' + annResponse.status + ' -- announcements panel unavailable');
     }
   } catch (err) {
     console.warn('[Continuum] Failed to load data:', err);

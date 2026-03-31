@@ -8,28 +8,26 @@ import {
   renderReportHero,
   renderSkewBar,
   renderVerdict,
-  renderSectionNav,
-  renderIdentity,
   renderHypotheses,
-  renderNarrative,
   renderEvidence,
   renderDiscriminators,
   renderTripwires,
   renderGaps,
   renderTechnicalAnalysis,
   renderGoldDiscovery,
-  renderReportFooter,
-  renderPDFDownload,
   renderHypSidebar,
   prepareHypotheses,
   renderOvercorrectionBanner,
   renderNarrativeTimeline,
   renderSignalBars,
-  setupScrollSpy,
   renderPriceDriversPlaceholder,
   fetchPriceDrivers,
   renderGoldSection
 } from './report-sections.js';
+
+import { renderSectionNav, renderIdentity } from '../features/report/identity.js';
+import { renderNarrative } from '../features/report/narrative.js';
+import { renderReportFooter, renderPDFDownload, setupScrollSpy } from '../features/report/footer.js';
 
 import { renderDeepContent, getDeepSectionNavItems } from './deep-report-sections.js';
 
