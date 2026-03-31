@@ -6,6 +6,8 @@
 
 import { STOCK_DATA, SNAPSHOT_DATA } from '../lib/state.js';
 import { computeSkewScore, normaliseScores } from '../lib/dom.js';
+import { validateResearchFields, REQUIRED_STOCKS_FIELDS } from './schema-manifest.js';
+import { formatPrice, formatPercent } from '../lib/format.js';
 
 // Bump this when the research JSON schema or score pipeline changes.
 // Any cached entry without a matching _cacheVersion is discarded so the
@@ -78,6 +80,11 @@ export function loadFullResearchData(ticker, callback) {
     if (xhr.status === 200) {
       try {
         const fullData = JSON.parse(xhr.responseText);
+        // Validate required fields (BEAD-003)
+        const missing = validateResearchFields(fullData);
+        if (missing.length > 0) {
+          console.warn('[Schema Loader] data/research/' + ticker + '.json missing required fields: ' + missing.join(', '));
+        }
         // Merge full data into STOCK_DATA, preserving any live price patches
         const livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
         const livePriceHistory = STOCK_DATA[ticker] ? STOCK_DATA[ticker].priceHistory : undefined;
@@ -106,15 +113,25 @@ export function loadFullResearchData(ticker, callback) {
           if (sigXhr.status === 200) {
             try {
               const sd = JSON.parse(sigXhr.responseText);
+              // Validate expected fields (BEAD-003)
+              var sigMissing = REQUIRED_STOCKS_FIELDS.filter(function(f) { return !(f in sd) || sd[f] == null; });
+              if (sigMissing.length > 0) {
+                console.warn('[Schema Loader] data/stocks/' + ticker + '.json missing fields: ' + sigMissing.join(', '));
+              }
               if (sd.three_layer_signal) STOCK_DATA[ticker].three_layer_signal = sd.three_layer_signal;
               if (sd.valuation_range)    STOCK_DATA[ticker].valuation_range    = sd.valuation_range;
               if (sd.price_signals && sd.price_signals.length)
                 {STOCK_DATA[ticker].price_signals = sd.price_signals;}
             } catch(e) { console.error('[Loader] Failed to parse signal data for ' + ticker + ':', e); }
+          } else {
+            console.error('[Schema Loader] Missing data/stocks/' + ticker + '.json: HTTP ' + sigXhr.status + ' -- signal fields (three_layer_signal, valuation_range, price_signals) will be absent');
           }
           if (callback) callback(STOCK_DATA[ticker]);
         };
-        sigXhr.onerror = function() { if (callback) callback(STOCK_DATA[ticker]); };
+        sigXhr.onerror = function() {
+          console.error('[Schema Loader] Network error loading data/stocks/' + ticker + '.json -- signal fields will be absent');
+          if (callback) callback(STOCK_DATA[ticker]);
+        };
         sigXhr.send();
         return; // callback is called from sigXhr handlers above
       } catch (err) {
@@ -409,12 +426,12 @@ export function buildSnapshotFromStock(ticker) {
       return {
         regime:        ta.regime || null,
         trend:         taT.direction ? taT.direction + ' (' + (taT.duration || '') + ')' : null,
-        ma50:          (ma50.value  != null) ? (taP.currency || '') + ma50.value.toFixed(2)  : null,
-        ma200:         (ma200.value != null) ? (taP.currency || '') + ma200.value.toFixed(2) : null,
-        vsMa50:        (taMA.priceVsMa50  != null) ? taMA.priceVsMa50.toFixed(1)  + '%' : null,
-        vsMa200:       (taMA.priceVsMa200 != null) ? taMA.priceVsMa200.toFixed(1) + '%' : null,
-        support:       (taSup.price != null) ? (taP.currency || '') + taSup.price.toFixed(2) : null,
-        resistance:    (taRes.price != null) ? (taP.currency || '') + taRes.price.toFixed(2) : null,
+        ma50:          (ma50.value  != null) ? (taP.currency || '') + formatPrice(ma50.value)  : null,
+        ma200:         (ma200.value != null) ? (taP.currency || '') + formatPrice(ma200.value) : null,
+        vsMa50:        (taMA.priceVsMa50  != null) ? formatPercent(taMA.priceVsMa50)  : null,
+        vsMa200:       (taMA.priceVsMa200 != null) ? formatPercent(taMA.priceVsMa200) : null,
+        support:       (taSup.price != null) ? (taP.currency || '') + formatPrice(taSup.price) : null,
+        resistance:    (taRes.price != null) ? (taP.currency || '') + formatPrice(taRes.price) : null,
         rangePosition: (taMR.rangePosition != null) ? 'Lower ' + taMR.rangePosition + '%' : null,
         crossover:     taCO ? taCO.type + ' (' + taCO.date + ')' : null
       };

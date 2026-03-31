@@ -13,6 +13,7 @@
  */
 
 import { STOCK_DATA, REFERENCE_DATA } from '../lib/state.js';
+import { formatPrice, formatChange, formatSignedPercent } from '../lib/format.js';
 import { renderedPages } from '../lib/router.js';
 import { renderFeaturedCard } from '../pages/home.js';
 import { renderTAChart, setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineChart } from '../pages/report-sections.js';
@@ -347,16 +348,16 @@ export function updateLiveUI(ticker) {
             const sign = change >= 0 ? '+' : '';
             const cls = change >= 0 ? 'positive' : 'negative';
             priceEl.innerHTML = '<span class="rh-price-currency">' + stock.currency + '</span>' +
-                stock._livePrice.toFixed(2) +
+                formatPrice(stock._livePrice) +
                 '<span class="rh-live-indicator"><span class="live-dot"></span>LIVE</span>' +
-                '<div class="rh-price-change ' + cls + '">' + sign + change.toFixed(2) + ' (' + sign + changePct.toFixed(1) + '%)</div>';
+                '<div class="rh-price-change ' + cls + '">' + formatChange(change) + ' (' + formatSignedPercent(changePct) + ')</div>';
         }
     }
 
     // 3) Update featured card price on home page
     const homeCard = document.querySelector('[data-ticker-card="' + ticker + '"] .fc-price');
     if (homeCard && stock._livePrice) {
-        homeCard.textContent = stock.currency + stock._livePrice.toFixed(2);
+        homeCard.textContent = stock.currency + formatPrice(stock._livePrice);
     }
 }
 

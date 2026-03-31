@@ -2,6 +2,7 @@
 // Stream C: Research Intelligence Graph (BEAD-006)
 
 import { API_BASE } from '../lib/api-config.js';
+import { formatPrice } from '../lib/format.js';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_EXTENSIONS = ['.pdf', '.docx', '.txt', '.md'];
@@ -37,7 +38,7 @@ export function validateFile(file) {
   }
 
   if (file.size > MAX_FILE_SIZE) {
-    return { valid: false, error: 'File size exceeds 10MB limit (' + (file.size / (1024 * 1024)).toFixed(1) + 'MB).' };
+    return { valid: false, error: 'File size exceeds 10MB limit (' + formatPrice(file.size / (1024 * 1024), 1) + 'MB).' };
   }
 
   return { valid: true, error: '' };

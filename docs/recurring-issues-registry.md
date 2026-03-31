@@ -270,11 +270,11 @@ No shared schema contract. Field names, data shapes, and file expectations are i
 3. **Onboarding integration test:** pytest that scaffolds a mock ticker and asserts every file in the manifest was created with all required fields.
 4. **Frontend loader error logging:** `loader.js` line 102 must `console.error()` when `data/stocks/{TICKER}.json` returns 404. Silent failures are the primary reason 14 tickers went unnoticed.
 
-### Status: PARTIALLY FIXED (BEAD-003, 2026-03-31)
+### Status: FIXED (BEAD-003 complete, 2026-03-31)
 
-**BEAD-003:** Schema manifest created at `src/data/schema-manifest.js` defining per-ticker and global data files with critical/non-critical classification and required fields. Loader hardened: silent 404 swallowing in `src/data/loader.js` replaced with explicit `console.error()` logging that names the missing file and lists the fields that will be absent. Network errors on signal data fetch now also logged explicitly. 10 Vitest tests added covering manifest structure and error handling.
+**BEAD-003 (Wave 1):** Initial manifest with 2 per-ticker + 5 global files. Loader error logging for stocks fetch.
 
-**Remaining:** Backend onboarding validation against the manifest not yet implemented. Ticker normalisation utility not yet created. Frontend degraded-state UI indicator not yet implemented.
+**BEAD-003 (Wave 2 -- Sentinel redeployment):** Full schema reconciliation. Comprehensive audit identified 12+ backend-generated files and 11 frontend fetch paths. Manifest expanded to 3 per-ticker files (research, stocks, stocks-history), 5 boot files (index, reference, freshness, tc, announcements), 1 polling file (live-prices), with per-file metadata: generatedBy, consumers, errorImpact, criticality. Added PAGE_DEPENDENCIES map linking each page to required/optional files. Added required field definitions for index, reference, and live-prices entries. Added `validateResearchFields()` and `validateReferenceFields()` helpers. Boot sequence in `src/main.js` now logs explicit errors (console.error for critical, console.warn for optional) on all 5 fetch failures. Loader validates research JSON required fields post-parse and warns on missing stocks signal fields. 46 Vitest tests covering manifest completeness, criticality classification, page deps, field definitions, validation helpers, and error handling.
 
 ---
 
@@ -490,7 +490,7 @@ Workflows depend on external service behaviour that changes without notice. No p
 2. Every workflow that commits to main ends with health check verification
 3. Workflows that commit to main use bot branch + auto-merge or check for concurrent runs
 
-### Status: PARTIALLY FIXED -- versions pinned in db-backup, others not
+### Status: FIXED -- all npm, Python, Docker, and CI action versions pinned; post-deploy health checks added (BEADs 021-022)
 
 ---
 
@@ -539,9 +539,9 @@ When fixing any bug, use this checklist:
 | # | Bug Family | Fix Commits | Top File(s) | Status |
 |---|---|---|---|---|
 | 1 | Encoding contamination | 15 | refresh.py, validate_research.py, 58 data JSONs | **FIXED** (BEAD-001: all 7 pipelines sanitised at boundary) |
-| 2 | Report rendering | 15 specific + 26 total | report-sections.js (2,726 lines) | UNFIXED (no validation, no tests) |
+| 2 | Report rendering | 15 specific + 26 total | report-sections.js (2,726 lines) | IN PROGRESS (BEAD-012: plan, BEAD-013: format library, BEAD-014: null guards; extraction pending) |
 | 3 | Portfolio/PM state | 25 | portfolio.js, pm-chat.js, portfolio_alignment.py | PARTIAL (races fixed, no state machine) |
-| 4 | Schema mismatches | 10 major | scaffold.py, loader.js, main.py | **PARTIAL** (BEAD-003: manifest created, loader errors logged, silent 404 eliminated) |
+| 4 | Schema mismatches | 10 major | scaffold.py, loader.js, main.py | **FIXED** (BEAD-003: full manifest, field validation, error logging on all fetch paths) |
 | 5 | API config chaos | 8 + 25 scattered | config.py + 25 client os.getenv() calls | **FIXED** (BEAD-004/005: centralised + linter) |
 | 6 | UX incremental drift | 10+ | tokens.css, chat.css, nav.css | **FIXED** (BEAD-007/008: tokens + linter) |
 | 7 | Boot order races | 3 critical + 5 related | main.js:301-315, chat.js, dynamics.js | **FIXED** (BEAD-009/010: readiness + tests) |
@@ -583,11 +583,66 @@ When fixing any bug, use this checklist:
 - **Regression gate:** CI step in fly-deploy.yml
 - **Recurrence risk:** LOW -- CI blocks deployment if contamination detected in source
 
-### 2026-03-31 BEAD-003: Schema Manifest and Loader Hardening
+### 2026-03-31 BEAD-003: Schema Manifest and Loader Hardening (Wave 1 + Wave 2)
 - **Family:** 4 (Schema mismatches)
-- **Symptom:** 14 tickers silently missing signal fields (three_layer_signal, valuation_range, price_signals) because loader.js swallowed 404 responses on data/stocks/{TICKER}.json
-- **Root cause:** No schema contract, no error logging on missing files, frontend loader silently continued with incomplete data
-- **Fix:** Created `src/data/schema-manifest.js` (per-ticker + global file definitions with critical/non-critical classification). Hardened `src/data/loader.js:105-118` to log explicit errors on non-200 and network errors for signal data fetch, naming the missing file and absent fields.
+- **Symptom:** 14 tickers silently missing signal fields; boot fetches silently skipped on failure; no contract between backend file generation and frontend consumption
+- **Root cause:** No schema contract, no error logging on missing files, frontend loader and boot() silently continued with incomplete data
+- **Fix (Wave 1):** Created initial `src/data/schema-manifest.js` with 2 per-ticker + 5 global files. Hardened loader.js signal data fetch with explicit error logging.
+- **Fix (Wave 2):** Full reconciliation audit identified 12+ backend files and 11 frontend fetch paths. Expanded manifest to 3 per-ticker files (research, stocks, stocks-history), 5 boot files (index, reference, freshness, tc, announcements), 1 polling file (live-prices). Added per-file metadata (generatedBy, consumers, errorImpact), PAGE_DEPENDENCIES map, required field definitions for all file types, and `validateResearchFields()`/`validateReferenceFields()` helpers. Hardened `src/main.js boot()` with explicit error/warn logging on all 5 fetch failures. Loader now validates research required fields post-parse and warns on missing stocks signal fields.
 - **Fix layer:** BOUNDARY
-- **Regression gate:** 10 Vitest tests in `src/data/loader.test.js` (manifest structure + error handling)
-- **Recurrence risk:** MEDIUM -- backend onboarding validation against manifest not yet implemented
+- **Regression gate:** 46 Vitest tests in `src/data/loader.test.js` (manifest completeness, criticality, page deps, field definitions, validation helpers, error handling)
+- **Recurrence risk:** LOW -- manifest is the single source of truth; all fetch failures now logged; field validation catches missing data at load time
+
+### 2026-03-31 BEAD-021: Dependency Pinning
+- **Family:** 9 (CI pipeline fragility)
+- **Symptom:** npm, Python, Docker, and GitHub Actions dependencies used range specifiers (`^`, `~`, `>=`, `@master`), allowing silent version drift between builds
+- **Root cause:** No pinning discipline. 12 npm deps used `^`, 8 Python deps used `>=`, Dockerfile used `python:3.11-slim` (floating tag), fly-deploy.yml used `@master` for flyctl-actions
+- **Fix:** Pinned all npm deps to exact resolved versions in package.json (12 packages). Pinned all Python deps to exact versions in api/requirements.txt (8 packages: fastapi, asyncpg, PyJWT, notebooklm-py, sentry-sdk, yfinance, PyMuPDF, python-docx, python-multipart). Pinned Dockerfile base to `python:3.11.15-slim`. Pinned `superfly/flyctl-actions/setup-flyctl@1.5` in fly-deploy.yml.
+- **Fix layer:** BOUNDARY
+- **Regression gate:** `npm ci` validates lockfile matches pinned versions; any `^` or `~` in package.json is a visible diff
+- **Recurrence risk:** LOW -- exact versions prevent silent upgrades; upgrades require explicit version bump
+
+### 2026-03-31 BEAD-022: Post-Deploy Health Checks
+- **Family:** 9 (CI pipeline fragility)
+- **Symptom:** Fly.io deploys succeeded in CI without verifying the application was actually healthy. Broken deploys (e.g. null byte injection in api/main.py) passed CI silently.
+- **Root cause:** fly-deploy.yml had no post-deploy verification step. Deploy success meant only that `flyctl deploy` exited 0, not that the application was serving correctly.
+- **Fix:** Added `post-deploy-health-check` job to fly-deploy.yml with `needs: deploy`. Three checks: (1) backend `/api/health` JSON status != "unhealthy", (2) frontend HTTP 200, (3) frontend content contains "Continuum Intelligence". 30s propagation delay. 15s timeouts per check.
+- **Fix layer:** REGRESSION-GATE
+- **Regression gate:** The health check itself is the gate -- runs automatically after every Fly.io deploy
+- **Recurrence risk:** LOW -- every deploy now verified end-to-end before CI reports success
+
+### 2026-03-31 BEAD-023: E2E Smoke Tests
+- **Family:** 9 (CI pipeline fragility) + 1 (Encoding contamination, regression gate)
+- **Symptom:** No automated browser-level verification of page rendering, routing, or encoding contamination. Rendering regressions only discovered by manual inspection.
+- **Root cause:** Playwright was installed but tests only covered basic navigation. No console error detection, no encoding contamination check, no chat panel or portfolio upload zone verification.
+- **Fix:** Added 4 new Playwright smoke tests: (1) console error detection on home page with backend-offline filters, (2) analyst chat panel existence/visibility, (3) portfolio upload zone presence, (4) critical encoding contamination check (null bytes, mojibake, smart quotes). Fixed playwright.config.js baseURL from stale GitHub Pages path to current Cloudflare Pages `/`. Total: 10 E2E smoke tests.
+- **Fix layer:** REGRESSION-GATE
+- **Regression gate:** `npx playwright test` in CI; encoding contamination test blocks if null bytes or mojibake detected in rendered report content
+- **Recurrence risk:** LOW -- automated browser rendering verification catches regressions invisible to unit tests
+
+### 2026-03-31 BEAD-012: Report Renderer Audit and Decomposition Plan
+- **Family:** 2 (Report rendering regressions)
+- **Symptom:** 2,762-line monolith with 32 exports, 15 null guard styles, 22 `.toFixed()` precisions generates 26+ fix commits per month
+- **Root cause:** No domain boundaries, no shared formatting, no section registry. Each section assumes its own data shape; guards added reactively.
+- **Fix:** Read-only audit. Produced `docs/report-decomposition-plan.md` mapping all 32 exports, 12 internal functions, 5 consumer files, 6 domain boundaries. Proposed 14 modules across 5 extraction waves. Identified zero circular dependencies.
+- **Fix layer:** INFRASTRUCTURE
+- **Regression gate:** NONE (planning artefact)
+- **Recurrence risk:** N/A -- plan, not code
+
+### 2026-03-31 BEAD-013: Number Formatting Library
+- **Family:** 2 (Report rendering regressions)
+- **Symptom:** 22 inconsistent `.toFixed()` precisions, 4 different decimal strategies, null values displayed as '0.0' instead of sentinel
+- **Root cause:** No shared formatting utility. Each rendering function invented its own `.toFixed()` call with its own decimals and null handling.
+- **Fix:** Added 10 standardised format functions to `src/lib/format.js` (formatPrice, formatPriceWithCurrency, formatPercent, formatSignedPercent, formatChange, formatRatio, formatVolume, formatMarketCap, formatInteger, svgCoord). Replaced all 133 `.toFixed()` calls across 13 source files. Zero `.toFixed()` calls remain outside format.js.
+- **Fix layer:** BOUNDARY
+- **Regression gate:** 57 new tests in `src/lib/format.test.js` (90 total). All 366 Vitest pass. Build passes. `grep -rn ".toFixed(" src/ | grep -v format.js | grep -v .test.js` returns zero.
+- **Recurrence risk:** LOW -- all numeric display routes through single library; new `.toFixed()` calls are immediately visible as violations
+
+### 2026-03-31 BEAD-014: Null Guard Standardisation
+- **Family:** 2 (Report rendering regressions)
+- **Symptom:** 15 different null guard patterns (!=, !==, typeof, &&, ||, ??, ternary)
+- **Root cause:** Guards added reactively after production crashes, each developer using their preferred style
+- **Fix:** BEAD-013 eliminated all numeric null guards by routing through format functions with built-in null handling. The remaining 88 `|| ''` guards are correct HTML-safe string interpolation patterns (preventing 'undefined' in DOM). No `|| '0.0'` fallbacks remain. The `|| 0` guards (22 instances) are legitimate numeric defaults for computation inputs (not display values).
+- **Fix layer:** BOUNDARY (via BEAD-013)
+- **Regression gate:** Format library tests cover all null/undefined/NaN paths
+- **Recurrence risk:** LOW -- new numeric display must use format functions

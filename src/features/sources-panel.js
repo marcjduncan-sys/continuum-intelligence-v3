@@ -2,6 +2,7 @@
 // Stream C: Research Intelligence Graph (BEAD-006)
 
 import { API_BASE } from '../lib/api-config.js';
+import { formatPrice } from '../lib/format.js';
 
 const DELETE_ICON_SVG =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
@@ -128,7 +129,7 @@ export function renderSourceCard(source) {
   }
 
   if (pt != null) {
-    html += '<div class="src-card-price-target">Price target: $' + Number(pt).toFixed(2) + '</div>';
+    html += '<div class="src-card-price-target">Price target: $' + formatPrice(pt) + '</div>';
   }
 
   html += '</details>';

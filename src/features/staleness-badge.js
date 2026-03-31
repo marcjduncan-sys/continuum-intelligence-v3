@@ -5,6 +5,7 @@
 // from GET /api/macro/state, computes percentage deviation.
 
 import { API_BASE } from '../lib/api-config.js';
+import { formatPrice, formatPercent } from '../lib/format.js';
 
 const _DRIVER_LABELS = {
   brent_crude: 'Brent Crude',
@@ -108,13 +109,13 @@ function renderBadge(staleness) {
 
   const level = staleness.absPct >= 30 ? 'staleness-red' : 'staleness-amber';
   const sign = staleness.pctChange >= 0 ? '+' : '';
-  const genDisplay = staleness.genValue.toFixed(2);
-  const curDisplay = staleness.currentValue.toFixed(2);
+  const genDisplay = formatPrice(staleness.genValue);
+  const curDisplay = formatPrice(staleness.currentValue);
 
   return '<span class="staleness-badge ' + level + '" title="This analysis may not reflect current market conditions">' +
     '<span class="staleness-icon">&#9888;</span> ' +
     staleness.label + ' was ' + genDisplay + ' at generation. Now ' + curDisplay +
-    ' (' + sign + staleness.pctChange.toFixed(1) + '%)' +
+    ' (' + sign + formatPercent(staleness.pctChange) + ')' +
   '</span>';
 }
 
