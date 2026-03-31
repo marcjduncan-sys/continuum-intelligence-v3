@@ -197,6 +197,12 @@ async def run_detection_cycle(pool: Any) -> list[RegimeEvent]:
     Called by the scheduler after each macro data refresh cycle.
     Returns any regime events detected.
     """
+    # Ensure sensitivity map is fresh from DB
+    try:
+        await macro_sensitivity._ensure_cache()
+    except Exception:
+        pass  # Detection continues with whatever map is available
+
     try:
         async with pool.acquire() as conn:
             # Query the same data as GET /api/macro/state, inline
