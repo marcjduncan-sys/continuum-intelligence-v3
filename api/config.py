@@ -1,10 +1,43 @@
+"""
+Canonical configuration for Continuum Intelligence v3 backend.
+
+ALL environment variables are read here and nowhere else.
+Any os.getenv() call outside this file is a bug.
+
+Variables are grouped by purpose. Each variable documents:
+- Whether it is required (R) or optional (O)
+- Its default value
+- What it controls
+
+Required (R) vars cause a startup failure in production (Fly.io) if missing.
+Optional (O) vars log a warning but allow startup to continue.
+"""
+
 import json
+import logging
 import os
+import sys
 
 import anthropic
 from dotenv import load_dotenv
 
 load_dotenv()
+
+_logger = logging.getLogger(__name__)
+
+
+def _getenv_with_deprecation(primary: str, legacy: str, default: str = "") -> str:
+    """Read env var, falling back to a deprecated name with a warning."""
+    val = os.getenv(primary, "")
+    if val:
+        return val.strip()
+    legacy_val = os.getenv(legacy, "")
+    if legacy_val:
+        _logger.warning(
+            "Env var '%s' is deprecated; rename to '%s'", legacy, primary
+        )
+        return legacy_val.strip()
+    return default
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "").strip()
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
@@ -55,14 +88,29 @@ DATABASE_URL = os.getenv("DATABASE_URL", "")
 EODHD_API_KEY = os.getenv("EODHD_API_KEY", "").strip()
 EODHD_BASE_URL = "https://eodhd.com/api"
 
-# Alpha Vantage — financial statement cross-validation (free, 25 req/day)
-ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY", "").strip()
+# Alpha Vantage — financial statement cross-validation (free, 25 req/day)  [O]
+# Legacy name: ALPHA_VANTAGE
+ALPHA_VANTAGE_API_KEY = _getenv_with_deprecation(
+    "ALPHA_VANTAGE_API_KEY", "ALPHA_VANTAGE"
+)
 
-# Finnhub — US peer analyst estimates, insider sentiment (free tier, US only)
-FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY", os.getenv("FINNHUB_API", "")).strip()
+# Finnhub — US peer analyst estimates, insider sentiment (free tier, US only)  [O]
+# Legacy name: FINNHUB_API
+FINNHUB_API_KEY = _getenv_with_deprecation("FINNHUB_API_KEY", "FINNHUB_API")
 
-# Twelve Data — pre-calculated technical indicators (free, 800 req/day)
+# Twelve Data — pre-calculated technical indicators (free, 800 req/day)  [O]
 TWELVE_DATA_API_KEY = os.getenv("TWELVE_DATA_API_KEY", "").strip()
+
+# FRED — US economic data (free tier, 120 req/min)  [O]
+FRED_API_KEY = os.getenv("FRED_API_KEY", "").strip()
+
+# EIA — US energy data (free tier, 100 req/sec)  [O]
+# Legacy name: EIA_API
+EIA_API_KEY = _getenv_with_deprecation("EIA_API_KEY", "EIA_API")
+
+# ACLED — conflict event data (OAuth)  [O]
+ACLED_USERNAME = os.getenv("ACLED_USERNAME", "").strip()
+ACLED_PASSWORD = os.getenv("ACLED_PASSWORD", "").strip()
 
 # ---------------------------------------------------------------------------
 # Gold agent -- hybrid: NotebookLM primary, Gemini local corpus fallback.
@@ -116,18 +164,55 @@ PRICE_DRIVERS_SECRET = os.getenv("PRICE_DRIVERS_SECRET", "")
 OPS_SECRET = os.getenv("OPS_SECRET", "")
 
 # ---------------------------------------------------------------------------
-# Production secrets check — fail loud on Railway if secrets are insecure
+# Monitoring  [O]
+# ---------------------------------------------------------------------------
+
+SENTRY_DSN = os.getenv("SENTRY_DSN", "")
+
+# ---------------------------------------------------------------------------
+# Feature flags  [O]
+# ---------------------------------------------------------------------------
+
+ENABLE_PM = os.getenv("ENABLE_PM", "true").lower() == "true"
+ECONOMIST_PM_BRIDGE_ENABLED = os.getenv(
+    "ECONOMIST_PM_BRIDGE_ENABLED", "true"
+).lower() in ("true", "1", "yes")
+
+# ---------------------------------------------------------------------------
+# GitHub, email, JWT  [O unless noted]
+# ---------------------------------------------------------------------------
+
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
+JWT_EXPIRY_DAYS = int(os.getenv("JWT_EXPIRY_DAYS", "30"))
+
+# Email -- OTP delivery via Resend HTTP API. Optional: falls back to log-only if unset.
+EMAIL_FROM = os.getenv("EMAIL_FROM", "")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip()
+
+# ---------------------------------------------------------------------------
+# Production environment detection
+# ---------------------------------------------------------------------------
+
+
+def _is_production() -> bool:
+    """Detect production environment (Fly.io or Railway)."""
+    return bool(
+        os.getenv("FLY_ALLOC_ID")
+        or os.getenv("RAILWAY_ENVIRONMENT")
+        or os.getenv("RAILWAY_SERVICE_NAME")
+    )
+
+
+IS_PRODUCTION = _is_production()
+
+# ---------------------------------------------------------------------------
+# Startup validation -- fail loud in production if secrets/keys are missing
 # ---------------------------------------------------------------------------
 
 
 def check_production_secrets() -> None:
-    """Raise RuntimeError if running on Railway with insecure/missing secrets."""
-    is_railway = (
-        os.getenv("RAILWAY_ENVIRONMENT") is not None
-        or os.getenv("RAILWAY_SERVICE_NAME") is not None
-    )
-
-    if not is_railway:
+    """Raise RuntimeError in production with insecure/missing secrets."""
+    if not IS_PRODUCTION:
         return
 
     insecure: list[str] = []
@@ -145,20 +230,36 @@ def check_production_secrets() -> None:
     if insecure:
         raise RuntimeError(
             f"Production secrets not configured: {', '.join(insecure)}. "
-            "Set these environment variables before deploying to Railway."
+            "Set these environment variables before deploying."
         )
 
 
+def validate_config() -> None:
+    """Validate all configuration at startup.
+
+    In production: fail for missing required vars.
+    In dev: warn for missing required vars.
+    """
+    required = {
+        "ANTHROPIC_API_KEY": ANTHROPIC_API_KEY,
+        "DATABASE_URL": DATABASE_URL,
+        "GEMINI_API_KEY": GEMINI_API_KEY,
+    }
+    missing = [k for k, v in required.items() if not v]
+
+    if IS_PRODUCTION and missing:
+        print(
+            f"FATAL: Missing required environment variables: {', '.join(missing)}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    elif missing:
+        for k in missing:
+            _logger.warning("Config: %s not set (required in production)", k)
+
+
 check_production_secrets()
-
-# GitHub PAT with repo write scope -- used by add_stock() to commit new
-# ticker scaffolds so data persists across Railway redeployments.
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
-JWT_EXPIRY_DAYS = int(os.getenv("JWT_EXPIRY_DAYS", "30"))
-
-# Email -- OTP delivery via Resend HTTP API. Optional: falls back to log-only if unset.
-EMAIL_FROM = os.getenv("EMAIL_FROM", "")
-RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip()
+validate_config()
 
 # ---------------------------------------------------------------------------
 # Shared Anthropic client (singleton with timeout)

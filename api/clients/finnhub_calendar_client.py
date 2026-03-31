@@ -16,6 +16,8 @@ from typing import Any
 
 import httpx
 
+import config
+
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://finnhub.io/api/v1"
@@ -45,7 +47,7 @@ async def fetch_economic_calendar(
     Returns:
         Number of events stored.
     """
-    api_key = os.getenv("FINNHUB_API_KEY", os.getenv("FINNHUB_API", "")).strip()
+    api_key = config.FINNHUB_API_KEY
     if not api_key:
         logger.warning("Finnhub calendar: FINNHUB_API_KEY not set")
         return 0
@@ -167,7 +169,7 @@ async def refresh_finnhub_calendar(pool: Any) -> int:
         logger.warning("Finnhub calendar refresh skipped: no database pool")
         return 0
 
-    api_key = os.getenv("FINNHUB_API_KEY", os.getenv("FINNHUB_API", "")).strip()
+    api_key = config.FINNHUB_API_KEY
     if not api_key:
         logger.warning("Finnhub calendar refresh skipped: FINNHUB_API_KEY not set")
         return 0
