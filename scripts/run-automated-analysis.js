@@ -108,7 +108,7 @@ for (const [ticker, config] of Object.entries(STOCK_CONFIG)) {
 
   // Step 2: Stock-specific narrative inference
   // Pass N4 base weight so engine knows if N4 is a bullish thesis
-  var characteristics = Object.assign({}, config.characteristics, {
+  const characteristics = Object.assign({}, config.characteristics, {
     n4BaseWeight: config.baseWeights.N4
   });
   const inference = NarrativeInferenceEngine.inferNarrative(

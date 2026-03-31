@@ -29,8 +29,8 @@ function makeHypotheses(scores, directions) {
 }
 
 function makeStockData(opts) {
-  var hypotheses = opts.hypotheses || makeHypotheses([55, 20, 15, 10]);
-  var _skew = opts._skew !== undefined ? opts._skew : { bull: 55, bear: 45, score: 10, direction: 'upside' };
+  const hypotheses = opts.hypotheses || makeHypotheses([55, 20, 15, 10]);
+  const _skew = opts._skew !== undefined ? opts._skew : { bull: 55, bear: 45, score: 10, direction: 'upside' };
   return { hypotheses: hypotheses, _skew: _skew };
 }
 
@@ -58,16 +58,16 @@ describe('generateAlerts', function () {
 
   it('returns conflict with high materiality when dominance gap > 30', function () {
     // User thinks N2 dominates, but N1 is at 65% and N2 at 20% (gap = 45)
-    var stock = makeStockData({
+    const stock = makeStockData({
       hypotheses: makeHypotheses([65, 20, 10, 5])
     });
-    var thesis = makeThesis({ dominantHypothesis: 'N2' });
+    const thesis = makeThesis({ dominantHypothesis: 'N2' });
 
-    var alerts = generateAlerts(thesis, stock);
-    var conflicts = alerts.filter(function (a) { return a.type === 'conflict'; });
+    const alerts = generateAlerts(thesis, stock);
+    const conflicts = alerts.filter(function (a) { return a.type === 'conflict'; });
 
     expect(conflicts.length).toBeGreaterThanOrEqual(1);
-    var dominance = conflicts.find(function (a) { return a.id.includes('dominance'); });
+    const dominance = conflicts.find(function (a) { return a.id.includes('dominance'); });
     expect(dominance).toBeDefined();
     expect(dominance.materiality).toBe('high');
     expect(dominance.sourceHypothesis).toBe('N1');
@@ -78,13 +78,13 @@ describe('generateAlerts', function () {
 
   it('returns conflict with medium materiality when dominance gap is 20', function () {
     // User thinks N2 dominates; N1 at 50%, N2 at 30% (gap = 20)
-    var stock = makeStockData({
+    const stock = makeStockData({
       hypotheses: makeHypotheses([50, 30, 15, 5])
     });
-    var thesis = makeThesis({ dominantHypothesis: 'N2' });
+    const thesis = makeThesis({ dominantHypothesis: 'N2' });
 
-    var alerts = generateAlerts(thesis, stock);
-    var dominance = alerts.find(function (a) { return a.id.includes('dominance'); });
+    const alerts = generateAlerts(thesis, stock);
+    const dominance = alerts.find(function (a) { return a.id.includes('dominance'); });
 
     expect(dominance).toBeDefined();
     expect(dominance.type).toBe('conflict');
@@ -93,29 +93,29 @@ describe('generateAlerts', function () {
 
   it('does not generate dominance conflict when gap <= 15', function () {
     // N1 at 40%, N2 at 30% (gap = 10, below threshold)
-    var stock = makeStockData({
+    const stock = makeStockData({
       hypotheses: makeHypotheses([40, 30, 20, 10])
     });
-    var thesis = makeThesis({ dominantHypothesis: 'N2' });
+    const thesis = makeThesis({ dominantHypothesis: 'N2' });
 
-    var alerts = generateAlerts(thesis, stock);
-    var dominance = alerts.find(function (a) { return a.id.includes('dominance'); });
+    const alerts = generateAlerts(thesis, stock);
+    const dominance = alerts.find(function (a) { return a.id.includes('dominance'); });
 
     expect(dominance).toBeUndefined();
   });
 
   it('downgrades dominance mismatch to signal for inferred thesis', function () {
-    var stock = makeStockData({
+    const stock = makeStockData({
       hypotheses: makeHypotheses([65, 20, 10, 5])
     });
-    var thesis = makeThesis({
+    const thesis = makeThesis({
       dominantHypothesis: 'N2',
       source: 'inferred',
       confidence: 'low'
     });
 
-    var alerts = generateAlerts(thesis, stock);
-    var dominance = alerts.find(function (a) { return a.id.includes('dominance'); });
+    const alerts = generateAlerts(thesis, stock);
+    const dominance = alerts.find(function (a) { return a.id.includes('dominance'); });
 
     expect(dominance).toBeDefined();
     expect(dominance.type).toBe('signal');
@@ -127,13 +127,13 @@ describe('generateAlerts', function () {
 
   it('returns conflict when skew contradicts bias direction', function () {
     // User is bearish but skew is upside with magnitude > 10%
-    var stock = makeStockData({
+    const stock = makeStockData({
       _skew: { bull: 65, bear: 35, score: 30, direction: 'upside' }
     });
-    var thesis = makeThesis({ biasDirection: 'bearish' });
+    const thesis = makeThesis({ biasDirection: 'bearish' });
 
-    var alerts = generateAlerts(thesis, stock);
-    var skewConflict = alerts.find(function (a) { return a.id.includes('skew'); });
+    const alerts = generateAlerts(thesis, stock);
+    const skewConflict = alerts.find(function (a) { return a.id.includes('skew'); });
 
     expect(skewConflict).toBeDefined();
     expect(skewConflict.type).toBe('conflict');
@@ -143,25 +143,25 @@ describe('generateAlerts', function () {
 
   it('does not generate skew conflict when magnitude <= 10%', function () {
     // Skew contradicts but magnitude is only 8%
-    var stock = makeStockData({
+    const stock = makeStockData({
       _skew: { bull: 54, bear: 46, score: 8, direction: 'upside' }
     });
-    var thesis = makeThesis({ biasDirection: 'bearish' });
+    const thesis = makeThesis({ biasDirection: 'bearish' });
 
-    var alerts = generateAlerts(thesis, stock);
-    var skewConflict = alerts.find(function (a) { return a.id.includes('skew'); });
+    const alerts = generateAlerts(thesis, stock);
+    const skewConflict = alerts.find(function (a) { return a.id.includes('skew'); });
 
     expect(skewConflict).toBeUndefined();
   });
 
   it('assigns high materiality when skew magnitude > 20%', function () {
-    var stock = makeStockData({
+    const stock = makeStockData({
       _skew: { bull: 70, bear: 30, score: 40, direction: 'upside' }
     });
-    var thesis = makeThesis({ biasDirection: 'bearish' });
+    const thesis = makeThesis({ biasDirection: 'bearish' });
 
-    var alerts = generateAlerts(thesis, stock);
-    var skewConflict = alerts.find(function (a) { return a.id.includes('skew'); });
+    const alerts = generateAlerts(thesis, stock);
+    const skewConflict = alerts.find(function (a) { return a.id.includes('skew'); });
 
     expect(skewConflict).toBeDefined();
     expect(skewConflict.materiality).toBe('high');
@@ -173,13 +173,13 @@ describe('generateAlerts', function () {
 
   it('returns signal when user assigns >25% to a hypothesis scoring <30%', function () {
     // User assigns 40% to N2, but N2 only scores 15%
-    var stock = makeStockData({
+    const stock = makeStockData({
       hypotheses: makeHypotheses([55, 15, 20, 10])
     });
-    var thesis = makeThesis({ probabilitySplit: [20, 40, 25, 15] });
+    const thesis = makeThesis({ probabilitySplit: [20, 40, 25, 15] });
 
-    var alerts = generateAlerts(thesis, stock);
-    var lowScore = alerts.find(function (a) { return a.id.includes('lowscore-N2'); });
+    const alerts = generateAlerts(thesis, stock);
+    const lowScore = alerts.find(function (a) { return a.id.includes('lowscore-N2'); });
 
     expect(lowScore).toBeDefined();
     expect(lowScore.type).toBe('signal');
@@ -195,16 +195,16 @@ describe('generateAlerts', function () {
 
   it('returns signal when hypothesis gains 2+ evidence items', function () {
     // N1 had 2 items, now has 5 (supporting: 3, contradicting: 2)
-    var hypotheses = makeHypotheses([55, 20, 15, 10]);
+    const hypotheses = makeHypotheses([55, 20, 15, 10]);
     hypotheses[0].supporting = ['a', 'b', 'c'];
     hypotheses[0].contradicting = ['x', 'y'];
-    var stock = makeStockData({ hypotheses: hypotheses });
+    const stock = makeStockData({ hypotheses: hypotheses });
 
-    var lastReviewed = { N1: 2, N2: 3, N3: 3, N4: 3 };
-    var thesis = makeThesis({});
+    const lastReviewed = { N1: 2, N2: 3, N3: 3, N4: 3 };
+    const thesis = makeThesis({});
 
-    var alerts = generateAlerts(thesis, stock, lastReviewed);
-    var newEvidence = alerts.find(function (a) { return a.id.includes('newevidence-N1'); });
+    const alerts = generateAlerts(thesis, stock, lastReviewed);
+    const newEvidence = alerts.find(function (a) { return a.id.includes('newevidence-N1'); });
 
     expect(newEvidence).toBeDefined();
     expect(newEvidence.type).toBe('signal');
@@ -213,12 +213,12 @@ describe('generateAlerts', function () {
   });
 
   it('does not generate new evidence signal when change < 2', function () {
-    var stock = makeStockData({});
-    var lastReviewed = { N1: 2, N2: 3, N3: 3, N4: 3 };
-    var thesis = makeThesis({});
+    const stock = makeStockData({});
+    const lastReviewed = { N1: 2, N2: 3, N3: 3, N4: 3 };
+    const thesis = makeThesis({});
 
-    var alerts = generateAlerts(thesis, stock, lastReviewed);
-    var newEvidence = alerts.filter(function (a) { return a.id.includes('newevidence'); });
+    const alerts = generateAlerts(thesis, stock, lastReviewed);
+    const newEvidence = alerts.filter(function (a) { return a.id.includes('newevidence'); });
 
     expect(newEvidence.length).toBe(0);
   });
@@ -229,17 +229,17 @@ describe('generateAlerts', function () {
 
   it('returns confirmation when thesis aligns with data', function () {
     // User thinks N1 dominates, N1 IS the highest, skew is upside, user is bullish
-    var stock = makeStockData({
+    const stock = makeStockData({
       hypotheses: makeHypotheses([55, 20, 15, 10]),
       _skew: { bull: 55, bear: 45, score: 10, direction: 'upside' }
     });
-    var thesis = makeThesis({
+    const thesis = makeThesis({
       dominantHypothesis: 'N1',
       biasDirection: 'bullish'
     });
 
-    var alerts = generateAlerts(thesis, stock);
-    var confirmation = alerts.find(function (a) { return a.type === 'confirmation'; });
+    const alerts = generateAlerts(thesis, stock);
+    const confirmation = alerts.find(function (a) { return a.type === 'confirmation'; });
 
     expect(confirmation).toBeDefined();
     expect(confirmation.id).toContain('confirmation');
@@ -252,11 +252,11 @@ describe('generateAlerts', function () {
 
   it('returns empty array when no mismatches exist and no confirmation conditions met', function () {
     // User's thesis matches dominant, skew matches bias, no low scores, no new evidence
-    var stock = makeStockData({
+    const stock = makeStockData({
       hypotheses: makeHypotheses([55, 50, 45, 40]),
       _skew: { bull: 55, bear: 45, score: 10, direction: 'upside' }
     });
-    var thesis = makeThesis({
+    const thesis = makeThesis({
       dominantHypothesis: 'N1',
       biasDirection: 'bullish',
       probabilitySplit: [30, 30, 20, 20]
@@ -264,8 +264,8 @@ describe('generateAlerts', function () {
 
     // No mismatch: N1 is dominant (55) and user picks N1. No hypothesis scores < 30.
     // This WILL produce a confirmation though. Filter to non-confirmation.
-    var alerts = generateAlerts(thesis, stock);
-    var actionable = alerts.filter(function (a) { return a.type !== 'confirmation'; });
+    const alerts = generateAlerts(thesis, stock);
+    const actionable = alerts.filter(function (a) { return a.type !== 'confirmation'; });
 
     expect(actionable.length).toBe(0);
   });
@@ -277,7 +277,7 @@ describe('generateAlerts', function () {
   });
 
   it('returns empty array when stockData has no hypotheses', function () {
-    var thesis = makeThesis({});
+    const thesis = makeThesis({});
     expect(generateAlerts(thesis, { hypotheses: null })).toEqual([]);
     expect(generateAlerts(thesis, {})).toEqual([]);
   });
@@ -287,14 +287,14 @@ describe('generateAlerts', function () {
 // localStorage polyfill for Node test environment
 // ---------------------------------------------------------------------------
 
-var _store = {};
+const _store = {};
 if (typeof globalThis.localStorage === 'undefined') {
   globalThis.localStorage = {
     _data: _store,
     getItem: function (key) { return Object.prototype.hasOwnProperty.call(_store, key) ? _store[key] : null; },
     setItem: function (key, val) { _store[key] = String(val); },
     removeItem: function (key) { delete _store[key]; },
-    clear: function () { for (var k in _store) { if (Object.prototype.hasOwnProperty.call(_store, k)) delete _store[k]; } },
+    clear: function () { for (const k in _store) { if (Object.prototype.hasOwnProperty.call(_store, k)) delete _store[k]; } },
     key: function (i) { return Object.keys(_store)[i] || null; },
     get length() { return Object.keys(_store).length; }
   };
@@ -308,9 +308,9 @@ describe('alert state management', function () {
 
   beforeEach(function () {
     // Clear all thesis alert keys from localStorage
-    var keysToRemove = [];
-    for (var i = 0; i < localStorage.length; i++) {
-      var key = localStorage.key(i);
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
       if (key && key.indexOf('ci_thesis_alerts') === 0) {
         keysToRemove.push(key);
       }
@@ -319,7 +319,7 @@ describe('alert state management', function () {
   });
 
   it('saveAlerts/getAlerts round-trip preserves alert data', function () {
-    var alerts = [
+    const alerts = [
       {
         id: 'WOR-conflict-dominance-20260317',
         ticker: 'WOR',
@@ -347,7 +347,7 @@ describe('alert state management', function () {
     ];
 
     saveAlerts('WOR', alerts);
-    var retrieved = getAlerts('WOR');
+    const retrieved = getAlerts('WOR');
 
     expect(retrieved.length).toBe(2);
     expect(retrieved[0].id).toBe('WOR-conflict-dominance-20260317');
@@ -357,7 +357,7 @@ describe('alert state management', function () {
   });
 
   it('acknowledgeAlert updates status and appends to audit log', function () {
-    var alerts = [
+    const alerts = [
       {
         id: 'BHP-conflict-dominance-20260317',
         ticker: 'BHP',
@@ -373,17 +373,17 @@ describe('alert state management', function () {
     ];
 
     saveAlerts('BHP', alerts);
-    var result = acknowledgeAlert('BHP-conflict-dominance-20260317');
+    const result = acknowledgeAlert('BHP-conflict-dominance-20260317');
 
     expect(result).not.toBeNull();
     expect(result.status).toBe('acknowledged');
 
     // Verify persisted state
-    var stored = getAlerts('BHP');
+    const stored = getAlerts('BHP');
     expect(stored[0].status).toBe('acknowledged');
 
     // Verify audit log
-    var log = getAuditLog('BHP');
+    const log = getAuditLog('BHP');
     expect(log.length).toBe(1);
     expect(log[0].action).toBe('acknowledged');
     expect(log[0].alertId).toBe('BHP-conflict-dominance-20260317');
@@ -399,7 +399,7 @@ describe('alert state management', function () {
       { id: 'a5', ticker: 'WOR', type: 'conflict', status: 'dismissed', timestamp: new Date().toISOString() }
     ]);
 
-    var counts = getAlertCounts();
+    const counts = getAlertCounts();
 
     expect(counts.conflicts).toBe(2);   // a5 dismissed, excluded
     expect(counts.signals).toBe(1);
@@ -407,8 +407,8 @@ describe('alert state management', function () {
   });
 
   it('pruning removes dismissed alerts older than 30 days', function () {
-    var oldDate = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000).toISOString();
-    var recentDate = new Date().toISOString();
+    const oldDate = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000).toISOString();
+    const recentDate = new Date().toISOString();
 
     saveAlerts('FMG', [
       { id: 'old-dismissed', ticker: 'FMG', type: 'conflict', status: 'dismissed', timestamp: oldDate },
@@ -417,11 +417,11 @@ describe('alert state management', function () {
       { id: 'recent-new', ticker: 'FMG', type: 'signal', status: 'new', timestamp: recentDate }
     ]);
 
-    var retrieved = getAlerts('FMG');
+    const retrieved = getAlerts('FMG');
 
     // old-dismissed should be pruned; old-acknowledged kept (not dismissed); recent ones kept
     expect(retrieved.length).toBe(3);
-    var ids = retrieved.map(function (a) { return a.id; });
+    const ids = retrieved.map(function (a) { return a.id; });
     expect(ids).not.toContain('old-dismissed');
     expect(ids).toContain('old-acknowledged');
     expect(ids).toContain('recent-dismissed');
@@ -433,12 +433,12 @@ describe('alert state management', function () {
       { id: 'cba-signal-1', ticker: 'CBA', type: 'signal', status: 'new', timestamp: new Date().toISOString() }
     ]);
 
-    var result = dismissAlert('cba-signal-1');
+    const result = dismissAlert('cba-signal-1');
 
     expect(result).not.toBeNull();
     expect(result.status).toBe('dismissed');
 
-    var log = getAuditLog('CBA');
+    const log = getAuditLog('CBA');
     expect(log.length).toBe(1);
     expect(log[0].action).toBe('dismissed');
   });
@@ -451,9 +451,9 @@ describe('alert state management', function () {
       { id: 'bhp-1', ticker: 'BHP', type: 'signal', status: 'new', timestamp: new Date().toISOString() }
     ]);
 
-    var all = getAllAlerts();
+    const all = getAllAlerts();
     expect(all.length).toBe(2);
-    var tickers = all.map(function (a) { return a.ticker; }).sort();
+    const tickers = all.map(function (a) { return a.ticker; }).sort();
     expect(tickers).toEqual(['BHP', 'WOR']);
   });
 });
@@ -466,9 +466,9 @@ describe('checkForAlerts', function () {
 
   beforeEach(function () {
     // Clear all thesis alert keys and personalisation profile
-    var keysToRemove = [];
-    for (var i = 0; i < localStorage.length; i++) {
-      var key = localStorage.key(i);
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
       if (key && (key.indexOf('ci_thesis_alerts') === 0 || key === 'continuum_personalisation_profile')) {
         keysToRemove.push(key);
       }
@@ -477,7 +477,7 @@ describe('checkForAlerts', function () {
   });
 
   it('returns 0 when no personalisation profile exists', function () {
-    var stockData = {
+    const stockData = {
       WOR: {
         hypotheses: [
           { tier: 'N1', score: '55%', direction: 'upside', supporting: ['a'], contradicting: ['b'] }
@@ -486,7 +486,7 @@ describe('checkForAlerts', function () {
       }
     };
 
-    var count = checkForAlerts(stockData);
+    const count = checkForAlerts(stockData);
     expect(count).toBe(0);
   });
 
@@ -503,7 +503,7 @@ describe('checkForAlerts', function () {
 
     // Stock data where N1 dominates at 65%, user's inferred thesis will pick N1
     // but bias is bullish while skew is downside with magnitude > 10% -- should trigger conflict
-    var stockData = {
+    const stockData = {
       WOR: {
         hypotheses: [
           { tier: 'N1', score: '30%', direction: 'upside', supporting: ['a'], contradicting: [] },
@@ -515,14 +515,14 @@ describe('checkForAlerts', function () {
       }
     };
 
-    var count = checkForAlerts(stockData);
+    const count = checkForAlerts(stockData);
 
     // Should detect at least 1 alert:
     // - Skew contradicts bias (user inferred bullish from 15% weight, skew is downside, magnitude 40%)
     expect(count).toBeGreaterThanOrEqual(1);
 
     // Verify alerts were persisted
-    var stored = getAlerts('WOR');
+    const stored = getAlerts('WOR');
     expect(stored.length).toBeGreaterThanOrEqual(1);
   });
 });

@@ -15,27 +15,27 @@
 // ─── Narrative Survival Bar ──────────────────────────────────────────────────
 
 function updateNarrativeUI(stock) {
-  var bar = document.getElementById('narrative-bar');
+  const bar = document.getElementById('narrative-bar');
   if (!bar) return;
 
-  var total = 0;
-  var ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
+  let total = 0;
+  const ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
 
-  for (var i = 0; i < ids.length; i++) {
+  for (let i = 0; i < ids.length; i++) {
     total += stock.hypotheses[ids[i]].survival_score;
   }
 
-  for (var j = 0; j < ids.length; j++) {
-    var hId = ids[j];
-    var segment = bar.querySelector('[data-hypothesis="' + hId + '"]');
+  for (let j = 0; j < ids.length; j++) {
+    const hId = ids[j];
+    const segment = bar.querySelector('[data-hypothesis="' + hId + '"]');
     if (!segment) continue;
 
-    var h = stock.hypotheses[hId];
-    var widthPct = total > 0 ? (h.survival_score / total * 100) : 25;
+    const h = stock.hypotheses[hId];
+    const widthPct = total > 0 ? (h.survival_score / total * 100) : 25;
 
     segment.style.width = widthPct + '%';
 
-    var scoreEl = segment.querySelector('.segment-score');
+    const scoreEl = segment.querySelector('.segment-score');
     if (scoreEl) {
       scoreEl.textContent = Math.round(h.survival_score * 100) + '%';
     }
@@ -57,17 +57,17 @@ function updateNarrativeUI(stock) {
 // ─── Alert Banner ────────────────────────────────────────────────────────────
 
 function updateAlertBanner(stock) {
-  var alertBanner = document.getElementById('narrative-alert');
+  const alertBanner = document.getElementById('narrative-alert');
   if (!alertBanner) return;
 
   if (stock.alert_state === 'ALERT') {
     alertBanner.style.display = 'flex';
 
-    var bestAltId = null;
-    var bestAltScore = -1;
-    var ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
+    let bestAltId = null;
+    let bestAltScore = -1;
+    const ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
 
-    for (var i = 0; i < ids.length; i++) {
+    for (let i = 0; i < ids.length; i++) {
       if (ids[i] !== stock.dominant &&
           stock.hypotheses[ids[i]].survival_score > bestAltScore) {
         bestAltScore = stock.hypotheses[ids[i]].survival_score;
@@ -75,7 +75,7 @@ function updateAlertBanner(stock) {
       }
     }
 
-    var detailEl = document.getElementById('alert-detail');
+    const detailEl = document.getElementById('alert-detail');
     if (detailEl && bestAltId) {
       detailEl.textContent = bestAltId + ' (' + stock.hypotheses[bestAltId].label +
                              ') challenging ' + stock.dominant;
@@ -88,30 +88,30 @@ function updateAlertBanner(stock) {
 // ─── Confidence Halo ─────────────────────────────────────────────────────────
 
 function updateConfidenceHalo(stock) {
-  var halo = document.getElementById('confidence-halo');
+  const halo = document.getElementById('confidence-halo');
   if (!halo) return;
 
-  var confidence = stock.hypotheses[stock.dominant].status;
+  const confidence = stock.hypotheses[stock.dominant].status;
   halo.className = 'confidence-halo confidence-' + confidence.toLowerCase();
 }
 
 // ─── Editorial Override Banner ───────────────────────────────────────────────
 
 function updateOverrideBanner(stock) {
-  var banner = document.getElementById('editorial-override-banner');
+  const banner = document.getElementById('editorial-override-banner');
   if (!banner) return;
 
-  var isActive = typeof hasActiveOverride === 'function'
+  const isActive = typeof hasActiveOverride === 'function'
     ? hasActiveOverride(stock)
     : (stock.editorial_override && new Date() < new Date(stock.editorial_override.until));
 
   if (isActive) {
     banner.style.display = 'flex';
-    var reasonEl = document.getElementById('override-reason');
+    const reasonEl = document.getElementById('override-reason');
     if (reasonEl) {
       reasonEl.textContent = stock.editorial_override.reason;
     }
-    var untilEl = document.getElementById('override-until');
+    const untilEl = document.getElementById('override-until');
     if (untilEl) {
       untilEl.textContent = new Date(stock.editorial_override.until).toLocaleString();
     }
@@ -123,13 +123,13 @@ function updateOverrideBanner(stock) {
 // ─── Narrative History Timeline ──────────────────────────────────────────────
 
 function renderNarrativeHistory(stock) {
-  var container = document.getElementById('narrative-history');
+  const container = document.getElementById('narrative-history');
   if (!container) return;
 
-  var allFlips = [];
+  const allFlips = [];
   if (stock.last_flip) allFlips.push(stock.last_flip);
   if (stock.narrative_history) {
-    for (var i = 0; i < stock.narrative_history.length; i++) {
+    for (let i = 0; i < stock.narrative_history.length; i++) {
       allFlips.push(stock.narrative_history[i]);
     }
   }
@@ -139,11 +139,11 @@ function renderNarrativeHistory(stock) {
     return;
   }
 
-  var html = '';
-  for (var f = 0; f < allFlips.length; f++) {
-    var flip = allFlips[f];
-    var isLatest = f === 0 ? ' latest' : '';
-    var priceHtml = flip.price_at_flip
+  let html = '';
+  for (let f = 0; f < allFlips.length; f++) {
+    const flip = allFlips[f];
+    const isLatest = f === 0 ? ' latest' : '';
+    const priceHtml = flip.price_at_flip
       ? '<div class="flip-price">Price: $' + Number(flip.price_at_flip).toFixed(2) + '</div>'
       : '';
 
@@ -168,21 +168,21 @@ function renderNarrativeHistory(stock) {
 // No exclamation marks. No pulsing. Institutional aesthetic.
 
 function updateDislocationIndicator(stock) {
-  var el = document.getElementById('dislocation-indicator');
+  const el = document.getElementById('dislocation-indicator');
   if (!el) return;
 
-  var w = stock.weighting;
+  const w = stock.weighting;
   if (!w || !w.dislocation || !w.dislocation.is_material) {
     el.style.display = 'none';
     return;
   }
 
-  var d = w.dislocation;
-  var direction = d.direction || 'neutral';
-  var absBps = Math.abs(d.max_dislocation_bps);
+  const d = w.dislocation;
+  const direction = d.direction || 'neutral';
+  const absBps = Math.abs(d.max_dislocation_bps);
 
   // Severity classification
-  var severity, severityLabel;
+  let severity, severityLabel;
   if (absBps >= 1500) {
     severity = 'critical';
     severityLabel = 'Critical Dislocation';
@@ -201,18 +201,18 @@ function updateDislocationIndicator(stock) {
   }
   el.style.display = 'flex';
 
-  var labelEl = el.querySelector('.dislocation-label');
+  const labelEl = el.querySelector('.dislocation-label');
   if (labelEl) {
     labelEl.textContent = severityLabel;
   }
 
-  var detailEl = el.querySelector('.dislocation-detail');
+  const detailEl = el.querySelector('.dislocation-detail');
   if (detailEl) {
-    var hId = d.max_dislocation_hypothesis;
-    var hLabel = stock.hypotheses[hId] ? stock.hypotheses[hId].label : hId;
-    var sign = d.max_dislocation_bps >= 0 ? '+' : '-';
+    const hId = d.max_dislocation_hypothesis;
+    const hLabel = stock.hypotheses[hId] ? stock.hypotheses[hId].label : hId;
+    const sign = d.max_dislocation_bps >= 0 ? '+' : '-';
 
-    var dirText = direction === 'positive'
+    const dirText = direction === 'positive'
       ? 'Price action supports upside narrative shift'
       : direction === 'negative'
         ? 'Price action signals downside narrative pressure'
@@ -230,15 +230,15 @@ function updateDislocationIndicator(stock) {
 // evidence support bars, "what to watch", and clear percentage labelling.
 
 function renderCompetingHypotheses(stock) {
-  var container = document.getElementById('hypotheses-panel');
+  const container = document.getElementById('hypotheses-panel');
   if (!container) return;
 
-  var ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
-  var w = stock.weighting;
-  var hasWeighting = w && w.hypothesis_weights;
+  const ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
+  const w = stock.weighting;
+  const hasWeighting = w && w.hypothesis_weights;
 
   // Explanatory header
-  var html = '<div class="hypotheses-header">' +
+  let html = '<div class="hypotheses-header">' +
     '<div class="hypotheses-header-title">How we read the evidence landscape</div>' +
     '<div class="hypotheses-header-desc">' +
     'Each hypothesis is scored by the weight of evidence against it. Fewer inconsistencies with the available ' +
@@ -247,29 +247,29 @@ function renderCompetingHypotheses(stock) {
     '</div></div>';
 
   // Sort: dominant first, then by survival score descending
-  var sorted = ids.slice().sort(function (a, b) {
+  const sorted = ids.slice().sort(function (a, b) {
     if (a === stock.dominant) return -1;
     if (b === stock.dominant) return 1;
     return stock.hypotheses[b].survival_score - stock.hypotheses[a].survival_score;
   });
 
-  for (var i = 0; i < sorted.length; i++) {
-    var hId = sorted[i];
-    var h = stock.hypotheses[hId];
-    var isDominant = hId === stock.dominant;
-    var hw = hasWeighting ? w.hypothesis_weights[hId] : null;
-    var survivalPct = Math.round(h.survival_score * 100);
-    var signalPct = hw ? hw.signal_strength_pct : survivalPct;
-    var weightPct = hw ? hw.narrative_weight_pct : 25;
-    var windowLabel = hw ? hw.dominant_window + 'd' : '';
+  for (let i = 0; i < sorted.length; i++) {
+    const hId = sorted[i];
+    const h = stock.hypotheses[hId];
+    const isDominant = hId === stock.dominant;
+    const hw = hasWeighting ? w.hypothesis_weights[hId] : null;
+    const survivalPct = Math.round(h.survival_score * 100);
+    const signalPct = hw ? hw.signal_strength_pct : survivalPct;
+    const weightPct = hw ? hw.narrative_weight_pct : 25;
+    const windowLabel = hw ? hw.dominant_window + 'd' : '';
 
     // Inflection detection
-    var isInflection = hasWeighting && w.top_narrative &&
+    const isInflection = hasWeighting && w.top_narrative &&
       w.top_narrative.inflection && w.top_narrative.top_narrative === hId;
 
     // Use plain_english if available, else description
-    var plainText = h.plain_english || h.description;
-    var watchText = h.what_to_watch || '';
+    const plainText = h.plain_english || h.description;
+    const watchText = h.what_to_watch || '';
 
     html += '<div class="hypothesis-card' + (isDominant ? ' hypothesis-dominant' : '') + '">';
 

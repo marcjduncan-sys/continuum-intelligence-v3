@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { renderSourcesPanel, renderSourceCard } from './sources-panel.js';
 
-var MOCK_SOURCE = {
+const MOCK_SOURCE = {
   id: 'abc-123',
   source_name: 'Macquarie',
   source_type: 'broker',
@@ -24,7 +24,7 @@ var MOCK_SOURCE = {
   }
 };
 
-var MOCK_SOURCE_MINIMAL = {
+const MOCK_SOURCE_MINIMAL = {
   id: 'def-456',
   source_name: 'My Notes',
   source_type: 'internal',
@@ -44,101 +44,101 @@ describe('sources-panel', function() {
 
   describe('renderSourcesPanel', function() {
     it('returns empty string when sources array is empty', function() {
-      var html = renderSourcesPanel([], 'ASB');
+      const html = renderSourcesPanel([], 'ASB');
       expect(html).toBe('');
     });
 
     it('returns empty string when sources is null', function() {
-      var html = renderSourcesPanel(null, 'ASB');
+      const html = renderSourcesPanel(null, 'ASB');
       expect(html).toBe('');
     });
 
     it('renders correct number of source cards', function() {
-      var html = renderSourcesPanel([MOCK_SOURCE, MOCK_SOURCE_MINIMAL], 'ASB');
-      var matches = html.match(/class="src-card"/g);
+      const html = renderSourcesPanel([MOCK_SOURCE, MOCK_SOURCE_MINIMAL], 'ASB');
+      const matches = html.match(/class="src-card"/g);
       expect(matches).toHaveLength(2);
     });
 
     it('shows source count in header', function() {
-      var html = renderSourcesPanel([MOCK_SOURCE], 'ASB');
+      const html = renderSourcesPanel([MOCK_SOURCE], 'ASB');
       expect(html).toContain('1 source');
 
-      var html2 = renderSourcesPanel([MOCK_SOURCE, MOCK_SOURCE_MINIMAL], 'ASB');
+      const html2 = renderSourcesPanel([MOCK_SOURCE, MOCK_SOURCE_MINIMAL], 'ASB');
       expect(html2).toContain('2 sources');
     });
 
     it('uses correct ticker in panel ID', function() {
-      var html = renderSourcesPanel([MOCK_SOURCE], 'ASB');
+      const html = renderSourcesPanel([MOCK_SOURCE], 'ASB');
       expect(html).toContain('id="src-panel-asb"');
     });
   });
 
   describe('renderSourceCard', function() {
     it('displays source name and type badge', function() {
-      var html = renderSourceCard(MOCK_SOURCE);
+      const html = renderSourceCard(MOCK_SOURCE);
       expect(html).toContain('Macquarie');
       expect(html).toContain('src-card-type-broker');
     });
 
     it('displays hypothesis alignment with correct class', function() {
-      var html = renderSourceCard(MOCK_SOURCE);
+      const html = renderSourceCard(MOCK_SOURCE);
       expect(html).toContain('src-card-hyp-n2');
       expect(html).toContain('N2');
     });
 
     it('displays confidence as percentage', function() {
-      var html = renderSourceCard(MOCK_SOURCE);
+      const html = renderSourceCard(MOCK_SOURCE);
       expect(html).toContain('75% confidence');
     });
 
     it('displays direction', function() {
-      var html = renderSourceCard(MOCK_SOURCE);
+      const html = renderSourceCard(MOCK_SOURCE);
       expect(html).toContain('src-card-dir-upside');
       expect(html).toContain('upside');
     });
 
     it('displays summary', function() {
-      var html = renderSourceCard(MOCK_SOURCE);
+      const html = renderSourceCard(MOCK_SOURCE);
       expect(html).toContain('margin recovery story');
     });
 
     it('contains evidence items', function() {
-      var html = renderSourceCard(MOCK_SOURCE);
+      const html = renderSourceCard(MOCK_SOURCE);
       expect(html).toContain('Defence contract pipeline expanding');
       expect(html).toContain('Supports N2');
     });
 
     it('contains risk items', function() {
-      var html = renderSourceCard(MOCK_SOURCE);
+      const html = renderSourceCard(MOCK_SOURCE);
       expect(html).toContain('Currency headwind');
       expect(html).toContain('Threatens N3');
     });
 
     it('displays price target', function() {
-      var html = renderSourceCard(MOCK_SOURCE);
+      const html = renderSourceCard(MOCK_SOURCE);
       expect(html).toContain('$5.40');
     });
 
     it('handles missing price target gracefully', function() {
-      var html = renderSourceCard(MOCK_SOURCE_MINIMAL);
+      const html = renderSourceCard(MOCK_SOURCE_MINIMAL);
       expect(html).not.toContain('Price target');
     });
 
     it('handles MIXED hypothesis', function() {
-      var html = renderSourceCard(MOCK_SOURCE_MINIMAL);
+      const html = renderSourceCard(MOCK_SOURCE_MINIMAL);
       expect(html).toContain('src-card-hyp-mixed');
       expect(html).toContain('MIXED');
     });
 
     it('includes delete button with source ID', function() {
-      var html = renderSourceCard(MOCK_SOURCE);
+      const html = renderSourceCard(MOCK_SOURCE);
       expect(html).toContain('src-card-delete');
       expect(html).toContain('data-source-id="abc-123"');
     });
 
     it('handles source_id field from upload response', function() {
-      var source = Object.assign({}, MOCK_SOURCE, { source_id: 'upload-789', id: undefined });
-      var html = renderSourceCard(source);
+      const source = Object.assign({}, MOCK_SOURCE, { source_id: 'upload-789', id: undefined });
+      const html = renderSourceCard(source);
       expect(html).toContain('data-source-id="upload-789"');
     });
   });

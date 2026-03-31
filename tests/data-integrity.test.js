@@ -27,7 +27,7 @@ describe('Ticker Configuration', () => {
 
   test('all tickers have required fields', () => {
     const tickers = Object.keys(tickerConfig.tickers);
-    expect(tickers.length).toBeGreaterThanOrEqual(18);
+    expect(tickers.length).toBeGreaterThanOrEqual(35);
 
     tickers.forEach(ticker => {
       const entry = tickerConfig.tickers[ticker];

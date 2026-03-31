@@ -40,13 +40,13 @@ function normaliseWithFloorCeiling(rawScores) {
   const CEILING = 80;
   if (!rawScores || rawScores.length === 0) return [];
 
-  let clamped = rawScores.map(s => Math.max(FLOOR, Math.min(CEILING, s)));
-  let sum = clamped.reduce((a, b) => a + b, 0);
+  const clamped = rawScores.map(s => Math.max(FLOOR, Math.min(CEILING, s)));
+  const sum = clamped.reduce((a, b) => a + b, 0);
   if (sum === 0) return clamped.map(() => Math.round(100 / clamped.length));
 
-  let normalised = clamped.map(s => (s / sum) * 100);
-  let rounded = normalised.map(s => Math.round(s));
-  let roundedSum = rounded.reduce((a, b) => a + b, 0);
+  const normalised = clamped.map(s => (s / sum) * 100);
+  const rounded = normalised.map(s => Math.round(s));
+  const roundedSum = rounded.reduce((a, b) => a + b, 0);
   if (roundedSum !== 100) {
     let maxIdx = 0;
     for (let i = 1; i < rounded.length; i++) {

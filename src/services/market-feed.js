@@ -19,33 +19,33 @@ import { LiveData, fetchAndPatchLive, updateLiveUI } from './live-data.js';
 // MARKET FEED -- Live Price Polling & Market Status Engine
 // ============================================================
 
-var _pollTimer = null;
-var _lastPrices = {};        // Previous prices for flash detection
-var _lastFetchTime = null;
-var _isPolling = false;
-var _pollCount = 0;
-var _errorCount = 0;
+let _pollTimer = null;
+const _lastPrices = {};        // Previous prices for flash detection
+let _lastFetchTime = null;
+let _isPolling = false;
+let _pollCount = 0;
+let _errorCount = 0;
 
 // Polling intervals (ms)
-var INTERVAL_MARKET_OPEN = 60 * 1000;     // 60s during trading
-var INTERVAL_PRE_MARKET = 120 * 1000;     // 2 min pre-market
-var INTERVAL_CLOSED = 15 * 60 * 1000;     // 15 min when closed
-var INTERVAL_ERROR_BACKOFF = 30 * 1000;   // 30s after error
+const INTERVAL_MARKET_OPEN = 60 * 1000;     // 60s during trading
+const INTERVAL_PRE_MARKET = 120 * 1000;     // 2 min pre-market
+const INTERVAL_CLOSED = 15 * 60 * 1000;     // 15 min when closed
+const INTERVAL_ERROR_BACKOFF = 30 * 1000;   // 30s after error
 
 // Track which tickers have had live data fetched (shared with live-data module)
-var _liveFetched = new Set();
+const _liveFetched = new Set();
 
 // Detect ASX market status (AEDT = UTC+11, AEST = UTC+10)
 // We use UTC+11 as default (covers most of trading year)
 function getMarketStatus() {
-    var now = new Date();
-    var day = now.getUTCDay();
+    const now = new Date();
+    const day = now.getUTCDay();
     if (day === 0 || day === 6) return 'closed';
 
-    var aedt = new Date(now.getTime() + 11 * 60 * 60 * 1000);
-    var h = aedt.getUTCHours();
-    var m = aedt.getUTCMinutes();
-    var t = h * 60 + m;
+    const aedt = new Date(now.getTime() + 11 * 60 * 60 * 1000);
+    const h = aedt.getUTCHours();
+    const m = aedt.getUTCMinutes();
+    const t = h * 60 + m;
 
     if (t < 590) return 'pre-market';   // Before 9:50 AM
     if (t < 600) return 'pre-open';      // 9:50 - 10:00 AM
@@ -55,23 +55,23 @@ function getMarketStatus() {
 }
 
 function getNextMarketOpen() {
-    var now = new Date();
-    var aedt = new Date(now.getTime() + 11 * 60 * 60 * 1000);
-    var day = aedt.getUTCDay();
-    var h = aedt.getUTCHours();
+    const now = new Date();
+    const aedt = new Date(now.getTime() + 11 * 60 * 60 * 1000);
+    const day = aedt.getUTCDay();
+    const h = aedt.getUTCHours();
 
     // If before 10 AM on a weekday, opens today
     if (day >= 1 && day <= 5 && h < 10) {
         return 'today at 10:00 AM AEDT';
     }
     // Otherwise, next weekday
-    var daysUntil = day === 5 ? 3 : day === 6 ? 2 : 1;
+    const daysUntil = day === 5 ? 3 : day === 6 ? 2 : 1;
     return 'Monday at 10:00 AM AEDT';
 }
 
 function getPollInterval() {
     if (_errorCount >= 3) return INTERVAL_ERROR_BACKOFF;
-    var status = getMarketStatus();
+    const status = getMarketStatus();
     if (status === 'open' || status === 'auction') return INTERVAL_MARKET_OPEN;
     if (status === 'pre-market' || status === 'pre-open') return INTERVAL_PRE_MARKET;
     return INTERVAL_CLOSED;
@@ -79,17 +79,17 @@ function getPollInterval() {
 
 // Update the market status bar UI
 function updateStatusBar(feedStatus) {
-    var status = getMarketStatus();
-    var dot = document.getElementById('msb-dot');
-    var label = document.getElementById('msb-label');
-    var updated = document.getElementById('msb-updated');
-    var feedEl = document.getElementById('msb-feed-status');
+    const status = getMarketStatus();
+    const dot = document.getElementById('msb-dot');
+    const label = document.getElementById('msb-label');
+    const updated = document.getElementById('msb-updated');
+    const feedEl = document.getElementById('msb-feed-status');
 
     if (dot) {
         dot.className = 'msb-dot ' + status;
     }
     if (label) {
-        var labels = {
+        const labels = {
             'open': 'ASX OPEN',
             'pre-open': 'ASX PRE-OPEN',
             'pre-market': 'ASX PRE-MARKET',
@@ -100,15 +100,15 @@ function updateStatusBar(feedStatus) {
         label.className = 'msb-label ' + status;
     }
     if (updated && _lastFetchTime) {
-        var ago = Math.round((Date.now() - _lastFetchTime) / 1000);
-        var agoStr = ago < 60 ? ago + 's ago' : Math.round(ago / 60) + 'm ago';
+        const ago = Math.round((Date.now() - _lastFetchTime) / 1000);
+        const agoStr = ago < 60 ? ago + 's ago' : Math.round(ago / 60) + 'm ago';
         updated.textContent = 'Updated ' + agoStr;
     }
     if (feedEl) {
         if (feedStatus) {
             feedEl.textContent = feedStatus;
         } else if (_isPolling) {
-            var ms = getMarketStatus();
+            const ms = getMarketStatus();
             if (ms === 'open') feedEl.textContent = 'Live feed active';
             else if (ms === 'pre-open' || ms === 'pre-market') feedEl.textContent = 'Pre-market monitoring';
             else feedEl.textContent = 'After-hours  --  polling every 15m';
@@ -119,11 +119,11 @@ function updateStatusBar(feedStatus) {
 // Fetch from server-side live-prices.json (fast, reliable, no CORS issues)
 async function fetchServerPrices() {
     try {
-        var resp = await fetch('data/live-prices.json?t=' + Date.now(), {
+        const resp = await fetch('data/live-prices.json?t=' + Date.now(), {
             cache: 'no-store'
         });
         if (!resp.ok) return null;
-        var data = await resp.json();
+        const data = await resp.json();
         if (!data || !data.prices) return null;
         return data;
     } catch(e) {
@@ -133,16 +133,16 @@ async function fetchServerPrices() {
 
 // Apply price updates from the server JSON to STOCK_DATA and UI
 function applyServerPrices(data) {
-    var prices = data.prices;
-    var updated = 0;
+    const prices = data.prices;
+    let updated = 0;
 
-    for (var ticker in prices) {
-        var p = prices[ticker];
-        var stock = STOCK_DATA[ticker];
+    for (const ticker in prices) {
+        const p = prices[ticker];
+        const stock = STOCK_DATA[ticker];
         if (!stock) continue;
 
-        var oldPrice = _lastPrices[ticker] || stock.price;
-        var newPrice = p.p;
+        const oldPrice = _lastPrices[ticker] || stock.price;
+        const newPrice = p.p;
 
         // Update STOCK_DATA with server price
         if (newPrice && newPrice > 0) {
@@ -153,7 +153,7 @@ function applyServerPrices(data) {
             stock._liveVolume = p.v;
 
             // Detect price direction for flash animation
-            var direction = null;
+            let direction = null;
             if (Math.abs(newPrice - oldPrice) > 0.005) {
                 direction = newPrice > oldPrice ? 'up' : 'down';
             }
@@ -176,15 +176,15 @@ function applyServerPrices(data) {
 
 // Update a single featured card's price display
 function updateHomeCardPrice(ticker, price, change, changePct, currency, direction) {
-    var card = document.querySelector('[data-ticker-card="' + ticker + '"]');
+    const card = document.querySelector('[data-ticker-card="' + ticker + '"]');
     if (!card) return;
 
-    var priceEl = card.querySelector('.fc-price');
+    const priceEl = card.querySelector('.fc-price');
     if (!priceEl) return;
 
     // Build price HTML with live dot
-    var sign = change >= 0 ? '+' : '';
-    var cls = change >= 0 ? 'positive' : 'negative';
+    const sign = change >= 0 ? '+' : '';
+    const cls = change >= 0 ? 'positive' : 'negative';
     priceEl.innerHTML =
         '<span style="font-size:0.8rem; color:var(--text-muted)">' + currency + '</span>' +
         price.toFixed(2) +
@@ -201,20 +201,20 @@ function updateHomeCardPrice(ticker, price, change, changePct, currency, directi
 
 // Render the scrolling price ticker strip
 function renderTickerStrip(data) {
-    var strip = document.getElementById('price-ticker-strip');
+    const strip = document.getElementById('price-ticker-strip');
     if (!strip || !data || !data.prices) return;
 
-    var prices = data.prices;
-    var items = '';
+    const prices = data.prices;
+    let items = '';
 
     // Build items for all tickers (doubled for infinite scroll effect)
-    var tickers = Object.keys(STOCK_DATA);
-    for (var pass = 0; pass < 2; pass++) {
+    const tickers = Object.keys(STOCK_DATA);
+    for (let pass = 0; pass < 2; pass++) {
         tickers.forEach(function(ticker) {
-            var p = prices[ticker];
+            const p = prices[ticker];
             if (!p) return;
-            var sign = p.c >= 0 ? '+' : '';
-            var cls = p.c >= 0 ? 'positive' : 'negative';
+            const sign = p.c >= 0 ? '+' : '';
+            const cls = p.c >= 0 ? 'positive' : 'negative';
             items += '<span class="pt-item" onclick="navigate(\'report-' + ticker + '\')">' +
                 '<span class="pt-ticker">' + ticker + '</span>' +
                 '<span class="pt-price">' + (p.cur || 'A$') + p.p.toFixed(2) + '</span>' +
@@ -233,9 +233,9 @@ async function poll() {
     updateStatusBar('Refreshing...');
 
     // Strategy 1: Try server-side live-prices.json first (fast, reliable)
-    var serverData = await fetchServerPrices();
+    const serverData = await fetchServerPrices();
     if (serverData && serverData.prices && Object.keys(serverData.prices).length > 0) {
-        var updated = applyServerPrices(serverData);
+        const updated = applyServerPrices(serverData);
         _lastFetchTime = new Date(serverData.updated).getTime();
         _errorCount = 0;
         renderTickerStrip(serverData);
@@ -253,22 +253,22 @@ async function poll() {
     // Strategy 2: Fall back to client-side Yahoo Finance fetch via CORS proxies
     // (This uses the existing LiveData module)
     try {
-        var tickers = Object.keys(STOCK_DATA);
-        var fetched = 0;
-        for (var i = 0; i < tickers.length; i++) {
+        const tickers = Object.keys(STOCK_DATA);
+        let fetched = 0;
+        for (let i = 0; i < tickers.length; i++) {
             var ticker = tickers[i];
-            var stock = STOCK_DATA[ticker];
+            const stock = STOCK_DATA[ticker];
             if (!stock || !stock.tickerFull) continue;
 
             // Override cache TTL during market hours
-            var status = getMarketStatus();
+            const status = getMarketStatus();
             if (status === 'open' || status === 'pre-open') {
                 // Clear stale cache for this ticker during market hours
                 try {
-                    var cacheKey = 'continuum_market_data_' + stock.tickerFull;
-                    var cached = localStorage.getItem(cacheKey);
+                    const cacheKey = 'continuum_market_data_' + stock.tickerFull;
+                    const cached = localStorage.getItem(cacheKey);
                     if (cached) {
-                        var parsed = JSON.parse(cached);
+                        const parsed = JSON.parse(cached);
                         // Expire cache after 2 minutes during market hours
                         if (Date.now() - parsed.ts > 2 * 60 * 1000) {
                             localStorage.removeItem(cacheKey);
@@ -277,16 +277,16 @@ async function poll() {
                 } catch(e) { console.error('[MarketFeed] Failed to expire price cache for ' + ticker + ':', e); }
             }
 
-            var liveData = await LiveData.fetch(stock.tickerFull);
+            const liveData = await LiveData.fetch(stock.tickerFull);
             if (liveData && liveData.currentPrice) {
                 LiveData.patchStockData(ticker, liveData);
                 _liveFetched.add(ticker);
 
-                var oldPrice = _lastPrices[ticker] || stock.price;
-                var newPrice = liveData.currentPrice;
-                var change = newPrice - (liveData.previousClose || stock.price);
-                var changePct = liveData.previousClose ? ((newPrice - liveData.previousClose) / liveData.previousClose) * 100 : 0;
-                var direction = Math.abs(newPrice - oldPrice) > 0.005 ? (newPrice > oldPrice ? 'up' : 'down') : null;
+                const oldPrice = _lastPrices[ticker] || stock.price;
+                const newPrice = liveData.currentPrice;
+                const change = newPrice - (liveData.previousClose || stock.price);
+                const changePct = liveData.previousClose ? ((newPrice - liveData.previousClose) / liveData.previousClose) * 100 : 0;
+                const direction = Math.abs(newPrice - oldPrice) > 0.005 ? (newPrice > oldPrice ? 'up' : 'down') : null;
 
                 updateHomeCardPrice(ticker, newPrice, change, changePct, stock.currency, direction);
 
@@ -352,7 +352,7 @@ function start() {
 
 function scheduleNext() {
     if (_pollTimer) clearTimeout(_pollTimer);
-    var interval = getPollInterval();
+    const interval = getPollInterval();
     _pollTimer = setTimeout(function() {
         poll().then(function() {
             scheduleNext();
@@ -365,7 +365,7 @@ function scheduleNext() {
 
 // Manual refresh
 function refreshNow() {
-    var btn = document.getElementById('msb-refresh');
+    const btn = document.getElementById('msb-refresh');
     if (btn) {
         btn.disabled = true;
         btn.textContent = '...';
@@ -389,22 +389,22 @@ function refreshNow() {
 // Load and display announcements
 async function loadAnnouncements() {
     try {
-        var resp = await fetch('data/announcements.json?t=' + Date.now(), { cache: 'no-store' });
+        const resp = await fetch('data/announcements.json?t=' + Date.now(), { cache: 'no-store' });
         if (!resp.ok) return;
-        var data = await resp.json();
+        const data = await resp.json();
         if (!data || !data.announcements) return;
 
-        var panel = document.getElementById('announcements-panel');
-        var list = document.getElementById('ann-list');
-        var updatedEl = document.getElementById('ann-updated');
+        const panel = document.getElementById('announcements-panel');
+        const list = document.getElementById('ann-list');
+        const updatedEl = document.getElementById('ann-updated');
         if (!panel || !list) return;
 
-        var anns = data.announcements;
-        var allItems = [];
+        const anns = data.announcements;
+        const allItems = [];
 
         // Flatten all announcements across tickers
         for (var ticker in anns) {
-            var items = anns[ticker];
+            const items = anns[ticker];
             if (!Array.isArray(items)) continue;
             items.forEach(function(item) {
                 allItems.push(Object.assign({ ticker: ticker }, item));
@@ -419,9 +419,9 @@ async function loadAnnouncements() {
         });
 
         // Show latest 8
-        var html = '';
+        let html = '';
         allItems.slice(0, 8).forEach(function(item) {
-            var timeStr = item.date ? new Date(item.date).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }) : '';
+            const timeStr = item.date ? new Date(item.date).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }) : '';
             html += '<li class="ann-item">' +
                 '<span class="ann-ticker">' + item.ticker + '</span>' +
                 '<span class="ann-headline">' + (item.headline || item.title || '') + '</span>' +

@@ -11,7 +11,6 @@
 export function fmtB(val) {
   val = parseFloat(/** @type {string} */(val)) || 0;
   if (val >= 100) return Math.round(val) + 'B';
-  if (val >= 10)  return val.toFixed(1).replace(/\.0$/, '') + 'B';
   if (val >= 1)   return val.toFixed(1).replace(/\.0$/, '') + 'B';
   return Math.round(val * 1000) + 'M';
 }
@@ -87,13 +86,13 @@ export function formatNum(n, decimals) {
  */
 export function formatDateAEST(utcDateStr) {
   if (!utcDateStr) return '';
-  var str = String(utcDateStr).replace(/\s*UTC\s*$/i, '').trim();
-  var date;
-  var hasTime = false;
-  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var longMonths = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const str = String(utcDateStr).replace(/\s*UTC\s*$/i, '').trim();
+  let date;
+  let hasTime = false;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const longMonths = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   // "2026-03-15 22:40"
-  var m = str.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})$/);
+  let m = str.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})$/);
   if (m) {
     date = new Date(Date.UTC(+m[1], +m[2]-1, +m[3], +m[4], +m[5]));
     hasTime = true;
@@ -107,10 +106,10 @@ export function formatDateAEST(utcDateStr) {
   if (!date) {
     m = str.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})$/);
     if (m) {
-      var monName = m[2].charAt(0).toUpperCase() + m[2].slice(1).toLowerCase();
-      var monIdx = longMonths.indexOf(monName);
+      const monName = m[2].charAt(0).toUpperCase() + m[2].slice(1).toLowerCase();
+      let monIdx = longMonths.indexOf(monName);
       if (monIdx < 0) {
-        for (var i = 0; i < months.length; i++) {
+        for (let i = 0; i < months.length; i++) {
           if (months[i].toLowerCase() === monName.toLowerCase().substring(0, 3)) { monIdx = i; break; }
         }
       }
@@ -119,13 +118,13 @@ export function formatDateAEST(utcDateStr) {
   }
   if (!date || isNaN(date.getTime())) return utcDateStr;
   // Use Intl to get correct AEST/AEDT offset for any date
-  var aest = new Date(date.toLocaleString('en-US', { timeZone: 'Australia/Sydney' }));
-  var day = String(aest.getDate()).padStart(2, '0');
-  var mon = months[aest.getMonth()];
-  var year = String(aest.getFullYear()).slice(-2);
+  const aest = new Date(date.toLocaleString('en-US', { timeZone: 'Australia/Sydney' }));
+  const day = String(aest.getDate()).padStart(2, '0');
+  const mon = months[aest.getMonth()];
+  const year = String(aest.getFullYear()).slice(-2);
   if (hasTime) {
-    var hours = String(aest.getHours()).padStart(2, '0');
-    var mins = String(aest.getMinutes()).padStart(2, '0');
+    const hours = String(aest.getHours()).padStart(2, '0');
+    const mins = String(aest.getMinutes()).padStart(2, '0');
     return day + '-' + mon + '-' + year + ' ' + hours + ':' + mins + ' AEST';
   }
   return day + '-' + mon + '-' + year;
@@ -141,34 +140,34 @@ export function formatDateAEST(utcDateStr) {
 export function truncateAtWord(str, maxLen) {
   if (!str) return '';
   if (str.length <= maxLen) return str;
-  var cut = str.lastIndexOf(' ', maxLen);
+  const cut = str.lastIndexOf(' ', maxLen);
   return (cut > maxLen * 0.5 ? str.slice(0, cut) : str.slice(0, maxLen)) + '\u2026';
 }
 
 export function renderSparkline(prices) {
   if (!prices || prices.length < 2) return '';
-  var w = 280, h = 88, pad = 4;
-  var min = prices[0], max = prices[0];
+  const w = 280, h = 88, pad = 4;
+  let min = prices[0], max = prices[0];
   for (var i = 1; i < prices.length; i++) {
     if (prices[i] < min) min = prices[i];
     if (prices[i] > max) max = prices[i];
   }
-  var range = max - min || 1;
-  var stepX = (w - pad * 2) / (prices.length - 1);
+  const range = max - min || 1;
+  const stepX = (w - pad * 2) / (prices.length - 1);
 
-  var points = '';
-  var fillPoints = pad + ',' + (h - pad);
+  let points = '';
+  let fillPoints = pad + ',' + (h - pad);
   for (var i = 0; i < prices.length; i++) {
-    var x = pad + i * stepX;
-    var y = h - pad - ((prices[i] - min) / range) * (h - pad * 2);
+    const x = pad + i * stepX;
+    const y = h - pad - ((prices[i] - min) / range) * (h - pad * 2);
     points += x.toFixed(1) + ',' + y.toFixed(1) + ' ';
     fillPoints += ' ' + x.toFixed(1) + ',' + y.toFixed(1);
   }
   fillPoints += ' ' + (pad + (prices.length - 1) * stepX).toFixed(1) + ',' + (h - pad);
 
-  var color = prices[prices.length - 1] > prices[0] * 1.02 ? '#00c875' :
+  const color = prices[prices.length - 1] > prices[0] * 1.02 ? '#00c875' :
               prices[prices.length - 1] < prices[0] * 0.98 ? '#e44258' : '#f5a623';
-  var id = 'sp' + Math.random().toString(36).substr(2, 6);
+  const id = 'sp' + Math.random().toString(36).substring(2, 8);
 
   return '<div class="rh-sparkline">' +
     '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +

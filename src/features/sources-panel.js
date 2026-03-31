@@ -268,7 +268,7 @@ export async function initSourcesPanel(ticker) {
  */
 export function appendSource(source, ticker) {
   const id = ticker.toLowerCase().replace(/[^a-z0-9]/g, '');
-  let panel = document.getElementById('src-panel-' + id);
+  const panel = document.getElementById('src-panel-' + id);
 
   // If the panel doesn't exist yet (first upload), create it in the mount point.
   if (!panel) {

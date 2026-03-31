@@ -10,57 +10,57 @@ import { describe, it, expect } from 'vitest';
  * @returns {{ isUserSource: boolean, originLabel: string, cssClass: string }}
  */
 function getAttribution(s) {
-  var isUserSource = s.source_origin && s.source_origin.indexOf('user') === 0;
-  var originLabel = isUserSource
+  const isUserSource = s.source_origin && s.source_origin.indexOf('user') === 0;
+  const originLabel = isUserSource
     ? s.source_origin.replace('user:', '').trim() + ' (uploaded)'
     : 'Continuum Research';
-  var cssClass = isUserSource ? ' ap-source-user' : ' ap-source-platform';
+  const cssClass = isUserSource ? ' ap-source-user' : ' ap-source-platform';
   return { isUserSource: isUserSource, originLabel: originLabel, cssClass: cssClass };
 }
 
 describe('chat source attribution', function() {
 
   it('platform source renders "Continuum Research" label', function() {
-    var attr = getAttribution({ source_origin: 'platform' });
+    const attr = getAttribution({ source_origin: 'platform' });
     expect(attr.isUserSource).toBe(false);
     expect(attr.originLabel).toBe('Continuum Research');
   });
 
   it('user source renders "{name} (uploaded)" label', function() {
-    var attr = getAttribution({ source_origin: 'user:Macquarie' });
+    const attr = getAttribution({ source_origin: 'user:Macquarie' });
     expect(attr.isUserSource).toBe(true);
     expect(attr.originLabel).toBe('Macquarie (uploaded)');
   });
 
   it('source without source_origin (backward compat) renders platform label', function() {
-    var attr = getAttribution({});
+    const attr = getAttribution({});
     expect(attr.isUserSource).toBeFalsy();
     expect(attr.originLabel).toBe('Continuum Research');
   });
 
   it('source with null source_origin renders platform label', function() {
-    var attr = getAttribution({ source_origin: null });
+    const attr = getAttribution({ source_origin: null });
     expect(attr.isUserSource).toBeFalsy();
     expect(attr.originLabel).toBe('Continuum Research');
   });
 
   it('user source has ap-source-user CSS class', function() {
-    var attr = getAttribution({ source_origin: 'user:Goldman Sachs' });
+    const attr = getAttribution({ source_origin: 'user:Goldman Sachs' });
     expect(attr.cssClass).toContain('ap-source-user');
   });
 
   it('platform source has ap-source-platform CSS class', function() {
-    var attr = getAttribution({ source_origin: 'platform' });
+    const attr = getAttribution({ source_origin: 'platform' });
     expect(attr.cssClass).toContain('ap-source-platform');
   });
 
   it('handles user source with spaces in name', function() {
-    var attr = getAttribution({ source_origin: 'user:Morgan Stanley' });
+    const attr = getAttribution({ source_origin: 'user:Morgan Stanley' });
     expect(attr.originLabel).toBe('Morgan Stanley (uploaded)');
   });
 
   it('handles user source with empty name after prefix', function() {
-    var attr = getAttribution({ source_origin: 'user:' });
+    const attr = getAttribution({ source_origin: 'user:' });
     expect(attr.originLabel).toContain('(uploaded)');
     expect(attr.isUserSource).toBeTruthy();
   });

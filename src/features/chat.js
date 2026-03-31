@@ -22,10 +22,10 @@ import { handleAnalystToPMHandoff } from './pm-chat.js';
 // CONFIGURATION
 // ============================================================
 
-var isFile        = window.location.protocol === 'file:';
-var apiOrigin     = API_BASE;
-var CHAT_API_BASE = apiOrigin + '/api/research-chat';
-var CI_API_KEY    = window.CI_API_KEY || '';
+const isFile        = window.location.protocol === 'file:';
+const apiOrigin     = API_BASE;
+const CHAT_API_BASE = apiOrigin + '/api/research-chat';
+const CI_API_KEY    = window.CI_API_KEY || '';
 
 // ============================================================
 // VOICE RULES -- loaded from data/config/voice-rules.json (single source of truth)
@@ -53,52 +53,52 @@ export var ANALYST_SYSTEM_PROMPT =
 // DOM REFS
 // ============================================================
 
-var panel, fab, collapseBtn, clearBtn, historyBtn, messages, input, sendBtn, tickerSelect, tickerBadge;
+let panel, fab, collapseBtn, clearBtn, historyBtn, messages, input, sendBtn, tickerSelect, tickerBadge;
 
 // ============================================================
 // STATE
 // ============================================================
 
-var isOpen        = false;
-var isLoading     = false;
-var _lastSendTime = 0;
-var _cooldownTimer = null;
-var SEND_COOLDOWN_MS = 2000;
-var conversations = (function() {
+let isOpen        = false;
+let isLoading     = false;
+let _lastSendTime = 0;
+let _cooldownTimer = null;
+const SEND_COOLDOWN_MS = 2000;
+const conversations = (function() {
     try {
-        var saved = sessionStorage.getItem('ci_conversations');
+        const saved = sessionStorage.getItem('ci_conversations');
         return saved ? JSON.parse(saved) : {};
     } catch(e) {
         return {};
     }
 }());
-var currentTicker = '';
+let currentTicker = '';
 
 // ============================================================
 // DB PERSISTENCE
 // ============================================================
 
 // Per-session cache of conversationId per ticker (avoids creating duplicate conversations)
-var dbConversationIds = {};
+const dbConversationIds = {};
 
 async function _ensureConversation(ticker) {
     if (!ticker) return null;
     if (dbConversationIds[ticker]) return dbConversationIds[ticker];
     if (isFile) return null;
-    var token   = window.CI_AUTH && window.CI_AUTH.getToken();
-    var guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
+    const token   = window.CI_AUTH && window.CI_AUTH.getToken();
+    const guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
     if (!token && !guestId) return null;
 
-    var headers = { 'Content-Type': 'application/json' };
+    const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = 'Bearer ' + token;
     try {
-        var res = await fetch(apiOrigin + '/api/conversations', {
+        const res = await fetch(apiOrigin + '/api/conversations', {
             method: 'POST',
             headers: headers,
             body: JSON.stringify({ ticker: ticker, guest_id: token ? null : guestId })
         });
         if (!res.ok) return null;
-        var data = await res.json();
+        const data = await res.json();
         dbConversationIds[ticker] = data.id;
         return data.id;
     } catch (e) {
@@ -111,8 +111,8 @@ function _persistMessage(ticker, role, content, sources) {
     // Fire and forget -- DB failures must never block the chat UI
     _ensureConversation(ticker).then(function(convId) {
         if (!convId) return;
-        var token   = window.CI_AUTH && window.CI_AUTH.getToken();
-        var headers = { 'Content-Type': 'application/json' };
+        const token   = window.CI_AUTH && window.CI_AUTH.getToken();
+        const headers = { 'Content-Type': 'application/json' };
         if (token) headers['Authorization'] = 'Bearer ' + token;
         fetch(apiOrigin + '/api/conversations/' + convId + '/messages', {
             method: 'POST',
@@ -124,13 +124,13 @@ function _persistMessage(ticker, role, content, sources) {
 
 function _restoreFromDB(ticker) {
     if (!ticker || isFile) return Promise.resolve();
-    var token   = window.CI_AUTH && window.CI_AUTH.getToken();
-    var guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
+    const token   = window.CI_AUTH && window.CI_AUTH.getToken();
+    const guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
     if (!token && !guestId) return Promise.resolve();
 
-    var headers = {};
+    const headers = {};
     if (token) headers['Authorization'] = 'Bearer ' + token;
-    var url = apiOrigin + '/api/conversations/' + encodeURIComponent(ticker) +
+    const url = apiOrigin + '/api/conversations/' + encodeURIComponent(ticker) +
               (token ? '' : ('?guest_id=' + encodeURIComponent(guestId)));
     return fetch(url, { headers: headers })
         .then(function(res) { return res.ok ? res.json() : null; })
@@ -158,7 +158,7 @@ function _restoreLatestFromDB() {
     if (isFile) return Promise.resolve();
     return _fetchConversationList().then(function(convos) {
         if (!convos || convos.length === 0) return;
-        var latest = convos[0]; // already sorted newest-first by the backend
+        const latest = convos[0]; // already sorted newest-first by the backend
         if (!latest.ticker) return;
         currentTicker = latest.ticker;
         if (tickerSelect && tickerSelect.querySelector('option[value="' + latest.ticker + '"]')) {
@@ -177,10 +177,10 @@ function _restoreLatestFromDB() {
 
 function populateTickerSelect() {
     if (!tickerSelect) return;
-    var tickers = Object.keys(STOCK_DATA).sort();
+    const tickers = Object.keys(STOCK_DATA).sort();
     tickerSelect.innerHTML = '<option value="">-- All coverage --</option>';
     tickers.forEach(function(t) {
-        var opt = document.createElement('option');
+        const opt = document.createElement('option');
         opt.value = t;
         opt.textContent = t + '  --  ' + (STOCK_DATA[t].company || t);
         tickerSelect.appendChild(opt);
@@ -191,8 +191,8 @@ function populateTickerSelect() {
 function syncTickerFromRoute() {
     // Only SET coverage when navigating to a stock page -- never clear on navigation.
     // The user controls clearing via the dropdown or Clear button.
-    var hash = window.location.hash.slice(1) || '';
-    var detected = '';
+    const hash = window.location.hash.slice(1) || '';
+    let detected = '';
     if (hash.startsWith('report-'))   detected = hash.replace('report-', '').toUpperCase();
     if (hash.startsWith('snapshot-')) detected = hash.replace('snapshot-', '').toUpperCase();
     if (detected) {
@@ -215,7 +215,7 @@ function updateTickerBadge() {
     }
     // Update textarea placeholder
     if (input) {
-        var company = currentTicker && STOCK_DATA[currentTicker] ? STOCK_DATA[currentTicker].company : 'any covered stock';
+        const company = currentTicker && STOCK_DATA[currentTicker] ? STOCK_DATA[currentTicker].company : 'any covered stock';
         input.placeholder = 'Ask about ' + company + '...';
     }
 }
@@ -247,14 +247,14 @@ function getSuggestions(ticker) {
 
 function formatTime(ts) {
     if (!ts) return '';
-    var d = new Date(ts);
-    var hh = String(d.getHours()).padStart(2, '0');
-    var mm = String(d.getMinutes()).padStart(2, '0');
+    const d = new Date(ts);
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
     return hh + ':' + mm;
 }
 
 function escapeHtml(str) {
-    var d = document.createElement('div');
+    const d = document.createElement('div');
     d.textContent = str != null ? String(str) : '';
     return d.innerHTML;
 }
@@ -264,9 +264,9 @@ function renderMarkdown(text) {
 }
 
 function renderWelcome() {
-    var suggs = getSuggestions(currentTicker);
-    var company = currentTicker && STOCK_DATA[currentTicker] ? STOCK_DATA[currentTicker].company : 'any covered stock';
-    var html =
+    const suggs = getSuggestions(currentTicker);
+    const company = currentTicker && STOCK_DATA[currentTicker] ? STOCK_DATA[currentTicker].company : 'any covered stock';
+    const html =
         '<div class="ap-welcome">' +
             '<div class="ap-welcome-title">Analyst Ready</div>' +
             '<div class="ap-welcome-text">Ask questions about <strong>' + escapeHtml(company) + '</strong> grounded in our structured ACH research framework.</div>' +
@@ -288,17 +288,17 @@ function renderWelcome() {
 
 function renderConversation() {
     if (!messages) return;
-    var convo = conversations[currentTicker] || [];
+    const convo = conversations[currentTicker] || [];
     if (convo.length === 0) {
         renderWelcome();
         return;
     }
 
-    var html = '';
+    let html = '';
     convo.forEach(function(msg) {
-        var role     = msg.role === 'user' ? 'user' : 'analyst';
-        var roleLabel = msg.role === 'user' ? 'YOU' : 'ANALYST';
-        var timeStr  = formatTime(msg.timestamp);
+        const role     = msg.role === 'user' ? 'user' : 'analyst';
+        const roleLabel = msg.role === 'user' ? 'YOU' : 'ANALYST';
+        const timeStr  = formatTime(msg.timestamp);
 
         html += '<div class="ap-msg-row">';
         html += '<div class="ap-msg-meta">';
@@ -312,18 +312,18 @@ function renderConversation() {
         } else {
             html += renderMarkdown(msg.content);
             if (msg.sources && msg.sources.length > 0) {
-                var srcId = 'ap-src-' + Math.random().toString(36).substr(2, 6);
+                const srcId = 'ap-src-' + Math.random().toString(36).substr(2, 6);
                 html += '<div class="ap-sources">';
                 html += '<button class="ap-sources-toggle" data-target="' + srcId + '">' +
                     msg.sources.length + ' source' + (msg.sources.length === 1 ? '' : 's') + ' &#9662;' +
                     '</button>';
                 html += '<div class="ap-sources-list" id="' + srcId + '">';
                 msg.sources.forEach(function(s) {
-                    var isUser = s.source_origin && s.source_origin.indexOf('user:') === 0;
-                    var originClass = isUser ? ' ap-source-user' : ' ap-source-platform';
+                    const isUser = s.source_origin && s.source_origin.indexOf('user:') === 0;
+                    const originClass = isUser ? ' ap-source-user' : ' ap-source-platform';
                     html += '<div class="ap-source-item' + originClass + '">';
                     if (isUser) {
-                        var srcName = s.source_origin.slice(5) || 'Uploaded';
+                        const srcName = s.source_origin.slice(5) || 'Uploaded';
                         html += '<span class="ap-source-label ap-source-label-user">' +
                             escapeHtml(srcName) + ' (uploaded)</span> ';
                     } else if (s.source_origin === 'platform') {
@@ -362,7 +362,7 @@ function renderConversation() {
 function bindSourceToggles() {
     messages.querySelectorAll('.ap-sources-toggle').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            var target = document.getElementById(btn.getAttribute('data-target'));
+            const target = document.getElementById(btn.getAttribute('data-target'));
             if (target) target.classList.toggle('open');
         });
     });
@@ -372,17 +372,17 @@ function _bindHandoffButtons() {
     if (!messages) return;
     messages.querySelectorAll('.ap-handoff-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            var hTicker = btn.getAttribute('data-ticker');
+            const hTicker = btn.getAttribute('data-ticker');
             if (!hTicker) return;
 
             // Fetch Analyst summary then hand off to PM
             btn.disabled = true;
             btn.textContent = 'Sending to PM...';
 
-            var _fetchHeaders = { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY };
-            var _fetchToken = window.CI_AUTH && window.CI_AUTH.getToken();
+            const _fetchHeaders = { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY };
+            const _fetchToken = window.CI_AUTH && window.CI_AUTH.getToken();
             if (_fetchToken) _fetchHeaders['Authorization'] = 'Bearer ' + _fetchToken;
-            var _guestId = window.CI_AUTH && window.CI_AUTH.getGuestId ? window.CI_AUTH.getGuestId() : null;
+            const _guestId = window.CI_AUTH && window.CI_AUTH.getGuestId ? window.CI_AUTH.getGuestId() : null;
 
             fetch(apiOrigin + '/api/handoffs/analyst-to-pm', {
                 method: 'POST',
@@ -411,7 +411,7 @@ function _bindHandoffButtons() {
 // ============================================================
 
 function showTyping() {
-    var el = document.createElement('div');
+    const el = document.createElement('div');
     el.className = 'ap-typing';
     el.id = 'apTypingIndicator';
     el.innerHTML =
@@ -426,7 +426,7 @@ function showTyping() {
 }
 
 function hideTyping() {
-    var el = document.getElementById('apTypingIndicator');
+    const el = document.getElementById('apTypingIndicator');
     if (el) el.remove();
 }
 
@@ -439,7 +439,7 @@ function scrollToBottom() {
 // ============================================================
 
 function sendMessage() {
-    var question = input ? input.value.trim() : '';
+    const question = input ? input.value.trim() : '';
     if (!question || isLoading) return;
 
     // Debounce: block sends within cooldown window
@@ -451,15 +451,15 @@ function sendMessage() {
     if (_cooldownTimer) clearTimeout(_cooldownTimer);
     _cooldownTimer = setTimeout(function() { updateSendButton(); }, SEND_COOLDOWN_MS);
 
-    var ticker = currentTicker || (tickerSelect ? tickerSelect.value : '');
+    const ticker = currentTicker || (tickerSelect ? tickerSelect.value : '');
 
     // Thesis capture: infer bias from the question
     if (ticker) {
-      var _inferredBias = inferBiasFromQuestion(question);
+      const _inferredBias = inferBiasFromQuestion(question);
       if (_inferredBias && _inferredBias !== 'neutral') {
         recordSignal(ticker, _inferredBias);
-        var _signalCount = getConsistentSignalCount(ticker, _inferredBias);
-        var _confidence = _signalCount >= 3 ? 'high' : 'low';
+        const _signalCount = getConsistentSignalCount(ticker, _inferredBias);
+        const _confidence = _signalCount >= 3 ? 'high' : 'low';
 
         saveThesis({
           ticker: ticker,
@@ -476,7 +476,7 @@ function sendMessage() {
     }
 
     if (!conversations[ticker]) conversations[ticker] = [];
-    var convo = conversations[ticker];
+    const convo = conversations[ticker];
 
     var now = Date.now();
     convo.push({ role: 'user', content: question, timestamp: now });
@@ -492,7 +492,7 @@ function sendMessage() {
     if (sendBtn) sendBtn.disabled = true;
 
     // Build history (exclude the just-added user message)
-    var history = convo.slice(0, -1).map(function(m) {
+    const history = convo.slice(0, -1).map(function(m) {
         return { role: m.role === 'user' ? 'user' : 'assistant', content: m.content };
     });
 
@@ -504,10 +504,10 @@ function sendMessage() {
         return;
     }
 
-    var _fetchHeaders = { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY };
-    var _fetchToken = window.CI_AUTH && window.CI_AUTH.getToken();
+    const _fetchHeaders = { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY };
+    const _fetchToken = window.CI_AUTH && window.CI_AUTH.getToken();
     if (_fetchToken) _fetchHeaders['Authorization'] = 'Bearer ' + _fetchToken;
-    var _chatUrl = CHAT_API_BASE;
+    let _chatUrl = CHAT_API_BASE;
     if (!_fetchToken && window.CI_AUTH && window.CI_AUTH.getGuestId) {
         _chatUrl += '?guest_id=' + encodeURIComponent(window.CI_AUTH.getGuestId());
     }
@@ -524,7 +524,7 @@ function sendMessage() {
     .then(function(res) {
         if (!res.ok) {
             return res.text().then(function(body) {
-                var detail = '';
+                let detail = '';
                 try { detail = JSON.parse(body).detail || ''; } catch(e) { // Expected: response body may not be valid JSON
                 }
                 if (res.status === 502 && detail.indexOf('authentication_error') !== -1) {
@@ -553,7 +553,7 @@ function sendMessage() {
     })
     .catch(function(err) {
         hideTyping();
-        var msg = err.message || 'Something went wrong. Please try again.';
+        let msg = err.message || 'Something went wrong. Please try again.';
         if (msg === 'Failed to fetch') msg = 'Cannot reach the API. Check that the server is running.';
         appendError(msg);
     })
@@ -564,7 +564,7 @@ function sendMessage() {
 }
 
 function appendError(msg) {
-    var el = document.createElement('div');
+    const el = document.createElement('div');
     el.className = 'ap-error';
     el.textContent = msg;
     if (messages) {
@@ -589,7 +589,7 @@ function _isInCooldown() {
 
 function updateSendButton() {
     if (!sendBtn || !input) return;
-    var cooldown = _isInCooldown();
+    const cooldown = _isInCooldown();
     sendBtn.disabled = !input.value.trim() || isLoading || cooldown;
     sendBtn.style.opacity = cooldown ? '0.4' : '';
 }
@@ -643,11 +643,11 @@ function clearConversation() {
 // CONVERSATION HISTORY
 // ============================================================
 
-var historyOverlay = null;
+let historyOverlay = null;
 
 function _injectHistoryCSS() {
     if (document.getElementById('ap-history-css')) return;
-    var style = document.createElement('style');
+    const style = document.createElement('style');
     style.id = 'ap-history-css';
     style.textContent =
         '.ap-history-btn{background:none;border:none;cursor:pointer;color:var(--text-secondary,#666);padding:4px;border-radius:4px;display:flex;align-items:center;justify-content:center;width:28px;height:28px}' +
@@ -670,9 +670,9 @@ function _injectHistoryCSS() {
 
 function _formatHistoryDate(isoStr) {
     if (!isoStr) return '';
-    var d = new Date(isoStr);
-    var now = new Date();
-    var diff = now - d;
+    const d = new Date(isoStr);
+    const now = new Date();
+    const diff = now - d;
     if (diff < 86400000) {
         return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
     }
@@ -684,17 +684,17 @@ function _formatHistoryDate(isoStr) {
 
 async function _fetchConversationList() {
     if (isFile) return [];
-    var token = window.CI_AUTH && window.CI_AUTH.getToken();
-    var guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
+    const token = window.CI_AUTH && window.CI_AUTH.getToken();
+    const guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
     if (!token && !guestId) return [];
 
-    var headers = {};
+    const headers = {};
     if (token) headers['Authorization'] = 'Bearer ' + token;
-    var url = apiOrigin + '/api/conversations' + (token ? '' : '?guest_id=' + encodeURIComponent(guestId));
+    const url = apiOrigin + '/api/conversations' + (token ? '' : '?guest_id=' + encodeURIComponent(guestId));
     try {
-        var res = await fetch(url, { headers: headers });
+        const res = await fetch(url, { headers: headers });
         if (!res.ok) return [];
-        var data = await res.json();
+        const data = await res.json();
         return data.conversations || [];
     } catch (e) {
         return [];
@@ -715,20 +715,20 @@ async function openHistory() {
     historyOverlay = document.createElement('div');
     historyOverlay.className = 'ap-history-overlay';
 
-    var head = document.createElement('div');
+    const head = document.createElement('div');
     head.className = 'ap-history-head';
     head.innerHTML = '<h3>History</h3><button class="ap-history-close" aria-label="Close history">&times;</button>';
     head.querySelector('.ap-history-close').addEventListener('click', _closeHistory);
     historyOverlay.appendChild(head);
 
-    var listEl = document.createElement('div');
+    const listEl = document.createElement('div');
     listEl.className = 'ap-history-list';
     listEl.innerHTML = '<div class="ap-history-empty">Loading...</div>';
     historyOverlay.appendChild(listEl);
 
     panel.appendChild(historyOverlay);
 
-    var convos = await _fetchConversationList();
+    const convos = await _fetchConversationList();
     if (convos.length === 0) {
         listEl.innerHTML = '<div class="ap-history-empty">No conversation history yet</div>';
         return;
@@ -736,7 +736,7 @@ async function openHistory() {
 
     listEl.innerHTML = '';
     convos.forEach(function(c) {
-        var item = document.createElement('div');
+        const item = document.createElement('div');
         item.className = 'ap-history-item';
         item.innerHTML =
             '<span class="ap-history-ticker">' + escapeHtml(c.ticker) + '</span>' +
@@ -768,7 +768,7 @@ function _setupListeners() {
     // Collapse/close button
     if (collapseBtn) {
         collapseBtn.addEventListener('click', function() {
-            var isNowCollapsed = panel.classList.toggle('ap-user-collapsed');
+            const isNowCollapsed = panel.classList.toggle('ap-user-collapsed');
             document.body.classList.toggle('ap-user-collapsed-active', isNowCollapsed);
             try { localStorage.setItem('ci_panel_collapsed', isNowCollapsed ? '1' : '0'); } catch(e) { // Expected: localStorage may be unavailable in restricted environments
             }

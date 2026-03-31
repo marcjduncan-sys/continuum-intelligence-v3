@@ -17,7 +17,7 @@
 
 function escapeHtmlForPdf(text) {
   if (!text) return '';
-  var map = {
+  const map = {
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
@@ -30,7 +30,7 @@ function escapeHtmlForPdf(text) {
 // ─── Hypothesis colour mapping ──────────────────────────────────────────────
 
 function getHypothesisColor(hId) {
-  var colors = {
+  const colors = {
     'N1': { hex: '#00C853', rgb: '0, 200, 83' },
     'N2': { hex: '#2979FF', rgb: '41, 121, 255' },
     'N3': { hex: '#FF9100', rgb: '255, 145, 0' },
@@ -47,7 +47,7 @@ function getHypothesisColor(hId) {
 
 function computeRiskSkewForPdf(stock) {
   // Try computing live from hypothesis data
-  var hyps = null;
+  let hyps = null;
   if (stock.report && Array.isArray(stock.report.hypotheses) && stock.report.hypotheses.length > 0) {
     hyps = stock.report.hypotheses;
   } else if (Array.isArray(stock.hypotheses) && stock.hypotheses.length > 0 && stock.hypotheses[0].direction) {
@@ -70,24 +70,24 @@ function computeRiskSkewForPdf(stock) {
   }
 
   // Inline fallback: normalise and compute net
-  var FLOOR = 5, CEILING = 80;
-  var raw = [];
+  const FLOOR = 5, CEILING = 80;
+  const raw = [];
   for (var i = 0; i < hyps.length; i++) {
     raw.push(Math.max(FLOOR, Math.min(CEILING, parseInt(hyps[i].score) || 0)));
   }
-  var sum = 0;
+  let sum = 0;
   for (var i = 0; i < raw.length; i++) sum += raw[i];
   if (sum === 0) return 'BALANCED';
-  var norm = [];
+  const norm = [];
   for (var i = 0; i < raw.length; i++) norm.push(Math.round((raw[i] / sum) * 100));
 
-  var bull = 0, bear = 0;
+  let bull = 0, bear = 0;
   for (var i = 0; i < hyps.length; i++) {
-    var dir = hyps[i].direction || 'downside';
+    const dir = hyps[i].direction || 'downside';
     if (dir === 'upside') bull += norm[i];
     else if (dir === 'downside') bear += norm[i];
   }
-  var score = bull - bear;
+  const score = bull - bear;
   return score > 5 ? 'UPSIDE' : score < -5 ? 'DOWNSIDE' : 'BALANCED';
 }
 
@@ -98,17 +98,17 @@ function buildInstitutionalReportHTML(stock) {
     return '<div>Error: Stock data unavailable</div>';
   }
 
-  var date = new Date().toLocaleDateString('en-AU', {
+  const date = new Date().toLocaleDateString('en-AU', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   });
 
-  var risk_skew = computeRiskSkewForPdf(stock);
-  var risk_color = risk_skew === 'DOWNSIDE' ? '#D50000' :
+  const risk_skew = computeRiskSkewForPdf(stock);
+  const risk_color = risk_skew === 'DOWNSIDE' ? '#D50000' :
                    risk_skew === 'UPSIDE' ? '#00C853' : '#FF9100';
 
-  var html = '';
+  let html = '';
 
   // ─── PAGE 1: Cover ──────────────────────────────────────────────────────
   html += '<div style="' +
@@ -175,7 +175,7 @@ function buildInstitutionalReportHTML(stock) {
   
   html += '<tr>';
   html += '<td style="padding: 6px 12px; border: 1px solid #ddd; background: #fafafa;">Dominant Narrative</td>';
-  var dom = stock.hypotheses[stock.dominant];
+  const dom = stock.hypotheses[stock.dominant];
   html += '<td style="padding: 6px 12px; border: 1px solid #ddd; background: #fafafa; font-weight: 700;">' +
     stock.dominant + ': ' + escapeHtmlForPdf(dom.label) +
     '</td>';
@@ -209,15 +209,15 @@ function buildInstitutionalReportHTML(stock) {
     '</h2>';
 
   // List all four hypotheses
-  var hyp_ids = ['N1', 'N2', 'N3', 'N4'];
-  for (var i = 0; i < hyp_ids.length; i++) {
-    var hId = hyp_ids[i];
-    var h = stock.hypotheses[hId];
+  const hyp_ids = ['N1', 'N2', 'N3', 'N4'];
+  for (let i = 0; i < hyp_ids.length; i++) {
+    const hId = hyp_ids[i];
+    const h = stock.hypotheses[hId];
     if (!h) continue;
 
-    var color = getHypothesisColor(hId);
-    var score = Math.round(h.survival_score * 100);
-    var isDom = hId === stock.dominant ? ' (DOMINANT)' : '';
+    const color = getHypothesisColor(hId);
+    const score = Math.round(h.survival_score * 100);
+    const isDom = hId === stock.dominant ? ' (DOMINANT)' : '';
 
     html += '<div style="' +
       'margin: 0 0 16px 0; ' +
@@ -276,20 +276,20 @@ function buildInstitutionalReportHTML(stock) {
     html += '<td style="padding: 6px; font-weight: 700; border: 1px solid #ddd;">N4</td>';
     html += '</tr>';
 
-    for (var j = 0; j < Math.min(stock.evidence_items.length, 8); j++) {
-      var ev = stock.evidence_items[j];
-      var date_str = ev.date ? new Date(ev.date).toLocaleDateString('en-AU') : 'N/A';
+    for (let j = 0; j < Math.min(stock.evidence_items.length, 8); j++) {
+      const ev = stock.evidence_items[j];
+      const date_str = ev.date ? new Date(ev.date).toLocaleDateString('en-AU') : 'N/A';
       
       html += '<tr>';
       html += '<td style="padding: 6px; border: 1px solid #ddd; font-size: 9px;">' + date_str + '</td>';
       html += '<td style="padding: 6px; border: 1px solid #ddd; font-size: 9px;">' + escapeHtmlForPdf(ev.source || '') + '</td>';
       html += '<td style="padding: 6px; border: 1px solid #ddd; font-size: 9px;">' + escapeHtmlForPdf(ev.summary || '') + '</td>';
       
-      for (var k = 0; k < 4; k++) {
-        var hId_k = 'N' + (k + 1);
-        var impact = ev.hypothesis_impact && ev.hypothesis_impact[hId_k];
-        var impact_color = impact === 'CONSISTENT' ? '#00C853' : impact === 'INCONSISTENT' ? '#D50000' : '#999';
-        var impact_text = impact ? impact.charAt(0).toUpperCase() : '−';
+      for (let k = 0; k < 4; k++) {
+        const hId_k = 'N' + (k + 1);
+        const impact = ev.hypothesis_impact && ev.hypothesis_impact[hId_k];
+        const impact_color = impact === 'CONSISTENT' ? '#00C853' : impact === 'INCONSISTENT' ? '#D50000' : '#999';
+        const impact_text = impact ? impact.charAt(0).toUpperCase() : '−';
         html += '<td style="padding: 6px; border: 1px solid #ddd; text-align: center; color: ' + impact_color + '; font-weight: 700; font-size: 9px;">' +
           impact_text +
           '</td>';
@@ -310,8 +310,8 @@ function buildInstitutionalReportHTML(stock) {
       'Tripwires' +
       '</h3>';
 
-    for (var tw_idx = 0; tw_idx < Math.min(stock.tripwires.length, 5); tw_idx++) {
-      var tw = stock.tripwires[tw_idx];
+    for (let tw_idx = 0; tw_idx < Math.min(stock.tripwires.length, 5); tw_idx++) {
+      const tw = stock.tripwires[tw_idx];
       html += '<div style="margin-bottom: 8px; padding: 8px; background: #fff; border: 1px solid #ddd; font-size: 10px;">';
       html += '<strong>' + escapeHtmlForPdf(tw.name || 'Tripwire') + ':</strong> ' +
         escapeHtmlForPdf(tw.description || '') +
@@ -382,17 +382,17 @@ function buildRetailReportHTML(stock) {
     return '<div>Error: Stock data unavailable</div>';
   }
 
-  var date = new Date().toLocaleDateString('en-AU', {
+  const date = new Date().toLocaleDateString('en-AU', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   });
 
-  var risk_skew = computeRiskSkewForPdf(stock);
-  var risk_color = risk_skew === 'DOWNSIDE' ? '#D50000' :
+  const risk_skew = computeRiskSkewForPdf(stock);
+  const risk_color = risk_skew === 'DOWNSIDE' ? '#D50000' :
                    risk_skew === 'UPSIDE' ? '#00C853' : '#FF9100';
 
-  var html = '';
+  let html = '';
 
   // ─── PAGE 1: Cover ──────────────────────────────────────────────────────
   html += '<div style="' +
@@ -426,7 +426,7 @@ function buildRetailReportHTML(stock) {
     escapeHtmlForPdf(stock.ticker) + ' &bull; As of ' + date +
     '</div>';
 
-  var dom = stock.hypotheses[stock.dominant];
+  const dom = stock.hypotheses[stock.dominant];
   
   // Summary in plain English
   html += '<div style="background: #ffffff; padding: 16px; border: 1px solid #ddd; margin-bottom: 24px; line-height: 1.6;">';
@@ -460,14 +460,14 @@ function buildRetailReportHTML(stock) {
     'What the Market is Pricing In' +
     '</div>';
 
-  var hyp_ids = ['N1', 'N2', 'N3', 'N4'];
-  for (var i = 0; i < hyp_ids.length; i++) {
-    var hId = hyp_ids[i];
-    var h = stock.hypotheses[hId];
+  const hyp_ids = ['N1', 'N2', 'N3', 'N4'];
+  for (let i = 0; i < hyp_ids.length; i++) {
+    const hId = hyp_ids[i];
+    const h = stock.hypotheses[hId];
     if (!h) continue;
 
-    var color = getHypothesisColor(hId);
-    var score = Math.round(h.survival_score * 100);
+    const color = getHypothesisColor(hId);
+    const score = Math.round(h.survival_score * 100);
 
     html += '<div style="margin-bottom: 8px;">';
     html += '<div style="display: flex; justify-content: space-between; margin-bottom: 2px; font-size: 11px;">';
@@ -580,7 +580,7 @@ function buildRetailReportHTML(stock) {
 
 window.generateReport = function (format) {
   // 1. Get stock data
-  var stock = window.DNE_STOCK;
+  const stock = window.DNE_STOCK;
   
   if (!stock || !stock.ticker) {
     alert('Stock data not loaded yet. Please wait a moment and try again.');
@@ -591,7 +591,7 @@ window.generateReport = function (format) {
   console.log('[PDF] Starting report generation for:', stock.ticker, 'format:', format);
 
   // 2. Build the HTML
-  var reportHTML = format === 'retail'
+  const reportHTML = format === 'retail'
     ? buildRetailReportHTML(stock)
     : buildInstitutionalReportHTML(stock);
 
@@ -604,7 +604,7 @@ window.generateReport = function (format) {
   console.log('[PDF] HTML generated, length:', reportHTML.length);
 
   // 3. Create a complete standalone HTML document
-  var fullDocument = '<!DOCTYPE html>' +
+  const fullDocument = '<!DOCTYPE html>' +
     '<html>' +
     '<head>' +
     '<meta charset="UTF-8">' +
@@ -620,7 +620,7 @@ window.generateReport = function (format) {
     '</html>';
 
   // 4. Open a new window and write the complete document directly
-  var printWindow = window.open('', 'PrintReport_' + Date.now());
+  const printWindow = window.open('', 'PrintReport_' + Date.now());
   
   console.log('[PDF] Print window opened');
 

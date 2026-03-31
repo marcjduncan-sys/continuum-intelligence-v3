@@ -9,35 +9,35 @@
 import { STOCK_DATA } from '../lib/state.js';
 import { API_BASE } from '../lib/api-config.js';
 
-var apiOrigin = API_BASE;
+const apiOrigin = API_BASE;
 
 // ============================================================
 // VIEW STATE
 // ============================================================
 
-var _currentView = 'stock'; // 'stock' | 'type' | 'date'
-var _currentFilter = '';    // ticker filter
-var _currentSource = 'analyst'; // 'analyst' | 'pm'
+let _currentView = 'stock'; // 'stock' | 'type' | 'date'
+let _currentFilter = '';    // ticker filter
+let _currentSource = 'analyst'; // 'analyst' | 'pm'
 
 // ============================================================
 // AUTH HELPERS
 // ============================================================
 
 function _getAuthHeaders() {
-    var headers = {};
-    var token = window.CI_AUTH && window.CI_AUTH.getToken();
+    const headers = {};
+    const token = window.CI_AUTH && window.CI_AUTH.getToken();
     if (token) headers['Authorization'] = 'Bearer ' + token;
     return { headers: headers, token: token };
 }
 
 function _getGuestParam(token) {
     if (token) return '';
-    var guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
+    const guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
     return guestId ? '?guest_id=' + encodeURIComponent(guestId) : '';
 }
 
 function _escHtml(str) {
-    var d = document.createElement('div');
+    const d = document.createElement('div');
     d.textContent = str != null ? String(str) : '';
     return d.innerHTML;
 }
@@ -48,21 +48,21 @@ function _escHtml(str) {
 
 function _formatAge(isoStr) {
     if (!isoStr) return '';
-    var d = new Date(isoStr);
-    var diff = Date.now() - d.getTime();
-    var days = Math.floor(diff / 86400000);
+    const d = new Date(isoStr);
+    const diff = Date.now() - d.getTime();
+    const days = Math.floor(diff / 86400000);
     if (days === 0) return 'today';
     if (days === 1) return '1 day ago';
     if (days < 30) return days + ' days ago';
-    var months = Math.floor(days / 30);
+    const months = Math.floor(days / 30);
     return months === 1 ? '1 month ago' : months + ' months ago';
 }
 
 function _formatDate(isoStr) {
     if (!isoStr) return '';
-    var d = new Date(isoStr);
-    var day = d.getDate();
-    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const d = new Date(isoStr);
+    const day = d.getDate();
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     return day + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
 }
 
@@ -76,7 +76,7 @@ function _confLabel(conf) {
 // TYPE CLASSIFICATION
 // ============================================================
 
-var TYPE_CONFIG = {
+const TYPE_CONFIG = {
     conviction:       { label: 'CONVICTION', borderColor: '#22c55e', badgeBg: 'rgba(34,197,94,.12)',  badgeColor: '#16a34a' },
     risk_flag:        { label: 'RISK FLAG',  borderColor: '#f59e0b', badgeBg: 'rgba(245,158,11,.12)', badgeColor: '#d97706' },
     valuation:        { label: 'VALUATION',  borderColor: '#3b82f6', badgeBg: 'rgba(59,130,246,.12)', badgeColor: '#2563eb' },
@@ -85,8 +85,8 @@ var TYPE_CONFIG = {
 };
 
 function _classifyMemory(m) {
-    var content = (m.content || '').toLowerCase();
-    var tags = (m.tags || []).map(function(t) { return t.toLowerCase(); });
+    const content = (m.content || '').toLowerCase();
+    const tags = (m.tags || []).map(function(t) { return t.toLowerCase(); });
 
     // Non-ticker = process note (check early)
     if (!m.ticker) return 'process_note';
@@ -115,7 +115,7 @@ function _getTypeConfig(type) {
 
 function _injectCSS() {
     if (document.getElementById('journal-page-css')) return;
-    var style = document.createElement('style');
+    const style = document.createElement('style');
     style.id = 'journal-page-css';
     style.textContent =
         '#page-memory{padding:96px 32px 24px;max-width:960px;margin:0 auto}' +
@@ -212,7 +212,7 @@ function _injectCSS() {
 // PM TYPE CONFIG
 // ============================================================
 
-var PM_TYPE_CONFIG = {
+const PM_TYPE_CONFIG = {
     pm_decision:          { label: 'DECISION',   borderColor: '#003A70', badgeBg: 'rgba(0,58,112,.10)',   badgeColor: '#003A70' },
     portfolio_risk:       { label: 'RISK',        borderColor: '#ef4444', badgeBg: 'rgba(239,68,68,.10)',  badgeColor: '#dc2626' },
     mandate_breach:       { label: 'BREACH',      borderColor: '#f59e0b', badgeBg: 'rgba(245,158,11,.12)', badgeColor: '#d97706' },
@@ -222,7 +222,7 @@ var PM_TYPE_CONFIG = {
     change_alert:         { label: 'CHANGE',      borderColor: '#10b981', badgeBg: 'rgba(16,185,129,.10)', badgeColor: '#059669' }
 };
 
-var PM_ACTION_CONFIG = {
+const PM_ACTION_CONFIG = {
     trim:      { label: 'TRIM',      color: '#ef4444' },
     add:       { label: 'ADD',       color: '#22c55e' },
     exit:      { label: 'EXIT',      color: '#dc2626' },
@@ -238,7 +238,7 @@ var PM_ACTION_CONFIG = {
 
 function _injectPMCSS() {
     if (document.getElementById('pm-journal-css')) return;
-    var style = document.createElement('style');
+    const style = document.createElement('style');
     style.id = 'pm-journal-css';
     style.textContent =
         // Source toggle bar (Analyst | PM)
@@ -283,19 +283,19 @@ function _injectPMCSS() {
 
 async function _fetchPMJournal(token, options) {
     options = options || {};
-    var params = [];
-    var gp = _getGuestParam(token);
+    const params = [];
+    const gp = _getGuestParam(token);
     if (gp) params.push(gp.slice(1)); // remove leading ?
     if (options.ticker) params.push('ticker=' + encodeURIComponent(options.ticker));
     if (options.insightType) params.push('insight_type=' + encodeURIComponent(options.insightType));
     if (options.includeArchived) params.push('include_archived=true');
-    var qs = params.length > 0 ? '?' + params.join('&') : '';
-    var url = apiOrigin + '/api/pm-journal' + qs;
-    var auth = _getAuthHeaders();
+    const qs = params.length > 0 ? '?' + params.join('&') : '';
+    const url = apiOrigin + '/api/pm-journal' + qs;
+    const auth = _getAuthHeaders();
     try {
-        var res = await fetch(url, { headers: auth.headers });
+        const res = await fetch(url, { headers: auth.headers });
         if (!res.ok) return [];
-        var data = await res.json();
+        const data = await res.json();
         return data.entries || [];
     } catch (e) {
         return [];
@@ -303,16 +303,16 @@ async function _fetchPMJournal(token, options) {
 }
 
 async function _archivePMInsight(id, token) {
-    var url = apiOrigin + '/api/pm-journal/insights/' + id + '/archive' + _getGuestParam(token);
-    var auth = _getAuthHeaders();
+    const url = apiOrigin + '/api/pm-journal/insights/' + id + '/archive' + _getGuestParam(token);
+    const auth = _getAuthHeaders();
     try {
         await fetch(url, { method: 'POST', headers: auth.headers });
     } catch (e) { /* silent */ }
 }
 
 async function _restorePMInsight(id, token) {
-    var url = apiOrigin + '/api/pm-journal/insights/' + id + '/restore' + _getGuestParam(token);
-    var auth = _getAuthHeaders();
+    const url = apiOrigin + '/api/pm-journal/insights/' + id + '/restore' + _getGuestParam(token);
+    const auth = _getAuthHeaders();
     try {
         await fetch(url, { method: 'POST', headers: auth.headers });
     } catch (e) { /* silent */ }
@@ -323,8 +323,8 @@ async function _restorePMInsight(id, token) {
 // ============================================================
 
 function _renderPMDecisionCard(d) {
-    var actionCfg = PM_ACTION_CONFIG[d.action_type] || PM_ACTION_CONFIG.hold;
-    var html = '<div class="jnl-pm-decision" data-id="' + _escHtml(d.id) + '">';
+    const actionCfg = PM_ACTION_CONFIG[d.action_type] || PM_ACTION_CONFIG.hold;
+    let html = '<div class="jnl-pm-decision" data-id="' + _escHtml(d.id) + '">';
     html += '<div class="jnl-pm-decision-top">';
     html += '<span class="jnl-pm-action-badge" style="background:' + actionCfg.color + '">' + actionCfg.label + '</span>';
     if (d.ticker) html += '<span class="jnl-pm-decision-ticker">' + _escHtml(d.ticker) + '</span>';
@@ -333,7 +333,7 @@ function _renderPMDecisionCard(d) {
     html += '<div class="jnl-pm-rationale">' + _escHtml(d.rationale) + '</div>';
 
     // Meta items
-    var meta = [];
+    const meta = [];
     if (d.sizing_band) meta.push('Size: ' + d.sizing_band);
     if (d.source_of_funds) meta.push('Source: ' + d.source_of_funds);
     if (d.mandate_basis) meta.push('Mandate: ' + d.mandate_basis);
@@ -360,10 +360,10 @@ function _renderPMDecisionCard(d) {
 }
 
 function _renderPMInsightCard(i) {
-    var typeCfg = PM_TYPE_CONFIG[i.insight_type] || PM_TYPE_CONFIG.portfolio_risk;
-    var archivedClass = i.active === false ? ' archived' : '';
-    var borderStyle = 'border-left-color:' + typeCfg.borderColor;
-    var html = '<div class="jnl-pm-insight' + archivedClass + '" data-id="' + _escHtml(i.id) + '" style="' + borderStyle + '">';
+    const typeCfg = PM_TYPE_CONFIG[i.insight_type] || PM_TYPE_CONFIG.portfolio_risk;
+    const archivedClass = i.active === false ? ' archived' : '';
+    const borderStyle = 'border-left-color:' + typeCfg.borderColor;
+    let html = '<div class="jnl-pm-insight' + archivedClass + '" data-id="' + _escHtml(i.id) + '" style="' + borderStyle + '">';
     html += '<div class="jnl-pm-insight-top">';
     html += '<span class="jnl-type-badge" style="background:' + typeCfg.badgeBg + ';color:' + typeCfg.badgeColor + '">' + typeCfg.label + '</span>';
     html += '<span class="jnl-pm-insight-date">' + _formatDate(i.created_at) + '</span>';
@@ -372,8 +372,8 @@ function _renderPMInsightCard(i) {
 
     // Confidence
     if (typeof i.confidence === 'number') {
-        var pct = Math.round(i.confidence * 100);
-        var confClass = pct >= 80 ? 'high' : pct >= 50 ? 'med' : 'low';
+        const pct = Math.round(i.confidence * 100);
+        const confClass = pct >= 80 ? 'high' : pct >= 50 ? 'med' : 'low';
         html += '<span class="jnl-pm-confidence jnl-pm-confidence--' + confClass + '">' + pct + '% confidence</span>';
     }
 
@@ -409,12 +409,12 @@ function _renderPMInsightCard(i) {
 }
 
 function _renderPMJournal(entries) {
-    var decisions = entries.filter(function(e) { return e.journal_type === 'decision'; });
-    var insights = entries.filter(function(e) { return e.journal_type === 'insight'; });
-    var activeInsights = insights.filter(function(e) { return e.active !== false; });
-    var archivedInsights = insights.filter(function(e) { return e.active === false; });
+    const decisions = entries.filter(function(e) { return e.journal_type === 'decision'; });
+    const insights = entries.filter(function(e) { return e.journal_type === 'insight'; });
+    const activeInsights = insights.filter(function(e) { return e.active !== false; });
+    const archivedInsights = insights.filter(function(e) { return e.active === false; });
 
-    var html = '';
+    let html = '';
 
     // Decisions section
     if (decisions.length > 0) {
@@ -458,12 +458,12 @@ function _renderPMJournal(entries) {
 // ============================================================
 
 async function _fetchMemories(token) {
-    var url = apiOrigin + '/api/memories' + _getGuestParam(token);
-    var auth = _getAuthHeaders();
+    const url = apiOrigin + '/api/memories' + _getGuestParam(token);
+    const auth = _getAuthHeaders();
     try {
-        var res = await fetch(url, { headers: auth.headers });
+        const res = await fetch(url, { headers: auth.headers });
         if (!res.ok) return [];
-        var data = await res.json();
+        const data = await res.json();
         return data.memories || [];
     } catch (e) {
         return [];
@@ -471,8 +471,8 @@ async function _fetchMemories(token) {
 }
 
 async function _archiveMemory(id, token) {
-    var url = apiOrigin + '/api/memories/' + id + _getGuestParam(token);
-    var auth = _getAuthHeaders();
+    const url = apiOrigin + '/api/memories/' + id + _getGuestParam(token);
+    const auth = _getAuthHeaders();
     try {
         await fetch(url, { method: 'DELETE', headers: auth.headers });
     } catch (e) {
@@ -481,12 +481,12 @@ async function _archiveMemory(id, token) {
 }
 
 async function _fetchNotifications(token) {
-    var url = apiOrigin + '/api/notifications' + _getGuestParam(token);
-    var auth = _getAuthHeaders();
+    const url = apiOrigin + '/api/notifications' + _getGuestParam(token);
+    const auth = _getAuthHeaders();
     try {
-        var res = await fetch(url, { headers: auth.headers });
+        const res = await fetch(url, { headers: auth.headers });
         if (!res.ok) return [];
-        var data = await res.json();
+        const data = await res.json();
         return Array.isArray(data) ? data : [];
     } catch (e) {
         return [];
@@ -495,16 +495,16 @@ async function _fetchNotifications(token) {
 
 function _renderDriftAlerts(notifications) {
     // Only show CONTRADICTS signals as evidence drift
-    var drifts = notifications.filter(function(n) { return n.signal === 'contradicts'; });
+    const drifts = notifications.filter(function(n) { return n.signal === 'contradicts'; });
     if (drifts.length === 0) return '';
 
-    var html = '<div class="jnl-drift">';
+    let html = '<div class="jnl-drift">';
     html += '<div class="jnl-drift-header">Evidence Drift (' + drifts.length + ')</div>';
 
     drifts.forEach(function(n) {
-        var stock = STOCK_DATA[n.ticker] || {};
-        var skew = stock.skew || {};
-        var currentSkew = (skew.direction || '').toUpperCase();
+        const stock = STOCK_DATA[n.ticker] || {};
+        const skew = stock.skew || {};
+        const currentSkew = (skew.direction || '').toUpperCase();
 
         html += '<div class="jnl-drift-item" data-id="' + _escHtml(n.id) + '">';
         html += '<span class="jnl-drift-ticker">' + _escHtml(n.ticker) + '</span>';
@@ -530,8 +530,8 @@ function _renderDriftAlerts(notifications) {
 
 function _toSecondPerson(text) {
     if (!text) return '';
-    var t = text.trim();
-    var lower = t.toLowerCase();
+    const t = text.trim();
+    const lower = t.toLowerCase();
 
     // Already second person
     if (lower.startsWith('you ') || lower.startsWith('your ')) return t;
@@ -566,11 +566,11 @@ function _toSecondPerson(text) {
 
 function _renderCard(m, showTicker) {
     // Use server-side insight_type if available, fall back to heuristic
-    var type = (m.insight_type && TYPE_CONFIG[m.insight_type]) ? m.insight_type : _classifyMemory(m);
-    var cfg = _getTypeConfig(type);
-    var borderStyle = 'border-left-color:' + cfg.borderColor;
+    const type = (m.insight_type && TYPE_CONFIG[m.insight_type]) ? m.insight_type : _classifyMemory(m);
+    const cfg = _getTypeConfig(type);
+    const borderStyle = 'border-left-color:' + cfg.borderColor;
 
-    var html = '<div class="jnl-card" data-id="' + _escHtml(m.id) + '" style="' + borderStyle + '">';
+    let html = '<div class="jnl-card" data-id="' + _escHtml(m.id) + '" style="' + borderStyle + '">';
     html += '<div class="jnl-card-body">';
 
     // Top row: type badge, ticker (if showing), date
@@ -621,8 +621,8 @@ function _renderCard(m, showTicker) {
 // ============================================================
 
 function _renderByStock(memories) {
-    var byTicker = {};
-    var noTicker = [];
+    const byTicker = {};
+    const noTicker = [];
     memories.forEach(function(m) {
         if (m.ticker) {
             if (!byTicker[m.ticker]) byTicker[m.ticker] = [];
@@ -632,16 +632,16 @@ function _renderByStock(memories) {
         }
     });
 
-    var html = '';
-    var tickers = Object.keys(byTicker).sort();
+    let html = '';
+    const tickers = Object.keys(byTicker).sort();
 
     tickers.forEach(function(ticker) {
-        var items = byTicker[ticker];
-        var stock = STOCK_DATA[ticker] || {};
-        var company = stock.company || ticker;
-        var skew = stock.skew || {};
-        var skewDir = (skew.direction || '').toLowerCase();
-        var skewClass = skewDir === 'upside' ? 'jnl-skew-upside'
+        const items = byTicker[ticker];
+        const stock = STOCK_DATA[ticker] || {};
+        const company = stock.company || ticker;
+        const skew = stock.skew || {};
+        const skewDir = (skew.direction || '').toLowerCase();
+        const skewClass = skewDir === 'upside' ? 'jnl-skew-upside'
             : skewDir === 'downside' ? 'jnl-skew-downside'
             : 'jnl-skew-balanced';
 
@@ -691,20 +691,20 @@ function _renderByStock(memories) {
 // ============================================================
 
 function _renderByType(memories) {
-    var byType = {};
+    const byType = {};
     memories.forEach(function(m) {
-        var type = (m.insight_type && TYPE_CONFIG[m.insight_type]) ? m.insight_type : _classifyMemory(m);
+        const type = (m.insight_type && TYPE_CONFIG[m.insight_type]) ? m.insight_type : _classifyMemory(m);
         if (!byType[type]) byType[type] = [];
         byType[type].push(m);
     });
 
-    var html = '';
-    var order = ['conviction', 'risk_flag', 'valuation', 'thesis_challenge', 'process_note'];
+    let html = '';
+    const order = ['conviction', 'risk_flag', 'valuation', 'thesis_challenge', 'process_note'];
 
     order.forEach(function(type) {
-        var items = byType[type];
+        const items = byType[type];
         if (!items || items.length === 0) return;
-        var cfg = _getTypeConfig(type);
+        const cfg = _getTypeConfig(type);
 
         // Sort newest first within each type
         items.sort(function(a, b) { return new Date(b.created_at) - new Date(a.created_at); });
@@ -728,15 +728,15 @@ function _renderByType(memories) {
 
 function _renderByDate(memories) {
     // Sort newest first
-    var sorted = memories.slice().sort(function(a, b) {
+    const sorted = memories.slice().sort(function(a, b) {
         return new Date(b.created_at) - new Date(a.created_at);
     });
 
     // Group by date string
-    var byDate = {};
-    var dateOrder = [];
+    const byDate = {};
+    const dateOrder = [];
     sorted.forEach(function(m) {
-        var dateStr = _formatDate(m.created_at);
+        const dateStr = _formatDate(m.created_at);
         if (!byDate[dateStr]) {
             byDate[dateStr] = [];
             dateOrder.push(dateStr);
@@ -744,7 +744,7 @@ function _renderByDate(memories) {
         byDate[dateStr].push(m);
     });
 
-    var html = '';
+    let html = '';
     dateOrder.forEach(function(dateStr) {
         html += '<div class="jnl-date-group">';
         html += '<div class="jnl-date-title">' + _escHtml(dateStr) + '</div>';
@@ -764,15 +764,15 @@ function _renderByDate(memories) {
 export async function renderMemoryPage() {
     _injectCSS();
     _injectPMCSS();
-    var container = document.getElementById('page-memory');
+    const container = document.getElementById('page-memory');
     if (!container) return;
 
     container.innerHTML = '<div class="jnl-loading">Loading journal...</div>';
 
-    var auth = _getAuthHeaders();
+    const auth = _getAuthHeaders();
 
     // Source toggle (Analyst | PM)
-    var headerHtml = '<div class="jnl-header">';
+    let headerHtml = '<div class="jnl-header">';
     headerHtml += '<h2>Journal</h2>';
     headerHtml += '<p class="jnl-subtitle">Your analytical positions, portfolio decisions, and evolving views.</p>';
     headerHtml += '</div>';
@@ -783,8 +783,8 @@ export async function renderMemoryPage() {
 
     // PM Journal path
     if (_currentSource === 'pm') {
-        var pmEntries = await _fetchPMJournal(auth.token, { includeArchived: true });
-        var pmHtml = headerHtml;
+        const pmEntries = await _fetchPMJournal(auth.token, { includeArchived: true });
+        let pmHtml = headerHtml;
         pmHtml += _renderPMJournal(pmEntries);
         container.innerHTML = pmHtml;
 
@@ -799,9 +799,9 @@ export async function renderMemoryPage() {
         // Wire PM archive buttons
         container.querySelectorAll('.pm-archive').forEach(function(btn) {
             btn.addEventListener('click', async function() {
-                var card = btn.closest('.jnl-pm-insight');
+                const card = btn.closest('.jnl-pm-insight');
                 if (!card) return;
-                var id = btn.getAttribute('data-id');
+                const id = btn.getAttribute('data-id');
                 card.style.opacity = '0.3';
                 await _archivePMInsight(id, auth.token);
                 renderMemoryPage();
@@ -811,7 +811,7 @@ export async function renderMemoryPage() {
         // Wire PM restore buttons
         container.querySelectorAll('.pm-restore').forEach(function(btn) {
             btn.addEventListener('click', async function() {
-                var id = btn.getAttribute('data-id');
+                const id = btn.getAttribute('data-id');
                 await _restorePMInsight(id, auth.token);
                 renderMemoryPage();
             });
@@ -820,7 +820,7 @@ export async function renderMemoryPage() {
         // Wire collapsible sections
         container.querySelectorAll('.jnl-type-title').forEach(function(title) {
             title.addEventListener('click', function() {
-                var group = title.closest('.jnl-type-group');
+                const group = title.closest('.jnl-type-group');
                 if (group) group.classList.toggle('collapsed');
             });
         });
@@ -829,10 +829,10 @@ export async function renderMemoryPage() {
         var archivedToggle = container.querySelector('.jnl-archived-toggle');
         if (archivedToggle) {
             archivedToggle.addEventListener('click', function() {
-                var list = container.querySelector('.jnl-archived-list');
-                var arrow = container.querySelector('.jnl-toggle-arrow');
+                const list = container.querySelector('.jnl-archived-list');
+                const arrow = container.querySelector('.jnl-toggle-arrow');
                 if (!list) return;
-                var isOpen = list.style.display !== 'none';
+                const isOpen = list.style.display !== 'none';
                 list.style.display = isOpen ? 'none' : 'block';
                 if (arrow) arrow.classList.toggle('open', !isOpen);
                 archivedToggle.setAttribute('aria-expanded', String(!isOpen));
@@ -843,8 +843,8 @@ export async function renderMemoryPage() {
     }
 
     // Analyst Journal path (existing code)
-    var memories = await _fetchMemories(auth.token);
-    var notifications = await _fetchNotifications(auth.token);
+    const memories = await _fetchMemories(auth.token);
+    const notifications = await _fetchNotifications(auth.token);
 
     if (memories.length === 0) {
         container.innerHTML = headerHtml +
@@ -860,18 +860,18 @@ export async function renderMemoryPage() {
     }
 
     // Apply ticker filter
-    var filtered = memories;
+    let filtered = memories;
     if (_currentFilter) {
         filtered = memories.filter(function(m) { return m.ticker === _currentFilter; });
     }
 
     // Get unique tickers for filter dropdown
-    var tickerSet = {};
+    const tickerSet = {};
     memories.forEach(function(m) { if (m.ticker) tickerSet[m.ticker] = true; });
-    var allTickers = Object.keys(tickerSet).sort();
+    const allTickers = Object.keys(tickerSet).sort();
 
     // Build header (use shared header with toggle)
-    var html = headerHtml;
+    let html = headerHtml;
 
     // Controls: view toggle + filter + count
     html += '<div class="jnl-controls">';
@@ -885,7 +885,7 @@ export async function renderMemoryPage() {
     html += '<select class="jnl-filter" id="jnlTickerFilter">';
     html += '<option value="">All Stocks</option>';
     allTickers.forEach(function(t) {
-        var sel = _currentFilter === t ? ' selected' : '';
+        const sel = _currentFilter === t ? ' selected' : '';
         html += '<option value="' + _escHtml(t) + '"' + sel + '>' + _escHtml(t) + '</option>';
     });
     html += '</select>';
@@ -937,7 +937,7 @@ export async function renderMemoryPage() {
     // Wire collapsible type sections
     container.querySelectorAll('.jnl-type-title').forEach(function(title) {
         title.addEventListener('click', function() {
-            var group = title.closest('.jnl-type-group');
+            const group = title.closest('.jnl-type-group');
             if (group) group.classList.toggle('collapsed');
         });
     });
@@ -945,7 +945,7 @@ export async function renderMemoryPage() {
     // Wire collapsible stock sections
     container.querySelectorAll('.jnl-stock-header').forEach(function(header) {
         header.addEventListener('click', function() {
-            var group = header.closest('.jnl-stock-group');
+            const group = header.closest('.jnl-stock-group');
             if (group) group.classList.toggle('collapsed');
         });
     });
@@ -958,11 +958,11 @@ export async function renderMemoryPage() {
     });
     container.querySelectorAll('.drift-discuss').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            var ticker = btn.getAttribute('data-ticker');
-            var summary = btn.getAttribute('data-summary');
+            const ticker = btn.getAttribute('data-ticker');
+            const summary = btn.getAttribute('data-summary');
             window.location.hash = 'report-' + ticker.toLowerCase();
             setTimeout(function() {
-                var chatInput = document.getElementById('apInput');
+                const chatInput = document.getElementById('apInput');
                 if (chatInput) {
                     chatInput.value = 'Evidence drift alert: "' + summary + '" -- Walk me through what changed and whether my view needs updating.';
                     chatInput.dispatchEvent(new Event('input'));
@@ -973,16 +973,16 @@ export async function renderMemoryPage() {
     });
     container.querySelectorAll('.drift-dismiss').forEach(function(btn) {
         btn.addEventListener('click', async function() {
-            var item = btn.closest('.jnl-drift-item');
-            var id = btn.getAttribute('data-id');
+            const item = btn.closest('.jnl-drift-item');
+            const id = btn.getAttribute('data-id');
             if (item) { item.style.opacity = '0.3'; item.style.pointerEvents = 'none'; }
-            var url = apiOrigin + '/api/notifications/' + id + '/dismiss' + _getGuestParam(auth.token);
+            const url = apiOrigin + '/api/notifications/' + id + '/dismiss' + _getGuestParam(auth.token);
             try {
                 await fetch(url, { method: 'PATCH', headers: auth.headers });
             } catch (e) { /* silent */ }
             if (item) item.remove();
             // Remove drift container if empty
-            var driftBox = container.querySelector('.jnl-drift');
+            const driftBox = container.querySelector('.jnl-drift');
             if (driftBox && driftBox.querySelectorAll('.jnl-drift-item').length === 0) {
                 driftBox.remove();
             }
@@ -990,7 +990,7 @@ export async function renderMemoryPage() {
     });
 
     // Wire ticker filter
-    var filterEl = document.getElementById('jnlTickerFilter');
+    const filterEl = document.getElementById('jnlTickerFilter');
     if (filterEl) {
         filterEl.addEventListener('change', function() {
             _currentFilter = filterEl.value;
@@ -1001,26 +1001,26 @@ export async function renderMemoryPage() {
     // Wire archive buttons: move card to archived section
     container.querySelectorAll('.jnl-action-btn.archive').forEach(function(btn) {
         btn.addEventListener('click', async function() {
-            var card = btn.closest('.jnl-card');
+            const card = btn.closest('.jnl-card');
             if (!card) return;
-            var id = card.getAttribute('data-id');
+            const id = card.getAttribute('data-id');
             card.style.opacity = '0.3';
             card.style.pointerEvents = 'none';
             await _archiveMemory(id, auth.token);
 
             // Move card to archived section
-            var archivedList = container.querySelector('.jnl-archived-list');
+            const archivedList = container.querySelector('.jnl-archived-list');
             if (archivedList) {
                 card.style.opacity = '';
                 card.style.pointerEvents = '';
                 // Remove archive button from the moved card
-                var archiveBtn = card.querySelector('.jnl-action-btn.archive');
+                const archiveBtn = card.querySelector('.jnl-action-btn.archive');
                 if (archiveBtn) archiveBtn.remove();
                 card.parentNode.removeChild(card);
                 archivedList.appendChild(card);
 
                 // Update archived count
-                var archivedCount = container.querySelector('.jnl-archived-count');
+                const archivedCount = container.querySelector('.jnl-archived-count');
                 if (archivedCount) {
                     archivedCount.textContent = archivedList.querySelectorAll('.jnl-card').length;
                 }
@@ -1029,9 +1029,9 @@ export async function renderMemoryPage() {
             }
 
             // Update active count
-            var countEl = container.querySelector('.jnl-count');
+            const countEl = container.querySelector('.jnl-count');
             if (countEl) {
-                var remaining = container.querySelector('.jnl-active-cards').querySelectorAll('.jnl-card').length;
+                const remaining = container.querySelector('.jnl-active-cards').querySelectorAll('.jnl-card').length;
                 countEl.textContent = remaining + ' entries';
             }
         });
@@ -1041,10 +1041,10 @@ export async function renderMemoryPage() {
     var archivedToggle = container.querySelector('.jnl-archived-toggle');
     if (archivedToggle) {
         archivedToggle.addEventListener('click', function() {
-            var list = container.querySelector('.jnl-archived-list');
-            var arrow = container.querySelector('.jnl-toggle-arrow');
+            const list = container.querySelector('.jnl-archived-list');
+            const arrow = container.querySelector('.jnl-toggle-arrow');
             if (!list) return;
-            var isOpen = list.style.display !== 'none';
+            const isOpen = list.style.display !== 'none';
             list.style.display = isOpen ? 'none' : 'block';
             if (arrow) arrow.classList.toggle('open', !isOpen);
             archivedToggle.setAttribute('aria-expanded', String(!isOpen));
@@ -1054,7 +1054,7 @@ export async function renderMemoryPage() {
     // Wire "View conversation" buttons (navigate to stock report, opens analyst panel with history)
     container.querySelectorAll('.jnl-action-btn.view-convo').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            var ticker = btn.getAttribute('data-ticker');
+            const ticker = btn.getAttribute('data-ticker');
             window.location.hash = 'report-' + ticker.toLowerCase();
         });
     });
@@ -1062,13 +1062,13 @@ export async function renderMemoryPage() {
     // Wire challenge buttons (open analyst chat with pre-loaded prompt)
     container.querySelectorAll('.jnl-action-btn.challenge').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            var ticker = btn.getAttribute('data-ticker');
-            var content = btn.getAttribute('data-content');
+            const ticker = btn.getAttribute('data-ticker');
+            const content = btn.getAttribute('data-content');
             // Navigate to the stock page (opens analyst panel)
             window.location.hash = 'report-' + ticker.toLowerCase();
             // Set the chat input after a short delay to let the panel open
             setTimeout(function() {
-                var chatInput = document.getElementById('apInput');
+                const chatInput = document.getElementById('apInput');
                 if (chatInput) {
                     chatInput.value = 'I previously noted: "' + content + '" -- Has the evidence changed? Should I update this view?';
                     chatInput.dispatchEvent(new Event('input'));

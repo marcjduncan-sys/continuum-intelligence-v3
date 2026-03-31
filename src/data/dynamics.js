@@ -34,37 +34,37 @@ import { emit } from '../lib/data-events.js';
  * @returns {ComputedMetrics|null} Computed metrics or null if data missing
  */
 export function compute(ticker) {
-  var stock = STOCK_DATA[ticker];
-  var ref = REFERENCE_DATA[ticker];
+  const stock = STOCK_DATA[ticker];
+  const ref = REFERENCE_DATA[ticker];
   if (!stock || !ref) return null;
 
-  var price = parseFloat(stock._livePrice || stock.price) || 0;
-  var currency = stock.currency || 'A$';
+  const price = parseFloat(stock._livePrice || stock.price) || 0;
+  const currency = stock.currency || 'A$';
 
   // 52-week high/low from priceHistory
-  var history = Array.isArray(stock.priceHistory) ? stock.priceHistory : [];
-  var h252 = history.slice(-252);
-  var high52 = h252.length > 0 ? Math.max.apply(null, h252) : null;
-  var low52  = h252.length > 0 ? Math.min.apply(null, h252) : null;
+  const history = Array.isArray(stock.priceHistory) ? stock.priceHistory : [];
+  const h252 = history.slice(-252);
+  const high52 = h252.length > 0 ? Math.max.apply(null, h252) : null;
+  const low52  = h252.length > 0 ? Math.min.apply(null, h252) : null;
 
   // Market cap
-  var marketCap = ref.sharesOutstanding ? (price * ref.sharesOutstanding / 1000) : null;
+  const marketCap = ref.sharesOutstanding ? (price * ref.sharesOutstanding / 1000) : null;
 
   // P/E ratios
-  var trailingPE = ref.epsTrailing ? price / ref.epsTrailing : null;
-  var forwardPE  = ref.epsForward  ? price / ref.epsForward  : null;
+  const trailingPE = ref.epsTrailing ? price / ref.epsTrailing : null;
+  const forwardPE  = ref.epsForward  ? price / ref.epsForward  : null;
 
   // Dividend yield
-  var divYield = ref.divPerShare ? (ref.divPerShare / price) * 100 : null;
+  const divYield = ref.divPerShare ? (ref.divPerShare / price) * 100 : null;
 
   // Drawdown from 52-week high
-  var drawdownFromHigh = high52 ? ((price - high52) / high52) * 100 : null;
+  const drawdownFromHigh = high52 ? ((price - high52) / high52) * 100 : null;
 
   // Upside to analyst target
-  var upsideToTarget = ref.analystTarget ? ((ref.analystTarget - price) / price) * 100 : null;
+  const upsideToTarget = ref.analystTarget ? ((ref.analystTarget - price) / price) * 100 : null;
 
   // Range position (0 = at 52w low, 100 = at 52w high)
-  var rangePosition = (high52 && low52 && high52 !== low52) ?
+  const rangePosition = (high52 && low52 && high52 !== low52) ?
     ((price - low52) / (high52 - low52)) * 100 : null;
 
   return {
@@ -110,9 +110,9 @@ export function compute(ticker) {
  */
 export function hydrateHeroMetrics(stock, computed) {
   if (!stock.heroMetrics) return;
-  for (var i = 0; i < stock.heroMetrics.length; i++) {
-    var m = stock.heroMetrics[i];
-    var label = m.label.toLowerCase();
+  for (let i = 0; i < stock.heroMetrics.length; i++) {
+    const m = stock.heroMetrics[i];
+    const label = m.label.toLowerCase();
     if (label === 'mkt cap' && computed.fmt.marketCap) {
       m.value = computed.fmt.marketCap;
     } else if (label === 'drawdown' && computed.fmt.drawdown) {
@@ -137,9 +137,9 @@ export function hydrateHeroMetrics(stock, computed) {
  */
 export function hydrateFeaturedMetrics(stock, computed) {
   if (!stock.featuredMetrics) return;
-  for (var i = 0; i < stock.featuredMetrics.length; i++) {
-    var m = stock.featuredMetrics[i];
-    var label = m.label.toLowerCase();
+  for (let i = 0; i < stock.featuredMetrics.length; i++) {
+    const m = stock.featuredMetrics[i];
+    const label = m.label.toLowerCase();
     if (label === 'mkt cap' && computed.fmt.marketCap) {
       m.value = computed.fmt.marketCap;
     } else if (label === 'drawdown' && computed.fmt.drawdown) {
@@ -168,10 +168,10 @@ export function hydrateFeaturedMetrics(stock, computed) {
  */
 export function hydrateIdentity(stock, computed) {
   if (!stock.identity || !stock.identity.rows) return;
-  for (var r = 0; r < stock.identity.rows.length; r++) {
-    for (var c = 0; c < stock.identity.rows[r].length; c++) {
-      var cell = stock.identity.rows[r][c];
-      var label = cell[0].toLowerCase();
+  for (let r = 0; r < stock.identity.rows.length; r++) {
+    for (let c = 0; c < stock.identity.rows[r].length; c++) {
+      const cell = stock.identity.rows[r][c];
+      const label = cell[0].toLowerCase();
       if (label === 'share price' && computed.fmt.price) {
         cell[1] = computed.fmt.price;
         cell[2] = computed.drawdownFromHigh < -20 ? 'td-mono td-red' :
@@ -205,16 +205,16 @@ export function hydrateIdentity(stock, computed) {
  */
 export function hydrateText(text, ref, computed) {
   if (!text || typeof text !== 'string') return text;
-  var anchors = ref._anchors || {};
-  var currency = computed.currency || 'A$';
+  const anchors = ref._anchors || {};
+  const currency = computed.currency || 'A$';
 
   // Escape currency for regex
-  var esc = currency.replace('$', '\\$');
+  const esc = currency.replace('$', '\\$');
 
   // Replace price: "A$77.87" -> new price
   if (anchors.price && computed.price !== anchors.price) {
-    var oldPrice = parseFloat(anchors.price).toFixed(2);
-    var newPrice = parseFloat(computed.price).toFixed(2);
+    const oldPrice = parseFloat(anchors.price).toFixed(2);
+    const newPrice = parseFloat(computed.price).toFixed(2);
     text = text.split(currency + oldPrice).join(currency + newPrice);
   }
 
@@ -225,8 +225,8 @@ export function hydrateText(text, ref, computed) {
 
   // Replace drawdown %: "60%" in drawdown context
   if (anchors.drawdown != null && computed.drawdownFromHigh != null) {
-    var oldDd = Math.round(Math.abs(anchors.drawdown));
-    var newDd = Math.round(Math.abs(computed.drawdownFromHigh));
+    const oldDd = Math.round(Math.abs(anchors.drawdown));
+    const newDd = Math.round(Math.abs(computed.drawdownFromHigh));
     if (oldDd !== newDd) {
       // Target drawdown references with context clues
       text = text.replace(new RegExp('(down |down&nbsp;|drawdown[^\\d]*|\\bdarr;|sell-off[^\\d]*|-|&darr;)' + oldDd + '%', 'gi'),
@@ -238,8 +238,8 @@ export function hydrateText(text, ref, computed) {
 
   // Replace upside to target: "145%" in upside context
   if (anchors.upsideToTarget != null && computed.upsideToTarget != null) {
-    var oldUp = Math.round(Math.abs(anchors.upsideToTarget));
-    var newUp = Math.round(Math.abs(computed.upsideToTarget));
+    const oldUp = Math.round(Math.abs(anchors.upsideToTarget));
+    const newUp = Math.round(Math.abs(computed.upsideToTarget));
     if (oldUp !== newUp) {
       text = text.replace(new RegExp('(\\+|upside[^\\d]*|representing |\\()' + oldUp + '%', 'gi'),
         function(match) { return match.replace(oldUp + '%', newUp + '%'); });
@@ -248,8 +248,8 @@ export function hydrateText(text, ref, computed) {
 
   // Replace P/E: "41x" -> new P/E
   if (anchors.pe && computed.trailingPE) {
-    var oldPE = fmtPE(anchors.pe);
-    var newPE = fmtPE(computed.trailingPE);
+    const oldPE = fmtPE(anchors.pe);
+    const newPE = fmtPE(computed.trailingPE);
     if (oldPE && newPE && oldPE !== newPE) {
       text = text.split(oldPE).join(newPE);
     }
@@ -257,8 +257,8 @@ export function hydrateText(text, ref, computed) {
 
   // Replace forward P/E
   if (anchors.fwdPE && computed.forwardPE) {
-    var oldFPE = fmtPE(anchors.fwdPE);
-    var newFPE = fmtPE(computed.forwardPE);
+    const oldFPE = fmtPE(anchors.fwdPE);
+    const newFPE = fmtPE(computed.forwardPE);
     if (oldFPE && newFPE && oldFPE !== newFPE) {
       text = text.split(oldFPE).join(newFPE);
     }
@@ -266,8 +266,8 @@ export function hydrateText(text, ref, computed) {
 
   // Replace analyst target with upside: "A$191 (+145%)" -> new
   if (anchors.upsideToTarget != null && ref.analystTarget && computed.upsideToTarget != null) {
-    var oldTargetStr = currency + Math.round(ref.analystTarget) + ' (+' + Math.round(Math.abs(anchors.upsideToTarget)) + '%)';
-    var newTargetStr = currency + Math.round(ref.analystTarget) + ' (' + signPct(computed.upsideToTarget) + ')';
+    const oldTargetStr = currency + Math.round(ref.analystTarget) + ' (+' + Math.round(Math.abs(anchors.upsideToTarget)) + '%)';
+    const newTargetStr = currency + Math.round(ref.analystTarget) + ' (' + signPct(computed.upsideToTarget) + ')';
     text = text.split(oldTargetStr).join(newTargetStr);
   }
 
@@ -282,12 +282,12 @@ export function hydrateText(text, ref, computed) {
  */
 export function hydrateTextFields(obj, ref, computed) {
   if (!obj || typeof obj !== 'object') return;
-  for (var key in obj) {
+  for (const key in obj) {
     if (!obj.hasOwnProperty(key)) continue;
     if (typeof obj[key] === 'string') {
       obj[key] = hydrateText(obj[key], ref, computed);
     } else if (Array.isArray(obj[key])) {
-      for (var i = 0; i < obj[key].length; i++) {
+      for (let i = 0; i < obj[key].length; i++) {
         if (typeof obj[key][i] === 'string') {
           obj[key][i] = hydrateText(obj[key][i], ref, computed);
         } else if (typeof obj[key][i] === 'object') {
@@ -322,14 +322,14 @@ export function hydrateFeaturedRationale(stock, computed, ref) {
 export function adjustHypothesisScores(stock, computed, ref) {
   if (!stock.hypotheses || !ref._anchors || !ref._anchors.price) return;
 
-  var priceDelta = ((computed.price - ref._anchors.price) / ref._anchors.price) * 100;
-  var absDelta = Math.abs(priceDelta);
+  const priceDelta = ((computed.price - ref._anchors.price) / ref._anchors.price) * 100;
+  const absDelta = Math.abs(priceDelta);
 
   // Only adjust if price has moved significantly (>5%)
   if (absDelta < 5) return;
 
-  for (var i = 0; i < stock.hypotheses.length; i++) {
-    var hyp = stock.hypotheses[i];
+  for (let i = 0; i < stock.hypotheses.length; i++) {
+    const hyp = stock.hypotheses[i];
 
     // Save original values on first adjustment – idempotency anchor.
     // All subsequent hydrate() calls adjust from the original, preventing compounding.
@@ -338,10 +338,10 @@ export function adjustHypothesisScores(stock, computed, ref) {
       hyp._origScoreMeta = hyp.scoreMeta || '';
     }
 
-    var baseScore = hyp._origScore;
+    const baseScore = hyp._origScore;
     if (isNaN(baseScore)) continue;
 
-    var adjustment = 0;
+    let adjustment = 0;
 
     if (hyp.direction === 'upside') {
       // Upside thesis: price drop strengthens it (more upside), price rise weakens it
@@ -358,7 +358,7 @@ export function adjustHypothesisScores(stock, computed, ref) {
     }
 
     if (adjustment !== 0) {
-      var newScore = Math.max(5, Math.min(95, baseScore + adjustment));
+      const newScore = Math.max(5, Math.min(95, baseScore + adjustment));
       hyp.score = newScore + '%';
       hyp.scoreWidth = newScore + '%';
       // Replace scoreMeta (not append) to prevent tag stacking
@@ -379,11 +379,11 @@ export function adjustHypothesisScores(stock, computed, ref) {
  * @returns {object|null} Computed metrics or null
  */
 export function hydrate(ticker) {
-  var stock = STOCK_DATA[ticker];
-  var ref = REFERENCE_DATA[ticker];
+  const stock = STOCK_DATA[ticker];
+  const ref = REFERENCE_DATA[ticker];
   if (!stock || !ref) return null;
 
-  var computed = compute(ticker);
+  const computed = compute(ticker);
   if (!computed) return null;
 
   // Store computed data on the stock for rendering access
@@ -410,11 +410,11 @@ export function hydrate(ticker) {
 
   // 3. All text fields (narrative, descriptions, rationale, evidence)
   // Skip fields that shouldn't be text-replaced
-  var textTargets = [
+  const textTargets = [
     'heroDescription', 'heroCompanyDescription',
     'featuredRationale'
   ];
-  for (var i = 0; i < textTargets.length; i++) {
+  for (let i = 0; i < textTargets.length; i++) {
     if (stock[textTargets[i]]) {
       stock[textTargets[i]] = hydrateText(stock[textTargets[i]], ref, computed);
     }
@@ -444,10 +444,10 @@ export function hydrate(ticker) {
  * @returns {object} Map of ticker -> computed results
  */
 export function hydrateAll() {
-  var tickers = Object.keys(STOCK_DATA);
-  var results = {};
-  for (var i = 0; i < tickers.length; i++) {
-    var t = tickers[i];
+  const tickers = Object.keys(STOCK_DATA);
+  const results = {};
+  for (let i = 0; i < tickers.length; i++) {
+    const t = tickers[i];
     if (REFERENCE_DATA[t]) {
       results[t] = hydrate(t);
     }
@@ -463,7 +463,7 @@ export function hydrateAll() {
  * @returns {object|null}
  */
 export function onPriceUpdate(ticker, newPrice) {
-  var stock = STOCK_DATA[ticker];
+  const stock = STOCK_DATA[ticker];
   if (!stock) return;
   stock._livePrice = newPrice;
   return hydrate(ticker);

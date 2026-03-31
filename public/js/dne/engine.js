@@ -40,18 +40,18 @@ function recalculateSurvival(stock) {
 
   if (maxPossibleWeight === 0) return;
 
-  for (var i = 0; i < HYPOTHESIS_IDS.length; i++) {
-    var hId = HYPOTHESIS_IDS[i];
-    var weightedInconsistency = 0;
+  for (let i = 0; i < HYPOTHESIS_IDS.length; i++) {
+    const hId = HYPOTHESIS_IDS[i];
+    let weightedInconsistency = 0;
 
-    for (var j = 0; j < allEvidence.length; j++) {
-      var evidence = allEvidence[j];
-      var rating = (evidence.hypothesis_impact && evidence.hypothesis_impact[hId]) ||
+    for (let j = 0; j < allEvidence.length; j++) {
+      const evidence = allEvidence[j];
+      const rating = (evidence.hypothesis_impact && evidence.hypothesis_impact[hId]) ||
                    (evidence.ratings && evidence.ratings[hId]);
 
       if (rating === 'INCONSISTENT') {
-        var diagWeight = DIAGNOSTICITY_WEIGHTS[evidence.diagnosticity] || 1.0;
-        var decay = evidence.decay
+        const diagWeight = DIAGNOSTICITY_WEIGHTS[evidence.diagnosticity] || 1.0;
+        const decay = evidence.decay
           ? calculateDecayFactor(evidence.date, now, evidence.decay)
           : 1.0;
         weightedInconsistency += diagWeight * decay;
@@ -60,7 +60,7 @@ function recalculateSurvival(stock) {
 
     // Survival = 1 - (weighted inconsistency / max possible)
     // Higher survival = fewer inconsistencies = stronger hypothesis
-    var survival = 1.0 - (weightedInconsistency / maxPossibleWeight);
+    const survival = 1.0 - (weightedInconsistency / maxPossibleWeight);
 
     stock.hypotheses[hId].weighted_inconsistency = weightedInconsistency;
     stock.hypotheses[hId].survival_score = Math.round(survival * 100) / 100;
@@ -97,26 +97,26 @@ function recalculateSurvival(stock) {
 function checkNarrativeFlip(stock) {
   // Respect editorial override
   if (stock.editorial_override) {
-    var overrideExpiry = new Date(stock.editorial_override.until);
+    const overrideExpiry = new Date(stock.editorial_override.until);
     if (new Date() < overrideExpiry) {
       return; // Override still active
     }
     stock.editorial_override = null; // Override expired
   }
 
-  var currentDominant = stock.dominant;
-  var currentStatus = stock.hypotheses[currentDominant].status;
+  const currentDominant = stock.dominant;
+  const currentStatus = stock.hypotheses[currentDominant].status;
 
   // Find the strongest alternative hypothesis
-  var alternatives = Object.keys(stock.hypotheses)
+  const alternatives = Object.keys(stock.hypotheses)
     .filter(function (id) { return id !== currentDominant; })
     .map(function (id) { return { id: id, data: stock.hypotheses[id] }; })
     .sort(function (a, b) { return b.data.survival_score - a.data.survival_score; });
 
-  var bestAlt = alternatives[0];
+  const bestAlt = alternatives[0];
 
   // CHECK FOR IMMEDIATE FLIP (critical event)
-  var latestCritical = (stock.price_signals || []).find(function (ps) {
+  const latestCritical = (stock.price_signals || []).find(function (ps) {
     return ps.can_trigger_immediate_flip && ps.active !== false;
   });
 
@@ -140,8 +140,8 @@ function checkNarrativeFlip(stock) {
   if ((currentStatus === 'LOW' || currentStatus === 'VERY_LOW') &&
       bestAlt.data.status === 'HIGH') {
     if (stock.alert_state === 'ALERT') {
-      var alertStart = new Date(stock.alert_started);
-      var tradingDaysSinceAlert = countTradingDays(alertStart, new Date());
+      const alertStart = new Date(stock.alert_started);
+      const tradingDaysSinceAlert = countTradingDays(alertStart, new Date());
 
       if (tradingDaysSinceAlert >= 2) {
         executeFlip(stock, currentDominant, bestAlt.id,
@@ -172,7 +172,7 @@ function checkNarrativeFlip(stock) {
  * @param {string} trigger   Human-readable trigger description
  */
 function executeFlip(stock, fromH, toH, trigger) {
-  var flipRecord = {
+  const flipRecord = {
     date: new Date().toISOString().split('T')[0],
     from: fromH,
     to: toH,

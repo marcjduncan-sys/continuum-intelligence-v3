@@ -10,7 +10,10 @@
  * @returns {string}
  */
 export function escapeHtml(str) {
-  var d = document.createElement('div');
+  if (typeof document === 'undefined') {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  const d = document.createElement('div');
   d.textContent = str;
   return d.innerHTML;
 }
@@ -20,7 +23,7 @@ export function escapeHtml(str) {
  * @param {string} text
  */
 export function announcePageChange(text) {
-  var announcer = document.getElementById('a11y-announcer');
+  const announcer = document.getElementById('a11y-announcer');
   if (announcer) {
     announcer.textContent = '';
     requestAnimationFrame(function() { announcer.textContent = text; });
@@ -39,32 +42,32 @@ export function announcePageChange(text) {
  * @returns {number[]} Normalised scores summing to 100, each in range [5, 80]
  */
 export function normaliseScores(items) {
-  var FLOOR = 5;
-  var CEILING = 80;
-  var raw = [];
+  const FLOOR = 5;
+  const CEILING = 80;
+  const raw = [];
   for (var i = 0; i < items.length; i++) {
-    var val = parseInt(String(items[i].score)) || 0;
+    const val = parseInt(String(items[i].score)) || 0;
     raw.push(val);
   }
   if (raw.length === 0) return raw;
 
   // Step 1: Clamp each score to floor/ceiling
-  var clamped = [];
+  const clamped = [];
   for (var i = 0; i < raw.length; i++) {
     clamped.push(Math.max(FLOOR, Math.min(CEILING, raw[i])));
   }
 
   // Step 2: Sum clamped values and proportionally scale to 100
-  var sum = 0;
+  let sum = 0;
   for (var i = 0; i < clamped.length; i++) sum += clamped[i];
   if (sum === 0) {
-    var eq = Math.round(100 / clamped.length);
-    var eqResult = [];
+    const eq = Math.round(100 / clamped.length);
+    const eqResult = [];
     for (var i = 0; i < clamped.length; i++) eqResult.push(eq);
     return eqResult;
   }
 
-  var result = [];
+  const result = [];
   for (var i = 0; i < clamped.length; i++) {
     result.push(Math.round((clamped[i] / sum) * 100));
   }
@@ -72,10 +75,10 @@ export function normaliseScores(items) {
   // Step 3: Iterative post-normalisation clamp.
   // Re-normalisation can push values outside [FLOOR, CEILING].
   // We iteratively clamp and redistribute until stable.
-  for (var iter = 0; iter < 20; iter++) {
-    var overflow = 0;   // total amount over ceiling
-    var underflow = 0;  // total amount under floor
-    var freeIndices = [];
+  for (let iter = 0; iter < 20; iter++) {
+    let overflow = 0;   // total amount over ceiling
+    let underflow = 0;  // total amount under floor
+    const freeIndices = [];
     for (var i = 0; i < result.length; i++) {
       if (result[i] > CEILING) { overflow += result[i] - CEILING; result[i] = CEILING; }
       else if (result[i] < FLOOR) { underflow += FLOOR - result[i]; result[i] = FLOOR; }
@@ -84,7 +87,7 @@ export function normaliseScores(items) {
     if (overflow === 0 && underflow === 0) break;
 
     // Net excess: positive means we need to grow other items, negative means shrink
-    var net = overflow - underflow;
+    const net = overflow - underflow;
     if (net === 0) break;
     if (freeIndices.length === 0) break; // All items are pinned; accept best-effort
 
@@ -96,7 +99,7 @@ export function normaliseScores(items) {
       for (var fi = 0; fi < freeIndices.length && remaining > 0; fi++) {
         var idx = freeIndices[fi];
         var room = CEILING - result[idx];
-        var give = Math.min(remaining, room);
+        const give = Math.min(remaining, room);
         result[idx] += give;
         remaining -= give;
       }
@@ -107,7 +110,7 @@ export function normaliseScores(items) {
       for (var fi = 0; fi < freeIndices.length && remaining > 0; fi++) {
         var idx = freeIndices[fi];
         var room = result[idx] - FLOOR;
-        var take = Math.min(remaining, room);
+        const take = Math.min(remaining, room);
         result[idx] -= take;
         remaining -= take;
       }
@@ -115,14 +118,14 @@ export function normaliseScores(items) {
   }
 
   // Step 4: Fix rounding residual -- adjust the largest non-ceiling value
-  var roundedSum = 0;
+  let roundedSum = 0;
   for (var i = 0; i < result.length; i++) roundedSum += result[i];
   if (roundedSum !== 100) {
-    var diff = 100 - roundedSum;
+    const diff = 100 - roundedSum;
     // Find best candidate: largest value that won't breach bounds after adjustment
-    var bestIdx = -1;
+    let bestIdx = -1;
     for (var i = 0; i < result.length; i++) {
-      var candidate = result[i] + diff;
+      const candidate = result[i] + diff;
       if (candidate >= FLOOR && candidate <= CEILING) {
         if (bestIdx === -1 || result[i] > result[bestIdx]) bestIdx = i;
       }
@@ -157,13 +160,13 @@ export function computeSkewScore(data) {
   if (!data || !data.hypotheses || data.hypotheses.length === 0) {
     return { bull: 50, bear: 50, score: 0, direction: 'balanced', hypotheses: [] };
   }
-  var hyps = data.hypotheses;
-  var norm = normaliseScores(hyps);
-  var bull = 0, bear = 0;
-  var breakdown = [];
-  for (var i = 0; i < hyps.length; i++) {
-    var w = norm[i] || 0;
-    var dir = hyps[i].direction || 'downside';
+  const hyps = data.hypotheses;
+  const norm = normaliseScores(hyps);
+  let bull = 0, bear = 0;
+  const breakdown = [];
+  for (let i = 0; i < hyps.length; i++) {
+    const w = norm[i] || 0;
+    const dir = hyps[i].direction || 'downside';
     if (dir === 'upside') {
       bull += w;
     } else if (dir === 'downside') {
@@ -178,9 +181,9 @@ export function computeSkewScore(data) {
   // Round to avoid floating point display issues
   bull = Math.round(bull);
   bear = Math.round(bear);
-  var score = bull - bear;
+  const score = bull - bear;
   // Derive direction mechanically from score -- never from static data
   /** @type {'upside'|'downside'|'balanced'} */
-  var direction = score > 5 ? 'upside' : score < -5 ? 'downside' : 'balanced';
+  const direction = score > 5 ? 'upside' : score < -5 ? 'downside' : 'balanced';
   return { bull: bull, bear: bear, score: score, direction: direction, hypotheses: breakdown };
 }

@@ -11,7 +11,7 @@
 import { API_BASE } from '../lib/api-config.js';
 
 export function renderPMPage() {
-    var container = document.getElementById('page-pm');
+    const container = document.getElementById('page-pm');
     if (!container || container.dataset.rendered === '1') return;
 
     container.innerHTML =
@@ -237,7 +237,7 @@ export function renderPMPage() {
     container.dataset.rendered = '1';
 
     // Wire refresh button
-    var refreshBtn = document.getElementById('pmRefreshDiag');
+    const refreshBtn = document.getElementById('pmRefreshDiag');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', function() {
             fetchDiagnostics();
@@ -254,13 +254,13 @@ export function renderPMPage() {
  * Reads portfolio_id from the personalisation bridge and mandate from localStorage.
  */
 export function fetchDiagnostics() {
-    var portfolioId = (typeof window.pnGetPortfolioId === 'function') ? window.pnGetPortfolioId() : null;
+    const portfolioId = (typeof window.pnGetPortfolioId === 'function') ? window.pnGetPortfolioId() : null;
     if (!portfolioId) return;
 
     // Read mandate from localStorage
-    var mandate = _readMandate();
+    const mandate = _readMandate();
 
-    var params = new URLSearchParams();
+    const params = new URLSearchParams();
     if (mandate.max_position_size != null) params.set('mandate_max_position', mandate.max_position_size);
     if (mandate.sector_cap != null) params.set('mandate_sector_cap', mandate.sector_cap);
     if (mandate.cash_range_min != null) params.set('mandate_cash_min', mandate.cash_range_min);
@@ -271,11 +271,11 @@ export function fetchDiagnostics() {
         params.set('restricted_names', mandate.restricted_names.join(','));
     }
 
-    var url = API_BASE + '/api/portfolios/' + portfolioId + '/diagnostics?' + params.toString();
-    var headers = {};
-    var apiKey = window.CI_API_KEY || '';
+    const url = API_BASE + '/api/portfolios/' + portfolioId + '/diagnostics?' + params.toString();
+    const headers = {};
+    const apiKey = window.CI_API_KEY || '';
     if (apiKey) headers['X-API-Key'] = apiKey;
-    var token = window.CI_AUTH && window.CI_AUTH.getToken();
+    const token = window.CI_AUTH && window.CI_AUTH.getToken();
     if (token) headers['Authorization'] = 'Bearer ' + token;
 
     fetch(url, { headers: headers })
@@ -283,10 +283,10 @@ export function fetchDiagnostics() {
         .then(function(data) {
             if (!data) return;
             // Update portfolio name badge
-            var nameEl = document.getElementById('pmPortfolioName');
+            const nameEl = document.getElementById('pmPortfolioName');
             if (nameEl) {
-                var pc = (data.analytics && data.analytics.position_count) || 0;
-                var tv = (data.analytics && data.analytics.total_value) || 0;
+                const pc = (data.analytics && data.analytics.position_count) || 0;
+                const tv = (data.analytics && data.analytics.total_value) || 0;
                 nameEl.textContent = pc + ' holdings -- ' + _fmtCurrency(tv);
             }
             updatePMDashboard(data.analytics);
@@ -303,7 +303,7 @@ export function fetchDiagnostics() {
  * Read mandate settings from localStorage (personalisation profile).
  */
 function _readMandate() {
-    var defaults = {
+    const defaults = {
         max_position_size: 0.15,
         sector_cap: 0.35,
         cash_range_min: 0.03,
@@ -313,11 +313,11 @@ function _readMandate() {
         restricted_names: []
     };
     try {
-        var raw = localStorage.getItem('continuum_personalisation_profile');
+        const raw = localStorage.getItem('continuum_personalisation_profile');
         if (!raw) return defaults;
-        var parsed = JSON.parse(raw);
-        var state = parsed.state || parsed;
-        var m = state.mandate || {};
+        const parsed = JSON.parse(raw);
+        const state = parsed.state || parsed;
+        const m = state.mandate || {};
         return {
             max_position_size: m.maxPositionSize != null ? m.maxPositionSize / 100 : defaults.max_position_size,
             sector_cap: m.sectorCap != null ? m.sectorCap / 100 : defaults.sector_cap,
@@ -343,11 +343,11 @@ export function updatePMDashboard(analytics) {
     if (!analytics) return;
 
     // Summary metrics
-    var summary = document.getElementById('pmSnapshotSummary');
+    const summary = document.getElementById('pmSnapshotSummary');
     if (summary) {
-        var tv = analytics.total_value || 0;
-        var cv = analytics.cash_value || 0;
-        var pc = analytics.position_count || 0;
+        const tv = analytics.total_value || 0;
+        const cv = analytics.cash_value || 0;
+        const pc = analytics.position_count || 0;
         summary.innerHTML =
             '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">' +
                 _metricStub('Total Value', _fmtCurrency(tv)) +
@@ -357,8 +357,8 @@ export function updatePMDashboard(analytics) {
     }
 
     // Concentration
-    var conc = analytics.concentration || {};
-    var concEl = document.getElementById('pmConcentration');
+    const conc = analytics.concentration || {};
+    const concEl = document.getElementById('pmConcentration');
     if (concEl) {
         concEl.innerHTML =
             _sectionHeader('CONCENTRATION') +
@@ -371,9 +371,9 @@ export function updatePMDashboard(analytics) {
     }
 
     // Top positions
-    var topBody = document.getElementById('pmTopPositionsBody');
+    const topBody = document.getElementById('pmTopPositionsBody');
     if (topBody && analytics.top_positions && analytics.top_positions.length > 0) {
-        var rows = analytics.top_positions.map(function(p) {
+        const rows = analytics.top_positions.map(function(p) {
             return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;' +
                 'border-bottom:1px solid var(--border)">' +
                 '<div>' +
@@ -390,14 +390,14 @@ export function updatePMDashboard(analytics) {
     }
 
     // Sector exposure
-    var sectorBody = document.getElementById('pmSectorExposureBody');
+    const sectorBody = document.getElementById('pmSectorExposureBody');
     if (sectorBody && analytics.sector_exposure) {
-        var sectors = Object.entries(analytics.sector_exposure);
+        const sectors = Object.entries(analytics.sector_exposure);
         if (sectors.length > 0) {
-            var sectorRows = sectors.map(function(entry) {
-                var name = entry[0];
-                var weight = entry[1];
-                var barWidth = Math.min(weight * 100, 100);
+            const sectorRows = sectors.map(function(entry) {
+                const name = entry[0];
+                const weight = entry[1];
+                const barWidth = Math.min(weight * 100, 100);
                 return '<div style="margin-bottom:8px">' +
                     '<div style="display:flex;justify-content:space-between;margin-bottom:2px">' +
                         '<span style="font-size:0.70rem;color:var(--text-primary)">' + _esc(name) + '</span>' +
@@ -416,14 +416,14 @@ export function updatePMDashboard(analytics) {
     _renderThemeExposure(analytics.theme_exposure);
 
     // Flags
-    var flagsBody = document.getElementById('pmFlagsBody');
+    const flagsBody = document.getElementById('pmFlagsBody');
     if (flagsBody && analytics.flags) {
         if (analytics.flags.length === 0) {
             flagsBody.innerHTML = '<div style="color:var(--text-muted);font-size:0.75rem">No risk flags triggered</div>';
         } else {
-            var flagRows = analytics.flags.map(function(f) {
-                var icon = f.severity === 'warning' ? '!' : 'i';
-                var color = f.severity === 'warning' ? 'var(--accent-gold)' : 'var(--text-muted)';
+            const flagRows = analytics.flags.map(function(f) {
+                const icon = f.severity === 'warning' ? '!' : 'i';
+                const color = f.severity === 'warning' ? 'var(--accent-gold)' : 'var(--text-muted)';
                 return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">' +
                     '<div style="' +
                         'width:18px;height:18px;border-radius:50%;flex-shrink:0;' +
@@ -466,8 +466,8 @@ export function updatePMDiagnostics(alignment, analytics) {
 // ============================================================
 
 function _renderThemeExposure(themeExposure) {
-    var wrapper = document.getElementById('pmThemeExposure');
-    var body = document.getElementById('pmThemeExposureBody');
+    const wrapper = document.getElementById('pmThemeExposure');
+    const body = document.getElementById('pmThemeExposureBody');
     if (!wrapper || !body) return;
 
     if (!themeExposure || Object.keys(themeExposure).length === 0) {
@@ -476,17 +476,17 @@ function _renderThemeExposure(themeExposure) {
     }
 
     wrapper.style.display = '';
-    var themes = Object.entries(themeExposure).sort(function(a, b) { return b[1] - a[1]; });
-    var themeColors = {
+    const themes = Object.entries(themeExposure).sort(function(a, b) { return b[1] - a[1]; });
+    const themeColors = {
         'Cyclical': '#4ECDC4', 'Defensive': '#45B7D1', 'Growth': '#96CEB4',
         'Financial': '#DDA0DD', 'Real Assets': '#F4A460'
     };
 
-    var rows = themes.map(function(entry) {
-        var name = entry[0];
-        var weight = entry[1];
-        var barWidth = Math.min(weight * 100, 100);
-        var barColor = themeColors[name] || 'var(--accent-gold)';
+    const rows = themes.map(function(entry) {
+        const name = entry[0];
+        const weight = entry[1];
+        const barWidth = Math.min(weight * 100, 100);
+        const barColor = themeColors[name] || 'var(--accent-gold)';
         return '<div style="margin-bottom:8px">' +
             '<div style="display:flex;justify-content:space-between;margin-bottom:2px">' +
                 '<span style="font-size:0.70rem;color:var(--text-primary)">' + _esc(name) + '</span>' +
@@ -506,12 +506,12 @@ function _renderThemeExposure(themeExposure) {
 // ============================================================
 
 function _renderMandateSettings(mandate) {
-    var wrapper = document.getElementById('pmMandateSettings');
-    var body = document.getElementById('pmMandateSettingsBody');
+    const wrapper = document.getElementById('pmMandateSettings');
+    const body = document.getElementById('pmMandateSettingsBody');
     if (!wrapper || !body) return;
 
     wrapper.style.display = '';
-    var rows = [
+    const rows = [
         _mandateRow('Max Position', _fmtPctDec(mandate.max_position_size)),
         _mandateRow('Sector Cap', _fmtPctDec(mandate.sector_cap)),
         _mandateRow('Cash Range', _fmtPctDec(mandate.cash_range_min) + ' - ' + _fmtPctDec(mandate.cash_range_max)),
@@ -537,8 +537,8 @@ function _mandateRow(label, value) {
 // ============================================================
 
 function _renderMandateBreaches(breaches) {
-    var wrapper = document.getElementById('pmMandateBreaches');
-    var body = document.getElementById('pmMandateBreachesBody');
+    const wrapper = document.getElementById('pmMandateBreaches');
+    const body = document.getElementById('pmMandateBreachesBody');
     if (!wrapper || !body) return;
 
     if (!breaches || breaches.length === 0) {
@@ -547,10 +547,10 @@ function _renderMandateBreaches(breaches) {
     }
 
     wrapper.style.display = '';
-    var rows = breaches.map(function(b) {
-        var sevColor = b.severity === 'critical' ? '#e74c3c' : 'var(--accent-gold)';
-        var sevLabel = b.severity === 'critical' ? 'CRITICAL' : 'WARNING';
-        var postureLabel = (b.recommended_posture || '').replace(/_/g, ' ');
+    const rows = breaches.map(function(b) {
+        const sevColor = b.severity === 'critical' ? '#e74c3c' : 'var(--accent-gold)';
+        const sevLabel = b.severity === 'critical' ? 'CRITICAL' : 'WARNING';
+        const postureLabel = (b.recommended_posture || '').replace(/_/g, ' ');
         return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start">' +
             '<div style="' +
                 'flex-shrink:0;font-family:var(--font-data);font-size:0.52rem;font-weight:700;' +
@@ -573,8 +573,8 @@ function _renderMandateBreaches(breaches) {
 // ============================================================
 
 function _renderAlignmentMatrix(holdings, summary) {
-    var wrapper = document.getElementById('pmAlignmentMatrix');
-    var body = document.getElementById('pmAlignmentMatrixBody');
+    const wrapper = document.getElementById('pmAlignmentMatrix');
+    const body = document.getElementById('pmAlignmentMatrixBody');
     if (!wrapper || !body) return;
 
     if (!holdings || holdings.length === 0) {
@@ -583,7 +583,7 @@ function _renderAlignmentMatrix(holdings, summary) {
     }
 
     wrapper.style.display = '';
-    var clsColors = {
+    const clsColors = {
         'aligned': '#27ae60',
         'contradicts': '#e74c3c',
         'neutral': '#95a5a6',
@@ -591,7 +591,7 @@ function _renderAlignmentMatrix(holdings, summary) {
     };
 
     // Summary bar at top
-    var summaryHtml = '';
+    let summaryHtml = '';
     if (summary) {
         summaryHtml =
             '<div style="display:flex;gap:12px;margin-bottom:10px;font-family:var(--font-data);font-size:0.60rem">' +
@@ -602,12 +602,12 @@ function _renderAlignmentMatrix(holdings, summary) {
             '</div>';
     }
 
-    var rows = holdings.map(function(h) {
-        var a = h.alignment || {};
-        var cls = a.cls || 'not-covered';
-        var badgeColor = clsColors[cls] || '#7f8c8d';
-        var skewDir = (h.skew && h.skew.direction) ? h.skew.direction : '';
-        var skewScore = (h.skew && h.skew.score != null) ? h.skew.score : '';
+    const rows = holdings.map(function(h) {
+        const a = h.alignment || {};
+        const cls = a.cls || 'not-covered';
+        const badgeColor = clsColors[cls] || '#7f8c8d';
+        const skewDir = (h.skew && h.skew.direction) ? h.skew.direction : '';
+        const skewScore = (h.skew && h.skew.score != null) ? h.skew.score : '';
         return '<div style="display:flex;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);gap:8px">' +
             '<span style="font-weight:600;color:var(--text-primary);font-size:0.72rem;min-width:50px">' + _esc(h.ticker) + '</span>' +
             '<span style="font-family:var(--font-data);font-size:0.62rem;color:var(--text-muted);min-width:40px">' + _fmtPctDec(h.weight) + '</span>' +
@@ -628,8 +628,8 @@ function _renderAlignmentMatrix(holdings, summary) {
 // ============================================================
 
 function _renderHypothesisDNA(dna) {
-    var wrapper = document.getElementById('pmHypothesisDNA');
-    var body = document.getElementById('pmHypothesisDNABody');
+    const wrapper = document.getElementById('pmHypothesisDNA');
+    const body = document.getElementById('pmHypothesisDNABody');
     if (!wrapper || !body) return;
 
     if (!dna) {
@@ -637,8 +637,8 @@ function _renderHypothesisDNA(dna) {
         return;
     }
 
-    var hasContent = false;
-    var html = '';
+    let hasContent = false;
+    let html = '';
 
     // Upside hypotheses
     if (dna.upside_hypotheses && dna.upside_hypotheses.length > 0) {
@@ -646,7 +646,7 @@ function _renderHypothesisDNA(dna) {
         html += '<div style="margin-bottom:10px">' +
             '<div style="font-family:var(--font-data);font-size:0.54rem;font-weight:700;color:#27ae60;margin-bottom:6px;letter-spacing:0.06em">UPSIDE EXPOSURE</div>';
         dna.upside_hypotheses.forEach(function(h) {
-            var barWidth = Math.min((h.weighted_exposure || 0) * 100, 100);
+            const barWidth = Math.min((h.weighted_exposure || 0) * 100, 100);
             html += '<div style="margin-bottom:6px">' +
                 '<div style="display:flex;justify-content:space-between;font-size:0.65rem;margin-bottom:2px">' +
                     '<span style="color:var(--text-primary)">' + _esc(h.hypothesis || h.name || '') + '</span>' +
@@ -669,7 +669,7 @@ function _renderHypothesisDNA(dna) {
         html += '<div style="margin-bottom:10px">' +
             '<div style="font-family:var(--font-data);font-size:0.54rem;font-weight:700;color:#e74c3c;margin-bottom:6px;letter-spacing:0.06em">DOWNSIDE EXPOSURE</div>';
         dna.downside_hypotheses.forEach(function(h) {
-            var barWidth = Math.min((h.weighted_exposure || 0) * 100, 100);
+            const barWidth = Math.min((h.weighted_exposure || 0) * 100, 100);
             html += '<div style="margin-bottom:6px">' +
                 '<div style="display:flex;justify-content:space-between;font-size:0.65rem;margin-bottom:2px">' +
                     '<span style="color:var(--text-primary)">' + _esc(h.hypothesis || h.name || '') + '</span>' +
@@ -715,8 +715,8 @@ function _renderHypothesisDNA(dna) {
 // ============================================================
 
 function _renderHedgeGaps(gaps) {
-    var wrapper = document.getElementById('pmHedgeGaps');
-    var body = document.getElementById('pmHedgeGapsBody');
+    const wrapper = document.getElementById('pmHedgeGaps');
+    const body = document.getElementById('pmHedgeGapsBody');
     if (!wrapper || !body) return;
 
     if (!gaps) {
@@ -724,8 +724,8 @@ function _renderHedgeGaps(gaps) {
         return;
     }
 
-    var hasContent = false;
-    var html = '';
+    let hasContent = false;
+    let html = '';
 
     // Correlated downside
     if (gaps.correlated_downside && gaps.correlated_downside.length > 0) {
@@ -772,8 +772,8 @@ function _renderHedgeGaps(gaps) {
 // ============================================================
 
 function _renderReweighting(suggestions) {
-    var wrapper = document.getElementById('pmReweighting');
-    var body = document.getElementById('pmReweightingBody');
+    const wrapper = document.getElementById('pmReweighting');
+    const body = document.getElementById('pmReweightingBody');
     if (!wrapper || !body) return;
 
     if (!suggestions || suggestions.length === 0) {
@@ -782,13 +782,13 @@ function _renderReweighting(suggestions) {
     }
 
     wrapper.style.display = '';
-    var rows = suggestions.map(function(s) {
-        var actionColor = '#95a5a6';
-        var action = s.suggested_direction || s.action || '';
+    const rows = suggestions.map(function(s) {
+        let actionColor = '#95a5a6';
+        const action = s.suggested_direction || s.action || '';
         if (action.indexOf('trim') >= 0) actionColor = '#e74c3c';
         else if (action.indexOf('increase') >= 0 || action === 'add') actionColor = '#27ae60';
         else if (action.indexOf('review') >= 0) actionColor = 'var(--accent-gold)';
-        var actionLabel = action.replace(/_/g, ' ');
+        const actionLabel = action.replace(/_/g, ' ');
 
         return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">' +
             '<span style="font-weight:600;color:var(--text-primary);font-size:0.72rem;min-width:50px">' + _esc(s.ticker || '') + '</span>' +
@@ -809,10 +809,10 @@ function _renderReweighting(suggestions) {
     // Wire "Send to PM" buttons
     body.querySelectorAll('.pm-send-to-pm-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            var ticker = btn.getAttribute('data-ticker');
-            var action = btn.getAttribute('data-action');
-            var reason = btn.getAttribute('data-reason') || '';
-            var question = 'Reweighting signal for ' + ticker + ': ' + action + '.' +
+            const ticker = btn.getAttribute('data-ticker');
+            const action = btn.getAttribute('data-action');
+            const reason = btn.getAttribute('data-reason') || '';
+            const question = 'Reweighting signal for ' + ticker + ': ' + action + '.' +
                 (reason ? ' Reason: ' + reason + '.' : '') +
                 ' Assess the portfolio impact, source of funds, and mandate compliance.';
             document.dispatchEvent(new CustomEvent('ci:pm:ask', { detail: { question: question } }));
@@ -826,8 +826,8 @@ function _renderReweighting(suggestions) {
 // ============================================================
 
 function _renderChangeLog(changes) {
-    var wrapper = document.getElementById('pmChangeLog');
-    var body = document.getElementById('pmChangeLogBody');
+    const wrapper = document.getElementById('pmChangeLog');
+    const body = document.getElementById('pmChangeLogBody');
     if (!wrapper || !body) return;
 
     // Backend returns a flat array of {ticker, change_type, description}
@@ -836,11 +836,11 @@ function _renderChangeLog(changes) {
         return;
     }
 
-    var html = '';
+    let html = '';
     changes.forEach(function(c) {
-        var type = c.change_type || '';
-        var badgeColor = '#95a5a6';
-        var badgeLabel = 'CHANGE';
+        const type = c.change_type || '';
+        let badgeColor = '#95a5a6';
+        let badgeLabel = 'CHANGE';
         if (type === 'new_position') { badgeColor = '#27ae60'; badgeLabel = 'NEW'; }
         else if (type === 'removed_position') { badgeColor = '#e74c3c'; badgeLabel = 'REMOVED'; }
         else if (type.indexOf('weight_') === 0) { badgeColor = 'var(--accent-gold)'; badgeLabel = 'WEIGHT'; }
@@ -914,7 +914,7 @@ function _capitalize(str) {
 }
 
 function _esc(str) {
-    var d = document.createElement('div');
+    const d = document.createElement('div');
     d.textContent = str != null ? String(str) : '';
     return d.innerHTML;
 }

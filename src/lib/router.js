@@ -15,7 +15,7 @@ const renderedPages = new Set();
 const renderedSnapshots = new Set();
 
 // Railway API base (centralised in api-config.js)
-var _REFRESH_API_BASE = API_BASE;
+const _REFRESH_API_BASE = API_BASE;
 
 // Page renderer callbacks -- wired in during integration (Phase 6)
 let _pageRenderers = {};
@@ -44,18 +44,18 @@ export function initRouter(pageRenderers) {
   window.addEventListener('hashchange', function() {
     route();
     // Announce the page change
-    var hash = window.location.hash.slice(1) || 'home';
-    var pageName = hash;
+    const hash = window.location.hash.slice(1) || 'home';
+    let pageName = hash;
     if (hash.startsWith('report-')) {
-      var t = hash.replace('report-', '');
+      const t = hash.replace('report-', '');
       pageName = STOCK_DATA[t] ? STOCK_DATA[t].company + ' Research Report' : t + ' Report';
     } else if (hash.startsWith('deep-report-')) {
-      var t2 = hash.replace('deep-report-', '');
+      const t2 = hash.replace('deep-report-', '');
       pageName = STOCK_DATA[t2] ? STOCK_DATA[t2].company + ' Deep Research Report' : t2 + ' Deep Report';
     } else if (hash.startsWith('snapshot-')) {
       pageName = hash.replace('snapshot-', '') + ' Snapshot';
     } else {
-      var names = { home: 'Research Home', 'deep-research': 'Deep Research', portfolio: 'Portfolio Intelligence', comparator: 'Investment Thesis Comparator', personalisation: 'Personalisation', memory: 'Analyst Journal', pm: 'Portfolio Manager', about: 'About' };
+      const names = { home: 'Research Home', 'deep-research': 'Deep Research', portfolio: 'Portfolio Intelligence', comparator: 'Investment Thesis Comparator', personalisation: 'Personalisation', memory: 'Analyst Journal', pm: 'Portfolio Manager', about: 'About' };
       pageName = names[hash] || hash;
     }
     announcePageChange('Navigated to ' + pageName);
@@ -82,14 +82,14 @@ function renderStockReport(hash, ticker) {
     container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Research Data&hellip;</div><div style="font-size:0.9rem">Fetching report for ' + ticker + ' from server</div></div></div>';
     (async function() {
       try {
-        var scaffoldResp = await fetch(_REFRESH_API_BASE + '/data/research/' + ticker + '.json');
+        const scaffoldResp = await fetch(_REFRESH_API_BASE + '/data/research/' + ticker + '.json');
         if (!scaffoldResp.ok) throw new Error('HTTP ' + scaffoldResp.status);
-        var scaffoldData = await scaffoldResp.json();
+        const scaffoldData = await scaffoldResp.json();
         scaffoldData._lastRefreshed = scaffoldData._lastRefreshed || new Date().toISOString();
         scaffoldData._cacheVersion = CACHE_VERSION;
         try { localStorage.setItem('ci_research_' + ticker, JSON.stringify(scaffoldData)); } catch(e) { // Expected: localStorage may be full or unavailable
         }
-        var currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00a3','EUR':'\u20ac'};
+        const currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00a3','EUR':'\u20ac'};
         STOCK_DATA[ticker] = scaffoldData;
         STOCK_DATA[ticker]._indexOnly = false;
         if (scaffoldData.currency && currencyMap[scaffoldData.currency]) {
@@ -164,9 +164,9 @@ export function route() {
   pages.forEach(p => p.classList.remove('active'));
 
   // Validate hash against allowlist before DOM construction (S5 security fix)
-  var isValidRoute = VALID_STATIC_PAGES.has(hash);
+  let isValidRoute = VALID_STATIC_PAGES.has(hash);
   if (!isValidRoute && hash.startsWith('report-')) {
-    var ticker = hash.replace('report-', '');
+    const ticker = hash.replace('report-', '');
     isValidRoute = typeof STOCK_DATA !== 'undefined' && STOCK_DATA.hasOwnProperty(ticker);
     // Allow route for dynamically-added stocks not yet in STOCK_DATA
     // (e.g. different browser, no localStorage -- will fetch from Railway)
@@ -175,11 +175,11 @@ export function route() {
     }
   }
   if (!isValidRoute && hash.startsWith('deep-report-')) {
-    var drTicker = hash.replace('deep-report-', '');
+    const drTicker = hash.replace('deep-report-', '');
     isValidRoute = typeof STOCK_DATA !== 'undefined' && STOCK_DATA.hasOwnProperty(drTicker);
   }
   if (!isValidRoute && hash.startsWith('snapshot-')) {
-    var snapTicker = hash.replace('snapshot-', '');
+    const snapTicker = hash.replace('snapshot-', '');
     // Accept if snapshot exists OR if stock data exists (snapshot will be built on demand)
     isValidRoute = (typeof SNAPSHOT_DATA !== 'undefined' && SNAPSHOT_DATA.hasOwnProperty(snapTicker)) ||
                    (typeof STOCK_DATA !== 'undefined' && STOCK_DATA.hasOwnProperty(snapTicker));
@@ -229,7 +229,7 @@ export function route() {
 
   // Lazy render personalisation page on first visit
   if (hash === 'personalisation' && !renderedPages.has('_personalisation')) {
-    var pnContainer = document.getElementById('page-personalisation');
+    const pnContainer = document.getElementById('page-personalisation');
     if (pnContainer && _pageRenderers.renderPersonalisationPage) {
       pnContainer.innerHTML = _pageRenderers.renderPersonalisationPage();
       if (_pageRenderers.initPersonalisationDemo) _pageRenderers.initPersonalisationDemo();
@@ -297,7 +297,7 @@ export function route() {
     // A7: Focus management -- move focus to the new page content
     // Use requestAnimationFrame to ensure DOM is rendered before focusing
     requestAnimationFrame(function() {
-      var focusTarget = target.querySelector('h1, h2, .hero-title, .page-heading');
+      const focusTarget = target.querySelector('h1, h2, .hero-title, .page-heading');
       if (focusTarget) {
         focusTarget.setAttribute('tabindex', '-1');
         focusTarget.focus({ preventScroll: true });

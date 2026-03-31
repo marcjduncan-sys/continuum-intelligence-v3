@@ -216,7 +216,7 @@ const NFI_STYLES = `
 function injectStyles() {
   if (typeof document === 'undefined') return;
   if (document.getElementById('nfi-styles')) return;
-  var style = document.createElement('style');
+  const style = document.createElement('style');
   style.id = 'nfi-styles';
   style.textContent = NFI_STYLES;
   document.head.appendChild(style);
@@ -225,21 +225,21 @@ function injectStyles() {
 // ─── ALERT BANNER RENDERING ──────────────────────────────────────────────────
 
 function createAlertBanner(analysis) {
-  var dislocation = analysis.dislocation;
-  var severity = dislocation.severity;
-  var metrics = dislocation.metrics;
+  const dislocation = analysis.dislocation;
+  const severity = dislocation.severity;
+  const metrics = dislocation.metrics;
 
   if (severity === 'NORMAL') return null;
 
   // Direction from price action
-  var direction = metrics.todayReturn < 0 ? 'negative' :
+  const direction = metrics.todayReturn < 0 ? 'negative' :
                   metrics.todayReturn > 0 ? 'positive' : 'neutral';
 
   // Severity label
-  var severityLabel = severity === 'CRITICAL' ? 'Critical' :
+  const severityLabel = severity === 'CRITICAL' ? 'Critical' :
                       severity === 'HIGH' ? 'Moderate' : 'Minor';
 
-  var banner = document.createElement('div');
+  const banner = document.createElement('div');
   banner.className = 'nfi-alert-banner nfi-alert-' + direction;
 
   banner.innerHTML =
@@ -263,18 +263,18 @@ function createAlertBanner(analysis) {
 // ─── MARKET-RESPONSIVE NARRATIVE SECTION ────────────────────────────────────
 
 function createMarketNarrativeSection(analysis) {
-  var severity = analysis.dislocation.severity;
+  const severity = analysis.dislocation.severity;
   if (severity === 'NORMAL') return null;
 
-  var shift = analysis.narrativeShift;
+  const shift = analysis.narrativeShift;
   if (!shift || !shift.hasShift) return null;
 
-  var headerClass = severity === 'CRITICAL' ? ' nfi-mn-header-critical' :
+  const headerClass = severity === 'CRITICAL' ? ' nfi-mn-header-critical' :
                     severity === 'HIGH' ? ' nfi-mn-header-high' : '';
-  var badgeClass = severity === 'CRITICAL' ? 'nfi-mn-badge-critical' :
+  const badgeClass = severity === 'CRITICAL' ? 'nfi-mn-badge-critical' :
                    severity === 'HIGH' ? 'nfi-mn-badge-high' : 'nfi-mn-badge-moderate';
 
-  var section = document.createElement('div');
+  const section = document.createElement('div');
   section.className = 'nfi-market-narrative';
   section.innerHTML =
     '<div class="nfi-mn-header' + headerClass + '">' +
@@ -302,26 +302,26 @@ function createMarketNarrativeSection(analysis) {
 // ─── HYPOTHESIS CARD WEIGHT INJECTION ──────────────────────────────────────
 
 function addWeightBreakdownToCards(reportPage, analysis) {
-  var weights = analysis.weights;
-  var hNames = analysis.hypothesisNames || {};
+  const weights = analysis.weights;
+  const hNames = analysis.hypothesisNames || {};
   if (!weights) return;
 
   // Find all hypothesis cards
-  var cards = reportPage.querySelectorAll('.hyp-card');
+  const cards = reportPage.querySelectorAll('.hyp-card');
   cards.forEach(function(card) {
-    var titleEl = card.querySelector('.hc-title');
+    const titleEl = card.querySelector('.hc-title');
     if (!titleEl) return;
 
-    var titleText = titleEl.textContent;
-    var tier = null;
-    var match = titleText.match(/T(\d)/);
+    const titleText = titleEl.textContent;
+    let tier = null;
+    const match = titleText.match(/T(\d)/);
     if (match) tier = 'T' + match[1];
     if (!tier || !weights[tier]) return;
 
-    var w = weights[tier];
-    var gap = parseFloat(Math.abs(w.longTerm - w.shortTerm).toFixed(1));
-    var gapClass = gap > 40 ? 'nfi-hw-gap-high' : gap > 20 ? 'nfi-hw-gap-medium' : '';
-    var isContradicted = analysis.inference.contradictedHypothesis === tier;
+    const w = weights[tier];
+    const gap = parseFloat(Math.abs(w.longTerm - w.shortTerm).toFixed(1));
+    const gapClass = gap > 40 ? 'nfi-hw-gap-high' : gap > 20 ? 'nfi-hw-gap-medium' : '';
+    const isContradicted = analysis.inference.contradictedHypothesis === tier;
 
     // Add contradicted badge to title if applicable
     if (isContradicted && !titleEl.querySelector('.nfi-contradicted-badge')) {
@@ -329,10 +329,10 @@ function addWeightBreakdownToCards(reportPage, analysis) {
     }
 
     // Remove any existing weight breakdown
-    var existing = card.querySelector('.nfi-hyp-weights');
+    const existing = card.querySelector('.nfi-hyp-weights');
     if (existing) existing.remove();
 
-    var breakdown = document.createElement('div');
+    const breakdown = document.createElement('div');
     breakdown.className = 'nfi-hyp-weights';
     breakdown.innerHTML =
       '<div class="nfi-hw-row">' +
@@ -356,7 +356,7 @@ function addWeightBreakdownToCards(reportPage, analysis) {
       '</div>';
 
     // Insert after score row
-    var scoreRow = card.querySelector('.hc-score-row');
+    const scoreRow = card.querySelector('.hc-score-row');
     if (scoreRow) {
       scoreRow.parentNode.insertBefore(breakdown, scoreRow.nextSibling);
     } else {
@@ -380,23 +380,23 @@ function applyNarrativeAnalysis(ticker) {
   }
   window._nfiProcessedTickers[ticker] = Date.now();
 
-  var analysis = window._nfiAnalysisData.results[ticker];
+  const analysis = window._nfiAnalysisData.results[ticker];
   if (!analysis || analysis.dislocation.severity === 'NORMAL') return;
 
-  var reportPage = document.getElementById('page-report-' + ticker);
+  const reportPage = document.getElementById('page-report-' + ticker);
   if (!reportPage || !reportPage.innerHTML) return;
 
   // 1. Insert dislocation indicator just before the Risk Skew bar (sibling element)
-  var banner = createAlertBanner(analysis);
+  const banner = createAlertBanner(analysis);
   if (banner) {
-    var existingBanner = reportPage.querySelector('.nfi-alert-banner');
+    const existingBanner = reportPage.querySelector('.nfi-alert-banner');
     if (existingBanner) existingBanner.remove();
 
-    var skewBar = reportPage.querySelector('.risk-skew-bar');
+    const skewBar = reportPage.querySelector('.risk-skew-bar');
     if (skewBar) {
       skewBar.parentNode.insertBefore(banner, skewBar);
     } else {
-      var heroSection = reportPage.querySelector('.report-hero') || reportPage.firstChild;
+      const heroSection = reportPage.querySelector('.report-hero') || reportPage.firstChild;
       if (heroSection && heroSection.nextSibling) {
         reportPage.insertBefore(banner, heroSection.nextSibling);
       } else {
@@ -406,20 +406,20 @@ function applyNarrativeAnalysis(ticker) {
   }
 
   // 2. Insert market-responsive narrative section into the Narrative section
-  var narrativeSection = createMarketNarrativeSection(analysis);
+  const narrativeSection = createMarketNarrativeSection(analysis);
   if (narrativeSection) {
-    var existingNarrative = reportPage.querySelector('.nfi-market-narrative');
+    const existingNarrative = reportPage.querySelector('.nfi-market-narrative');
     if (existingNarrative) existingNarrative.remove();
 
     // Find the Dominant Narrative section and insert at top
-    var t = ticker.toLowerCase();
-    var narrativeSectionEl = reportPage.querySelector('#' + t + '-narrative');
+    const t = ticker.toLowerCase();
+    const narrativeSectionEl = reportPage.querySelector('#' + t + '-narrative');
     if (narrativeSectionEl) {
-      var subtitle = narrativeSectionEl.querySelector('.rs-subtitle');
+      const subtitle = narrativeSectionEl.querySelector('.rs-subtitle');
       if (subtitle) {
         subtitle.parentNode.insertBefore(narrativeSection, subtitle);
       } else {
-        var rsBody = narrativeSectionEl.querySelector('.rs-body');
+        const rsBody = narrativeSectionEl.querySelector('.rs-body');
         if (rsBody) {
           rsBody.prepend(narrativeSection);
         } else {
@@ -441,20 +441,20 @@ function applyNarrativeAnalysis(ticker) {
 }
 
 function updateContradictedHypothesis(reportPage, analysis) {
-  var contradicted = analysis.inference.contradictedHypothesis;
-  var w = analysis.weights[contradicted];
-  var hName = (analysis.hypothesisNames || {})[contradicted] || contradicted;
+  const contradicted = analysis.inference.contradictedHypothesis;
+  const w = analysis.weights[contradicted];
+  const hName = (analysis.hypothesisNames || {})[contradicted] || contradicted;
   if (!w) return;
 
-  var cards = reportPage.querySelectorAll('.hyp-card');
+  const cards = reportPage.querySelectorAll('.hyp-card');
   cards.forEach(function(card) {
-    var title = card.querySelector('.hc-title');
+    const title = card.querySelector('.hc-title');
     if (!title) return;
     if (!title.textContent.includes(contradicted)) return;
 
-    var desc = card.querySelector('.hc-desc');
+    const desc = card.querySelector('.hc-desc');
     if (desc && !desc.dataset.nfiUpdated) {
-      var originalText = desc.innerHTML;
+      const originalText = desc.innerHTML;
       desc.innerHTML =
         '<span class="nfi-contradicted-warning">' +
           'CONTRADICTED BY PRICE ACTION: Market has reversed view. ' +
@@ -475,12 +475,12 @@ async function initNarrativeFramework() {
 
   // Load narrative analysis data
   try {
-    var response = await fetch('data/narrative-analysis.json');
+    const response = await fetch('data/narrative-analysis.json');
     if (!response.ok) {
       console.warn('[NFI] No narrative-analysis.json found. Run analysis first.');
       return;
     }
-    var data = await response.json();
+    const data = await response.json();
 
     if (!data.results) {
       console.warn('[NFI] No results in narrative-analysis.json');
@@ -494,17 +494,17 @@ async function initNarrativeFramework() {
     window.applyNarrativeAnalysis = applyNarrativeAnalysis;
 
     // Apply to any already-rendered report pages
-    for (var ticker in data.results) {
+    for (const ticker in data.results) {
       if (data.results.hasOwnProperty(ticker)) {
-        var reportPage = document.getElementById('page-report-' + ticker);
+        const reportPage = document.getElementById('page-report-' + ticker);
         if (reportPage && reportPage.innerHTML) {
           applyNarrativeAnalysis(ticker);
         }
       }
     }
 
-    var critCount = data.summary.criticalDislocations || 0;
-    var highCount = data.summary.highDislocations || 0;
+    const critCount = data.summary.criticalDislocations || 0;
+    const highCount = data.summary.highDislocations || 0;
     console.log('[NFI] Narrative Framework v3.0 loaded. ' + critCount + ' critical, ' + highCount + ' high dislocations.');
   } catch (e) {
     console.warn('[NFI] Could not load narrative analysis:', e.message);

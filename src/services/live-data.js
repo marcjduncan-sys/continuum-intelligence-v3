@@ -26,27 +26,27 @@ import { API_BASE } from '../lib/api-config.js';
 
 const CACHE_KEY = 'continuum_market_data';
 const CACHE_TTL = 4 * 60 * 60 * 1000; // 4 hours
-var _status = {}; // Per-ticker status: 'loading', 'live', 'failed'
+const _status = {}; // Per-ticker status: 'loading', 'live', 'failed'
 
 // Live prices come from data/live-prices.json (updated every 15 min via GitHub Actions).
 // OHLCV chart data routes through the Railway backend proxy to avoid CORS blocks.
 // Direct Yahoo Finance calls kept as best-effort fallback only (works in dev, blocked on GH Pages).
 
 // Railway API base (centralised in api-config.js)
-var _CHART_API_BASE = API_BASE;
+const _CHART_API_BASE = API_BASE;
 
 // Chart data URLs: Railway proxy only. Direct Yahoo calls are CORS-blocked
 // from GitHub Pages and generate noisy console errors.
 function chartUrls(ticker) {
-    var clean = ticker.replace(/\.AX$/i, '');
+    const clean = ticker.replace(/\.AX$/i, '');
     return [_CHART_API_BASE + '/api/chart/' + clean];
 }
 
 function getCache(ticker) {
     try {
-      var raw = localStorage.getItem(CACHE_KEY + '_' + ticker);
+      const raw = localStorage.getItem(CACHE_KEY + '_' + ticker);
       if (!raw) return null;
-      var cached = JSON.parse(raw);
+      const cached = JSON.parse(raw);
       if (Date.now() - cached.ts > CACHE_TTL) return null;
       return cached.data;
     } catch(e) { return null; }
@@ -59,14 +59,14 @@ function setCache(ticker, data) {
 }
 
 function parseYahooResponse(json) {
-    var result = json.chart.result[0];
-    var meta = result.meta;
-    var timestamps = result.timestamp;
-    var quote = result.indicators.quote[0];
-    var adjclose = result.indicators.adjclose ? result.indicators.adjclose[0].adjclose : null;
+    const result = json.chart.result[0];
+    const meta = result.meta;
+    const timestamps = result.timestamp;
+    const quote = result.indicators.quote[0];
+    const adjclose = result.indicators.adjclose ? result.indicators.adjclose[0].adjclose : null;
 
-    var bars = [];
-    for (var i = 0; i < timestamps.length; i++) {
+    const bars = [];
+    for (let i = 0; i < timestamps.length; i++) {
       if (quote.close[i] == null) continue;
       bars.push({
         date: new Date(timestamps[i] * 1000),
@@ -91,35 +91,35 @@ function parseYahooResponse(json) {
 // Timeout wrapper that works in all browsers
 function fetchWithTimeout(url, opts, ms) {
     return new Promise(function(resolve, reject) {
-      var controller = new AbortController();
+      const controller = new AbortController();
       opts.signal = controller.signal;
-      var timer = setTimeout(function() { controller.abort(); }, ms);
+      const timer = setTimeout(function() { controller.abort(); }, ms);
       fetch(url, opts).then(function(r) { clearTimeout(timer); resolve(r); })
                        .catch(function(e) { clearTimeout(timer); reject(e); });
     });
 }
 
 async function fetchTicker(ticker) {
-    var cached = getCache(ticker);
+    const cached = getCache(ticker);
     if (cached) {
       _status[ticker] = 'live';
       return cached;
     }
 
     _status[ticker] = 'loading';
-    var urls = chartUrls(ticker);
+    const urls = chartUrls(ticker);
 
     // Direct Yahoo Finance attempt (may work from some origins/browsers)
-    for (var u = 0; u < urls.length; u++) {
+    for (let u = 0; u < urls.length; u++) {
       try {
-        var resp = await fetchWithTimeout(urls[u], {
+        const resp = await fetchWithTimeout(urls[u], {
           headers: { 'Accept': 'application/json' },
           mode: 'cors'
         }, 10000);
         if (resp.ok) {
-          var json = await resp.json();
+          const json = await resp.json();
           if (json.chart && json.chart.result) {
-            var data = parseYahooResponse(json);
+            const data = parseYahooResponse(json);
             if (data.bars.length > 100) {
               setCache(ticker, data);
               _status[ticker] = 'live';
@@ -137,26 +137,26 @@ async function fetchTicker(ticker) {
 // Compute technical metrics from live bar data
 function computeLiveTA(bars, staticTA) {
     if (!bars || bars.length < 50) return null;
-    var n = bars.length;
-    var closes = bars.map(function(b) { return b.close; });
+    const n = bars.length;
+    const closes = bars.map(function(b) { return b.close; });
 
     function ma(arr, period) {
       if (arr.length < period) return null;
-      var sum = 0;
-      for (var i = arr.length - period; i < arr.length; i++) sum += arr[i];
+      let sum = 0;
+      for (let i = arr.length - period; i < arr.length; i++) sum += arr[i];
       return sum / period;
     }
 
-    var ma50 = ma(closes, 50);
-    var ma200 = ma(closes, 200);
-    var price = closes[n - 1];
-    var high52 = Math.max.apply(null, closes.slice(-252));
-    var low52 = Math.min.apply(null, closes.slice(-252));
+    const ma50 = ma(closes, 50);
+    const ma200 = ma(closes, 200);
+    const price = closes[n - 1];
+    const high52 = Math.max.apply(null, closes.slice(-252));
+    const low52 = Math.min.apply(null, closes.slice(-252));
 
     // Full MA arrays for chart
-    var ma50Arr = [];
-    var ma200Arr = [];
-    for (var i = 0; i < n; i++) {
+    const ma50Arr = [];
+    const ma200Arr = [];
+    for (let i = 0; i < n; i++) {
       if (i >= 49) {
         var s = 0; for (var j = i - 49; j <= i; j++) s += closes[j];
         ma50Arr.push(s / 50);
@@ -185,7 +185,7 @@ function computeLiveTA(bars, staticTA) {
 
 // Patch a STOCK_DATA entry with live data
 function patchStockData(ticker, liveData) {
-    var stock = STOCK_DATA[ticker];
+    const stock = STOCK_DATA[ticker];
     if (!stock || !liveData) return;
 
     // Store live chart data on the stock object
@@ -221,14 +221,14 @@ export async function fetchAndPatchLive(ticker) {
         return;
     }
 
-    var stock = STOCK_DATA[ticker];
+    const stock = STOCK_DATA[ticker];
     if (!stock) return;
 
     // Show loading state in chart container
-    var chartContainer = document.querySelector('#page-report-' + ticker + ' .ta-chart-container');
+    const chartContainer = document.querySelector('#page-report-' + ticker + ' .ta-chart-container');
     if (chartContainer && !stock._liveChart) {
         chartContainer.style.position = 'relative';
-        var loadingDiv = document.createElement('div');
+        const loadingDiv = document.createElement('div');
         loadingDiv.className = 'ta-chart-loading';
         loadingDiv.id = 'chart-loading-' + ticker;
         loadingDiv.innerHTML = '<div class="spinner"></div>Fetching live market data\u2026';
@@ -237,7 +237,7 @@ export async function fetchAndPatchLive(ticker) {
     }
 
     try {
-        var liveData = await LiveData.fetch(stock.tickerFull);
+        const liveData = await LiveData.fetch(stock.tickerFull);
         if (liveData) {
             LiveData.patchStockData(ticker, liveData);
             _liveFetched.add(ticker);
@@ -254,17 +254,17 @@ export async function fetchAndPatchLive(ticker) {
 
 export function showDataStatus(ticker, status) {
     // Remove any loading overlay
-    var loader = document.getElementById('chart-loading-' + ticker);
+    const loader = document.getElementById('chart-loading-' + ticker);
     if (loader) loader.remove();
     // Update badge text if static
     if (status === 'static') {
-        var badge = document.querySelector('#page-report-' + ticker + ' .ta-chart-static-badge');
+        const badge = document.querySelector('#page-report-' + ticker + ' .ta-chart-static-badge');
         if (badge) badge.textContent = 'STATIC \u2014 Live feed unavailable';
     }
 }
 
 export function updateLiveUI(ticker) {
-    var stock = STOCK_DATA[ticker];
+    const stock = STOCK_DATA[ticker];
     if (!stock || stock._indexOnly) return;
 
     // 0) Re-hydrate STOCK_DATA with new live price  --  updates all metrics and narrative
@@ -274,7 +274,7 @@ export function updateLiveUI(ticker) {
         // Force re-render of the report page with hydrated data
         if (renderedPages.has(ticker)) {
             renderedPages.delete(ticker);
-            var container = document.getElementById('page-report-' + ticker);
+            const container = document.getElementById('page-report-' + ticker);
             if (container) {
                 // Destroy Chart.js instances BEFORE DOM replacement
                 destroyNarrativeTimelineChart(ticker);
@@ -293,9 +293,9 @@ export function updateLiveUI(ticker) {
         }
 
         // Update home page featured card with hydrated metrics
-        var featuredCard = document.querySelector('[data-ticker-card="' + ticker + '"]');
+        const featuredCard = document.querySelector('[data-ticker-card="' + ticker + '"]');
         if (featuredCard) {
-            var newCardHtml = renderFeaturedCard(stock);
+            const newCardHtml = renderFeaturedCard(stock);
             var temp = document.createElement('div');
             temp.innerHTML = newCardHtml;
             if (temp.firstElementChild) {
@@ -305,9 +305,9 @@ export function updateLiveUI(ticker) {
     }
 
     // 1) Re-render the chart with live data
-    var chartContainer = document.querySelector('#page-report-' + ticker + ' .ta-chart-container');
+    const chartContainer = document.querySelector('#page-report-' + ticker + ' .ta-chart-container');
     if (chartContainer) {
-        var newChartHtml = renderTAChart(stock);
+        const newChartHtml = renderTAChart(stock);
         var temp = document.createElement('div');
         temp.innerHTML = newChartHtml;
         chartContainer.parentNode.replaceChild(temp.firstElementChild, chartContainer);
@@ -317,12 +317,12 @@ export function updateLiveUI(ticker) {
     // Rule 7.11: never derive change from stock.price (overwritten to live price).
     // Use server-supplied _liveChange/_liveChangePct from applyServerPrices().
     if (stock._livePrice) {
-        var priceEl = document.querySelector('#page-report-' + ticker + ' .rh-price');
+        const priceEl = document.querySelector('#page-report-' + ticker + ' .rh-price');
         if (priceEl) {
-            var change = stock._liveChange !== undefined ? stock._liveChange : 0;
-            var changePct = stock._liveChangePct !== undefined ? stock._liveChangePct : 0;
-            var sign = change >= 0 ? '+' : '';
-            var cls = change >= 0 ? 'positive' : 'negative';
+            const change = stock._liveChange !== undefined ? stock._liveChange : 0;
+            const changePct = stock._liveChangePct !== undefined ? stock._liveChangePct : 0;
+            const sign = change >= 0 ? '+' : '';
+            const cls = change >= 0 ? 'positive' : 'negative';
             priceEl.innerHTML = '<span class="rh-price-currency">' + stock.currency + '</span>' +
                 stock._livePrice.toFixed(2) +
                 '<span class="rh-live-indicator"><span class="live-dot"></span>LIVE</span>' +
@@ -331,7 +331,7 @@ export function updateLiveUI(ticker) {
     }
 
     // 3) Update featured card price on home page
-    var homeCard = document.querySelector('[data-ticker-card="' + ticker + '"] .fc-price');
+    const homeCard = document.querySelector('[data-ticker-card="' + ticker + '"] .fc-price');
     if (homeCard && stock._livePrice) {
         homeCard.textContent = stock.currency + stock._livePrice.toFixed(2);
     }
@@ -339,11 +339,11 @@ export function updateLiveUI(ticker) {
 
 // Prefetch live data for all tickers on page load (background, staggered)
 export function prefetchAllLiveData() {
-    var tickers = Object.keys(STOCK_DATA);
-    var delay = 0;
+    const tickers = Object.keys(STOCK_DATA);
+    let delay = 0;
     tickers.forEach(function(ticker) {
         setTimeout(function() {
-            var stock = STOCK_DATA[ticker];
+            const stock = STOCK_DATA[ticker];
             if (!stock || !stock.tickerFull) return;
             // Skip if already fetched this session
             if (_liveFetched.has(ticker)) return;
@@ -358,10 +358,10 @@ export function prefetchAllLiveData() {
                     }
 
                     // Update home card with fully hydrated data
-                    var featuredCard = document.querySelector('[data-ticker-card="' + ticker + '"]');
+                    const featuredCard = document.querySelector('[data-ticker-card="' + ticker + '"]');
                     if (featuredCard) {
-                        var newCardHtml = renderFeaturedCard(stock);
-                        var temp = document.createElement('div');
+                        const newCardHtml = renderFeaturedCard(stock);
+                        const temp = document.createElement('div');
                         temp.innerHTML = newCardHtml;
                         if (temp.firstElementChild) {
                             featuredCard.parentNode.replaceChild(temp.firstElementChild, featuredCard);

@@ -12,7 +12,7 @@
 // CONSTANTS & DATA
 // =========================================================================
 
-var PN_STEP_LABELS = [
+const PN_STEP_LABELS = [
     { num: 1, title: 'Firm', subtitle: 'Institutional context' },
     { num: 2, title: 'Strategy', subtitle: 'Fund & mandate' },
     { num: 3, title: 'Assessment', subtitle: 'Cognitive profile' },
@@ -23,7 +23,7 @@ var PN_STEP_LABELS = [
 // Step 1: Firm options
 // ---------------------------------------------------------------------------
 
-var PN_FIRM_OPTIONS = {
+const PN_FIRM_OPTIONS = {
     type: [
         'Superannuation Fund',
         'Insurance Company',
@@ -58,7 +58,7 @@ var PN_FIRM_OPTIONS = {
 // Step 2: Fund options
 // ---------------------------------------------------------------------------
 
-var PN_FUND_OPTIONS = {
+const PN_FUND_OPTIONS = {
     strategy: [
         'Long Only',
         'Long-Short',
@@ -98,7 +98,7 @@ var PN_FUND_OPTIONS = {
 // 4 items per factor. Reverse-coded items marked.
 // ---------------------------------------------------------------------------
 
-var PN_IPIP_ITEMS = [
+const PN_IPIP_ITEMS = [
     // Extraversion (E)
     { id: 'E1', text: 'I am the life of the party.', factor: 'E', reverse: false },
     { id: 'E2', text: 'I don\'t talk a lot.', factor: 'E', reverse: true },
@@ -131,7 +131,7 @@ var PN_IPIP_ITEMS = [
 // Items 1-3: Frederick (2005). Items 4-6: Thomson & Oppenheimer (2016).
 // ---------------------------------------------------------------------------
 
-var PN_CRT_ITEMS = [
+const PN_CRT_ITEMS = [
     {
         id: 'CRT1',
         text: 'A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost? (in cents)',
@@ -180,7 +180,7 @@ var PN_CRT_ITEMS = [
 // Step 4c: Investment Philosophy (8 items, 5-point agree/disagree)
 // ---------------------------------------------------------------------------
 
-var PN_PHILOSOPHY_ITEMS = [
+const PN_PHILOSOPHY_ITEMS = [
     { id: 'PH1', text: 'I prefer to take a contrarian position against market consensus.', dimension: 'Contrarianism' },
     { id: 'PH2', text: 'I would rather hold a concentrated portfolio of 10 high-conviction names than a diversified portfolio of 40.', dimension: 'Conviction' },
     { id: 'PH3', text: 'Valuation is the most important factor in any investment decision.', dimension: 'Value Orientation' },
@@ -195,7 +195,7 @@ var PN_PHILOSOPHY_ITEMS = [
 // Step 4d: Bias Scenarios (6 items, forced-choice A/B)
 // ---------------------------------------------------------------------------
 
-var PN_BIAS_ITEMS = [
+const PN_BIAS_ITEMS = [
     {
         id: 'B1',
         bias: 'disposition_effect',
@@ -250,7 +250,7 @@ var PN_BIAS_ITEMS = [
 // Step 4e: Delivery Preferences (5 items)
 // ---------------------------------------------------------------------------
 
-var PN_PREFERENCE_ITEMS = [
+const PN_PREFERENCE_ITEMS = [
     {
         id: 'PR1',
         text: 'When do you want to receive investment analysis?',
@@ -312,7 +312,7 @@ var PN_PREFERENCE_ITEMS = [
 // Bias counter-intervention strategies
 // ---------------------------------------------------------------------------
 
-var PN_BIAS_INTERVENTIONS = {
+const PN_BIAS_INTERVENTIONS = {
     disposition_effect: 'Use clean-sheet evaluation framing ("If you did not already hold this stock, would you buy today at this price?")',
     anchoring: 'Challenge external price anchors; force model-based valuation refresh before referencing broker targets',
     loss_aversion: 'Frame decisions in terms of expected value, not certain outcomes; present asymmetric risk/reward explicitly',
@@ -326,7 +326,7 @@ var PN_BIAS_INTERVENTIONS = {
 // STATE
 // =========================================================================
 
-var pnState = {
+const pnState = {
     currentStep: 1,
     maxStepReached: 1,
     firm: {
@@ -376,7 +376,7 @@ var pnState = {
 // User mandate overrides house defaults but cannot exceed these.
 // ---------------------------------------------------------------------------
 
-var PN_MANDATE_SAFETY_CAPS = {
+const PN_MANDATE_SAFETY_CAPS = {
     maxPositionSize: { min: 1, max: 50 },
     sectorCap: { min: 5, max: 50 },
     cashRangeMin: { min: 0, max: 20 },
@@ -387,7 +387,7 @@ var PN_MANDATE_SAFETY_CAPS = {
 // Mandate option lists
 // ---------------------------------------------------------------------------
 
-var PN_MANDATE_OPTIONS = {
+const PN_MANDATE_OPTIONS = {
     turnoverTolerance: [
         'Low (< 20% annual)',
         'Moderate (20-50% annual)',
@@ -428,7 +428,7 @@ var PN_MANDATE_OPTIONS = {
 };
 
 function pnClampMandate(mandate) {
-    var caps = PN_MANDATE_SAFETY_CAPS;
+    const caps = PN_MANDATE_SAFETY_CAPS;
     mandate.maxPositionSize = Math.max(caps.maxPositionSize.min,
         Math.min(caps.maxPositionSize.max, mandate.maxPositionSize || 15));
     mandate.sectorCap = Math.max(caps.sectorCap.min,
@@ -448,11 +448,11 @@ function pnClampMandate(mandate) {
 // PERSISTENCE (localStorage)
 // =========================================================================
 
-var PN_STORAGE_KEY = 'continuum_personalisation_profile';
+const PN_STORAGE_KEY = 'continuum_personalisation_profile';
 
 function pnSaveToLocalStorage() {
     try {
-        var data = {
+        const data = {
             version: 4,
             savedAt: new Date().toISOString(),
             state: {
@@ -471,21 +471,21 @@ function pnSaveToLocalStorage() {
 }
 
 function pnSaveToServer() {
-    var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    var origin = isLocal ? '' : 'https://api.continuumintelligence.ai';
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const origin = isLocal ? '' : 'https://api.continuumintelligence.ai';
 
-    var headers = { 'Content-Type': 'application/json' };
-    var token = window.CI_AUTH && window.CI_AUTH.getToken();
+    const headers = { 'Content-Type': 'application/json' };
+    const token = window.CI_AUTH && window.CI_AUTH.getToken();
     if (token) headers['Authorization'] = 'Bearer ' + token;
 
-    var body = {
+    const body = {
         firm: pnState.firm || {},
         fund: pnState.fund || {},
         mandate: pnState.mandate || {},
         profile: pnState.profile || {}
     };
     if (!token) {
-        var guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
+        const guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
         if (guestId) body.guest_id = guestId;
     }
 
@@ -502,7 +502,7 @@ function pnSaveToServer() {
 // localStorage portfolio_id so PM Chat can reference it.
 // ---------------------------------------------------------------------------
 
-var PN_PORTFOLIO_ID_KEY = 'continuum_pm_portfolio_id';
+const PN_PORTFOLIO_ID_KEY = 'continuum_pm_portfolio_id';
 
 function pnGetPortfolioId() {
     try { return localStorage.getItem(PN_PORTFOLIO_ID_KEY) || null; } catch(e) { return null; }
@@ -514,13 +514,13 @@ function pnSetPortfolioId(id) {
 
 function pnLoadFromLocalStorage() {
     try {
-        var raw = localStorage.getItem(PN_STORAGE_KEY);
+        const raw = localStorage.getItem(PN_STORAGE_KEY);
         if (!raw) return false;
-        var data = JSON.parse(raw);
+        const data = JSON.parse(raw);
         if (!data || ![2, 3, 4].includes(data.version)) return false;
-        var s = data.state;
-        var step = s.currentStep || 1;
-        var maxStep = s.maxStepReached || 1;
+        const s = data.state;
+        let step = s.currentStep || 1;
+        let maxStep = s.maxStepReached || 1;
         // Migrate from 5-step (v2/v3) to 4-step (v4): old 3→3, old 4→3, old 5→4
         if (data.version < 4) {
             if (step >= 4) step = step - 1;
@@ -550,10 +550,10 @@ function pnClearLocalStorage() {
 // =========================================================================
 
 function pnScoreBigFive() {
-    var scores = { E: 0, A: 0, C: 0, N: 0, O: 0 };
-    for (var i = 0; i < PN_IPIP_ITEMS.length; i++) {
-        var item = PN_IPIP_ITEMS[i];
-        var val = pnState.assessment.ipip[item.id];
+    const scores = { E: 0, A: 0, C: 0, N: 0, O: 0 };
+    for (let i = 0; i < PN_IPIP_ITEMS.length; i++) {
+        const item = PN_IPIP_ITEMS[i];
+        let val = pnState.assessment.ipip[item.id];
         if (val === undefined) continue;
         val = parseInt(val, 10);
         if (item.reverse) val = 6 - val;
@@ -563,12 +563,12 @@ function pnScoreBigFive() {
 }
 
 function pnScoreCRT() {
-    var correct = 0;
-    var intuitiveErrors = 0;
-    var errorTypes = [];
-    for (var i = 0; i < PN_CRT_ITEMS.length; i++) {
-        var item = PN_CRT_ITEMS[i];
-        var answer = parseFloat(pnState.assessment.crt[item.id]);
+    let correct = 0;
+    let intuitiveErrors = 0;
+    const errorTypes = [];
+    for (let i = 0; i < PN_CRT_ITEMS.length; i++) {
+        const item = PN_CRT_ITEMS[i];
+        const answer = parseFloat(pnState.assessment.crt[item.id]);
         if (isNaN(answer)) continue;
         if (answer === item.correctAnswer) {
             correct++;
@@ -577,27 +577,27 @@ function pnScoreCRT() {
             errorTypes.push(item.biasType);
         }
     }
-    var label = correct >= 5 ? 'High System 2' :
+    const label = correct >= 5 ? 'High System 2' :
                 correct >= 3 ? 'Moderate System 2' :
                 'System 1 Dominant';
     return { score: correct, total: 6, intuitiveErrors: intuitiveErrors, errorTypes: errorTypes, label: label };
 }
 
 function pnScorePhilosophy() {
-    var scores = {};
-    for (var i = 0; i < PN_PHILOSOPHY_ITEMS.length; i++) {
-        var item = PN_PHILOSOPHY_ITEMS[i];
-        var val = pnState.assessment.philosophy[item.id];
+    const scores = {};
+    for (let i = 0; i < PN_PHILOSOPHY_ITEMS.length; i++) {
+        const item = PN_PHILOSOPHY_ITEMS[i];
+        const val = pnState.assessment.philosophy[item.id];
         if (val !== undefined) scores[item.dimension] = parseInt(val, 10);
     }
     return scores;
 }
 
 function pnScoreBiases() {
-    var biases = [];
-    for (var i = 0; i < PN_BIAS_ITEMS.length; i++) {
-        var item = PN_BIAS_ITEMS[i];
-        var choice = pnState.assessment.bias[item.id];
+    const biases = [];
+    for (let i = 0; i < PN_BIAS_ITEMS.length; i++) {
+        const item = PN_BIAS_ITEMS[i];
+        const choice = pnState.assessment.bias[item.id];
         if (choice === 'a' && item.optionA.score === 'biased') {
             biases.push({
                 bias: item.biasLabel,
@@ -630,7 +630,7 @@ function pnBuildProfile() {
 }
 
 function pnPercentileLabel(score, max) {
-    var pct = (score / max) * 100;
+    const pct = (score / max) * 100;
     if (pct >= 80) return 'High';
     if (pct >= 60) return 'Above Average';
     if (pct >= 40) return 'Average';
@@ -686,10 +686,10 @@ function pnAssessmentComplete() {
 }
 
 function pnAssessmentProgress() {
-    var total = PN_IPIP_ITEMS.length + PN_CRT_ITEMS.length + PN_PHILOSOPHY_ITEMS.length +
+    const total = PN_IPIP_ITEMS.length + PN_CRT_ITEMS.length + PN_PHILOSOPHY_ITEMS.length +
                 PN_BIAS_ITEMS.length + PN_PREFERENCE_ITEMS.length;
-    var answered = 0;
-    var k;
+    let answered = 0;
+    let k;
     for (k in pnState.assessment.ipip) {
         if (pnState.assessment.ipip.hasOwnProperty(k)) answered++;
     }
@@ -709,7 +709,7 @@ function pnAssessmentProgress() {
 }
 
 function pnBlockComplete(blockIndex) {
-    var i;
+    let i;
     switch (blockIndex) {
         case 0:
             for (i = 0; i < PN_IPIP_ITEMS.length; i++) {
@@ -748,7 +748,7 @@ function pnBlockComplete(blockIndex) {
 // =========================================================================
 
 function pnBuildSystemPrompt(profile, firm, fund, portfolio, mandate) {
-    var p = '';
+    let p = '';
 
     p += 'You are a senior equity research analyst at Continuum Intelligence, an independent research platform focused on ASX-listed companies. ';
     p += 'You are providing personalised investment research analysis calibrated to this specific fund manager\'s cognitive profile, institutional context, and decision-making style.\n\n';
@@ -770,7 +770,7 @@ function pnBuildSystemPrompt(profile, firm, fund, portfolio, mandate) {
     p += 'Typical holding period: ' + fund.holdingPeriod + '\n\n';
 
     if (portfolio && portfolio.length > 0) {
-        var validHoldings = portfolio.filter(function(h) { return h.ticker && h.ticker.trim(); });
+        const validHoldings = portfolio.filter(function(h) { return h.ticker && h.ticker.trim(); });
         if (validHoldings.length > 0) {
             p += '## CURRENT PORTFOLIO\n';
             p += 'The manager currently holds these positions. Reference them when relevant:\n';
@@ -805,7 +805,7 @@ function pnBuildSystemPrompt(profile, firm, fund, portfolio, mandate) {
 
     p += '## MANAGER COGNITIVE PROFILE\n\n';
 
-    var factors = [
+    const factors = [
         { key: 'E', label: 'Extraversion' },
         { key: 'A', label: 'Agreeableness' },
         { key: 'C', label: 'Conscientiousness' },
@@ -814,8 +814,8 @@ function pnBuildSystemPrompt(profile, firm, fund, portfolio, mandate) {
     ];
     p += 'Big Five Personality:\n';
     for (var i = 0; i < factors.length; i++) {
-        var f = factors[i];
-        var score = profile.bigFive[f.key];
+        const f = factors[i];
+        const score = profile.bigFive[f.key];
         p += '- ' + f.label + ': ' + score + '/20 (' + pnPercentileLabel(score, 20) + ')\n';
     }
     p += '\n';
@@ -850,10 +850,10 @@ function pnBuildSystemPrompt(profile, firm, fund, portfolio, mandate) {
 
     if (profile.philosophy && Object.keys(profile.philosophy).length > 0) {
         p += 'Investment Philosophy:\n';
-        for (var dim in profile.philosophy) {
+        for (const dim in profile.philosophy) {
             if (profile.philosophy.hasOwnProperty(dim)) {
-                var val = profile.philosophy[dim];
-                var strength = val >= 4 ? 'Strong' : val <= 2 ? 'Weak' : 'Moderate';
+                const val = profile.philosophy[dim];
+                const strength = val >= 4 ? 'Strong' : val <= 2 ? 'Weak' : 'Moderate';
                 p += '- ' + dim + ': ' + val + '/5 (' + strength + ')\n';
             }
         }
@@ -863,7 +863,7 @@ function pnBuildSystemPrompt(profile, firm, fund, portfolio, mandate) {
     if (profile.biases && profile.biases.length > 0) {
         p += '## BIAS COUNTER-INTERVENTIONS\n';
         p += 'The manager has identified bias vulnerabilities below. When delivering analysis that touches these areas, embed subtle counter-framing:\n';
-        for (var b = 0; b < profile.biases.length; b++) {
+        for (let b = 0; b < profile.biases.length; b++) {
             p += '- ' + profile.biases[b].bias + ': ' + profile.biases[b].intervention + '\n';
         }
         p += '\n';
@@ -893,7 +893,7 @@ function pnBuildSystemPrompt(profile, firm, fund, portfolio, mandate) {
 // =========================================================================
 
 function pnTextInput(id, label, value, placeholder, required) {
-    var req = required !== false;
+    const req = required !== false;
     return '<div class="pn-form-group">' +
         '<label class="pn-label" for="pn-' + id + '">' + label + (req ? ' <span class="pn-required">*</span>' : '') + '</label>' +
         '<input type="text" class="pn-input" id="pn-' + id + '" data-field="' + id + '" ' +
@@ -903,13 +903,13 @@ function pnTextInput(id, label, value, placeholder, required) {
 }
 
 function pnSelect(id, label, options, selectedValue, required) {
-    var req = required !== false;
-    var html = '<div class="pn-form-group">' +
+    const req = required !== false;
+    let html = '<div class="pn-form-group">' +
         '<label class="pn-label" for="pn-' + id + '">' + label + (req ? ' <span class="pn-required">*</span>' : '') + '</label>' +
         '<select class="pn-select" id="pn-' + id + '" data-field="' + id + '">' +
         '<option value="">Select...</option>';
-    for (var i = 0; i < options.length; i++) {
-        var sel = options[i] === selectedValue ? ' selected' : '';
+    for (let i = 0; i < options.length; i++) {
+        const sel = options[i] === selectedValue ? ' selected' : '';
         html += '<option value="' + escapeAttr(options[i]) + '"' + sel + '>' + escapeHtml(options[i]) + '</option>';
     }
     html += '</select></div>';
@@ -917,12 +917,12 @@ function pnSelect(id, label, options, selectedValue, required) {
 }
 
 function pnMultiSelect(id, label, options, selectedValues) {
-    var html = '<div class="pn-form-group full-width">' +
+    let html = '<div class="pn-form-group full-width">' +
         '<label class="pn-label">' + label + '</label>' +
         '<div class="pn-multi-select" id="pn-' + id + '">';
-    for (var i = 0; i < options.length; i++) {
-        var checked = selectedValues && selectedValues.indexOf(options[i]) !== -1;
-        var cls = 'pn-checkbox-label' + (checked ? ' checked' : '');
+    for (let i = 0; i < options.length; i++) {
+        const checked = selectedValues && selectedValues.indexOf(options[i]) !== -1;
+        const cls = 'pn-checkbox-label' + (checked ? ' checked' : '');
         html += '<label class="' + cls + '">' +
             '<input type="checkbox" value="' + escapeAttr(options[i]) + '"' + (checked ? ' checked' : '') + '>' +
             '<span class="pn-checkbox-indicator"></span>' +
@@ -934,7 +934,7 @@ function pnMultiSelect(id, label, options, selectedValues) {
 }
 
 function pnSlider(id, label, min, max, value, unit, required) {
-    var req = required !== false;
+    const req = required !== false;
     return '<div class="pn-form-group full-width">' +
         '<label class="pn-label">' + label + (req ? ' <span class="pn-required">*</span>' : '') + '</label>' +
         '<div class="pn-slider-container">' +
@@ -967,10 +967,10 @@ function renderPage() {
 }
 
 function renderStepIndicator() {
-    var html = '<div class="pn-step-indicator">';
-    for (var i = 0; i < PN_STEP_LABELS.length; i++) {
-        var s = PN_STEP_LABELS[i];
-        var cls = 'pn-step-dot';
+    let html = '<div class="pn-step-indicator">';
+    for (let i = 0; i < PN_STEP_LABELS.length; i++) {
+        const s = PN_STEP_LABELS[i];
+        let cls = 'pn-step-dot';
         if (s.num === pnState.currentStep) cls += ' active';
         if (s.num < pnState.currentStep) cls += ' completed';
         if (s.num <= pnState.maxStepReached) cls += ' reachable';
@@ -980,7 +980,7 @@ function renderStepIndicator() {
         html += '<div class="pn-step-subtitle">' + s.subtitle + '</div>';
         html += '</div>';
         if (i < PN_STEP_LABELS.length - 1) {
-            var lineClass = 'pn-step-line' + (s.num < pnState.currentStep ? ' completed' : '');
+            const lineClass = 'pn-step-line' + (s.num < pnState.currentStep ? ' completed' : '');
             html += '<div class="' + lineClass + '"></div>';
         }
     }
@@ -1018,12 +1018,12 @@ function renderStep1() {
 }
 
 function renderStep2() {
-    var longShortWarning = '';
+    let longShortWarning = '';
     if (pnState.mandate.positionDirection === 'long_short') {
         longShortWarning = '<div class="pn-mandate-warning">Long-Short is not yet supported in PM analytics. Stored for future use.</div>';
     }
 
-    var restrictedStr = (pnState.mandate.restrictedNames || []).join(', ');
+    const restrictedStr = (pnState.mandate.restrictedNames || []).join(', ');
 
     return '<div class="pn-step" data-step="2">' +
         '<div class="pn-step-header">' +
@@ -1066,8 +1066,8 @@ function renderStep2() {
 }
 
 function renderStep3() {
-    var progress = pnAssessmentProgress();
-    var blockNames = [
+    const progress = pnAssessmentProgress();
+    const blockNames = [
         { title: 'Personality', items: PN_IPIP_ITEMS.length },
         { title: 'Cognitive', items: PN_CRT_ITEMS.length },
         { title: 'Philosophy', items: PN_PHILOSOPHY_ITEMS.length },
@@ -1075,9 +1075,9 @@ function renderStep3() {
         { title: 'Preferences', items: PN_PREFERENCE_ITEMS.length }
     ];
 
-    var blockNav = '<div class="pn-assessment-nav">';
-    for (var i = 0; i < blockNames.length; i++) {
-        var cls = 'pn-assessment-nav-item';
+    let blockNav = '<div class="pn-assessment-nav">';
+    for (let i = 0; i < blockNames.length; i++) {
+        let cls = 'pn-assessment-nav-item';
         if (i === pnState.assessmentBlock) cls += ' active';
         if (pnBlockComplete(i)) cls += ' complete';
         blockNav += '<button class="' + cls + '" data-block="' + i + '">' +
@@ -1087,7 +1087,7 @@ function renderStep3() {
     }
     blockNav += '</div>';
 
-    var contentHtml = '';
+    let contentHtml = '';
     switch (pnState.assessmentBlock) {
         case 0: contentHtml = renderIPIPBlock(); break;
         case 1: contentHtml = renderCRTBlock(); break;
@@ -1115,10 +1115,10 @@ function renderStep3() {
 }
 
 function renderIPIPBlock() {
-    var html = '<div class="pn-assessment-block">' +
+    let html = '<div class="pn-assessment-block">' +
         '<div class="pn-assessment-block-title">Mini-IPIP Big Five Personality Assessment</div>' +
         '<div class="pn-assessment-block-desc">Rate how accurately each statement describes you in general. There are no right or wrong answers.</div>';
-    for (var i = 0; i < PN_IPIP_ITEMS.length; i++) {
+    for (let i = 0; i < PN_IPIP_ITEMS.length; i++) {
         html += renderLikertItem(PN_IPIP_ITEMS[i], pnState.assessment.ipip[PN_IPIP_ITEMS[i].id], 'ipip');
     }
     html += '</div>';
@@ -1126,12 +1126,12 @@ function renderIPIPBlock() {
 }
 
 function renderCRTBlock() {
-    var html = '<div class="pn-assessment-block">' +
+    let html = '<div class="pn-assessment-block">' +
         '<div class="pn-assessment-block-title">Cognitive Reflection Test</div>' +
         '<div class="pn-assessment-block-desc">Answer each question with a number. Take your time \u2014 your first instinct may not be correct.</div>';
-    for (var i = 0; i < PN_CRT_ITEMS.length; i++) {
-        var item = PN_CRT_ITEMS[i];
-        var val = pnState.assessment.crt[item.id];
+    for (let i = 0; i < PN_CRT_ITEMS.length; i++) {
+        const item = PN_CRT_ITEMS[i];
+        const val = pnState.assessment.crt[item.id];
         html += '<div class="pn-crt-item">' +
             '<div class="pn-crt-text">' + (i + 1) + '. ' + escapeHtml(item.text) + '</div>' +
             '<input type="number" class="pn-crt-input" data-id="' + item.id + '" ' +
@@ -1143,10 +1143,10 @@ function renderCRTBlock() {
 }
 
 function renderPhilosophyBlock() {
-    var html = '<div class="pn-assessment-block">' +
+    let html = '<div class="pn-assessment-block">' +
         '<div class="pn-assessment-block-title">Investment Philosophy</div>' +
         '<div class="pn-assessment-block-desc">Rate your agreement with each statement. 1 = Strongly Disagree, 5 = Strongly Agree.</div>';
-    for (var i = 0; i < PN_PHILOSOPHY_ITEMS.length; i++) {
+    for (let i = 0; i < PN_PHILOSOPHY_ITEMS.length; i++) {
         html += renderLikertItem(PN_PHILOSOPHY_ITEMS[i], pnState.assessment.philosophy[PN_PHILOSOPHY_ITEMS[i].id], 'philosophy');
     }
     html += '</div>';
@@ -1154,10 +1154,10 @@ function renderPhilosophyBlock() {
 }
 
 function renderBiasBlock() {
-    var html = '<div class="pn-assessment-block">' +
+    let html = '<div class="pn-assessment-block">' +
         '<div class="pn-assessment-block-title">Bias Scenario Assessment</div>' +
         '<div class="pn-assessment-block-desc">For each scenario, choose the response that best describes what you would actually do (not what you think you should do).</div>';
-    for (var i = 0; i < PN_BIAS_ITEMS.length; i++) {
+    for (let i = 0; i < PN_BIAS_ITEMS.length; i++) {
         html += renderForcedChoice(PN_BIAS_ITEMS[i], pnState.assessment.bias[PN_BIAS_ITEMS[i].id]);
     }
     html += '</div>';
@@ -1165,18 +1165,18 @@ function renderBiasBlock() {
 }
 
 function renderPreferencesBlock() {
-    var html = '<div class="pn-assessment-block">' +
+    let html = '<div class="pn-assessment-block">' +
         '<div class="pn-assessment-block-title">Delivery Preferences</div>' +
         '<div class="pn-assessment-block-desc">Tell us how you want to receive investment analysis.</div>';
-    for (var i = 0; i < PN_PREFERENCE_ITEMS.length; i++) {
-        var item = PN_PREFERENCE_ITEMS[i];
-        var selectedVal = pnState.assessment.preferences[item.id] || '';
+    for (let i = 0; i < PN_PREFERENCE_ITEMS.length; i++) {
+        const item = PN_PREFERENCE_ITEMS[i];
+        const selectedVal = pnState.assessment.preferences[item.id] || '';
         html += '<div class="pn-pref-item">' +
             '<div class="pn-pref-text">' + escapeHtml(item.text) + '</div>' +
             '<select class="pn-select pn-pref-select" data-id="' + item.id + '">' +
                 '<option value="">Select...</option>';
-        for (var j = 0; j < item.options.length; j++) {
-            var sel = item.options[j] === selectedVal ? ' selected' : '';
+        for (let j = 0; j < item.options.length; j++) {
+            const sel = item.options[j] === selectedVal ? ' selected' : '';
             html += '<option value="' + escapeAttr(item.options[j]) + '"' + sel + '>' + escapeHtml(item.options[j]) + '</option>';
         }
         html += '</select></div>';
@@ -1186,15 +1186,15 @@ function renderPreferencesBlock() {
 }
 
 function renderLikertItem(item, currentValue, category) {
-    var labels = ['Very Inaccurate', 'Inaccurate', 'Neutral', 'Accurate', 'Very Accurate'];
+    let labels = ['Very Inaccurate', 'Inaccurate', 'Neutral', 'Accurate', 'Very Accurate'];
     if (category === 'philosophy') {
         labels = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'];
     }
-    var html = '<div class="pn-likert-item">' +
+    let html = '<div class="pn-likert-item">' +
         '<div class="pn-likert-text">' + escapeHtml(item.text) + '</div>' +
         '<div class="pn-likert-scale">';
-    for (var i = 1; i <= 5; i++) {
-        var selected = (parseInt(currentValue, 10) === i) ? ' selected' : '';
+    for (let i = 1; i <= 5; i++) {
+        const selected = (parseInt(currentValue, 10) === i) ? ' selected' : '';
         html += '<button class="pn-likert-btn' + selected + '" data-id="' + item.id + '" data-value="' + i + '" data-category="' + category + '" title="' + labels[i - 1] + '">' +
             '<span class="pn-likert-circle"></span>' +
             '<span class="pn-likert-label">' + labels[i - 1] + '</span>' +
@@ -1218,12 +1218,12 @@ function renderForcedChoice(item, currentValue) {
     '</div>';
 }
 
-var PN_BLOCK_NAMES = ['Personality', 'Cognitive', 'Philosophy', 'Bias', 'Preferences'];
+const PN_BLOCK_NAMES = ['Personality', 'Cognitive', 'Philosophy', 'Bias', 'Preferences'];
 
 function renderBlockBottomNav() {
-    var current = pnState.assessmentBlock;
-    var isLast = current === PN_BLOCK_NAMES.length - 1;
-    var html = '<div class="pn-block-bottom-nav">';
+    const current = pnState.assessmentBlock;
+    const isLast = current === PN_BLOCK_NAMES.length - 1;
+    let html = '<div class="pn-block-bottom-nav">';
 
     if (current > 0) {
         html += '<button class="pn-btn pn-btn-secondary pn-block-prev">' +
@@ -1249,12 +1249,12 @@ function renderBlockBottomNav() {
 }
 
 function bindBlockBottomNav() {
-    var nextBtn = document.querySelector('.pn-block-next');
-    var prevBtn = document.querySelector('.pn-block-prev');
+    const nextBtn = document.querySelector('.pn-block-next');
+    const prevBtn = document.querySelector('.pn-block-prev');
 
     if (nextBtn) {
         nextBtn.addEventListener('click', function() {
-            var current = pnState.assessmentBlock;
+            const current = pnState.assessmentBlock;
             if (current === PN_BLOCK_NAMES.length - 1) {
                 // Complete Assessment: advance wizard to step 4
                 if (!pnAssessmentComplete()) return;
@@ -1289,24 +1289,24 @@ function bindBlockBottomNav() {
 // STICKY ASSESSMENT FOOTER BAR
 // =========================================================================
 
-var _stickyObserver = null;
+let _stickyObserver = null;
 
 function initStickyBar() {
     // Clean up previous observer
     destroyStickyBar();
 
-    var navRow = document.querySelector('.pn-assessment-nav');
+    const navRow = document.querySelector('.pn-assessment-nav');
     if (!navRow) return;
 
     // Create the sticky bar element
-    var bar = document.createElement('div');
+    const bar = document.createElement('div');
     bar.className = 'pn-sticky-bar';
     bar.id = 'pn-sticky-bar';
     updateStickyBarContent(bar);
     document.body.appendChild(bar);
 
     _stickyObserver = new IntersectionObserver(function(entries) {
-        var bar = document.getElementById('pn-sticky-bar');
+        const bar = document.getElementById('pn-sticky-bar');
         if (!bar) return;
         // Show sticky bar when nav row scrolls out of view
         bar.classList.toggle('pn-sticky-bar--visible', !entries[0].isIntersecting);
@@ -1319,12 +1319,12 @@ function updateStickyBarContent(bar) {
     if (!bar) bar = document.getElementById('pn-sticky-bar');
     if (!bar) return;
 
-    var current = pnState.assessmentBlock;
-    var isLast = current === PN_BLOCK_NAMES.length - 1;
-    var blockItems = [PN_IPIP_ITEMS, PN_CRT_ITEMS, PN_PHILOSOPHY_ITEMS, PN_BIAS_ITEMS, PN_PREFERENCE_ITEMS];
-    var totalInBlock = blockItems[current].length;
-    var answeredInBlock = 0;
-    var k;
+    const current = pnState.assessmentBlock;
+    const isLast = current === PN_BLOCK_NAMES.length - 1;
+    const blockItems = [PN_IPIP_ITEMS, PN_CRT_ITEMS, PN_PHILOSOPHY_ITEMS, PN_BIAS_ITEMS, PN_PREFERENCE_ITEMS];
+    const totalInBlock = blockItems[current].length;
+    let answeredInBlock = 0;
+    let k;
 
     switch (current) {
         case 0:
@@ -1344,9 +1344,9 @@ function updateStickyBarContent(bar) {
             break;
     }
 
-    var label = PN_BLOCK_NAMES[current] + ' \u2014 ' + answeredInBlock + ' of ' + totalInBlock + ' answered';
+    const label = PN_BLOCK_NAMES[current] + ' \u2014 ' + answeredInBlock + ' of ' + totalInBlock + ' answered';
 
-    var btnHtml;
+    let btnHtml;
     if (isLast) {
         btnHtml = '<button class="pn-btn pn-btn-primary pn-sticky-btn pn-sticky-complete"' +
             (pnAssessmentComplete() ? '' : ' disabled') + '>' +
@@ -1359,7 +1359,7 @@ function updateStickyBarContent(bar) {
     bar.innerHTML = '<span class="pn-sticky-label">' + label + '</span>' + btnHtml;
 
     // Bind the sticky button
-    var stickyBtn = bar.querySelector('.pn-sticky-btn');
+    const stickyBtn = bar.querySelector('.pn-sticky-btn');
     if (stickyBtn) {
         stickyBtn.addEventListener('click', function() {
             if (current === PN_BLOCK_NAMES.length - 1) {
@@ -1386,7 +1386,7 @@ function destroyStickyBar() {
         _stickyObserver.disconnect();
         _stickyObserver = null;
     }
-    var bar = document.getElementById('pn-sticky-bar');
+    const bar = document.getElementById('pn-sticky-bar');
     if (bar) bar.remove();
 }
 
@@ -1425,10 +1425,10 @@ function renderProfileSidebar() {
     if (!pnState.profile) {
         return '<div class="pn-chat-sidebar"><div class="pn-profile-empty">Complete the assessment to see your profile.</div></div>';
     }
-    var p = pnState.profile;
+    const p = pnState.profile;
 
-    var bigFiveHtml = '';
-    var factors = [
+    let bigFiveHtml = '';
+    const factors = [
         { key: 'E', label: 'Extraversion' },
         { key: 'A', label: 'Agreeableness' },
         { key: 'C', label: 'Conscientiousness' },
@@ -1436,9 +1436,9 @@ function renderProfileSidebar() {
         { key: 'O', label: 'Openness' }
     ];
     for (var i = 0; i < factors.length; i++) {
-        var f = factors[i];
-        var score = p.bigFive[f.key];
-        var pct = Math.round((score / 20) * 100);
+        const f = factors[i];
+        const score = p.bigFive[f.key];
+        const pct = Math.round((score / 20) * 100);
         bigFiveHtml += '<div class="pn-profile-factor">' +
             '<div class="pn-profile-factor-label">' + f.label + '</div>' +
             '<div class="pn-profile-bar"><div class="pn-profile-bar-fill" style="width: ' + pct + '%;"></div></div>' +
@@ -1446,10 +1446,10 @@ function renderProfileSidebar() {
         '</div>';
     }
 
-    var crtHtml = '<div class="pn-profile-crt">' + p.crt.score + '/6</div>' +
+    const crtHtml = '<div class="pn-profile-crt">' + p.crt.score + '/6</div>' +
         '<div class="pn-profile-crt-label">' + p.crt.label + '</div>';
 
-    var biasHtml = '';
+    let biasHtml = '';
     if (p.biases.length === 0) {
         biasHtml = '<div class="pn-profile-note">No significant bias vulnerabilities identified.</div>';
     } else {
@@ -1458,7 +1458,7 @@ function renderProfileSidebar() {
         }
     }
 
-    var contextHtml = '';
+    let contextHtml = '';
     if (pnState.firm.name) {
         contextHtml = '<div class="pn-profile-firm">' +
             escapeHtml(pnState.firm.name) + '<br>' +
@@ -1488,11 +1488,11 @@ function renderProfileSidebar() {
 }
 
 function renderWizardFooter() {
-    var isFirst = pnState.currentStep === 1;
-    var isLast = pnState.currentStep === 4;
-    var canAdvance = pnValidateStep(pnState.currentStep);
+    const isFirst = pnState.currentStep === 1;
+    const isLast = pnState.currentStep === 4;
+    const canAdvance = pnValidateStep(pnState.currentStep);
 
-    var nextLabel = 'Continue';
+    let nextLabel = 'Continue';
     if (pnState.currentStep === 3) nextLabel = 'Build Profile & Chat';
 
     return '<div class="pn-wizard-footer">' +
@@ -1523,10 +1523,10 @@ function bindAll() {
 }
 
 function bindStepIndicator() {
-    var dots = document.querySelectorAll('.pn-step-dot.reachable');
-    for (var i = 0; i < dots.length; i++) {
+    const dots = document.querySelectorAll('.pn-step-dot.reachable');
+    for (let i = 0; i < dots.length; i++) {
         dots[i].addEventListener('click', function() {
-            var step = parseInt(this.getAttribute('data-step'), 10);
+            const step = parseInt(this.getAttribute('data-step'), 10);
             if (step <= pnState.maxStepReached && step !== pnState.currentStep) {
                 pnState.currentStep = step;
                 pnRefresh();
@@ -1536,8 +1536,8 @@ function bindStepIndicator() {
 }
 
 function bindNavigation() {
-    var nextBtn = document.getElementById('pn-next');
-    var prevBtn = document.getElementById('pn-prev');
+    const nextBtn = document.getElementById('pn-next');
+    const prevBtn = document.getElementById('pn-prev');
 
     if (nextBtn) {
         nextBtn.addEventListener('click', function() {
@@ -1581,18 +1581,18 @@ function bindStep1Inputs() {
     bindSelectInput('pn-firm-aum', function(val) { pnState.firm.aum = val; });
     bindSelectInput('pn-firm-governance', function(val) { pnState.firm.governance = val; });
 
-    var container = document.getElementById('pn-firm-regs');
+    const container = document.getElementById('pn-firm-regs');
     if (container) {
-        var labels = container.querySelectorAll('.pn-checkbox-label');
-        for (var i = 0; i < labels.length; i++) {
+        const labels = container.querySelectorAll('.pn-checkbox-label');
+        for (let i = 0; i < labels.length; i++) {
             labels[i].addEventListener('click', function(e) {
                 e.preventDefault();
-                var cb = this.querySelector('input[type="checkbox"]');
+                const cb = this.querySelector('input[type="checkbox"]');
                 cb.checked = !cb.checked;
                 this.classList.toggle('checked', cb.checked);
                 pnState.firm.regulations = [];
-                var allCbs = container.querySelectorAll('input[type="checkbox"]:checked');
-                for (var j = 0; j < allCbs.length; j++) {
+                const allCbs = container.querySelectorAll('input[type="checkbox"]:checked');
+                for (let j = 0; j < allCbs.length; j++) {
                     pnState.firm.regulations.push(allCbs[j].value);
                 }
                 pnSaveToLocalStorage();
@@ -1609,8 +1609,8 @@ function bindStep2Inputs() {
     bindSelectInput('pn-fund-benchmark', function(val) { pnState.fund.benchmark = val; });
     bindSelectInput('pn-fund-holding', function(val) { pnState.fund.holdingPeriod = val; });
 
-    var slider = document.getElementById('pn-fund-risk');
-    var sliderVal = document.getElementById('pn-fund-risk-value');
+    const slider = document.getElementById('pn-fund-risk');
+    const sliderVal = document.getElementById('pn-fund-risk-value');
     if (slider) {
         slider.addEventListener('input', function() {
             pnState.fund.riskBudget = parseInt(this.value, 10);
@@ -1638,10 +1638,10 @@ function bindStep2Inputs() {
     bindSelectInput('pn-mandate-benchmark-framing', function(val) { pnState.mandate.benchmarkFraming = val; });
 
     // Restricted names
-    var restrictedInput = document.getElementById('pn-mandate-restricted');
+    const restrictedInput = document.getElementById('pn-mandate-restricted');
     if (restrictedInput) {
         restrictedInput.addEventListener('input', function() {
-            var raw = this.value;
+            const raw = this.value;
             pnState.mandate.restrictedNames = raw
                 .split(',')
                 .map(function(t) { return t.trim().toUpperCase(); })
@@ -1652,25 +1652,25 @@ function bindStep2Inputs() {
 }
 
 function bindMandateSlider(elementId, stateKey) {
-    var el = document.getElementById(elementId);
-    var valEl = document.getElementById(elementId + '-value');
+    const el = document.getElementById(elementId);
+    const valEl = document.getElementById(elementId + '-value');
     if (el) {
         el.addEventListener('input', function() {
-            var v = parseInt(this.value, 10);
+            const v = parseInt(this.value, 10);
             pnState.mandate[stateKey] = v;
             if (valEl) valEl.textContent = v + '%';
             // Cross-validate cash range
             if (stateKey === 'cashRangeMin' && v > pnState.mandate.cashRangeMax) {
                 pnState.mandate.cashRangeMax = v;
-                var maxEl = document.getElementById('pn-mandate-cash-max');
-                var maxValEl = document.getElementById('pn-mandate-cash-max-value');
+                const maxEl = document.getElementById('pn-mandate-cash-max');
+                const maxValEl = document.getElementById('pn-mandate-cash-max-value');
                 if (maxEl) maxEl.value = v;
                 if (maxValEl) maxValEl.textContent = v + '%';
             }
             if (stateKey === 'cashRangeMax' && v < pnState.mandate.cashRangeMin) {
                 pnState.mandate.cashRangeMin = v;
-                var minEl = document.getElementById('pn-mandate-cash-min');
-                var minValEl = document.getElementById('pn-mandate-cash-min-value');
+                const minEl = document.getElementById('pn-mandate-cash-min');
+                const minValEl = document.getElementById('pn-mandate-cash-min-value');
                 if (minEl) minEl.value = v;
                 if (minValEl) minValEl.textContent = v + '%';
             }
@@ -1680,10 +1680,10 @@ function bindMandateSlider(elementId, stateKey) {
 }
 
 function bindStep3Inputs() {
-    var navItems = document.querySelectorAll('.pn-assessment-nav-item');
-    for (var i = 0; i < navItems.length; i++) {
+    const navItems = document.querySelectorAll('.pn-assessment-nav-item');
+    for (let i = 0; i < navItems.length; i++) {
         navItems[i].addEventListener('click', function() {
-            var block = parseInt(this.getAttribute('data-block'), 10);
+            const block = parseInt(this.getAttribute('data-block'), 10);
             if (block !== pnState.assessmentBlock) {
                 pnState.assessmentBlock = block;
                 pnSaveToLocalStorage();
@@ -1707,14 +1707,14 @@ function bindAssessmentBlockInputs() {
 }
 
 function bindLikertInputs(category) {
-    var btns = document.querySelectorAll('.pn-likert-btn[data-category="' + category + '"]');
-    for (var i = 0; i < btns.length; i++) {
+    const btns = document.querySelectorAll('.pn-likert-btn[data-category="' + category + '"]');
+    for (let i = 0; i < btns.length; i++) {
         btns[i].addEventListener('click', function() {
-            var id = this.getAttribute('data-id');
-            var val = parseInt(this.getAttribute('data-value'), 10);
+            const id = this.getAttribute('data-id');
+            const val = parseInt(this.getAttribute('data-value'), 10);
             pnState.assessment[category][id] = val;
-            var siblings = this.parentNode.querySelectorAll('.pn-likert-btn');
-            for (var j = 0; j < siblings.length; j++) {
+            const siblings = this.parentNode.querySelectorAll('.pn-likert-btn');
+            for (let j = 0; j < siblings.length; j++) {
                 siblings[j].classList.remove('selected');
             }
             this.classList.add('selected');
@@ -1726,10 +1726,10 @@ function bindLikertInputs(category) {
 }
 
 function bindCRTInputs() {
-    var inputs = document.querySelectorAll('.pn-crt-input');
-    for (var i = 0; i < inputs.length; i++) {
+    const inputs = document.querySelectorAll('.pn-crt-input');
+    for (let i = 0; i < inputs.length; i++) {
         inputs[i].addEventListener('input', function() {
-            var id = this.getAttribute('data-id');
+            const id = this.getAttribute('data-id');
             pnState.assessment.crt[id] = this.value;
             pnSaveToLocalStorage();
             updateProgress();
@@ -1739,14 +1739,14 @@ function bindCRTInputs() {
 }
 
 function bindBiasInputs() {
-    var btns = document.querySelectorAll('.pn-bias-option');
-    for (var i = 0; i < btns.length; i++) {
+    const btns = document.querySelectorAll('.pn-bias-option');
+    for (let i = 0; i < btns.length; i++) {
         btns[i].addEventListener('click', function() {
-            var id = this.getAttribute('data-id');
-            var val = this.getAttribute('data-value');
+            const id = this.getAttribute('data-id');
+            const val = this.getAttribute('data-value');
             pnState.assessment.bias[id] = val;
-            var siblings = this.parentNode.querySelectorAll('.pn-bias-option');
-            for (var j = 0; j < siblings.length; j++) {
+            const siblings = this.parentNode.querySelectorAll('.pn-bias-option');
+            for (let j = 0; j < siblings.length; j++) {
                 siblings[j].classList.remove('selected');
             }
             this.classList.add('selected');
@@ -1758,10 +1758,10 @@ function bindBiasInputs() {
 }
 
 function bindPreferenceInputs() {
-    var selects = document.querySelectorAll('.pn-pref-select');
-    for (var i = 0; i < selects.length; i++) {
+    const selects = document.querySelectorAll('.pn-pref-select');
+    for (let i = 0; i < selects.length; i++) {
         selects[i].addEventListener('change', function() {
-            var id = this.getAttribute('data-id');
+            const id = this.getAttribute('data-id');
             pnState.assessment.preferences[id] = this.value;
             pnSaveToLocalStorage();
             updateProgress();
@@ -1771,7 +1771,7 @@ function bindPreferenceInputs() {
 }
 
 function bindStep4Inputs() {
-    var resetBtn = document.getElementById('pn-reset-profile');
+    const resetBtn = document.getElementById('pn-reset-profile');
 
     if (resetBtn) {
         resetBtn.addEventListener('click', function() {
@@ -1797,7 +1797,7 @@ function bindStep4Inputs() {
 // =========================================================================
 
 function bindTextInput(id, setter) {
-    var el = document.getElementById(id);
+    const el = document.getElementById(id);
     if (el) {
         el.addEventListener('input', function() {
             setter(this.value);
@@ -1808,7 +1808,7 @@ function bindTextInput(id, setter) {
 }
 
 function bindSelectInput(id, setter) {
-    var el = document.getElementById(id);
+    const el = document.getElementById(id);
     if (el) {
         el.addEventListener('change', function() {
             setter(this.value);
@@ -1819,27 +1819,27 @@ function bindSelectInput(id, setter) {
 }
 
 function updateNextButton() {
-    var btn = document.getElementById('pn-next');
+    const btn = document.getElementById('pn-next');
     if (btn) {
         btn.disabled = !pnValidateStep(pnState.currentStep);
     }
     // Keep "Complete Assessment" bottom button in sync
-    var completeBtn = document.querySelector('.pn-block-complete');
+    const completeBtn = document.querySelector('.pn-block-complete');
     if (completeBtn) {
         completeBtn.disabled = !pnAssessmentComplete();
     }
 }
 
 function updateProgress() {
-    var progress = pnAssessmentProgress();
-    var fill = document.querySelector('.pn-progress-fill');
-    var text = document.querySelector('.pn-progress-text');
+    const progress = pnAssessmentProgress();
+    const fill = document.querySelector('.pn-progress-fill');
+    const text = document.querySelector('.pn-progress-text');
     if (fill) fill.style.width = progress.percent + '%';
     if (text) text.textContent = progress.answered + ' / ' + progress.total + ' completed';
 
-    var navItems = document.querySelectorAll('.pn-assessment-nav-item');
-    for (var i = 0; i < navItems.length; i++) {
-        var blockIdx = parseInt(navItems[i].getAttribute('data-block'), 10);
+    const navItems = document.querySelectorAll('.pn-assessment-nav-item');
+    for (let i = 0; i < navItems.length; i++) {
+        const blockIdx = parseInt(navItems[i].getAttribute('data-block'), 10);
         if (pnBlockComplete(blockIdx)) {
             navItems[i].classList.add('complete');
         } else {
@@ -1851,7 +1851,7 @@ function updateProgress() {
 }
 
 function pnRefresh() {
-    var wizard = document.getElementById('pn-wizard');
+    const wizard = document.getElementById('pn-wizard');
     if (!wizard) return;
     // Clean up sticky bar when leaving step 3
     if (pnState.currentStep !== 3) {
@@ -1867,10 +1867,10 @@ function pnRefresh() {
 }
 
 function pnRefreshAssessment() {
-    var contentEl = document.getElementById('pn-assessment-content');
+    const contentEl = document.getElementById('pn-assessment-content');
     if (!contentEl) return;
 
-    var contentHtml = '';
+    let contentHtml = '';
     switch (pnState.assessmentBlock) {
         case 0: contentHtml = renderIPIPBlock(); break;
         case 1: contentHtml = renderCRTBlock(); break;
@@ -1881,14 +1881,14 @@ function pnRefreshAssessment() {
     contentEl.innerHTML = contentHtml;
 
     // Update bottom nav
-    var bottomNav = document.querySelector('.pn-block-bottom-nav');
+    const bottomNav = document.querySelector('.pn-block-bottom-nav');
     if (bottomNav) {
         bottomNav.outerHTML = renderBlockBottomNav();
     }
 
-    var navItems = document.querySelectorAll('.pn-assessment-nav-item');
-    for (var i = 0; i < navItems.length; i++) {
-        var blockIdx = parseInt(navItems[i].getAttribute('data-block'), 10);
+    const navItems = document.querySelectorAll('.pn-assessment-nav-item');
+    for (let i = 0; i < navItems.length; i++) {
+        const blockIdx = parseInt(navItems[i].getAttribute('data-block'), 10);
         navItems[i].classList.toggle('active', blockIdx === pnState.assessmentBlock);
     }
 
@@ -1923,10 +1923,10 @@ function escapeAttr(str) {
 
 function formatMarkdown(text) {
     if (!text) return '';
-    var html = escapeHtml(text);
+    let html = escapeHtml(text);
     html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    var paragraphs = html.split(/\n\n+/);
+    const paragraphs = html.split(/\n\n+/);
     if (paragraphs.length > 1) {
         html = paragraphs.map(function(p) { return '<p>' + p.replace(/\n/g, '<br>') + '</p>'; }).join('');
     } else {
@@ -1946,7 +1946,7 @@ window.renderPersonalisationPage = function() {
 
 window.initPersonalisationDemo = function() {
     pnLoadFromLocalStorage();
-    var wizard = document.getElementById('pn-wizard');
+    const wizard = document.getElementById('pn-wizard');
     if (wizard && pnState.currentStep > 1) {
         wizard.innerHTML = renderStepIndicator() +
             '<div class="pn-wizard-body" id="pn-wizard-body">' +

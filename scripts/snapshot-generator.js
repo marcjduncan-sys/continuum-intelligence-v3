@@ -22,7 +22,7 @@
   'use strict';
 
   // Coverage universe – dynamically derived from STOCK_DATA at runtime
-  var COVERAGE_UNIVERSE = (typeof STOCK_DATA !== 'undefined')
+  const COVERAGE_UNIVERSE = (typeof STOCK_DATA !== 'undefined')
     ? Object.keys(STOCK_DATA).sort()
     : [];
 
@@ -35,26 +35,26 @@
    */
   function extractFromStockData(ticker) {
     if (typeof STOCK_DATA === 'undefined' || !STOCK_DATA[ticker]) return null;
-    var stock = STOCK_DATA[ticker];
+    const stock = STOCK_DATA[ticker];
 
     // Evidence domain count
-    var evidenceCount = 0;
+    let evidenceCount = 0;
     if (stock.evidence && stock.evidence.cards) {
       evidenceCount = stock.evidence.cards.length;
     }
 
     // Verdict text (truncate for card display)
-    var verdictText = '';
+    let verdictText = '';
     if (stock.verdict && stock.verdict.text) {
       verdictText = stock.verdict.text;
       if (verdictText.length > 180) verdictText = verdictText.substring(0, 177) + '...';
     }
 
     // Hypothesis summary – top thesis direction and title
-    var hypotheses = [];
+    const hypotheses = [];
     if (stock.hypotheses) {
-      for (var i = 0; i < stock.hypotheses.length; i++) {
-        var h = stock.hypotheses[i];
+      for (let i = 0; i < stock.hypotheses.length; i++) {
+        const h = stock.hypotheses[i];
         hypotheses.push({
           tier: h.tier,
           title: h.title.replace(/^T\d+:\s*/, ''),
@@ -66,7 +66,7 @@
     }
 
     // Skew score
-    var skew = null;
+    let skew = null;
     if (typeof computeSkewScore === 'function') {
       skew = computeSkewScore(stock);
     }
@@ -98,7 +98,7 @@
    */
   function getNFIData(ticker) {
     if (!global._nfiAnalysisData || !global._nfiAnalysisData.results) return null;
-    var result = global._nfiAnalysisData.results[ticker];
+    const result = global._nfiAnalysisData.results[ticker];
     if (!result) return null;
 
     return {
@@ -114,10 +114,10 @@
    * Get live price if available from DOM (price-narrative-engine updates these).
    */
   function getLivePrice(ticker) {
-    var el = document.querySelector('#page-report-' + ticker + ' .hero-price-value');
+    const el = document.querySelector('#page-report-' + ticker + ' .hero-price-value');
     if (el) {
-      var text = el.textContent.replace(/[^0-9.]/g, '');
-      var val = parseFloat(text);
+      const text = el.textContent.replace(/[^0-9.]/g, '');
+      const val = parseFloat(text);
       if (!isNaN(val) && val > 0) return val;
     }
     return null;
@@ -125,7 +125,7 @@
 
   // ─── SEVERITY STYLING ───────────────────────────────────────
 
-  var SEVERITY_CONFIG = {
+  const SEVERITY_CONFIG = {
     'CRITICAL': { color: '#ef4444', bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.3)', label: 'CRITICAL', order: 0 },
     'HIGH':     { color: '#f59e0b', bg: 'rgba(245,158,11,0.06)', border: 'rgba(245,158,11,0.25)', label: 'HIGH', order: 1 },
     'MODERATE': { color: '#3b82f6', bg: 'rgba(59,130,246,0.05)', border: 'rgba(59,130,246,0.2)', label: 'MODERATE', order: 2 },
@@ -145,19 +145,19 @@
    * verdict excerpt, hypothesis bars, evidence count, skew indicator.
    */
   function renderCard(data) {
-    var stock = data.stock;
-    var nfi = data.nfi;
-    var livePrice = data.livePrice;
+    const stock = data.stock;
+    const nfi = data.nfi;
+    const livePrice = data.livePrice;
 
-    var severity = nfi ? nfi.severity : 'NONE';
-    var config = getSeverityConfig(severity);
+    const severity = nfi ? nfi.severity : 'NONE';
+    const config = getSeverityConfig(severity);
 
     // Price display – prefer live price
-    var displayPrice = parseFloat(livePrice || stock.price) || 0;
-    var priceStr = stock.currency + displayPrice.toFixed(2);
+    const displayPrice = parseFloat(livePrice || stock.price) || 0;
+    const priceStr = stock.currency + displayPrice.toFixed(2);
 
     // NFI badge HTML
-    var nfiBadgeHtml = '';
+    let nfiBadgeHtml = '';
     if (nfi && severity !== 'NONE') {
       nfiBadgeHtml = '<span class="snap-nfi-badge" style="color:' + config.color + ';border-color:' + config.border + ';background:' + config.bg + '">' +
         config.label +
@@ -166,20 +166,20 @@
     }
 
     // Hypothesis mini-bars
-    var hypBarsHtml = '';
+    let hypBarsHtml = '';
     if (stock.hypotheses.length > 0) {
       // Normalise scores
-      var totalScore = 0;
+      let totalScore = 0;
       for (var i = 0; i < stock.hypotheses.length; i++) totalScore += stock.hypotheses[i].score;
       if (totalScore === 0) totalScore = 1;
 
       hypBarsHtml = '<div class="snap-hyp-bars">';
       for (var i = 0; i < stock.hypotheses.length; i++) {
-        var h = stock.hypotheses[i];
-        var pct = Math.round(h.score / totalScore * 100);
-        var barColor = h.direction === 'upside' ? 'var(--signal-green)' :
+        const h = stock.hypotheses[i];
+        const pct = Math.round(h.score / totalScore * 100);
+        const barColor = h.direction === 'upside' ? 'var(--signal-green)' :
                        h.direction === 'downside' ? 'var(--signal-red)' : 'var(--signal-amber)';
-        var titleShort = h.title.length > 25 ? h.title.substring(0, 22) + '...' : h.title;
+        const titleShort = h.title.length > 25 ? h.title.substring(0, 22) + '...' : h.title;
         hypBarsHtml += '<div class="snap-hyp-bar-row">' +
           '<span class="snap-hyp-bar-label">T' + (i + 1) + '</span>' +
           '<div class="snap-hyp-bar-track"><div class="snap-hyp-bar-fill" style="width:' + pct + '%;background:' + barColor + '"></div></div>' +
@@ -190,10 +190,10 @@
     }
 
     // Skew indicator
-    var skewHtml = '';
+    let skewHtml = '';
     if (stock.skewComputed) {
-      var sc = stock.skewComputed;
-      var skewCls = sc.score > 5 ? 'positive' : sc.score < -5 ? 'negative' : 'neutral';
+      const sc = stock.skewComputed;
+      const skewCls = sc.score > 5 ? 'positive' : sc.score < -5 ? 'negative' : 'neutral';
       skewHtml = '<div class="snap-skew">' +
         '<div class="skew-bar-track" style="width:60px;height:5px">' +
           '<div class="skew-bar-bull" style="width:' + sc.bull + '%"></div>' +
@@ -204,14 +204,14 @@
     }
 
     // Evidence coverage badge
-    var evBadgeCls = stock.evidenceCount >= 10 ? 'snap-ev-full' :
+    const evBadgeCls = stock.evidenceCount >= 10 ? 'snap-ev-full' :
                      stock.evidenceCount >= 7 ? 'snap-ev-good' : 'snap-ev-partial';
 
     // Key metrics (top 3)
-    var metricsHtml = '';
-    var metrics = stock.heroMetrics.slice(0, 3);
-    for (var m = 0; m < metrics.length; m++) {
-      var cls = metrics[m].colorClass ? ' snap-metric-' + metrics[m].colorClass : '';
+    let metricsHtml = '';
+    const metrics = stock.heroMetrics.slice(0, 3);
+    for (let m = 0; m < metrics.length; m++) {
+      const cls = metrics[m].colorClass ? ' snap-metric-' + metrics[m].colorClass : '';
       metricsHtml += '<span class="snap-metric' + cls + '">' + metrics[m].label + ': ' + metrics[m].value + '</span>';
     }
 
@@ -249,18 +249,18 @@
    * sorts by selected criteria, and renders into the grid.
    */
   function generateSnapshotCards(containerId, sortBy) {
-    var container = document.getElementById(containerId);
+    const container = document.getElementById(containerId);
     if (!container) return;
 
     // Collect card data
-    var cardData = [];
-    for (var i = 0; i < COVERAGE_UNIVERSE.length; i++) {
-      var ticker = COVERAGE_UNIVERSE[i];
-      var stock = extractFromStockData(ticker);
+    const cardData = [];
+    for (let i = 0; i < COVERAGE_UNIVERSE.length; i++) {
+      const ticker = COVERAGE_UNIVERSE[i];
+      const stock = extractFromStockData(ticker);
       if (!stock) continue;
 
-      var nfi = getNFIData(ticker);
-      var livePrice = getLivePrice(ticker);
+      const nfi = getNFIData(ticker);
+      const livePrice = getLivePrice(ticker);
 
       cardData.push({
         stock: stock,
@@ -273,8 +273,8 @@
     sortBy = sortBy || 'severity';
     if (sortBy === 'severity') {
       cardData.sort(function(a, b) {
-        var sa = a.nfi ? a.nfi.severityScore : 0;
-        var sb = b.nfi ? b.nfi.severityScore : 0;
+        const sa = a.nfi ? a.nfi.severityScore : 0;
+        const sb = b.nfi ? b.nfi.severityScore : 0;
         return sb - sa; // Highest severity first
       });
     } else if (sortBy === 'ticker') {
@@ -283,17 +283,17 @@
       });
     } else if (sortBy === 'sector') {
       cardData.sort(function(a, b) {
-        var sc = a.stock.sector.localeCompare(b.stock.sector);
+        const sc = a.stock.sector.localeCompare(b.stock.sector);
         return sc !== 0 ? sc : a.stock.ticker.localeCompare(b.stock.ticker);
       });
     }
 
     // Render
-    var gridEl = container.querySelector('.snap-grid');
+    const gridEl = container.querySelector('.snap-grid');
     if (!gridEl) return;
     gridEl.innerHTML = '';
 
-    for (var j = 0; j < cardData.length; j++) {
+    for (let j = 0; j < cardData.length; j++) {
       gridEl.innerHTML += renderCard(cardData[j]);
     }
 
@@ -318,7 +318,7 @@
   function injectSnapshotStyles() {
     if (document.getElementById('snapshot-gen-styles')) return;
 
-    var css = '' +
+    const css = '' +
       '.snap-sort-controls { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }' +
       '.snap-sort-btn { padding:6px 14px; border-radius:6px; border:1px solid var(--border-subtle, rgba(255,255,255,0.08)); ' +
         'background:var(--bg-tertiary, rgba(255,255,255,0.03)); color:var(--text-secondary, #9ca3af); font-size:0.75rem; ' +
@@ -364,7 +364,7 @@
       '@media (max-width: 480px) { .snap-grid { grid-template-columns:1fr; } }' +
     '';
 
-    var style = document.createElement('style');
+    const style = document.createElement('style');
     style.id = 'snapshot-gen-styles';
     style.textContent = css;
     document.head.appendChild(style);
@@ -382,7 +382,7 @@
   function initSnapshots(containerId) {
     console.log('[SnapshotGenerator] Initialising snapshots for #' + containerId + '...');
 
-    var container = document.getElementById(containerId);
+    const container = document.getElementById(containerId);
     if (!container) {
       console.warn('[SnapshotGenerator] Container #' + containerId + ' not found');
       return;
@@ -401,13 +401,13 @@
       '<div class="snap-grid"></div>';
 
     // Wire sort buttons
-    var buttons = container.querySelectorAll('.snap-sort-btn');
-    for (var b = 0; b < buttons.length; b++) {
+    const buttons = container.querySelectorAll('.snap-sort-btn');
+    for (let b = 0; b < buttons.length; b++) {
       buttons[b].addEventListener('click', function(e) {
-        var sortBy = this.getAttribute('data-sort');
+        const sortBy = this.getAttribute('data-sort');
         // Update active state
-        var allBtns = container.querySelectorAll('.snap-sort-btn');
-        for (var k = 0; k < allBtns.length; k++) allBtns[k].classList.remove('active');
+        const allBtns = container.querySelectorAll('.snap-sort-btn');
+        for (let k = 0; k < allBtns.length; k++) allBtns[k].classList.remove('active');
         this.classList.add('active');
         // Re-render
         generateSnapshotCards(containerId, sortBy);
@@ -425,8 +425,8 @@
   global.refreshSnapshotData = function() {
     // Compatibility with any code that calls refreshSnapshotData
     if (typeof SNAPSHOT_ORDER !== 'undefined' && typeof STOCK_DATA !== 'undefined' && typeof buildSnapshotFromStock === 'function') {
-      for (var i = 0; i < SNAPSHOT_ORDER.length; i++) {
-        var ticker = SNAPSHOT_ORDER[i];
+      for (let i = 0; i < SNAPSHOT_ORDER.length; i++) {
+        const ticker = SNAPSHOT_ORDER[i];
         if (STOCK_DATA[ticker]) {
           SNAPSHOT_DATA[ticker] = buildSnapshotFromStock(ticker);
         }

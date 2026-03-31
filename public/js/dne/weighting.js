@@ -14,7 +14,7 @@
 
 // ─── Price Correlation Windows ───────────────────────────────────────────────
 
-var CORRELATION_WINDOWS = [5, 10, 20]; // trading days
+const CORRELATION_WINDOWS = [5, 10, 20]; // trading days
 
 /**
  * Calculate Pearson correlation between two arrays.
@@ -24,11 +24,11 @@ var CORRELATION_WINDOWS = [5, 10, 20]; // trading days
  * @returns {number} Correlation coefficient in [-1, 1]
  */
 function pearsonCorrelation(x, y) {
-  var n = Math.min(x.length, y.length);
+  const n = Math.min(x.length, y.length);
   if (n < 3) return 0;
 
-  var sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
-  for (var i = 0; i < n; i++) {
+  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
+  for (let i = 0; i < n; i++) {
     sumX += x[i];
     sumY += y[i];
     sumXY += x[i] * y[i];
@@ -36,7 +36,7 @@ function pearsonCorrelation(x, y) {
     sumY2 += y[i] * y[i];
   }
 
-  var denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+  const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
   if (denominator === 0) return 0;
 
   return (n * sumXY - sumX * sumY) / denominator;
@@ -49,8 +49,8 @@ function pearsonCorrelation(x, y) {
  * @returns {number[]} Daily returns
  */
 function dailyReturns(prices) {
-  var returns = [];
-  for (var i = 1; i < prices.length; i++) {
+  const returns = [];
+  for (let i = 1; i < prices.length; i++) {
     returns.push((prices[i] - prices[i - 1]) / prices[i - 1]);
   }
   return returns;
@@ -76,14 +76,14 @@ function dailyReturns(prices) {
  */
 function hypothesisImpliedReturns(hId, score, returns) {
   // Directional bias for each hypothesis tier
-  var directionMap = { N1: 1.0, N2: 0.3, N3: -0.7, N4: -1.0 };
-  var direction = directionMap[hId] || 0;
+  const directionMap = { N1: 1.0, N2: 0.3, N3: -0.7, N4: -1.0 };
+  const direction = directionMap[hId] || 0;
 
   // The implied series is: for each actual return, the hypothesis "predicts"
   // a return of (direction * score * magnitude). We compare this with actual.
-  var implied = [];
-  for (var i = 0; i < returns.length; i++) {
-    var magnitude = Math.abs(returns[i]) || 0.005; // floor at 50bps
+  const implied = [];
+  for (let i = 0; i < returns.length; i++) {
+    const magnitude = Math.abs(returns[i]) || 0.005; // floor at 50bps
     implied.push(direction * score * magnitude);
   }
   return implied;
@@ -102,28 +102,28 @@ function hypothesisImpliedReturns(hId, score, returns) {
  * @returns {Object} Correlation analysis keyed by hypothesis ID
  */
 function calculatePriceCorrelations(stock, priceHistory) {
-  var returns = dailyReturns(priceHistory);
-  var ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
-  var result = {};
+  const returns = dailyReturns(priceHistory);
+  const ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
+  const result = {};
 
-  for (var h = 0; h < ids.length; h++) {
-    var hId = ids[h];
-    var hyp = stock.hypotheses[hId];
-    var correlations = {};
-    var dominantWindow = 5;
-    var maxAbsCorr = 0;
+  for (let h = 0; h < ids.length; h++) {
+    const hId = ids[h];
+    const hyp = stock.hypotheses[hId];
+    const correlations = {};
+    let dominantWindow = 5;
+    let maxAbsCorr = 0;
 
-    for (var w = 0; w < CORRELATION_WINDOWS.length; w++) {
-      var window = CORRELATION_WINDOWS[w];
-      var windowReturns = returns.slice(-window);
+    for (let w = 0; w < CORRELATION_WINDOWS.length; w++) {
+      const window = CORRELATION_WINDOWS[w];
+      const windowReturns = returns.slice(-window);
 
       if (windowReturns.length < 3) {
         correlations[window] = 0;
         continue;
       }
 
-      var implied = hypothesisImpliedReturns(hId, hyp.survival_score, windowReturns);
-      var corr = pearsonCorrelation(windowReturns, implied);
+      const implied = hypothesisImpliedReturns(hId, hyp.survival_score, windowReturns);
+      const corr = pearsonCorrelation(windowReturns, implied);
       correlations[window] = Math.round(corr * 1000) / 1000;
 
       if (Math.abs(corr) > maxAbsCorr) {
@@ -133,16 +133,16 @@ function calculatePriceCorrelations(stock, priceHistory) {
     }
 
     // Composite: weight dominant window 2x, others 1x
-    var weightedSum = 0;
-    var totalWeight = 0;
-    for (var w2 = 0; w2 < CORRELATION_WINDOWS.length; w2++) {
-      var win = CORRELATION_WINDOWS[w2];
-      var weight = (win === dominantWindow) ? 2.0 : 1.0;
+    let weightedSum = 0;
+    let totalWeight = 0;
+    for (let w2 = 0; w2 < CORRELATION_WINDOWS.length; w2++) {
+      const win = CORRELATION_WINDOWS[w2];
+      const weight = (win === dominantWindow) ? 2.0 : 1.0;
       weightedSum += (correlations[win] || 0) * weight;
       totalWeight += weight;
     }
 
-    var composite = totalWeight > 0 ? weightedSum / totalWeight : 0;
+    const composite = totalWeight > 0 ? weightedSum / totalWeight : 0;
 
     result[hId] = {
       correlations: correlations,
@@ -163,18 +163,18 @@ function calculatePriceCorrelations(stock, priceHistory) {
  * @returns {Object} { top_narrative, previous_top, inflection, signal_strength }
  */
 function determineTopNarrative(correlationData, previousTopNarrative) {
-  var ids = Object.keys(correlationData);
-  var bestId = ids[0];
-  var bestSignal = correlationData[ids[0]].composite_signal;
+  const ids = Object.keys(correlationData);
+  let bestId = ids[0];
+  let bestSignal = correlationData[ids[0]].composite_signal;
 
-  for (var i = 1; i < ids.length; i++) {
+  for (let i = 1; i < ids.length; i++) {
     if (correlationData[ids[i]].composite_signal > bestSignal) {
       bestSignal = correlationData[ids[i]].composite_signal;
       bestId = ids[i];
     }
   }
 
-  var inflection = previousTopNarrative && previousTopNarrative !== bestId;
+  const inflection = previousTopNarrative && previousTopNarrative !== bestId;
 
   return {
     top_narrative: bestId,
@@ -202,38 +202,38 @@ function determineTopNarrative(correlationData, previousTopNarrative) {
  * @returns {Object} Dislocation metrics
  */
 function quantifyDislocation(stock, correlationData) {
-  var ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
+  const ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
 
   // Normalise survival scores to sum to 1 (evidence-implied weights)
-  var totalSurvival = 0;
-  for (var i = 0; i < ids.length; i++) {
+  let totalSurvival = 0;
+  for (let i = 0; i < ids.length; i++) {
     totalSurvival += stock.hypotheses[ids[i]].survival_score;
   }
 
   // Normalise signal strengths to sum to 1 (price-implied weights)
-  var totalSignal = 0;
-  for (var j = 0; j < ids.length; j++) {
-    var signalRaw = Math.max(0, correlationData[ids[j]].composite_signal);
+  let totalSignal = 0;
+  for (let j = 0; j < ids.length; j++) {
+    const signalRaw = Math.max(0, correlationData[ids[j]].composite_signal);
     totalSignal += signalRaw;
   }
 
-  var maxDislocationBps = 0;
-  var maxDislocationHypothesis = null;
-  var dislocationDirection = 'neutral';
-  var perHypothesis = {};
+  let maxDislocationBps = 0;
+  let maxDislocationHypothesis = null;
+  let dislocationDirection = 'neutral';
+  const perHypothesis = {};
 
-  for (var k = 0; k < ids.length; k++) {
-    var hId = ids[k];
-    var evidenceWeight = totalSurvival > 0
+  for (let k = 0; k < ids.length; k++) {
+    const hId = ids[k];
+    const evidenceWeight = totalSurvival > 0
       ? stock.hypotheses[hId].survival_score / totalSurvival
       : 0.25;
-    var priceWeight = totalSignal > 0
+    const priceWeight = totalSignal > 0
       ? Math.max(0, correlationData[hId].composite_signal) / totalSignal
       : 0.25;
 
     // Dislocation in basis points (1 pct = 100 bps)
-    var dislocationPct = (priceWeight - evidenceWeight) * 100;
-    var dislocationBps = Math.round(dislocationPct * 100);
+    const dislocationPct = (priceWeight - evidenceWeight) * 100;
+    const dislocationBps = Math.round(dislocationPct * 100);
 
     perHypothesis[hId] = {
       evidence_weight_pct: Math.round(evidenceWeight * 100),
@@ -278,22 +278,22 @@ function quantifyDislocation(stock, correlationData) {
  * @returns {Object} Full weighting analysis result, also stored on stock.weighting
  */
 function computeNarrativeWeighting(stock, priceHistory, previousTopNarrative) {
-  var correlations = calculatePriceCorrelations(stock, priceHistory);
-  var topNarrative = determineTopNarrative(correlations, previousTopNarrative);
-  var dislocation = quantifyDislocation(stock, correlations);
+  const correlations = calculatePriceCorrelations(stock, priceHistory);
+  const topNarrative = determineTopNarrative(correlations, previousTopNarrative);
+  const dislocation = quantifyDislocation(stock, correlations);
 
-  var ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
+  const ids = HYPOTHESIS_IDS || ['N1', 'N2', 'N3', 'N4'];
 
   // Compute normalised narrative weights (evidence_weight + signal_weight blended)
-  var totalSurvival = 0;
-  for (var i = 0; i < ids.length; i++) {
+  let totalSurvival = 0;
+  for (let i = 0; i < ids.length; i++) {
     totalSurvival += stock.hypotheses[ids[i]].survival_score;
   }
 
-  var narrativeWeights = {};
-  for (var j = 0; j < ids.length; j++) {
-    var hId = ids[j];
-    var evidenceWeight = totalSurvival > 0
+  const narrativeWeights = {};
+  for (let j = 0; j < ids.length; j++) {
+    const hId = ids[j];
+    const evidenceWeight = totalSurvival > 0
       ? stock.hypotheses[hId].survival_score / totalSurvival
       : 0.25;
 
@@ -305,7 +305,7 @@ function computeNarrativeWeighting(stock, priceHistory, previousTopNarrative) {
     };
   }
 
-  var result = {
+  const result = {
     top_narrative: topNarrative,
     dislocation: dislocation,
     hypothesis_weights: narrativeWeights,

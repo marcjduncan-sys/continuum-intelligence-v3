@@ -200,7 +200,7 @@ const NarrativeInferenceEngine = {
 
     // AI-exposed stock declining → competitive disruption fears, AI moat questioned
     // Only contradict N4 if it's a bullish thesis (base weight >= 40 suggests a bull thesis)
-    var n4IsBullish = (stockCharacteristics.n4BaseWeight || 0) >= 40;
+    const n4IsBullish = (stockCharacteristics.n4BaseWeight || 0) >= 40;
     if (hasAIExposure && metrics.todayReturn < -5) {
       scores.N3 += 3;  // AI as competitive threat becomes dominant
       if (n4IsBullish) contradicted = 'N4';  // Only contradict bullish AI-moat thesis

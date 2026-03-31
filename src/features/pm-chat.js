@@ -19,39 +19,39 @@ import { API_BASE } from '../lib/api-config.js';
 // CONFIGURATION
 // ============================================================
 
-var isFile        = window.location.protocol === 'file:';
-var apiOrigin     = API_BASE;
-var PM_API_BASE   = apiOrigin + '/api/pm-chat';
-var CI_API_KEY    = window.CI_API_KEY || '';
+const isFile        = window.location.protocol === 'file:';
+const apiOrigin     = API_BASE;
+const PM_API_BASE   = apiOrigin + '/api/pm-chat';
+const CI_API_KEY    = window.CI_API_KEY || '';
 
 // ============================================================
 // DOM REFS
 // ============================================================
 
-var panel, fab, collapseBtn, clearBtn, messagesEl, inputEl, sendBtn, portfolioBadge;
+let panel, fab, collapseBtn, clearBtn, messagesEl, inputEl, sendBtn, portfolioBadge;
 
 // ============================================================
 // STATE
 // ============================================================
 
-var isOpen        = false;
-var isLoading     = false;
-var _lastSendTime = 0;
-var _cooldownTimer = null;
-var SEND_COOLDOWN_MS = 2000;
-var _lastBreaches = [];
-var _lastAlignmentScore = null;
-var _lastNotCoveredCount = null;
-var _pmConversationId = null;  // Phase E: persisted PM conversation ID
-var conversations = (function() {
+const isOpen        = false;
+let isLoading     = false;
+let _lastSendTime = 0;
+let _cooldownTimer = null;
+const SEND_COOLDOWN_MS = 2000;
+let _lastBreaches = [];
+let _lastAlignmentScore = null;
+let _lastNotCoveredCount = null;
+let _pmConversationId = null;  // Phase E: persisted PM conversation ID
+const conversations = (function() {
     try {
-        var saved = sessionStorage.getItem('ci_pm_conversations');
+        const saved = sessionStorage.getItem('ci_pm_conversations');
         return saved ? JSON.parse(saved) : {};
     } catch(e) {
         return {};
     }
 }());
-var currentPortfolioKey = '_default';
+const currentPortfolioKey = '_default';
 
 // ============================================================
 // DB PERSISTENCE
@@ -59,16 +59,16 @@ var currentPortfolioKey = '_default';
 
 function _restoreFromDB() {
     if (isFile) return Promise.resolve();
-    var token   = window.CI_AUTH && window.CI_AUTH.getToken();
-    var guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
+    const token   = window.CI_AUTH && window.CI_AUTH.getToken();
+    const guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
     if (!token && !guestId) return Promise.resolve();
 
-    var headers = { 'Content-Type': 'application/json' };
+    const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = 'Bearer ' + token;
 
-    var portfolioId = (typeof window.pnGetPortfolioId === 'function') ? window.pnGetPortfolioId() : null;
-    var url = apiOrigin + '/api/pm-conversations/latest';
-    var params = [];
+    const portfolioId = (typeof window.pnGetPortfolioId === 'function') ? window.pnGetPortfolioId() : null;
+    let url = apiOrigin + '/api/pm-conversations/latest';
+    const params = [];
     if (!token && guestId) params.push('guest_id=' + encodeURIComponent(guestId));
     if (portfolioId) params.push('portfolio_id=' + encodeURIComponent(portfolioId));
     if (params.length > 0) url += '?' + params.join('&');
@@ -98,9 +98,9 @@ function _restoreFromDB() {
 // RAIL MODE SWITCH
 // ============================================================
 
-var _analystPanel  = null;
-var _econPanel     = null;
-var _modeSwitches  = [];   // all mode-switch containers (analyst + pm + strat header)
+let _analystPanel  = null;
+let _econPanel     = null;
+const _modeSwitches  = [];   // all mode-switch containers (analyst + pm + strat header)
 var _currentMode   = 'analyst'; // 'analyst' | 'pm' | 'strategist'
 
 function _getRailMode() { return _currentMode; }
@@ -108,7 +108,7 @@ function _getRailMode() { return _currentMode; }
 function _syncAllModeSwitches(mode) {
     _modeSwitches.forEach(function(sw) {
         sw.querySelectorAll('.rail-mode-btn').forEach(function(btn) {
-            var isActive = btn.getAttribute('data-mode') === mode;
+            const isActive = btn.getAttribute('data-mode') === mode;
             btn.classList.toggle('active', isActive);
             btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
             btn.setAttribute('tabindex', isActive ? '0' : '-1');
@@ -167,7 +167,7 @@ function switchRailMode(mode) {
     if (_analystPanel && _analystPanel.classList.contains('ap-user-collapsed')) {
         _analystPanel.classList.remove('ap-user-collapsed');
         document.body.classList.remove('ap-user-collapsed-active');
-        var _cb = document.getElementById('apCollapseBtn');
+        const _cb = document.getElementById('apCollapseBtn');
         if (_cb) _cb.style.transform = '';
         try { localStorage.setItem('ci_panel_collapsed', '0'); } catch(e) { /* storage unavailable */ }
     }
@@ -178,7 +178,7 @@ function switchRailMode(mode) {
 }
 
 function _createModeSwitch(activeMode) {
-    var sw = document.createElement('div');
+    const sw = document.createElement('div');
     sw.className = 'rail-mode-switch';
     sw.setAttribute('role', 'tablist');
     sw.setAttribute('aria-label', 'Panel mode');
@@ -189,7 +189,7 @@ function _createModeSwitch(activeMode) {
 
     // Set initial active state
     sw.querySelectorAll('.rail-mode-btn').forEach(function(btn) {
-        var isActive = btn.getAttribute('data-mode') === activeMode;
+        const isActive = btn.getAttribute('data-mode') === activeMode;
         btn.classList.toggle('active', isActive);
         btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
         btn.setAttribute('tabindex', isActive ? '0' : '-1');
@@ -197,18 +197,18 @@ function _createModeSwitch(activeMode) {
 
     // Click handler
     sw.addEventListener('click', function(e) {
-        var btn = e.target.closest('.rail-mode-btn');
+        const btn = e.target.closest('.rail-mode-btn');
         if (!btn) return;
         switchRailMode(btn.getAttribute('data-mode'));
     });
 
     // Keyboard: arrow keys move between tabs (ARIA tablist pattern)
     sw.addEventListener('keydown', function(e) {
-        var btns = Array.from(sw.querySelectorAll('.rail-mode-btn'));
-        var idx  = btns.indexOf(document.activeElement);
+        const btns = Array.from(sw.querySelectorAll('.rail-mode-btn'));
+        const idx  = btns.indexOf(document.activeElement);
         if (idx < 0) return;
 
-        var next = -1;
+        let next = -1;
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
             next = (idx + 1) % btns.length;
         } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
@@ -235,21 +235,21 @@ function _injectModeSwitch() {
     if (!_analystPanel) return;
 
     // Inject into analyst header
-    var apHeader = _analystPanel.querySelector('.ap-header');
+    const apHeader = _analystPanel.querySelector('.ap-header');
     if (apHeader) {
-        var apHeaderLeft = apHeader.querySelector('.ap-header-left');
+        const apHeaderLeft = apHeader.querySelector('.ap-header-left');
         if (apHeaderLeft) {
-            var analystSw = _createModeSwitch('analyst');
+            const analystSw = _createModeSwitch('analyst');
             apHeader.insertBefore(analystSw, apHeaderLeft.nextSibling);
         }
     }
 
     // Inject into PM header
-    var pmHeader = panel ? panel.querySelector('.pm-header') : null;
+    const pmHeader = panel ? panel.querySelector('.pm-header') : null;
     if (pmHeader) {
-        var pmHeaderLeft = pmHeader.querySelector('.pm-header-left');
+        const pmHeaderLeft = pmHeader.querySelector('.pm-header-left');
         if (pmHeaderLeft) {
-            var pmSw = _createModeSwitch('pm');
+            const pmSw = _createModeSwitch('pm');
             pmHeader.insertBefore(pmSw, pmHeaderLeft.nextSibling);
         }
     }
@@ -259,13 +259,13 @@ function _injectModeSwitch() {
     window._injectStratModeSwitch = function() {
         if (!_econPanel) _econPanel = document.getElementById('econ-panel');
         if (!_econPanel) return;
-        var econHeader = _econPanel.querySelector('.econ-header');
+        const econHeader = _econPanel.querySelector('.econ-header');
         if (!econHeader) return;
         // Only inject once
         if (econHeader.querySelector('.rail-mode-switch')) return;
-        var econHeaderLeft = econHeader.querySelector('.econ-header-left');
+        const econHeaderLeft = econHeader.querySelector('.econ-header-left');
         if (econHeaderLeft) {
-            var econSw = _createModeSwitch('strategist');
+            const econSw = _createModeSwitch('strategist');
             econHeader.insertBefore(econSw, econHeaderLeft.nextSibling);
         }
     };
@@ -275,7 +275,7 @@ function _injectModeSwitch() {
 // SUGGESTIONS
 // ============================================================
 
-var PM_SUGGESTIONS = [
+const PM_SUGGESTIONS = [
     'Am I too concentrated?',
     'What should fund a new position?',
     'What are my top three portfolio actions?',
@@ -283,7 +283,7 @@ var PM_SUGGESTIONS = [
 ];
 
 // Phase F: Track the ticker the user last referenced from Analyst handoff
-var _lastHandoffTicker = null;
+let _lastHandoffTicker = null;
 
 // ============================================================
 // RENDERING
@@ -291,14 +291,14 @@ var _lastHandoffTicker = null;
 
 function formatTime(ts) {
     if (!ts) return '';
-    var d = new Date(ts);
-    var hh = String(d.getHours()).padStart(2, '0');
-    var mm = String(d.getMinutes()).padStart(2, '0');
+    const d = new Date(ts);
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
     return hh + ':' + mm;
 }
 
 function escapeHtml(str) {
-    var d = document.createElement('div');
+    const d = document.createElement('div');
     d.textContent = str != null ? String(str) : '';
     return d.innerHTML;
 }
@@ -307,7 +307,7 @@ function escapeHtml(str) {
 // RECOMMENDATION CARD RENDERER
 // ============================================================
 
-var _ACTION_COLORS = {
+const _ACTION_COLORS = {
     'add':       { bg: 'rgba(76,175,80,0.08)',  border: 'rgba(76,175,80,0.3)',  label: '#4CAF50' },
     'trim':      { bg: 'rgba(255,152,0,0.08)',  border: 'rgba(255,152,0,0.3)',  label: '#FF9800' },
     'exit':      { bg: 'rgba(244,67,54,0.08)',   border: 'rgba(244,67,54,0.3)',  label: '#F44336' },
@@ -318,10 +318,10 @@ var _ACTION_COLORS = {
 };
 
 function _renderRecommendationCard(action, fields) {
-    var actionLower = (action || '').toLowerCase().trim();
-    var colors = _ACTION_COLORS[actionLower] || _ACTION_COLORS['hold'];
+    const actionLower = (action || '').toLowerCase().trim();
+    const colors = _ACTION_COLORS[actionLower] || _ACTION_COLORS['hold'];
 
-    var html = '<div class="pm-rec-card" style="' +
+    let html = '<div class="pm-rec-card" style="' +
         'margin:12px 0;padding:14px 16px;' +
         'background:' + colors.bg + ';' +
         'border-left:3px solid ' + colors.border + ';' +
@@ -348,8 +348,8 @@ function _renderRecommendationCard(action, fields) {
     html += '</div>';
 
     // Fields
-    var fieldOrder = ['rationale', 'portfolio_effect', 'risks_tradeoffs', 'data_basis', 'confidence'];
-    var fieldLabels = {
+    const fieldOrder = ['rationale', 'portfolio_effect', 'risks_tradeoffs', 'data_basis', 'confidence'];
+    const fieldLabels = {
         'rationale': 'Rationale',
         'portfolio_effect': 'Portfolio Effect',
         'risks_tradeoffs': 'Risks / Trade-offs',
@@ -378,29 +378,29 @@ function _parseRecommendationBlocks(text) {
     // Look for structured recommendation blocks in the LLM output.
     // Pattern: **Action**: ... followed by structured fields.
     // We detect blocks that have at least action + one other schema field.
-    var schemaKeys = ['action', 'security', 'sizing_band', 'sizing band',
+    const schemaKeys = ['action', 'security', 'sizing_band', 'sizing band',
                       'rationale', 'portfolio_effect', 'portfolio effect',
                       'risks_tradeoffs', 'risks/trade-offs', 'risks / trade-offs',
                       'data_basis', 'data basis', 'confidence'];
 
     // Try to find recommendation blocks delimited by field patterns
-    var blockPattern = /\*\*(?:action|recommendation)\*\*\s*[:]\s*(.+?)(?=\n\*\*(?:action|recommendation)\*\*|\n#{1,3}\s|$)/gis;
-    var blocks = [];
-    var match;
+    const blockPattern = /\*\*(?:action|recommendation)\*\*\s*[:]\s*(.+?)(?=\n\*\*(?:action|recommendation)\*\*|\n#{1,3}\s|$)/gis;
+    const blocks = [];
+    let match;
 
     // Simpler approach: find lines that look like "**Field**: Value" grouped together
-    var lines = text.split('\n');
-    var currentBlock = null;
+    const lines = text.split('\n');
+    let currentBlock = null;
 
-    for (var i = 0; i < lines.length; i++) {
-        var line = lines[i].trim();
-        var fieldMatch = line.match(/^\*\*(.+?)\*\*\s*[:]\s*(.+)/);
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        const fieldMatch = line.match(/^\*\*(.+?)\*\*\s*[:]\s*(.+)/);
         if (fieldMatch) {
-            var key = fieldMatch[1].toLowerCase().trim();
-            var val = fieldMatch[2].trim();
+            const key = fieldMatch[1].toLowerCase().trim();
+            const val = fieldMatch[2].trim();
 
             // Normalise key names
-            var normKey = key
+            const normKey = key
                 .replace(/\s+/g, '_')
                 .replace(/risks[_/]trade[_-]offs/i, 'risks_tradeoffs')
                 .replace(/sizing_band/i, 'sizing_band')
@@ -426,15 +426,15 @@ function _parseRecommendationBlocks(text) {
 
 function renderMarkdown(text) {
     // Check for recommendation blocks first
-    var blocks = _parseRecommendationBlocks(text);
+    const blocks = _parseRecommendationBlocks(text);
     if (blocks.length > 0) {
         // Render recommendation cards, plus any non-card text as markdown
-        var cardHtml = blocks.map(function(b) {
+        const cardHtml = blocks.map(function(b) {
             return _renderRecommendationCard(b.action, b);
         }).join('');
 
         // Also render the full text as markdown for any narrative content
-        var fullHtml = DOMPurify.sanitize(marked.parse(text));
+        const fullHtml = DOMPurify.sanitize(marked.parse(text));
 
         // If the text is primarily structured recommendations, show cards prominently
         // Otherwise show both
@@ -449,24 +449,24 @@ function renderMarkdown(text) {
 // ============================================================
 
 function _renderMandateStatus() {
-    var container = panel ? panel.querySelector('.pm-mandate-status') : null;
+    let container = panel ? panel.querySelector('.pm-mandate-status') : null;
     if (!container) {
         // Create the container if it doesn't exist
         if (!panel) return;
         container = document.createElement('div');
         container.className = 'pm-mandate-status';
-        var messagesParent = messagesEl ? messagesEl.parentNode : null;
+        const messagesParent = messagesEl ? messagesEl.parentNode : null;
         if (messagesParent && messagesEl) {
             messagesParent.insertBefore(container, messagesEl);
         }
     }
 
-    var parts = [];
+    const parts = [];
 
     // Alignment score
     if (_lastAlignmentScore !== null && _lastAlignmentScore !== undefined) {
-        var pct = Math.round(_lastAlignmentScore * 100);
-        var scoreClass = pct >= 70 ? 'good' : pct >= 40 ? 'mixed' : 'poor';
+        const pct = Math.round(_lastAlignmentScore * 100);
+        const scoreClass = pct >= 70 ? 'good' : pct >= 40 ? 'mixed' : 'poor';
         parts.push(
             '<span class="pm-status-pill pm-status-' + scoreClass + '">' +
             'Alignment ' + pct + '%</span>'
@@ -483,13 +483,13 @@ function _renderMandateStatus() {
 
     // Breaches
     if (_lastBreaches.length > 0) {
-        var critCount = 0;
-        var warnCount = 0;
+        let critCount = 0;
+        let warnCount = 0;
         _lastBreaches.forEach(function(b) {
             if (b.severity === 'critical') critCount++;
             else warnCount++;
         });
-        var breachLabel = '';
+        let breachLabel = '';
         if (critCount > 0) breachLabel += critCount + ' critical';
         if (warnCount > 0) breachLabel += (breachLabel ? ', ' : '') + warnCount + ' warning';
         parts.push(
@@ -509,7 +509,7 @@ function _renderMandateStatus() {
 }
 
 function renderWelcome() {
-    var html =
+    const html =
         '<div class="pm-welcome">' +
             '<div class="pm-welcome-title">Portfolio Manager Ready</div>' +
             '<div class="pm-welcome-text">Portfolio construction, sizing, exposure, and risk decisions.</div>' +
@@ -536,17 +536,17 @@ function renderWelcome() {
 
 function renderConversation() {
     if (!messagesEl) return;
-    var convo = conversations[currentPortfolioKey] || [];
+    const convo = conversations[currentPortfolioKey] || [];
     if (convo.length === 0) {
         renderWelcome();
         return;
     }
 
-    var html = '';
+    let html = '';
     convo.forEach(function(msg) {
-        var role      = msg.role === 'user' ? 'user' : 'pm';
-        var roleLabel = msg.role === 'user' ? 'YOU' : 'PM';
-        var timeStr   = formatTime(msg.timestamp);
+        const role      = msg.role === 'user' ? 'user' : 'pm';
+        const roleLabel = msg.role === 'user' ? 'YOU' : 'PM';
+        const timeStr   = formatTime(msg.timestamp);
 
         html += '<div class="pm-msg-row">';
         html += '<div class="pm-msg-meta">';
@@ -581,7 +581,7 @@ function _bindViewAnalystButtons() {
     if (!messagesEl) return;
     messagesEl.querySelectorAll('.pm-view-analyst-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            var t = btn.getAttribute('data-ticker');
+            const t = btn.getAttribute('data-ticker');
             if (t) viewAnalystSummary(t);
         });
     });
@@ -592,7 +592,7 @@ function _bindViewAnalystButtons() {
 // ============================================================
 
 function showTyping() {
-    var el = document.createElement('div');
+    const el = document.createElement('div');
     el.className = 'pm-typing';
     el.id = 'pmTypingIndicator';
     el.innerHTML =
@@ -607,7 +607,7 @@ function showTyping() {
 }
 
 function hideTyping() {
-    var el = document.getElementById('pmTypingIndicator');
+    const el = document.getElementById('pmTypingIndicator');
     if (el) el.remove();
 }
 
@@ -620,10 +620,10 @@ function scrollToBottom() {
 // ============================================================
 
 function sendMessage() {
-    var question = inputEl ? inputEl.value.trim() : '';
+    const question = inputEl ? inputEl.value.trim() : '';
     if (!question || isLoading) return;
 
-    var now = Date.now();
+    const now = Date.now();
     if (now - _lastSendTime < SEND_COOLDOWN_MS) return;
     _lastSendTime = now;
 
@@ -631,7 +631,7 @@ function sendMessage() {
     _cooldownTimer = setTimeout(function() { updateSendButton(); }, SEND_COOLDOWN_MS);
 
     if (!conversations[currentPortfolioKey]) conversations[currentPortfolioKey] = [];
-    var convo = conversations[currentPortfolioKey];
+    const convo = conversations[currentPortfolioKey];
 
     convo.push({ role: 'user', content: question, timestamp: now });
     try { sessionStorage.setItem('ci_pm_conversations', JSON.stringify(conversations)); } catch(e) { // Expected: sessionStorage may be unavailable in restricted environments
@@ -645,7 +645,7 @@ function sendMessage() {
     if (sendBtn) sendBtn.disabled = true;
 
     // Build history
-    var history = convo.slice(0, -1).map(function(m) {
+    const history = convo.slice(0, -1).map(function(m) {
         return { role: m.role === 'user' ? 'user' : 'assistant', content: m.content };
     });
 
@@ -657,10 +657,10 @@ function sendMessage() {
         return;
     }
 
-    var _fetchHeaders = { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY };
-    var _fetchToken = window.CI_AUTH && window.CI_AUTH.getToken();
+    const _fetchHeaders = { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY };
+    const _fetchToken = window.CI_AUTH && window.CI_AUTH.getToken();
     if (_fetchToken) _fetchHeaders['Authorization'] = 'Bearer ' + _fetchToken;
-    var _chatUrl = PM_API_BASE;
+    let _chatUrl = PM_API_BASE;
     if (!_fetchToken && window.CI_AUTH && window.CI_AUTH.getGuestId) {
         _chatUrl += '?guest_id=' + encodeURIComponent(window.CI_AUTH.getGuestId());
     }
@@ -680,7 +680,7 @@ function sendMessage() {
     .then(function(res) {
         if (!res.ok) {
             return res.text().then(function(body) {
-                var detail = '';
+                let detail = '';
                 try { detail = JSON.parse(body).detail || ''; } catch(e) { // Expected: response body may not be valid JSON
                 }
                 if (res.status === 502) {
@@ -714,7 +714,7 @@ function sendMessage() {
     })
     .catch(function(err) {
         hideTyping();
-        var msg = err.message || 'Something went wrong. Please try again.';
+        let msg = err.message || 'Something went wrong. Please try again.';
         if (msg === 'Failed to fetch') msg = 'Cannot reach the PM API. Check that the server is running.';
         appendError(msg);
     })
@@ -725,7 +725,7 @@ function sendMessage() {
 }
 
 function appendError(msg) {
-    var el = document.createElement('div');
+    const el = document.createElement('div');
     el.className = 'pm-error';
     el.textContent = msg;
     if (messagesEl) {
@@ -750,7 +750,7 @@ function _isInCooldown() {
 
 function updateSendButton() {
     if (!sendBtn || !inputEl) return;
-    var cooldown = _isInCooldown();
+    const cooldown = _isInCooldown();
     sendBtn.disabled = !inputEl.value.trim() || isLoading || cooldown;
     sendBtn.style.opacity = cooldown ? '0.4' : '';
 }
@@ -825,15 +825,15 @@ function _setupListeners() {
  * where ci:portfolio:synced event was never fired.
  */
 function _checkExistingPortfolio() {
-    var pid = (typeof window.pnGetPortfolioId === 'function') ? window.pnGetPortfolioId() : null;
+    const pid = (typeof window.pnGetPortfolioId === 'function') ? window.pnGetPortfolioId() : null;
     if (!pid || !portfolioBadge) return;
 
-    var headers = {};
-    var apiKey = window.CI_API_KEY || '';
+    const headers = {};
+    const apiKey = window.CI_API_KEY || '';
     if (apiKey) headers['X-API-Key'] = apiKey;
 
-    var url = apiOrigin + '/api/portfolios/' + pid + '/state';
-    var guestId = (window.CI_AUTH && window.CI_AUTH.getGuestId) ? window.CI_AUTH.getGuestId() : null;
+    let url = apiOrigin + '/api/portfolios/' + pid + '/state';
+    const guestId = (window.CI_AUTH && window.CI_AUTH.getGuestId) ? window.CI_AUTH.getGuestId() : null;
     if (guestId) url += '?guest_id=' + encodeURIComponent(guestId);
 
     fetch(url, { headers: headers })
@@ -877,7 +877,7 @@ export function initPMChat() {
 
     // Restore last mode if user had PM active
     try {
-        var savedMode = localStorage.getItem('ci_rail_mode');
+        const savedMode = localStorage.getItem('ci_rail_mode');
         if (savedMode === 'pm') {
             switchRailMode('pm');
         }
@@ -887,7 +887,7 @@ export function initPMChat() {
     // Listen for portfolio sync from Portfolio page
     window.addEventListener('ci:portfolio:synced', function(e) {
         if (portfolioBadge) {
-            var n = e.detail && e.detail.holdings ? e.detail.holdings : 0;
+            const n = e.detail && e.detail.holdings ? e.detail.holdings : 0;
             portfolioBadge.textContent = n + ' HOLDINGS';
             portfolioBadge.classList.add('pm-badge-active');
         }
@@ -909,7 +909,7 @@ export function initPMChat() {
 
     // Listen for "Send to PM" events from the PM dashboard (BEAD-008)
     document.addEventListener('ci:pm:ask', function(e) {
-        var question = e.detail && e.detail.question;
+        const question = e.detail && e.detail.question;
         if (!question || !inputEl) return;
         switchRailMode('pm');
         inputEl.value = question;
@@ -941,11 +941,11 @@ function handleAnalystToPMHandoff(ticker, summaryPayload) {
     switchRailMode('pm');
 
     // Build a contextualised question for PM
-    var coverage = (summaryPayload && summaryPayload.coverage_state) || 'unknown';
-    var conviction = (summaryPayload && summaryPayload.conviction_level) || '';
-    var valuation = (summaryPayload && summaryPayload.valuation_stance) || '';
+    const coverage = (summaryPayload && summaryPayload.coverage_state) || 'unknown';
+    const conviction = (summaryPayload && summaryPayload.conviction_level) || '';
+    const valuation = (summaryPayload && summaryPayload.valuation_stance) || '';
 
-    var question = 'Assess portfolio fit for ' + ticker + '.';
+    let question = 'Assess portfolio fit for ' + ticker + '.';
     if (coverage === 'not_covered') {
         question = ticker + ' has no Analyst coverage. Should we add it and what are the portfolio implications?';
     } else if (conviction && valuation) {
@@ -968,20 +968,20 @@ function handleAnalystToPMHandoff(ticker, summaryPayload) {
 function viewAnalystSummary(ticker) {
     if (!ticker || !messagesEl) return;
 
-    var _fetchHeaders = { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY };
-    var _fetchToken = window.CI_AUTH && window.CI_AUTH.getToken();
+    const _fetchHeaders = { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY };
+    const _fetchToken = window.CI_AUTH && window.CI_AUTH.getToken();
     if (_fetchToken) _fetchHeaders['Authorization'] = 'Bearer ' + _fetchToken;
-    var guestParam = '';
+    let guestParam = '';
     if (!_fetchToken && window.CI_AUTH && window.CI_AUTH.getGuestId) {
         guestParam = '?guest_id=' + encodeURIComponent(window.CI_AUTH.getGuestId());
     }
 
-    var url = apiOrigin + '/api/handoffs/summary/' + encodeURIComponent(ticker) + guestParam;
+    const url = apiOrigin + '/api/handoffs/summary/' + encodeURIComponent(ticker) + guestParam;
 
     fetch(url, { method: 'GET', headers: _fetchHeaders })
     .then(function(res) { return res.json(); })
     .then(function(data) {
-        var payload = data.summary_payload;
+        const payload = data.summary_payload;
         if (!payload) {
             _showAnalystSummaryCard(ticker, null);
             return;
@@ -998,10 +998,10 @@ function viewAnalystSummary(ticker) {
 function _showAnalystSummaryCard(ticker, payload) {
     if (!messagesEl) return;
 
-    var existing = messagesEl.querySelector('.pm-analyst-summary-card');
+    const existing = messagesEl.querySelector('.pm-analyst-summary-card');
     if (existing) existing.remove();
 
-    var card = document.createElement('div');
+    const card = document.createElement('div');
     card.className = 'pm-analyst-summary-card';
 
     if (!payload || payload.coverage_state === 'not_covered') {
@@ -1013,20 +1013,20 @@ function _showAnalystSummaryCard(ticker, payload) {
             '<div class="pm-handoff-body">No Analyst coverage available. ' +
             'Consider requesting Analyst research before making portfolio decisions.</div>';
     } else {
-        var staleTag = payload.coverage_state === 'stale'
+        const staleTag = payload.coverage_state === 'stale'
             ? '<span class="pm-handoff-badge stale">STALE</span>' : '';
-        var convictionTag = payload.conviction_level
+        const convictionTag = payload.conviction_level
             ? '<span class="pm-handoff-badge conviction-' + payload.conviction_level + '">' +
               payload.conviction_level.toUpperCase() + '</span>' : '';
 
-        var risksHtml = '';
+        let risksHtml = '';
         if (payload.key_risks && payload.key_risks.length > 0) {
             risksHtml = '<div class="pm-handoff-risks"><strong>Risks:</strong> ' +
                 payload.key_risks.map(function(r) { return escapeHtml(r); }).join(' | ') +
                 '</div>';
         }
 
-        var tripsHtml = '';
+        let tripsHtml = '';
         if (payload.tripwires && payload.tripwires.length > 0) {
             tripsHtml = '<div class="pm-handoff-trips"><strong>Tripwires:</strong> ' +
                 payload.tripwires.map(function(t) { return escapeHtml(t); }).join(' | ') +
@@ -1052,7 +1052,7 @@ function _showAnalystSummaryCard(ticker, payload) {
     }
 
     // Insert before input area
-    var inputArea = panel ? panel.querySelector('.pm-input-area') : null;
+    const inputArea = panel ? panel.querySelector('.pm-input-area') : null;
     if (inputArea) {
         inputArea.parentNode.insertBefore(card, inputArea);
     } else {

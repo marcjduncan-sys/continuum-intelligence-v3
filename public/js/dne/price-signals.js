@@ -40,16 +40,16 @@
  * }
  */
 function evaluatePriceSignals(stock, priceData, rules) {
-  var intradayReturn = (priceData.current - priceData.previous_close) / priceData.previous_close;
+  const intradayReturn = (priceData.current - priceData.previous_close) / priceData.previous_close;
   stock.current_price = priceData.current;
 
-  var now = new Date();
+  const now = new Date();
 
   // Deactivate expired price signals
-  for (var s = 0; s < stock.price_signals.length; s++) {
-    var signal = stock.price_signals[s];
+  for (let s = 0; s < stock.price_signals.length; s++) {
+    const signal = stock.price_signals[s];
     if (signal.decay && signal.active !== false) {
-      var decayFactor = calculateDecayFactor(signal.date, now, signal.decay);
+      const decayFactor = calculateDecayFactor(signal.date, now, signal.decay);
       if (decayFactor < 0.05) {
         signal.active = false;
       }
@@ -57,9 +57,9 @@ function evaluatePriceSignals(stock, priceData, rules) {
   }
 
   // Evaluate each rule
-  for (var r = 0; r < rules.length; r++) {
-    var rule = rules[r];
-    var triggered = false;
+  for (let r = 0; r < rules.length; r++) {
+    const rule = rules[r];
+    let triggered = false;
 
     switch (rule.id) {
       case 'INTRADAY_DROP_5':
@@ -97,9 +97,9 @@ function evaluatePriceSignals(stock, priceData, rules) {
 
     if (triggered) {
       // Check if this signal already exists for today
-      var today = now.toISOString().split('T')[0];
-      var alreadyExists = false;
-      for (var e = 0; e < stock.price_signals.length; e++) {
+      const today = now.toISOString().split('T')[0];
+      let alreadyExists = false;
+      for (let e = 0; e < stock.price_signals.length; e++) {
         if (stock.price_signals[e].rule_id === rule.id &&
             stock.price_signals[e].date.indexOf(today) === 0) {
           alreadyExists = true;
@@ -145,22 +145,22 @@ function evaluatePriceSignals(stock, priceData, rules) {
  * @returns {Object|null}  Price data object or null on failure
  */
 async function fetchPriceData(ticker) {
-  var yahooTicker = ticker.indexOf('.AX') !== -1 ? ticker : ticker + '.AX';
-  var url = 'https://query1.finance.yahoo.com/v8/finance/chart/' +
+  const yahooTicker = ticker.indexOf('.AX') !== -1 ? ticker : ticker + '.AX';
+  const url = 'https://query1.finance.yahoo.com/v8/finance/chart/' +
             encodeURIComponent(yahooTicker) + '?interval=1d&range=5d';
 
   try {
-    var response = await fetch(url);
-    var data = await response.json();
-    var result = data.chart.result[0];
-    var meta = result.meta;
-    var quotes = result.indicators.quote[0];
+    const response = await fetch(url);
+    const data = await response.json();
+    const result = data.chart.result[0];
+    const meta = result.meta;
+    const quotes = result.indicators.quote[0];
 
-    var lastIdx = quotes.close.length - 1;
+    const lastIdx = quotes.close.length - 1;
 
     // Calculate 5-day cumulative return
-    var fiveDayStart = quotes.close[0];
-    var cumulative5day = (quotes.close[lastIdx] - fiveDayStart) / fiveDayStart;
+    const fiveDayStart = quotes.close[0];
+    const cumulative5day = (quotes.close[lastIdx] - fiveDayStart) / fiveDayStart;
 
     return {
       current: meta.regularMarketPrice,
@@ -191,7 +191,7 @@ async function fetchPriceData(ticker) {
  * @param {Array}  priceEvidenceRules   Rules from data/config/price_rules.json
  */
 async function updateStockNarrative(stock, priceEvidenceRules) {
-  var priceData = await fetchPriceData(stock.ticker);
+  const priceData = await fetchPriceData(stock.ticker);
   if (!priceData) return;
 
   // Track price history for correlation analysis (Work Stream 3)
@@ -209,7 +209,7 @@ async function updateStockNarrative(stock, priceEvidenceRules) {
 
   // Compute narrative weighting with price correlation (Work Stream 3)
   if (stock.price_history.length > 3 && typeof computeNarrativeWeighting === 'function') {
-    var prevTop = stock.weighting ? stock.weighting.top_narrative.top_narrative : null;
+    const prevTop = stock.weighting ? stock.weighting.top_narrative.top_narrative : null;
     computeNarrativeWeighting(stock, stock.price_history, prevTop);
   }
 
@@ -226,7 +226,7 @@ async function updateStockNarrative(stock, priceEvidenceRules) {
 
 // ─── Refresh Scheduler ──────────────────────────────────────────────────────
 
-var _refreshInterval = null;
+let _refreshInterval = null;
 
 /**
  * Start the 15-minute refresh loop for a stock during ASX market hours.
@@ -238,16 +238,16 @@ var _refreshInterval = null;
 function startNarrativeRefresh(stock, priceEvidenceRules, intervalMs) {
   if (_refreshInterval) clearInterval(_refreshInterval);
 
-  var interval = intervalMs || 15 * 60 * 1000; // 15 minutes
+  const interval = intervalMs || 15 * 60 * 1000; // 15 minutes
 
   // Run immediately
   updateStockNarrative(stock, priceEvidenceRules);
 
   _refreshInterval = setInterval(function () {
     // Only refresh during approximate ASX hours (AEST = UTC+11 roughly)
-    var nowUTC = new Date();
-    var aestHour = (nowUTC.getUTCHours() + 11) % 24;
-    var dayOfWeek = nowUTC.getUTCDay();
+    const nowUTC = new Date();
+    const aestHour = (nowUTC.getUTCHours() + 11) % 24;
+    const dayOfWeek = nowUTC.getUTCDay();
 
     // Market hours: Mon–Fri, 07:00–17:00 AEST (including pre/post)
     if (dayOfWeek >= 1 && dayOfWeek <= 5 && aestHour >= 7 && aestHour < 17) {

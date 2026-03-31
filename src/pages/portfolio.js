@@ -8,7 +8,7 @@ import { on } from '../lib/data-events.js';
 import { API_BASE } from '../lib/api-config.js';
 
 // Coverage data matching portal reports (built dynamically from STOCK_DATA)
-var COVERAGE_DATA = null;
+let COVERAGE_DATA = null;
 
 /* ------------------------------------------------------------------ */
 /*  Pure helpers – gross-exposure alignment engine                     */
@@ -22,8 +22,8 @@ export function calculateExposureDollar(position) {
 
 /** Sum of |exposure| across all positions with valid prices */
 export function calculateGrossExposure(positions) {
-  var total = 0;
-  for (var i = 0; i < positions.length; i++) {
+  let total = 0;
+  for (let i = 0; i < positions.length; i++) {
     total += Math.abs(calculateExposureDollar(positions[i]));
   }
   return total;
@@ -61,8 +61,8 @@ function getTcData() {
 }
 
 export function setupUploadZone() {
-  var zone = document.getElementById('uploadZone');
-  var fileInput = document.getElementById('fileInput');
+  const zone = document.getElementById('uploadZone');
+  const fileInput = document.getElementById('fileInput');
   if (!zone || !fileInput) return;
 
   zone.addEventListener('click', function() { fileInput.click(); });
@@ -71,35 +71,35 @@ export function setupUploadZone() {
   zone.addEventListener('drop', function(e) {
     e.preventDefault();
     zone.classList.remove('dragover');
-    var file = e.dataTransfer.files[0];
+    const file = e.dataTransfer.files[0];
     if (file) handleFile(file);
   });
   fileInput.addEventListener('change', function(e) {
-    var file = e.target.files[0];
+    const file = e.target.files[0];
     if (file) handleFile(file);
     fileInput.value = '';
   });
 }
 
 export function handleFile(file) {
-  var ext = file.name.split('.').pop().toLowerCase();
-  var reader = new FileReader();
+  const ext = file.name.split('.').pop().toLowerCase();
+  const reader = new FileReader();
 
   if (ext === 'csv') {
     reader.onload = function(e) {
-      var rows = parseCSV(e.target.result);
+      const rows = parseCSV(e.target.result);
       processPortfolioData(rows);
     };
     reader.readAsText(file);
   } else {
     // Lazy-load SheetJS on demand for Excel files
     reader.onload = function(e) {
-      var processExcel = function() {
+      const processExcel = function() {
         try {
-          var data = new Uint8Array(e.target.result);
-          var workbook = window.XLSX.read(data, { type: 'array' });
-          var sheet = workbook.Sheets[workbook.SheetNames[0]];
-          var rows = window.XLSX.utils.sheet_to_json(sheet);
+          const data = new Uint8Array(e.target.result);
+          const workbook = window.XLSX.read(data, { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = window.XLSX.utils.sheet_to_json(sheet);
           processPortfolioData(rows);
         } catch (err) {
           alert('Could not read Excel file. Please check the format and try again.');
@@ -118,12 +118,12 @@ export function handleFile(file) {
 }
 
 export function parseCSV(text) {
-  var lines = text.trim().split('\n');
+  const lines = text.trim().split('\n');
   if (lines.length < 2) return [];
-  var headers = lines[0].split(',').map(function(h) { return h.trim(); });
+  const headers = lines[0].split(',').map(function(h) { return h.trim(); });
   return lines.slice(1).map(function(line) {
-    var vals = line.split(',').map(function(v) { return v.trim(); });
-    var obj = {};
+    const vals = line.split(',').map(function(v) { return v.trim(); });
+    const obj = {};
     headers.forEach(function(h, i) { obj[h] = vals[i] || ''; });
     return obj;
   });
@@ -135,10 +135,10 @@ export function normalizeTicker(raw) {
 }
 
 export function getCol(row, names) {
-  for (var ni = 0; ni < names.length; ni++) {
+  for (let ni = 0; ni < names.length; ni++) {
     var n = names[ni];
-    var keys = Object.keys(row);
-    var match = keys.find(function(k) {
+    const keys = Object.keys(row);
+    const match = keys.find(function(k) {
       return k.toLowerCase().replace(/[^a-z]/g, '') === n.toLowerCase().replace(/[^a-z]/g, '');
     });
     if (match && row[match] !== undefined && row[match] !== '') return row[match];
@@ -147,25 +147,25 @@ export function getCol(row, names) {
 }
 
 export function processPortfolioData(rows) {
-  var coverageData = getCoverageData();
-  var positions = [];
-  for (var ri = 0; ri < rows.length; ri++) {
-    var row = rows[ri];
-    var ticker = normalizeTicker(getCol(row, ['Ticker', 'ASX', 'ASXCode', 'Code', 'Symbol', 'Stock']));
-    var units = parseFloat(getCol(row, ['Units', 'Quantity', 'Qty', 'Shares', 'Volume']));
-    var avgCost = parseFloat(getCol(row, ['AvgCost', 'AverageCost', 'CostBasis', 'Cost', 'Price', 'BuyPrice', 'AvgPrice']));
+  const coverageData = getCoverageData();
+  const positions = [];
+  for (let ri = 0; ri < rows.length; ri++) {
+    const row = rows[ri];
+    const ticker = normalizeTicker(getCol(row, ['Ticker', 'ASX', 'ASXCode', 'Code', 'Symbol', 'Stock']));
+    const units = parseFloat(getCol(row, ['Units', 'Quantity', 'Qty', 'Shares', 'Volume']));
+    const avgCost = parseFloat(getCol(row, ['AvgCost', 'AverageCost', 'CostBasis', 'Cost', 'Price', 'BuyPrice', 'AvgPrice']));
 
     if (!ticker || isNaN(units) || isNaN(avgCost)) continue;
 
-    var covered = coverageData[ticker];
-    var currentPrice = covered ? covered.price : null;
-    var company = covered ? covered.company : ticker;
-    var skew = covered ? covered.skew : null;
+    const covered = coverageData[ticker];
+    const currentPrice = covered ? covered.price : null;
+    const company = covered ? covered.company : ticker;
+    const skew = covered ? covered.skew : null;
 
-    var marketValue = currentPrice ? units * currentPrice : null;
-    var costBasis = units * avgCost;
-    var pnlDollar = marketValue !== null ? marketValue - costBasis : null;
-    var pnlPercent = costBasis > 0 && pnlDollar !== null ? (pnlDollar / costBasis) * 100 : null;
+    const marketValue = currentPrice ? units * currentPrice : null;
+    const costBasis = units * avgCost;
+    const pnlDollar = marketValue !== null ? marketValue - costBasis : null;
+    const pnlPercent = costBasis > 0 && pnlDollar !== null ? (pnlDollar / costBasis) * 100 : null;
 
     positions.push({ ticker: ticker, company: company, units: units, avgCost: avgCost, currentPrice: currentPrice, marketValue: marketValue, costBasis: costBasis, pnlDollar: pnlDollar, pnlPercent: pnlPercent, skew: skew });
   }
@@ -176,11 +176,11 @@ export function processPortfolioData(rows) {
   }
 
   /* Calculate gross-exposure-based weights */
-  var grossExposure = calculateGrossExposure(positions);
+  const grossExposure = calculateGrossExposure(positions);
   positions.forEach(function(p) {
     p.exposureDollar = calculateExposureDollar(p);
     p.weight = calculateCurrentWeightPct(Math.abs(p.exposureDollar), grossExposure);
-    var dir = p.units >= 0 ? 'long' : 'short';
+    const dir = p.units >= 0 ? 'long' : 'short';
     p.alignment = classifyAlignment(dir, p.skew);
   });
 
@@ -191,35 +191,35 @@ export function processPortfolioData(rows) {
 
 /** @deprecated Use classifyAlignment() instead. Kept for backward compatibility. */
 export function deriveAlignment(skew, weight, isShort) {
-  var dir = isShort ? 'short' : 'long';
+  const dir = isShort ? 'short' : 'long';
   return classifyAlignment(dir, skew);
 }
 
 export function renderPortfolio(positions, grossExposure) {
-  var body = document.getElementById('portfolioBody');
-  var table = document.getElementById('portfolioTable');
-  var summary = document.getElementById('portfolioSummary');
-  var actions = document.getElementById('portfolioActions');
-  var zone = document.getElementById('uploadZone');
+  const body = document.getElementById('portfolioBody');
+  const table = document.getElementById('portfolioTable');
+  const summary = document.getElementById('portfolioSummary');
+  const actions = document.getElementById('portfolioActions');
+  const zone = document.getElementById('uploadZone');
 
   body.innerHTML = '';
 
   positions.sort(function(a, b) { return Math.abs(b.exposureDollar || b.marketValue || 0) - Math.abs(a.exposureDollar || a.marketValue || 0); });
 
-  for (var pi = 0; pi < positions.length; pi++) {
-    var p = positions[pi];
-    var tr = document.createElement('tr');
-    var coverageData = getCoverageData();
+  for (let pi = 0; pi < positions.length; pi++) {
+    const p = positions[pi];
+    const tr = document.createElement('tr');
+    const coverageData = getCoverageData();
     if (coverageData[p.ticker]) {
       tr.setAttribute('onclick', "navigate('report-" + p.ticker + "')");
     }
 
-    var pnlClass = p.pnlDollar >= 0 ? 'td-pnl-pos' : 'td-pnl-neg';
-    var skewBadge = p.skew ? '<span class="skew-badge ' + p.skew + '">' + (p.skew === 'upside' ? '&#9650; UPSIDE' : p.skew === 'downside' ? '&#9660; DOWNSIDE' : '&#9670; BALANCED') + '</span>' : '<span style="color:var(--text-muted)">N/A</span>';
+    const pnlClass = p.pnlDollar >= 0 ? 'td-pnl-pos' : 'td-pnl-neg';
+    const skewBadge = p.skew ? '<span class="skew-badge ' + p.skew + '">' + (p.skew === 'upside' ? '&#9650; UPSIDE' : p.skew === 'downside' ? '&#9660; DOWNSIDE' : '&#9670; BALANCED') + '</span>' : '<span style="color:var(--text-muted)">N/A</span>';
 
-    var expDollar = p.exposureDollar != null ? p.exposureDollar : (p.marketValue || 0);
-    var expSign = expDollar >= 0 ? '+' : '';
-    var expFormatted = p.currentPrice ? expSign + 'A$' + formatNum(expDollar, 0) : 'N/A';
+    const expDollar = p.exposureDollar != null ? p.exposureDollar : (p.marketValue || 0);
+    const expSign = expDollar >= 0 ? '+' : '';
+    const expFormatted = p.currentPrice ? expSign + 'A$' + formatNum(expDollar, 0) : 'N/A';
 
     tr.innerHTML =
       '<td class="td-ticker">' + p.ticker + '</td>' +
@@ -238,16 +238,16 @@ export function renderPortfolio(positions, grossExposure) {
   }
 
   /* Footer row */
-  var totalLong = 0, totalShortAbs = 0;
+  let totalLong = 0, totalShortAbs = 0;
   positions.forEach(function(p) {
-    var exp = p.exposureDollar != null ? p.exposureDollar : (p.marketValue || 0);
+    const exp = p.exposureDollar != null ? p.exposureDollar : (p.marketValue || 0);
     if (exp >= 0) totalLong += exp;
     else totalShortAbs += Math.abs(exp);
   });
-  var netExposure = totalLong - totalShortAbs;
-  var grossCalc = totalLong + totalShortAbs;
+  const netExposure = totalLong - totalShortAbs;
+  const grossCalc = totalLong + totalShortAbs;
 
-  var footer = document.createElement('tr');
+  const footer = document.createElement('tr');
   footer.className = 'portfolio-footer';
   footer.innerHTML =
     '<td colspan="8" class="portfolio-footer-summary">' +
@@ -261,11 +261,11 @@ export function renderPortfolio(positions, grossExposure) {
   body.appendChild(footer);
 
   /* Summary */
-  var totalPnL = positions.reduce(function(s, p) { return s + (p.pnlDollar || 0); }, 0);
-  var totalCost = positions.reduce(function(s, p) { return s + p.costBasis; }, 0);
-  var totalPnLPct = totalCost > 0 ? (totalPnL / totalCost) * 100 : 0;
+  const totalPnL = positions.reduce(function(s, p) { return s + (p.pnlDollar || 0); }, 0);
+  const totalCost = positions.reduce(function(s, p) { return s + p.costBasis; }, 0);
+  const totalPnLPct = totalCost > 0 ? (totalPnL / totalCost) * 100 : 0;
 
-  var alignedWeight = 0, contraWeight = 0, neutralWeight = 0;
+  let alignedWeight = 0, contraWeight = 0, neutralWeight = 0;
   positions.forEach(function(p) {
     if (p.alignment.cls === 'aligned') alignedWeight += p.weight;
     else if (p.alignment.cls === 'contradicts') contraWeight += p.weight;
@@ -274,16 +274,16 @@ export function renderPortfolio(positions, grossExposure) {
 
   document.getElementById('summaryPositions').textContent = String(positions.length);
   // Reset async-populated fields to "--" (will be updated when analytics arrive)
-  var concResetEl = document.getElementById('summaryConcentration');
+  const concResetEl = document.getElementById('summaryConcentration');
   if (concResetEl) { concResetEl.textContent = '--'; concResetEl.className = 'portfolio-summary-value'; }
-  var flagsResetEl = document.getElementById('summaryFlags');
+  const flagsResetEl = document.getElementById('summaryFlags');
   if (flagsResetEl) flagsResetEl.textContent = '--';
   // Hide stale concentration detail until fresh analytics arrive
-  var concDetailEl = document.getElementById('portConcentrationDetail');
+  const concDetailEl = document.getElementById('portConcentrationDetail');
   if (concDetailEl) concDetailEl.style.display = 'none';
   document.getElementById('summaryNet').textContent = 'A$' + formatNum(netExposure, 0);
   document.getElementById('summaryGross').textContent = 'A$' + formatNum(grossCalc, 0);
-  var pnlEl = document.getElementById('summaryPnL');
+  const pnlEl = document.getElementById('summaryPnL');
   pnlEl.textContent = (totalPnL >= 0 ? '+' : '') + 'A$' + formatNum(totalPnL, 0) + ' (' + (totalPnLPct >= 0 ? '+' : '') + formatNum(totalPnLPct, 1) + '%)';
   pnlEl.className = 'portfolio-summary-value ' + (totalPnL >= 0 ? 'positive' : 'negative');
   document.getElementById('summaryAligned').textContent = formatNum(alignedWeight, 1) + '%';
@@ -302,11 +302,11 @@ export function renderPortfolio(positions, grossExposure) {
 }
 
 export function renderPortfolioFromSaved(positions) {
-  var grossExposure = calculateGrossExposure(positions);
+  const grossExposure = calculateGrossExposure(positions);
   positions.forEach(function(p) {
     p.exposureDollar = calculateExposureDollar(p);
     p.weight = calculateCurrentWeightPct(Math.abs(p.exposureDollar), grossExposure);
-    var dir = p.units >= 0 ? 'long' : 'short';
+    const dir = p.units >= 0 ? 'long' : 'short';
     p.alignment = classifyAlignment(dir, p.skew);
   });
   renderPortfolio(positions, grossExposure);
@@ -317,37 +317,37 @@ export function renderPortfolioFromSaved(positions) {
 
 export function formatNum(n, decimals) {
   if (n === null || n === undefined || isNaN(n)) return '--';
-  var abs = Math.abs(n);
+  const abs = Math.abs(n);
   if (abs >= 1000000) return (n / 1000000).toFixed(1) + 'M';
   if (abs >= 1000) return n.toLocaleString('en-AU', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   return n.toFixed(decimals);
 }
 
 export function renderPortfolioDiagnostics(positions, grossExposure) {
-  var diagnosticsEl = document.getElementById('portfolioDiagnostics');
+  const diagnosticsEl = document.getElementById('portfolioDiagnostics');
   if (!diagnosticsEl) return;
   diagnosticsEl.style.display = '';
 
-  var TC_DATA = getTcData();
-  var hypothesisValues = { n1: 0, n2: 0, n3: 0, n4: 0, unknown: 0 };
+  const TC_DATA = getTcData();
+  const hypothesisValues = { n1: 0, n2: 0, n3: 0, n4: 0, unknown: 0 };
 
   positions.forEach(function(p) {
-    var data = TC_DATA[p.ticker];
-    var absVal = Math.abs(p.marketValue || 0);
+    const data = TC_DATA[p.ticker];
+    const absVal = Math.abs(p.marketValue || 0);
     if (!data) {
       hypothesisValues.unknown += absVal;
       return;
     }
-    var tier = data.primary === 'uphill' ? 'n2' : data.primary;
+    const tier = data.primary === 'uphill' ? 'n2' : data.primary;
     hypothesisValues[tier] += absVal;
   });
 
-  var tiers = ['n1', 'n2', 'n3', 'n4'];
+  const tiers = ['n1', 'n2', 'n3', 'n4'];
   tiers.forEach(function(tier) {
-    var pct = grossExposure > 0 ? (hypothesisValues[tier] / grossExposure) * 100 : 0;
-    var segment = document.getElementById('dna' + tier.toUpperCase());
-    var pctEl = document.getElementById('pct' + tier.toUpperCase());
-    var valEl = document.getElementById('val' + tier.toUpperCase());
+    const pct = grossExposure > 0 ? (hypothesisValues[tier] / grossExposure) * 100 : 0;
+    const segment = document.getElementById('dna' + tier.toUpperCase());
+    const pctEl = document.getElementById('pct' + tier.toUpperCase());
+    const valEl = document.getElementById('val' + tier.toUpperCase());
 
     if (segment) {
       segment.style.width = Math.max(pct, 5) + '%';
@@ -357,9 +357,9 @@ export function renderPortfolioDiagnostics(positions, grossExposure) {
     if (valEl) valEl.textContent = 'A$' + formatNum(hypothesisValues[tier], 0);
   });
 
-  var maxTier = tiers.reduce(function(a, b) { return hypothesisValues[a] > hypothesisValues[b] ? a : b; });
-  var maxPct = grossExposure > 0 ? (hypothesisValues[maxTier] / grossExposure) * 100 : 0;
-  var concentrationEl = document.getElementById('portConcentrationAlert');
+  const maxTier = tiers.reduce(function(a, b) { return hypothesisValues[a] > hypothesisValues[b] ? a : b; });
+  const maxPct = grossExposure > 0 ? (hypothesisValues[maxTier] / grossExposure) * 100 : 0;
+  const concentrationEl = document.getElementById('portConcentrationAlert');
 
   if (maxPct > 60) {
     concentrationEl.innerHTML = '<span class="alert-highlight">High concentration risk:</span> ' + formatNum(maxPct, 0) + '% of your book aligns with ' + maxTier.toUpperCase() + '. If this hypothesis is wrong, significant downside.';
@@ -369,32 +369,32 @@ export function renderPortfolioDiagnostics(positions, grossExposure) {
     concentrationEl.innerHTML = '<span class="success-highlight">Well diversified</span> across hypotheses. No single scenario dominates your portfolio.';
   }
 
-  var contrarianEl = document.getElementById('portContrarianOpp');
-  var contrarianPositions = positions.filter(function(p) {
-    var data = TC_DATA[p.ticker];
+  const contrarianEl = document.getElementById('portContrarianOpp');
+  const contrarianPositions = positions.filter(function(p) {
+    const data = TC_DATA[p.ticker];
     return data && data.primary === 'uphill';
   });
 
   if (contrarianPositions.length > 0) {
-    var names = contrarianPositions.slice(0, 3).map(function(p) { return p.ticker; }).join(', ');
-    var more = contrarianPositions.length > 3 ? ' +' + (contrarianPositions.length - 3) + ' more' : '';
+    const names = contrarianPositions.slice(0, 3).map(function(p) { return p.ticker; }).join(', ');
+    const more = contrarianPositions.length > 3 ? ' +' + (contrarianPositions.length - 3) + ' more' : '';
     contrarianEl.innerHTML = '<strong>' + names + more + '</strong>  --  Your view differs from all four Continuum hypotheses. High conviction required, but potential alpha if correct.';
   } else {
     contrarianEl.innerHTML = 'Your positions generally align with at least one Continuum hypothesis. No extreme contrarian bets detected.';
   }
 
-  var hedgeEl = document.getElementById('portHedgeGaps');
-  var missingTiers = tiers.filter(function(tier) { return hypothesisValues[tier] === 0; });
+  const hedgeEl = document.getElementById('portHedgeGaps');
+  const missingTiers = tiers.filter(function(tier) { return hypothesisValues[tier] === 0; });
 
   if (missingTiers.length > 0) {
-    var tierNames = { n1: 'N1 (Growth/Recovery)', n2: 'N2 (Base Case)', n3: 'N3 (Downside)', n4: 'N4 (Disruption)' };
+    const tierNames = { n1: 'N1 (Growth/Recovery)', n2: 'N2 (Base Case)', n3: 'N3 (Downside)', n4: 'N4 (Disruption)' };
     hedgeEl.innerHTML = 'You have <strong>zero exposure</strong> to: ' + missingTiers.map(function(t) { return tierNames[t]; }).join(', ') + '. Consider whether this creates blind spots if these scenarios play out.';
   } else {
     hedgeEl.innerHTML = '<span class="success-highlight">Comprehensive coverage.</span> Your portfolio spans all four hypothesis types.';
   }
 
-  var alignmentEl = document.getElementById('portAlignmentScore');
-  var alignedWeight = positions.reduce(function(s, p) { return s + (p.alignment.cls === 'aligned' ? p.weight : 0); }, 0);
+  const alignmentEl = document.getElementById('portAlignmentScore');
+  const alignedWeight = positions.reduce(function(s, p) { return s + (p.alignment.cls === 'aligned' ? p.weight : 0); }, 0);
 
   if (alignedWeight > 50) {
     alignmentEl.innerHTML = '<span class="success-highlight">' + formatNum(alignedWeight, 0) + '% aligned</span> with Continuum. Your book largely reflects our evidence-based view.';
@@ -410,35 +410,35 @@ export function renderPortfolioDiagnostics(positions, grossExposure) {
  * Falls back to house defaults if no personalisation is configured.
  */
 export function renderMandateBreaches(positions, grossExposure) {
-  var container = document.getElementById('portfolioMandateBreaches');
+  const container = document.getElementById('portfolioMandateBreaches');
   if (!container) return;
   if (grossExposure <= 0) { container.style.display = 'none'; return; }
 
-  var ctx = (typeof window.pnGetPersonalisationContext === 'function')
+  const ctx = (typeof window.pnGetPersonalisationContext === 'function')
     ? window.pnGetPersonalisationContext() : null;
-  var mandate = (ctx && ctx.mandate) ? ctx.mandate : {};
+  const mandate = (ctx && ctx.mandate) ? ctx.mandate : {};
 
   // Mandate values are stored as whole percentages (15 = 15%); convert to decimals
-  var maxSingle = (mandate.maxPositionSize || 15) / 100;
-  var maxTop5 = 0.50; // not yet in mandate; house default
-  var maxSector = (mandate.sectorCap || 35) / 100;
-  var cashMin = (mandate.cashRangeMin || 3) / 100;
-  var cashMax = (mandate.cashRangeMax || 25) / 100;
+  const maxSingle = (mandate.maxPositionSize || 15) / 100;
+  const maxTop5 = 0.50; // not yet in mandate; house default
+  const maxSector = (mandate.sectorCap || 35) / 100;
+  const cashMin = (mandate.cashRangeMin || 3) / 100;
+  const cashMax = (mandate.cashRangeMax || 25) / 100;
 
-  var isCustom = mandate.maxPositionSize || mandate.sectorCap ||
+  const isCustom = mandate.maxPositionSize || mandate.sectorCap ||
     mandate.cashRangeMin || mandate.cashRangeMax;
 
   // Sort positions by absolute exposure descending
-  var sorted = positions.slice().sort(function(a, b) {
+  const sorted = positions.slice().sort(function(a, b) {
     return Math.abs(b.exposureDollar || 0) - Math.abs(a.exposureDollar || 0);
   });
 
-  var coverageData = getCoverageData();
-  var flags = [];
+  const coverageData = getCoverageData();
+  const flags = [];
 
   // Single-name check
   sorted.forEach(function(p) {
-    var wt = Math.abs(p.exposureDollar || 0) / grossExposure;
+    const wt = Math.abs(p.exposureDollar || 0) / grossExposure;
     if (wt > maxSingle) {
       flags.push({
         severity: 'breach',
@@ -448,8 +448,8 @@ export function renderMandateBreaches(positions, grossExposure) {
   });
 
   // Top 5 check
-  var top5Weight = 0;
-  for (var i = 0; i < Math.min(5, sorted.length); i++) {
+  let top5Weight = 0;
+  for (let i = 0; i < Math.min(5, sorted.length); i++) {
     top5Weight += Math.abs(sorted[i].exposureDollar || 0) / grossExposure;
   }
   if (top5Weight > maxTop5) {
@@ -460,9 +460,9 @@ export function renderMandateBreaches(positions, grossExposure) {
   }
 
   // Sector check
-  var sectorWeights = {};
+  const sectorWeights = {};
   positions.forEach(function(p) {
-    var sector = (coverageData[p.ticker] && coverageData[p.ticker].sector) || 'Unclassified';
+    const sector = (coverageData[p.ticker] && coverageData[p.ticker].sector) || 'Unclassified';
     if (!sectorWeights[sector]) sectorWeights[sector] = 0;
     sectorWeights[sector] += Math.abs(p.exposureDollar || 0) / grossExposure;
   });
@@ -476,7 +476,7 @@ export function renderMandateBreaches(positions, grossExposure) {
   });
 
   // Cash check (portfolio page uses 5% notional cash buffer in sync)
-  var cashEst = 0.05;
+  const cashEst = 0.05;
   if (cashEst < cashMin) {
     flags.push({
       severity: 'warning',
@@ -485,7 +485,7 @@ export function renderMandateBreaches(positions, grossExposure) {
   }
 
   // Build HTML
-  var html = '<div class="port-mandate-header">' +
+  let html = '<div class="port-mandate-header">' +
     '<div class="port-mandate-title">Mandate Compliance</div>' +
     '<div class="port-mandate-subtitle">' +
       (isCustom ? 'Checked against your personalised mandate'
@@ -498,8 +498,8 @@ export function renderMandateBreaches(positions, grossExposure) {
   } else {
     html += '<div class="port-mandate-flags">';
     flags.forEach(function(f) {
-      var cls = f.severity === 'breach' ? 'port-mandate-flag-breach' : 'port-mandate-flag-warn';
-      var icon = f.severity === 'breach' ? '!' : 'i';
+      const cls = f.severity === 'breach' ? 'port-mandate-flag-breach' : 'port-mandate-flag-warn';
+      const icon = f.severity === 'breach' ? '!' : 'i';
       html += '<div class="port-mandate-flag ' + cls + '">' +
         '<span class="port-mandate-flag-icon">' + icon + '</span>' +
         '<span class="port-mandate-flag-msg">' + _escText(f.text) + '</span>' +
@@ -523,30 +523,30 @@ export function renderMandateBreaches(positions, grossExposure) {
  * @returns {Array} scored positions with suggestedWeight, action, shareAction
  */
 export function calculateReweightingScores(covered, coverageData, tcData, grossExposure) {
-  var GRACE_PCT = 5.0;
-  var baseWeight = covered.length > 0 ? 100 / covered.length : 0;
-  var scores = [];
+  const GRACE_PCT = 5.0;
+  const baseWeight = covered.length > 0 ? 100 / covered.length : 0;
+  const scores = [];
 
   covered.forEach(function(p) {
-    var cd = coverageData[p.ticker];
-    var tc = tcData[p.ticker];
-    var isShort = p.units < 0;
-    var rawScore;
+    const cd = coverageData[p.ticker];
+    const tc = tcData[p.ticker];
+    const isShort = p.units < 0;
+    let rawScore;
 
-    var contradicting = (!isShort && cd.skew === 'downside') ||
+    const contradicting = (!isShort && cd.skew === 'downside') ||
                         (isShort && cd.skew === 'upside');
 
     if (contradicting) {
       rawScore = 0;
     } else {
-      var multiplier = 1.0;
-      var aligned = (!isShort && cd.skew === 'upside') ||
+      let multiplier = 1.0;
+      const aligned = (!isShort && cd.skew === 'upside') ||
                     (isShort && cd.skew === 'downside');
       if (aligned) multiplier = 1.3;
 
       if (tc) {
-        var probs = [tc.n1.prob, tc.n2.prob, tc.n3.prob, tc.n4.prob];
-        var maxProb = Math.max.apply(null, probs);
+        const probs = [tc.n1.prob, tc.n2.prob, tc.n3.prob, tc.n4.prob];
+        const maxProb = Math.max.apply(null, probs);
         if (maxProb > 40) multiplier *= 1.05;
         if (tc.primary === 'uphill') multiplier *= 0.9;
       }
@@ -567,7 +567,7 @@ export function calculateReweightingScores(covered, coverageData, tcData, grossE
   });
 
   // Normalise: only non-zero scores participate in the denominator
-  var totalScore = scores.reduce(function(s, x) { return s + x.rawScore; }, 0);
+  const totalScore = scores.reduce(function(s, x) { return s + x.rawScore; }, 0);
   scores.forEach(function(s) {
     if (s.rawScore === 0) {
       s.suggestedWeight = 0;
@@ -578,7 +578,7 @@ export function calculateReweightingScores(covered, coverageData, tcData, grossE
 
   // Derive action + share amount using uniform 5% grace band
   scores.forEach(function(s) {
-    var delta = s.suggestedWeight - s.currentWeight;
+    const delta = s.suggestedWeight - s.currentWeight;
     s.delta = delta;
 
     if (!s.isShort) {
@@ -639,7 +639,7 @@ export function calculateReweightingScores(covered, coverageData, tcData, grossE
   });
 
   // De minimis: positions under 0.25% of gross get Hold to avoid noise
-  var DE_MINIMIS_PCT = 0.25;
+  const DE_MINIMIS_PCT = 0.25;
   scores.forEach(function(s) {
     if (s.currentWeight < DE_MINIMIS_PCT && s.suggestedWeight < DE_MINIMIS_PCT) {
       s.action = 'Hold';
@@ -656,26 +656,26 @@ export function calculateReweightingScores(covered, coverageData, tcData, grossE
 }
 
 export function renderReweighting(positions, grossExposure) {
-  var sectionEl = document.getElementById('portfolioReweighting');
-  var bodyEl = document.getElementById('reweightBody');
+  const sectionEl = document.getElementById('portfolioReweighting');
+  const bodyEl = document.getElementById('reweightBody');
   if (!sectionEl || !bodyEl) return;
 
-  var coverageData = getCoverageData();
-  var tcData = getTcData();
+  const coverageData = getCoverageData();
+  const tcData = getTcData();
 
-  var covered = positions.filter(function(p) { return coverageData[p.ticker]; });
+  const covered = positions.filter(function(p) { return coverageData[p.ticker]; });
   if (covered.length === 0) {
     sectionEl.style.display = 'none';
     return;
   }
 
-  var scores = calculateReweightingScores(covered, coverageData, tcData, grossExposure);
+  const scores = calculateReweightingScores(covered, coverageData, tcData, grossExposure);
 
-  var rows = '';
+  let rows = '';
   scores.forEach(function(s) {
-    var skewArrow = s.skew === 'upside' ? '&#9650; UPSIDE' :
+    const skewArrow = s.skew === 'upside' ? '&#9650; UPSIDE' :
                     s.skew === 'downside' ? '&#9660; DOWNSIDE' : '&#9670; BALANCED';
-    var skewCls = s.skew;
+    const skewCls = s.skew;
 
     rows += '<tr>' +
       '<td><span class="rw-ticker">' + s.ticker + '</span></td>' +
@@ -718,7 +718,7 @@ export function savePortfolio(positions) {
 }
 
 export function loadPortfolio() {
-  try { var d = localStorage.getItem('continuum-portfolio'); return d ? JSON.parse(d) : null; } catch(e) { return null; }
+  try { const d = localStorage.getItem('continuum-portfolio'); return d ? JSON.parse(d) : null; } catch(e) { return null; }
 }
 
 export function clearPortfolio() {
@@ -736,9 +736,9 @@ export function clearPortfolio() {
   document.getElementById('portfolioBody').innerHTML = '';
 
   /* Hide diagnostics, reweighting, mandate, and alerts */
-  var diag = document.getElementById('portfolioDiagnostics');
-  var reweight = document.getElementById('portfolioReweighting');
-  var mandateEl = document.getElementById('portfolioMandateBreaches');
+  const diag = document.getElementById('portfolioDiagnostics');
+  const reweight = document.getElementById('portfolioReweighting');
+  const mandateEl = document.getElementById('portfolioMandateBreaches');
   if (diag) diag.style.display = 'none';
   if (reweight) reweight.style.display = 'none';
   if (mandateEl) mandateEl.style.display = 'none';
@@ -749,8 +749,8 @@ export function clearPortfolio() {
 /* ------------------------------------------------------------------ */
 
 var _pmPortfolioId = null;
-var _lastSyncTimestamp = 0;
-var _PM_SYNC_COOLDOWN_MS = 30000; // 30s cooldown between syncs
+let _lastSyncTimestamp = 0;
+const _PM_SYNC_COOLDOWN_MS = 30000; // 30s cooldown between syncs
 
 /**
  * Sync the uploaded portfolio to the PM database so PM Chat has access.
@@ -758,34 +758,34 @@ var _PM_SYNC_COOLDOWN_MS = 30000; // 30s cooldown between syncs
  * Includes a 30-second cooldown to avoid redundant syncs on rapid re-renders.
  */
 function _syncPortfolioToPMDatabase(positions, grossExposure) {
-  var now = Date.now();
+  const now = Date.now();
   if (now - _lastSyncTimestamp < _PM_SYNC_COOLDOWN_MS) {
     return; // skip redundant sync
   }
   _lastSyncTimestamp = now;
-  var apiBase = API_BASE;
-  var apiKey = window.CI_API_KEY || '';
-  var headers = { 'Content-Type': 'application/json' };
+  const apiBase = API_BASE;
+  const apiKey = window.CI_API_KEY || '';
+  const headers = { 'Content-Type': 'application/json' };
   if (apiKey) headers['X-API-Key'] = apiKey;
-  var guestId = (window.CI_AUTH && window.CI_AUTH.getGuestId) ? window.CI_AUTH.getGuestId() : null;
-  var _syncedPortfolioId = null;
+  const guestId = (window.CI_AUTH && window.CI_AUTH.getGuestId) ? window.CI_AUTH.getGuestId() : null;
+  let _syncedPortfolioId = null;
 
   // Only sync positions with valid prices (skip uncovered/unpriced)
-  var validPositions = positions.filter(function(p) { return p.currentPrice > 0 && p.units !== 0; });
+  const validPositions = positions.filter(function(p) { return p.currentPrice > 0 && p.units !== 0; });
   if (validPositions.length === 0) return;
 
   // Calculate total value (gross exposure + notional cash buffer at 5%)
-  var totalMV = 0;
+  let totalMV = 0;
   validPositions.forEach(function(p) { totalMV += Math.abs(p.units * p.currentPrice); });
-  var cashValue = Math.round(totalMV * 0.05);
-  var totalValue = totalMV + cashValue;
+  const cashValue = Math.round(totalMV * 0.05);
+  const totalValue = totalMV + cashValue;
 
   // Build holdings array for the API
-  var holdingsPayload = validPositions.map(function(p) {
-    var mv = Math.abs(p.units * p.currentPrice);
-    var isShort = p.units < 0;
-    var coverageData = getCoverageData();
-    var sector = null;
+  const holdingsPayload = validPositions.map(function(p) {
+    const mv = Math.abs(p.units * p.currentPrice);
+    const isShort = p.units < 0;
+    const coverageData = getCoverageData();
+    let sector = null;
     if (coverageData[p.ticker] && coverageData[p.ticker].sector) {
       sector = coverageData[p.ticker].sector;
     }
@@ -800,7 +800,7 @@ function _syncPortfolioToPMDatabase(positions, grossExposure) {
     };
   });
 
-  var snapshotBody = {
+  const snapshotBody = {
     as_of_date: new Date().toISOString().slice(0, 10),
     total_value: totalValue,
     cash_value: cashValue,
@@ -811,8 +811,8 @@ function _syncPortfolioToPMDatabase(positions, grossExposure) {
 
   // Step 1: ensure portfolio exists (create or reuse)
   // Check if personalisation wizard already created one
-  var existingId = _pmPortfolioId || (typeof window.pnGetPortfolioId === 'function' ? window.pnGetPortfolioId() : null);
-  var ensurePortfolio = existingId
+  const existingId = _pmPortfolioId || (typeof window.pnGetPortfolioId === 'function' ? window.pnGetPortfolioId() : null);
+  const ensurePortfolio = existingId
     ? (function() {
         _pmPortfolioId = existingId;
         if (typeof window.pnSetPortfolioId === 'function') {
@@ -871,9 +871,9 @@ function _syncPortfolioToPMDatabase(positions, grossExposure) {
  * Fire-and-forget: errors are logged but do not block the UI.
  */
 function _fetchAndDispatchAnalytics(portfolioId) {
-  var apiBase = API_BASE;
-  var apiKey = window.CI_API_KEY || '';
-  var headers = { 'Content-Type': 'application/json' };
+  const apiBase = API_BASE;
+  const apiKey = window.CI_API_KEY || '';
+  const headers = { 'Content-Type': 'application/json' };
   if (apiKey) headers['X-API-Key'] = apiKey;
 
   fetch(apiBase + '/api/portfolios/' + portfolioId + '/analytics', { headers: headers })
@@ -891,22 +891,22 @@ function _fetchAndDispatchAnalytics(portfolioId) {
 }
 
 export function populateSidebar(ticker) {
-  var sidebarId = ticker.toLowerCase() + '-sidebar';
-  var sidebar = document.getElementById(sidebarId);
+  const sidebarId = ticker.toLowerCase() + '-sidebar';
+  const sidebar = document.getElementById(sidebarId);
   if (!sidebar) return;
 
   // Don't re-populate if already filled
   if (sidebar.children.length > 0) return;
 
-  var stock = STOCK_DATA[ticker];
+  const stock = STOCK_DATA[ticker];
   if (!stock) return;
 
   // Extract N1-N4 directly from STOCK_DATA (not DOM)
-  var hypotheses = [];
+  const hypotheses = [];
   if (stock.hypotheses && stock.hypotheses.length > 0) {
-    var norm = normaliseScores(stock.hypotheses);
-    for (var i = 0; i < stock.hypotheses.length; i++) {
-      var h = stock.hypotheses[i];
+    const norm = normaliseScores(stock.hypotheses);
+    for (let i = 0; i < stock.hypotheses.length; i++) {
+      const h = stock.hypotheses[i];
       hypotheses.push({
         dirClass: h.dirClass || 'dir-neutral',
         label: (h.title || '').replace(/^N\d+:\s*/, ''),
@@ -916,28 +916,28 @@ export function populateSidebar(ticker) {
   }
 
   // Compute skew from data
-  var skew = stock._skew || computeSkewScore(stock);
-  var skewDir = skew.direction || 'balanced';
-  var skewLabel = skewDir.toUpperCase();
-  var skewScoreNum = skew.score || 0;
-  var skewScoreStr = (skewScoreNum > 0 ? '+' : '') + skewScoreNum;
+  const skew = stock._skew || computeSkewScore(stock);
+  const skewDir = skew.direction || 'balanced';
+  const skewLabel = skewDir.toUpperCase();
+  const skewScoreNum = skew.score || 0;
+  const skewScoreStr = (skewScoreNum > 0 ? '+' : '') + skewScoreNum;
 
   // Three-layer signal data
-  var tls = stock.three_layer_signal || {};
-  var macSig = tls.macro_signal || 0;
-  var secSig = tls.sector_signal || 0;
-  var macCls = macSig > 10 ? 'dir-up' : macSig < -10 ? 'dir-down' : 'dir-neutral';
-  var secCls = secSig > 10 ? 'dir-up' : secSig < -10 ? 'dir-down' : 'dir-neutral';
+  const tls = stock.three_layer_signal || {};
+  const macSig = tls.macro_signal || 0;
+  const secSig = tls.sector_signal || 0;
+  const macCls = macSig > 10 ? 'dir-up' : macSig < -10 ? 'dir-down' : 'dir-neutral';
+  const secCls = secSig > 10 ? 'dir-up' : secSig < -10 ? 'dir-down' : 'dir-neutral';
 
   // P/E and Revenue Growth from REFERENCE_DATA / heroMetrics
-  var ref = (typeof REFERENCE_DATA !== 'undefined') ? REFERENCE_DATA[ticker] : null;
-  var peValue = ' -- ';
-  var revGrowthValue = ' -- ';
+  const ref = (typeof REFERENCE_DATA !== 'undefined') ? REFERENCE_DATA[ticker] : null;
+  let peValue = ' -- ';
+  let revGrowthValue = ' -- ';
 
   // Try heroMetrics first (live-hydrated values)
   if (stock.heroMetrics) {
-    for (var mi = 0; mi < stock.heroMetrics.length; mi++) {
-      var mLabel = (stock.heroMetrics[mi].label || '').toLowerCase();
+    for (let mi = 0; mi < stock.heroMetrics.length; mi++) {
+      const mLabel = (stock.heroMetrics[mi].label || '').toLowerCase();
       if (mLabel === 'fwd p/e' || mLabel === 'p/e') {
         peValue = stock.heroMetrics[mi].value;
       }
@@ -949,7 +949,7 @@ export function populateSidebar(ticker) {
   // Fallback to REFERENCE_DATA
   if (ref) {
     if (peValue === ' -- ' && ref.epsForward) {
-      var currentP = parseFloat(stock._livePrice || stock.price || stock.current_price || 0);
+      const currentP = parseFloat(stock._livePrice || stock.price || stock.current_price || 0);
       if (currentP > 0) peValue = (currentP / ref.epsForward).toFixed(1) + 'x';
     }
     if (revGrowthValue === ' -- ' && ref.revenueGrowth != null) {
@@ -958,9 +958,9 @@ export function populateSidebar(ticker) {
   }
 
   // Price and change
-  var livePrice = parseFloat(stock._livePrice || stock.price || stock.current_price || 0);
-  var ph = stock.priceHistory;
-  var changePct = null;
+  const livePrice = parseFloat(stock._livePrice || stock.price || stock.current_price || 0);
+  const ph = stock.priceHistory;
+  let changePct = null;
   if (ph && ph.length >= 2) {
     changePct = ((ph[ph.length - 1] - ph[ph.length - 2]) / ph[ph.length - 2] * 100);
   } else if (stock.freshness && stock.freshness.pricePctChange != null) {
@@ -968,7 +968,7 @@ export function populateSidebar(ticker) {
   }
 
   // Build HTML
-  var html = '';
+  let html = '';
 
   // 1. Stock ID
   html += '<div class="hs-stock-id">' +
@@ -978,7 +978,7 @@ export function populateSidebar(ticker) {
     html += '<span class="hs-price">A$' + livePrice.toFixed(2) + '</span>';
   }
   if (changePct !== null) {
-    var chgCls = changePct >= 0 ? 'pos' : 'neg';
+    const chgCls = changePct >= 0 ? 'pos' : 'neg';
     html += '<span class="hs-change-badge ' + chgCls + '">' +
       (changePct >= 0 ? '+' : '') + changePct.toFixed(1) + '%</span>';
   }
@@ -1034,7 +1034,7 @@ export function populateSidebar(ticker) {
 
 export function initPortfolioPage() {
   setupUploadZone();
-  var savedPortfolio = loadPortfolio();
+  const savedPortfolio = loadPortfolio();
   if (savedPortfolio && savedPortfolio.length > 0) {
     renderPortfolioFromSaved(savedPortfolio);
   }
@@ -1043,17 +1043,17 @@ export function initPortfolioPage() {
   on('stock:updated', function() {
     COVERAGE_DATA = null; // invalidate stale cache
 
-    var page = document.getElementById('page-portfolio');
+    const page = document.getElementById('page-portfolio');
     if (!page || !page.classList.contains('active')) return;
 
-    var positions = loadPortfolio();
+    const positions = loadPortfolio();
     if (!positions || positions.length === 0) return;
 
     // Recalculate prices and P&L from fresh STOCK_DATA
-    var coverageData = getCoverageData();
-    for (var i = 0; i < positions.length; i++) {
-      var p = positions[i];
-      var covered = coverageData[p.ticker];
+    const coverageData = getCoverageData();
+    for (let i = 0; i < positions.length; i++) {
+      const p = positions[i];
+      const covered = coverageData[p.ticker];
       if (covered) {
         p.currentPrice = covered.price;
         p.marketValue = p.currentPrice ? p.units * p.currentPrice : null;
@@ -1063,11 +1063,11 @@ export function initPortfolioPage() {
         p.skew = covered.skew;
       }
     }
-    var grossExposure = calculateGrossExposure(positions);
+    const grossExposure = calculateGrossExposure(positions);
     positions.forEach(function(p) {
       p.exposureDollar = calculateExposureDollar(p);
       p.weight = calculateCurrentWeightPct(Math.abs(p.exposureDollar), grossExposure);
-      var dir = p.units >= 0 ? 'long' : 'short';
+      const dir = p.units >= 0 ? 'long' : 'short';
       p.alignment = classifyAlignment(dir, p.skew);
     });
 
@@ -1081,9 +1081,9 @@ export function initPortfolioPage() {
  * Called when ci:portfolio:analytics event fires.
  */
 export function updateSummaryHeader(analytics) {
-  var posEl = document.getElementById('summaryPositions');
-  var concEl = document.getElementById('summaryConcentration');
-  var flagsEl = document.getElementById('summaryFlags');
+  const posEl = document.getElementById('summaryPositions');
+  const concEl = document.getElementById('summaryConcentration');
+  const flagsEl = document.getElementById('summaryFlags');
 
   if (!analytics) {
     if (concEl) { concEl.textContent = '--'; concEl.className = 'portfolio-summary-value'; }
@@ -1095,10 +1095,10 @@ export function updateSummaryHeader(analytics) {
   // Backend position_count may differ (excludes unpriced holdings). Frontend count is kept.
 
   if (concEl) {
-    var score = analytics.concentration_score != null ? Math.round(analytics.concentration_score) : null;
+    const score = analytics.concentration_score != null ? Math.round(analytics.concentration_score) : null;
     if (score != null) {
       concEl.textContent = String(score);
-      var colorClass = score <= 30 ? 'conc-green' : score <= 60 ? 'conc-amber' : 'conc-red';
+      const colorClass = score <= 30 ? 'conc-green' : score <= 60 ? 'conc-amber' : 'conc-red';
       concEl.className = 'portfolio-summary-value ' + colorClass;
     } else {
       concEl.textContent = '--';
@@ -1107,13 +1107,13 @@ export function updateSummaryHeader(analytics) {
   }
 
   if (flagsEl) {
-    var flags = analytics.flags || [];
-    var warnings = flags.filter(function(f) { return f.severity === 'warning'; }).length;
-    var infos = flags.filter(function(f) { return f.severity === 'info'; }).length;
+    const flags = analytics.flags || [];
+    const warnings = flags.filter(function(f) { return f.severity === 'warning'; }).length;
+    const infos = flags.filter(function(f) { return f.severity === 'info'; }).length;
     if (flags.length === 0) {
       flagsEl.innerHTML = '<span class="conc-green">0</span>';
     } else {
-      var parts = [];
+      const parts = [];
       if (warnings > 0) parts.push('<span class="conc-amber">' + warnings + '</span>');
       if (infos > 0) parts.push('<span class="conc-muted">' + infos + '</span>');
       flagsEl.innerHTML = parts.join(' / ');
@@ -1126,7 +1126,7 @@ export function updateSummaryHeader(analytics) {
  * Shows max single-name, top 5, top 10, HHI, sector bars, and risk flags.
  */
 export function renderConcentrationDetail(analytics) {
-  var container = document.getElementById('portConcentrationDetail');
+  const container = document.getElementById('portConcentrationDetail');
   if (!container) return;
 
   if (!analytics) {
@@ -1135,28 +1135,28 @@ export function renderConcentrationDetail(analytics) {
   }
 
   container.style.display = '';
-  var conc = analytics.concentration || {};
+  const conc = analytics.concentration || {};
 
-  var maxEl = document.getElementById('concMaxSingle');
-  var top5El = document.getElementById('concTop5');
-  var top10El = document.getElementById('concTop10');
-  var hhiEl = document.getElementById('concHHI');
+  const maxEl = document.getElementById('concMaxSingle');
+  const top5El = document.getElementById('concTop5');
+  const top10El = document.getElementById('concTop10');
+  const hhiEl = document.getElementById('concHHI');
 
   if (maxEl) maxEl.textContent = _fmtWeight(conc.max_single_weight);
   if (top5El) top5El.textContent = _fmtWeight(conc.top5_weight);
   if (top10El) top10El.textContent = _fmtWeight(conc.top10_weight);
   if (hhiEl) hhiEl.textContent = conc.hhi != null ? conc.hhi.toFixed(3) : '--';
 
-  var sectorsEl = document.getElementById('portConcSectors');
+  const sectorsEl = document.getElementById('portConcSectors');
   if (sectorsEl && analytics.sector_exposure) {
-    var sectors = Object.entries(analytics.sector_exposure);
+    const sectors = Object.entries(analytics.sector_exposure);
     if (sectors.length > 0) {
       sectorsEl.innerHTML =
         '<div class="port-conc-section-label">SECTOR EXPOSURE</div>' +
         sectors.map(function(entry) {
-          var name = entry[0];
-          var weight = entry[1];
-          var barWidth = Math.min(weight * 100, 100);
+          const name = entry[0];
+          const weight = entry[1];
+          const barWidth = Math.min(weight * 100, 100);
           return '<div class="port-conc-sector-row">' +
             '<div class="port-conc-sector-name">' + _escText(name) + '</div>' +
             '<div class="port-conc-sector-bar-wrap">' +
@@ -1170,17 +1170,17 @@ export function renderConcentrationDetail(analytics) {
     }
   }
 
-  var flagsEl = document.getElementById('portConcFlags');
+  const flagsEl = document.getElementById('portConcFlags');
   if (flagsEl) {
-    var flags = analytics.flags || [];
+    const flags = analytics.flags || [];
     if (flags.length === 0) {
       flagsEl.innerHTML = '<div class="port-conc-no-flags">No risk flags triggered</div>';
     } else {
       flagsEl.innerHTML =
         '<div class="port-conc-section-label">RISK FLAGS</div>' +
         flags.map(function(f) {
-          var icon = f.severity === 'warning' ? '!' : 'i';
-          var cls = f.severity === 'warning' ? 'port-conc-flag-warn' : 'port-conc-flag-info';
+          const icon = f.severity === 'warning' ? '!' : 'i';
+          const cls = f.severity === 'warning' ? 'port-conc-flag-warn' : 'port-conc-flag-info';
           return '<div class="port-conc-flag ' + cls + '">' +
             '<span class="port-conc-flag-icon">' + icon + '</span>' +
             '<span class="port-conc-flag-msg">' + _escText(f.message) + '</span>' +
@@ -1196,7 +1196,7 @@ function _fmtWeight(w) {
 }
 
 function _escText(str) {
-  var d = document.createElement('div');
+  const d = document.createElement('div');
   d.textContent = str != null ? String(str) : '';
   return d.innerHTML;
 }

@@ -6,7 +6,7 @@
 
 import { API_BASE } from '../lib/api-config.js';
 
-var _DRIVER_LABELS = {
+const _DRIVER_LABELS = {
   brent_crude: 'Brent Crude',
   natural_gas: 'Natural Gas',
   gold: 'Gold',
@@ -14,13 +14,13 @@ var _DRIVER_LABELS = {
   iron_ore: 'Iron Ore',
 };
 
-var _macroStateCache = null;
-var _macroStateFetchedAt = 0;
-var _CACHE_TTL_MS = 5 * 60 * 1000;
+let _macroStateCache = null;
+let _macroStateFetchedAt = 0;
+const _CACHE_TTL_MS = 5 * 60 * 1000;
 
 
 function _fetchMacroState() {
-  var now = Date.now();
+  const now = Date.now();
   if (_macroStateCache && (now - _macroStateFetchedAt) < _CACHE_TTL_MS) {
     return Promise.resolve(_macroStateCache);
   }
@@ -40,7 +40,7 @@ function _fetchMacroState() {
 function _findCurrentPrice(macroState, driverKey, driverTicker) {
   // Try matching by Yahoo ticker symbol in macro_prices (FX/commodities)
   // Then try matching by series_id in macro_series (FRED/EIA/RBA)
-  var symbolMap = {
+  const symbolMap = {
     brent_crude: 'BRENT_SPOT',
     gold: 'GOLD',
     copper: 'COPPER',
@@ -48,7 +48,7 @@ function _findCurrentPrice(macroState, driverKey, driverTicker) {
     natural_gas: null,
   };
 
-  var seriesId = symbolMap[driverKey];
+  const seriesId = symbolMap[driverKey];
   if (seriesId && macroState[seriesId]) {
     return macroState[seriesId].current;
   }
@@ -59,7 +59,7 @@ function _findCurrentPrice(macroState, driverKey, driverTicker) {
   }
 
   // Fallback: iterate looking for a matching symbol or key
-  for (var key in macroState) {
+  for (const key in macroState) {
     if (key.toLowerCase().indexOf(driverKey.replace(/_/g, '')) >= 0) {
       return macroState[key].current;
     }
@@ -71,21 +71,21 @@ function _findCurrentPrice(macroState, driverKey, driverTicker) {
 function computeStaleness(generationMeta, macroState) {
   if (!generationMeta || !generationMeta.drivers) return null;
 
-  var drivers = generationMeta.drivers;
-  var worst = null;
+  const drivers = generationMeta.drivers;
+  let worst = null;
 
-  for (var key in drivers) {
-    var genDriver = drivers[key];
+  for (const key in drivers) {
+    const genDriver = drivers[key];
     if (!genDriver || genDriver.value == null) continue;
 
-    var currentPrice = _findCurrentPrice(macroState, key, genDriver.ticker);
+    const currentPrice = _findCurrentPrice(macroState, key, genDriver.ticker);
     if (currentPrice == null) continue;
 
-    var genValue = parseFloat(genDriver.value);
+    const genValue = parseFloat(genDriver.value);
     if (genValue === 0) continue;
 
-    var pctChange = ((currentPrice - genValue) / Math.abs(genValue)) * 100;
-    var absPct = Math.abs(pctChange);
+    const pctChange = ((currentPrice - genValue) / Math.abs(genValue)) * 100;
+    const absPct = Math.abs(pctChange);
 
     if (absPct >= 15 && (!worst || absPct > Math.abs(worst.pctChange))) {
       worst = {
@@ -106,10 +106,10 @@ function computeStaleness(generationMeta, macroState) {
 function renderBadge(staleness) {
   if (!staleness) return '';
 
-  var level = staleness.absPct >= 30 ? 'staleness-red' : 'staleness-amber';
-  var sign = staleness.pctChange >= 0 ? '+' : '';
-  var genDisplay = staleness.genValue.toFixed(2);
-  var curDisplay = staleness.currentValue.toFixed(2);
+  const level = staleness.absPct >= 30 ? 'staleness-red' : 'staleness-amber';
+  const sign = staleness.pctChange >= 0 ? '+' : '';
+  const genDisplay = staleness.genValue.toFixed(2);
+  const curDisplay = staleness.currentValue.toFixed(2);
 
   return '<span class="staleness-badge ' + level + '" title="This analysis may not reflect current market conditions">' +
     '<span class="staleness-icon">&#9888;</span> ' +
@@ -122,12 +122,12 @@ function renderBadge(staleness) {
 export function initStalenessBadge(ticker, data) {
   if (!data || !data._generation_meta) return;
 
-  var containerId = 'staleness-mount-' + ticker.toLowerCase();
-  var mount = document.getElementById(containerId);
+  const containerId = 'staleness-mount-' + ticker.toLowerCase();
+  const mount = document.getElementById(containerId);
   if (!mount) return;
 
   _fetchMacroState().then(function (macroState) {
-    var staleness = computeStaleness(data._generation_meta, macroState);
+    const staleness = computeStaleness(data._generation_meta, macroState);
     if (staleness) {
       mount.innerHTML = renderBadge(staleness);
     }

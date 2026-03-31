@@ -32,10 +32,10 @@ import {
 
 import { renderDeepContent, getDeepSectionNavItems } from './deep-report-sections.js';
 
-var SOURCES_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="6 9 12 15 18 9"/></svg>';
+const SOURCES_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="6 9 12 15 18 9"/></svg>';
 
 function sourcesSection(ticker) {
-  var t = ticker.toLowerCase();
+  const t = ticker.toLowerCase();
   return '<div class="report-section" id="' + t + '-sources">' +
     '<div class="rs-header"><div class="rs-header-text">' +
     '<div class="rs-number">Section 09</div>' +
@@ -51,7 +51,7 @@ function sourcesSection(ticker) {
 export function renderReport(data) {
   prepareHypotheses(data);
 
-  var floatingToggle =
+  const floatingToggle =
     '<button class="sections-float-toggle" onclick="window.toggleAllSections(this)" data-state="expanded" aria-label="Collapse all sections">' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="18 15 12 9 6 15"/></svg>' +
       '<span>Collapse All</span>' +
@@ -59,18 +59,18 @@ export function renderReport(data) {
 
   // Deep research: hybrid layout -- existing hero chrome, long-form body
   if (data._deepResearch && data.deepContent) {
-    var deepMainContent = renderDeepContent(data);
+    const deepMainContent = renderDeepContent(data);
 
     // Build custom section nav for deep content
-    var deepNavItems = getDeepSectionNavItems(data);
+    const deepNavItems = getDeepSectionNavItems(data);
     deepNavItems.push(['sources', 'Ext. Research']);
-    var t = data.ticker.toLowerCase();
-    var deepNavHtml = '';
-    for (var i = 0; i < deepNavItems.length; i++) {
-      var activeClass = i === 0 ? ' class="active"' : '';
+    const t = data.ticker.toLowerCase();
+    let deepNavHtml = '';
+    for (let i = 0; i < deepNavItems.length; i++) {
+      const activeClass = i === 0 ? ' class="active"' : '';
       deepNavHtml += '<a href="#' + t + '-' + deepNavItems[i][0] + '"' + activeClass + '>' + deepNavItems[i][1] + '</a>';
     }
-    var deepSectionNav = '<div class="section-nav"><div class="section-nav-inner">' + deepNavHtml + '</div></div>';
+    const deepSectionNav = '<div class="section-nav"><div class="section-nav-inner">' + deepNavHtml + '</div></div>';
 
     return renderReportHero(data) +
       renderSignalBars(data) +
@@ -87,7 +87,7 @@ export function renderReport(data) {
   }
 
   // Standard report: existing flow with sources section
-  var mainContent =
+  const mainContent =
     renderPriceDriversPlaceholder(data.ticker) +
     renderOvercorrectionBanner(data) +
     renderIdentity(data) +

@@ -25,10 +25,10 @@ function parseScore(score) {
  */
 function findDominantHypothesis(hypotheses) {
   if (!hypotheses || hypotheses.length === 0) return null;
-  var best = null;
-  var bestScore = -1;
-  for (var i = 0; i < hypotheses.length; i++) {
-    var s = parseScore(hypotheses[i].score);
+  let best = null;
+  let bestScore = -1;
+  for (let i = 0; i < hypotheses.length; i++) {
+    const s = parseScore(hypotheses[i].score);
     if (s > bestScore) {
       bestScore = s;
       best = hypotheses[i];
@@ -43,7 +43,7 @@ function findDominantHypothesis(hypotheses) {
  */
 function findHypothesis(hypotheses, tier) {
   if (!hypotheses) return null;
-  for (var i = 0; i < hypotheses.length; i++) {
+  for (let i = 0; i < hypotheses.length; i++) {
     if (hypotheses[i].tier === tier) return hypotheses[i];
   }
   return null;
@@ -63,7 +63,7 @@ function biasToSkewDirection(bias) {
  * Count evidence items for a hypothesis (supporting + contradicting arrays).
  */
 function countEvidence(hypothesis) {
-  var count = 0;
+  let count = 0;
   if (hypothesis.supporting) count += hypothesis.supporting.length;
   if (hypothesis.contradicting) count += hypothesis.contradicting.length;
   return count;
@@ -73,10 +73,10 @@ function countEvidence(hypothesis) {
  * Generate a date string for deterministic IDs (YYYYMMDD).
  */
 function dateStr(timestamp) {
-  var d = new Date(timestamp);
-  var y = d.getUTCFullYear();
-  var m = String(d.getUTCMonth() + 1).padStart(2, '0');
-  var day = String(d.getUTCDate()).padStart(2, '0');
+  const d = new Date(timestamp);
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
   return '' + y + m + day;
 }
 
@@ -108,37 +108,37 @@ function dateStr(timestamp) {
 export function generateAlerts(userThesis, stockData, lastReviewedEvidence) {
   if (!userThesis || !stockData || !stockData.hypotheses) return [];
 
-  var alerts = [];
-  var ticker = userThesis.ticker;
-  var now = new Date().toISOString();
-  var ds = dateStr(Date.now());
-  var hypotheses = stockData.hypotheses;
+  const alerts = [];
+  const ticker = userThesis.ticker;
+  const now = new Date().toISOString();
+  const ds = dateStr(Date.now());
+  const hypotheses = stockData.hypotheses;
 
   // Resolve skew: prefer computed _skew, fall back to raw skew
-  var skew = stockData._skew || stockData.skew || null;
-  var skewDirection = skew ? (skew.direction || 'balanced') : 'balanced';
+  const skew = stockData._skew || stockData.skew || null;
+  const skewDirection = skew ? (skew.direction || 'balanced') : 'balanced';
   // For computed _skew, magnitude is Math.abs(score)/100; for raw skew, no magnitude available
-  var skewMagnitude = (skew && typeof skew.score === 'number')
+  const skewMagnitude = (skew && typeof skew.score === 'number')
     ? Math.abs(skew.score) / 100
     : 0;
 
-  var dominant = findDominantHypothesis(hypotheses);
+  const dominant = findDominantHypothesis(hypotheses);
 
   // Only generate conflict alerts for explicit/high-confidence theses.
   // Inferred theses generate signals only.
-  var isExplicit = userThesis.source === 'explicit' || userThesis.confidence === 'high';
+  const isExplicit = userThesis.source === 'explicit' || userThesis.confidence === 'high';
 
   // -------------------------------------------------------------------
   // Rule 1: Hypothesis dominance mismatch
   // -------------------------------------------------------------------
   if (dominant && userThesis.dominantHypothesis) {
-    var userHyp = findHypothesis(hypotheses, userThesis.dominantHypothesis);
-    var userScore = userHyp ? parseScore(userHyp.score) : 0;
-    var gap = dominant.score - userScore;
+    const userHyp = findHypothesis(hypotheses, userThesis.dominantHypothesis);
+    const userScore = userHyp ? parseScore(userHyp.score) : 0;
+    const gap = dominant.score - userScore;
 
     if (dominant.tier !== userThesis.dominantHypothesis && gap > 15) {
-      var materiality = gap > 30 ? 'high' : 'medium';
-      var alertType = isExplicit ? 'conflict' : 'signal';
+      const materiality = gap > 30 ? 'high' : 'medium';
+      const alertType = isExplicit ? 'conflict' : 'signal';
 
       alerts.push({
         id: ticker + '-' + alertType + '-dominance-' + ds,
@@ -159,15 +159,15 @@ export function generateAlerts(userThesis, stockData, lastReviewedEvidence) {
   // Rule 2: Skew contradicts bias direction
   // -------------------------------------------------------------------
   if (skew && userThesis.biasDirection && userThesis.biasDirection !== 'neutral') {
-    var expectedDirection = biasToSkewDirection(userThesis.biasDirection);
-    var contradicts = (
+    const expectedDirection = biasToSkewDirection(userThesis.biasDirection);
+    const contradicts = (
       (expectedDirection === 'upside' && skewDirection === 'downside') ||
       (expectedDirection === 'downside' && skewDirection === 'upside')
     );
 
     if (contradicts && skewMagnitude > 0.10) {
-      var skewMateriality = skewMagnitude > 0.20 ? 'high' : 'medium';
-      var skewAlertType = isExplicit ? 'conflict' : 'signal';
+      const skewMateriality = skewMagnitude > 0.20 ? 'high' : 'medium';
+      const skewAlertType = isExplicit ? 'conflict' : 'signal';
 
       alerts.push({
         id: ticker + '-' + skewAlertType + '-skew-' + ds,
@@ -190,10 +190,10 @@ export function generateAlerts(userThesis, stockData, lastReviewedEvidence) {
   // in the research data, generate a signal.
   // -------------------------------------------------------------------
   if (userThesis.probabilitySplit && userThesis.probabilitySplit.length > 0) {
-    for (var i = 0; i < hypotheses.length && i < userThesis.probabilitySplit.length; i++) {
-      var userProb = userThesis.probabilitySplit[i];
+    for (let i = 0; i < hypotheses.length && i < userThesis.probabilitySplit.length; i++) {
+      const userProb = userThesis.probabilitySplit[i];
       if (userProb > 25) {
-        var researchScore = parseScore(hypotheses[i].score);
+        const researchScore = parseScore(hypotheses[i].score);
         if (researchScore < 30) {
           alerts.push({
             id: ticker + '-signal-lowscore-' + hypotheses[i].tier + '-' + ds,
@@ -217,10 +217,10 @@ export function generateAlerts(userThesis, stockData, lastReviewedEvidence) {
   // If a hypothesis has gained 2+ evidence items since the user last reviewed.
   // -------------------------------------------------------------------
   if (lastReviewedEvidence && typeof lastReviewedEvidence === 'object') {
-    for (var j = 0; j < hypotheses.length; j++) {
-      var tier = hypotheses[j].tier;
-      var currentCount = countEvidence(hypotheses[j]);
-      var previousCount = lastReviewedEvidence[tier];
+    for (let j = 0; j < hypotheses.length; j++) {
+      const tier = hypotheses[j].tier;
+      const currentCount = countEvidence(hypotheses[j]);
+      const previousCount = lastReviewedEvidence[tier];
       if (typeof previousCount === 'number' && (currentCount - previousCount) >= 2) {
         alerts.push({
           id: ticker + '-signal-newevidence-' + tier + '-' + ds,
@@ -244,7 +244,7 @@ export function generateAlerts(userThesis, stockData, lastReviewedEvidence) {
   // Logged as confirmation, not surfaced as notification.
   // -------------------------------------------------------------------
   if (dominant && userThesis.dominantHypothesis === dominant.tier) {
-    var biasMatchesSkew = (
+    const biasMatchesSkew = (
       userThesis.biasDirection === 'neutral' ||
       !userThesis.biasDirection ||
       biasToSkewDirection(userThesis.biasDirection) === skewDirection ||
@@ -274,10 +274,10 @@ export function generateAlerts(userThesis, stockData, lastReviewedEvidence) {
 // localStorage keys
 // ---------------------------------------------------------------------------
 
-var KEY_PREFIX = 'ci_thesis_alerts_';
-var KEY_LOG = 'ci_thesis_alerts_log';
-var KEY_LAST_CHECK = 'ci_thesis_alerts_lastCheck';
-var PRUNE_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const KEY_PREFIX = 'ci_thesis_alerts_';
+const KEY_LOG = 'ci_thesis_alerts_log';
+const KEY_LAST_CHECK = 'ci_thesis_alerts_lastCheck';
+const PRUNE_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 // ---------------------------------------------------------------------------
 // Safe localStorage wrappers
@@ -285,7 +285,7 @@ var PRUNE_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 function _lsGet(key) {
   try {
-    var raw = localStorage.getItem(key);
+    const raw = localStorage.getItem(key);
     return raw ? JSON.parse(raw) : null;
   } catch (_e) {
     return null;
@@ -309,10 +309,10 @@ function _lsSet(key, value) {
  * Returns a new array (immutable).
  */
 function _pruneOld(alerts) {
-  var cutoff = Date.now() - PRUNE_AGE_MS;
+  const cutoff = Date.now() - PRUNE_AGE_MS;
   return alerts.filter(function (a) {
     if (a.status !== 'dismissed') return true;
-    var ts = new Date(a.timestamp).getTime();
+    const ts = new Date(a.timestamp).getTime();
     return ts >= cutoff;
   });
 }
@@ -326,16 +326,16 @@ function _pruneOld(alerts) {
  * New alerts overwrite existing alerts with the same id.
  */
 export function saveAlerts(ticker, alerts) {
-  var key = KEY_PREFIX + ticker;
-  var existing = _lsGet(key) || [];
-  var map = {};
-  for (var i = 0; i < existing.length; i++) {
+  const key = KEY_PREFIX + ticker;
+  const existing = _lsGet(key) || [];
+  const map = {};
+  for (let i = 0; i < existing.length; i++) {
     map[existing[i].id] = existing[i];
   }
-  for (var j = 0; j < alerts.length; j++) {
+  for (let j = 0; j < alerts.length; j++) {
     map[alerts[j].id] = alerts[j];
   }
-  var merged = Object.keys(map).map(function (k) { return map[k]; });
+  const merged = Object.keys(map).map(function (k) { return map[k]; });
   _lsSet(key, _pruneOld(merged));
   _lsSet(KEY_LAST_CHECK, new Date().toISOString());
 }
@@ -344,9 +344,9 @@ export function saveAlerts(ticker, alerts) {
  * Get alerts for a ticker. Prunes dismissed alerts older than 30 days.
  */
 export function getAlerts(ticker) {
-  var key = KEY_PREFIX + ticker;
-  var alerts = _lsGet(key) || [];
-  var pruned = _pruneOld(alerts);
+  const key = KEY_PREFIX + ticker;
+  const alerts = _lsGet(key) || [];
+  const pruned = _pruneOld(alerts);
   // Write back if pruning removed anything
   if (pruned.length !== alerts.length) {
     _lsSet(key, pruned);
@@ -358,13 +358,13 @@ export function getAlerts(ticker) {
  * Get all alerts across all tickers. Scans localStorage for matching keys.
  */
 export function getAllAlerts() {
-  var all = [];
+  const all = [];
   try {
-    for (var i = 0; i < localStorage.length; i++) {
-      var key = localStorage.key(i);
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
       if (key && key.indexOf(KEY_PREFIX) === 0 && key !== KEY_LOG && key !== KEY_LAST_CHECK) {
-        var alerts = getAlerts(key.replace(KEY_PREFIX, ''));
-        for (var j = 0; j < alerts.length; j++) {
+        const alerts = getAlerts(key.replace(KEY_PREFIX, ''));
+        for (let j = 0; j < alerts.length; j++) {
           all.push(alerts[j]);
         }
       }
@@ -383,7 +383,7 @@ export function getAllAlerts() {
  * Append an entry to the audit log.
  */
 function _appendLog(entry) {
-  var log = _lsGet(KEY_LOG) || [];
+  const log = _lsGet(KEY_LOG) || [];
   log.push(entry);
   _lsSet(KEY_LOG, log);
 }
@@ -394,15 +394,15 @@ function _appendLog(entry) {
  */
 function _updateAlertStatus(alertId, newStatus) {
   try {
-    for (var i = 0; i < localStorage.length; i++) {
-      var key = localStorage.key(i);
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
       if (!key || key.indexOf(KEY_PREFIX) !== 0 || key === KEY_LOG || key === KEY_LAST_CHECK) continue;
 
-      var alerts = _lsGet(key);
+      const alerts = _lsGet(key);
       if (!alerts) continue;
 
       var found = false;
-      var updated = alerts.map(function (a) {
+      const updated = alerts.map(function (a) {
         if (a.id === alertId) {
           found = true;
           return Object.assign({}, a, { status: newStatus });
@@ -412,7 +412,7 @@ function _updateAlertStatus(alertId, newStatus) {
 
       if (found) {
         _lsSet(key, updated);
-        var match = updated.find(function (a) { return a.id === alertId; });
+        const match = updated.find(function (a) { return a.id === alertId; });
         return match || null;
       }
     }
@@ -426,7 +426,7 @@ function _updateAlertStatus(alertId, newStatus) {
  * Acknowledge an alert: set status to 'acknowledged' and log the action.
  */
 export function acknowledgeAlert(alertId) {
-  var alert = _updateAlertStatus(alertId, 'acknowledged');
+  const alert = _updateAlertStatus(alertId, 'acknowledged');
   if (alert) {
     _appendLog({
       alertId: alertId,
@@ -444,7 +444,7 @@ export function acknowledgeAlert(alertId) {
  * Dismiss an alert: set status to 'dismissed' and log the action.
  */
 export function dismissAlert(alertId) {
-  var alert = _updateAlertStatus(alertId, 'dismissed');
+  const alert = _updateAlertStatus(alertId, 'dismissed');
   if (alert) {
     _appendLog({
       alertId: alertId,
@@ -466,7 +466,7 @@ export function dismissAlert(alertId) {
  * Get the audit log, optionally filtered by ticker.
  */
 export function getAuditLog(ticker) {
-  var log = _lsGet(KEY_LOG) || [];
+  const log = _lsGet(KEY_LOG) || [];
   if (!ticker) return log;
   return log.filter(function (entry) { return entry.ticker === ticker; });
 }
@@ -480,9 +480,9 @@ export function getAuditLog(ticker) {
  * Confirmations are counted but not surfaced as notifications.
  */
 export function getAlertCounts() {
-  var all = getAllAlerts();
-  var counts = { conflicts: 0, signals: 0, confirmations: 0 };
-  for (var i = 0; i < all.length; i++) {
+  const all = getAllAlerts();
+  const counts = { conflicts: 0, signals: 0, confirmations: 0 };
+  for (let i = 0; i < all.length; i++) {
     if (all[i].status === 'dismissed') continue;
     if (all[i].type === 'conflict') counts.conflicts++;
     else if (all[i].type === 'signal') counts.signals++;
@@ -495,7 +495,7 @@ export function getAlertCounts() {
 // Pipeline integration
 // ---------------------------------------------------------------------------
 
-var PN_STORAGE_KEY = 'continuum_personalisation_profile';
+const PN_STORAGE_KEY = 'continuum_personalisation_profile';
 
 /**
  * Read the user's personalisation profile from localStorage.
@@ -503,9 +503,9 @@ var PN_STORAGE_KEY = 'continuum_personalisation_profile';
  */
 function _readProfile() {
   try {
-    var raw = localStorage.getItem(PN_STORAGE_KEY);
+    const raw = localStorage.getItem(PN_STORAGE_KEY);
     if (!raw) return null;
-    var parsed = JSON.parse(raw);
+    const parsed = JSON.parse(raw);
     return (parsed && parsed.state) ? parsed.state : null;
   } catch (_e) {
     return null;
@@ -519,14 +519,14 @@ function _readProfile() {
 function _inferThesisFromPortfolio(ticker, weight, stockData) {
   if (!stockData || !stockData.hypotheses || stockData.hypotheses.length === 0) return null;
 
-  var dominant = findDominantHypothesis(stockData.hypotheses);
+  const dominant = findDominantHypothesis(stockData.hypotheses);
   if (!dominant) return null;
 
   // Infer bias from portfolio weight
-  var biasDirection = 'neutral';
-  var confidence = 'low';
+  let biasDirection = 'neutral';
+  let confidence = 'low';
   if (typeof weight === 'number' || typeof weight === 'string') {
-    var w = parseFloat(weight) || 0;
+    const w = parseFloat(weight) || 0;
     if (w > 5) {
       biasDirection = 'bullish';
       confidence = w > 10 ? 'high' : 'low';
@@ -537,7 +537,7 @@ function _inferThesisFromPortfolio(ticker, weight, stockData) {
   }
 
   // Build probability split from research scores (user hasn't declared one)
-  var probabilitySplit = stockData.hypotheses.map(function (h) {
+  const probabilitySplit = stockData.hypotheses.map(function (h) {
     return parseScore(h.score);
   });
 
@@ -566,17 +566,17 @@ export function checkForAlerts(stockDataMap) {
   if (!stockDataMap) return 0;
 
   // Collect all tickers with a thesis: from stored ci_thesis_* keys + portfolio
-  var tickerTheses = {};
+  const tickerTheses = {};
 
   // 1. Scan stored theses (from comparator, chat, portfolio captures)
   try {
-    for (var si = 0; si < localStorage.length; si++) {
-      var sKey = localStorage.key(si);
+    for (let si = 0; si < localStorage.length; si++) {
+      const sKey = localStorage.key(si);
       if (sKey && sKey.indexOf('ci_thesis_') === 0 &&
           sKey.indexOf('ci_thesis_alerts') !== 0 &&
           sKey.indexOf('ci_thesis_signals') !== 0 &&
           sKey.indexOf('ci_thesis_evidence') !== 0) {
-        var storedThesis = _lsGet(sKey);
+        const storedThesis = _lsGet(sKey);
         if (storedThesis && storedThesis.ticker) {
           tickerTheses[storedThesis.ticker.toUpperCase()] = storedThesis;
         }
@@ -585,47 +585,47 @@ export function checkForAlerts(stockDataMap) {
   } catch (_e) { console.error('[ThesisMonitor] Failed to scan localStorage for theses:', _e); }
 
   // 2. For portfolio tickers without a stored thesis, infer from weight
-  var profile = _readProfile();
+  const profile = _readProfile();
   if (profile && profile.portfolio && Array.isArray(profile.portfolio)) {
-    for (var pi = 0; pi < profile.portfolio.length; pi++) {
-      var entry = profile.portfolio[pi];
-      var pTicker = (entry.ticker || '').toUpperCase();
+    for (let pi = 0; pi < profile.portfolio.length; pi++) {
+      const entry = profile.portfolio[pi];
+      const pTicker = (entry.ticker || '').toUpperCase();
       if (pTicker && !tickerTheses[pTicker] && stockDataMap[pTicker]) {
-        var inferred = _inferThesisFromPortfolio(pTicker, entry.weight, stockDataMap[pTicker]);
+        const inferred = _inferThesisFromPortfolio(pTicker, entry.weight, stockDataMap[pTicker]);
         if (inferred) tickerTheses[pTicker] = inferred;
       }
     }
   }
 
-  var tickers = Object.keys(tickerTheses);
+  const tickers = Object.keys(tickerTheses);
   if (tickers.length === 0) return 0;
 
-  var newAlertCount = 0;
+  let newAlertCount = 0;
 
-  for (var i = 0; i < tickers.length; i++) {
-    var ticker = tickers[i];
+  for (let i = 0; i < tickers.length; i++) {
+    const ticker = tickers[i];
     if (!stockDataMap[ticker]) continue;
 
-    var thesis = tickerTheses[ticker];
-    var lastReviewed = _lsGet('ci_thesis_evidence_' + ticker) || {};
+    const thesis = tickerTheses[ticker];
+    const lastReviewed = _lsGet('ci_thesis_evidence_' + ticker) || {};
 
-    var alerts = generateAlerts(thesis, stockDataMap[ticker], lastReviewed);
+    const alerts = generateAlerts(thesis, stockDataMap[ticker], lastReviewed);
     if (alerts.length === 0) continue;
 
     // Deduplicate: only count alerts with ids not already stored
-    var existingAlerts = getAlerts(ticker);
+    const existingAlerts = getAlerts(ticker);
     var existingIds = {};
-    for (var j = 0; j < existingAlerts.length; j++) {
+    for (let j = 0; j < existingAlerts.length; j++) {
       existingIds[existingAlerts[j].id] = true;
     }
 
-    var newAlerts = alerts.filter(function (a) {
+    const newAlerts = alerts.filter(function (a) {
       return !existingIds[a.id];
     });
 
     if (newAlerts.length > 0) {
       saveAlerts(ticker, alerts);
-      for (var k = 0; k < newAlerts.length; k++) {
+      for (let k = 0; k < newAlerts.length; k++) {
         if (newAlerts[k].type !== 'confirmation') {
           newAlertCount++;
         }
@@ -645,10 +645,10 @@ export function checkForAlerts(stockDataMap) {
  * Reads current alert counts and shows/hides badges accordingly.
  */
 export function updateAlertBadge() {
-  var counts = getAlertCounts();
+  const counts = getAlertCounts();
 
-  var conflictBadge = document.querySelector('.tm-badge-conflict');
-  var signalBadge = document.querySelector('.tm-badge-signal');
+  const conflictBadge = document.querySelector('.tm-badge-conflict');
+  const signalBadge = document.querySelector('.tm-badge-signal');
 
   if (conflictBadge) {
     conflictBadge.textContent = counts.conflicts + ' conflict' + (counts.conflicts !== 1 ? 's' : '');
@@ -666,7 +666,7 @@ export function updateAlertBadge() {
 // Alert panel rendering
 // ---------------------------------------------------------------------------
 
-var MAX_PANEL_ALERTS = 20;
+const MAX_PANEL_ALERTS = 20;
 
 /**
  * Escape HTML entities in user-facing text.
@@ -693,11 +693,11 @@ function _matWeight(m) {
  * Build HTML for a single alert card.
  */
 function _renderAlertCard(alert) {
-  var typeClass = alert.type === 'conflict' ? 'tm-card-conflict' : 'tm-card-signal';
-  var typeLabel = alert.type === 'conflict' ? 'Conflicts with your thesis' : 'New signal';
-  var typeBadgeClass = alert.type === 'conflict' ? 'tm-type-conflict' : 'tm-type-signal';
+  const typeClass = alert.type === 'conflict' ? 'tm-card-conflict' : 'tm-card-signal';
+  const typeLabel = alert.type === 'conflict' ? 'Conflicts with your thesis' : 'New signal';
+  const typeBadgeClass = alert.type === 'conflict' ? 'tm-type-conflict' : 'tm-type-signal';
 
-  var actions = '';
+  let actions = '';
   if (alert.type === 'conflict') {
     actions =
       '<button class="tm-action" data-action="review" data-ticker="' + _esc(alert.ticker) + '">Review evidence</button>' +
@@ -725,22 +725,22 @@ function _renderAlertCard(alert) {
  * Render the alert panel contents. Call after any alert state change.
  */
 export function renderAlertPanel() {
-  var body = document.querySelector('.tm-panel-body');
+  const body = document.querySelector('.tm-panel-body');
   if (!body) return;
 
-  var alerts = getAllAlerts().filter(function (a) {
+  const alerts = getAllAlerts().filter(function (a) {
     return a.status === 'new' || a.status === 'acknowledged';
   });
 
   // Sort: conflicts first, then signals; within each, high materiality first, then by timestamp desc
   alerts.sort(function (a, b) {
     // Type priority: conflict = 0, signal = 1
-    var ta = a.type === 'conflict' ? 0 : 1;
-    var tb = b.type === 'conflict' ? 0 : 1;
+    const ta = a.type === 'conflict' ? 0 : 1;
+    const tb = b.type === 'conflict' ? 0 : 1;
     if (ta !== tb) return ta - tb;
     // Materiality
-    var ma = _matWeight(a.materiality);
-    var mb = _matWeight(b.materiality);
+    const ma = _matWeight(a.materiality);
+    const mb = _matWeight(b.materiality);
     if (ma !== mb) return ma - mb;
     // Timestamp desc
     return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
@@ -751,8 +751,8 @@ export function renderAlertPanel() {
     return;
   }
 
-  var display = alerts.slice(0, MAX_PANEL_ALERTS);
-  var html = display.map(_renderAlertCard).join('');
+  const display = alerts.slice(0, MAX_PANEL_ALERTS);
+  let html = display.map(_renderAlertCard).join('');
 
   if (alerts.length > MAX_PANEL_ALERTS) {
     html += '<div class="tm-overflow">Showing ' + MAX_PANEL_ALERTS + ' of ' + alerts.length + ' alerts</div>';
@@ -763,25 +763,25 @@ export function renderAlertPanel() {
   body.innerHTML = html;
 }
 
-var MAX_LOG_ENTRIES = 50;
+const MAX_LOG_ENTRIES = 50;
 
 /**
  * Render the audit log view into the panel body.
  */
 export function renderAuditLog() {
-  var body = document.querySelector('.tm-panel-body');
+  const body = document.querySelector('.tm-panel-body');
   if (!body) return;
 
-  var log = getAuditLog();
+  const log = getAuditLog();
 
   // Sort by timestamp descending
   log.sort(function (a, b) {
     return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
   });
 
-  var display = log.slice(0, MAX_LOG_ENTRIES);
+  const display = log.slice(0, MAX_LOG_ENTRIES);
 
-  var html = '<div class="tm-panel-footer tm-panel-footer--top"><button class="tm-action tm-action-log" data-action="show-alerts">Back to alerts</button></div>';
+  let html = '<div class="tm-panel-footer tm-panel-footer--top"><button class="tm-action tm-action-log" data-action="show-alerts">Back to alerts</button></div>';
 
   if (display.length === 0) {
     html += '<p class="tm-empty">No decisions recorded yet.</p>';
@@ -789,13 +789,13 @@ export function renderAuditLog() {
     return;
   }
 
-  for (var i = 0; i < display.length; i++) {
-    var entry = display[i];
-    var date = new Date(entry.timestamp);
-    var dateStr = date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+  for (let i = 0; i < display.length; i++) {
+    const entry = display[i];
+    const date = new Date(entry.timestamp);
+    const dateStr = date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
 
-    var actionClass = 'tm-log-dismissed';
-    var actionLabel = 'Dismissed';
+    let actionClass = 'tm-log-dismissed';
+    let actionLabel = 'Dismissed';
     if (entry.action === 'acknowledged') {
       actionClass = 'tm-log-acknowledged';
       actionLabel = 'Acknowledged ' + (entry.type === 'conflict' ? 'conflict' : 'signal');
@@ -826,9 +826,9 @@ export function renderAuditLog() {
  * Toggle the alert panel visibility.
  */
 function _togglePanel() {
-  var panel = document.querySelector('.tm-panel');
+  const panel = document.querySelector('.tm-panel');
   if (!panel) return;
-  var isVisible = panel.style.display !== 'none';
+  const isVisible = panel.style.display !== 'none';
   if (isVisible) {
     panel.style.display = 'none';
   } else {
@@ -843,7 +843,7 @@ function _togglePanel() {
  */
 export function initAlertPanel() {
   // Badge group click toggles panel
-  var badgeGroup = document.querySelector('.tm-badge-group');
+  const badgeGroup = document.querySelector('.tm-badge-group');
   if (badgeGroup) {
     badgeGroup.style.cursor = 'pointer';
     badgeGroup.addEventListener('click', function (e) {
@@ -853,32 +853,32 @@ export function initAlertPanel() {
   }
 
   // Close button
-  var closeBtn = document.querySelector('.tm-panel-close');
+  const closeBtn = document.querySelector('.tm-panel-close');
   if (closeBtn) {
     closeBtn.addEventListener('click', function (e) {
       e.stopPropagation();
-      var panel = document.querySelector('.tm-panel');
+      const panel = document.querySelector('.tm-panel');
       if (panel) panel.style.display = 'none';
     });
   }
 
   // Action delegation on panel body
-  var panelBody = document.querySelector('.tm-panel-body');
+  const panelBody = document.querySelector('.tm-panel-body');
   if (panelBody) {
     panelBody.addEventListener('click', function (e) {
-      var btn = e.target.closest('.tm-action');
+      const btn = e.target.closest('.tm-action');
       if (!btn) return;
       e.stopPropagation();
 
-      var action = btn.getAttribute('data-action');
-      var alertId = btn.getAttribute('data-alert-id');
-      var ticker = btn.getAttribute('data-ticker');
+      const action = btn.getAttribute('data-action');
+      const alertId = btn.getAttribute('data-alert-id');
+      const ticker = btn.getAttribute('data-ticker');
 
       if (action === 'review' && ticker) {
         if (typeof window.navigate === 'function') {
           window.navigate('report-' + ticker);
         }
-        var panel = document.querySelector('.tm-panel');
+        const panel = document.querySelector('.tm-panel');
         if (panel) panel.style.display = 'none';
       } else if (action === 'acknowledge' && alertId) {
         acknowledgeAlert(alertId);
@@ -898,7 +898,7 @@ export function initAlertPanel() {
 
   // Close panel on outside click
   document.addEventListener('click', function (e) {
-    var panel = document.querySelector('.tm-panel');
+    const panel = document.querySelector('.tm-panel');
     if (!panel || panel.style.display === 'none') return;
     if (!panel.contains(e.target) && !e.target.closest('.tm-badge-group')) {
       panel.style.display = 'none';

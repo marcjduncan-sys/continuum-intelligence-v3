@@ -225,9 +225,9 @@ export function hideAuthModal() {
 // ============================================================
 
 function _bindSignInBtn() {
-    var btn = document.getElementById('ciSignInBtn');
+    const btn = document.getElementById('ciSignInBtn');
     if (!btn) return;
-    var user = getCurrentUser();
+    const user = getCurrentUser();
     if (user) {
         btn.textContent = user.email.split('@')[0];
         btn.classList.add('authenticated');
@@ -238,14 +238,14 @@ function _bindSignInBtn() {
 export function initAuth() {
     // Inject sign-in button styles immediately so the nav button is styled before
     // the auth modal is ever opened (modal styles are injected lazily in _getOrCreateModal).
-    var btnStyle = document.createElement('style');
+    const btnStyle = document.createElement('style');
     btnStyle.textContent = '.ci-signin-btn { background: none; border: 1px solid var(--border, #2e2e4a); border-radius: 6px; color: var(--text, #e0e0f0); font-size: 0.8rem; padding: 0.3rem 0.7rem; cursor: pointer; white-space: nowrap; } .ci-signin-btn:hover { background: var(--bg-card, #1a1a2e); } .ci-signin-btn.authenticated { color: var(--accent, #4f6ef7); }';
     document.head.appendChild(btnStyle);
 
     getGuestId(); // mint UUID on first visit
 
     window.addEventListener('ci:auth:login', function(e) {
-        var btn = document.getElementById('ciSignInBtn');
+        const btn = document.getElementById('ciSignInBtn');
         if (btn) {
             btn.textContent = e.detail.email.split('@')[0];
             btn.classList.add('authenticated');

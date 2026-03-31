@@ -13,13 +13,13 @@
 // localStorage helpers
 // ---------------------------------------------------------------------------
 
-var KEY_PREFIX = 'ci_thesis_';
-var SIGNAL_PREFIX = 'ci_thesis_signals_';
-var MAX_SIGNALS = 10;
+const KEY_PREFIX = 'ci_thesis_';
+const SIGNAL_PREFIX = 'ci_thesis_signals_';
+const MAX_SIGNALS = 10;
 
 function _lsGet(key) {
   try {
-    var raw = localStorage.getItem(key);
+    const raw = localStorage.getItem(key);
     return raw ? JSON.parse(raw) : null;
   } catch (_e) {
     return null;
@@ -67,8 +67,8 @@ function _rank(thesis) {
 export function saveThesis(thesis) {
   if (!thesis || !thesis.ticker) return false;
 
-  var key = KEY_PREFIX + thesis.ticker.toUpperCase();
-  var existing = _lsGet(key);
+  const key = KEY_PREFIX + thesis.ticker.toUpperCase();
+  const existing = _lsGet(key);
 
   if (existing && _rank(thesis) < _rank(existing)) {
     return false;
@@ -106,12 +106,12 @@ export function getThesis(ticker) {
  * @returns {Array} Array of thesis objects
  */
 export function getAllTheses() {
-  var theses = [];
+  const theses = [];
   try {
-    for (var i = 0; i < localStorage.length; i++) {
-      var key = localStorage.key(i);
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
       if (key && key.indexOf(KEY_PREFIX) === 0 && key.indexOf('ci_thesis_alerts') !== 0 && key.indexOf('ci_thesis_signals') !== 0 && key.indexOf('ci_thesis_evidence') !== 0) {
-        var thesis = _lsGet(key);
+        const thesis = _lsGet(key);
         if (thesis && thesis.ticker) {
           theses.push(thesis);
         }
@@ -127,20 +127,20 @@ export function getAllTheses() {
 // Bias inference from chat questions
 // ---------------------------------------------------------------------------
 
-var BULLISH_PATTERNS = [
+const BULLISH_PATTERNS = [
   /\bbuy\b/i, /\bbull case\b/i, /\bupside\b/i, /\blong\b/i,
   /\baccumulate\b/i, /\badd to position\b/i,
   /\bwhat'?s the bull\b/i, /\bwhy would I buy\b/i, /\bcase for buying\b/i
 ];
 
-var BEARISH_PATTERNS = [
+const BEARISH_PATTERNS = [
   /\bsell\b/i, /\bbear case\b/i, /\bdownside\b/i, /\bshort\b/i,
   /\breduce\b/i, /\bexit\b/i,
   /\bwhat'?s the bear\b/i, /\bwhy would I sell\b/i,
   /\bcase for selling\b/i, /\brisk of holding\b/i
 ];
 
-var NEUTRAL_PATTERNS = [
+const NEUTRAL_PATTERNS = [
   /\bfair value\b/i, /\bworth\b/i, /\bvaluation\b/i,
   /\bcompare\b/i, /\bversus\b/i
 ];
@@ -155,9 +155,9 @@ var NEUTRAL_PATTERNS = [
 export function inferBiasFromQuestion(question) {
   if (!question || typeof question !== 'string') return null;
 
-  var hasBullish = BULLISH_PATTERNS.some(function (p) { return p.test(question); });
-  var hasBearish = BEARISH_PATTERNS.some(function (p) { return p.test(question); });
-  var hasNeutral = NEUTRAL_PATTERNS.some(function (p) { return p.test(question); });
+  const hasBullish = BULLISH_PATTERNS.some(function (p) { return p.test(question); });
+  const hasBearish = BEARISH_PATTERNS.some(function (p) { return p.test(question); });
+  const hasNeutral = NEUTRAL_PATTERNS.some(function (p) { return p.test(question); });
 
   // Ambiguous: both bullish and bearish signals
   if (hasBullish && hasBearish) return null;
@@ -182,9 +182,9 @@ export function inferBiasFromQuestion(question) {
  */
 export function getDominantFromSplit(split) {
   if (!split || split.length === 0) return 'N1';
-  var maxIdx = 0;
-  var maxVal = split[0] || 0;
-  for (var i = 1; i < split.length; i++) {
+  let maxIdx = 0;
+  let maxVal = split[0] || 0;
+  for (let i = 1; i < split.length; i++) {
     if ((split[i] || 0) > maxVal) {
       maxVal = split[i] || 0;
       maxIdx = i;
@@ -206,13 +206,13 @@ export function getDominantFromSplit(split) {
 export function inferBiasFromSplit(split, stockData) {
   if (!stockData || !stockData.hypotheses || !split) return 'neutral';
 
-  var dominantTier = getDominantFromSplit(split);
-  var idx = parseInt(dominantTier.replace('N', ''), 10) - 1;
-  var hypothesis = stockData.hypotheses[idx];
+  const dominantTier = getDominantFromSplit(split);
+  const idx = parseInt(dominantTier.replace('N', ''), 10) - 1;
+  const hypothesis = stockData.hypotheses[idx];
 
   if (!hypothesis) return 'neutral';
 
-  var direction = hypothesis.direction || '';
+  const direction = hypothesis.direction || '';
   if (direction === 'upside') return 'bullish';
   if (direction === 'downside') return 'bearish';
   return 'neutral';
@@ -230,8 +230,8 @@ export function inferBiasFromSplit(split, stockData) {
  */
 export function recordSignal(ticker, bias) {
   if (!ticker || !bias) return;
-  var key = SIGNAL_PREFIX + ticker.toUpperCase();
-  var signals = _lsGet(key) || [];
+  const key = SIGNAL_PREFIX + ticker.toUpperCase();
+  let signals = _lsGet(key) || [];
   signals.push({ bias: bias, timestamp: new Date().toISOString() });
   if (signals.length > MAX_SIGNALS) {
     signals = signals.slice(signals.length - MAX_SIGNALS);
@@ -248,10 +248,10 @@ export function recordSignal(ticker, bias) {
  */
 export function getConsistentSignalCount(ticker, bias) {
   if (!ticker || !bias) return 0;
-  var key = SIGNAL_PREFIX + ticker.toUpperCase();
-  var signals = _lsGet(key) || [];
-  var count = 0;
-  for (var i = 0; i < signals.length; i++) {
+  const key = SIGNAL_PREFIX + ticker.toUpperCase();
+  const signals = _lsGet(key) || [];
+  let count = 0;
+  for (let i = 0; i < signals.length; i++) {
     if (signals[i].bias === bias) count++;
   }
   return count;

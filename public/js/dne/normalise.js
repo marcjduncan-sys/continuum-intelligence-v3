@@ -13,8 +13,8 @@
 (function (exports) {
   'use strict';
 
-  var FLOOR = 5;
-  var CEILING = 80;
+  const FLOOR = 5;
+  const CEILING = 80;
 
   /**
    * Normalise raw ACH survival scores to sum to 100%.
@@ -24,30 +24,30 @@
    * @returns {number[]}  – array of integers summing to 100.
    */
   function normaliseScores(items) {
-    var raw = [];
+    const raw = [];
     for (var i = 0; i < items.length; i++) {
-      var val = parseInt(items[i].score) || 0;
+      const val = parseInt(items[i].score) || 0;
       raw.push(val);
     }
     if (raw.length === 0) return raw;
 
     // Step 1: Clamp each score to floor/ceiling
-    var clamped = [];
+    const clamped = [];
     for (var i = 0; i < raw.length; i++) {
       clamped.push(Math.max(FLOOR, Math.min(CEILING, raw[i])));
     }
 
     // Step 2: Sum clamped values and proportionally scale to 100
-    var sum = 0;
+    let sum = 0;
     for (var i = 0; i < clamped.length; i++) sum += clamped[i];
     if (sum === 0) {
-      var eq = Math.round(100 / clamped.length);
-      var eqResult = [];
+      const eq = Math.round(100 / clamped.length);
+      const eqResult = [];
       for (var i = 0; i < clamped.length; i++) eqResult.push(eq);
       return eqResult;
     }
 
-    var result = [];
+    const result = [];
     for (var i = 0; i < clamped.length; i++) {
       result.push(Math.round((clamped[i] / sum) * 100));
     }
@@ -55,10 +55,10 @@
     // Step 3: Iterative post-normalisation clamp.
     // Re-normalisation can push values outside [FLOOR, CEILING].
     // Iteratively clamp and redistribute until stable.
-    for (var iter = 0; iter < 20; iter++) {
-      var overflow = 0;
-      var underflow = 0;
-      var freeIndices = [];
+    for (let iter = 0; iter < 20; iter++) {
+      let overflow = 0;
+      let underflow = 0;
+      const freeIndices = [];
       for (var i = 0; i < result.length; i++) {
         if (result[i] > CEILING) { overflow += result[i] - CEILING; result[i] = CEILING; }
         else if (result[i] < FLOOR) { underflow += FLOOR - result[i]; result[i] = FLOOR; }
@@ -66,7 +66,7 @@
       }
       if (overflow === 0 && underflow === 0) break;
 
-      var net = overflow - underflow;
+      const net = overflow - underflow;
       if (net === 0) break;
       if (freeIndices.length === 0) break;
 
@@ -76,7 +76,7 @@
         for (var fi = 0; fi < freeIndices.length && remaining > 0; fi++) {
           var idx = freeIndices[fi];
           var room = CEILING - result[idx];
-          var give = Math.min(remaining, room);
+          const give = Math.min(remaining, room);
           result[idx] += give;
           remaining -= give;
         }
@@ -86,7 +86,7 @@
         for (var fi = 0; fi < freeIndices.length && remaining > 0; fi++) {
           var idx = freeIndices[fi];
           var room = result[idx] - FLOOR;
-          var take = Math.min(remaining, room);
+          const take = Math.min(remaining, room);
           result[idx] -= take;
           remaining -= take;
         }
@@ -94,13 +94,13 @@
     }
 
     // Step 4: Fix rounding residual
-    var roundedSum = 0;
+    let roundedSum = 0;
     for (var i = 0; i < result.length; i++) roundedSum += result[i];
     if (roundedSum !== 100) {
-      var diff = 100 - roundedSum;
-      var bestIdx = -1;
+      const diff = 100 - roundedSum;
+      let bestIdx = -1;
       for (var i = 0; i < result.length; i++) {
-        var candidate = result[i] + diff;
+        const candidate = result[i] + diff;
         if (candidate >= FLOOR && candidate <= CEILING) {
           if (bestIdx === -1 || result[i] > result[bestIdx]) bestIdx = i;
         }
@@ -131,13 +131,13 @@
     if (!data || !data.hypotheses || data.hypotheses.length === 0) {
       return { bull: 50, bear: 50, score: 0, direction: 'balanced', hypotheses: [] };
     }
-    var hyps = data.hypotheses;
-    var norm = normaliseScores(hyps);
-    var bull = 0, bear = 0;
-    var breakdown = [];
-    for (var i = 0; i < hyps.length; i++) {
-      var w = norm[i] || 0;
-      var dir = hyps[i].direction || 'downside';
+    const hyps = data.hypotheses;
+    const norm = normaliseScores(hyps);
+    let bull = 0, bear = 0;
+    const breakdown = [];
+    for (let i = 0; i < hyps.length; i++) {
+      const w = norm[i] || 0;
+      const dir = hyps[i].direction || 'downside';
       if (dir === 'upside') {
         bull += w;
       } else if (dir === 'downside') {
@@ -148,8 +148,8 @@
     }
     bull = Math.round(bull);
     bear = Math.round(bear);
-    var score = bull - bear;
-    var direction = score > 5 ? 'upside' : score < -5 ? 'downside' : 'balanced';
+    const score = bull - bear;
+    const direction = score > 5 ? 'upside' : score < -5 ? 'downside' : 'balanced';
     return { bull: bull, bear: bear, score: score, direction: direction, hypotheses: breakdown };
   }
 

@@ -10,7 +10,7 @@
 
 /* global recalculateSurvival */
 
-var MAX_OVERRIDE_HOURS = 48;
+const MAX_OVERRIDE_HOURS = 48;
 
 /**
  * Set an editorial override that locks the current dominant narrative.
@@ -20,9 +20,9 @@ var MAX_OVERRIDE_HOURS = 48;
  * @param {number} durationHours  Lock duration (capped at 48 hours)
  */
 function setEditorialOverride(stock, reason, durationHours) {
-  var actualDuration = Math.min(durationHours || MAX_OVERRIDE_HOURS, MAX_OVERRIDE_HOURS);
+  const actualDuration = Math.min(durationHours || MAX_OVERRIDE_HOURS, MAX_OVERRIDE_HOURS);
 
-  var until = new Date();
+  const until = new Date();
   until.setHours(until.getHours() + actualDuration);
 
   stock.editorial_override = {

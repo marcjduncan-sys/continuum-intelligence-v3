@@ -6,10 +6,10 @@ import { computeSkewScore } from '../lib/dom.js';
 import { on } from '../lib/data-events.js';
 import { formatDateAEST, truncateAtWord } from '../lib/format.js';
 
-var coverageSortDir = 0; // 0 = unsorted (default), 1 = desc (bearish first), -1 = asc (bullish first)
+let coverageSortDir = 0; // 0 = unsorted (default), 1 = desc (bearish first), -1 = asc (bullish first)
 
 // Archetypes where null P/E and Div Yield are structurally expected (not a data failure)
-var NULLABLE_PE_ARCHETYPES = { explorer: true, developer: true };
+const NULLABLE_PE_ARCHETYPES = { explorer: true, developer: true };
 
 function _getArchetype(ticker) {
   if (!REFERENCE_DATA || !REFERENCE_DATA[ticker]) return null;
@@ -17,18 +17,18 @@ function _getArchetype(ticker) {
 }
 
 function isDataPending(data) {
-  var metrics = data.featuredMetrics || [];
+  const metrics = data.featuredMetrics || [];
   if (metrics.length === 0) return true;
 
-  var archetype = _getArchetype(data.ticker);
+  const archetype = _getArchetype(data.ticker);
 
   // For explorer/developer archetypes, only check Mkt Cap and Drawdown (the structurally available metrics)
   if (archetype && NULLABLE_PE_ARCHETYPES[archetype]) {
-    var hasMktCap = false;
-    var hasDrawdown = false;
-    for (var i = 0; i < metrics.length; i++) {
-      var v = metrics[i].value;
-      var filled = v && v !== 'N/A' && v !== '--';
+    let hasMktCap = false;
+    let hasDrawdown = false;
+    for (let i = 0; i < metrics.length; i++) {
+      const v = metrics[i].value;
+      const filled = v && v !== 'N/A' && v !== '--';
       if (metrics[i].label === 'Mkt Cap' && filled) hasMktCap = true;
       if (metrics[i].label === 'Drawdown' && filled) hasDrawdown = true;
     }
@@ -36,7 +36,7 @@ function isDataPending(data) {
   }
 
   // Default: pending if all but one metric are N/A
-  var naCount = metrics.filter(function(m) {
+  const naCount = metrics.filter(function(m) {
     return !m.value || m.value === 'N/A' || m.value === '--';
   }).length;
   return naCount >= metrics.length - 1;
@@ -55,21 +55,21 @@ export function renderFeaturedCard(data) {
       '<div class="fc-pending-msg">Analysis pending</div>' +
     '</div>';
   }
-  var skew = data._skew || computeSkewScore(data);
-  var dir = skew.direction;
-  var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
-  var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
+  const skew = data._skew || computeSkewScore(data);
+  const dir = skew.direction;
+  const scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
+  const scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
 
-  var metricsHtml = '';
-  var _metrics = data.featuredMetrics || [];
-  for (var i = 0; i < _metrics.length; i++) {
-    var m = _metrics[i];
-    var colorStyle = m.color ? ' style="color:' + m.color + '"' : '';
+  let metricsHtml = '';
+  const _metrics = data.featuredMetrics || [];
+  for (let i = 0; i < _metrics.length; i++) {
+    const m = _metrics[i];
+    const colorStyle = m.color ? ' style="color:' + m.color + '"' : '';
     metricsHtml += '<div><div class="fc-metric-label">' + m.label + '</div><div class="fc-metric-value"' + colorStyle + '>' + m.value + '</div></div>';
   }
 
-  var priceColor = data.featuredPriceColor || '';
-  var priceStyle = priceColor ? ' style="color: ' + priceColor + '"' : '';
+  const priceColor = data.featuredPriceColor || '';
+  const priceStyle = priceColor ? ' style="color: ' + priceColor + '"' : '';
 
   return '<div class="featured-card skew-' + dir + '" data-ticker-card="' + data.ticker + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
     '<div class="fc-top">' +
@@ -97,48 +97,48 @@ export function renderFeaturedCard(data) {
 
 export function renderFreshnessBadge(ticker) {
   if (typeof FRESHNESS_DATA === 'undefined' || !FRESHNESS_DATA[ticker]) return '';
-  var f = FRESHNESS_DATA[ticker];
-  var cls = 'fb-' + f.badge;
-  var label = f.daysSinceReview === 9999 ? 'Unknown' : f.daysSinceReview + 'd ago';
+  const f = FRESHNESS_DATA[ticker];
+  const cls = 'fb-' + f.badge;
+  let label = f.daysSinceReview === 9999 ? 'Unknown' : f.daysSinceReview + 'd ago';
   if (f.badge === 'ok') label = 'Current';
   return ' <span class="freshness-badge ' + cls + '">' + label + '</span>';
 }
 
 export function renderCatalystTag(ticker) {
   if (typeof FRESHNESS_DATA === 'undefined' || !FRESHNESS_DATA[ticker]) return '';
-  var f = FRESHNESS_DATA[ticker];
+  const f = FRESHNESS_DATA[ticker];
   if (!f.nearestCatalyst) return '';
-  var cls = f.nearestCatalystDays !== null && f.nearestCatalystDays <= 7 ? ' ct-imminent' : '';
-  var daysLabel = f.nearestCatalystDays !== null
+  const cls = f.nearestCatalystDays !== null && f.nearestCatalystDays <= 7 ? ' ct-imminent' : '';
+  const daysLabel = f.nearestCatalystDays !== null
     ? (f.nearestCatalystDays <= 0 ? 'NOW' : f.nearestCatalystDays + 'd')
     : '';
   return ' <span class="catalyst-tag' + cls + '">' + f.nearestCatalyst + (daysLabel ? ' &bull; ' + daysLabel : '') + '</span>';
 }
 
 export function renderCoverageRow(data) {
-  var skew = data._skew || computeSkewScore(data);
-  var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
-  var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
+  const skew = data._skew || computeSkewScore(data);
+  const scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
+  const scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
 
   // Tooltip hypothesis breakdown
-  var tooltipRows = '';
-  for (var i = 0; i < skew.hypotheses.length; i++) {
-    var h = skew.hypotheses[i];
-    var dotCls = h.direction === 'upside' ? 'up' : h.direction === 'downside' ? 'down' : 'neutral';
+  let tooltipRows = '';
+  for (let i = 0; i < skew.hypotheses.length; i++) {
+    const h = skew.hypotheses[i];
+    const dotCls = h.direction === 'upside' ? 'up' : h.direction === 'downside' ? 'down' : 'neutral';
     tooltipRows += '<div class="skew-tooltip-row">' +
       '<span class="skew-tooltip-dot ' + dotCls + '"></span>' +
       '<span>' + h.title + '</span>' +
       '<span class="skew-tooltip-weight">' + h.weight + '%</span>' +
     '</div>';
   }
-  var _rationale = (data.skew && data.skew.rationale) ? data.skew.rationale : '';
-  var tooltipHtml = '<div class="skew-tooltip">' +
+  const _rationale = (data.skew && data.skew.rationale) ? data.skew.rationale : '';
+  const tooltipHtml = '<div class="skew-tooltip">' +
     '<div class="skew-tooltip-title">Hypothesis Weights</div>' +
     tooltipRows +
     (_rationale ? '<div class="skew-tooltip-rationale">' + _rationale.substring(0, 160) + (_rationale.length > 160 ? '&hellip;' : '') + '</div>' : '') +
   '</div>';
 
-  var shortDate = formatDateAEST(data.date);
+  const shortDate = formatDateAEST(data.date);
 
   return '<tr data-skew-score="' + skew.score + '" onclick="navigate(\'report-' + data.ticker + '\')" tabindex="0" role="link" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navigate(\'report-' + data.ticker + '\')}">' +
     '<td class="td-ticker">' + data.ticker + '</td>' +
@@ -161,12 +161,12 @@ export function renderCoverageRow(data) {
 }
 
 export function renderComingSoonRow(stub) {
-  var dir = stub.skew || 'balanced';
-  var bull = dir === 'upside' ? 65 : dir === 'downside' ? 35 : 50;
-  var bear = 100 - bull;
-  var score = bull - bear;
-  var scoreCls = score > 5 ? 'positive' : score < -5 ? 'negative' : 'neutral';
-  var scoreLabel = (score > 0 ? '+' : '') + score;
+  const dir = stub.skew || 'balanced';
+  const bull = dir === 'upside' ? 65 : dir === 'downside' ? 35 : 50;
+  const bear = 100 - bull;
+  const score = bull - bear;
+  const scoreCls = score > 5 ? 'positive' : score < -5 ? 'negative' : 'neutral';
+  const scoreLabel = (score > 0 ? '+' : '') + score;
 
   return '<tr class="stub" data-skew-score="' + score + '">' +
     '<td class="td-ticker">' + stub.ticker + '</td>' +
@@ -188,10 +188,10 @@ export function renderComingSoonRow(stub) {
 }
 
 export function sortCoverageTable() {
-  var tbody = document.getElementById('coverage-body');
+  const tbody = document.getElementById('coverage-body');
   if (!tbody) return;
-  var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
-  var arrow = document.getElementById('skew-sort-arrow');
+  const rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+  const arrow = document.getElementById('skew-sort-arrow');
 
   // Cycle: unsorted -> desc (bearish first) -> asc (bullish first) -> unsorted
   coverageSortDir = coverageSortDir === 0 ? 1 : coverageSortDir === 1 ? -1 : 0;
@@ -215,8 +215,8 @@ export function sortCoverageTable() {
 
   // Sort by data-skew-score attribute
   rows.sort(function(a, b) {
-    var sa = parseInt(a.getAttribute('data-skew-score')) || 0;
-    var sb = parseInt(b.getAttribute('data-skew-score')) || 0;
+    const sa = parseInt(a.getAttribute('data-skew-score')) || 0;
+    const sb = parseInt(b.getAttribute('data-skew-score')) || 0;
     return coverageSortDir === 1 ? sa - sb : sb - sa; // desc: bearish first (lowest score), asc: bullish first (highest score)
   });
 
@@ -226,17 +226,17 @@ export function sortCoverageTable() {
   }
 
   // Re-append in sorted order
-  for (var i = 0; i < rows.length; i++) {
+  for (let i = 0; i < rows.length; i++) {
     tbody.appendChild(rows[i]);
   }
 }
 
 export function buildCoverageData() {
-  var coverageData = {};
-  var tickers = Object.keys(STOCK_DATA);
-  for (var i = 0; i < tickers.length; i++) {
-    var t = tickers[i];
-    var d = STOCK_DATA[t];
+  const coverageData = {};
+  const tickers = Object.keys(STOCK_DATA);
+  for (let i = 0; i < tickers.length; i++) {
+    const t = tickers[i];
+    const d = STOCK_DATA[t];
     coverageData[t] = {
       company: d.company,
       price: d._livePrice || d.price,
@@ -248,16 +248,16 @@ export function buildCoverageData() {
 }
 
 export function initHomeSearch() {
-  var input = document.getElementById('home-stock-search');
-  var results = document.getElementById('home-search-results');
+  const input = document.getElementById('home-stock-search');
+  const results = document.getElementById('home-search-results');
   if (!input || !results) return;
 
   input.addEventListener('input', function() {
-    var q = this.value.trim().toLowerCase();
+    const q = this.value.trim().toLowerCase();
     if (!q) { results.style.display = 'none'; results.innerHTML = ''; return; }
-    var matches = [];
-    for (var ticker in STOCK_DATA) {
-      var s = STOCK_DATA[ticker];
+    const matches = [];
+    for (const ticker in STOCK_DATA) {
+      const s = STOCK_DATA[ticker];
       if (ticker.toLowerCase().includes(q) ||
           (s.company && s.company.toLowerCase().includes(q)) ||
           (s.tickerFull && s.tickerFull.toLowerCase().includes(q))) {
@@ -269,7 +269,7 @@ export function initHomeSearch() {
       results.style.display = 'block';
       return;
     }
-    var html = '';
+    let html = '';
     matches.slice(0, 8).forEach(function(s) {
       html += '<div class="home-search-result" onclick="navigate(\'report-' + s.ticker + '\');document.getElementById(\'home-stock-search\').value=\'\';document.getElementById(\'home-search-results\').style.display=\'none\'">' +
           '<span class="home-search-result-ticker">' + (s.tickerFull || s.ticker) + '</span>' +
@@ -293,7 +293,7 @@ export function initHomeSearch() {
 
 export function initHomePage() {
   // Populate featured cards
-  var featuredGrid = document.getElementById('featured-grid');
+  const featuredGrid = document.getElementById('featured-grid');
   if (featuredGrid) {
     featuredGrid.innerHTML = '';
     FEATURED_ORDER.forEach(function(ticker) {
@@ -305,7 +305,7 @@ export function initHomePage() {
   }
 
   // Populate coverage table
-  var coverageBody = document.getElementById('coverage-body');
+  const coverageBody = document.getElementById('coverage-body');
   if (coverageBody) {
     coverageBody.innerHTML = '';
     FEATURED_ORDER.forEach(function(ticker) {
@@ -320,11 +320,11 @@ export function initHomePage() {
   }
 
   // Populate footer research links
-  var footerLinks = document.getElementById('footer-research-links');
+  const footerLinks = document.getElementById('footer-research-links');
   if (footerLinks) {
     footerLinks.innerHTML = '';
     FEATURED_ORDER.forEach(function(ticker) {
-      var d = STOCK_DATA[ticker];
+      const d = STOCK_DATA[ticker];
       if (d) {
         footerLinks.innerHTML += '<a href="#report-' + ticker + '" onclick="navigate(\'report-' + ticker + '\')">' + d.company + ' (' + (d.tickerFull || ticker) + ')</a>';
       }
@@ -342,20 +342,20 @@ export function initHomePage() {
 }
 
 function _updateCoverageRow(ticker) {
-  var homePage = document.getElementById('page-home');
+  const homePage = document.getElementById('page-home');
   if (!homePage || !homePage.classList.contains('active')) return;
 
-  var tbody = document.getElementById('coverage-body');
+  const tbody = document.getElementById('coverage-body');
   if (!tbody) return;
 
-  var stock = STOCK_DATA[ticker];
+  const stock = STOCK_DATA[ticker];
   if (!stock) return;
 
-  var rows = tbody.querySelectorAll('tr');
-  for (var i = 0; i < rows.length; i++) {
-    var tickerCell = rows[i].querySelector('.td-ticker');
+  const rows = tbody.querySelectorAll('tr');
+  for (let i = 0; i < rows.length; i++) {
+    const tickerCell = rows[i].querySelector('.td-ticker');
     if (tickerCell && tickerCell.textContent.trim() === ticker) {
-      var temp = document.createElement('tbody');
+      const temp = document.createElement('tbody');
       temp.innerHTML = renderCoverageRow(stock);
       if (temp.firstElementChild) {
         tbody.replaceChild(temp.firstElementChild, rows[i]);
@@ -366,16 +366,16 @@ function _updateCoverageRow(ticker) {
 }
 
 function _updateFeaturedCard(ticker) {
-  var homePage = document.getElementById('page-home');
+  const homePage = document.getElementById('page-home');
   if (!homePage || !homePage.classList.contains('active')) return;
 
-  var stock = STOCK_DATA[ticker];
+  const stock = STOCK_DATA[ticker];
   if (!stock) return;
 
-  var card = document.querySelector('[data-ticker-card="' + ticker + '"]');
+  const card = document.querySelector('[data-ticker-card="' + ticker + '"]');
   if (!card) return;
 
-  var temp = document.createElement('div');
+  const temp = document.createElement('div');
   temp.innerHTML = renderFeaturedCard(stock);
   if (temp.firstElementChild) {
     card.parentNode.replaceChild(temp.firstElementChild, card);

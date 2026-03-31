@@ -23,8 +23,8 @@
 (function () {
   'use strict';
 
-  var DATA_BASE_URL = 'data/stocks/';
-  var CONFIG_URL = 'data/config/price_rules.json';
+  const DATA_BASE_URL = 'data/stocks/';
+  const CONFIG_URL = 'data/config/price_rules.json';
 
   /**
    * Load a JSON file via fetch.
@@ -34,7 +34,7 @@
    */
   async function loadJSON(url) {
     try {
-      var response = await fetch(url);
+      const response = await fetch(url);
       if (!response.ok) throw new Error('HTTP ' + response.status);
       return await response.json();
     } catch (err) {
@@ -60,26 +60,26 @@
    * Main initialisation – called on DOMContentLoaded.
    */
   async function init() {
-    var ticker = window.DNE_TICKER;
+    const ticker = window.DNE_TICKER;
     if (!ticker) {
       console.warn('[DNE] No DNE_TICKER set – skipping initialisation');
       return;
     }
 
     // Derive the JSON filename from ticker (strip .AX suffix)
-    var baseTicker = ticker.replace('.AX', '');
-    var stockUrl = DATA_BASE_URL + baseTicker + '.json';
+    const baseTicker = ticker.replace('.AX', '');
+    const stockUrl = DATA_BASE_URL + baseTicker + '.json';
 
     console.log('[DNE] Initialising for ' + ticker);
 
     // Load stock data and config in parallel
-    var results = await Promise.all([
+    const results = await Promise.all([
       loadJSON(stockUrl),
       loadJSON(CONFIG_URL)
     ]);
 
-    var stock = results[0];
-    var config = results[1];
+    const stock = results[0];
+    const config = results[1];
 
     if (!stock) {
       console.error('[DNE] Could not load stock data for ' + ticker);
@@ -91,7 +91,7 @@
       return;
     }
 
-    var rules = config.price_evidence_rules;
+    const rules = config.price_evidence_rules;
 
     // Store globally for console debugging
     window.DNE_STOCK = stock;
@@ -103,7 +103,7 @@
     // Compute narrative weighting with seed price history if available
     if (stock.price_history && stock.price_history.length > 3 &&
         typeof computeNarrativeWeighting === 'function') {
-      var prevTop = stock.weighting ? stock.weighting.top_narrative.top_narrative : null;
+      const prevTop = stock.weighting ? stock.weighting.top_narrative.top_narrative : null;
       computeNarrativeWeighting(stock, stock.price_history, prevTop);
     }
 

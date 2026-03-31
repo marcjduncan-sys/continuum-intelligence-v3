@@ -14,7 +14,7 @@
 
 import { escapeHtml } from '../lib/dom.js';
 
-var DR_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+const DR_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
 
 function drHeader(num, title) {
   return '<div class="rs-header"><div class="rs-header-text">' +
@@ -25,11 +25,11 @@ function drHeader(num, title) {
 
 function renderStanceBanner(dc) {
   if (!dc.stance) return '';
-  var stanceCls = 'dr-stance-' + dc.stance.toLowerCase();
-  var catalystHtml = dc.stanceCatalyst
+  const stanceCls = 'dr-stance-' + dc.stance.toLowerCase();
+  const catalystHtml = dc.stanceCatalyst
     ? '<span class="dr-stance-catalyst">' + escapeHtml(dc.stanceCatalyst) + '</span>'
     : '';
-  var dateHtml = dc.stanceDate
+  const dateHtml = dc.stanceDate
     ? '<span class="dr-stance-date">' + escapeHtml(dc.stanceDate) + '</span>'
     : '';
   return '<div class="dr-stance-banner ' + stanceCls + '">' +
@@ -40,7 +40,7 @@ function renderStanceBanner(dc) {
 
 function renderExecutiveSummary(es) {
   if (!es) return '';
-  var html = '<div class="dr-exec-summary">';
+  let html = '<div class="dr-exec-summary">';
 
   if (es.lede) {
     html += '<p class="dr-exec-lede">' + escapeHtml(es.lede) + '</p>';
@@ -67,15 +67,15 @@ function renderExecutiveSummary(es) {
 
 function renderTable(block) {
   if (!block.headers || !block.rows) return '';
-  var html = '<div class="dr-table-wrap"><table class="dr-table">';
+  let html = '<div class="dr-table-wrap"><table class="dr-table">';
   html += '<thead><tr>';
-  for (var h = 0; h < block.headers.length; h++) {
+  for (let h = 0; h < block.headers.length; h++) {
     html += '<th>' + escapeHtml(block.headers[h]) + '</th>';
   }
   html += '</tr></thead><tbody>';
-  for (var r = 0; r < block.rows.length; r++) {
+  for (let r = 0; r < block.rows.length; r++) {
     html += '<tr>';
-    for (var c = 0; c < block.rows[r].length; c++) {
+    for (let c = 0; c < block.rows[r].length; c++) {
       html += '<td>' + escapeHtml(String(block.rows[r][c] || '')) + '</td>';
     }
     html += '</tr>';
@@ -104,14 +104,14 @@ function renderContentBlock(block) {
 }
 
 function renderDeepSection(section, ticker) {
-  var t = ticker.toLowerCase();
-  var sectionId = t + '-dr-section-' + section.number;
-  var html = '<div class="report-section dr-section" id="' + sectionId + '">';
+  const t = ticker.toLowerCase();
+  const sectionId = t + '-dr-section-' + section.number;
+  let html = '<div class="report-section dr-section" id="' + sectionId + '">';
   html += drHeader('Section ' + String(section.number).padStart(2, '0'), section.title);
   html += '<div class="rs-body dr-section-body">';
 
   if (section.content && Array.isArray(section.content)) {
-    for (var i = 0; i < section.content.length; i++) {
+    for (let i = 0; i < section.content.length; i++) {
       html += renderContentBlock(section.content[i]);
     }
   }
@@ -126,14 +126,14 @@ function renderDeepSection(section, ticker) {
  * used by renderSectionNav in report-sections.js.
  */
 export function getDeepSectionNavItems(data) {
-  var dc = data.deepContent;
+  const dc = data.deepContent;
   if (!dc || !dc.sections) return [];
 
-  var t = data.ticker.toLowerCase();
-  var items = [['dr-exec-summary', 'Summary']];
+  const t = data.ticker.toLowerCase();
+  const items = [['dr-exec-summary', 'Summary']];
 
-  for (var i = 0; i < dc.sections.length; i++) {
-    var s = dc.sections[i];
+  for (let i = 0; i < dc.sections.length; i++) {
+    const s = dc.sections[i];
     items.push(['dr-section-' + s.number, s.title]);
   }
 
@@ -147,12 +147,12 @@ export function getDeepSectionNavItems(data) {
  * narrative, evidence, etc.) with long-form deep research content.
  */
 export function renderDeepContent(data) {
-  var dc = data.deepContent;
+  const dc = data.deepContent;
   if (!dc) return '';
 
-  var ticker = data.ticker;
-  var t = ticker.toLowerCase();
-  var html = '';
+  const ticker = data.ticker;
+  const t = ticker.toLowerCase();
+  let html = '';
 
   // Stance banner
   html += renderStanceBanner(dc);
@@ -164,7 +164,7 @@ export function renderDeepContent(data) {
 
   // Numbered sections (collapsible, reuse existing rs-header/rs-body pattern)
   if (dc.sections && Array.isArray(dc.sections)) {
-    for (var i = 0; i < dc.sections.length; i++) {
+    for (let i = 0; i < dc.sections.length; i++) {
       html += renderDeepSection(dc.sections[i], ticker);
     }
   }

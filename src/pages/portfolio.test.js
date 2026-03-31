@@ -49,17 +49,17 @@ function makeTc(ticker, overrides) {
 
 describe('calculateExposureDollar', () => {
   it('returns positive value for long positions', () => {
-    var p = makePosition('GMG', { units: 1000, currentPrice: 50 });
+    const p = makePosition('GMG', { units: 1000, currentPrice: 50 });
     expect(calculateExposureDollar(p)).toBe(50000);
   });
 
   it('returns negative value for short positions', () => {
-    var p = makePosition('WDS', { units: -500, currentPrice: 30 });
+    const p = makePosition('WDS', { units: -500, currentPrice: 30 });
     expect(calculateExposureDollar(p)).toBe(-15000);
   });
 
   it('returns 0 when currentPrice is null', () => {
-    var p = makePosition('XYZ', { units: 1000, currentPrice: null });
+    const p = makePosition('XYZ', { units: 1000, currentPrice: null });
     expect(calculateExposureDollar(p)).toBe(0);
   });
 });
@@ -70,7 +70,7 @@ describe('calculateExposureDollar', () => {
 
 describe('calculateGrossExposure', () => {
   it('sums absolute values of all positions', () => {
-    var positions = [
+    const positions = [
       makePosition('GMG', { units: 1000, currentPrice: 50 }),  // +50000
       makePosition('WDS', { units: -500, currentPrice: 30 })   // -15000
     ];
@@ -82,7 +82,7 @@ describe('calculateGrossExposure', () => {
   });
 
   it('handles positions with null price', () => {
-    var positions = [
+    const positions = [
       makePosition('GMG', { units: 1000, currentPrice: 50 }),
       makePosition('XYZ', { units: 500, currentPrice: null })
     ];
@@ -104,9 +104,9 @@ describe('calculateCurrentWeightPct', () => {
   });
 
   it('weights sum to 100 for mixed long/short portfolio', () => {
-    var gross = 65000;
-    var longWeight = calculateCurrentWeightPct(50000, gross);
-    var shortWeight = calculateCurrentWeightPct(15000, gross);
+    const gross = 65000;
+    const longWeight = calculateCurrentWeightPct(50000, gross);
+    const shortWeight = calculateCurrentWeightPct(15000, gross);
     expect(longWeight + shortWeight).toBeCloseTo(100, 5);
   });
 });
@@ -183,22 +183,22 @@ describe('deriveAlignment', () => {
 describe('calculateReweightingScores', () => {
   describe('contradicting positions get zero weight', () => {
     it('downside-skewed long gets suggestedWeight = 0', () => {
-      var covered = [makePosition('WOW', { skew: 'downside', weight: 25, units: 31289 })];
-      var coverageData = { WOW: makeCoverage('WOW', 'downside') };
-      var tcData = { WOW: makeTc('WOW') };
+      const covered = [makePosition('WOW', { skew: 'downside', weight: 25, units: 31289 })];
+      const coverageData = { WOW: makeCoverage('WOW', 'downside') };
+      const tcData = { WOW: makeTc('WOW') };
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
 
       expect(scores[0].suggestedWeight).toBe(0);
       expect(scores[0].rawScore).toBe(0);
     });
 
     it('upside-skewed short gets suggestedWeight = 0', () => {
-      var covered = [makePosition('CBA', { skew: 'upside', weight: 25, units: -500 })];
-      var coverageData = { CBA: makeCoverage('CBA', 'upside') };
-      var tcData = { CBA: makeTc('CBA') };
+      const covered = [makePosition('CBA', { skew: 'upside', weight: 25, units: -500 })];
+      const coverageData = { CBA: makeCoverage('CBA', 'upside') };
+      const tcData = { CBA: makeTc('CBA') };
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
 
       expect(scores[0].suggestedWeight).toBe(0);
       expect(scores[0].rawScore).toBe(0);
@@ -207,38 +207,38 @@ describe('calculateReweightingScores', () => {
 
   describe('aligned positions get conviction-weighted scores', () => {
     it('upside-skewed long gets 1.3x multiplier', () => {
-      var covered = [
+      const covered = [
         makePosition('GMG', { skew: 'upside', weight: 50 }),
         makePosition('MQG', { skew: 'balanced', weight: 50 })
       ];
-      var coverageData = {
+      const coverageData = {
         GMG: makeCoverage('GMG', 'upside'),
         MQG: makeCoverage('MQG', 'balanced')
       };
-      var tcData = {};
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
-      var gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
-      var mqg = scores.find(function(s) { return s.ticker === 'MQG'; });
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
+      const mqg = scores.find(function(s) { return s.ticker === 'MQG'; });
 
       expect(gmg.rawScore).toBeGreaterThan(mqg.rawScore);
       expect(gmg.rawScore / mqg.rawScore).toBeCloseTo(1.3, 1);
     });
 
     it('downside-skewed short gets 1.3x multiplier', () => {
-      var covered = [
+      const covered = [
         makePosition('WDS', { skew: 'downside', weight: 50, units: -1000 }),
         makePosition('MQG', { skew: 'balanced', weight: 50, units: -1000 })
       ];
-      var coverageData = {
+      const coverageData = {
         WDS: makeCoverage('WDS', 'downside'),
         MQG: makeCoverage('MQG', 'balanced')
       };
-      var tcData = {};
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
-      var wds = scores.find(function(s) { return s.ticker === 'WDS'; });
-      var mqg = scores.find(function(s) { return s.ticker === 'MQG'; });
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const wds = scores.find(function(s) { return s.ticker === 'WDS'; });
+      const mqg = scores.find(function(s) { return s.ticker === 'MQG'; });
 
       expect(wds.rawScore / mqg.rawScore).toBeCloseTo(1.3, 1);
     });
@@ -246,37 +246,37 @@ describe('calculateReweightingScores', () => {
 
   describe('normalisation', () => {
     it('non-zero weights sum to 100%', () => {
-      var covered = [
+      const covered = [
         makePosition('GMG', { skew: 'upside', weight: 30 }),
         makePosition('MQG', { skew: 'balanced', weight: 30 }),
         makePosition('WOW', { skew: 'downside', weight: 40 })
       ];
-      var coverageData = {
+      const coverageData = {
         GMG: makeCoverage('GMG', 'upside'),
         MQG: makeCoverage('MQG', 'balanced'),
         WOW: makeCoverage('WOW', 'downside')
       };
-      var tcData = {};
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
 
-      var total = scores.reduce(function(s, x) { return s + x.suggestedWeight; }, 0);
+      const total = scores.reduce(function(s, x) { return s + x.suggestedWeight; }, 0);
       expect(total).toBeCloseTo(100, 1);
       expect(scores.find(function(s) { return s.ticker === 'WOW'; }).suggestedWeight).toBe(0);
     });
 
     it('all-downside portfolio: no division by zero, all weights zero', () => {
-      var covered = [
+      const covered = [
         makePosition('WOW', { skew: 'downside', weight: 50 }),
         makePosition('WDS', { skew: 'downside', weight: 50 })
       ];
-      var coverageData = {
+      const coverageData = {
         WOW: makeCoverage('WOW', 'downside'),
         WDS: makeCoverage('WDS', 'downside')
       };
-      var tcData = {};
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
 
       scores.forEach(function(s) {
         expect(s.suggestedWeight).toBe(0);
@@ -286,11 +286,11 @@ describe('calculateReweightingScores', () => {
 
   describe('action logic – long positions', () => {
     it('downside skew => Sell with all units', () => {
-      var covered = [makePosition('WOW', { skew: 'downside', weight: 25, units: 31289, currentPrice: 38 })];
-      var coverageData = { WOW: makeCoverage('WOW', 'downside') };
-      var tcData = {};
+      const covered = [makePosition('WOW', { skew: 'downside', weight: 25, units: 31289, currentPrice: 38 })];
+      const coverageData = { WOW: makeCoverage('WOW', 'downside') };
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 1200000);
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 1200000);
 
       expect(scores[0].action).toBe('Sell');
       expect(scores[0].actionCls).toBe('sell');
@@ -299,17 +299,17 @@ describe('calculateReweightingScores', () => {
     });
 
     it('upside skew, within 5% band => Hold', () => {
-      var covered = [
+      const covered = [
         makePosition('GMG', { skew: 'upside', weight: 50, units: 1000 }),
         makePosition('CBA', { skew: 'upside', weight: 50, units: 1000 })
       ];
-      var coverageData = {
+      const coverageData = {
         GMG: makeCoverage('GMG', 'upside'),
         CBA: makeCoverage('CBA', 'upside')
       };
-      var tcData = {};
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
 
       scores.forEach(function(s) {
         expect(s.action).toBe('Hold');
@@ -317,58 +317,58 @@ describe('calculateReweightingScores', () => {
     });
 
     it('upside skew, delta < -5% => Sell with calculated shares', () => {
-      var covered = [
+      const covered = [
         makePosition('GMG', { skew: 'upside', weight: 80, units: 5000, currentPrice: 30 }),
         makePosition('CBA', { skew: 'upside', weight: 20, units: 1000, currentPrice: 130 })
       ];
-      var coverageData = {
+      const coverageData = {
         GMG: makeCoverage('GMG', 'upside'),
         CBA: makeCoverage('CBA', 'upside')
       };
-      var tcData = {};
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 200000);
-      var gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 200000);
+      const gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
 
-      if (gmg.delta < -5) {
-        expect(gmg.action).toBe('Sell');
-        expect(gmg.shareAction).not.toBe('--');
-      }
+      // GMG has 80% current weight but model suggests ~56% (1.3x on 50/50 base) => delta < -5
+      expect(gmg.delta).toBeLessThan(-5);
+      expect(gmg.action).toBe('Sell');
+      expect(gmg.shareAction).not.toBe('--');
     });
 
     it('upside skew, delta > 5% => Buy with calculated shares', () => {
-      var covered = [
+      const covered = [
         makePosition('GMG', { skew: 'upside', weight: 20, units: 1000, currentPrice: 30 }),
         makePosition('CBA', { skew: 'upside', weight: 80, units: 5000, currentPrice: 130 })
       ];
-      var coverageData = {
+      const coverageData = {
         GMG: makeCoverage('GMG', 'upside'),
         CBA: makeCoverage('CBA', 'upside')
       };
-      var tcData = {};
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 200000);
-      var gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 200000);
+      const gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
 
-      if (gmg.delta > 5) {
-        expect(gmg.action).toBe('Buy');
-        expect(gmg.actionCls).toBe('buy');
-        expect(gmg.shareAction).not.toBe('--');
-      }
+      // GMG has 20% current weight but model suggests ~56% (1.3x on 50/50 base) => delta > 5
+      expect(gmg.delta).toBeGreaterThan(5);
+      expect(gmg.action).toBe('Buy');
+      expect(gmg.actionCls).toBe('buy');
+      expect(gmg.shareAction).not.toBe('--');
     });
 
     it('balanced skew, within 5% band => Hold', () => {
-      var covered = [
+      const covered = [
         makePosition('MQG', { skew: 'balanced', weight: 50 }),
         makePosition('NAB', { skew: 'balanced', weight: 50 })
       ];
-      var coverageData = {
+      const coverageData = {
         MQG: makeCoverage('MQG', 'balanced'),
         NAB: makeCoverage('NAB', 'balanced')
       };
-      var tcData = {};
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
 
       scores.forEach(function(s) {
         expect(s.action).toBe('Hold');
@@ -378,11 +378,11 @@ describe('calculateReweightingScores', () => {
 
   describe('action logic – short positions', () => {
     it('upside skew => Buy to Close with all units', () => {
-      var covered = [makePosition('CBA', { skew: 'upside', weight: 25, units: -500, currentPrice: 130 })];
-      var coverageData = { CBA: makeCoverage('CBA', 'upside') };
-      var tcData = {};
+      const covered = [makePosition('CBA', { skew: 'upside', weight: 25, units: -500, currentPrice: 130 })];
+      const coverageData = { CBA: makeCoverage('CBA', 'upside') };
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
 
       expect(scores[0].action).toBe('Buy to Close');
       expect(scores[0].actionCls).toBe('close-short');
@@ -390,17 +390,17 @@ describe('calculateReweightingScores', () => {
     });
 
     it('downside skew short, within 5% band => Hold', () => {
-      var covered = [
+      const covered = [
         makePosition('WDS', { skew: 'downside', weight: 50, units: -1000 }),
         makePosition('WOW', { skew: 'downside', weight: 50, units: -1000 })
       ];
-      var coverageData = {
+      const coverageData = {
         WDS: makeCoverage('WDS', 'downside'),
         WOW: makeCoverage('WOW', 'downside')
       };
-      var tcData = {};
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
 
       scores.forEach(function(s) {
         expect(s.action).toBe('Hold');
@@ -409,62 +409,62 @@ describe('calculateReweightingScores', () => {
 
     it('downside skew short, delta > 5% => Increase Short', () => {
       // One short with low weight, high suggested => delta > 5
-      var covered = [
+      const covered = [
         makePosition('WDS', { skew: 'downside', weight: 10, units: -200, currentPrice: 30 }),
         makePosition('MQG', { skew: 'balanced', weight: 90, units: -5000, currentPrice: 12 })
       ];
-      var coverageData = {
+      const coverageData = {
         WDS: makeCoverage('WDS', 'downside'),
         MQG: makeCoverage('MQG', 'balanced')
       };
-      var tcData = {};
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 66000);
-      var wds = scores.find(function(s) { return s.ticker === 'WDS'; });
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 66000);
+      const wds = scores.find(function(s) { return s.ticker === 'WDS'; });
 
-      if (wds.delta > 5) {
-        expect(wds.action).toBe('Increase Short');
-        expect(wds.actionCls).toBe('increase-short');
-      }
+      // WDS has 10% current weight; model suggests ~57% (1.3x aligned short) => delta > 5
+      expect(wds.delta).toBeGreaterThan(5);
+      expect(wds.action).toBe('Increase Short');
+      expect(wds.actionCls).toBe('increase-short');
     });
 
     it('downside skew short, delta < -5% => Reduce Short', () => {
       // Short with high weight, low suggested => delta < -5
-      var covered = [
+      const covered = [
         makePosition('WDS', { skew: 'downside', weight: 90, units: -5000, currentPrice: 30 }),
         makePosition('MQG', { skew: 'balanced', weight: 10, units: -200, currentPrice: 12 })
       ];
-      var coverageData = {
+      const coverageData = {
         WDS: makeCoverage('WDS', 'downside'),
         MQG: makeCoverage('MQG', 'balanced')
       };
-      var tcData = {};
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 152400);
-      var wds = scores.find(function(s) { return s.ticker === 'WDS'; });
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 152400);
+      const wds = scores.find(function(s) { return s.ticker === 'WDS'; });
 
-      if (wds.delta < -5) {
-        expect(wds.action).toBe('Reduce Short');
-        expect(wds.actionCls).toBe('reduce-short');
-      }
+      // WDS has 90% current weight; model suggests ~57% (1.3x aligned short) => delta < -5
+      expect(wds.delta).toBeLessThan(-5);
+      expect(wds.action).toBe('Reduce Short');
+      expect(wds.actionCls).toBe('reduce-short');
     });
   });
 
   describe('5% grace band', () => {
     it('upside long with delta +4% => Hold', () => {
       // Set weight so suggested - current is about +4
-      var covered = [
+      const covered = [
         makePosition('GMG', { skew: 'upside', weight: 48, units: 1000 }),
         makePosition('MQG', { skew: 'balanced', weight: 52, units: 1200 })
       ];
-      var coverageData = {
+      const coverageData = {
         GMG: makeCoverage('GMG', 'upside'),
         MQG: makeCoverage('MQG', 'balanced')
       };
-      var tcData = {};
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
-      var gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
 
       // With 1.3x multiplier, GMG gets ~56.5% suggested vs 48% current = +8.5 delta
       // Actually delta depends on exact normalisation; just verify grace band logic exists
@@ -474,17 +474,17 @@ describe('calculateReweightingScores', () => {
     });
 
     it('balanced long with delta -3% => Hold', () => {
-      var covered = [
+      const covered = [
         makePosition('MQG', { skew: 'balanced', weight: 53 }),
         makePosition('NAB', { skew: 'balanced', weight: 47 })
       ];
-      var coverageData = {
+      const coverageData = {
         MQG: makeCoverage('MQG', 'balanced'),
         NAB: makeCoverage('NAB', 'balanced')
       };
-      var tcData = {};
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
 
       // Both balanced, equal base weight => delta ~-3 and +3 => both Hold
       scores.forEach(function(s) {
@@ -496,20 +496,20 @@ describe('calculateReweightingScores', () => {
   describe('gross exposure weighting', () => {
     it('current weight uses gross exposure not net', () => {
       // Mixed long/short: long $80k, short $20k. Gross = $100k
-      var covered = [
+      const covered = [
         makePosition('GMG', { skew: 'upside', weight: 80, units: 2000, currentPrice: 40 }),
         makePosition('WDS', { skew: 'downside', weight: 20, units: -500, currentPrice: 40 })
       ];
-      var coverageData = {
+      const coverageData = {
         GMG: makeCoverage('GMG', 'upside'),
         WDS: makeCoverage('WDS', 'downside')
       };
-      var tcData = {};
+      const tcData = {};
 
       // Pass gross exposure = 100000 (80000 + 20000)
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
-      var gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
-      var wds = scores.find(function(s) { return s.ticker === 'WDS'; });
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
+      const wds = scores.find(function(s) { return s.ticker === 'WDS'; });
 
       // Both should have positive currentWeight
       expect(gmg.currentWeight).toBe(80);
@@ -519,43 +519,43 @@ describe('calculateReweightingScores', () => {
 
   describe('TC_DATA adjustments', () => {
     it('high conviction (maxProb > 40) boosts multiplier', () => {
-      var covered = [
+      const covered = [
         makePosition('CBA', { skew: 'upside', weight: 50 }),
         makePosition('MQG', { skew: 'upside', weight: 50 })
       ];
-      var coverageData = {
+      const coverageData = {
         CBA: makeCoverage('CBA', 'upside'),
         MQG: makeCoverage('MQG', 'upside')
       };
-      var tcData = {
+      const tcData = {
         CBA: makeTc('CBA', { n1: { prob: 55 }, n2: { prob: 20 }, n3: { prob: 15 }, n4: { prob: 10 } }),
         MQG: makeTc('MQG', { n1: { prob: 30 }, n2: { prob: 25 }, n3: { prob: 25 }, n4: { prob: 20 } })
       };
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
-      var cba = scores.find(function(s) { return s.ticker === 'CBA'; });
-      var mqg = scores.find(function(s) { return s.ticker === 'MQG'; });
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const cba = scores.find(function(s) { return s.ticker === 'CBA'; });
+      const mqg = scores.find(function(s) { return s.ticker === 'MQG'; });
 
       expect(cba.rawScore).toBeGreaterThan(mqg.rawScore);
     });
 
     it('contrarian (uphill) reduces multiplier', () => {
-      var covered = [
+      const covered = [
         makePosition('CBA', { skew: 'upside', weight: 50 }),
         makePosition('MQG', { skew: 'upside', weight: 50 })
       ];
-      var coverageData = {
+      const coverageData = {
         CBA: makeCoverage('CBA', 'upside'),
         MQG: makeCoverage('MQG', 'upside')
       };
-      var tcData = {
+      const tcData = {
         CBA: makeTc('CBA', { primary: 'uphill' }),
         MQG: makeTc('MQG', { primary: 'n1' })
       };
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
-      var cba = scores.find(function(s) { return s.ticker === 'CBA'; });
-      var mqg = scores.find(function(s) { return s.ticker === 'MQG'; });
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const cba = scores.find(function(s) { return s.ticker === 'CBA'; });
+      const mqg = scores.find(function(s) { return s.ticker === 'MQG'; });
 
       expect(cba.rawScore).toBeLessThan(mqg.rawScore);
     });
@@ -563,23 +563,23 @@ describe('calculateReweightingScores', () => {
 
   describe('sorting', () => {
     it('sorts by largest |delta| descending', () => {
-      var covered = [
+      const covered = [
         makePosition('GMG', { skew: 'upside', weight: 10 }),
         makePosition('WOW', { skew: 'downside', weight: 60 }),
         makePosition('MQG', { skew: 'balanced', weight: 30 })
       ];
-      var coverageData = {
+      const coverageData = {
         GMG: makeCoverage('GMG', 'upside'),
         WOW: makeCoverage('WOW', 'downside'),
         MQG: makeCoverage('MQG', 'balanced')
       };
-      var tcData = {};
+      const tcData = {};
 
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
 
       // WOW has delta = 0 - 60 = -60, should be first
       expect(scores[0].ticker).toBe('WOW');
-      for (var i = 1; i < scores.length; i++) {
+      for (let i = 1; i < scores.length; i++) {
         expect(Math.abs(scores[i - 1].delta)).toBeGreaterThanOrEqual(Math.abs(scores[i].delta));
       }
     });
@@ -587,16 +587,16 @@ describe('calculateReweightingScores', () => {
 
   describe('top-table weight integrity', () => {
     it('all position weights sum to ~100%', () => {
-      var positions = [
+      const positions = [
         makePosition('GMG', { units: 2000, currentPrice: 40 }),
         makePosition('WDS', { units: -500, currentPrice: 30 }),
         makePosition('CBA', { units: 1000, currentPrice: 130 }),
         makePosition('MQG', { units: -300, currentPrice: 60 })
       ];
-      var gross = calculateGrossExposure(positions);
-      var totalWeight = 0;
+      const gross = calculateGrossExposure(positions);
+      let totalWeight = 0;
       positions.forEach(function(p) {
-        var absExp = Math.abs(calculateExposureDollar(p));
+        const absExp = Math.abs(calculateExposureDollar(p));
         totalWeight += calculateCurrentWeightPct(absExp, gross);
       });
       expect(totalWeight).toBeCloseTo(100, 5);
@@ -605,19 +605,19 @@ describe('calculateReweightingScores', () => {
 
   describe('full exit actions', () => {
     it('long + downside Sell uses shares = abs(units)', () => {
-      var covered = [makePosition('WOW', { skew: 'downside', weight: 100, units: 31289, currentPrice: 38 })];
-      var coverageData = { WOW: makeCoverage('WOW', 'downside') };
-      var tcData = {};
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 1200000);
+      const covered = [makePosition('WOW', { skew: 'downside', weight: 100, units: 31289, currentPrice: 38 })];
+      const coverageData = { WOW: makeCoverage('WOW', 'downside') };
+      const tcData = {};
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 1200000);
       expect(scores[0].action).toBe('Sell');
       expect(scores[0].shareAction).toBe('31,289');
     });
 
     it('short + upside Buy to Close uses shares = abs(units)', () => {
-      var covered = [makePosition('CBA', { skew: 'upside', weight: 100, units: -500, currentPrice: 130 })];
-      var coverageData = { CBA: makeCoverage('CBA', 'upside') };
-      var tcData = {};
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 65000);
+      const covered = [makePosition('CBA', { skew: 'upside', weight: 100, units: -500, currentPrice: 130 })];
+      const coverageData = { CBA: makeCoverage('CBA', 'upside') };
+      const tcData = {};
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 65000);
       expect(scores[0].action).toBe('Buy to Close');
       expect(scores[0].shareAction).toBe('500');
     });
@@ -626,34 +626,34 @@ describe('calculateReweightingScores', () => {
   describe('de minimis rule', () => {
     it('position with both current and suggested weight under 0.25% gets De minimis', () => {
       // Tiny contradicting position: currentWeight 0.01%, suggestedWeight 0% (downside long)
-      var covered = [
+      const covered = [
         makePosition('GMG', { skew: 'downside', weight: 0.01, units: 1, currentPrice: 10 }),
         makePosition('CBA', { skew: 'upside', weight: 99.99, units: 10000, currentPrice: 10 })
       ];
-      var coverageData = {
+      const coverageData = {
         GMG: makeCoverage('GMG', 'downside'),
         CBA: makeCoverage('CBA', 'upside')
       };
-      var tcData = {};
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100010);
-      var gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
+      const tcData = {};
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100010);
+      const gmg = scores.find(function(s) { return s.ticker === 'GMG'; });
       expect(gmg.action).toBe('Hold');
       expect(gmg.shareAction).toBe('De minimis');
     });
 
     it('zero-unit position with non-zero suggested weight is NOT de minimis', () => {
       // BHP has 0 units (currentWeight=0) but model suggests ~50% => should show Buy
-      var covered = [
+      const covered = [
         makePosition('BHP', { skew: 'upside', weight: 0, units: 0, currentPrice: 45 }),
         makePosition('CBA', { skew: 'upside', weight: 100, units: 10000, currentPrice: 10 })
       ];
-      var coverageData = {
+      const coverageData = {
         BHP: makeCoverage('BHP', 'upside'),
         CBA: makeCoverage('CBA', 'upside')
       };
-      var tcData = {};
-      var scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
-      var bhp = scores.find(function(s) { return s.ticker === 'BHP'; });
+      const tcData = {};
+      const scores = calculateReweightingScores(covered, coverageData, tcData, 100000);
+      const bhp = scores.find(function(s) { return s.ticker === 'BHP'; });
       expect(bhp.suggestedWeight).toBeGreaterThan(0.25);
       expect(bhp.action).not.toBe('Hold');
       expect(bhp.shareAction).not.toBe('De minimis');
@@ -747,7 +747,7 @@ describe('renderConcentrationDetail', () => {
       sector_exposure: { Materials: 0.35, Financials: 0.25, Energy: 0.15 },
       flags: []
     });
-    var sectors = document.getElementById('portConcSectors');
+    const sectors = document.getElementById('portConcSectors');
     expect(sectors.querySelectorAll('.port-conc-sector-row').length).toBe(3);
   });
 
@@ -760,7 +760,7 @@ describe('renderConcentrationDetail', () => {
         { code: 'UNMAPPED_SECTOR', severity: 'info', message: '5% unmapped' }
       ]
     });
-    var flagsEl = document.getElementById('portConcFlags');
+    const flagsEl = document.getElementById('portConcFlags');
     expect(flagsEl.querySelectorAll('.port-conc-flag').length).toBe(2);
   });
 
@@ -775,7 +775,7 @@ describe('renderConcentrationDetail', () => {
       sector_exposure: {},
       flags: []
     });
-    var flagsEl = document.getElementById('portConcFlags');
+    const flagsEl = document.getElementById('portConcFlags');
     expect(flagsEl.textContent).toContain('No risk flags');
   });
 });

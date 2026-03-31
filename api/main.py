@@ -1589,6 +1589,18 @@ async def add_stock(
             except Exception as nlm_err:
                 logger.warning("[AddStock] NotebookLM provisioning failed for %s (non-fatal): %s", ticker, nlm_err)
 
+            # Auto-infer macro sensitivity mapping
+            try:
+                from web_search import SECTOR_COMMODITY_MAP
+                import macro_sensitivity as _ms
+                scm_entry = SECTOR_COMMODITY_MAP.get(ticker)
+                entries = _ms.infer_macro_sensitivity(ticker, scm_entry, sector)
+                if entries:
+                    await _ms.write_sensitivity(ticker, entries, source="inferred")
+                    logger.info("[AddStock] Macro sensitivity inferred for %s: %d entries", ticker, len(entries))
+            except Exception as ms_err:
+                logger.warning("[AddStock] Macro sensitivity inference failed for %s (non-fatal): %s", ticker, ms_err)
+
         except Exception as e:
             logger.error("[AddStock] Coverage initiation FAILED for %s: %s", ticker, e, exc_info=True)
             # RefreshJob.status is already set to "failed" by run_refresh().

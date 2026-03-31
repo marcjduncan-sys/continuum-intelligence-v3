@@ -16,33 +16,33 @@ function RS_HDR(num, title) {
 
 export function renderReportHero(data) {
   if (!data.heroMetrics || !data.heroMetrics.length) return '';
-  var metricsHtml = '';
+  let metricsHtml = '';
   for (var i = 0; i < data.heroMetrics.length; i++) {
-    var m = data.heroMetrics[i];
-    var cls = 'rh-metric-value' + (m.colorClass ? ' ' + m.colorClass : '');
+    const m = data.heroMetrics[i];
+    const cls = 'rh-metric-value' + (m.colorClass ? ' ' + m.colorClass : '');
     metricsHtml += '<div class="rh-metric"><div class="rh-metric-label">' + m.label + '</div><div class="' + cls + '">' + m.value + '</div></div>';
   }
 
-  var sparklineHtml = data.priceHistory ? renderSparkline(data.priceHistory) : '';
+  const sparklineHtml = data.priceHistory ? renderSparkline(data.priceHistory) : '';
 
   // Hero announcements -- latest 4 ASX announcements for this ticker
-  var heroAnnouncementsHtml = '';
-  var tickerAnns = ANNOUNCEMENTS_DATA[data.ticker];
+  let heroAnnouncementsHtml = '';
+  const tickerAnns = ANNOUNCEMENTS_DATA[data.ticker];
   if (tickerAnns && tickerAnns.length > 0) {
-    var annItems = '';
-    var count = Math.min(tickerAnns.length, 4);
-    for (var a = 0; a < count; a++) {
-      var ann = tickerAnns[a];
-      var annDate = '';
+    let annItems = '';
+    const count = Math.min(tickerAnns.length, 4);
+    for (let a = 0; a < count; a++) {
+      const ann = tickerAnns[a];
+      let annDate = '';
       if (ann.date) {
-        var d = new Date(ann.date);
+        const d = new Date(ann.date);
         annDate = d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
       }
-      var headlineText = ann.headline || '';
-      var annLink = ann.url
+      const headlineText = ann.headline || '';
+      const annLink = ann.url
         ? '<a href="' + ann.url + '" target="_blank" rel="noopener">' + headlineText + '</a>'
         : headlineText;
-      var sensitiveIcon = ann.sensitive ? '<span class="rh-ann-sensitive" title="Price sensitive">&#9679;</span>' : '';
+      const sensitiveIcon = ann.sensitive ? '<span class="rh-ann-sensitive" title="Price sensitive">&#9679;</span>' : '';
       annItems +=
         '<div class="rh-ann-item">' +
           '<span class="rh-ann-date">' + annDate + '</span>' +
@@ -61,7 +61,7 @@ export function renderReportHero(data) {
   }
 
   // Spec Section 1.2 -- What the Price Embeds
-  var embeddedThesisHtml = '';
+  let embeddedThesisHtml = '';
   if (data.hero && data.hero.embedded_thesis) {
     embeddedThesisHtml =
       '<div class="rh-spec-block rh-embedded-thesis">' +
@@ -71,45 +71,45 @@ export function renderReportHero(data) {
   }
 
   // Spec Section 1.3 -- Position in Range
-  var positionInRangeHtml = '';
+  let positionInRangeHtml = '';
   if (data.hero && data.hero.position_in_range && data.hero.position_in_range.worlds && data.hero.position_in_range.worlds.length > 0) {
-    var pir = data.hero.position_in_range;
-    var worlds = pir.worlds;
-    var current = parseFloat(data._livePrice || data.price || pir.current_price);
-    var prices = worlds.map(function(w) { w.price = parseFloat(w.price) || 0; return w.price; });
+    const pir = data.hero.position_in_range;
+    const worlds = pir.worlds;
+    const current = parseFloat(data._livePrice || data.price || pir.current_price);
+    const prices = worlds.map(function(w) { w.price = parseFloat(w.price) || 0; return w.price; });
     prices.push(current);
-    var minP = Math.min.apply(null, prices);
-    var maxP = Math.max.apply(null, prices);
-    var rangeP = maxP - minP || 1;
+    const minP = Math.min.apply(null, prices);
+    const maxP = Math.max.apply(null, prices);
+    const rangeP = maxP - minP || 1;
 
     // Map hypothesis weights to worlds via direction-based sort
-    var pirWeights = [];
-    var skewObj = data._skew;
+    const pirWeights = [];
+    let skewObj = data._skew;
     if (typeof skewObj === 'string') { try { skewObj = JSON.parse(skewObj); } catch (e) { skewObj = null; } }
     if (skewObj && skewObj.hypotheses && skewObj.hypotheses.length === worlds.length) {
-      var dirOrd = { downside: 0, neutral: 1, upside: 2 };
-      var sorted = skewObj.hypotheses.map(function(h) {
-        var tMatch = (h.title || '').match(/N(\d)/);
+      const dirOrd = { downside: 0, neutral: 1, upside: 2 };
+      const sorted = skewObj.hypotheses.map(function(h) {
+        const tMatch = (h.title || '').match(/N(\d)/);
         return { weight: parseInt(h.weight) || 0, direction: h.direction || 'neutral', tierNum: tMatch ? parseInt(tMatch[1]) : 9 };
       }).sort(function(a, b) {
-        var da = dirOrd[a.direction] != null ? dirOrd[a.direction] : 1;
-        var db = dirOrd[b.direction] != null ? dirOrd[b.direction] : 1;
+        const da = dirOrd[a.direction] != null ? dirOrd[a.direction] : 1;
+        const db = dirOrd[b.direction] != null ? dirOrd[b.direction] : 1;
         if (da !== db) return da - db;
         if (a.weight !== b.weight) return a.weight - b.weight;
         return b.tierNum - a.tierNum;
       });
-      for (var si = 0; si < sorted.length; si++) pirWeights.push(sorted[si].weight);
+      for (let si = 0; si < sorted.length; si++) pirWeights.push(sorted[si].weight);
     }
 
     // Derive implied valuation metric for each world price
-    var pirValLabel = '';
-    var pirDenom = 0;
+    let pirValLabel = '';
+    let pirDenom = 0;
     if (data.heroMetrics) {
-      for (var vi = 0; vi < data.heroMetrics.length; vi++) {
-        var mLbl = data.heroMetrics[vi].label || '';
+      for (let vi = 0; vi < data.heroMetrics.length; vi++) {
+        const mLbl = data.heroMetrics[vi].label || '';
         if (/P\/E|P\/B|EV\/|P\/S|P\/NTA/i.test(mLbl)) {
-          var mVal = String(data.heroMetrics[vi].value || '').replace(/[~x]/g, '');
-          var parsed = parseFloat(mVal);
+          const mVal = String(data.heroMetrics[vi].value || '').replace(/[~x]/g, '');
+          const parsed = parseFloat(mVal);
           if (parsed > 0 && isFinite(parsed) && current > 0) {
             pirValLabel = mLbl;
             pirDenom = current / parsed;
@@ -119,15 +119,15 @@ export function renderReportHero(data) {
       }
     }
 
-    var worldMarkersHtml = '';
+    let worldMarkersHtml = '';
     for (var i = 0; i < worlds.length; i++) {
-      var w = worlds[i];
-      var pct = ((w.price - minP) / rangeP * 100).toFixed(1);
-      var probStr = pirWeights[i] != null ? ' (' + pirWeights[i] + '%)' : '';
-      var metricHtml = '';
+      const w = worlds[i];
+      const pct = ((w.price - minP) / rangeP * 100).toFixed(1);
+      const probStr = pirWeights[i] != null ? ' (' + pirWeights[i] + '%)' : '';
+      let metricHtml = '';
       if (pirDenom > 0 && w.price > 0) {
-        var implied = w.price / pirDenom;
-        var formatted = fmtPE(implied);
+        const implied = w.price / pirDenom;
+        const formatted = fmtPE(implied);
         if (formatted) {
           metricHtml = '<div class="pir-world-metric">' + formatted + ' ' + pirValLabel + '</div>';
         }
@@ -140,20 +140,20 @@ export function renderReportHero(data) {
           metricHtml +
         '</div>';
     }
-    var currentPct = ((current - minP) / rangeP * 100).toFixed(1);
+    const currentPct = ((current - minP) / rangeP * 100).toFixed(1);
 
     // Probability-weighted average price
-    var weightedAvgHtml = '';
-    var hasProbs = worlds.length > 0 && worlds[0].probability != null;
+    let weightedAvgHtml = '';
+    const hasProbs = worlds.length > 0 && worlds[0].probability != null;
     if (hasProbs) {
-      var weightedAvg = 0;
-      for (var wi = 0; wi < worlds.length; wi++) {
+      let weightedAvg = 0;
+      for (let wi = 0; wi < worlds.length; wi++) {
         weightedAvg += (parseFloat(worlds[wi].probability) || 0) * worlds[wi].price;
       }
-      var wavgPct = ((weightedAvg - minP) / rangeP * 100).toFixed(1);
-      var wavgDelta = ((weightedAvg - current) / current * 100);
-      var wavgDeltaCls = wavgDelta >= 0 ? 'upside' : 'downside';
-      var wavgDeltaLabel = (wavgDelta >= 0 ? '+' : '') + wavgDelta.toFixed(1) + '% ' + wavgDeltaCls;
+      const wavgPct = ((weightedAvg - minP) / rangeP * 100).toFixed(1);
+      const wavgDelta = ((weightedAvg - current) / current * 100);
+      const wavgDeltaCls = wavgDelta >= 0 ? 'upside' : 'downside';
+      const wavgDeltaLabel = (wavgDelta >= 0 ? '+' : '') + wavgDelta.toFixed(1) + '% ' + wavgDeltaCls;
       weightedAvgHtml =
         '<div class="pir-weighted-avg" style="left:' + wavgPct + '%">' +
           '<div class="pir-weighted-avg-label">A$' + weightedAvg.toFixed(2) + '</div>' +
@@ -180,9 +180,9 @@ export function renderReportHero(data) {
   }
 
   // Spec Section 1.5 -- Skew Indicator
-  var skewIndicatorHtml = '';
+  let skewIndicatorHtml = '';
   if (data.hero && data.hero.skew) {
-    var skewCls = data.hero.skew === 'DOWNSIDE' ? 'rh-skew-down' : data.hero.skew === 'UPSIDE' ? 'rh-skew-up' : 'rh-skew-balanced';
+    const skewCls = data.hero.skew === 'DOWNSIDE' ? 'rh-skew-down' : data.hero.skew === 'UPSIDE' ? 'rh-skew-up' : 'rh-skew-balanced';
     skewIndicatorHtml =
       '<div class="rh-spec-block rh-skew-indicator">' +
         '<span class="rh-spec-label">SKEW: </span>' +
@@ -192,9 +192,9 @@ export function renderReportHero(data) {
   }
 
   // Spec Section 1.5 -- Next Decision Point
-  var nextDecisionHtml = '';
+  let nextDecisionHtml = '';
   if (data.hero && data.hero.next_decision_point) {
-    var ndp = data.hero.next_decision_point;
+    const ndp = data.hero.next_decision_point;
     nextDecisionHtml =
       '<div class="rh-spec-block rh-next-decision">' +
         '<div class="rh-spec-label">NEXT DECISION POINT</div>' +
@@ -204,11 +204,11 @@ export function renderReportHero(data) {
   }
 
   // Prev/next stock navigation
-  var _navTickers = (typeof FEATURED_ORDER !== 'undefined') ? FEATURED_ORDER : Object.keys(STOCK_DATA);
-  var _navIdx = _navTickers.indexOf(data.ticker);
-  var _prevTicker = _navTickers[(_navIdx - 1 + _navTickers.length) % _navTickers.length];
-  var _nextTicker = _navTickers[(_navIdx + 1) % _navTickers.length];
-  var stockNavHtml = '<div class="rh-stock-nav-bar">' +
+  const _navTickers = (typeof FEATURED_ORDER !== 'undefined') ? FEATURED_ORDER : Object.keys(STOCK_DATA);
+  const _navIdx = _navTickers.indexOf(data.ticker);
+  const _prevTicker = _navTickers[(_navIdx - 1 + _navTickers.length) % _navTickers.length];
+  const _nextTicker = _navTickers[(_navIdx + 1) % _navTickers.length];
+  const stockNavHtml = '<div class="rh-stock-nav-bar">' +
     '<div class="rh-stock-nav">' +
       '<a href="#report-' + _prevTicker + '" onclick="navigate(\'report-' + _prevTicker + '\');return false;">&lsaquo; ' + _prevTicker + '</a>' +
       '<a href="#report-' + _nextTicker + '" onclick="navigate(\'report-' + _nextTicker + '\');return false;">' + _nextTicker + ' &rsaquo;</a>' +
@@ -261,12 +261,12 @@ export function renderReportHero(data) {
 
 export function renderSkewBar(data) {
   if (!data.skew && !data._skew && (!data.hypotheses || !data.hypotheses.length)) return '';
-  var skew = data._skew || computeSkewScore(data);
-  var dir = skew.direction;
-  var arrow = dir === 'downside' ? '&#9660; DOWNSIDE' : dir === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
-  var scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
-  var scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
-  var rationale = (data.skew && data.skew.rationale) || '';
+  const skew = data._skew || computeSkewScore(data);
+  const dir = skew.direction;
+  const arrow = dir === 'downside' ? '&#9660; DOWNSIDE' : dir === 'upside' ? '&#9650; UPSIDE' : '&#9670; BALANCED';
+  const scoreCls = skew.score > 5 ? 'positive' : skew.score < -5 ? 'negative' : 'neutral';
+  const scoreLabel = (skew.score > 0 ? '+' : '') + skew.score;
+  const rationale = (data.skew && data.skew.rationale) || '';
 
   return '<div class="risk-skew-bar">' +
     '<div class="rsb-inner">' +
@@ -283,20 +283,20 @@ export function renderSkewBar(data) {
 }
 
 export function renderVerdict(data) {
-  var v = data.verdict;
+  const v = data.verdict;
   if (!v || !v.scores || !v.scores.length) return '';
-  var skewDir = (data.skew && data.skew.direction) || '';
-  var vtCls = skewDir === 'upside' ? ' vt-positive' : skewDir === 'downside' ? ' vt-negative' : '';
-  var hyps = data.hypotheses || [];
-  var norm = (hyps.length)
+  const skewDir = (data.skew && data.skew.direction) || '';
+  const vtCls = skewDir === 'upside' ? ' vt-positive' : skewDir === 'downside' ? ' vt-negative' : '';
+  const hyps = data.hypotheses || [];
+  const norm = (hyps.length)
     ? normaliseScores(hyps)
     : normaliseScores(v.scores);
 
-  var scoresHtml = '';
-  for (var i = 0; i < v.scores.length; i++) {
-    var s = v.scores[i];
-    var dirCls = hyps[i] ? hyps[i].dirClass || 'dir-neutral' : 'dir-neutral';
-    var dirAttr = hyps[i] ? ' data-dir="' + dirCls + '"' : '';
+  let scoresHtml = '';
+  for (let i = 0; i < v.scores.length; i++) {
+    const s = v.scores[i];
+    const dirCls = hyps[i] ? hyps[i].dirClass || 'dir-neutral' : 'dir-neutral';
+    const dirAttr = hyps[i] ? ' data-dir="' + dirCls + '"' : '';
     scoresHtml += '<div class="vs-item ' + dirCls + '"' + dirAttr + '>' +
       '<div class="vs-label">' + (s.label || '') + '</div>' +
       '<div class="vs-score">' + (norm[i] != null ? norm[i] : 0) + '%</div>' +
@@ -313,8 +313,8 @@ export function renderVerdict(data) {
 }
 
 export function renderSectionNav(data) {
-  var t = data.ticker.toLowerCase();
-  var sections = [
+  const t = data.ticker.toLowerCase();
+  const sections = [
     ['identity', 'Identity'],
     ['hypotheses', 'Hypotheses']
   ];
@@ -343,9 +343,9 @@ export function renderSectionNav(data) {
   sections.push(['sources', 'Ext. Research']);
   sections.push(['chat', 'Research Chat']);
 
-  var linksHtml = '';
-  for (var i = 0; i < sections.length; i++) {
-    var activeClass = i === 0 ? ' class="active"' : '';
+  let linksHtml = '';
+  for (let i = 0; i < sections.length; i++) {
+    const activeClass = i === 0 ? ' class="active"' : '';
     linksHtml += '<a href="#' + t + '-' + sections[i][0] + '"' + activeClass + '>' + sections[i][1] + '</a>';
   }
 
@@ -355,15 +355,15 @@ export function renderSectionNav(data) {
 }
 
 export function renderIdentity(data) {
-  var id = data.identity;
+  const id = data.identity;
   if (!id || !id.rows || !id.rows.length) return '';
-  var t = data.ticker.toLowerCase();
+  const t = data.ticker.toLowerCase();
 
-  var rowsHtml = '';
-  for (var i = 0; i < id.rows.length; i++) {
-    var row = id.rows[i];
-    var left = row[0];
-    var right = row[1];
+  let rowsHtml = '';
+  for (let i = 0; i < id.rows.length; i++) {
+    const row = id.rows[i];
+    const left = row[0];
+    const right = row[1];
     rowsHtml += '<tr>' +
       '<td class="td-label">' + left[0] + '</td>' +
       '<td' + (left[2] ? ' class="' + left[2] + '"' : '') + '>' + left[1] + '</td>' +
@@ -384,49 +384,49 @@ export function renderIdentity(data) {
 
 export function renderHypotheses(data) {
   if (!data.hypotheses || !data.hypotheses.length) return '';
-  var t = data.ticker.toLowerCase();
-  var cardsHtml = '';
-  var norm = normaliseScores(data.hypotheses);
+  const t = data.ticker.toLowerCase();
+  let cardsHtml = '';
+  const norm = normaliseScores(data.hypotheses);
 
-  for (var i = 0; i < data.hypotheses.length; i++) {
-    var h = data.hypotheses[i];
-    var normScore = norm[i] + '%';
-    var normWidth = norm[i] + '%';
+  for (let i = 0; i < data.hypotheses.length; i++) {
+    const h = data.hypotheses[i];
+    const normScore = norm[i] + '%';
+    const normWidth = norm[i] + '%';
 
-    var requiresHtml = '';
+    let requiresHtml = '';
     if (h.requires && h.requires.length > 0) {
       requiresHtml = '<div class="hc-subtitle">Requires</div><ul class="hc-list requires">';
-      for (var r = 0; r < h.requires.length; r++) {
+      for (let r = 0; r < h.requires.length; r++) {
         requiresHtml += '<li>' + h.requires[r] + '</li>';
       }
       requiresHtml += '</ul>';
     }
 
-    var supportHtml = '';
+    let supportHtml = '';
     if (h.supporting && h.supporting.length > 0) {
       supportHtml = '<div class="hc-subtitle">' + h.supportingLabel + '</div><ul class="hc-list supports">';
-      for (var s = 0; s < h.supporting.length; s++) {
+      for (let s = 0; s < h.supporting.length; s++) {
         supportHtml += '<li>' + h.supporting[s] + '</li>';
       }
       supportHtml += '</ul>';
     }
 
-    var contradictHtml = '';
+    let contradictHtml = '';
     if (h.contradicting && h.contradicting.length > 0) {
       contradictHtml = '<div class="hc-subtitle">' + h.contradictingLabel + '</div><ul class="hc-list contradicts">';
-      for (var c = 0; c < h.contradicting.length; c++) {
+      for (let c = 0; c < h.contradicting.length; c++) {
         contradictHtml += '<li>' + h.contradicting[c] + '</li>';
       }
       contradictHtml += '</ul>';
     }
 
-    var tierMatch = (h.tier || '').toUpperCase().match(/^[NT]\d+/);
-    var displayTitle = (h.title || '');
+    const tierMatch = (h.tier || '').toUpperCase().match(/^[NT]\d+/);
+    let displayTitle = (h.title || '');
     if (tierMatch && !/^[NT]\d+[:\s]/i.test(displayTitle)) {
       displayTitle = tierMatch[0] + ': ' + displayTitle;
     }
 
-    var dominantCls = (i === 0) ? ' dominant' : '';
+    const dominantCls = (i === 0) ? ' dominant' : '';
     cardsHtml += '<div class="hyp-card ' + h.dirClass + dominantCls + '">' +
       '<div class="hc-header"><div class="hc-title">' + displayTitle + '</div><div class="hc-status ' + h.statusClass + '">' + h.statusText + '</div></div>' +
       '<div class="hc-score-row"><div class="hc-score-number">' + normScore + '</div><div class="hc-score-bar"><div class="hc-score-fill" style="width:' + normWidth + '"></div></div><div class="hc-score-meta">' + h.scoreMeta + '</div></div>' +
@@ -445,10 +445,10 @@ export function renderHypotheses(data) {
 }
 
 export function renderNarrative(data) {
-  var n = data.narrative;
+  const n = data.narrative;
   if (!n) return '';
-  var t = data.ticker.toLowerCase();
-  var pi = n.priceImplication || {};
+  const t = data.ticker.toLowerCase();
+  const pi = n.priceImplication || {};
 
   return '<div class="report-section" id="' + t + '-narrative">' +
     RS_HDR('Section 03', 'Dominant Narrative') +
@@ -469,16 +469,16 @@ export function renderNarrative(data) {
 
 export function renderEvidenceCard(card) {
   if (!card) return '';
-  var tableHtml = '';
+  let tableHtml = '';
   if (card.table && card.table.headers && card.table.rows) {
-    var thHtml = '';
-    for (var h = 0; h < card.table.headers.length; h++) {
+    let thHtml = '';
+    for (let h = 0; h < card.table.headers.length; h++) {
       thHtml += '<th>' + card.table.headers[h] + '</th>';
     }
-    var tbHtml = '';
-    for (var r = 0; r < card.table.rows.length; r++) {
+    let tbHtml = '';
+    for (let r = 0; r < card.table.rows.length; r++) {
       tbHtml += '<tr>';
-      for (var c = 0; c < card.table.rows[r].length; c++) {
+      for (let c = 0; c < card.table.rows[r].length; c++) {
         tbHtml += '<td>' + card.table.rows[r][c] + '</td>';
       }
       tbHtml += '</tr>';
@@ -489,7 +489,7 @@ export function renderEvidenceCard(card) {
     '</table>';
   }
 
-  var tensionHtml = '';
+  let tensionHtml = '';
   if (card.tension) {
     tensionHtml = '<div class="ec-tension">' +
       '<div class="ec-tension-label">Key Tension</div>' +
@@ -497,9 +497,9 @@ export function renderEvidenceCard(card) {
     '</div>';
   }
 
-  var tagsHtml = '';
-  var tags = card.tags || [];
-  for (var t = 0; t < tags.length; t++) {
+  let tagsHtml = '';
+  const tags = card.tags || [];
+  for (let t = 0; t < tags.length; t++) {
     tagsHtml += '<span class="ec-tag ' + (tags[t].class || '') + '">' + (tags[t].text || '') + '</span>';
   }
 
@@ -524,20 +524,20 @@ export function renderEvidenceCard(card) {
 }
 
 export function renderAlignmentSummary(data) {
-  var as = data.evidence && data.evidence.alignmentSummary;
+  const as = data.evidence && data.evidence.alignmentSummary;
   if (!as || typeof as !== 'object' || !Array.isArray(as.headers) || !Array.isArray(as.rows)) return '';
 
-  var thHtml = '';
-  for (var h = 0; h < as.headers.length; h++) {
+  let thHtml = '';
+  for (let h = 0; h < as.headers.length; h++) {
     thHtml += '<th>' + as.headers[h] + '</th>';
   }
 
-  var tbHtml = '';
-  for (var i = 0; i < as.rows.length; i++) {
-    var row = as.rows[i];
+  let tbHtml = '';
+  for (let i = 0; i < as.rows.length; i++) {
+    const row = as.rows[i];
 
-    var cellFn = function(cell) {
-      var styleAttr = cell.style ? ' style="' + cell.style + '"' : '';
+    const cellFn = function(cell) {
+      const styleAttr = cell.style ? ' style="' + cell.style + '"' : '';
       return '<td class="' + cell.class + '"' + styleAttr + '>' + cell.text + '</td>';
     };
 
@@ -551,7 +551,7 @@ export function renderAlignmentSummary(data) {
     '</tr>';
   }
 
-  var sum = as.summary;
+  const sum = as.summary;
   tbHtml += '<tr style="font-weight:700">' +
     '<td>Domain Count</td>' +
     '<td></td>' +
@@ -569,17 +569,17 @@ export function renderAlignmentSummary(data) {
 }
 
 export function renderEvidence(data) {
-  var ev = data.evidence;
+  const ev = data.evidence;
   if (!ev) return '';
-  var t = data.ticker.toLowerCase();
-  var cards = ev.cards || [];
+  const t = data.ticker.toLowerCase();
+  const cards = ev.cards || [];
 
-  var cardsHtml = '';
-  for (var i = 0; i < cards.length; i++) {
+  let cardsHtml = '';
+  for (let i = 0; i < cards.length; i++) {
     cardsHtml += renderEvidenceCard(cards[i]);
   }
 
-  var alignmentHtml = renderAlignmentSummary(data);
+  const alignmentHtml = renderAlignmentSummary(data);
 
   return '<div class="report-section" id="' + t + '-evidence">' +
     RS_HDR('Section 04', 'Cross-Domain Evidence Synthesis') +
@@ -591,13 +591,13 @@ export function renderEvidence(data) {
 }
 
 export function renderDiscriminators(data) {
-  var d = data.discriminators;
+  const d = data.discriminators;
   if (!d || !d.rows || !d.rows.length) return '';
-  var t = data.ticker.toLowerCase();
+  const t = data.ticker.toLowerCase();
 
-  var rowsHtml = '';
-  for (var i = 0; i < d.rows.length; i++) {
-    var r = d.rows[i];
+  let rowsHtml = '';
+  for (let i = 0; i < d.rows.length; i++) {
+    const r = d.rows[i];
     rowsHtml += '<tr>' +
       '<td><span class="' + (r.diagnosticityClass || '') + '">' + (r.diagnosticity || '') + '</span></td>' +
       '<td>' + (r.evidence || '') + '</td>' +
@@ -622,27 +622,27 @@ export function renderDiscriminators(data) {
 }
 
 export function renderTripwires(data) {
-  var t = data.ticker.toLowerCase();
-  var tw = data.tripwires;
+  const t = data.ticker.toLowerCase();
+  const tw = data.tripwires;
   if (!tw || !tw.cards) return '';
 
-  var cardsHtml = '';
-  for (var i = 0; i < tw.cards.length; i++) {
-    var card = tw.cards[i];
+  let cardsHtml = '';
+  for (let i = 0; i < tw.cards.length; i++) {
+    const card = tw.cards[i];
     if (!card) continue;
-    var cardName = card.name || '';
+    const cardName = card.name || '';
 
-    var conditionsHtml = '';
-    var conditions = card.conditions || [];
-    for (var c = 0; c < conditions.length; c++) {
-      var cond = conditions[c];
+    let conditionsHtml = '';
+    const conditions = card.conditions || [];
+    for (let c = 0; c < conditions.length; c++) {
+      const cond = conditions[c];
       conditionsHtml += '<div class="tw-condition">' +
         '<div class="tw-cond-if ' + cond.valence + '">' + cond.if + '</div>' +
         '<div class="tw-cond-then">' + cond.then + '</div>' +
       '</div>';
     }
 
-    var resolvedCls = cardName.indexOf('RESOLVED') >= 0 ? ' tw-resolved' : '';
+    const resolvedCls = cardName.indexOf('RESOLVED') >= 0 ? ' tw-resolved' : '';
 
     cardsHtml += '<div class="tw-card' + resolvedCls + '">' +
       '<div class="tw-header"><div class="tw-date">' + (card.date || '') + '</div><div class="tw-name">' + cardName + '</div></div>' +
@@ -660,14 +660,14 @@ export function renderTripwires(data) {
 }
 
 export function renderGaps(data) {
-  var g = data.gaps;
+  const g = data.gaps;
   if (!g || !g.coverageRows || !g.coverageRows.length) return '';
-  var t = data.ticker.toLowerCase();
+  const t = data.ticker.toLowerCase();
 
-  var coverageHtml = '';
-  for (var i = 0; i < g.coverageRows.length; i++) {
-    var r = g.coverageRows[i];
-    var confClass = r.confidenceClass ? ' class="' + r.confidenceClass + '"' : '';
+  let coverageHtml = '';
+  for (let i = 0; i < g.coverageRows.length; i++) {
+    const r = g.coverageRows[i];
+    const confClass = r.confidenceClass ? ' class="' + r.confidenceClass + '"' : '';
     coverageHtml += '<tr>' +
       '<td>' + r.domain + '</td>' +
       '<td><span class="gap-dot ' + r.coverageLevel + '"></span>' + r.coverageLabel + '</td>' +
@@ -676,11 +676,11 @@ export function renderGaps(data) {
     '</tr>';
   }
 
-  var couldntAssess = g.couldntAssess || [];
-  var calloutsHtml = '';
+  const couldntAssess = g.couldntAssess || [];
+  let calloutsHtml = '';
   if (couldntAssess.length) {
-    var listItems = '';
-    for (var j = 0; j < couldntAssess.length; j++) {
+    let listItems = '';
+    for (let j = 0; j < couldntAssess.length; j++) {
       listItems += '<li>' + couldntAssess[j] + '</li>';
     }
     calloutsHtml = '<div class="callout"><ul class="gaps-list">' + listItems + '</ul></div>';
@@ -702,23 +702,23 @@ export function renderGaps(data) {
 }
 
 export function computeMA(arr, period) {
-  var result = [];
-  for (var i = 0; i < arr.length; i++) {
+  const result = [];
+  for (let i = 0; i < arr.length; i++) {
     if (i < period - 1) { result.push(null); continue; }
-    var sum = 0;
-    for (var j = i - period + 1; j <= i; j++) sum += arr[j];
+    let sum = 0;
+    for (let j = i - period + 1; j <= i; j++) sum += arr[j];
     result.push(sum / period);
   }
   return result;
 }
 
 export function renderTAChart(data) {
-  var ta = data.technicalAnalysis;
-  var live = data._liveChart;
-  var liveTA = data._liveTA;
+  const ta = data.technicalAnalysis;
+  const live = data._liveChart;
+  const liveTA = data._liveTA;
 
-  var isLight = document.documentElement.getAttribute('data-theme') === 'light';
-  var C = {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const C = {
     bg: isLight ? '#FFFFFF' : '#0D1726',
     grid: isLight ? '#E2E8F0' : '#1E3050',
     axisText: isLight ? '#718096' : '#566882',
@@ -734,36 +734,36 @@ export function renderTAChart(data) {
     ma200: '#4A8ECC'
   };
 
-  var useLive = live && live.bars && live.bars.length > 100;
-  var bars = useLive ? live.bars : null;
-  var closes = useLive ? bars.map(function(b){ return b.close; }) : data.priceHistory;
-  var highs = useLive ? bars.map(function(b){ return b.high; }) : null;
-  var lows = useLive ? bars.map(function(b){ return b.low; }) : null;
+  const useLive = live && live.bars && live.bars.length > 100;
+  const bars = useLive ? live.bars : null;
+  const closes = useLive ? bars.map(function(b){ return b.close; }) : data.priceHistory;
+  const highs = useLive ? bars.map(function(b){ return b.high; }) : null;
+  const lows = useLive ? bars.map(function(b){ return b.low; }) : null;
 
   if (!closes || closes.length < 20) return '';
 
-  var n = closes.length;
-  var ma50Arr = useLive && liveTA ? liveTA.ma50Arr : computeMA(closes, 50);
-  var ma200Arr = useLive && liveTA ? liveTA.ma200Arr : computeMA(closes, 200);
+  const n = closes.length;
+  const ma50Arr = useLive && liveTA ? liveTA.ma50Arr : computeMA(closes, 50);
+  const ma200Arr = useLive && liveTA ? liveTA.ma200Arr : computeMA(closes, 200);
 
-  var chartTitle = useLive ? (n > 500 ? '3' : n > 250 ? '2' : '1') + '-Year Daily Price &amp; Moving Averages' : '12-Month Daily Price &amp; Moving Averages';
-  var liveLabel = useLive ? '<span class="ta-chart-live-badge">LIVE</span>' : '<span class="ta-chart-static-badge">STATIC</span>';
+  const chartTitle = useLive ? (n > 500 ? '3' : n > 250 ? '2' : '1') + '-Year Daily Price &amp; Moving Averages' : '12-Month Daily Price &amp; Moving Averages';
+  const liveLabel = useLive ? '<span class="ta-chart-live-badge">LIVE</span>' : '<span class="ta-chart-static-badge">STATIC</span>';
 
-  var W = 960, H = 380;
-  var padL = 62, padR = 16, padT = 28, padB = 44;
-  var cW = W - padL - padR;
-  var cH = H - padT - padB;
+  const W = 960, H = 380;
+  const padL = 62, padR = 16, padT = 28, padB = 44;
+  const cW = W - padL - padR;
+  const cH = H - padT - padB;
 
-  var allVals = closes.slice();
+  const allVals = closes.slice();
   if (highs) for (var i = 0; i < n; i++) { if (highs[i] != null) allVals.push(highs[i]); }
   if (lows) for (var i = 0; i < n; i++) { if (lows[i] != null) allVals.push(lows[i]); }
   for (var i = 0; i < n; i++) {
     if (ma50Arr[i] !== null) allVals.push(ma50Arr[i]);
     if (ma200Arr[i] !== null) allVals.push(ma200Arr[i]);
   }
-  var pMin = Math.min.apply(null, allVals);
-  var pMax = Math.max.apply(null, allVals);
-  var pRange = pMax - pMin;
+  let pMin = Math.min.apply(null, allVals);
+  let pMax = Math.max.apply(null, allVals);
+  let pRange = pMax - pMin;
   pMin -= pRange * 0.05;
   pMax += pRange * 0.05;
   pRange = pMax - pMin;
@@ -771,45 +771,45 @@ export function renderTAChart(data) {
   function xPos(idx) { return padL + (idx / (n - 1)) * cW; }
   function yPos(val) { return padT + (1 - (val - pMin) / pRange) * cH; }
 
-  var taKl = ta && ta.keyLevels ? ta.keyLevels : {};
-  var supportPrice = taKl.support ? parseFloat(taKl.support.price) || null : null;
-  var resistPrice = taKl.resistance ? parseFloat(taKl.resistance.price) || null : null;
-  var curPrice = parseFloat(useLive && live.currentPrice ? live.currentPrice : data.price) || 0;
-  var cur = data.currency;
+  const taKl = ta && ta.keyLevels ? ta.keyLevels : {};
+  const supportPrice = taKl.support ? parseFloat(taKl.support.price) || null : null;
+  const resistPrice = taKl.resistance ? parseFloat(taKl.resistance.price) || null : null;
+  const curPrice = parseFloat(useLive && live.currentPrice ? live.currentPrice : data.price) || 0;
+  const cur = data.currency;
 
-  var svg = '<svg class="ta-chart-svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">';
+  let svg = '<svg class="ta-chart-svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">';
   svg += '<rect x="' + padL + '" y="' + padT + '" width="' + cW + '" height="' + cH + '" fill="' + C.bg + '" rx="2"/>';
 
-  var gridStep = pRange / 5;
-  var magnitude = Math.pow(10, Math.floor(Math.log10(gridStep)));
-  var niceSteps = [1, 2, 2.5, 5, 10];
-  var bestStep = magnitude;
-  for (var s = 0; s < niceSteps.length; s++) {
+  const gridStep = pRange / 5;
+  const magnitude = Math.pow(10, Math.floor(Math.log10(gridStep)));
+  const niceSteps = [1, 2, 2.5, 5, 10];
+  let bestStep = magnitude;
+  for (let s = 0; s < niceSteps.length; s++) {
     if (niceSteps[s] * magnitude >= gridStep) { bestStep = niceSteps[s] * magnitude; break; }
   }
-  for (var gv = Math.ceil(pMin / bestStep) * bestStep; gv <= pMax; gv += bestStep) {
-    var gy = yPos(gv);
+  for (let gv = Math.ceil(pMin / bestStep) * bestStep; gv <= pMax; gv += bestStep) {
+    const gy = yPos(gv);
     if (gy < padT || gy > padT + cH) continue;
     svg += '<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + (padL + cW) + '" y2="' + gy.toFixed(1) + '" stroke="' + C.grid + '" stroke-width="0.5"/>';
     svg += '<text x="' + (padL - 8) + '" y="' + (gy + 3.5).toFixed(1) + '" text-anchor="end" fill="' + C.axisText + '" font-family="JetBrains Mono, monospace" font-size="9">' + cur + gv.toFixed(gv >= 100 ? 0 : 2) + '</text>';
   }
 
   if (supportPrice && supportPrice >= pMin && supportPrice <= pMax) {
-    var sy = yPos(supportPrice);
+    const sy = yPos(supportPrice);
     svg += '<line x1="' + padL + '" y1="' + sy.toFixed(1) + '" x2="' + (padL + cW) + '" y2="' + sy.toFixed(1) + '" stroke="' + C.support + '" stroke-width="0.8" stroke-dasharray="6,4" opacity="0.6"/>';
     svg += '<text x="' + (padL + 4) + '" y="' + (sy - 4).toFixed(1) + '" fill="' + C.support + '" font-family="JetBrains Mono, monospace" font-size="7.5" opacity="0.8">S ' + cur + supportPrice.toFixed(2) + '</text>';
   }
   if (resistPrice && resistPrice >= pMin && resistPrice <= pMax) {
-    var ry = yPos(resistPrice);
+    const ry = yPos(resistPrice);
     svg += '<line x1="' + padL + '" y1="' + ry.toFixed(1) + '" x2="' + (padL + cW) + '" y2="' + ry.toFixed(1) + '" stroke="' + C.resistance + '" stroke-width="0.8" stroke-dasharray="6,4" opacity="0.6"/>';
     svg += '<text x="' + (padL + 4) + '" y="' + (ry - 4).toFixed(1) + '" fill="' + C.resistance + '" font-family="JetBrains Mono, monospace" font-size="7.5" opacity="0.8">R ' + cur + resistPrice.toFixed(2) + '</text>';
   }
 
   if (highs && lows) {
-    var hlUpper = '', hlLower = '';
+    let hlUpper = '', hlLower = '';
     for (var i = 0; i < n; i++) {
       if (highs[i] == null || lows[i] == null) continue;
-      var x = xPos(i).toFixed(1);
+      const x = xPos(i).toFixed(1);
       hlUpper += (hlUpper === '' ? 'M' : 'L') + x + ',' + yPos(highs[i]).toFixed(1);
       hlLower = x + ',' + yPos(lows[i]).toFixed(1) + (hlLower === '' ? '' : 'L' + hlLower);
     }
@@ -818,23 +818,23 @@ export function renderTAChart(data) {
     }
   }
 
-  var ma200Path = '';
+  let ma200Path = '';
   for (var i = 0; i < n; i++) {
     if (ma200Arr[i] === null) continue;
     ma200Path += (ma200Path === '' ? 'M' : 'L') + xPos(i).toFixed(1) + ',' + yPos(ma200Arr[i]).toFixed(1);
   }
   if (ma200Path) svg += '<path d="' + ma200Path + '" fill="none" stroke="' + C.ma200 + '" stroke-width="1.3" opacity="0.8"/>';
 
-  var ma50Path = '';
+  let ma50Path = '';
   for (var i = 0; i < n; i++) {
     if (ma50Arr[i] === null) continue;
     ma50Path += (ma50Path === '' ? 'M' : 'L') + xPos(i).toFixed(1) + ',' + yPos(ma50Arr[i]).toFixed(1);
   }
   if (ma50Path) svg += '<path d="' + ma50Path + '" fill="none" stroke="' + C.ma50 + '" stroke-width="1.3" opacity="0.8"/>';
 
-  var pricePath = 'M' + xPos(0).toFixed(1) + ',' + yPos(closes[0]).toFixed(1);
+  let pricePath = 'M' + xPos(0).toFixed(1) + ',' + yPos(closes[0]).toFixed(1);
   for (var i = 1; i < n; i++) pricePath += 'L' + xPos(i).toFixed(1) + ',' + yPos(closes[i]).toFixed(1);
-  var areaPath = pricePath + 'L' + xPos(n-1).toFixed(1) + ',' + (padT+cH) + 'L' + xPos(0).toFixed(1) + ',' + (padT+cH) + 'Z';
+  const areaPath = pricePath + 'L' + xPos(n-1).toFixed(1) + ',' + (padT+cH) + 'L' + xPos(0).toFixed(1) + ',' + (padT+cH) + 'Z';
   svg += '<defs><linearGradient id="priceGrad-' + data.ticker + '" x1="0" y1="0" x2="0" y2="1">';
   svg += '<stop offset="0%" stop-color="' + C.priceGradA + '" stop-opacity="' + (isLight ? '0.1' : '0.08') + '"/>';
   svg += '<stop offset="100%" stop-color="' + C.priceGradA + '" stop-opacity="0.01"/>';
@@ -843,18 +843,18 @@ export function renderTAChart(data) {
 
   svg += '<path d="' + pricePath + '" fill="none" stroke="' + C.price + '" stroke-width="1.4"/>';
 
-  var lastX = xPos(n - 1), lastY = yPos(closes[n-1]);
+  const lastX = xPos(n - 1), lastY = yPos(closes[n-1]);
   svg += '<circle cx="' + lastX.toFixed(1) + '" cy="' + lastY.toFixed(1) + '" r="3.5" fill="' + C.dot + '" stroke="' + C.dotStroke + '" stroke-width="1.5"/>';
-  var labelX = lastX + 8 > W - padR - 60 ? lastX - 65 : lastX + 8;
+  const labelX = lastX + 8 > W - padR - 60 ? lastX - 65 : lastX + 8;
   svg += '<text x="' + labelX.toFixed(1) + '" y="' + (lastY + 3).toFixed(1) + '" fill="' + C.dot + '" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600">' + cur + curPrice.toFixed(2) + '</text>';
 
-  var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   if (useLive) {
-    var lastMonth = -1, lastYear = -1;
-    var step = Math.max(1, Math.floor(n / 36));
+    let lastMonth = -1, lastYear = -1;
+    const step = Math.max(1, Math.floor(n / 36));
     for (var i = 0; i < n; i += step) {
-      var d = bars[i].date;
-      var mm = d.getMonth(), yy = d.getFullYear();
+      const d = bars[i].date;
+      const mm = d.getMonth(), yy = d.getFullYear();
       if (mm === lastMonth && yy === lastYear) continue;
       lastMonth = mm; lastYear = yy;
       var lx = xPos(i);
@@ -865,12 +865,12 @@ export function renderTAChart(data) {
       svg += '<line x1="' + lx.toFixed(1) + '" y1="' + (padT + cH) + '" x2="' + lx.toFixed(1) + '" y2="' + (padT + cH + 4) + '" stroke="' + C.grid + '" stroke-width="0.5"/>';
     }
   } else {
-    var reportDate = new Date(data.date);
-    var tradingDaysPerMonth = n / 12;
-    for (var m = 0; m <= 11; m++) {
-      var idx = Math.round(m * tradingDaysPerMonth);
+    const reportDate = new Date(data.date);
+    const tradingDaysPerMonth = n / 12;
+    for (let m = 0; m <= 11; m++) {
+      let idx = Math.round(m * tradingDaysPerMonth);
       if (idx >= n) idx = n - 1;
-      var labelDate = new Date(reportDate);
+      const labelDate = new Date(reportDate);
       labelDate.setMonth(labelDate.getMonth() - (11 - m));
       var label = monthNames[labelDate.getMonth()];
       if (labelDate.getMonth() === 0) label += " '" + String(labelDate.getFullYear()).slice(2);
@@ -881,7 +881,7 @@ export function renderTAChart(data) {
     }
   }
 
-  var lx0 = padL + 8;
+  let lx0 = padL + 8;
   svg += '<circle cx="' + lx0 + '" cy="14" r="3" fill="' + C.dot + '"/>';
   svg += '<text x="' + (lx0+8) + '" y="17" fill="' + C.legendText + '" font-family="Inter, sans-serif" font-size="8">Price</text>';
   if (highs) {
@@ -908,22 +908,22 @@ export function renderTAChart(data) {
 
 export function renderTechnicalAnalysis(data) {
   if (!data.technicalAnalysis) return '';
-  var t = data.ticker.toLowerCase();
-  var ta = data.technicalAnalysis;
-  var trend = ta.trend || {};
-  var price = ta.price || {};
-  var kl = ta.keyLevels || {};
-  var support = kl.support || {};
-  var resistance = kl.resistance || {};
-  var ma = ta.movingAverages || {};
-  var vol = ta.volume || {};
-  var vola = ta.volatility || {};
-  var mr = ta.meanReversion || {};
+  const t = data.ticker.toLowerCase();
+  const ta = data.technicalAnalysis;
+  const trend = ta.trend || {};
+  const price = ta.price || {};
+  const kl = ta.keyLevels || {};
+  const support = kl.support || {};
+  const resistance = kl.resistance || {};
+  const ma = ta.movingAverages || {};
+  const vol = ta.volume || {};
+  const vola = ta.volatility || {};
+  const mr = ta.meanReversion || {};
 
-  var chartHtml = renderTAChart(data);
+  const chartHtml = renderTAChart(data);
 
-  var trendDir = trend.direction || '';
-  var regimeHtml = '<div class="ta-regime-bar">' +
+  const trendDir = trend.direction || '';
+  const regimeHtml = '<div class="ta-regime-bar">' +
     '<div class="ta-regime-item"><div class="ta-regime-label">Regime</div><div class="ta-regime-value">' + (ta.regime || '') + '</div></div>' +
     '<div class="ta-regime-item"><div class="ta-regime-label">Clarity</div><div class="ta-regime-value">' + (ta.clarity || '') + '</div></div>' +
     '<div class="ta-regime-item"><div class="ta-regime-label">Trend</div><div class="ta-regime-value ' + (/down/i.test(trendDir) ? 'ta-down' : /up|recover/i.test(trendDir) ? 'ta-up' : '') + '">' + trendDir + (trend.duration ? ' (' + trend.duration + ')' : '') + '</div></div>' +
@@ -932,9 +932,9 @@ export function renderTechnicalAnalysis(data) {
     (resistance.price != null ? '<div class="ta-regime-item"><div class="ta-regime-label">Resistance</div><div class="ta-regime-value">' + (price.currency || '') + resistance.price.toFixed(2) + '</div></div>' : '') +
   '</div>';
 
-  var ma50 = ma.ma50 || {};
-  var ma200 = ma.ma200 || {};
-  var maHtml = (ma50.value != null || ma200.value != null) ? '<div class="rs-subtitle">Moving Averages</div>' +
+  const ma50 = ma.ma50 || {};
+  const ma200 = ma.ma200 || {};
+  const maHtml = (ma50.value != null || ma200.value != null) ? '<div class="rs-subtitle">Moving Averages</div>' +
     '<table class="ta-ma-table"><thead><tr>' +
       '<th>Measure</th><th>Value</th><th>Price vs MA</th><th>Note</th>' +
     '</tr></thead><tbody>' +
@@ -952,20 +952,20 @@ export function renderTechnicalAnalysis(data) {
     '</tr>' : '') +
     '</tbody></table>' : '';
 
-  var crossoverHtml = '';
+  let crossoverHtml = '';
   if (ma.crossover) {
-    var cx = ma.crossover;
+    const cx = ma.crossover;
     crossoverHtml = '<div class="ta-crossover-callout">' +
       '<div class="ta-crossover-label">' + cx.type + '</div>' +
       '<div class="ta-crossover-text">' + cx.description + ' &mdash; ' + cx.date + '</div>' +
     '</div>';
   }
 
-  var inflHtml = '';
+  let inflHtml = '';
   if (ta.inflectionPoints && ta.inflectionPoints.length > 0) {
-    var inflRows = '';
-    for (var i = 0; i < ta.inflectionPoints.length; i++) {
-      var ip = ta.inflectionPoints[i];
+    let inflRows = '';
+    for (let i = 0; i < ta.inflectionPoints.length; i++) {
+      const ip = ta.inflectionPoints[i];
       inflRows += '<tr>' +
         '<td class="ta-date-cell">' + ip.date + '</td>' +
         '<td class="ta-price-cell">' + ta.price.currency + ip.price.toFixed(2) + '</td>' +
@@ -978,7 +978,7 @@ export function renderTechnicalAnalysis(data) {
       '</tr></thead><tbody>' + inflRows + '</tbody></table>';
   }
 
-  var volHtml = '';
+  let volHtml = '';
   if (vol.latestVs20DayAvg != null) {
     volHtml = '<div class="ta-metrics-grid">' +
       '<div class="ta-metric-card">' +
@@ -986,14 +986,14 @@ export function renderTechnicalAnalysis(data) {
         '<div class="ta-metric-row"><div class="ta-metric-name">Latest vs 20-day avg</div><div class="ta-metric-val">' + vol.latestVs20DayAvg.toFixed(1) + 'x</div></div>' +
         '<div class="ta-metric-row"><div class="ta-metric-name">Date</div><div class="ta-metric-val">' + (vol.latestDate || '') + '</div></div>';
     if (vol.priorSpikes) {
-      for (var v = 0; v < vol.priorSpikes.length; v++) {
-        var sp = vol.priorSpikes[v];
+      for (let v = 0; v < vol.priorSpikes.length; v++) {
+        const sp = vol.priorSpikes[v];
         volHtml += '<div class="ta-metric-row"><div class="ta-metric-name">' + (sp.period || '') + '</div><div class="ta-metric-val">' + (sp.ratio != null ? sp.ratio.toFixed(1) : '0.0') + 'x <span class="ta-metric-desc">&mdash; ' + (sp.context || '') + '</span></div></div>';
       }
     }
     volHtml += '</div>';
     if (vola.latestRangePercent != null) {
-      var latestRange = vola.latestDailyRange || {};
+      const latestRange = vola.latestDailyRange || {};
       volHtml +=
         '<div class="ta-metric-card">' +
           '<div class="ta-metric-card-title">Volatility</div>' +
@@ -1006,12 +1006,12 @@ export function renderTechnicalAnalysis(data) {
     volHtml += '</div>';
   }
 
-  var mrHtml = '';
+  let mrHtml = '';
   if (mr.rangeHigh != null && mr.rangeLow != null) {
-    var rangeSpan = mr.rangeHigh - mr.rangeLow;
-    var pricePct = rangeSpan > 0 ? (((price.current || 0) - mr.rangeLow) / rangeSpan) * 100 : 50;
-    var ma50Pct = rangeSpan > 0 ? (((ma50.value || 0) - mr.rangeLow) / rangeSpan) * 100 : 50;
-    var ma200Pct = rangeSpan > 0 ? (((ma200.value || 0) - mr.rangeLow) / rangeSpan) * 100 : 50;
+    const rangeSpan = mr.rangeHigh - mr.rangeLow;
+    const pricePct = rangeSpan > 0 ? (((price.current || 0) - mr.rangeLow) / rangeSpan) * 100 : 50;
+    const ma50Pct = rangeSpan > 0 ? (((ma50.value || 0) - mr.rangeLow) / rangeSpan) * 100 : 50;
+    const ma200Pct = rangeSpan > 0 ? (((ma200.value || 0) - mr.rangeLow) / rangeSpan) * 100 : 50;
 
     mrHtml = '<div class="ta-mr-container">' +
       '<div class="ta-mr-title">Mean Reversion Positioning</div>' +
@@ -1037,9 +1037,9 @@ export function renderTechnicalAnalysis(data) {
   '</div>';
   }
 
-  var relHtml = '';
+  let relHtml = '';
   if (ta.relativePerformance && ta.relativePerformance.vsIndex && ta.relativePerformance.vsSector) {
-    var rp = ta.relativePerformance;
+    const rp = ta.relativePerformance;
     relHtml = '<div class="rs-subtitle">Relative Performance (' + rp.vsIndex.period + ')</div>' +
       '<table class="ta-rel-table"><thead><tr>' +
         '<th>Benchmark</th><th>Stock Return</th><th>Benchmark Return</th><th>Relative</th>' +
@@ -1059,9 +1059,9 @@ export function renderTechnicalAnalysis(data) {
       '</tbody></table>';
   }
 
-  var ftw52High = kl.fiftyTwoWeekHigh || {};
-  var ftw52Low = kl.fiftyTwoWeekLow || {};
-  var levelsHtml = (support.price != null || resistance.price != null) ? '<div class="rs-subtitle">Key Levels</div>' +
+  const ftw52High = kl.fiftyTwoWeekHigh || {};
+  const ftw52Low = kl.fiftyTwoWeekLow || {};
+  const levelsHtml = (support.price != null || resistance.price != null) ? '<div class="rs-subtitle">Key Levels</div>' +
     '<table class="ta-ma-table"><thead><tr><th>Level</th><th>Price</th><th>Derivation</th></tr></thead><tbody>' +
     (support.price != null ? '<tr><td class="ta-label-cell">Support</td><td>' + (price.currency || '') + support.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + (support.method || '') + '</td></tr>' : '') +
     (resistance.price != null ? '<tr><td class="ta-label-cell">Resistance</td><td>' + (price.currency || '') + resistance.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + (resistance.method || '') + '</td></tr>' : '') +
@@ -1069,7 +1069,7 @@ export function renderTechnicalAnalysis(data) {
     (ftw52Low.price != null ? '<tr><td class="ta-label-cell">52-Week Low</td><td>' + (price.currency || '') + ftw52Low.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + (ftw52Low.date || '') + '</td></tr>' : '') +
     '</tbody></table>' : '';
 
-  var footerHtml = '<div class="ta-footer">' +
+  const footerHtml = '<div class="ta-footer">' +
     'Analysis period: ' + (ta.period || '') + ' &bull; Generated: ' + (ta.date || '') + ' &bull; Source: ' + (ta.source || 'Continuum Technical Intelligence') +
   '</div>';
 
@@ -1090,7 +1090,7 @@ export function renderTechnicalAnalysis(data) {
 }
 
 export function renderReportFooter(data) {
-  var footer = data.footer || {};
+  const footer = data.footer || {};
   return '<div class="report-footer-section">' +
     '<div class="rf-inner">' +
       '<div class="rf-disclaimer-text">' + (footer.disclaimer || '') + '</div>' +
@@ -1107,7 +1107,7 @@ export function renderReportFooter(data) {
 }
 
 export function renderPDFDownload(data) {
-  var t = data.ticker;
+  const t = data.ticker;
   return '<div class="report-download-section">' +
     '<div class="report-download-inner">' +
       '<div class="report-download-title">Download Research Report</div>' +
@@ -1127,16 +1127,16 @@ export function renderPDFDownload(data) {
 }
 
 export function renderHypSidebar(data) {
-  var t = data.ticker.toLowerCase();
-  var ticker = data.ticker;
+  const t = data.ticker.toLowerCase();
+  const ticker = data.ticker;
 
-  var hypItems = '';
+  let hypItems = '';
   if (data.hypotheses && data.hypotheses.length > 0) {
-    var norm = normaliseScores(data.hypotheses);
-    for (var i = 0; i < data.hypotheses.length; i++) {
-      var h = data.hypotheses[i];
-      var dc = h.dirClass || 'dir-neutral';
-      var label = (h.title || '').replace(/^N\d+:\s*/, '');
+    const norm = normaliseScores(data.hypotheses);
+    for (let i = 0; i < data.hypotheses.length; i++) {
+      const h = data.hypotheses[i];
+      const dc = h.dirClass || 'dir-neutral';
+      const label = (h.title || '').replace(/^N\d+:\s*/, '');
       hypItems += '<div class="hs-item">' +
         '<div class="hs-dot ' + dc + '"></div>' +
         '<div class="hs-label">' + label + '</div>' +
@@ -1145,31 +1145,31 @@ export function renderHypSidebar(data) {
     }
   }
 
-  var skew = data._skew || computeSkewScore(data);
-  var skewDir = skew.direction || 'balanced';
-  var skewLabel = skewDir.toUpperCase();
-  var skewScoreNum = skew.score || 0;
-  var skewScoreStr = (skewScoreNum > 0 ? '+' : '') + skewScoreNum;
+  const skew = data._skew || computeSkewScore(data);
+  const skewDir = skew.direction || 'balanced';
+  const skewLabel = skewDir.toUpperCase();
+  const skewScoreNum = skew.score || 0;
+  const skewScoreStr = (skewScoreNum > 0 ? '+' : '') + skewScoreNum;
 
-  var tls = data.three_layer_signal || {};
-  var macSig = tls.macro_signal || 0;
-  var secSig = tls.sector_signal || 0;
-  var macCls = macSig > 10 ? 'dir-up' : macSig < -10 ? 'dir-down' : 'dir-neutral';
-  var secCls = secSig > 10 ? 'dir-up' : secSig < -10 ? 'dir-down' : 'dir-neutral';
+  const tls = data.three_layer_signal || {};
+  const macSig = tls.macro_signal || 0;
+  const secSig = tls.sector_signal || 0;
+  const macCls = macSig > 10 ? 'dir-up' : macSig < -10 ? 'dir-down' : 'dir-neutral';
+  const secCls = secSig > 10 ? 'dir-up' : secSig < -10 ? 'dir-down' : 'dir-neutral';
 
-  var ref = (typeof REFERENCE_DATA !== 'undefined') ? REFERENCE_DATA[ticker] : null;
-  var peValue = '\u2014';
-  var revGrowthValue = '\u2014';
+  const ref = (typeof REFERENCE_DATA !== 'undefined') ? REFERENCE_DATA[ticker] : null;
+  let peValue = '\u2014';
+  let revGrowthValue = '\u2014';
   if (data.heroMetrics) {
-    for (var mi = 0; mi < data.heroMetrics.length; mi++) {
-      var mLabel = (data.heroMetrics[mi].label || '').toLowerCase();
+    for (let mi = 0; mi < data.heroMetrics.length; mi++) {
+      const mLabel = (data.heroMetrics[mi].label || '').toLowerCase();
       if (mLabel === 'fwd p/e' || mLabel === 'p/e') peValue = data.heroMetrics[mi].value;
       if (mLabel === 'rev growth' || mLabel === 'revenue growth') revGrowthValue = data.heroMetrics[mi].value;
     }
   }
   if (ref) {
     if (peValue === '\u2014' && ref.epsForward) {
-      var currentP = parseFloat(data._livePrice || data.price || data.current_price || 0);
+      const currentP = parseFloat(data._livePrice || data.price || data.current_price || 0);
       if (currentP > 0) peValue = (currentP / ref.epsForward).toFixed(1) + 'x';
     }
     if (revGrowthValue === '\u2014' && ref.revenueGrowth != null) {
@@ -1177,21 +1177,21 @@ export function renderHypSidebar(data) {
     }
   }
 
-  var livePrice = parseFloat(data._livePrice || data.price || data.current_price || 0);
-  var ph = data.priceHistory;
-  var changePct = null;
+  const livePrice = parseFloat(data._livePrice || data.price || data.current_price || 0);
+  const ph = data.priceHistory;
+  let changePct = null;
   if (ph && ph.length >= 2) {
     changePct = ((ph[ph.length - 1] - ph[ph.length - 2]) / ph[ph.length - 2] * 100);
   } else if (data.freshness && data.freshness.pricePctChange != null) {
     changePct = data.freshness.pricePctChange;
   }
 
-  var vr = null;
-  var vrBear = 0, vrFair = 0, vrBull = 0, vrZone = '', vrZoneCls = '';
-  var vrToBull = '', vrToBear = '';
+  let vr = null;
+  let vrBear = 0, vrFair = 0, vrBull = 0, vrZone = '', vrZoneCls = '';
+  let vrToBull = '', vrToBear = '';
   if (data.hero && data.hero.position_in_range && data.hero.position_in_range.worlds &&
       data.hero.position_in_range.worlds.length >= 4) {
-    var w = data.hero.position_in_range.worlds;
+    const w = data.hero.position_in_range.worlds;
     vrBear = parseFloat(w[1].price) || 0;
     vrFair = (parseFloat(w[1].price) + parseFloat(w[2].price)) / 2;
     vrBull = parseFloat(w[3].price) || 0;
@@ -1210,7 +1210,7 @@ export function renderHypSidebar(data) {
     vrToBear = ((vrBear / livePrice - 1) * 100).toFixed(1);
   }
 
-  var inner = '';
+  let inner = '';
 
   inner += '<div class="hs-stock-id">' +
     '<div class="hs-stock-ticker">' + (data.tickerFull || data.ticker || ticker) + '</div>' +
@@ -1219,7 +1219,7 @@ export function renderHypSidebar(data) {
     inner += '<span class="hs-price">A$' + livePrice.toFixed(2) + '</span>';
   }
   if (changePct !== null) {
-    var chgCls = changePct >= 0 ? 'pos' : 'neg';
+    const chgCls = changePct >= 0 ? 'pos' : 'neg';
     inner += '<span class="hs-change-badge ' + chgCls + '">' +
       (changePct >= 0 ? '+' : '') + changePct.toFixed(1) + '%</span>';
   }
@@ -1258,8 +1258,8 @@ export function renderHypSidebar(data) {
     '</div>';
 
   if (vr && livePrice > 0) {
-    var vrRange = vrBull - vrBear || 1;
-    var vrCurrPct = Math.min(100, Math.max(0, ((livePrice - vrBear) / vrRange * 100))).toFixed(1);
+    const vrRange = vrBull - vrBear || 1;
+    const vrCurrPct = Math.min(100, Math.max(0, ((livePrice - vrBear) / vrRange * 100))).toFixed(1);
     inner += '<div class="hs-section-head">Valuation Range</div>' +
       '<div class="hs-val-section">' +
         '<div class="hs-val-header">' +
@@ -1288,10 +1288,10 @@ export function prepareHypotheses(data) {
   data._hypothesesPrepared = true;
   if (!data.hypotheses || !data.hypotheses.length) return;
 
-  var dirMap = { upside: 'dir-up', downside: 'dir-down', neutral: 'dir-neutral' };
-  var colorMap = { 'dir-up': 'var(--signal-green)', 'dir-down': 'var(--signal-red)', 'dir-neutral': 'var(--signal-amber)' };
+  const dirMap = { upside: 'dir-up', downside: 'dir-down', neutral: 'dir-neutral' };
+  const colorMap = { 'dir-up': 'var(--signal-green)', 'dir-down': 'var(--signal-red)', 'dir-neutral': 'var(--signal-amber)' };
 
-  var hyps = data.hypotheses;
+  const hyps = data.hypotheses;
 
   // No sort. The JSON stores hypotheses in canonical N1→N4 order and is the
   // source of truth. Sorting in place would permanently reorder STOCK_DATA,
@@ -1306,8 +1306,8 @@ export function prepareHypotheses(data) {
   // Apply direction colours to verdict scores without renaming labels.
   if (data.verdict && data.verdict.scores) {
     for (var i = 0; i < hyps.length; i++) {
-      var rawScore = hyps[i].score;
-      for (var j = 0; j < data.verdict.scores.length; j++) {
+      const rawScore = hyps[i].score;
+      for (let j = 0; j < data.verdict.scores.length; j++) {
         if (data.verdict.scores[j] && data.verdict.scores[j].score === rawScore) {
           data.verdict.scores[j].scoreColor = colorMap[hyps[i].dirClass] || data.verdict.scores[j].scoreColor;
           break;
@@ -1318,10 +1318,10 @@ export function prepareHypotheses(data) {
 
   // Rebuild alignmentSummary column headers to match sorted display order.
   if (data.evidence && data.evidence.alignmentSummary && typeof data.evidence.alignmentSummary === 'object') {
-    var as = data.evidence.alignmentSummary;
+    const as = data.evidence.alignmentSummary;
     if (Array.isArray(as.headers) && as.headers.length >= 5 && as.rows) {
-      var nonNCount = as.headers.length - hyps.length;
-      var newHeaders = as.headers.slice(0, nonNCount);
+      const nonNCount = as.headers.length - hyps.length;
+      const newHeaders = as.headers.slice(0, nonNCount);
       for (var i = 0; i < hyps.length; i++) {
         newHeaders.push(hyps[i].title.substring(0, 18));
       }
@@ -1331,14 +1331,14 @@ export function prepareHypotheses(data) {
 }
 
 export function renderOvercorrectionBanner(data) {
-  var oc = data._overcorrection;
+  const oc = data._overcorrection;
   if (!oc || !oc.active) return '';
-  var cls = oc.reviewResult && oc.reviewResult.confirmed ? ' confirmed' : '';
-  var label = oc.reviewResult && oc.reviewResult.confirmed
+  const cls = oc.reviewResult && oc.reviewResult.confirmed ? ' confirmed' : '';
+  const label = oc.reviewResult && oc.reviewResult.confirmed
     ? '&#10004; Overcorrection Confirmed'
     : '&#9888; Possible Overcorrection Detected';
-  var message = oc.message || 'Price move exceeded threshold  --  scores under review.';
-  var reviewHtml = oc.reviewDate
+  const message = oc.message || 'Price move exceeded threshold  --  scores under review.';
+  let reviewHtml = oc.reviewDate
     ? '<div class="oc-review">5-day review scheduled: ' + oc.reviewDate + '</div>'
     : '';
   if (oc.reviewResult) {
@@ -1353,20 +1353,20 @@ export function renderOvercorrectionBanner(data) {
 
 // Narrative Timeline Chart (Phase 6)
 
-var HISTORY_CACHE = {};
+const HISTORY_CACHE = {};
 
 function loadNarrativeHistory(ticker, callback) {
   if (HISTORY_CACHE[ticker]) {
     callback(HISTORY_CACHE[ticker]);
     return;
   }
-  var url = 'data/stocks/' + ticker + '-history.json';
-  var xhr = new XMLHttpRequest();
+  const url = 'data/stocks/' + ticker + '-history.json';
+  const xhr = new XMLHttpRequest();
   xhr.open('GET', url, true);
   xhr.onload = function() {
     if (xhr.status === 200) {
       try {
-        var data = JSON.parse(xhr.responseText);
+        const data = JSON.parse(xhr.responseText);
         HISTORY_CACHE[ticker] = data;
         callback(data);
       } catch (e) {
@@ -1382,7 +1382,7 @@ function loadNarrativeHistory(ticker, callback) {
 }
 
 export function renderNarrativeTimeline(data) {
-  var t = data.ticker.toLowerCase();
+  const t = data.ticker.toLowerCase();
   return '<div class="report-section narrative-timeline-section" id="' + t + '-narrative-timeline">' +
     RS_HDR('Timeline', 'Narrative Evolution') +
     '<div class="rs-body">' +
@@ -1404,7 +1404,7 @@ export function renderNarrativeTimeline(data) {
   '</div>';
 }
 
-var NT_COLORS = {
+const NT_COLORS = {
   price: '#8B95A5',
   hypotheses: [
     { bg: 'rgba(61, 170, 109, 0.15)', border: '#3DAA6D', label: '#3DAA6D' },
@@ -1418,7 +1418,7 @@ var NT_COLORS = {
 };
 
 export function initNarrativeTimelineChart(ticker) {
-  var Chart = window.Chart;
+  const Chart = window.Chart;
   if (!Chart) {
     console.warn('[NarrativeTimeline] Chart.js not loaded yet');
     return;
@@ -1426,28 +1426,28 @@ export function initNarrativeTimelineChart(ticker) {
 
   destroyNarrativeTimelineChart(ticker);
 
-  var canvas = document.getElementById('nt-canvas-' + ticker);
-  var loading = document.getElementById('nt-loading-' + ticker);
-  var legend = document.getElementById('nt-legend-' + ticker);
+  const canvas = document.getElementById('nt-canvas-' + ticker);
+  const loading = document.getElementById('nt-loading-' + ticker);
+  const legend = document.getElementById('nt-legend-' + ticker);
   if (!canvas) return;
 
   loadNarrativeHistory(ticker, function(histData) {
-    var canvasCheck = document.getElementById('nt-canvas-' + ticker);
+    const canvasCheck = document.getElementById('nt-canvas-' + ticker);
     if (!canvasCheck) return;
 
     if (loading) loading.style.display = 'none';
     canvasCheck.style.display = 'block';
 
     if (!histData || !histData.entries || histData.entries.length < 2) {
-      var wrap = document.getElementById('nt-wrap-' + ticker);
+      const wrap = document.getElementById('nt-wrap-' + ticker);
       if (wrap) {
         wrap.innerHTML = '<div class="nt-chart-empty">Insufficient history data for timeline visualisation.<br>Data accumulates daily via the automated pipeline.</div>';
       }
       return;
     }
 
-    var history = histData.entries;
-    var flips = histData.flips || [];
+    const history = histData.entries;
+    const flips = histData.flips || [];
 
     // Canonical ID: map T-prefixed IDs to N-prefixed (same hypotheses, renamed mid-history)
     function canonId(id) {
@@ -1457,13 +1457,13 @@ export function initNarrativeTimelineChart(ticker) {
 
     // Normalise both history schemas into {N1: score, N2: score, ...} with integer 0-100 scale
     function extractScores(entry) {
-      var result = {};
+      const result = {};
       if (entry.hypotheses) {
         for (var j = 0; j < entry.hypotheses.length; j++) {
           result[canonId(entry.hypotheses[j].id)] = entry.hypotheses[j].survival_score;
         }
       } else if (entry.scores) {
-        var keys = Object.keys(entry.scores);
+        const keys = Object.keys(entry.scores);
         for (var j = 0; j < keys.length; j++) {
           result[canonId(keys[j])] = Math.round(entry.scores[keys[j]] * 100);
         }
@@ -1471,14 +1471,14 @@ export function initNarrativeTimelineChart(ticker) {
       return result;
     }
 
-    var labels = [];
-    var priceData = [];
-    var hypDatasets = {};
-    var hypIdSet = {};
-    var hypIds = [];
+    const labels = [];
+    const priceData = [];
+    const hypDatasets = {};
+    const hypIdSet = {};
+    const hypIds = [];
     for (var i = 0; i < history.length; i++) {
       var scores = extractScores(history[i]);
-      var sKeys = Object.keys(scores);
+      const sKeys = Object.keys(scores);
       for (var h = 0; h < sKeys.length; h++) {
         if (!hypIdSet[sKeys[h]]) {
           hypIdSet[sKeys[h]] = true;
@@ -1488,8 +1488,8 @@ export function initNarrativeTimelineChart(ticker) {
     }
 
     for (var i = 0; i < history.length; i++) {
-      var entry = history[i];
-      var parts = (entry.date || '').split('-');
+      const entry = history[i];
+      const parts = (entry.date || '').split('-');
       if (parts.length === 3) {
         labels.push(parts[2] + '/' + parts[1]);
       } else {
@@ -1506,7 +1506,7 @@ export function initNarrativeTimelineChart(ticker) {
     }
 
     // Resolve hypothesis names: old-schema rich names first, then STOCK_DATA research fallback
-    var hypNames = {};
+    const hypNames = {};
     for (var i = history.length - 1; i >= 0; i--) {
       if (history[i].hypotheses) {
         for (var h = 0; h < history[i].hypotheses.length; h++) {
@@ -1519,7 +1519,7 @@ export function initNarrativeTimelineChart(ticker) {
       }
     }
     // Fall back to STOCK_DATA hypotheses (tier/title) for any gaps
-    var stockHyps = STOCK_DATA[ticker] && STOCK_DATA[ticker].hypotheses;
+    const stockHyps = STOCK_DATA[ticker] && STOCK_DATA[ticker].hypotheses;
     if (stockHyps) {
       for (var h = 0; h < stockHyps.length; h++) {
         var cid = canonId(stockHyps[h].tier || stockHyps[h].id || '');
@@ -1529,7 +1529,7 @@ export function initNarrativeTimelineChart(ticker) {
       }
     }
 
-    var datasets = [];
+    const datasets = [];
     datasets.push({
       label: 'Price',
       data: priceData,
@@ -1545,7 +1545,7 @@ export function initNarrativeTimelineChart(ticker) {
 
     for (var h = 0; h < hypIds.length; h++) {
       var hid = hypIds[h];
-      var colorSet = NT_COLORS.hypotheses[h] || NT_COLORS.hypotheses[0];
+      const colorSet = NT_COLORS.hypotheses[h] || NT_COLORS.hypotheses[0];
       datasets.push({
         label: hid + ': ' + (hypNames[hid] || hid),
         data: hypDatasets[hid],
@@ -1562,21 +1562,21 @@ export function initNarrativeTimelineChart(ticker) {
     }
 
     // Filter out false flips caused by T->N rename (same canonical ID)
-    var realFlips = [];
+    const realFlips = [];
     for (var f = 0; f < flips.length; f++) {
       var fl = flips[f];
-      var fromId = fl.from && fl.from.id ? canonId(fl.from.id) : null;
-      var toId = fl.to && fl.to.id ? canonId(fl.to.id) : null;
+      const fromId = fl.from && fl.from.id ? canonId(fl.from.id) : null;
+      const toId = fl.to && fl.to.id ? canonId(fl.to.id) : null;
       if (fromId !== toId) realFlips.push(fl);
     }
 
-    var flipMarkers = [];
+    const flipMarkers = [];
     for (var f = 0; f < realFlips.length; f++) {
-      var flip = realFlips[f];
-      var flipParts = (flip.date || '').split('-');
+      const flip = realFlips[f];
+      const flipParts = (flip.date || '').split('-');
       if (flipParts.length === 3) {
-        var flipLabel = flipParts[2] + '/' + flipParts[1];
-        var flipIdx = labels.indexOf(flipLabel);
+        const flipLabel = flipParts[2] + '/' + flipParts[1];
+        const flipIdx = labels.indexOf(flipLabel);
         if (flipIdx >= 0) {
           flipMarkers.push({ idx: flipIdx, color: NT_COLORS.flip, dash: [4, 3], width: 1.5 });
         }
@@ -1584,10 +1584,10 @@ export function initNarrativeTimelineChart(ticker) {
     }
     for (var i = 0; i < history.length; i++) {
       if (history[i].overcorrection_active) {
-        var ocParts = (history[i].date || '').split('-');
+        const ocParts = (history[i].date || '').split('-');
         if (ocParts.length === 3) {
-          var ocLabel = ocParts[2] + '/' + ocParts[1];
-          var ocIdx = labels.indexOf(ocLabel);
+          const ocLabel = ocParts[2] + '/' + ocParts[1];
+          const ocIdx = labels.indexOf(ocLabel);
           if (ocIdx >= 0) {
             flipMarkers.push({ idx: ocIdx, color: NT_COLORS.overcorrection, dash: [2, 2], width: 2 });
           }
@@ -1595,17 +1595,17 @@ export function initNarrativeTimelineChart(ticker) {
       }
     }
 
-    var verticalLinePlugin = {
+    const verticalLinePlugin = {
       id: 'ntVerticalLines',
       afterDraw: function(chart) {
         if (!flipMarkers || flipMarkers.length === 0) return;
-        var ctx = chart.ctx;
-        var xScale = chart.scales.x;
-        var yScale = chart.scales.yPrice;
+        const ctx = chart.ctx;
+        const xScale = chart.scales.x;
+        const yScale = chart.scales.yPrice;
         ctx.save();
-        for (var m = 0; m < flipMarkers.length; m++) {
-          var marker = flipMarkers[m];
-          var xPixel = xScale.getPixelForValue(marker.idx);
+        for (let m = 0; m < flipMarkers.length; m++) {
+          const marker = flipMarkers[m];
+          const xPixel = xScale.getPixelForValue(marker.idx);
           ctx.beginPath();
           ctx.setLineDash(marker.dash);
           ctx.strokeStyle = marker.color;
@@ -1618,11 +1618,11 @@ export function initNarrativeTimelineChart(ticker) {
       }
     };
 
-    var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-    var textColor = isDark ? '#8B95A5' : '#4A5568';
-    var gridColor = isDark ? 'rgba(139, 149, 165, 0.1)' : 'rgba(0, 0, 0, 0.06)';
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const textColor = isDark ? '#8B95A5' : '#4A5568';
+    const gridColor = isDark ? 'rgba(139, 149, 165, 0.1)' : 'rgba(0, 0, 0, 0.06)';
 
-    var ctx = canvasCheck.getContext('2d');
+    const ctx = canvasCheck.getContext('2d');
     try {
     var chart = new Chart(ctx, {
       type: 'line',
@@ -1659,8 +1659,8 @@ export function initNarrativeTimelineChart(ticker) {
             cornerRadius: 4,
             callbacks: {
               label: function(context) {
-                var label = context.dataset.label || '';
-                var value = context.parsed.y;
+                const label = context.dataset.label || '';
+                const value = context.parsed.y;
                 if (context.dataset.yAxisID === 'yPrice') {
                   return label + ': $' + (value !== null ? value.toFixed(2) : ' -- ');
                 }
@@ -1726,14 +1726,14 @@ export function initNarrativeTimelineChart(ticker) {
 
     canvasCheck._ntChart = chart;
 
-    var legendEl = document.getElementById('nt-legend-' + ticker);
+    const legendEl = document.getElementById('nt-legend-' + ticker);
     if (legendEl && realFlips.length > 0) {
       legendEl.innerHTML = '';
       for (var f = 0; f < realFlips.length; f++) {
         var fl = realFlips[f];
-        var item = document.createElement('div');
+        const item = document.createElement('div');
         item.className = 'nt-flip-item';
-        var marker = document.createElement('span');
+        const marker = document.createElement('span');
         marker.className = 'nt-flip-marker';
         item.appendChild(marker);
         item.appendChild(document.createTextNode(
@@ -1748,14 +1748,14 @@ export function initNarrativeTimelineChart(ticker) {
 }
 
 export function destroyNarrativeTimelineChart(ticker) {
-  var Chart = window.Chart;
-  var canvas = document.getElementById('nt-canvas-' + ticker);
+  const Chart = window.Chart;
+  const canvas = document.getElementById('nt-canvas-' + ticker);
   if (canvas) {
     if (canvas._ntChart) {
       canvas._ntChart.destroy();
       canvas._ntChart = null;
     }
-    var existing = (window.Chart && window.Chart.getChart) ? window.Chart.getChart(canvas) : null;
+    const existing = (window.Chart && window.Chart.getChart) ? window.Chart.getChart(canvas) : null;
     if (existing) {
       existing.destroy();
     }
@@ -1763,35 +1763,35 @@ export function destroyNarrativeTimelineChart(ticker) {
 }
 
 export function renderSignalBars(data) {
-  var tls = data.three_layer_signal || {};
-  var ta  = data.technicalAnalysis;
-  var rows = '';
+  const tls = data.three_layer_signal || {};
+  const ta  = data.technicalAnalysis;
+  let rows = '';
 
   // Row 1: Technical Indicators
   if (ta) {
-    var regime     = ta.regime || '';
-    var isCritical = /break|bear|crash/i.test(regime);
-    var isPositive = /up|bull|accum|recov/i.test(regime);
-    var regimeCls  = isCritical ? 'critical' : isPositive ? 'positive' : 'neutral';
-    var badgeLabel = isCritical ? 'Critical' : isPositive ? 'Positive' : (regime.split(/[\s\u2014\u2013-]/)[0] || 'Neutral');
+    const regime     = ta.regime || '';
+    const isCritical = /break|bear|crash/i.test(regime);
+    const isPositive = /up|bull|accum|recov/i.test(regime);
+    const regimeCls  = isCritical ? 'critical' : isPositive ? 'positive' : 'neutral';
+    const badgeLabel = isCritical ? 'Critical' : isPositive ? 'Positive' : (regime.split(/[\s\u2014\u2013-]/)[0] || 'Neutral');
 
-    var currentP = parseFloat(data._livePrice || data.price || 0);
-    var ph = data.priceHistory;
-    var dailyChange = '', dailyCls = '';
+    const currentP = parseFloat(data._livePrice || data.price || 0);
+    const ph = data.priceHistory;
+    let dailyChange = '', dailyCls = '';
     if (data._liveChangePct != null && !isNaN(data._liveChangePct)) {
       var chg = parseFloat(data._liveChangePct);
       dailyCls    = chg >= 0 ? 'pos' : 'neg';
       dailyChange = (chg >= 0 ? '+' : '') + chg.toFixed(1) + '% today';
     } else if (ph && ph.length >= 2) {
-      var last2 = parseFloat(ph[ph.length - 1]);
-      var prev2 = parseFloat(ph[ph.length - 2]);
+      const last2 = parseFloat(ph[ph.length - 1]);
+      const prev2 = parseFloat(ph[ph.length - 2]);
       if (!isNaN(last2) && !isNaN(prev2) && prev2 !== 0) {
         var chg = (last2 - prev2) / prev2 * 100;
         dailyCls    = chg >= 0 ? 'pos' : 'neg';
         dailyChange = (chg >= 0 ? '+' : '') + chg.toFixed(1) + '% today';
       }
     }
-    var fromPeak = '', fromPeakCls = '';
+    let fromPeak = '', fromPeakCls = '';
     if (ta.trend && ta.trend.drawdown != null) {
       fromPeak    = ta.trend.drawdown.toFixed(1) + '% from peak';
       fromPeakCls = ta.trend.drawdown < 0 ? 'neg' : 'pos';
@@ -1811,9 +1811,9 @@ export function renderSignalBars(data) {
 
   // Row 2: Macro Environment
   if (tls) {
-    var macSig   = tls.macro_signal  || 0;
-    var macCls   = macSig >  10 ? 'positive' : macSig < -10 ? 'downside' : 'neutral';
-    var macLabel = macSig >  10 ? 'SUPPORTIVE' : macSig < -10 ? 'HEADWIND' : 'NEUTRAL';
+    const macSig   = tls.macro_signal  || 0;
+    const macCls   = macSig >  10 ? 'positive' : macSig < -10 ? 'downside' : 'neutral';
+    const macLabel = macSig >  10 ? 'SUPPORTIVE' : macSig < -10 ? 'HEADWIND' : 'NEUTRAL';
     rows +=
       '<div class="sb-row">' +
         '<span class="sb-indicator ' + macCls + '"></span>' +
@@ -1828,11 +1828,11 @@ export function renderSignalBars(data) {
 
   // Row 3: Sector Narrative
   if (tls) {
-    var secSig   = tls.sector_signal || 0;
-    var secCls   = secSig >  10 ? 'positive' : secSig < -10 ? 'downside' : 'neutral';
-    var secLabel = secSig >  10 ? 'POSITIVE'  : secSig < -10 ? 'NEGATIVE'  : 'NEUTRAL';
-    var secName  = (data.sector || '') + (data.sectorSub ? ' / ' + data.sectorSub : '');
-    var secWeight = tls.external_weight || 0;
+    const secSig   = tls.sector_signal || 0;
+    const secCls   = secSig >  10 ? 'positive' : secSig < -10 ? 'downside' : 'neutral';
+    const secLabel = secSig >  10 ? 'POSITIVE'  : secSig < -10 ? 'NEGATIVE'  : 'NEUTRAL';
+    const secName  = (data.sector || '') + (data.sectorSub ? ' / ' + data.sectorSub : '');
+    const secWeight = tls.external_weight || 0;
     rows +=
       '<div class="sb-row">' +
         '<span class="sb-indicator ' + secCls + '"></span>' +
@@ -1850,38 +1850,38 @@ export function renderSignalBars(data) {
   }
 
   // Row 4: Company Research
-  var skew     = data._skew || computeSkewScore(data);
-  var compCls  = skew.score < -5 ? 'downside' : skew.score > 5 ? 'upside' : 'neutral';
-  var compBadge= skew.score < -5 ? 'DOWNSIDE'  : skew.score > 5 ? 'UPSIDE'  : 'NEUTRAL';
-  var scoreLbl = (skew.score > 0 ? '+' : '') + skew.score;
-  var hyps     = (tls && tls.company_detail && tls.company_detail.hypotheses)
+  const skew     = data._skew || computeSkewScore(data);
+  const compCls  = skew.score < -5 ? 'downside' : skew.score > 5 ? 'upside' : 'neutral';
+  const compBadge= skew.score < -5 ? 'DOWNSIDE'  : skew.score > 5 ? 'UPSIDE'  : 'NEUTRAL';
+  const scoreLbl = (skew.score > 0 ? '+' : '') + skew.score;
+  const hyps     = (tls && tls.company_detail && tls.company_detail.hypotheses)
                    ? tls.company_detail.hypotheses
                    : (skew.hypotheses || []);
 
-  var bearCt = 0, bullCt = 0;
-  for (var hi = 0; hi < hyps.length; hi++) {
+  let bearCt = 0, bullCt = 0;
+  for (let hi = 0; hi < hyps.length; hi++) {
     if      (hyps[hi].direction === 'downside') bearCt++;
     else if (hyps[hi].direction === 'upside')   bullCt++;
   }
 
-  var dominant = null, domMax = -1;
-  for (var di = 0; di < hyps.length; di++) {
-    var dh = hyps[di], dw = dh.weight || 0;
+  let dominant = null, domMax = -1;
+  for (let di = 0; di < hyps.length; di++) {
+    const dh = hyps[di], dw = dh.weight || 0;
     if ((skew.score < 0 && dh.direction === 'downside' && dw > domMax) ||
         (skew.score >= 0 && dh.direction === 'upside'  && dw > domMax)) {
       domMax = dw; dominant = dh;
     }
   }
 
-  var sorted = hyps.slice().sort(function(a,b){ return (b.weight||0)-(a.weight||0); });
-  var chipsHtml = '';
-  for (var ci = 0; ci < sorted.length; ci++) {
-    var sh = sorted[ci];
-    var chipCls  = sh.direction === 'downside' ? 'downside' : sh.direction === 'upside' ? 'upside' : '';
-    var nMatch   = sh.title ? sh.title.match(/^([NT]\d+)/i) : null;
-    var nCode    = nMatch ? nMatch[1].toUpperCase() : ((sh.tier || '').toUpperCase().match(/^[NT]\d+/) || [''])[0];
-    var descParts= (sh.title || '').replace(/^[NT]\d+[:\s]*/i,'').split(' ');
-    var keyWord  = (descParts[0] || '').toLowerCase() === 'structural' && descParts[1]
+  const sorted = hyps.slice().sort(function(a,b){ return (b.weight||0)-(a.weight||0); });
+  let chipsHtml = '';
+  for (let ci = 0; ci < sorted.length; ci++) {
+    const sh = sorted[ci];
+    const chipCls  = sh.direction === 'downside' ? 'downside' : sh.direction === 'upside' ? 'upside' : '';
+    const nMatch   = sh.title ? sh.title.match(/^([NT]\d+)/i) : null;
+    const nCode    = nMatch ? nMatch[1].toUpperCase() : ((sh.tier || '').toUpperCase().match(/^[NT]\d+/) || [''])[0];
+    const descParts= (sh.title || '').replace(/^[NT]\d+[:\s]*/i,'').split(' ');
+    const keyWord  = (descParts[0] || '').toLowerCase() === 'structural' && descParts[1]
                    ? descParts[1] : (descParts[0] || '');
     chipsHtml +=
       '<span class="sb-hyp-chip ' + chipCls + '">' +
@@ -1931,12 +1931,12 @@ export function renderGoldDiscovery(data) {
 }
 
 function _renderGoldAssets(ga) {
-  var assets = ga.assets;
+  const assets = ga.assets;
   if (!assets || !assets.length) return '';
 
-  var rows = '';
-  for (var i = 0; i < assets.length; i++) {
-    var a = assets[i];
+  let rows = '';
+  for (let i = 0; i < assets.length; i++) {
+    const a = assets[i];
     rows += '<tr>' +
       '<td>' + (a.name || 'N/A') + '</td>' +
       '<td>' + (a.country || 'N/A') + '</td>' +
@@ -1963,33 +1963,33 @@ function _renderGoldAssets(ga) {
 }
 
 function _renderGoldValuation(ga) {
-  var v = ga.valuation;
+  const v = ga.valuation;
   if (!v) return '';
-  var base = v.screening_nav_usd_m;
-  var up = v.upside_nav_usd_m;
-  var down = v.downside_nav_usd_m;
+  const base = v.screening_nav_usd_m;
+  const up = v.upside_nav_usd_m;
+  const down = v.downside_nav_usd_m;
   if (base == null && up == null && down == null) return '';
 
-  var fmt = function(n) { return n != null ? 'US$' + n.toLocaleString() + 'm' : 'N/A'; };
+  const fmt = function(n) { return n != null ? 'US$' + n.toLocaleString() + 'm' : 'N/A'; };
 
-  var navCards =
+  const navCards =
     '<div class="ga-val-grid">' +
       '<div class="ga-val-card ga-val-down"><div class="ga-val-label">Downside NAV</div><div class="ga-val-num">' + fmt(down) + '</div></div>' +
       '<div class="ga-val-card ga-val-base"><div class="ga-val-label">Base NAV</div><div class="ga-val-num">' + fmt(base) + '</div></div>' +
       '<div class="ga-val-card ga-val-up"><div class="ga-val-label">Upside NAV</div><div class="ga-val-num">' + fmt(up) + '</div></div>' +
     '</div>';
 
-  var multiples = [];
+  const multiples = [];
   if (v.p_nav != null) multiples.push(['P/NAV', v.p_nav + 'x']);
   if (v.ev_per_reserve_oz_usd != null) multiples.push(['EV/Reserve oz', 'US$' + v.ev_per_reserve_oz_usd.toLocaleString()]);
   if (v.ev_per_resource_oz_usd != null) multiples.push(['EV/Resource oz', 'US$' + v.ev_per_resource_oz_usd.toLocaleString()]);
   if (v.ev_per_production_oz_usd != null) multiples.push(['EV/Production oz', 'US$' + v.ev_per_production_oz_usd.toLocaleString()]);
   if (v.fcf_yield_spot_pct != null) multiples.push(['FCF Yield (spot)', v.fcf_yield_spot_pct + '%']);
 
-  var multiplesHtml = '';
+  let multiplesHtml = '';
   if (multiples.length > 0) {
-    var mRows = '';
-    for (var i = 0; i < multiples.length; i++) {
+    let mRows = '';
+    for (let i = 0; i < multiples.length; i++) {
       mRows += '<tr><td class="ga-metric-name">' + multiples[i][0] + '</td><td class="ga-metric-val">' + multiples[i][1] + '</td></tr>';
     }
     multiplesHtml = '<table class="ga-metrics-table"><tbody>' + mRows + '</tbody></table>';
@@ -2002,36 +2002,36 @@ function _renderGoldValuation(ga) {
 }
 
 function _renderGoldPeers(ga) {
-  var pf = ga.peer_frame;
+  const pf = ga.peer_frame;
   if (!pf) return '';
 
-  var v = ga.valuation || {};
-  var pNav = v.p_nav;
-  var medianPNav = pf.peer_median_p_nav;
-  var discount = pf.p_nav_discount_premium_pct;
-  var comment = pf.relative_valuation_comment || '';
-  var peers = pf.peer_group || [];
+  const v = ga.valuation || {};
+  const pNav = v.p_nav;
+  const medianPNav = pf.peer_median_p_nav;
+  const discount = pf.p_nav_discount_premium_pct;
+  const comment = pf.relative_valuation_comment || '';
+  const peers = pf.peer_group || [];
 
   if (!medianPNav && !comment) return '';
 
-  var discountColor = discount != null
+  const discountColor = discount != null
     ? (discount < 0 ? 'var(--signal-green)' : discount > 0 ? 'var(--signal-red)' : 'var(--text-primary)')
     : '';
-  var discountText = discount != null
+  const discountText = discount != null
     ? (discount > 0 ? '+' : '') + discount + '% vs peers'
     : '';
 
-  var metricsHtml = '<div class="ga-peer-metrics">';
+  let metricsHtml = '<div class="ga-peer-metrics">';
   if (pNav != null) metricsHtml += '<div class="ga-cost-cell"><div class="ga-cost-label">Company P/NAV</div><div class="ga-cost-value">' + pNav + 'x</div></div>';
   if (medianPNav != null) metricsHtml += '<div class="ga-cost-cell"><div class="ga-cost-label">Peer Median P/NAV</div><div class="ga-cost-value">' + medianPNav + 'x</div></div>';
   if (discount != null) metricsHtml += '<div class="ga-cost-cell"><div class="ga-cost-label">Discount / Premium</div><div class="ga-cost-value" style="color:' + discountColor + '">' + discountText + '</div></div>';
   metricsHtml += '</div>';
 
-  var peersHtml = peers.length > 0
+  const peersHtml = peers.length > 0
     ? '<div class="ga-peer-group"><span class="ga-cost-label">Peer group:</span> ' + peers.join(', ') + '</div>'
     : '';
 
-  var commentHtml = comment
+  const commentHtml = comment
     ? '<div class="rs-text" style="margin-top:8px">' + comment + '</div>'
     : '';
 
@@ -2042,14 +2042,14 @@ function _renderGoldPeers(ga) {
 }
 
 function _renderGoldSensitivities(ga) {
-  var sens = ga.sensitivities;
+  const sens = ga.sensitivities;
   if (!sens) return '';
 
-  var v = ga.valuation || {};
-  var baseNav = v.ic_nav_usd_m || v.screening_nav_usd_m;
+  const v = ga.valuation || {};
+  const baseNav = v.ic_nav_usd_m || v.screening_nav_usd_m;
   if (!baseNav) return '';
 
-  var scenarios = [
+  const scenarios = [
     ['Gold price +15%', sens.gold_price_up_15_nav_usd_m],
     ['Gold price -15%', sens.gold_price_down_15_nav_usd_m],
     ['FX +5%', sens.fx_plus_5pct_nav_usd_m],
@@ -2058,15 +2058,15 @@ function _renderGoldSensitivities(ga) {
     ['6-month delay', sens.delay_6m_nav_usd_m]
   ];
 
-  var hasAny = false;
-  var rows = '';
-  for (var i = 0; i < scenarios.length; i++) {
-    var nav = scenarios[i][1];
+  let hasAny = false;
+  let rows = '';
+  for (let i = 0; i < scenarios.length; i++) {
+    const nav = scenarios[i][1];
     if (nav == null) continue;
     hasAny = true;
-    var pctChange = Math.round((nav - baseNav) / baseNav * 100);
-    var color = pctChange >= 0 ? 'var(--signal-green)' : 'var(--signal-red)';
-    var sign = pctChange >= 0 ? '+' : '';
+    const pctChange = Math.round((nav - baseNav) / baseNav * 100);
+    const color = pctChange >= 0 ? 'var(--signal-green)' : 'var(--signal-red)';
+    const sign = pctChange >= 0 ? '+' : '';
     rows += '<tr>' +
       '<td>' + scenarios[i][0] + '</td>' +
       '<td>US$' + nav.toLocaleString() + 'm</td>' +
@@ -2085,27 +2085,27 @@ function _renderGoldSensitivities(ga) {
 }
 
 function _renderGoldDiscoveryInner(data) {
-  var t = data.ticker.toLowerCase();
-  var ga = data.goldAgent;
+  const t = data.ticker.toLowerCase();
+  const ga = data.goldAgent;
 
   // Normalise both raw (gold_agent.py) and flattened schemas
-  var skew = ga.skew_score != null ? ga.skew_score : (ga.scorecard ? ga.scorecard.skew_score : 0);
-  var verdict = ga.verdict || ga.executive_summary || '';
-  var bull = (ga.hypothesis && ga.hypothesis.bull) || (ga.investment_view && ga.investment_view.bull_case) || '';
-  var bear = (ga.hypothesis && ga.hypothesis.bear) || (ga.investment_view && ga.investment_view.bear_case) || '';
-  var trigger = ga.monitoring_trigger || (ga.investment_view && ga.investment_view.monitoring_trigger) || '';
-  var km = ga.key_metrics || {};
-  var aisc = km.aisc_per_oz != null ? km.aisc_per_oz : km.aisc_per_oz_usd;
-  var netCash = km.net_cash_debt_aud_m != null ? km.net_cash_debt_aud_m : km.net_cash_debt_usd_m;
+  const skew = ga.skew_score != null ? ga.skew_score : (ga.scorecard ? ga.scorecard.skew_score : 0);
+  const verdict = ga.verdict || ga.executive_summary || '';
+  const bull = (ga.hypothesis && ga.hypothesis.bull) || (ga.investment_view && ga.investment_view.bull_case) || '';
+  const bear = (ga.hypothesis && ga.hypothesis.bear) || (ga.investment_view && ga.investment_view.bear_case) || '';
+  const trigger = ga.monitoring_trigger || (ga.investment_view && ga.investment_view.monitoring_trigger) || '';
+  const km = ga.key_metrics || {};
+  const aisc = km.aisc_per_oz != null ? km.aisc_per_oz : km.aisc_per_oz_usd;
+  const netCash = km.net_cash_debt_aud_m != null ? km.net_cash_debt_aud_m : km.net_cash_debt_usd_m;
 
   // ---- Scorecard ----
-  var skewColor = skew >= 55 ? 'var(--signal-green)' : skew <= 45 ? 'var(--signal-red)' : 'var(--signal-amber)';
-  var stageBadge = ga.company_stage
+  const skewColor = skew >= 55 ? 'var(--signal-green)' : skew <= 45 ? 'var(--signal-red)' : 'var(--signal-amber)';
+  const stageBadge = ga.company_stage
     ? '<div class="ga-score-card"><div class="ga-score-label">Stage</div>' +
         '<div class="ga-score-value ga-stage-value">' + ga.company_stage.replace(/_/g, ' ') + '</div></div>'
     : '';
 
-  var scorecardHtml =
+  const scorecardHtml =
     '<div class="ga-scorecard">' +
       '<div class="ga-score-card ga-score-skew" style="border-color:' + skewColor + '">' +
         '<div class="ga-score-label">Skew</div>' +
@@ -2115,13 +2115,13 @@ function _renderGoldDiscoveryInner(data) {
     '</div>';
 
   // ---- Verdict ----
-  var verdictHtml = '<div class="ga-verdict">' +
+  const verdictHtml = '<div class="ga-verdict">' +
     '<div class="rs-subtitle">Verdict</div>' +
     '<div class="rs-text">' + verdict + '</div>' +
   '</div>';
 
   // ---- Investment View (Bull / Bear) ----
-  var viewHtml = '<div class="ga-view-grid">' +
+  const viewHtml = '<div class="ga-view-grid">' +
     '<div class="ga-view-col ga-view-bull">' +
       '<div class="ga-view-label">Bull Case</div>' +
       '<div class="rs-text">' + bull + '</div>' +
@@ -2133,11 +2133,11 @@ function _renderGoldDiscoveryInner(data) {
   '</div>';
 
   // ---- Cost Structure (3x2 grid) ----
-  var goldPrice = (km.gold_price_assumption_usd_per_oz || 2900);
-  var aiscUsd = km.aisc_per_oz_usd || aisc;
-  var margin = (aiscUsd && goldPrice) ? Math.round((goldPrice - aiscUsd) / goldPrice * 100) : null;
+  const goldPrice = (km.gold_price_assumption_usd_per_oz || 2900);
+  const aiscUsd = km.aisc_per_oz_usd || aisc;
+  const margin = (aiscUsd && goldPrice) ? Math.round((goldPrice - aiscUsd) / goldPrice * 100) : null;
 
-  var costItems = [
+  const costItems = [
     ['AISC (per oz)', aisc != null ? ('A$' + aisc.toLocaleString()) : 'N/A'],
     ['Cash Cost (per oz)', km.cash_cost_per_oz_usd != null ? ('US$' + km.cash_cost_per_oz_usd.toLocaleString()) : 'N/A'],
     ['Production', km.production_koz_annual ? (km.production_koz_annual.toLocaleString() + ' koz/yr') : 'N/A'],
@@ -2146,39 +2146,39 @@ function _renderGoldDiscoveryInner(data) {
     ['Net Cash / (Debt)', netCash != null ? ('A$' + netCash.toLocaleString() + 'm') : 'N/A']
   ];
 
-  var costGrid = '';
-  for (var c = 0; c < costItems.length; c++) {
+  let costGrid = '';
+  for (let c = 0; c < costItems.length; c++) {
     costGrid += '<div class="ga-cost-cell">' +
       '<div class="ga-cost-label">' + costItems[c][0] + '</div>' +
       '<div class="ga-cost-value">' + costItems[c][1] + '</div>' +
     '</div>';
   }
 
-  var marginHtml = margin != null
+  const marginHtml = margin != null
     ? '<div class="ga-margin-bar">' +
         '<span class="ga-margin-label">Margin at spot:</span> ' +
         '<span class="ga-margin-value" style="color:' + (margin > 30 ? 'var(--signal-green)' : margin > 15 ? 'var(--signal-amber)' : 'var(--signal-red)') + '">' + margin + '%</span>' +
       '</div>'
     : '';
 
-  var metricsHtml = '<div class="ga-sub-panel">' +
+  const metricsHtml = '<div class="ga-sub-panel">' +
     '<div class="rs-subtitle">Cost Structure</div>' +
     marginHtml +
     '<div class="ga-cost-grid">' + costGrid + '</div>' +
   '</div>';
 
   // ---- Evidence ----
-  var evidenceRows = '';
-  var ev = ga.evidence || [];
-  for (var e = 0; e < ev.length; e++) {
-    var item = ev[e];
+  let evidenceRows = '';
+  const ev = ga.evidence || [];
+  for (let e = 0; e < ev.length; e++) {
+    const item = ev[e];
     evidenceRows += '<tr>' +
       '<td class="ga-ev-label">' + item.label + '</td>' +
       '<td class="ga-ev-finding">' + item.finding + '</td>' +
       '<td class="ga-ev-source">' + item.source + '</td>' +
     '</tr>';
   }
-  var evidenceHtml = '<div class="rs-subtitle">Evidence Base</div>' +
+  const evidenceHtml = '<div class="rs-subtitle">Evidence Base</div>' +
     '<div class="ga-evidence-scroll">' +
     '<table class="ga-evidence-table"><thead><tr>' +
       '<th>Label</th><th>Finding</th><th>Source</th>' +
@@ -2186,7 +2186,7 @@ function _renderGoldDiscoveryInner(data) {
     '</div>';
 
   // ---- Monitoring Trigger ----
-  var triggerHtml = '';
+  let triggerHtml = '';
   if (trigger) {
     triggerHtml = '<div class="ga-trigger">' +
       '<div class="rs-subtitle">Monitoring Trigger</div>' +
@@ -2195,11 +2195,11 @@ function _renderGoldDiscoveryInner(data) {
   }
 
   // ---- Information Gaps ----
-  var gapsHtml = '';
-  var gaps = ga.information_gaps || [];
+  let gapsHtml = '';
+  const gaps = ga.information_gaps || [];
   if (gaps.length > 0) {
-    var gapItems = '';
-    for (var g = 0; g < gaps.length; g++) {
+    let gapItems = '';
+    for (let g = 0; g < gaps.length; g++) {
       gapItems += '<li class="ga-gap-item">' + gaps[g] + '</li>';
     }
     gapsHtml = '<div class="ga-gaps">' +
@@ -2209,7 +2209,7 @@ function _renderGoldDiscoveryInner(data) {
   }
 
   // ---- Analysis date ----
-  var dateHtml = '<div class="ga-date">Analysis date: ' + ga.analysis_date + '</div>';
+  const dateHtml = '<div class="ga-date">Analysis date: ' + ga.analysis_date + '</div>';
 
   return '<div class="report-section" id="' + t + '-gold-analysis">' +
     RS_HDR('Section 02 / Gold', 'Gold Analysis') +
@@ -2236,35 +2236,35 @@ function _renderGoldDiscoveryInner(data) {
 
 export function renderPriceDrivers(data) {
   if (!data.priceDrivers) return '';
-  var pd = data.priceDrivers;
+  const pd = data.priceDrivers;
   if (pd.error) return '';
 
-  var ds = pd.driver_stack || {};
-  var pa = pd.price_action_summary || {};
-  var msc = pd.macro_sector_context || {};
-  var eq = pd.evidence_quality || {};
-  var ba = pd.broker_activity || {};
-  var ss = pd.social_signal || {};
-  var conf = pd.confidence || 'moderate';
-  var primary = pd.primary_driver || '';
-  var ticker = data.ticker || '';
+  const ds = pd.driver_stack || {};
+  const pa = pd.price_action_summary || {};
+  const msc = pd.macro_sector_context || {};
+  const eq = pd.evidence_quality || {};
+  const ba = pd.broker_activity || {};
+  const ss = pd.social_signal || {};
+  const conf = pd.confidence || 'moderate';
+  let primary = pd.primary_driver || '';
+  const ticker = data.ticker || '';
 
   if (!primary && ds.primary && ds.primary.length > 0) primary = ds.primary[0];
   if (!primary) return '';
 
-  var confCls = conf === 'very_high' || conf === 'high' ? 'pd-conf-high' : conf === 'moderate' ? 'pd-conf-mod' : 'pd-conf-low';
-  var dateStr = _formatDriverDate(pd.analysis_date);
+  const confCls = conf === 'very_high' || conf === 'high' ? 'pd-conf-high' : conf === 'moderate' ? 'pd-conf-mod' : 'pd-conf-low';
+  const dateStr = _formatDriverDate(pd.analysis_date);
 
   // Performance grid helper
   function _fmtCell(val) {
     if (val == null) return '<span class="pd-perf-cell pd-perf-flat">N/A</span>';
-    var dir = val > 0 ? '+' : '';
-    var cls = val > 0.1 ? 'pd-perf-up' : val < -0.1 ? 'pd-perf-down' : 'pd-perf-flat';
+    const dir = val > 0 ? '+' : '';
+    const cls = val > 0.1 ? 'pd-perf-up' : val < -0.1 ? 'pd-perf-down' : 'pd-perf-flat';
     return '<span class="pd-perf-cell ' + cls + '">' + dir + val.toFixed(1) + '%</span>';
   }
 
   // Performance grid
-  var gridHtml =
+  const gridHtml =
     '<div class="pd-perf-grid">' +
       '<div class="pd-perf-row"><span class="pd-perf-cell pd-perf-header"></span><span class="pd-perf-cell pd-perf-header">2D</span><span class="pd-perf-cell pd-perf-header">5D</span><span class="pd-perf-cell pd-perf-header">10D</span></div>' +
       '<div class="pd-perf-row"><span class="pd-perf-cell pd-perf-label">' + ticker + '</span>' + _fmtCell(pa.price_change_2d_pct) + _fmtCell(pa.price_change_5d_pct) + _fmtCell(pa.price_change_10d_pct) + '</div>' +
@@ -2273,33 +2273,33 @@ export function renderPriceDrivers(data) {
     '</div>';
 
   // Broker alerts
-  var brokerHtml = '';
-  var upgrades = ba.recent_upgrades || [];
-  var downgrades = ba.recent_downgrades || [];
-  for (var u = 0; u < upgrades.length && u < 2; u++) {
+  let brokerHtml = '';
+  const upgrades = ba.recent_upgrades || [];
+  const downgrades = ba.recent_downgrades || [];
+  for (let u = 0; u < upgrades.length && u < 2; u++) {
     brokerHtml += '<div class="pd-broker-alert pd-broker-upgrade">\u2191 UPGRADE: ' + _truncate(upgrades[u], 200) + '</div>';
   }
-  for (var dg = 0; dg < downgrades.length && dg < 2; dg++) {
+  for (let dg = 0; dg < downgrades.length && dg < 2; dg++) {
     brokerHtml += '<div class="pd-broker-alert pd-broker-downgrade">\u2193 DOWNGRADE: ' + _truncate(downgrades[dg], 200) + '</div>';
   }
 
   // Social badge
-  var socialHtml = '';
-  var hcAct = ss.hotcopper_activity || '';
+  let socialHtml = '';
+  const hcAct = ss.hotcopper_activity || '';
   if (hcAct === 'elevated') socialHtml = '<span class="pd-social pd-social-elevated">HC: Elevated</span>';
   else if (hcAct === 'quiet') socialHtml = '<span class="pd-social pd-social-quiet">HC: Quiet</span>';
 
-  var MAX = 250;
-  var bullets = [];
+  const MAX = 250;
+  const bullets = [];
   bullets.push('<b>Primary driver:</b> ' + _truncate(primary, MAX));
 
-  var secondaries = ds.secondary || [];
+  const secondaries = ds.secondary || [];
   if (secondaries.length > 0) {
     bullets.push('<b>Secondary:</b> ' + _truncate(secondaries.join('; '), MAX));
   }
 
-  var peerText = msc.peer_moves_summary || '';
-  var macroText = msc.commodity_or_rate_context || '';
+  const peerText = msc.peer_moves_summary || '';
+  const macroText = msc.commodity_or_rate_context || '';
   if (peerText && macroText) {
     bullets.push('<b>Peer and macro context:</b> ' + _truncate(peerText + '. ' + macroText, MAX));
   } else if (peerText) {
@@ -2307,13 +2307,13 @@ export function renderPriceDrivers(data) {
   } else if (macroText) {
     bullets.push('<b>Macro context:</b> ' + _truncate(macroText, MAX));
   } else {
-    var amps = ds.amplifiers || [];
+    const amps = ds.amplifiers || [];
     if (amps.length > 0) {
       bullets.push('<b>Amplifiers:</b> ' + _truncate(amps.join('; '), MAX));
     }
   }
 
-  var rejected = ds.rejected || [];
+  const rejected = ds.rejected || [];
   if (rejected.length > 0) {
     bullets.push('<b>Ruled out:</b> ' + _truncate(rejected.slice(0, 3).join('; '), MAX));
   }
@@ -2322,13 +2322,13 @@ export function renderPriceDrivers(data) {
     bullets.push('<b>Confidence (' + conf.replace(/_/g, ' ') + '):</b> ' + _truncate(eq.key_gap, MAX));
   }
 
-  var bulletsHtml = '<ul class="pd-bullets">';
-  for (var i = 0; i < bullets.length; i++) {
+  let bulletsHtml = '<ul class="pd-bullets">';
+  for (let i = 0; i < bullets.length; i++) {
     bulletsHtml += '<li>' + bullets[i] + '</li>';
   }
   bulletsHtml += '</ul>';
 
-  var t = data.ticker.toLowerCase();
+  const t = data.ticker.toLowerCase();
   return '<div class="report-section" id="' + t + '-price-drivers-embedded">' +
     RS_HDR('Section 10', 'Price Drivers') +
     '<div class="rs-body">' +
@@ -2352,11 +2352,11 @@ export function renderPriceDrivers(data) {
 
 export function renderGoldSection(data) {
   if (!data.goldAnalysis) return '';
-  var t = data.ticker.toLowerCase();
-  var ga = data.goldAnalysis;
+  const t = data.ticker.toLowerCase();
+  const ga = data.goldAnalysis;
 
   // Executive summary
-  var execHtml = '';
+  let execHtml = '';
   if (ga.executive_summary) {
     execHtml =
       '<div class="rs-subtitle">Executive Summary</div>' +
@@ -2364,8 +2364,8 @@ export function renderGoldSection(data) {
   }
 
   // Investment view: bull/base/bear scenario table
-  var viewHtml = '';
-  var iv = ga.investment_view;
+  let viewHtml = '';
+  const iv = ga.investment_view;
   if (iv) {
     viewHtml =
       '<div class="rs-subtitle">Investment View</div>' +
@@ -2383,11 +2383,11 @@ export function renderGoldSection(data) {
   }
 
   // Key metrics
-  var metricsHtml = '';
-  var km = ga.key_metrics;
+  let metricsHtml = '';
+  const km = ga.key_metrics;
   if (km) {
-    var metricRows = '';
-    var metricPairs = [
+    let metricRows = '';
+    const metricPairs = [
       ['AISC (per oz)', km.aisc_per_oz != null ? ('A$' + km.aisc_per_oz.toLocaleString()) : null],
       ['Production', km.production_koz_annual ? (km.production_koz_annual.toLocaleString() + ' koz/yr') : null],
       ['Reserve Grade', km.reserve_grade_gt ? (km.reserve_grade_gt + ' g/t') : null],
@@ -2409,12 +2409,12 @@ export function renderGoldSection(data) {
   }
 
   // Assets table
-  var assetsHtml = '';
-  var assets = ga.assets;
+  let assetsHtml = '';
+  const assets = ga.assets;
   if (assets && assets.length > 0) {
-    var assetRows = '';
+    let assetRows = '';
     for (var i = 0; i < assets.length; i++) {
-      var a = assets[i];
+      const a = assets[i];
       assetRows += '<tr>' +
         '<td>' + (a.name || 'N/A') + '</td>' +
         '<td>' + (a.stage || 'N/A') + '</td>' +
@@ -2432,16 +2432,16 @@ export function renderGoldSection(data) {
   }
 
   // Quality scorecard
-  var scorecardHtml = '';
-  var sc = ga.quality_scorecard || ga.scorecard;
+  let scorecardHtml = '';
+  const sc = ga.quality_scorecard || ga.scorecard;
   if (sc) {
-    var scItems = '';
-    var scKeys = Object.keys(sc);
+    let scItems = '';
+    const scKeys = Object.keys(sc);
     for (var i = 0; i < scKeys.length; i++) {
-      var key = scKeys[i];
-      var val = sc[key];
+      const key = scKeys[i];
+      const val = sc[key];
       if (typeof val === 'object') continue;
-      var label = key.replace(/_/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+      const label = key.replace(/_/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
       scItems += '<tr><td class="td-label">' + label + '</td><td>' + val + '</td></tr>';
     }
     if (scItems) {
@@ -2453,10 +2453,10 @@ export function renderGoldSection(data) {
   }
 
   // Risks
-  var risksHtml = '';
-  var risks = ga.risks || [];
+  let risksHtml = '';
+  const risks = ga.risks || [];
   if (risks.length > 0) {
-    var riskItems = '';
+    let riskItems = '';
     for (var i = 0; i < risks.length; i++) {
       riskItems += '<li>' + risks[i] + '</li>';
     }
@@ -2466,7 +2466,7 @@ export function renderGoldSection(data) {
   }
 
   // Recommendation
-  var recoHtml = '';
+  let recoHtml = '';
   if (ga.recommendation) {
     recoHtml =
       '<div class="callout">' +
@@ -2532,19 +2532,19 @@ export function renderPriceDriversPlaceholder(ticker) {
 
 function _formatDriverDate(isoDate) {
   if (!isoDate) return '';
-  var d = new Date(isoDate + 'T00:00:00');
-  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const d = new Date(isoDate + 'T00:00:00');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   return d.getDate() + '-' + months[d.getMonth()] + '-' + String(d.getFullYear()).slice(2);
 }
 
 function _truncate(text, maxLen) {
   if (!text) return '';
-  var s = String(text).trim();
+  const s = String(text).trim();
   if (s.length <= maxLen) return s;
-  var cut = s.substring(0, maxLen);
-  var lastDot = cut.lastIndexOf('. ');
+  const cut = s.substring(0, maxLen);
+  const lastDot = cut.lastIndexOf('. ');
   if (lastDot > maxLen * 0.5) return cut.substring(0, lastDot + 1);
-  var lastSpace = cut.lastIndexOf(' ');
+  const lastSpace = cut.lastIndexOf(' ');
   if (lastSpace > maxLen * 0.6) return cut.substring(0, lastSpace) + '.';
   return cut + '.';
 }
@@ -2556,29 +2556,29 @@ export function renderPriceDriversContent(container, driverData) {
     return;
   }
 
-  var ds = driverData.driver_stack || {};
-  var rc = driverData.ranked_conclusion || {};
-  var rt = driverData.report_text || {};
-  var pa = driverData.price_action_summary || {};
-  var eq = driverData.evidence_quality || {};
-  var ba = driverData.broker_activity || {};
-  var ss = driverData.social_signal || {};
-  var meta = driverData.agent_metadata || {};
-  var conf = driverData.confidence || rc.overall_confidence || 'moderate';
-  var confCls = conf === 'very_high' || conf === 'high' ? 'pd-conf-high' : conf === 'moderate' ? 'pd-conf-mod' : 'pd-conf-low';
-  var dateStr = _formatDriverDate(driverData.analysis_date || meta.analysis_date);
-  var ticker = driverData.ticker || '';
+  const ds = driverData.driver_stack || {};
+  const rc = driverData.ranked_conclusion || {};
+  const rt = driverData.report_text || {};
+  const pa = driverData.price_action_summary || {};
+  const eq = driverData.evidence_quality || {};
+  const ba = driverData.broker_activity || {};
+  const ss = driverData.social_signal || {};
+  const meta = driverData.agent_metadata || {};
+  const conf = driverData.confidence || rc.overall_confidence || 'moderate';
+  const confCls = conf === 'very_high' || conf === 'high' ? 'pd-conf-high' : conf === 'moderate' ? 'pd-conf-mod' : 'pd-conf-low';
+  const dateStr = _formatDriverDate(driverData.analysis_date || meta.analysis_date);
+  const ticker = driverData.ticker || '';
 
   // Performance grid helper
   function _fmtCell(val) {
     if (val == null) return '<span class="pd-perf-cell pd-perf-flat">N/A</span>';
-    var dir = val > 0 ? '+' : '';
-    var cls = val > 0.1 ? 'pd-perf-up' : val < -0.1 ? 'pd-perf-down' : 'pd-perf-flat';
+    const dir = val > 0 ? '+' : '';
+    const cls = val > 0.1 ? 'pd-perf-up' : val < -0.1 ? 'pd-perf-down' : 'pd-perf-flat';
     return '<span class="pd-perf-cell ' + cls + '">' + dir + val.toFixed(1) + '%</span>';
   }
 
   // Performance grid
-  var gridHtml =
+  const gridHtml =
     '<div class="pd-perf-grid">' +
       '<div class="pd-perf-row"><span class="pd-perf-cell pd-perf-header"></span><span class="pd-perf-cell pd-perf-header">2D</span><span class="pd-perf-cell pd-perf-header">5D</span><span class="pd-perf-cell pd-perf-header">10D</span></div>' +
       '<div class="pd-perf-row"><span class="pd-perf-cell pd-perf-label">' + ticker + '</span>' + _fmtCell(pa.price_change_2d_pct) + _fmtCell(pa.price_change_5d_pct) + _fmtCell(pa.price_change_10d_pct) + '</div>' +
@@ -2587,28 +2587,28 @@ export function renderPriceDriversContent(container, driverData) {
     '</div>';
 
   // Broker alerts
-  var brokerHtml = '';
-  var upgrades = ba.recent_upgrades || [];
-  var downgrades = ba.recent_downgrades || [];
-  for (var u = 0; u < upgrades.length && u < 2; u++) {
+  let brokerHtml = '';
+  const upgrades = ba.recent_upgrades || [];
+  const downgrades = ba.recent_downgrades || [];
+  for (let u = 0; u < upgrades.length && u < 2; u++) {
     brokerHtml += '<div class="pd-broker-alert pd-broker-upgrade">\u2191 UPGRADE: ' + _truncate(upgrades[u], 200) + '</div>';
   }
-  for (var dg = 0; dg < downgrades.length && dg < 2; dg++) {
+  for (let dg = 0; dg < downgrades.length && dg < 2; dg++) {
     brokerHtml += '<div class="pd-broker-alert pd-broker-downgrade">\u2193 DOWNGRADE: ' + _truncate(downgrades[dg], 200) + '</div>';
   }
 
   // Social badge
-  var socialHtml = '';
-  var hcAct = ss.hotcopper_activity || '';
+  let socialHtml = '';
+  const hcAct = ss.hotcopper_activity || '';
   if (hcAct === 'elevated') socialHtml = '<span class="pd-social pd-social-elevated">HC: Elevated</span>';
   else if (hcAct === 'quiet') socialHtml = '<span class="pd-social pd-social-quiet">HC: Quiet</span>';
 
   // Build 5 bullets from available data (new or old schema)
-  var MAX = 250;
-  var bullets = [];
+  const MAX = 250;
+  const bullets = [];
 
   // Bullet 1: Primary driver
-  var primary = driverData.primary_driver || rc.most_likely_primary_driver || '';
+  let primary = driverData.primary_driver || rc.most_likely_primary_driver || '';
   if (!primary && ds.primary && ds.primary.length > 0) primary = ds.primary[0];
   if (!primary && rt.primary_driver_paragraph) primary = _truncate(rt.primary_driver_paragraph, MAX);
   if (primary) {
@@ -2616,7 +2616,7 @@ export function renderPriceDriversContent(container, driverData) {
   }
 
   // Bullet 2: Secondary drivers
-  var secondaries = ds.secondary || rc.secondary_drivers || [];
+  const secondaries = ds.secondary || rc.secondary_drivers || [];
   if (secondaries.length > 0) {
     bullets.push('<b>Secondary:</b> ' + _truncate(secondaries.join('; '), MAX));
   } else if (rt.secondary_drivers_paragraph) {
@@ -2624,9 +2624,9 @@ export function renderPriceDriversContent(container, driverData) {
   }
 
   // Bullet 3: Peer and macro context or amplifiers
-  var msc = driverData.macro_sector_context || {};
-  var peerText = msc.peer_moves_summary || '';
-  var macroText = msc.commodity_or_rate_context || '';
+  const msc = driverData.macro_sector_context || {};
+  const peerText = msc.peer_moves_summary || '';
+  const macroText = msc.commodity_or_rate_context || '';
   if (peerText && macroText) {
     bullets.push('<b>Peer and macro context:</b> ' + _truncate(peerText + '. ' + macroText, MAX));
   } else if (peerText) {
@@ -2635,14 +2635,14 @@ export function renderPriceDriversContent(container, driverData) {
     bullets.push('<b>Macro context:</b> ' + _truncate(macroText, MAX));
   }
   if (!peerText && !macroText) {
-    var amps = ds.amplifiers || rc.amplifiers || [];
+    const amps = ds.amplifiers || rc.amplifiers || [];
     if (amps.length > 0) {
       bullets.push('<b>Amplifiers:</b> ' + _truncate(amps.join('; '), MAX));
     }
   }
 
   // Bullet 4: Ruled out
-  var rejected = ds.rejected || rc.rejected_explanations || [];
+  const rejected = ds.rejected || rc.rejected_explanations || [];
   if (rejected.length > 0) {
     bullets.push('<b>Ruled out:</b> ' + _truncate(rejected.slice(0, 3).join('; '), MAX));
   } else if (rt.rejected_explanations_paragraph) {
@@ -2650,7 +2650,7 @@ export function renderPriceDriversContent(container, driverData) {
   }
 
   // Bullet 5: Confidence rationale
-  var rationale = '';
+  let rationale = '';
   if (eq.key_gap) {
     rationale = eq.key_gap;
   } else if (rc.confidence_rationale) {
@@ -2667,8 +2667,8 @@ export function renderPriceDriversContent(container, driverData) {
     return;
   }
 
-  var bulletsHtml = '<ul class="pd-bullets">';
-  for (var i = 0; i < bullets.length; i++) {
+  let bulletsHtml = '<ul class="pd-bullets">';
+  for (let i = 0; i < bullets.length; i++) {
     bulletsHtml += '<li>' + bullets[i] + '</li>';
   }
   bulletsHtml += '</ul>';
@@ -2689,17 +2689,17 @@ export function renderPriceDriversContent(container, driverData) {
 
 
 export function fetchPriceDrivers(ticker, force) {
-  var container = document.getElementById('price-drivers-' + ticker);
+  const container = document.getElementById('price-drivers-' + ticker);
   if (!container) return;
 
-  var baseUrl = API_BASE;
-  var apiKey = window.CI_API_KEY || '';
+  const baseUrl = API_BASE;
+  const apiKey = window.CI_API_KEY || '';
 
-  var headers = { 'Accept': 'application/json' };
+  const headers = { 'Accept': 'application/json' };
   if (apiKey) headers['X-API-Key'] = apiKey;
 
   // /latest serves cache only; /{ticker} runs fresh analysis
-  var endpoint = force
+  const endpoint = force
     ? '/api/agents/drivers/' + ticker
     : '/api/agents/drivers/' + ticker + '/latest';
 

@@ -226,11 +226,11 @@ function normaliseWithFloorCeiling(rawScores) {
   const CEILING = 80;
   if (!rawScores || rawScores.length === 0) return [];
 
-  let clamped = rawScores.map(s => Math.max(FLOOR, Math.min(CEILING, s)));
-  let sum = clamped.reduce((a, b) => a + b, 0);
+  const clamped = rawScores.map(s => Math.max(FLOOR, Math.min(CEILING, s)));
+  const sum = clamped.reduce((a, b) => a + b, 0);
   if (sum === 0) return clamped.map(() => Math.round(100 / clamped.length));
 
-  let result = clamped.map(s => Math.round((s / sum) * 100));
+  const result = clamped.map(s => Math.round((s / sum) * 100));
 
   // Post-normalisation clamp iterations
   for (let iter = 0; iter < 20; iter++) {

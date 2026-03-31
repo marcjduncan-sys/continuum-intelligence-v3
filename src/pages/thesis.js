@@ -8,8 +8,8 @@ import { saveThesis, inferBiasFromSplit } from '../features/thesis-capture.js';
 import { API_BASE as _API_BASE } from '../lib/api-config.js';
 
 
-var tcSelectedTicker = null;
-var tcCurrentAlignment = null;
+let tcSelectedTicker = null;
+let tcCurrentAlignment = null;
 
 export function tcSelectStock(ticker) {
   tcSelectedTicker = ticker;
@@ -23,18 +23,18 @@ export function tcSelectStock(ticker) {
 export function tcAnalyze() {
   if (!tcSelectedTicker) { alert('Please select a stock first'); return; }
 
-  var thesis = document.getElementById('tc-thesis-input').value.trim();
+  const thesis = document.getElementById('tc-thesis-input').value.trim();
   if (!thesis || thesis.length < 20) {
     alert('Please enter a substantive thesis (at least a sentence or two).');
     return;
   }
 
   // Show loading state
-  var resultsEl = document.getElementById('tc-results');
+  const resultsEl = document.getElementById('tc-results');
   resultsEl.classList.add('active');
   resultsEl.scrollIntoView({ behavior: 'smooth' });
 
-  var banner = document.getElementById('tc-banner');
+  const banner = document.getElementById('tc-banner');
   banner.className = 'tc-banner loading';
   document.getElementById('tc-banner-label').textContent = 'Analysing your thesis against ' + tcSelectedTicker + ' research...';
   document.getElementById('tc-banner-hypothesis').textContent = '';
@@ -45,12 +45,12 @@ export function tcAnalyze() {
   document.getElementById('tc-contradicting').innerHTML = '';
 
   // Disable the button during analysis
-  var btn = document.querySelector('.tc-analyze-btn');
+  const btn = document.querySelector('.tc-analyze-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Analysing...'; }
 
-  var systemPrompt = buildComparatorPrompt(tcSelectedTicker);
+  const systemPrompt = buildComparatorPrompt(tcSelectedTicker);
 
-  var apiBase = _API_BASE;
+  const apiBase = _API_BASE;
 
   fetch(apiBase + '/api/research-chat', {
     method: 'POST',
@@ -80,9 +80,9 @@ export function tcAnalyze() {
 }
 
 function buildComparatorPrompt(ticker) {
-  var tcData = getTcData(ticker);
+  const tcData = getTcData(ticker);
 
-  var prompt = 'You are the Thesis Comparator engine for Continuum Intelligence. ';
+  let prompt = 'You are the Thesis Comparator engine for Continuum Intelligence. ';
   prompt += 'The user has submitted an investment thesis for ' + ticker + '. ';
   prompt += 'Your job is to compare their thesis against the platform\'s four competing hypotheses (N1 through N4) using the research passages provided.\n\n';
 
@@ -125,7 +125,7 @@ function buildComparatorPrompt(ticker) {
   if (tcData) {
     prompt += '\nHYPOTHESIS REFERENCE (from platform data):\n';
     ['n1','n2','n3','n4'].forEach(function(tier) {
-      var h = tcData[tier];
+      const h = tcData[tier];
       if (h) {
         prompt += tier.toUpperCase() + ': ' + h.name + ' (' + h.prob + '% probability) - ' + h.desc + '\n';
       }
@@ -136,14 +136,14 @@ function buildComparatorPrompt(ticker) {
 }
 
 function renderComparatorResult(text, ticker) {
-  var tcData = getTcData(ticker);
+  const tcData = getTcData(ticker);
 
   // Parse alignment from first line
-  var lines = text.split('\n');
-  var alignment = 'contrarian';
-  var alignmentName = '';
-  for (var i = 0; i < Math.min(lines.length, 5); i++) {
-    var match = lines[i].match(/^ALIGNMENT:\s*(N[1-4]|CONTRARIAN)/i);
+  const lines = text.split('\n');
+  let alignment = 'contrarian';
+  let alignmentName = '';
+  for (let i = 0; i < Math.min(lines.length, 5); i++) {
+    const match = lines[i].match(/^ALIGNMENT:\s*(N[1-4]|CONTRARIAN)/i);
     if (match) {
       alignment = match[1].toLowerCase();
       alignmentName = lines[i].replace(/^ALIGNMENT:\s*(N[1-4]|CONTRARIAN)\s*/i, '').replace(/^[:\-]\s*/, '').trim();
@@ -155,14 +155,14 @@ function renderComparatorResult(text, ticker) {
 
   // Capture thesis from comparator result (explicit, high confidence)
   if (alignment !== 'contrarian') {
-    var _stockData = STOCK_DATA[ticker];
-    var _tierIdx = parseInt(alignment.replace('n', ''), 10) - 1;
-    var _hypDirection = (_stockData && _stockData.hypotheses && _stockData.hypotheses[_tierIdx])
+    const _stockData = STOCK_DATA[ticker];
+    const _tierIdx = parseInt(alignment.replace('n', ''), 10) - 1;
+    const _hypDirection = (_stockData && _stockData.hypotheses && _stockData.hypotheses[_tierIdx])
       ? _stockData.hypotheses[_tierIdx].direction : '';
-    var _bias = _hypDirection === 'upside' ? 'bullish' : _hypDirection === 'downside' ? 'bearish' : 'neutral';
+    const _bias = _hypDirection === 'upside' ? 'bullish' : _hypDirection === 'downside' ? 'bearish' : 'neutral';
 
     // Build probability split from tcData if available
-    var _split = null;
+    let _split = null;
     if (tcData) {
       _split = ['n1','n2','n3','n4'].map(function(t) { return tcData[t] ? (parseFloat(tcData[t].prob) || 0) : 0; });
     }
@@ -181,7 +181,7 @@ function renderComparatorResult(text, ticker) {
   }
 
   // Banner
-  var banner = document.getElementById('tc-banner');
+  const banner = document.getElementById('tc-banner');
   banner.className = 'tc-banner ' + alignment;
 
   if (alignment === 'contrarian') {
@@ -189,20 +189,20 @@ function renderComparatorResult(text, ticker) {
     document.getElementById('tc-banner-hypothesis').textContent = '\u26A0\uFE0F CONTRARIAN';
     document.getElementById('tc-banner-desc').textContent = alignmentName || "Your view doesn't clearly align with any single hypothesis. You're making a contrarian bet.";
   } else {
-    var tierData = tcData ? tcData[alignment] : null;
+    const tierData = tcData ? tcData[alignment] : null;
     document.getElementById('tc-banner-label').textContent = 'Your thesis aligns most closely with:';
     document.getElementById('tc-banner-hypothesis').textContent = alignment.toUpperCase() + ': ' + (tierData ? tierData.name : alignmentName);
     document.getElementById('tc-banner-desc').textContent = tierData ? tierData.desc : alignmentName;
   }
 
   // Hypothesis map rows
-  var rowsContainer = document.getElementById('tc-map-rows');
+  const rowsContainer = document.getElementById('tc-map-rows');
   if (tcData) {
     rowsContainer.innerHTML = ['n1','n2','n3','n4'].map(function(tier) {
-      var tData = tcData[tier];
+      const tData = tcData[tier];
       if (!tData) return '';
-      var isMatch = tier === alignment;
-      var stance = isMatch ? 'supports' : 'contradicts';
+      const isMatch = tier === alignment;
+      const stance = isMatch ? 'supports' : 'contradicts';
       return '<div class="tc-row">' +
         '<div class="tc-indicator ' + tier + (isMatch ? ' match' : '') + '">' + tier.toUpperCase() + '</div>' +
         '<div class="tc-info">' +
@@ -218,10 +218,10 @@ function renderComparatorResult(text, ticker) {
   }
 
   // Parse sections from the response
-  var analysisText = extractSection(text, 'ANALYSIS');
-  var supportingItems = extractBulletList(text, 'SUPPORTING EVIDENCE');
-  var contradictingItems = extractBulletList(text, 'CONTRADICTING EVIDENCE');
-  var discriminatorItems = extractBulletList(text, 'DISCRIMINATORS');
+  const analysisText = extractSection(text, 'ANALYSIS');
+  const supportingItems = extractBulletList(text, 'SUPPORTING EVIDENCE');
+  const contradictingItems = extractBulletList(text, 'CONTRADICTING EVIDENCE');
+  const discriminatorItems = extractBulletList(text, 'DISCRIMINATORS');
 
   // Render analysis
   document.getElementById('tc-analysis-text').innerHTML = formatParagraphs(analysisText);
@@ -238,15 +238,15 @@ function renderComparatorResult(text, ticker) {
 
   // Render discriminators if present
   if (discriminatorItems.length > 0) {
-    var discHtml = '<div class="tc-evidence-col" style="grid-column: 1 / -1; margin-top: 1.5rem;">' +
+    const discHtml = '<div class="tc-evidence-col" style="grid-column: 1 / -1; margin-top: 1.5rem;">' +
       '<div class="tc-evidence-header">Key Discriminators to Watch</div>' +
       discriminatorItems.map(function(item) {
         return '<div class="tc-evidence-item"><span class="tc-evidence-icon disc">\u25C6</span><span>' + item + '</span></div>';
       }).join('') +
       '</div>';
-    var grid = document.querySelector('.tc-evidence-grid');
+    const grid = document.querySelector('.tc-evidence-grid');
     if (grid) {
-      var existing = grid.querySelector('.tc-evidence-col[style]');
+      const existing = grid.querySelector('.tc-evidence-col[style]');
       if (existing) existing.remove();
       grid.insertAdjacentHTML('beforeend', discHtml);
     }
@@ -254,21 +254,21 @@ function renderComparatorResult(text, ticker) {
 }
 
 function extractSection(text, sectionName) {
-  var pattern = new RegExp(sectionName + '[:\\s]*\\n([\\s\\S]*?)(?=\\n(?:ALIGNMENT|ANALYSIS|SUPPORTING EVIDENCE|CONTRADICTING EVIDENCE|DISCRIMINATORS)[:\\s]*\\n|$)', 'i');
-  var match = text.match(pattern);
+  const pattern = new RegExp(sectionName + '[:\\s]*\\n([\\s\\S]*?)(?=\\n(?:ALIGNMENT|ANALYSIS|SUPPORTING EVIDENCE|CONTRADICTING EVIDENCE|DISCRIMINATORS)[:\\s]*\\n|$)', 'i');
+  const match = text.match(pattern);
   if (match) return match[1].trim();
 
   // Fallback: find the section name and take everything until the next all-caps label
-  var idx = text.indexOf(sectionName);
+  const idx = text.indexOf(sectionName);
   if (idx === -1) return '';
-  var rest = text.substring(idx + sectionName.length).replace(/^[:\s]+/, '');
-  var nextSection = rest.match(/\n[A-Z][A-Z ]{5,}[:\s]*\n/);
+  const rest = text.substring(idx + sectionName.length).replace(/^[:\s]+/, '');
+  const nextSection = rest.match(/\n[A-Z][A-Z ]{5,}[:\s]*\n/);
   if (nextSection) return rest.substring(0, nextSection.index).trim();
   return rest.trim();
 }
 
 function extractBulletList(text, sectionName) {
-  var section = extractSection(text, sectionName);
+  const section = extractSection(text, sectionName);
   if (!section) return [];
   return section.split(/\n/).filter(function(line) {
     return line.trim().length > 0;
@@ -289,7 +289,7 @@ function formatParagraphs(text) {
 }
 
 function renderComparatorError(message) {
-  var banner = document.getElementById('tc-banner');
+  const banner = document.getElementById('tc-banner');
   banner.className = 'tc-banner error';
   document.getElementById('tc-banner-label').textContent = 'Analysis unavailable';
   document.getElementById('tc-banner-hypothesis').textContent = '';
@@ -304,10 +304,10 @@ function renderComparatorError(message) {
 // INLINE RESEARCH CHAT FUNCTIONS
 // ============================================================
 
-var API_BASE = _API_BASE + '/api/research-chat';
+const API_BASE = _API_BASE + '/api/research-chat';
 
-var inlineConversations = {};
-var inlineLoading = {};
+const inlineConversations = {};
+const inlineLoading = {};
 
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -315,7 +315,7 @@ function escHtml(s) {
 
 function renderMd(text) {
   if (typeof window.marked !== 'undefined' && window.marked.parse) {
-    var raw = window.marked.parse(text);
+    const raw = window.marked.parse(text);
     // Sanitize to prevent XSS from AI responses or compromised backend
     if (typeof window.DOMPurify !== 'undefined') return window.DOMPurify.sanitize(raw);
     return raw;
@@ -334,12 +334,12 @@ function getSuggestions(ticker) {
 }
 
 function renderInlineMessages(ticker) {
-  var el = document.getElementById('chat-inline-' + ticker);
+  const el = document.getElementById('chat-inline-' + ticker);
   if (!el) return;
-  var convo = inlineConversations[ticker] || [];
+  const convo = inlineConversations[ticker] || [];
   if (convo.length === 0) {
-    var company = STOCK_DATA[ticker] ? STOCK_DATA[ticker].company : ticker;
-    var sugs = getSuggestions(ticker);
+    const company = STOCK_DATA[ticker] ? STOCK_DATA[ticker].company : ticker;
+    const sugs = getSuggestions(ticker);
     el.innerHTML =
       '<div class="chat-inline-welcome">' +
         '<p>Ask questions about <strong>' + company + '</strong> grounded in structured research data.</p>' +
@@ -351,7 +351,7 @@ function renderInlineMessages(ticker) {
       '</div>';
     return;
   }
-  var html = '';
+  let html = '';
   convo.forEach(function(msg) {
     if (msg.role === 'user') {
       html += '<div class="chat-msg user">' + escHtml(msg.content) + '</div>';
@@ -366,15 +366,15 @@ function renderInlineMessages(ticker) {
 function sendInlineMessage(ticker, question) {
   if (!question || inlineLoading[ticker]) return;
   if (!inlineConversations[ticker]) inlineConversations[ticker] = [];
-  var convo = inlineConversations[ticker];
+  const convo = inlineConversations[ticker];
   convo.push({ role: 'user', content: question });
   renderInlineMessages(ticker);
   inlineLoading[ticker] = true;
 
   // Show typing indicator
-  var el = document.getElementById('chat-inline-' + ticker);
+  const el = document.getElementById('chat-inline-' + ticker);
   if (el) {
-    var typing = document.createElement('div');
+    const typing = document.createElement('div');
     typing.className = 'chat-typing';
     typing.id = 'inline-typing-' + ticker;
     typing.innerHTML = '<div class="chat-typing-dot"></div><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div>';
@@ -383,11 +383,11 @@ function sendInlineMessage(ticker, question) {
   }
 
   // Disable send button
-  var container = document.querySelector('.chat-inline[data-ticker="' + ticker + '"]');
-  var sendBtn = container ? container.querySelector('.chat-inline-send') : null;
+  const container = document.querySelector('.chat-inline[data-ticker="' + ticker + '"]');
+  const sendBtn = container ? container.querySelector('.chat-inline-send') : null;
   if (sendBtn) sendBtn.disabled = true;
 
-  var history = convo.slice(0, -1).map(function(m) {
+  const history = convo.slice(0, -1).map(function(m) {
     return { role: m.role, content: m.content };
   });
 
@@ -401,16 +401,16 @@ function sendInlineMessage(ticker, question) {
     return res.json();
   })
   .then(function(data) {
-    var t = document.getElementById('inline-typing-' + ticker);
+    const t = document.getElementById('inline-typing-' + ticker);
     if (t) t.remove();
     convo.push({ role: 'assistant', content: data.response });
     renderInlineMessages(ticker);
   })
   .catch(function(err) {
-    var t = document.getElementById('inline-typing-' + ticker);
+    const t = document.getElementById('inline-typing-' + ticker);
     if (t) t.remove();
     if (el) {
-      var errEl = document.createElement('div');
+      const errEl = document.createElement('div');
       errEl.className = 'chat-error';
       errEl.textContent = err.message || 'Something went wrong.';
       el.appendChild(errEl);
@@ -420,7 +420,7 @@ function sendInlineMessage(ticker, question) {
   .finally(function() {
     inlineLoading[ticker] = false;
     if (sendBtn) {
-      var inp = container ? container.querySelector('.chat-inline-input') : null;
+      const inp = container ? container.querySelector('.chat-inline-input') : null;
       sendBtn.disabled = !(inp && inp.value.trim());
     }
   });
@@ -428,11 +428,11 @@ function sendInlineMessage(ticker, question) {
 
 export function initThesisPage() {
   // Populate thesis comparator stock cards dynamically
-  var tcGrid = document.getElementById('tc-stock-grid');
+  const tcGrid = document.getElementById('tc-stock-grid');
   if (tcGrid) {
     Object.keys(STOCK_DATA).sort().forEach(function(ticker) {
-      var stock = STOCK_DATA[ticker];
-      var card = document.createElement('div');
+      const stock = STOCK_DATA[ticker];
+      const card = document.createElement('div');
       card.className = 'tc-stock-card';
       card.dataset.ticker = ticker;
       card.onclick = function() { tcSelectStock(ticker); };
@@ -444,7 +444,7 @@ export function initThesisPage() {
   }
 
   // Enter key on the thesis textarea submits analysis (Shift+Enter inserts newline)
-  var tcTextarea = document.getElementById('tc-thesis-input');
+  const tcTextarea = document.getElementById('tc-thesis-input');
   if (tcTextarea) {
     tcTextarea.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && !e.shiftKey) {
@@ -456,12 +456,12 @@ export function initThesisPage() {
 
   // Event delegation for inline chat -- suggestion buttons
   document.addEventListener('click', function(e) {
-    var sugBtn = e.target.closest('.chat-inline-suggestion');
+    const sugBtn = e.target.closest('.chat-inline-suggestion');
     if (sugBtn) {
       var container = sugBtn.closest('.chat-inline');
       if (container) {
         var ticker = container.getAttribute('data-ticker');
-        var q = sugBtn.getAttribute('data-q');
+        const q = sugBtn.getAttribute('data-q');
         var inp = container.querySelector('.chat-inline-input');
         if (inp) inp.value = '';
         sendInlineMessage(ticker, q);
@@ -470,7 +470,7 @@ export function initThesisPage() {
     }
 
     // Send button click
-    var sendBtnEl = e.target.closest('.chat-inline-send');
+    const sendBtnEl = e.target.closest('.chat-inline-send');
     if (sendBtnEl) {
       var container = sendBtnEl.closest('.chat-inline');
       if (container) {
@@ -490,9 +490,9 @@ export function initThesisPage() {
   // Handle input and enter key via delegation
   document.addEventListener('input', function(e) {
     if (e.target.classList.contains('chat-inline-input')) {
-      var container = e.target.closest('.chat-inline');
+      const container = e.target.closest('.chat-inline');
       if (container) {
-        var sendBtn = container.querySelector('.chat-inline-send');
+        const sendBtn = container.querySelector('.chat-inline-send');
         if (sendBtn) sendBtn.disabled = !e.target.value.trim();
         e.target.style.height = 'auto';
         e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
@@ -503,14 +503,14 @@ export function initThesisPage() {
   document.addEventListener('keydown', function(e) {
     if (e.target.classList.contains('chat-inline-input') && e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      var container = e.target.closest('.chat-inline');
+      const container = e.target.closest('.chat-inline');
       if (container) {
-        var ticker = container.getAttribute('data-ticker');
+        const ticker = container.getAttribute('data-ticker');
         if (e.target.value.trim()) {
           sendInlineMessage(ticker, e.target.value.trim());
           e.target.value = '';
           e.target.style.height = 'auto';
-          var sendBtn = container.querySelector('.chat-inline-send');
+          const sendBtn = container.querySelector('.chat-inline-send');
           if (sendBtn) sendBtn.disabled = true;
         }
       }

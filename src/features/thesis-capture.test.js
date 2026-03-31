@@ -14,23 +14,23 @@ import {
 // localStorage polyfill for Node test environment
 // ---------------------------------------------------------------------------
 
-var _store = {};
+const _store = {};
 if (typeof globalThis.localStorage === 'undefined') {
   globalThis.localStorage = {
     _data: _store,
     getItem: function (key) { return Object.prototype.hasOwnProperty.call(_store, key) ? _store[key] : null; },
     setItem: function (key, val) { _store[key] = String(val); },
     removeItem: function (key) { delete _store[key]; },
-    clear: function () { for (var k in _store) { if (Object.prototype.hasOwnProperty.call(_store, k)) delete _store[k]; } },
+    clear: function () { for (const k in _store) { if (Object.prototype.hasOwnProperty.call(_store, k)) delete _store[k]; } },
     key: function (i) { return Object.keys(_store)[i] || null; },
     get length() { return Object.keys(_store).length; }
   };
 }
 
 function clearThesisKeys() {
-  var keysToRemove = [];
-  for (var i = 0; i < localStorage.length; i++) {
-    var key = localStorage.key(i);
+  const keysToRemove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
     if (key && (key.indexOf('ci_thesis_') === 0)) {
       keysToRemove.push(key);
     }
@@ -49,7 +49,7 @@ describe('thesis-capture core', function () {
   // Task 1 tests
 
   it('saveThesis stores and getThesis retrieves correctly', function () {
-    var thesis = {
+    const thesis = {
       ticker: 'WOR',
       dominantHypothesis: 'N2',
       probabilitySplit: [25, 50, 15, 10],
@@ -59,10 +59,10 @@ describe('thesis-capture core', function () {
       capturedFrom: 'comparator'
     };
 
-    var saved = saveThesis(thesis);
+    const saved = saveThesis(thesis);
     expect(saved).toBe(true);
 
-    var retrieved = getThesis('WOR');
+    const retrieved = getThesis('WOR');
     expect(retrieved).not.toBeNull();
     expect(retrieved.ticker).toBe('WOR');
     expect(retrieved.dominantHypothesis).toBe('N2');
@@ -80,7 +80,7 @@ describe('thesis-capture core', function () {
       capturedFrom: 'comparator'
     });
 
-    var overwritten = saveThesis({
+    const overwritten = saveThesis({
       ticker: 'WOR',
       dominantHypothesis: 'N1',
       biasDirection: 'bullish',
@@ -90,7 +90,7 @@ describe('thesis-capture core', function () {
     });
 
     expect(overwritten).toBe(false);
-    var stored = getThesis('WOR');
+    const stored = getThesis('WOR');
     expect(stored.dominantHypothesis).toBe('N2');
     expect(stored.source).toBe('explicit');
   });
@@ -104,7 +104,7 @@ describe('thesis-capture core', function () {
       capturedFrom: 'portfolio'
     });
 
-    var overwritten = saveThesis({
+    const overwritten = saveThesis({
       ticker: 'BHP',
       biasDirection: 'bullish',
       source: 'inferred',
@@ -113,7 +113,7 @@ describe('thesis-capture core', function () {
     });
 
     expect(overwritten).toBe(true);
-    var stored = getThesis('BHP');
+    const stored = getThesis('BHP');
     expect(stored.confidence).toBe('high');
     expect(stored.capturedFrom).toBe('chat');
   });
@@ -127,7 +127,7 @@ describe('thesis-capture core', function () {
       capturedFrom: 'chat'
     });
 
-    var overwritten = saveThesis({
+    const overwritten = saveThesis({
       ticker: 'FMG',
       biasDirection: 'bullish',
       source: 'explicit',
@@ -136,7 +136,7 @@ describe('thesis-capture core', function () {
     });
 
     expect(overwritten).toBe(true);
-    var stored = getThesis('FMG');
+    const stored = getThesis('FMG');
     expect(stored.source).toBe('explicit');
     expect(stored.biasDirection).toBe('bullish');
   });
@@ -179,7 +179,7 @@ describe('getDominantFromSplit', function () {
 describe('inferBiasFromSplit', function () {
 
   it('returns bullish when dominant hypothesis is upside', function () {
-    var stock = {
+    const stock = {
       hypotheses: [
         { tier: 'N1', direction: 'upside' },
         { tier: 'N2', direction: 'downside' }
@@ -189,7 +189,7 @@ describe('inferBiasFromSplit', function () {
   });
 
   it('returns bearish when dominant hypothesis is downside', function () {
-    var stock = {
+    const stock = {
       hypotheses: [
         { tier: 'N1', direction: 'upside' },
         { tier: 'N2', direction: 'downside' }

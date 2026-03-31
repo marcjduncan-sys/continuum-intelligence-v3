@@ -19,11 +19,11 @@ import { API_BASE } from '../lib/api-config.js';
 // ============================================================
 // REFRESH API BASE (centralised in api-config.js)
 // ============================================================
-var REFRESH_API_BASE = API_BASE;
+const REFRESH_API_BASE = API_BASE;
 
-var CI_API_KEY = window.CI_API_KEY || '';
+const CI_API_KEY = window.CI_API_KEY || '';
 
-var _refreshPollers = {};
+const _refreshPollers = {};
 
 // ============================================================
 // SINGLE-TICKER REFRESH
@@ -31,11 +31,11 @@ var _refreshPollers = {};
 
 async function triggerRefresh(ticker) {
     ticker = ticker.toUpperCase();
-    var btn = document.getElementById('refresh-btn-' + ticker);
-    var progress = document.getElementById('refresh-progress-' + ticker);
-    var fill = document.getElementById('refresh-fill-' + ticker);
-    var label = document.getElementById('refresh-label-' + ticker);
-    var ts = document.getElementById('refresh-ts-' + ticker);
+    const btn = document.getElementById('refresh-btn-' + ticker);
+    const progress = document.getElementById('refresh-progress-' + ticker);
+    const fill = document.getElementById('refresh-fill-' + ticker);
+    const label = document.getElementById('refresh-label-' + ticker);
+    const ts = document.getElementById('refresh-ts-' + ticker);
 
     if (!btn) return;
 
@@ -48,7 +48,7 @@ async function triggerRefresh(ticker) {
 
     try {
         // POST to trigger refresh
-        var resp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker, {
+        const resp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY }
         });
@@ -57,7 +57,7 @@ async function triggerRefresh(ticker) {
             if (label) label.textContent = 'Refresh already in progress...';
             // Still poll for status
         } else if (!resp.ok) {
-            var errData = await resp.json().catch(function() { return {}; });
+            const errData = await resp.json().catch(function() { return {}; });
             throw new Error(errData.detail || 'Refresh failed (' + resp.status + ')');
         }
 
@@ -79,12 +79,12 @@ function _pollRefreshStatus(ticker) {
 
     _refreshPollers[ticker] = setInterval(async function() {
         try {
-            var resp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker + '/status');
+            const resp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker + '/status');
             if (!resp.ok) return;
 
-            var data = await resp.json();
-            var fill = document.getElementById('refresh-fill-' + ticker);
-            var label = document.getElementById('refresh-label-' + ticker);
+            const data = await resp.json();
+            const fill = document.getElementById('refresh-fill-' + ticker);
+            const label = document.getElementById('refresh-label-' + ticker);
 
             if (fill) fill.style.width = data.progress_pct + '%';
             if (label) label.textContent = data.stage_label;
@@ -95,17 +95,17 @@ function _pollRefreshStatus(ticker) {
 
                 // Fetch updated data
                 try {
-                    var resultResp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker + '/result');
+                    const resultResp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker + '/result');
                     if (resultResp.ok) {
-                        var updatedData = await resultResp.json();
+                        const updatedData = await resultResp.json();
                         // Normalise ISO currency codes to symbols
-                        var currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00A3','EUR':'\u20AC'};
+                        const currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00A3','EUR':'\u20AC'};
                         if (updatedData.currency && currencyMap[updatedData.currency]) {
                             updatedData.currency = currencyMap[updatedData.currency];
                         }
                         // Merge into global stock data, preserving live price patches
                         if (typeof STOCK_DATA !== 'undefined') {
-                            var livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
+                            const livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
                             STOCK_DATA[ticker] = updatedData;
                             if (livePrice !== undefined) STOCK_DATA[ticker]._livePrice = livePrice;
                         }
@@ -126,7 +126,7 @@ function _pollRefreshStatus(ticker) {
                             window.destroyNarrativeTimelineChart(ticker);
                         }
                         // Re-render the report page
-                        var container = document.getElementById('page-report-' + ticker);
+                        const container = document.getElementById('page-report-' + ticker);
                         if (container && typeof window.renderReportPage === 'function') {
                             container.innerHTML = window.renderReportPage(STOCK_DATA[ticker]);
                             if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
@@ -162,9 +162,9 @@ function _pollRefreshStatus(ticker) {
 }
 
 function _resetRefreshUI(ticker) {
-    var btn = document.getElementById('refresh-btn-' + ticker);
-    var progress = document.getElementById('refresh-progress-' + ticker);
-    var fill = document.getElementById('refresh-fill-' + ticker);
+    const btn = document.getElementById('refresh-btn-' + ticker);
+    const progress = document.getElementById('refresh-progress-' + ticker);
+    const fill = document.getElementById('refresh-fill-' + ticker);
 
     if (btn) {
         btn.disabled = false;
@@ -177,12 +177,12 @@ function _resetRefreshUI(ticker) {
 // ============================================================
 // BATCH REFRESH (Refresh All)
 // ============================================================
-var _batchPoller = null;
-var _batchStartTime = null;
-var _batchCachedTickers = {};
+let _batchPoller = null;
+let _batchStartTime = null;
+const _batchCachedTickers = {};
 
 async function triggerRefreshAll() {
-    var btn = document.getElementById('btn-refresh-all');
+    const btn = document.getElementById('btn-refresh-all');
     if (btn) { btn.disabled = true; btn.textContent = 'Refreshing...'; }
 
     try {
@@ -190,13 +190,13 @@ async function triggerRefreshAll() {
         // server-side data/research/*.json) are included in the batch.
         // On retry, exclude tickers already cached this session.
         var allTickers = Object.keys(STOCK_DATA).sort();
-        var cachedKeys = Object.keys(_batchCachedTickers).filter(function(k) { return _batchCachedTickers[k]; });
-        var tickersToRefresh = cachedKeys.length > 0
+        const cachedKeys = Object.keys(_batchCachedTickers).filter(function(k) { return _batchCachedTickers[k]; });
+        const tickersToRefresh = cachedKeys.length > 0
             ? allTickers.filter(function(t) { return cachedKeys.indexOf(t) === -1; })
             : allTickers;
-        var bodyPayload = { tickers: tickersToRefresh };
+        const bodyPayload = { tickers: tickersToRefresh };
 
-        var resp = await fetch(REFRESH_API_BASE + '/api/refresh-all', {
+        const resp = await fetch(REFRESH_API_BASE + '/api/refresh-all', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY },
             body: JSON.stringify(bodyPayload)
@@ -210,11 +210,11 @@ async function triggerRefreshAll() {
         }
 
         if (!resp.ok) {
-            var err = await resp.json().catch(function() { return {}; });
+            const err = await resp.json().catch(function() { return {}; });
             throw new Error(err.detail || 'Batch refresh failed (' + resp.status + ')');
         }
 
-        var data = await resp.json();
+        const data = await resp.json();
         _batchStartTime = Date.now();
         // Don't reset _batchCachedTickers -- preserve already-cached from prior run
 
@@ -232,15 +232,15 @@ async function triggerRefreshAll() {
 }
 
 function _buildBatchGrid(tickers) {
-    var grid = document.getElementById('batch-ticker-grid');
+    const grid = document.getElementById('batch-ticker-grid');
     if (!grid) return;
-    var html = '';
-    for (var i = 0; i < tickers.length; i++) {
-        var t = tickers[i];
-        var isCached = _batchCachedTickers[t];
-        var statusClass = isCached ? 'status-completed' : 'status-queued';
-        var icon = isCached ? '\u2713' : '\u25CB';
-        var fill = isCached ? '100' : '0';
+    let html = '';
+    for (let i = 0; i < tickers.length; i++) {
+        const t = tickers[i];
+        const isCached = _batchCachedTickers[t];
+        const statusClass = isCached ? 'status-completed' : 'status-queued';
+        const icon = isCached ? '\u2713' : '\u25CB';
+        const fill = isCached ? '100' : '0';
         html += '<div class="batch-card ' + statusClass + '" id="batch-card-' + t + '">' +
             '<div class="batch-card-ticker">' + t + '</div>' +
             '<div class="batch-card-mini-bar"><div class="batch-card-mini-fill" style="width:' + fill + '%"></div></div>' +
@@ -251,12 +251,12 @@ function _buildBatchGrid(tickers) {
 }
 
 function _showBatchModal() {
-    var modal = document.getElementById('batch-refresh-modal');
+    const modal = document.getElementById('batch-refresh-modal');
     if (modal) modal.style.display = 'flex';
 }
 
 function closeBatchModal() {
-    var modal = document.getElementById('batch-refresh-modal');
+    const modal = document.getElementById('batch-refresh-modal');
     if (modal) modal.style.display = 'none';
     // Don't stop polling -- let it continue in background
 }
@@ -269,13 +269,13 @@ function _startBatchPolling() {
 
 async function _pollBatchStatus() {
     try {
-        var resp = await fetch(REFRESH_API_BASE + '/api/refresh-all/status');
+        const resp = await fetch(REFRESH_API_BASE + '/api/refresh-all/status');
         if (resp.status === 404) {
             // Server restarted -- batch state lost
             clearInterval(_batchPoller);
             _batchPoller = null;
             var stats = document.getElementById('batch-stats');
-            var cachedCount = Object.keys(_batchCachedTickers).filter(function(k) { return _batchCachedTickers[k]; }).length;
+            const cachedCount = Object.keys(_batchCachedTickers).filter(function(k) { return _batchCachedTickers[k]; }).length;
             if (stats) stats.textContent = 'Server restarted. ' + cachedCount + ' tickers cached. Close and retry remaining.';
             var btn = document.getElementById('btn-refresh-all');
             if (btn) { btn.disabled = false; btn.textContent = '\u21BB Refresh All Research'; }
@@ -283,10 +283,10 @@ async function _pollBatchStatus() {
         }
         if (!resp.ok) return;
 
-        var data = await resp.json();
+        const data = await resp.json();
 
         // Update overall progress
-        var fill = document.getElementById('batch-overall-fill');
+        const fill = document.getElementById('batch-overall-fill');
         if (fill) fill.style.width = data.overall_progress_pct + '%';
 
         var stats = document.getElementById('batch-stats');
@@ -299,17 +299,17 @@ async function _pollBatchStatus() {
 
         // Update elapsed time
         if (_batchStartTime) {
-            var elapsed = Math.round((Date.now() - _batchStartTime) / 1000);
-            var mins = Math.floor(elapsed / 60);
-            var secs = elapsed % 60;
-            var elapsedEl = document.getElementById('batch-elapsed');
+            const elapsed = Math.round((Date.now() - _batchStartTime) / 1000);
+            const mins = Math.floor(elapsed / 60);
+            const secs = elapsed % 60;
+            const elapsedEl = document.getElementById('batch-elapsed');
             if (elapsedEl) elapsedEl.textContent = mins + 'm ' + (secs < 10 ? '0' : '') + secs + 's';
         }
 
         // Update per-ticker cards + incremental caching
-        var tickerStatuses = data.per_ticker_status || [];
-        for (var i = 0; i < tickerStatuses.length; i++) {
-            var ts = tickerStatuses[i];
+        const tickerStatuses = data.per_ticker_status || [];
+        for (let i = 0; i < tickerStatuses.length; i++) {
+            const ts = tickerStatuses[i];
             _updateBatchCard(ts);
 
             // Incrementally fetch + cache each ticker as it completes
@@ -342,12 +342,12 @@ async function _pollBatchStatus() {
 }
 
 function _updateBatchCard(ts) {
-    var card = document.getElementById('batch-card-' + ts.ticker);
+    const card = document.getElementById('batch-card-' + ts.ticker);
     if (!card) return;
 
     // Determine visual status class
-    var statusClass = 'status-queued';
-    var icon = '\u25CB'; // circle
+    let statusClass = 'status-queued';
+    let icon = '\u25CB'; // circle
     if (ts.status === 'completed') {
         statusClass = 'status-completed';
         icon = '\u2713'; // checkmark
@@ -361,10 +361,10 @@ function _updateBatchCard(ts) {
 
     card.className = 'batch-card ' + statusClass;
 
-    var miniFill = card.querySelector('.batch-card-mini-fill');
+    const miniFill = card.querySelector('.batch-card-mini-fill');
     if (miniFill) miniFill.style.width = ts.progress_pct + '%';
 
-    var iconEl = card.querySelector('.batch-card-icon');
+    const iconEl = card.querySelector('.batch-card-icon');
     if (iconEl) {
         iconEl.textContent = icon;
         if (ts.error) iconEl.title = ts.error;
@@ -373,11 +373,11 @@ function _updateBatchCard(ts) {
 
 async function _fetchAndCacheSingleTicker(ticker) {
     try {
-        var resp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker + '/result');
+        const resp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker + '/result');
         if (!resp.ok) return;
 
-        var updatedData = await resp.json();
-        var currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00A3','EUR':'\u20AC'};
+        const updatedData = await resp.json();
+        const currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00A3','EUR':'\u20AC'};
 
         // Normalise currency
         if (updatedData.currency && currencyMap[updatedData.currency]) {
@@ -386,8 +386,8 @@ async function _fetchAndCacheSingleTicker(ticker) {
 
         // Merge into STOCK_DATA, preserving live prices
         if (typeof STOCK_DATA !== 'undefined') {
-            var livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
-            var livePriceHistory = STOCK_DATA[ticker] ? STOCK_DATA[ticker].priceHistory : undefined;
+            const livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
+            const livePriceHistory = STOCK_DATA[ticker] ? STOCK_DATA[ticker].priceHistory : undefined;
             STOCK_DATA[ticker] = updatedData;
             if (livePrice !== undefined) {
                 STOCK_DATA[ticker]._livePrice = livePrice;
@@ -410,11 +410,11 @@ async function _fetchAndCacheSingleTicker(ticker) {
         }
 
         // Re-render current page if viewing this ticker
-        var hash = window.location.hash || '';
-        var reportMatch = hash.match(/^#report-(\w+)/);
+        const hash = window.location.hash || '';
+        const reportMatch = hash.match(/^#report-(\w+)/);
         if (reportMatch && reportMatch[1].toUpperCase() === ticker) {
             if (typeof window.destroyNarrativeTimelineChart === 'function') window.destroyNarrativeTimelineChart(ticker);
-            var container = document.getElementById('page-report-' + ticker);
+            const container = document.getElementById('page-report-' + ticker);
             if (container && typeof window.renderReportPage === 'function') {
                 container.innerHTML = window.renderReportPage(STOCK_DATA[ticker]);
                 if (typeof window.initSectionToggles === 'function') window.initSectionToggles();
@@ -431,20 +431,20 @@ async function _fetchAndCacheSingleTicker(ticker) {
 
 async function _fetchAndMergeBatchResults() {
     try {
-        var resp = await fetch(REFRESH_API_BASE + '/api/refresh-all/results');
+        const resp = await fetch(REFRESH_API_BASE + '/api/refresh-all/results');
         if (!resp.ok) {
             console.error('Failed to fetch batch results:', resp.status);
             return;
         }
 
-        var data = await resp.json();
-        var results = data.results || {};
-        var currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00A3','EUR':'\u20AC'};
-        var merged = 0;
+        const data = await resp.json();
+        const results = data.results || {};
+        const currencyMap = {'AUD':'A$','USD':'US$','GBP':'\u00A3','EUR':'\u20AC'};
+        let merged = 0;
 
-        for (var ticker in results) {
+        for (const ticker in results) {
             if (!results.hasOwnProperty(ticker)) continue;
-            var updatedData = results[ticker];
+            const updatedData = results[ticker];
 
             // Normalise currency
             if (updatedData.currency && currencyMap[updatedData.currency]) {
@@ -453,8 +453,8 @@ async function _fetchAndMergeBatchResults() {
 
             // Merge into STOCK_DATA, preserving live prices
             if (typeof STOCK_DATA !== 'undefined') {
-                var livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
-                var livePriceHistory = STOCK_DATA[ticker] ? STOCK_DATA[ticker].priceHistory : undefined;
+                const livePrice = STOCK_DATA[ticker] ? STOCK_DATA[ticker]._livePrice : undefined;
+                const livePriceHistory = STOCK_DATA[ticker] ? STOCK_DATA[ticker].priceHistory : undefined;
                 STOCK_DATA[ticker] = updatedData;
                 if (livePrice !== undefined) {
                     STOCK_DATA[ticker]._livePrice = livePrice;
@@ -476,7 +476,7 @@ async function _fetchAndMergeBatchResults() {
 
         // Hydrate all merged tickers
         if (window.ContinuumDynamics && window.ContinuumDynamics.hydrate) {
-            for (var ht in results) {
+            for (const ht in results) {
                 if (results.hasOwnProperty(ht)) {
                     window.ContinuumDynamics.hydrate(ht);
                 }
@@ -484,15 +484,15 @@ async function _fetchAndMergeBatchResults() {
         }
 
         // Re-render current page if it's a report page
-        var hash = window.location.hash || '';
-        var reportMatch = hash.match(/^#report-(\w+)/);
+        const hash = window.location.hash || '';
+        const reportMatch = hash.match(/^#report-(\w+)/);
         if (reportMatch) {
-            var currentTicker = reportMatch[1].toUpperCase();
+            const currentTicker = reportMatch[1].toUpperCase();
             if (STOCK_DATA[currentTicker]) {
                 if (typeof window.destroyNarrativeTimelineChart === 'function') {
                     window.destroyNarrativeTimelineChart(currentTicker);
                 }
-                var container = document.getElementById('page-report-' + currentTicker);
+                const container = document.getElementById('page-report-' + currentTicker);
                 if (container && typeof window.renderReportPage === 'function') {
                     container.innerHTML = window.renderReportPage(STOCK_DATA[currentTicker]);
                     if (typeof window.initSectionToggles === 'function') window.initSectionToggles();

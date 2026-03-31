@@ -22,15 +22,15 @@ import { CACHE_VERSION } from '../data/loader.js';
 import { API_BASE } from '../lib/api-config.js';
 
 // Railway API base (centralised in api-config.js)
-var REFRESH_API_BASE = API_BASE;
+const REFRESH_API_BASE = API_BASE;
 
-var CI_API_KEY = window.CI_API_KEY || '';
+const CI_API_KEY = window.CI_API_KEY || '';
 
 export function openAddStockModal() {
-    var modal = document.getElementById('add-stock-modal');
-    var input = document.getElementById('add-stock-input');
-    var status = document.getElementById('add-stock-status');
-    var submitBtn = document.getElementById('add-stock-submit');
+    const modal = document.getElementById('add-stock-modal');
+    const input = document.getElementById('add-stock-input');
+    const status = document.getElementById('add-stock-status');
+    const submitBtn = document.getElementById('add-stock-submit');
     if (!modal) return;
     modal.style.display = 'flex';
     if (input) { input.value = ''; input.disabled = false; }
@@ -42,7 +42,7 @@ export function openAddStockModal() {
 }
 
 export function closeAddStockModal() {
-    var modal = document.getElementById('add-stock-modal');
+    const modal = document.getElementById('add-stock-modal');
     if (!modal) return;
     modal.style.display = 'none';
     if (modal._escHandler) {
@@ -64,7 +64,7 @@ function _loadResearchIntoApp(ticker, data) {
     }
     STOCK_DATA[ticker] = data;
     STOCK_DATA[ticker]._indexOnly = false;
-    var currencyMap = {'AUD': 'A\u0024', 'USD': 'US\u0024', 'GBP': '\u00a3', 'EUR': '\u20ac'};
+    const currencyMap = {'AUD': 'A\u0024', 'USD': 'US\u0024', 'GBP': '\u00a3', 'EUR': '\u20ac'};
     if (data.currency && currencyMap[data.currency]) {
         STOCK_DATA[ticker].currency = currencyMap[data.currency];
     }
@@ -81,9 +81,9 @@ function _loadResearchIntoApp(ticker, data) {
  */
 async function _loadScaffold(ticker, company, apiData) {
     try {
-        var scaffoldResp = await fetch(REFRESH_API_BASE + '/data/research/' + ticker + '.json');
+        const scaffoldResp = await fetch(REFRESH_API_BASE + '/data/research/' + ticker + '.json');
         if (scaffoldResp.ok) {
-            var scaffoldData = await scaffoldResp.json();
+            const scaffoldData = await scaffoldResp.json();
             _loadResearchIntoApp(ticker, scaffoldData);
             console.log('[AddStock] Scaffold loaded for ' + ticker);
             return;
@@ -93,7 +93,7 @@ async function _loadScaffold(ticker, company, apiData) {
     }
 
     // Minimal stub so the stock appears in the UI
-    var stub = {
+    const stub = {
         ticker: ticker,
         tickerFull: ticker + '.AX',
         company: company,
@@ -121,8 +121,8 @@ async function _loadScaffold(ticker, company, apiData) {
  */
 function _pollUntilDone(ticker, statusEl, timeoutMs) {
     return new Promise(function(resolve, reject) {
-        var elapsed = 0;
-        var interval = 3000;
+        let elapsed = 0;
+        const interval = 3000;
 
         var poller = setInterval(async function() {
             elapsed += interval;
@@ -134,16 +134,16 @@ function _pollUntilDone(ticker, statusEl, timeoutMs) {
             }
 
             try {
-                var resp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker + '/status', {
+                const resp = await fetch(REFRESH_API_BASE + '/api/refresh/' + ticker + '/status', {
                     headers: { 'X-API-Key': CI_API_KEY }
                 });
                 if (!resp.ok) return; // job not created yet, keep waiting
 
-                var job = resp.json ? await resp.json() : {};
+                const job = resp.json ? await resp.json() : {};
 
                 // Update status display
                 if (job.stage_label) {
-                    var pct = job.progress_pct || 0;
+                    const pct = job.progress_pct || 0;
                     statusEl.textContent = ticker + ': ' + job.stage_label + (pct > 0 ? ' (' + pct + '%)' : '');
                 }
 
@@ -151,12 +151,12 @@ function _pollUntilDone(ticker, statusEl, timeoutMs) {
                     clearInterval(poller);
                     // Fetch the full result
                     try {
-                        var resultResp = await fetch(
+                        const resultResp = await fetch(
                             REFRESH_API_BASE + '/api/refresh/' + ticker + '/result',
                             { headers: { 'X-API-Key': CI_API_KEY } }
                         );
                         if (resultResp.ok) {
-                            var resultData = await resultResp.json();
+                            const resultData = await resultResp.json();
                             resolve({ status: 'completed', result: resultData });
                         } else {
                             resolve({ status: 'completed', result: null });
@@ -181,12 +181,12 @@ function _pollUntilDone(ticker, statusEl, timeoutMs) {
 
 export async function submitAddStock(event) {
     event.preventDefault();
-    var input = document.getElementById('add-stock-input');
-    var status = document.getElementById('add-stock-status');
-    var submitBtn = document.getElementById('add-stock-submit');
+    const input = document.getElementById('add-stock-input');
+    const status = document.getElementById('add-stock-status');
+    const submitBtn = document.getElementById('add-stock-submit');
     if (!input || !status || !submitBtn) return;
 
-    var ticker = input.value.trim().toUpperCase();
+    const ticker = input.value.trim().toUpperCase();
     if (!ticker || !/^[A-Z0-9]{1,6}$/.test(ticker)) {
         status.className = 'add-modal-status error';
         status.textContent = 'Enter a valid ASX ticker (1-6 characters).';
@@ -208,13 +208,13 @@ export async function submitAddStock(event) {
     try {
         // Step 1: POST to create scaffold and kick off coverage initiation.
         // This returns in ~10s, well within Railway's 60s proxy timeout.
-        var resp = await fetch(REFRESH_API_BASE + '/api/stocks/add', {
+        const resp = await fetch(REFRESH_API_BASE + '/api/stocks/add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-API-Key': CI_API_KEY },
             body: JSON.stringify({ ticker: ticker })
         });
 
-        var data = await resp.json().catch(function() { return {}; });
+        const data = await resp.json().catch(function() { return {}; });
 
         if (resp.status === 409) {
             status.className = 'add-modal-status error';
@@ -229,7 +229,7 @@ export async function submitAddStock(event) {
             throw new Error(data.detail || 'Failed to add stock (' + resp.status + ')');
         }
 
-        var company = data.company || ticker;
+        const company = data.company || ticker;
         status.className = 'add-modal-status info';
         status.textContent = company + ' added. Generating research report...';
 
@@ -238,7 +238,7 @@ export async function submitAddStock(event) {
 
         // Step 2: Poll for coverage initiation progress (120s timeout)
         try {
-            var outcome = await _pollUntilDone(ticker, status, 120000);
+            const outcome = await _pollUntilDone(ticker, status, 120000);
 
             if (outcome.status === 'completed' && outcome.result) {
                 _loadResearchIntoApp(ticker, outcome.result);

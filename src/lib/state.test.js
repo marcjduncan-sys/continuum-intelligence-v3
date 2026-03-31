@@ -15,7 +15,7 @@ beforeEach(() => {
 });
 
 describe('VALID_STATIC_PAGES', () => {
-  it('is a Set with 10 entries', () => {
+  it('is a Set with 9 entries', () => {
     expect(VALID_STATIC_PAGES).toBeInstanceOf(Set);
     expect(VALID_STATIC_PAGES.size).toBe(9);
   });
@@ -82,7 +82,7 @@ describe('FEATURED_ORDER Proxy', () => {
   });
   it('supports forEach iteration', () => {
     initStockData({ CBA: {}, WBC: {} });
-    var tickers = [];
+    const tickers = [];
     FEATURED_ORDER.forEach(t => tickers.push(t));
     expect(tickers).toEqual(['CBA', 'WBC']);
   });

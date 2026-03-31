@@ -86,22 +86,22 @@ window.initNarrativeTimelineChart = initNarrativeTimelineChart;
 
 // Helper: find the active report page container
 function _activeReportPage() {
-  var active = document.querySelector('.page.active');
+  const active = document.querySelector('.page.active');
   return (active && active.id && active.id.startsWith('page-report-')) ? active : null;
 }
 
 // Helper: derive ticker from a report section's id (e.g. "bhp-identity" -> "bhp")
 function _tickerFromSection(section) {
-  var id = section.id || '';
-  var dash = id.indexOf('-');
+  const id = section.id || '';
+  const dash = id.indexOf('-');
   return dash > 0 ? id.substring(0, dash) : '';
 }
 
 // Helper: persist collapsed state to localStorage
 function _saveSectionState(ticker, sectionId, isCollapsed) {
   if (!ticker) return;
-  var key = 'sec-state-' + ticker;
-  var state = {};
+  const key = 'sec-state-' + ticker;
+  let state = {};
   try { state = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) { // Expected: localStorage may not have this key or value may be corrupted
   }
   state[sectionId] = isCollapsed;
@@ -110,27 +110,27 @@ function _saveSectionState(ticker, sectionId, isCollapsed) {
 }
 
 window.toggleSection = function(btn) {
-  var section = btn.closest('.report-section');
+  const section = btn.closest('.report-section');
   if (!section) return;
-  var body = section.querySelector('.rs-body');
+  const body = section.querySelector('.rs-body');
   if (!body) return;
-  var isCollapsed = section.classList.toggle('collapsed');
+  const isCollapsed = section.classList.toggle('collapsed');
   btn.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
   body.style.display = isCollapsed ? 'none' : '';
   _saveSectionState(_tickerFromSection(section), section.id, isCollapsed);
 };
 
 window.initSectionToggles = function() {
-  var page = _activeReportPage();
+  const page = _activeReportPage();
   if (!page) return;
-  var ticker = page.id.replace('page-report-', '').toLowerCase();
-  var key = 'sec-state-' + ticker;
-  var state = {};
+  const ticker = page.id.replace('page-report-', '').toLowerCase();
+  const key = 'sec-state-' + ticker;
+  let state = {};
   try { state = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) { // Expected: localStorage may not have this key or value may be corrupted
   }
   page.querySelectorAll('.report-section').forEach(function(section) {
-    var body = section.querySelector('.rs-body');
-    var btn = section.querySelector('.rs-toggle');
+    const body = section.querySelector('.rs-body');
+    const btn = section.querySelector('.rs-toggle');
     if (state[section.id]) {
       section.classList.add('collapsed');
       if (body) body.style.display = 'none';
@@ -141,25 +141,25 @@ window.initSectionToggles = function() {
       if (btn) btn.setAttribute('aria-expanded', 'true');
     }
   });
-  var allBtn = page.querySelector('.sections-float-toggle');
+  const allBtn = page.querySelector('.sections-float-toggle');
   if (allBtn) {
     allBtn.dataset.state = 'expanded';
-    var _span = allBtn.querySelector('span');
+    const _span = allBtn.querySelector('span');
     if (_span) _span.textContent = 'Collapse All';
-    var _poly = allBtn.querySelector('svg polyline');
+    const _poly = allBtn.querySelector('svg polyline');
     if (_poly) _poly.setAttribute('points', '18 15 12 9 6 15');
   }
 };
 
 window.toggleAllSections = function(btn) {
-  var page = _activeReportPage();
+  const page = _activeReportPage();
   if (!page) return;
-  var ticker = page.id.replace('page-report-', '').toLowerCase();
-  var isExpanded = btn.dataset.state === 'expanded';
-  var newState = isExpanded ? 'collapsed' : 'expanded';
+  const ticker = page.id.replace('page-report-', '').toLowerCase();
+  const isExpanded = btn.dataset.state === 'expanded';
+  const newState = isExpanded ? 'collapsed' : 'expanded';
   page.querySelectorAll('.report-section').forEach(function(section) {
-    var body = section.querySelector('.rs-body');
-    var toggle = section.querySelector('.rs-toggle');
+    const body = section.querySelector('.rs-body');
+    const toggle = section.querySelector('.rs-toggle');
     if (!body) return;
     if (isExpanded) {
       section.classList.add('collapsed');
@@ -173,21 +173,21 @@ window.toggleAllSections = function(btn) {
     _saveSectionState(ticker, section.id, isExpanded);
   });
   btn.dataset.state = newState;
-  var label = isExpanded ? 'Expand All' : 'Collapse All';
-  var _span2 = btn.querySelector('span');
+  const label = isExpanded ? 'Expand All' : 'Collapse All';
+  const _span2 = btn.querySelector('span');
   if (_span2) _span2.textContent = label;
   btn.setAttribute('aria-label', label + ' sections');
-  var points = isExpanded ? '6 9 12 15 18 9' : '18 15 12 9 6 15';
-  var _poly2 = btn.querySelector('svg polyline');
+  const points = isExpanded ? '6 9 12 15 18 9' : '18 15 12 9 6 15';
+  const _poly2 = btn.querySelector('svg polyline');
   if (_poly2) _poly2.setAttribute('points', points);
 };
 
 // Lazy-load SheetJS only when needed (portfolio upload interaction)
 window.loadSheetJS = function(callback) {
   if (typeof window.XLSX !== 'undefined') { if (callback) callback(); return; }
-  var placeholder = document.getElementById('sheetjs-placeholder');
+  const placeholder = document.getElementById('sheetjs-placeholder');
   if (!placeholder) { console.error('[SheetJS] Placeholder not found'); return; }
-  var script = document.createElement('script');
+  const script = document.createElement('script');
   script.src = placeholder.getAttribute('data-src');
   script.onload = function() { if (callback) callback(); };
   script.onerror = function() {
@@ -281,7 +281,7 @@ async function boot() {
   // Thesis integrity monitor -- non-blocking check after data is ready
   setTimeout(function () {
     try {
-      var newAlerts = checkForAlerts(STOCK_DATA);
+      const newAlerts = checkForAlerts(STOCK_DATA);
       updateAlertBadge();
       if (newAlerts > 0) {
         console.log('[ThesisMonitor] ' + newAlerts + ' new alert(s) detected');
@@ -307,9 +307,9 @@ async function boot() {
     fetchAndPatchLive: fetchAndPatchLive,
     initPersonalisationDemo: window.initPersonalisationDemo,
     initSourcesOnReport: function(ticker) {
-      var t = ticker.toLowerCase();
-      var uploadMount = document.getElementById('src-upload-mount-' + t);
-      var panelMount = document.getElementById('src-panel-mount-' + t);
+      const t = ticker.toLowerCase();
+      const uploadMount = document.getElementById('src-upload-mount-' + t);
+      const panelMount = document.getElementById('src-panel-mount-' + t);
       if (uploadMount) {
         uploadMount.innerHTML = renderSourceUploadZone(ticker);
         initSourceUpload(ticker, function(sourceData) {
@@ -324,7 +324,7 @@ async function boot() {
   });
 
   // Initialize pages (each wrapped so one failure does not block the rest)
-  var _inits = [
+  const _inits = [
     ['Auth', initAuth],
     ['Home', initHomePage],
     ['BatchRefresh', initBatchRefresh],
@@ -339,7 +339,7 @@ async function boot() {
     ['DeepResearch', function() { initDeepResearch('deep-research-container'); }],
     ['AlertPanel', initAlertPanel]
   ];
-  for (var _i = 0; _i < _inits.length; _i++) {
+  for (let _i = 0; _i < _inits.length; _i++) {
     try { _inits[_i][1](); }
     catch (e) { console.error('[Boot] init' + _inits[_i][0] + ' failed:', e); }
   }
@@ -348,7 +348,7 @@ async function boot() {
   document.addEventListener('ci:data:refreshed', function () {
     setTimeout(function () {
       try {
-        var newAlerts = checkForAlerts(STOCK_DATA);
+        const newAlerts = checkForAlerts(STOCK_DATA);
         updateAlertBadge();
         if (newAlerts > 0) {
           document.dispatchEvent(new CustomEvent('ci:thesis:alerts', { detail: { count: newAlerts } }));
@@ -368,15 +368,15 @@ async function boot() {
   });
 
   // --- Theme toggle ---
-  var themeToggle = document.getElementById('themeToggle');
+  const themeToggle = document.getElementById('themeToggle');
   if (themeToggle) {
     // Restore saved theme
-    var savedTheme = localStorage.getItem('ci-theme');
+    const savedTheme = localStorage.getItem('ci-theme');
     if (savedTheme === 'light') {
       document.documentElement.setAttribute('data-theme', 'light');
     }
     themeToggle.addEventListener('click', function() {
-      var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
       if (isLight) {
         document.documentElement.removeAttribute('data-theme');
         localStorage.setItem('ci-theme', 'dark');
@@ -389,23 +389,23 @@ async function boot() {
 
   // --- Evidence card expand/collapse (event delegation) ---
   document.addEventListener('click', function(e) {
-    var header = e.target.closest('.ec-header');
+    const header = e.target.closest('.ec-header');
     if (!header) return;
-    var card = header.closest('.evidence-card');
+    const card = header.closest('.evidence-card');
     if (!card) return;
-    var body = card.querySelector('.ec-body');
-    var toggle = card.querySelector('.ec-toggle');
+    const body = card.querySelector('.ec-body');
+    const toggle = card.querySelector('.ec-toggle');
     if (body) body.classList.toggle('open');
     if (toggle) toggle.classList.toggle('open');
   });
 
   // --- Mobile nav toggle ---
-  var menuBtn = document.getElementById('menuToggle');
-  var navLinks = document.querySelector('.nav-links');
+  const menuBtn = document.getElementById('menuToggle');
+  const navLinks = document.querySelector('.nav-links');
   if (menuBtn && navLinks) {
     menuBtn.addEventListener('click', function() {
       navLinks.classList.toggle('open');
-      var expanded = menuBtn.getAttribute('aria-expanded') === 'true';
+      const expanded = menuBtn.getAttribute('aria-expanded') === 'true';
       menuBtn.setAttribute('aria-expanded', String(!expanded));
     });
     // Close mobile nav when a link is clicked

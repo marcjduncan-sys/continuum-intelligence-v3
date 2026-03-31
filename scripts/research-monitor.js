@@ -311,7 +311,7 @@ function analyseStocks(stocks, now) {
     // Find nearest upcoming catalyst
     let nearestCatalyst = null;
     let nearestCatalystDays = null;
-    let upcomingCatalysts = [];
+    const upcomingCatalysts = [];
 
     for (const tw of stock.tripwires) {
       const twDate = parseDate(tw.date);

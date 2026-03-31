@@ -48,17 +48,17 @@ function normaliseWithFloorCeiling(rawScores) {
   if (!rawScores || rawScores.length === 0) return [];
 
   // Clamp to floor/ceiling
-  let clamped = rawScores.map(s => Math.max(FLOOR, Math.min(CEILING, s)));
+  const clamped = rawScores.map(s => Math.max(FLOOR, Math.min(CEILING, s)));
 
   // Normalise to sum to 100
-  let sum = clamped.reduce((a, b) => a + b, 0);
+  const sum = clamped.reduce((a, b) => a + b, 0);
   if (sum === 0) return clamped.map(() => Math.round(100 / clamped.length));
 
-  let normalised = clamped.map(s => (s / sum) * 100);
+  const normalised = clamped.map(s => (s / sum) * 100);
 
   // Round and ensure sum = 100
-  let rounded = normalised.map(s => Math.round(s));
-  let roundedSum = rounded.reduce((a, b) => a + b, 0);
+  const rounded = normalised.map(s => Math.round(s));
+  const roundedSum = rounded.reduce((a, b) => a + b, 0);
   if (roundedSum !== 100) {
     // Adjust largest value to compensate
     let maxIdx = 0;

@@ -20,7 +20,7 @@ function _esc(str) {
 // Configuration (centralised in api-config.js)
 // ---------------------------------------------------------------------------
 
-var _NOTIF_BASE = API_BASE + '/api/notifications';
+const _NOTIF_BASE = API_BASE + '/api/notifications';
 
 const POLL_INTERVAL_MS = 5 * 60 * 1000;
 let _pollTimer = null;

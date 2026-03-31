@@ -18,54 +18,54 @@ import { API_BASE } from '../lib/api-config.js';
 // CONFIGURATION
 // ============================================================
 
-var isFile         = window.location.protocol === 'file:';
-var apiOrigin      = API_BASE;
-var ECON_API_BASE  = apiOrigin + '/api/economist/chat';
-var ECON_STATE_URL = apiOrigin + '/api/economist/state';
-var CI_API_KEY     = window.CI_API_KEY || '';
+const isFile         = window.location.protocol === 'file:';
+const apiOrigin      = API_BASE;
+const ECON_API_BASE  = apiOrigin + '/api/economist/chat';
+const ECON_STATE_URL = apiOrigin + '/api/economist/state';
+const CI_API_KEY     = window.CI_API_KEY || '';
 
 // ============================================================
 // DOM REFS
 // ============================================================
 
-var container, headerEl, messagesEl, inputEl, sendBtn, clearBtn;
-var historyBtn, sidebarEl, regimeBadgeEl;
+let container, headerEl, messagesEl, inputEl, sendBtn, clearBtn;
+let historyBtn, sidebarEl, regimeBadgeEl;
 
 // ============================================================
 // STATE
 // ============================================================
 
-var _initialised  = false;
-var isLoading     = false;
-var _lastSendTime = 0;
-var _cooldownTimer = null;
-var SEND_COOLDOWN_MS = 2000;
-var STREAM_TIMEOUT_MS = 120000; // 2 min max for streaming response
-var _econConversationId = null;
-var _currentRegime = null;
-var _currentPolicyPath = null;
-var _streamAbortController = null; // AbortController for in-flight SSE stream
-var _streamReader = null; // ReadableStreamDefaultReader for cleanup
+let _initialised  = false;
+let isLoading     = false;
+let _lastSendTime = 0;
+let _cooldownTimer = null;
+const SEND_COOLDOWN_MS = 2000;
+const STREAM_TIMEOUT_MS = 120000; // 2 min max for streaming response
+let _econConversationId = null;
+let _currentRegime = null;
+let _currentPolicyPath = null;
+let _streamAbortController = null; // AbortController for in-flight SSE stream
+let _streamReader = null; // ReadableStreamDefaultReader for cleanup
 
-var conversations = (function() {
+const conversations = (function() {
     try {
-        var saved = localStorage.getItem('ci_economist_conversations');
+        const saved = localStorage.getItem('ci_economist_conversations');
         return saved ? JSON.parse(saved) : {};
     } catch(e) {
         return {};
     }
 }());
-var currentConversationKey = '_default';
+const currentConversationKey = '_default';
 
 // Conversation list cache for sidebar
-var _conversationList = [];
-var _sidebarOpen = false;
+let _conversationList = [];
+let _sidebarOpen = false;
 
 // ============================================================
 // SUGGESTIONS
 // ============================================================
 
-var ECON_SUGGESTIONS = [
+const ECON_SUGGESTIONS = [
     'What is the current macro regime and why?',
     'How should I position for an RBA rate cut?',
     'What are the leading indicators signalling right now?',
@@ -77,22 +77,22 @@ var ECON_SUGGESTIONS = [
 // ============================================================
 
 function _getAuthHeaders() {
-    var headers = { 'Content-Type': 'application/json' };
+    const headers = { 'Content-Type': 'application/json' };
     if (CI_API_KEY) headers['X-API-Key'] = CI_API_KEY;
-    var token = window.CI_AUTH && window.CI_AUTH.getToken();
+    const token = window.CI_AUTH && window.CI_AUTH.getToken();
     if (token) headers['Authorization'] = 'Bearer ' + token;
     return headers;
 }
 
 function _getGuestParam() {
-    var token = window.CI_AUTH && window.CI_AUTH.getToken();
+    const token = window.CI_AUTH && window.CI_AUTH.getToken();
     if (token) return '';
-    var guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
+    const guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
     return guestId ? '?guest_id=' + encodeURIComponent(guestId) : '';
 }
 
 function _getUserId() {
-    var token = window.CI_AUTH && window.CI_AUTH.getToken();
+    const token = window.CI_AUTH && window.CI_AUTH.getToken();
     if (token) return null; // server derives from JWT
     return (window.CI_AUTH && window.CI_AUTH.getGuestId()) || null;
 }
@@ -105,14 +105,14 @@ function _persistToLocalStorage() {
 
 function _restoreFromDB() {
     if (isFile) return Promise.resolve();
-    var token   = window.CI_AUTH && window.CI_AUTH.getToken();
-    var guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
+    const token   = window.CI_AUTH && window.CI_AUTH.getToken();
+    const guestId = window.CI_AUTH && window.CI_AUTH.getGuestId();
     if (!token && !guestId) return Promise.resolve();
 
     // Fetch conversation list (sorted newest-first by backend), then load the latest
     return _fetchConversationList().then(function(convos) {
         if (!convos || convos.length === 0) return;
-        var latest = convos[0];
+        const latest = convos[0];
         if (!latest.conversation_id) return;
         return _loadConversationFromDB(latest.conversation_id);
     }).catch(function(err) {
@@ -121,8 +121,8 @@ function _restoreFromDB() {
 }
 
 function _loadConversationFromDB(conversationId) {
-    var headers = _getAuthHeaders();
-    var url = apiOrigin + '/api/economist/conversations/' + encodeURIComponent(conversationId) + _getGuestParam();
+    const headers = _getAuthHeaders();
+    const url = apiOrigin + '/api/economist/conversations/' + encodeURIComponent(conversationId) + _getGuestParam();
     return fetch(url, { headers: headers })
         .then(function(res) { return res.ok ? res.json() : null; })
         .then(function(data) {
@@ -141,8 +141,8 @@ function _loadConversationFromDB(conversationId) {
 
 function _fetchConversationList() {
     if (isFile) return Promise.resolve([]);
-    var headers = _getAuthHeaders();
-    var url = apiOrigin + '/api/economist/conversations' + _getGuestParam();
+    const headers = _getAuthHeaders();
+    const url = apiOrigin + '/api/economist/conversations' + _getGuestParam();
     return fetch(url, { headers: headers })
         .then(function(res) { return res.ok ? res.json() : { conversations: [] }; })
         .then(function(data) { return data.conversations || []; })
@@ -155,7 +155,7 @@ function _fetchConversationList() {
 
 function fetchRegimeState() {
     if (isFile) return Promise.resolve();
-    var headers = _getAuthHeaders();
+    const headers = _getAuthHeaders();
     return fetch(ECON_STATE_URL, { headers: headers })
         .then(function(res) { return res.ok ? res.json() : null; })
         .then(function(data) {
@@ -179,9 +179,9 @@ function fetchRegimeState() {
 function renderRegimeBadge() {
     if (!regimeBadgeEl) return;
 
-    var regime = _currentRegime;
-    var colourClass = 'econ-regime-none';
-    var label = 'NO DATA';
+    const regime = _currentRegime;
+    let colourClass = 'econ-regime-none';
+    let label = 'NO DATA';
 
     if (regime === 'RISK_ON') {
         colourClass = 'econ-regime-risk-on';
@@ -194,7 +194,7 @@ function renderRegimeBadge() {
         label = 'TRANSITION';
     }
 
-    var html = '<span class="econ-regime-dot ' + colourClass + '"></span>' +
+    let html = '<span class="econ-regime-dot ' + colourClass + '"></span>' +
                '<span class="econ-regime-label">' + escapeHtml(label) + '</span>';
 
     if (_currentPolicyPath) {
@@ -211,14 +211,14 @@ function renderRegimeBadge() {
 
 function formatTime(ts) {
     if (!ts) return '';
-    var d = new Date(ts);
-    var hh = String(d.getHours()).padStart(2, '0');
-    var mm = String(d.getMinutes()).padStart(2, '0');
+    const d = new Date(ts);
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
     return hh + ':' + mm;
 }
 
 function escapeHtml(str) {
-    var d = document.createElement('div');
+    const d = document.createElement('div');
     d.textContent = str != null ? String(str) : '';
     return d.innerHTML;
 }
@@ -229,7 +229,7 @@ function renderMarkdown(text) {
 
 function renderWelcome() {
     if (!messagesEl) return;
-    var html =
+    const html =
         '<div class="econ-welcome">' +
             '<div class="econ-welcome-title">Strategist Ready</div>' +
             '<div class="econ-welcome-text">Macro regime analysis, central bank policy, and economic indicators grounded in official data sources.</div>' +
@@ -255,17 +255,17 @@ function renderWelcome() {
 
 function renderConversation() {
     if (!messagesEl) return;
-    var convo = conversations[currentConversationKey] || [];
+    const convo = conversations[currentConversationKey] || [];
     if (convo.length === 0) {
         renderWelcome();
         return;
     }
 
-    var html = '';
+    let html = '';
     convo.forEach(function(msg) {
-        var role      = msg.role === 'user' ? 'user' : 'economist';
-        var roleLabel = msg.role === 'user' ? 'YOU' : 'STRATEGIST';
-        var timeStr   = formatTime(msg.timestamp);
+        const role      = msg.role === 'user' ? 'user' : 'economist';
+        const roleLabel = msg.role === 'user' ? 'YOU' : 'STRATEGIST';
+        const timeStr   = formatTime(msg.timestamp);
 
         html += '<div class="econ-msg-row">';
         html += '<div class="econ-msg-meta">';
@@ -293,7 +293,7 @@ function renderConversation() {
 
 function showTyping() {
     if (!messagesEl) return;
-    var el = document.createElement('div');
+    const el = document.createElement('div');
     el.className = 'econ-typing';
     el.id = 'econTypingIndicator';
     el.innerHTML =
@@ -308,7 +308,7 @@ function showTyping() {
 }
 
 function hideTyping() {
-    var el = document.getElementById('econTypingIndicator');
+    const el = document.getElementById('econTypingIndicator');
     if (el) el.remove();
 }
 
@@ -326,7 +326,7 @@ function _appendStreamingBubble() {
     // Suppress aria-live during streaming to avoid flooding screen readers
     messagesEl.setAttribute('aria-live', 'off');
 
-    var row = document.createElement('div');
+    const row = document.createElement('div');
     row.className = 'econ-msg-row';
     row.innerHTML =
         '<div class="econ-msg-meta">' +
@@ -343,7 +343,7 @@ function _finaliseStreamingBubble(bubbleEl) {
     if (!bubbleEl) return;
     bubbleEl.classList.remove('econ-streaming');
     // Re-render accumulated text through markdown
-    var rawText = bubbleEl.getAttribute('data-raw') || bubbleEl.textContent;
+    const rawText = bubbleEl.getAttribute('data-raw') || bubbleEl.textContent;
     bubbleEl.innerHTML = renderMarkdown(rawText);
 
     // Restore aria-live so the final message is announced
@@ -362,10 +362,10 @@ function _abortStream() {
 }
 
 function sendMessage() {
-    var question = inputEl ? inputEl.value.trim() : '';
+    const question = inputEl ? inputEl.value.trim() : '';
     if (!question || isLoading) return;
 
-    var now = Date.now();
+    const now = Date.now();
     if (now - _lastSendTime < SEND_COOLDOWN_MS) return;
     _lastSendTime = now;
 
@@ -373,7 +373,7 @@ function sendMessage() {
     _cooldownTimer = setTimeout(function() { updateSendButton(); }, SEND_COOLDOWN_MS);
 
     if (!conversations[currentConversationKey]) conversations[currentConversationKey] = [];
-    var convo = conversations[currentConversationKey];
+    const convo = conversations[currentConversationKey];
 
     convo.push({ role: 'user', content: question, timestamp: now });
     _persistToLocalStorage();
@@ -396,18 +396,18 @@ function sendMessage() {
     // Set up abort controller and timeout for this stream
     _abortStream(); // cancel any previous in-flight stream
     _streamAbortController = new AbortController();
-    var streamTimeoutId = setTimeout(function() {
+    const streamTimeoutId = setTimeout(function() {
         _abortStream();
     }, STREAM_TIMEOUT_MS);
 
-    var headers = _getAuthHeaders();
-    var chatUrl = ECON_API_BASE + _getGuestParam();
+    const headers = _getAuthHeaders();
+    const chatUrl = ECON_API_BASE + _getGuestParam();
 
     // Build personalisation profile if available (same source as Analyst/PM Chat)
-    var personalisationProfile = null;
+    let personalisationProfile = null;
     if (typeof window.pnBuildSystemPrompt === 'function' &&
         typeof window.pnGetPersonalisationContext === 'function') {
-        var ctx = window.pnGetPersonalisationContext();
+        const ctx = window.pnGetPersonalisationContext();
         if (ctx && ctx.hasProfile && ctx.profile) {
             try {
                 personalisationProfile = window.pnBuildSystemPrompt(
@@ -419,7 +419,7 @@ function sendMessage() {
         }
     }
 
-    var requestBody = {
+    const requestBody = {
         conversation_id: _econConversationId,
         message: question,
         user_id: _getUserId()
@@ -437,7 +437,7 @@ function sendMessage() {
     .then(function(res) {
         if (!res.ok) {
             return res.text().then(function(body) {
-                var detail = '';
+                let detail = '';
                 try { detail = JSON.parse(body).detail || ''; } catch(e) { /* not JSON */ }
                 if (res.status === 502) {
                     throw new Error('The Strategist service returned an error. Please try again in a moment.');
@@ -450,18 +450,18 @@ function sendMessage() {
         }
 
         // Extract conversation_id from header
-        var headerConvId = res.headers.get('X-Conversation-Id');
+        const headerConvId = res.headers.get('X-Conversation-Id');
         if (headerConvId) _econConversationId = headerConvId;
 
         // Replace typing indicator with a streaming bubble
         hideTyping();
-        var bubbleEl = _appendStreamingBubble();
-        var accumulated = '';
+        const bubbleEl = _appendStreamingBubble();
+        let accumulated = '';
 
-        var reader = res.body.getReader();
+        const reader = res.body.getReader();
         _streamReader = reader; // store for cleanup
-        var decoder = new TextDecoder();
-        var buffer = '';
+        const decoder = new TextDecoder();
+        let buffer = '';
 
         function processStream() {
             return reader.read().then(function(result) {
@@ -490,11 +490,11 @@ function sendMessage() {
                 buffer += decoder.decode(result.value, { stream: true });
 
                 // Parse SSE lines: each event is "data: {...}\n\n"
-                var lines = buffer.split('\n');
+                const lines = buffer.split('\n');
                 buffer = '';
 
-                for (var i = 0; i < lines.length; i++) {
-                    var line = lines[i];
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
 
                     // If this is the last element and does not end with a
                     // newline, it is an incomplete line; keep it in buffer.
@@ -505,7 +505,7 @@ function sendMessage() {
 
                     if (!line.startsWith('data: ')) continue;
 
-                    var jsonStr = line.slice(6);
+                    const jsonStr = line.slice(6);
                     if (!jsonStr) continue;
 
                     try {
@@ -539,7 +539,7 @@ function sendMessage() {
         if (err.name === 'AbortError') {
             appendError('Request timed out or was cancelled. Please try again.');
         } else {
-            var msg = err.message || 'Something went wrong. Please try again.';
+            let msg = err.message || 'Something went wrong. Please try again.';
             if (msg === 'Failed to fetch') msg = 'Cannot reach the Strategist API. Check that the server is running.';
             appendError(msg);
         }
@@ -549,7 +549,7 @@ function sendMessage() {
 }
 
 function appendError(msg) {
-    var el = document.createElement('div');
+    const el = document.createElement('div');
     el.className = 'econ-error';
     el.textContent = msg;
     if (messagesEl) {
@@ -574,7 +574,7 @@ function _isInCooldown() {
 
 function updateSendButton() {
     if (!sendBtn || !inputEl) return;
-    var cooldown = _isInCooldown();
+    const cooldown = _isInCooldown();
     sendBtn.disabled = !inputEl.value.trim() || isLoading || cooldown;
     sendBtn.style.opacity = cooldown ? '0.4' : '';
 }
@@ -599,9 +599,9 @@ function clearConversation() {
 
 function _formatHistoryDate(isoStr) {
     if (!isoStr) return '';
-    var d = new Date(isoStr);
-    var now = new Date();
-    var diff = now - d;
+    const d = new Date(isoStr);
+    const now = new Date();
+    const diff = now - d;
     if (diff < 86400000) {
         return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
     }
@@ -635,7 +635,7 @@ function closeSidebar() {
 
 function _refreshSidebar() {
     if (!sidebarEl) return;
-    var listEl = sidebarEl.querySelector('.econ-sidebar-list');
+    const listEl = sidebarEl.querySelector('.econ-sidebar-list');
     if (!listEl) return;
     listEl.innerHTML = '<div class="econ-sidebar-loading">Loading...</div>';
 
@@ -648,10 +648,10 @@ function _refreshSidebar() {
 
         listEl.innerHTML = '';
         convos.forEach(function(c) {
-            var item = document.createElement('div');
+            const item = document.createElement('div');
             item.className = 'econ-conversation-item';
-            var convId = c.conversation_id || '';
-            var title = c.macro_context_summary || ('Conversation ' + convId.slice(0, 8));
+            const convId = c.conversation_id || '';
+            const title = c.macro_context_summary || ('Conversation ' + convId.slice(0, 8));
             item.innerHTML =
                 '<span class="econ-conv-title">' + escapeHtml(title) + '</span>' +
                 '<div class="econ-conv-meta">' +
@@ -668,7 +668,7 @@ function _refreshSidebar() {
 }
 
 function _loadConversation(convMeta) {
-    var convId = convMeta && convMeta.conversation_id;
+    const convId = convMeta && convMeta.conversation_id;
     if (!convId) return;
 
     _loadConversationFromDB(convId)
@@ -749,12 +749,12 @@ function _setupListeners() {
         historyBtn.addEventListener('click', toggleSidebar);
     }
 
-    var sidebarClose = document.getElementById('econSidebarClose');
+    const sidebarClose = document.getElementById('econSidebarClose');
     if (sidebarClose) {
         sidebarClose.addEventListener('click', closeSidebar);
     }
 
-    var collapseBtn = document.getElementById('econCollapseBtn');
+    const collapseBtn = document.getElementById('econCollapseBtn');
     if (collapseBtn) {
         collapseBtn.addEventListener('click', function() {
             // Import switchRailMode from pm-chat.js (available globally after init)

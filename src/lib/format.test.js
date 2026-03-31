@@ -128,28 +128,28 @@ describe('renderSparkline', () => {
     expect(renderSparkline(null)).toBe('');
   });
   it('generates SVG with polyline for valid data', () => {
-    var svg = renderSparkline([100, 105, 102, 110, 108]);
+    const svg = renderSparkline([100, 105, 102, 110, 108]);
     expect(svg).toContain('<svg');
     expect(svg).toContain('<polyline');
     expect(svg).toContain('class="rh-sparkline"');
   });
   it('uses green for rising prices (>2% gain)', () => {
-    var svg = renderSparkline([100, 101, 102, 103, 104]);
+    const svg = renderSparkline([100, 101, 102, 103, 104]);
     expect(svg).toContain('#00c875');
   });
   it('uses red for falling prices (>2% loss)', () => {
-    var svg = renderSparkline([110, 108, 105, 102, 100]);
+    const svg = renderSparkline([110, 108, 105, 102, 100]);
     expect(svg).toContain('#e44258');
   });
   it('uses amber for flat prices (<2% change)', () => {
-    var svg = renderSparkline([100, 100.5, 100, 100.5, 100.5]);
+    const svg = renderSparkline([100, 100.5, 100, 100.5, 100.5]);
     expect(svg).toContain('#f5a623');
   });
   it('generates unique gradient IDs', () => {
-    var svg1 = renderSparkline([100, 110]);
-    var svg2 = renderSparkline([100, 110]);
-    var id1 = svg1.match(/id="(sp[a-z0-9]+)"/)[1];
-    var id2 = svg2.match(/id="(sp[a-z0-9]+)"/)[1];
+    const svg1 = renderSparkline([100, 110]);
+    const svg2 = renderSparkline([100, 110]);
+    const id1 = svg1.match(/id="(sp[a-z0-9]+)"/)[1];
+    const id2 = svg2.match(/id="(sp[a-z0-9]+)"/)[1];
     expect(id1).not.toBe(id2);
   });
 });
