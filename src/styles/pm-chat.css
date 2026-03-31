@@ -710,3 +710,503 @@
     background: #F7F8FA;
     border-color: #E2E8F0;
 }
+
+/* ============================================================
+   PM PAGE REFACTORED STYLES (Light Theme Overrides)
+   ============================================================ */
+
+[data-theme="light"] .pm-dashboard-body,
+[data-theme="light"] .pm-metric-card,
+[data-theme="light"] .pm-port-selector {
+    background: #FFFFFF;
+    border-color: #E2E8F0;
+    color: #4A5568;
+}
+
+[data-theme="light"] .pm-top-pos-row,
+[data-theme="light"] .pm-mandate-row,
+[data-theme="light"] .pm-breach-row,
+[data-theme="light"] .pm-align-row,
+[data-theme="light"] .pm-reweight-row,
+[data-theme="light"] .pm-dna-risk {
+    border-bottom-color: #F0F1F4;
+}
+
+[data-theme="light"] .pm-text-primary,
+[data-theme="light"] .pm-top-pos-ticker,
+[data-theme="light"] .pm-mandate-value,
+[data-theme="light"] .pm-dna-name,
+[data-theme="light"] .pm-reweight-ticker {
+    color: #1A1F2E;
+}
+
+[data-theme="light"] .pm-text-muted,
+[data-theme="light"] .pm-metric-label {
+    color: #A0AEC0;
+}
+
+[data-theme="light"] .pm-exposure-track,
+[data-theme="light"] .pm-dna-track {
+    background: #E2E8F0;
+}
+
+/* ============================================================
+   PM PAGE REFACTORED STYLES
+   ============================================================ */
+
+.pm-page-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px;
+}
+
+.pm-page-header {
+    margin-bottom: 32px;
+}
+
+.pm-page-kicker {
+    font-family: var(--font-data);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    margin-bottom: 8px;
+}
+
+.pm-page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 12px;
+    line-height: 1.3;
+}
+
+.pm-page-desc {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* --- Portfolio Selector --- */
+.pm-port-selector-wrap {
+    margin-bottom: 24px;
+}
+.pm-port-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+.pm-port-selector-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-gold);
+    opacity: 0.6;
+    flex-shrink: 0;
+}
+.pm-port-selector-kicker {
+    font-family: var(--font-data);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+.pm-port-selector-name {
+    font-size: 0.82rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+.pm-port-selector-btn {
+    font-family: var(--font-data);
+    font-size: 0.58rem;
+    font-weight: 600;
+    color: var(--accent-gold);
+    background: none;
+    border: 1px solid var(--accent-gold);
+    border-radius: 4px;
+    padding: 4px 10px;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+/* --- Dashboard Sections --- */
+.pm-dashboard-section {
+    margin-bottom: 24px;
+}
+.pm-flags-section {
+    margin-bottom: 32px;
+}
+.pm-dash-header {
+    font-family: var(--font-data);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    margin-bottom: 10px;
+}
+.pm-dashboard-body {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.pm-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+.pm-grid-4 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+/* --- Metrics / Stubs --- */
+.pm-metric-card {
+    padding: 12px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-align: center;
+}
+.pm-metric-label {
+    font-family: var(--font-data);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+.pm-metric-value {
+    font-family: var(--font-data);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* --- How to start banner --- */
+.pm-how-to-start {
+    padding: 16px;
+    background: rgba(201, 169, 110, 0.05);
+    border-left: 2px solid rgba(201, 169, 110, 0.3);
+    border-radius: 0 4px 4px 0;
+}
+.pm-how-to-start-title {
+    font-family: var(--font-data);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    margin-bottom: 6px;
+}
+.pm-how-to-start-desc {
+    font-size: 0.80rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* --- Mandates --- */
+.pm-mandate-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+}
+.pm-mandate-label {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+}
+.pm-mandate-value {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.pm-breach-row {
+    display: flex;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+}
+.pm-breach-badge {
+    flex-shrink: 0;
+    font-family: var(--font-data);
+    font-size: 0.52rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #fff;
+}
+.pm-breach-content {
+    flex: 1;
+}
+.pm-breach-desc {
+    font-size: 0.72rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+.pm-breach-meta {
+    font-size: 0.60rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* --- Top Positions / Exposures --- */
+.pm-top-pos-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+}
+.pm-top-pos-ticker {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.pm-top-pos-sector {
+    margin-left: 8px;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+.pm-top-pos-right {
+    text-align: right;
+}
+.pm-top-pos-weight {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.pm-top-pos-mv {
+    margin-left: 8px;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+.pm-exposure-row {
+    margin-bottom: 8px;
+}
+.pm-exposure-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2px;
+}
+.pm-exposure-name {
+    font-size: 0.70rem;
+    color: var(--text-primary);
+}
+.pm-exposure-value {
+    font-family: var(--font-data);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+.pm-exposure-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.pm-exposure-fill {
+    height: 100%;
+    border-radius: 2px;
+}
+
+/* --- Alignment Matrix --- */
+.pm-align-summary {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-family: var(--font-data);
+    font-size: 0.60rem;
+}
+.pm-align-row {
+    display: flex;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+}
+.pm-align-ticker {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.72rem;
+    min-width: 50px;
+}
+.pm-align-weight {
+    font-family: var(--font-data);
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    min-width: 40px;
+}
+.pm-align-badge {
+    font-family: var(--font-data);
+    font-size: 0.50rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #fff;
+}
+.pm-align-skew {
+    font-size: 0.60rem;
+    color: var(--text-muted);
+}
+
+/* --- Hypothesis DNA --- */
+.pm-dna-block {
+    margin-bottom: 10px;
+}
+.pm-dna-title {
+    font-family: var(--font-data);
+    font-size: 0.54rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: 0.06em;
+}
+.pm-dna-row {
+    margin-bottom: 6px;
+}
+.pm-dna-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    margin-bottom: 2px;
+}
+.pm-dna-name {
+    color: var(--text-primary);
+}
+.pm-dna-weight {
+    color: var(--text-muted);
+}
+.pm-dna-track {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.pm-dna-fill {
+    height: 100%;
+    border-radius: 2px;
+}
+.pm-dna-tickers {
+    font-size: 0.58rem;
+    color: var(--text-muted);
+    margin-top: 1px;
+}
+.pm-dna-risk {
+    font-size: 0.65rem;
+    color: var(--text-primary);
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px;
+}
+
+/* --- Hedge Gaps --- */
+.pm-gap-row {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+.pm-gap-type {
+    font-size: 0.70rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+.pm-gap-desc {
+    font-size: 0.65rem;
+    color: var(--text-primary);
+}
+.pm-gap-tickers {
+    font-size: 0.58rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* --- Reweighting & Changelog --- */
+.pm-reweight-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+}
+.pm-reweight-ticker {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.72rem;
+    min-width: 50px;
+}
+.pm-reweight-badge {
+    font-family: var(--font-data);
+    font-size: 0.50rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #fff;
+}
+.pm-reweight-reason {
+    flex: 1;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+.pm-send-btn-small {
+    font-family: var(--font-data);
+    font-size: 0.50rem;
+    font-weight: 600;
+    color: var(--accent-gold);
+    background: none;
+    border: 1px solid var(--accent-gold);
+    border-radius: 3px;
+    padding: 2px 8px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.pm-send-btn-small:hover {
+    background: rgba(201, 169, 110, 0.1);
+}
+
+.pm-log-row {
+    display: flex;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+}
+.pm-log-badge {
+    font-family: var(--font-data);
+    font-size: 0.50rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #fff;
+}
+.pm-log-ticker {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.70rem;
+}
+.pm-log-desc {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+}
+
+/* --- Color Utilities --- */
+.pm-bg-gold { background: var(--accent-gold); }
+.pm-bg-green { background: #27ae60; }
+.pm-bg-red { background: #e74c3c; }
+
+.pm-text-gold { color: var(--accent-gold); }
+.pm-text-green { color: #27ae60; }
+.pm-text-red { color: #e74c3c; }
+.pm-text-neutral { color: #95a5a6; }
+.pm-text-muted { color: var(--text-muted); }

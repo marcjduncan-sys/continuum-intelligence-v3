@@ -15,65 +15,30 @@ export function renderPMPage() {
     if (!container || container.dataset.rendered === '1') return;
 
     container.innerHTML =
-        '<div class="page-inner" style="max-width:720px;margin:0 auto;padding:48px 24px">' +
+        '<div class="pm-page-inner">' +
 
             // --- Header ---
-            '<div style="margin-bottom:32px">' +
-                '<div style="' +
-                    'font-family:var(--font-data);font-size:0.62rem;font-weight:700;' +
-                    'letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-gold);' +
-                    'margin-bottom:8px' +
-                '">' +
-                    'PORTFOLIO MANAGER' +
-                '</div>' +
-                '<h1 style="' +
-                    'font-size:1.5rem;font-weight:700;color:var(--text-primary);' +
-                    'margin:0 0 12px;line-height:1.3' +
-                '">' +
-                    'Portfolio construction, sizing, exposure and risk decisions' +
-                '</h1>' +
-                '<p style="' +
-                    'font-size:0.88rem;line-height:1.65;color:var(--text-muted);margin:0' +
-                '">' +
-                    'PM Chat is your portfolio-level decision surface. It handles position sizing, ' +
-                    'concentration analysis, sector exposure, source-of-funds decisions, and prioritised ' +
-                    'portfolio actions. For stock-level thesis and evidence, use the Analyst.' +
-                '</p>' +
+            '<div class="pm-page-header">' +
+                '<div class="pm-page-kicker">PORTFOLIO MANAGER</div>' +
+                '<h1 class="pm-page-title">Portfolio construction, sizing, exposure and risk decisions</h1>' +
+                '<p class="pm-page-desc">PM Chat is your portfolio-level decision surface. It handles position sizing, concentration analysis, sector exposure, source-of-funds decisions, and prioritised portfolio actions. For stock-level thesis and evidence, use the Analyst.</p>' +
             '</div>' +
 
             // --- Portfolio selector placeholder ---
-            '<div id="pmPortfolioSelector" style="margin-bottom:24px">' +
-                '<div style="' +
-                    'display:flex;align-items:center;gap:12px;padding:14px 16px;' +
-                    'background:var(--bg-card);border:1px solid var(--border);border-radius:6px' +
-                '">' +
-                    '<div style="' +
-                        'width:8px;height:8px;border-radius:50%;' +
-                        'background:var(--accent-gold);opacity:0.6;flex-shrink:0' +
-                    '"></div>' +
+            '<div id="pmPortfolioSelector" class="pm-port-selector-wrap">' +
+                '<div class="pm-port-selector">' +
+                    '<div class="pm-port-selector-dot"></div>' +
                     '<div style="flex:1">' +
-                        '<div style="' +
-                            'font-family:var(--font-data);font-size:0.62rem;font-weight:700;' +
-                            'letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);' +
-                            'margin-bottom:2px' +
-                        '">PORTFOLIO</div>' +
-                        '<div id="pmPortfolioName" style="' +
-                            'font-size:0.82rem;color:var(--text-primary);font-weight:600' +
-                        '">No portfolio loaded</div>' +
+                        '<div class="pm-port-selector-kicker">PORTFOLIO</div>' +
+                        '<div id="pmPortfolioName" class="pm-port-selector-name">No portfolio loaded</div>' +
                     '</div>' +
-                    '<button id="pmRefreshDiag" style="' +
-                        'font-family:var(--font-data);font-size:0.58rem;font-weight:600;' +
-                        'color:var(--accent-gold);background:none;border:1px solid var(--accent-gold);' +
-                        'border-radius:4px;padding:4px 10px;cursor:pointer;opacity:0.7' +
-                    '">Refresh</button>' +
+                    '<button id="pmRefreshDiag" class="pm-port-selector-btn">Refresh</button>' +
                 '</div>' +
             '</div>' +
 
             // --- Summary metrics ---
-            '<div id="pmSnapshotSummary" style="margin-bottom:24px">' +
-                '<div style="' +
-                    'display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px' +
-                '">' +
+            '<div id="pmSnapshotSummary" class="pm-dashboard-section">' +
+                '<div class="pm-grid-3">' +
                     _metricStub('Total Value', '--') +
                     _metricStub('Cash', '--') +
                     _metricStub('Positions', '--') +
@@ -81,33 +46,21 @@ export function renderPMPage() {
             '</div>' +
 
             // --- Mandate settings (BEAD-003) ---
-            '<div id="pmMandateSettings" style="margin-bottom:24px;display:none">' +
+            '<div id="pmMandateSettings" class="pm-dashboard-section" style="display:none">' +
                 _sectionHeader('MANDATE SETTINGS') +
-                '<div id="pmMandateSettingsBody" style="' +
-                    'background:var(--bg-card);border:1px solid var(--border);border-radius:6px;' +
-                    'padding:12px 14px;font-size:0.75rem;color:var(--text-muted)' +
-                '">' +
-                    'No mandate configured' +
-                '</div>' +
+                '<div id="pmMandateSettingsBody" class="pm-dashboard-body">No mandate configured</div>' +
             '</div>' +
 
             // --- Mandate breaches (BEAD-004) ---
-            '<div id="pmMandateBreaches" style="margin-bottom:24px;display:none">' +
+            '<div id="pmMandateBreaches" class="pm-dashboard-section" style="display:none">' +
                 _sectionHeader('MANDATE BREACHES') +
-                '<div id="pmMandateBreachesBody" style="' +
-                    'background:var(--bg-card);border:1px solid var(--border);border-radius:6px;' +
-                    'padding:12px 14px;font-size:0.75rem;color:var(--text-muted)' +
-                '">' +
-                    'No breaches' +
-                '</div>' +
+                '<div id="pmMandateBreachesBody" class="pm-dashboard-body">No breaches</div>' +
             '</div>' +
 
             // --- Concentration bar (Phase C) ---
-            '<div id="pmConcentration" style="margin-bottom:24px">' +
+            '<div id="pmConcentration" class="pm-dashboard-section">' +
                 _sectionHeader('CONCENTRATION') +
-                '<div style="' +
-                    'display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px' +
-                '">' +
+                '<div class="pm-grid-4">' +
                     _metricStub('Max Single', '--') +
                     _metricStub('Top 5', '--') +
                     _metricStub('Top 10', '--') +
@@ -116,117 +69,63 @@ export function renderPMPage() {
             '</div>' +
 
             // --- Top positions (Phase C) ---
-            '<div id="pmTopPositions" style="margin-bottom:24px">' +
+            '<div id="pmTopPositions" class="pm-dashboard-section">' +
                 _sectionHeader('TOP POSITIONS') +
-                '<div id="pmTopPositionsBody" style="' +
-                    'background:var(--bg-card);border:1px solid var(--border);border-radius:6px;' +
-                    'padding:12px 14px;font-size:0.75rem;color:var(--text-muted)' +
-                '">' +
-                    'No portfolio loaded' +
-                '</div>' +
+                '<div id="pmTopPositionsBody" class="pm-dashboard-body">No portfolio loaded</div>' +
             '</div>' +
 
             // --- Alignment matrix (BEAD-005) ---
-            '<div id="pmAlignmentMatrix" style="margin-bottom:24px;display:none">' +
+            '<div id="pmAlignmentMatrix" class="pm-dashboard-section" style="display:none">' +
                 _sectionHeader('ALIGNMENT MATRIX') +
-                '<div id="pmAlignmentMatrixBody" style="' +
-                    'background:var(--bg-card);border:1px solid var(--border);border-radius:6px;' +
-                    'padding:12px 14px;font-size:0.75rem;color:var(--text-muted)' +
-                '">' +
-                    'No portfolio loaded' +
-                '</div>' +
+                '<div id="pmAlignmentMatrixBody" class="pm-dashboard-body">No portfolio loaded</div>' +
             '</div>' +
 
             // --- Sector exposure (Phase C) ---
-            '<div id="pmSectorExposure" style="margin-bottom:24px">' +
+            '<div id="pmSectorExposure" class="pm-dashboard-section">' +
                 _sectionHeader('SECTOR EXPOSURE') +
-                '<div id="pmSectorExposureBody" style="' +
-                    'background:var(--bg-card);border:1px solid var(--border);border-radius:6px;' +
-                    'padding:12px 14px;font-size:0.75rem;color:var(--text-muted)' +
-                '">' +
-                    'No portfolio loaded' +
-                '</div>' +
+                '<div id="pmSectorExposureBody" class="pm-dashboard-body">No portfolio loaded</div>' +
             '</div>' +
 
             // --- Theme exposure (BEAD-002) ---
-            '<div id="pmThemeExposure" style="margin-bottom:24px;display:none">' +
+            '<div id="pmThemeExposure" class="pm-dashboard-section" style="display:none">' +
                 _sectionHeader('THEME EXPOSURE') +
-                '<div id="pmThemeExposureBody" style="' +
-                    'background:var(--bg-card);border:1px solid var(--border);border-radius:6px;' +
-                    'padding:12px 14px;font-size:0.75rem;color:var(--text-muted)' +
-                '">' +
-                    'No portfolio loaded' +
-                '</div>' +
+                '<div id="pmThemeExposureBody" class="pm-dashboard-body">No portfolio loaded</div>' +
             '</div>' +
 
             // --- Hypothesis DNA (BEAD-006) ---
-            '<div id="pmHypothesisDNA" style="margin-bottom:24px;display:none">' +
+            '<div id="pmHypothesisDNA" class="pm-dashboard-section" style="display:none">' +
                 _sectionHeader('HYPOTHESIS DNA') +
-                '<div id="pmHypothesisDNABody" style="' +
-                    'background:var(--bg-card);border:1px solid var(--border);border-radius:6px;' +
-                    'padding:12px 14px;font-size:0.75rem;color:var(--text-muted)' +
-                '">' +
-                    'No portfolio loaded' +
-                '</div>' +
+                '<div id="pmHypothesisDNABody" class="pm-dashboard-body">No portfolio loaded</div>' +
             '</div>' +
 
             // --- Hedge gaps (BEAD-007) ---
-            '<div id="pmHedgeGaps" style="margin-bottom:24px;display:none">' +
+            '<div id="pmHedgeGaps" class="pm-dashboard-section" style="display:none">' +
                 _sectionHeader('HEDGE GAP ALERTS') +
-                '<div id="pmHedgeGapsBody" style="' +
-                    'background:var(--bg-card);border:1px solid var(--border);border-radius:6px;' +
-                    'padding:12px 14px;font-size:0.75rem;color:var(--text-muted)' +
-                '">' +
-                    'No gaps detected' +
-                '</div>' +
+                '<div id="pmHedgeGapsBody" class="pm-dashboard-body">No gaps detected</div>' +
             '</div>' +
 
             // --- Reweighting signals (BEAD-008) ---
-            '<div id="pmReweighting" style="margin-bottom:24px;display:none">' +
+            '<div id="pmReweighting" class="pm-dashboard-section" style="display:none">' +
                 _sectionHeader('REWEIGHTING SIGNALS') +
-                '<div id="pmReweightingBody" style="' +
-                    'background:var(--bg-card);border:1px solid var(--border);border-radius:6px;' +
-                    'padding:12px 14px;font-size:0.75rem;color:var(--text-muted)' +
-                '">' +
-                    'No signals' +
-                '</div>' +
+                '<div id="pmReweightingBody" class="pm-dashboard-body">No signals</div>' +
             '</div>' +
 
             // --- Change detection (BEAD-009) ---
-            '<div id="pmChangeLog" style="margin-bottom:24px;display:none">' +
+            '<div id="pmChangeLog" class="pm-dashboard-section" style="display:none">' +
                 _sectionHeader('CHANGE LOG') +
-                '<div id="pmChangeLogBody" style="' +
-                    'background:var(--bg-card);border:1px solid var(--border);border-radius:6px;' +
-                    'padding:12px 14px;font-size:0.75rem;color:var(--text-muted)' +
-                '">' +
-                    'No changes detected' +
-                '</div>' +
+                '<div id="pmChangeLogBody" class="pm-dashboard-body">No changes detected</div>' +
             '</div>' +
 
             // --- Flags (Phase C) ---
-            '<div id="pmFlags" style="margin-bottom:32px">' +
+            '<div id="pmFlags" class="pm-dashboard-section pm-flags-section">' +
                 _sectionHeader('RISK FLAGS') +
-                '<div id="pmFlagsBody" style="' +
-                    'background:var(--bg-card);border:1px solid var(--border);border-radius:6px;' +
-                    'padding:12px 14px;font-size:0.75rem;color:var(--text-muted)' +
-                '">' +
-                    'No flags' +
-                '</div>' +
+                '<div id="pmFlagsBody" class="pm-dashboard-body">No flags</div>' +
             '</div>' +
 
             // --- How to start ---
-            '<div style="' +
-                'padding:16px;background:rgba(201,169,110,0.05);' +
-                'border-left:2px solid rgba(201,169,110,0.3);border-radius:0 4px 4px 0' +
-            '">' +
-                '<div style="' +
-                    'font-family:var(--font-data);font-size:0.58rem;font-weight:700;' +
-                    'letter-spacing:0.08em;text-transform:uppercase;color:var(--accent-gold);' +
-                    'margin-bottom:6px' +
-                '">' +
-                    'HOW TO START' +
-                '</div>' +
-                '<p style="font-size:0.80rem;line-height:1.6;color:var(--text-muted);margin:0">' +
+            '<div class="pm-how-to-start">' +
+                '<div class="pm-how-to-start-title">HOW TO START</div>' +
+                '<p class="pm-how-to-start-desc">' +
                     'Switch to PM mode using the Analyst/PM toggle in the right panel header, ' +
                     'then ask a portfolio-level question. Load a portfolio to see analytics, ' +
                     'concentration, and risk flags updated in real time.' +
@@ -374,15 +273,14 @@ export function updatePMDashboard(analytics) {
     const topBody = document.getElementById('pmTopPositionsBody');
     if (topBody && analytics.top_positions && analytics.top_positions.length > 0) {
         const rows = analytics.top_positions.map(function(p) {
-            return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;' +
-                'border-bottom:1px solid var(--border)">' +
+            return '<div class="pm-top-pos-row">' +
                 '<div>' +
-                    '<span style="font-weight:600;color:var(--text-primary)">' + _esc(p.ticker) + '</span>' +
-                    '<span style="margin-left:8px;font-size:0.65rem;color:var(--text-muted)">' + _esc(p.sector) + '</span>' +
+                    '<span class="pm-top-pos-ticker">' + _esc(p.ticker) + '</span>' +
+                    '<span class="pm-top-pos-sector">' + _esc(p.sector) + '</span>' +
                 '</div>' +
-                '<div style="text-align:right">' +
-                    '<span style="font-weight:600;color:var(--text-primary)">' + _fmtPct(p.weight) + '</span>' +
-                    '<span style="margin-left:8px;font-size:0.65rem;color:var(--text-muted)">' + _fmtCurrency(p.market_value) + '</span>' +
+                '<div class="pm-top-pos-right">' +
+                    '<span class="pm-top-pos-weight">' + _fmtPct(p.weight) + '</span>' +
+                    '<span class="pm-top-pos-mv">' + _fmtCurrency(p.market_value) + '</span>' +
                 '</div>' +
             '</div>';
         });
@@ -398,13 +296,13 @@ export function updatePMDashboard(analytics) {
                 const name = entry[0];
                 const weight = entry[1];
                 const barWidth = Math.min(weight * 100, 100);
-                return '<div style="margin-bottom:8px">' +
-                    '<div style="display:flex;justify-content:space-between;margin-bottom:2px">' +
-                        '<span style="font-size:0.70rem;color:var(--text-primary)">' + _esc(name) + '</span>' +
-                        '<span style="font-family:var(--font-data);font-size:0.65rem;color:var(--text-muted)">' + _fmtPct(weight) + '</span>' +
+                return '<div class="pm-exposure-row">' +
+                    '<div class="pm-exposure-header">' +
+                        '<span class="pm-exposure-name">' + _esc(name) + '</span>' +
+                        '<span class="pm-exposure-value">' + _fmtPct(weight) + '</span>' +
                     '</div>' +
-                    '<div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">' +
-                        '<div style="height:100%;width:' + barWidth + '%;background:var(--accent-gold);border-radius:2px"></div>' +
+                    '<div class="pm-exposure-track">' +
+                        '<div class="pm-exposure-fill pm-bg-gold" style="width:' + barWidth + '%"></div>' +
                     '</div>' +
                 '</div>';
             });
@@ -487,13 +385,13 @@ function _renderThemeExposure(themeExposure) {
         const weight = entry[1];
         const barWidth = Math.min(weight * 100, 100);
         const barColor = themeColors[name] || 'var(--accent-gold)';
-        return '<div style="margin-bottom:8px">' +
-            '<div style="display:flex;justify-content:space-between;margin-bottom:2px">' +
-                '<span style="font-size:0.70rem;color:var(--text-primary)">' + _esc(name) + '</span>' +
-                '<span style="font-family:var(--font-data);font-size:0.65rem;color:var(--text-muted)">' + _fmtPct(weight) + '</span>' +
+        return '<div class="pm-exposure-row">' +
+            '<div class="pm-exposure-header">' +
+                '<span class="pm-exposure-name">' + _esc(name) + '</span>' +
+                '<span class="pm-exposure-value">' + _fmtPct(weight) + '</span>' +
             '</div>' +
-            '<div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">' +
-                '<div style="height:100%;width:' + barWidth + '%;background:' + barColor + ';border-radius:2px"></div>' +
+            '<div class="pm-exposure-track">' +
+                '<div class="pm-exposure-fill" style="width:' + barWidth + '%;background:' + barColor + '"></div>' +
             '</div>' +
         '</div>';
     });
@@ -525,9 +423,9 @@ function _renderMandateSettings(mandate) {
 }
 
 function _mandateRow(label, value) {
-    return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">' +
-        '<span style="font-size:0.68rem;color:var(--text-muted)">' + _esc(label) + '</span>' +
-        '<span style="font-size:0.68rem;font-weight:600;color:var(--text-primary)">' + _esc(value) + '</span>' +
+    return '<div class="pm-mandate-row">' +
+        '<span class="pm-mandate-label">' + _esc(label) + '</span>' +
+        '<span class="pm-mandate-value">' + _esc(value) + '</span>' +
     '</div>';
 }
 
@@ -551,14 +449,11 @@ function _renderMandateBreaches(breaches) {
         const sevColor = b.severity === 'critical' ? '#e74c3c' : 'var(--accent-gold)';
         const sevLabel = b.severity === 'critical' ? 'CRITICAL' : 'WARNING';
         const postureLabel = (b.recommended_posture || '').replace(/_/g, ' ');
-        return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start">' +
-            '<div style="' +
-                'flex-shrink:0;font-family:var(--font-data);font-size:0.52rem;font-weight:700;' +
-                'padding:2px 6px;border-radius:3px;color:#fff;background:' + sevColor +
-            '">' + sevLabel + '</div>' +
-            '<div style="flex:1">' +
-                '<div style="font-size:0.72rem;color:var(--text-primary);line-height:1.4">' + _esc(b.description) + '</div>' +
-                '<div style="font-size:0.60rem;color:var(--text-muted);margin-top:2px">' +
+        return '<div class="pm-breach-row">' +
+            '<div class="pm-breach-badge" style="background:' + sevColor + '">' + sevLabel + '</div>' +
+            '<div class="pm-breach-content">' +
+                '<div class="pm-breach-desc">' + _esc(b.description) + '</div>' +
+                '<div class="pm-breach-meta">' +
                     _esc(b.code) + (postureLabel ? ' -- ' + _esc(postureLabel) : '') +
                 '</div>' +
             '</div>' +
@@ -594,11 +489,11 @@ function _renderAlignmentMatrix(holdings, summary) {
     let summaryHtml = '';
     if (summary) {
         summaryHtml =
-            '<div style="display:flex;gap:12px;margin-bottom:10px;font-family:var(--font-data);font-size:0.60rem">' +
-                '<span style="color:#27ae60">Aligned: ' + _fmtPctDec(summary.aligned_weight) + '</span>' +
-                '<span style="color:#e74c3c">Contradicts: ' + _fmtPctDec(summary.contradicts_weight) + '</span>' +
-                '<span style="color:#95a5a6">Neutral: ' + _fmtPctDec(summary.neutral_weight) + '</span>' +
-                '<span style="color:#7f8c8d">Not covered: ' + _fmtPctDec(summary.not_covered_weight) + '</span>' +
+            '<div class="pm-align-summary">' +
+                '<span class="pm-text-green">Aligned: ' + _fmtPctDec(summary.aligned_weight) + '</span>' +
+                '<span class="pm-text-red">Contradicts: ' + _fmtPctDec(summary.contradicts_weight) + '</span>' +
+                '<span class="pm-text-neutral">Neutral: ' + _fmtPctDec(summary.neutral_weight) + '</span>' +
+                '<span class="pm-text-muted">Not covered: ' + _fmtPctDec(summary.not_covered_weight) + '</span>' +
             '</div>';
     }
 
@@ -608,14 +503,11 @@ function _renderAlignmentMatrix(holdings, summary) {
         const badgeColor = clsColors[cls] || '#7f8c8d';
         const skewDir = (h.skew && h.skew.direction) ? h.skew.direction : '';
         const skewScore = (h.skew && h.skew.score != null) ? h.skew.score : '';
-        return '<div style="display:flex;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);gap:8px">' +
-            '<span style="font-weight:600;color:var(--text-primary);font-size:0.72rem;min-width:50px">' + _esc(h.ticker) + '</span>' +
-            '<span style="font-family:var(--font-data);font-size:0.62rem;color:var(--text-muted);min-width:40px">' + _fmtPctDec(h.weight) + '</span>' +
-            '<span style="' +
-                'font-family:var(--font-data);font-size:0.50rem;font-weight:700;padding:2px 6px;' +
-                'border-radius:3px;color:#fff;background:' + badgeColor +
-            '">' + _esc(cls.toUpperCase()) + '</span>' +
-            (skewDir ? '<span style="font-size:0.60rem;color:var(--text-muted)">' + _esc(skewDir) + (skewScore ? ' ' + skewScore : '') + '</span>' : '') +
+        return '<div class="pm-align-row">' +
+            '<span class="pm-align-ticker">' + _esc(h.ticker) + '</span>' +
+            '<span class="pm-align-weight">' + _fmtPctDec(h.weight) + '</span>' +
+            '<span class="pm-align-badge" style="background:' + badgeColor + '">' + _esc(cls.toUpperCase()) + '</span>' +
+            (skewDir ? '<span class="pm-align-skew">' + _esc(skewDir) + (skewScore ? ' ' + skewScore : '') + '</span>' : '') +
         '</div>';
     });
 
@@ -643,21 +535,19 @@ function _renderHypothesisDNA(dna) {
     // Upside hypotheses
     if (dna.upside_hypotheses && dna.upside_hypotheses.length > 0) {
         hasContent = true;
-        html += '<div style="margin-bottom:10px">' +
-            '<div style="font-family:var(--font-data);font-size:0.54rem;font-weight:700;color:#27ae60;margin-bottom:6px;letter-spacing:0.06em">UPSIDE EXPOSURE</div>';
+        html += '<div class="pm-dna-block">' +
+            '<div class="pm-dna-title pm-text-green">UPSIDE EXPOSURE</div>';
         dna.upside_hypotheses.forEach(function(h) {
             const barWidth = Math.min((h.weighted_exposure || 0) * 100, 100);
-            html += '<div style="margin-bottom:6px">' +
-                '<div style="display:flex;justify-content:space-between;font-size:0.65rem;margin-bottom:2px">' +
-                    '<span style="color:var(--text-primary)">' + _esc(h.hypothesis || h.name || '') + '</span>' +
-                    '<span style="color:var(--text-muted)">' + _fmtPctDec(h.weighted_exposure) + '</span>' +
+            html += '<div class="pm-dna-row">' +
+                '<div class="pm-dna-header">' +
+                    '<span class="pm-dna-name">' + _esc(h.hypothesis || h.name || '') + '</span>' +
+                    '<span class="pm-dna-weight">' + _fmtPctDec(h.weighted_exposure) + '</span>' +
                 '</div>' +
-                '<div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden">' +
-                    '<div style="height:100%;width:' + barWidth + '%;background:#27ae60;border-radius:2px"></div>' +
+                '<div class="pm-dna-track">' +
+                    '<div class="pm-dna-fill pm-bg-green" style="width:' + barWidth + '%"></div>' +
                 '</div>' +
-                '<div style="font-size:0.58rem;color:var(--text-muted);margin-top:1px">' +
-                    (h.tickers ? h.tickers.join(', ') : '') +
-                '</div>' +
+                '<div class="pm-dna-tickers">' + (h.tickers ? h.tickers.join(', ') : '') + '</div>' +
             '</div>';
         });
         html += '</div>';
@@ -666,21 +556,19 @@ function _renderHypothesisDNA(dna) {
     // Downside hypotheses
     if (dna.downside_hypotheses && dna.downside_hypotheses.length > 0) {
         hasContent = true;
-        html += '<div style="margin-bottom:10px">' +
-            '<div style="font-family:var(--font-data);font-size:0.54rem;font-weight:700;color:#e74c3c;margin-bottom:6px;letter-spacing:0.06em">DOWNSIDE EXPOSURE</div>';
+        html += '<div class="pm-dna-block">' +
+            '<div class="pm-dna-title pm-text-red">DOWNSIDE EXPOSURE</div>';
         dna.downside_hypotheses.forEach(function(h) {
             const barWidth = Math.min((h.weighted_exposure || 0) * 100, 100);
-            html += '<div style="margin-bottom:6px">' +
-                '<div style="display:flex;justify-content:space-between;font-size:0.65rem;margin-bottom:2px">' +
-                    '<span style="color:var(--text-primary)">' + _esc(h.hypothesis || h.name || '') + '</span>' +
-                    '<span style="color:var(--text-muted)">' + _fmtPctDec(h.weighted_exposure) + '</span>' +
+            html += '<div class="pm-dna-row">' +
+                '<div class="pm-dna-header">' +
+                    '<span class="pm-dna-name">' + _esc(h.hypothesis || h.name || '') + '</span>' +
+                    '<span class="pm-dna-weight">' + _fmtPctDec(h.weighted_exposure) + '</span>' +
                 '</div>' +
-                '<div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden">' +
-                    '<div style="height:100%;width:' + barWidth + '%;background:#e74c3c;border-radius:2px"></div>' +
+                '<div class="pm-dna-track">' +
+                    '<div class="pm-dna-fill pm-bg-red" style="width:' + barWidth + '%"></div>' +
                 '</div>' +
-                '<div style="font-size:0.58rem;color:var(--text-muted);margin-top:1px">' +
-                    (h.tickers ? h.tickers.join(', ') : '') +
-                '</div>' +
+                '<div class="pm-dna-tickers">' + (h.tickers ? h.tickers.join(', ') : '') + '</div>' +
             '</div>';
         });
         html += '</div>';
@@ -690,9 +578,9 @@ function _renderHypothesisDNA(dna) {
     if (dna.concentration_risks && dna.concentration_risks.length > 0) {
         hasContent = true;
         html += '<div>' +
-            '<div style="font-family:var(--font-data);font-size:0.54rem;font-weight:700;color:var(--accent-gold);margin-bottom:6px;letter-spacing:0.06em">CONCENTRATION RISKS</div>';
+            '<div class="pm-dna-title pm-text-gold">CONCENTRATION RISKS</div>';
         dna.concentration_risks.forEach(function(r) {
-            html += '<div style="font-size:0.65rem;color:var(--text-primary);padding:4px 0;border-bottom:1px solid var(--border)">' +
+            html += '<div class="pm-dna-risk">' +
                 _esc(r.hypothesis || r.description || r) +
                 (r.combined_weight ? ' (' + _fmtPctDec(r.combined_weight) + ')' : '') +
             '</div>';
@@ -731,14 +619,12 @@ function _renderHedgeGaps(gaps) {
     if (gaps.correlated_downside && gaps.correlated_downside.length > 0) {
         hasContent = true;
         gaps.correlated_downside.forEach(function(g) {
-            html += '<div style="padding:8px 0;border-bottom:1px solid var(--border)">' +
-                '<div style="font-size:0.70rem;font-weight:600;color:#e74c3c;margin-bottom:2px">Correlated Downside</div>' +
-                '<div style="font-size:0.65rem;color:var(--text-primary)">' +
+            html += '<div class="pm-gap-row">' +
+                '<div class="pm-gap-type pm-text-red">Correlated Downside</div>' +
+                '<div class="pm-gap-desc">' +
                     _esc(g.hypothesis || '') + ' -- ' + _fmtPctDec(g.combined_weight) + ' combined weight' +
                 '</div>' +
-                '<div style="font-size:0.58rem;color:var(--text-muted);margin-top:2px">' +
-                    'Tickers: ' + _esc((g.tickers || []).join(', ')) +
-                '</div>' +
+                '<div class="pm-gap-tickers">Tickers: ' + _esc((g.tickers || []).join(', ')) + '</div>' +
             '</div>';
         });
     }
@@ -747,9 +633,9 @@ function _renderHedgeGaps(gaps) {
     if (gaps.single_name_unhedged && gaps.single_name_unhedged.length > 0) {
         hasContent = true;
         gaps.single_name_unhedged.forEach(function(g) {
-            html += '<div style="padding:8px 0;border-bottom:1px solid var(--border)">' +
-                '<div style="font-size:0.70rem;font-weight:600;color:var(--accent-gold);margin-bottom:2px">Single-Name Unhedged</div>' +
-                '<div style="font-size:0.65rem;color:var(--text-primary)">' +
+            html += '<div class="pm-gap-row">' +
+                '<div class="pm-gap-type pm-text-gold">Single-Name Unhedged</div>' +
+                '<div class="pm-gap-desc">' +
                     _esc(g.ticker) + ' at ' + _fmtPctDec(g.weight) +
                     (g.downside_score ? ' (downside score: ' + g.downside_score + ')' : '') +
                 '</div>' +
@@ -790,18 +676,11 @@ function _renderReweighting(suggestions) {
         else if (action.indexOf('review') >= 0) actionColor = 'var(--accent-gold)';
         const actionLabel = action.replace(/_/g, ' ');
 
-        return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">' +
-            '<span style="font-weight:600;color:var(--text-primary);font-size:0.72rem;min-width:50px">' + _esc(s.ticker || '') + '</span>' +
-            '<span style="' +
-                'font-family:var(--font-data);font-size:0.50rem;font-weight:700;padding:2px 6px;' +
-                'border-radius:3px;color:#fff;background:' + actionColor +
-            '">' + _esc(actionLabel.toUpperCase()) + '</span>' +
-            '<span style="flex:1;font-size:0.65rem;color:var(--text-muted)">' + _esc(s.reason || s.rationale || '') + '</span>' +
-            '<button class="pm-send-to-pm-btn" data-ticker="' + _esc(s.ticker || '') + '" data-action="' + _esc(actionLabel) + '" data-reason="' + _esc(s.reason || '') + '" style="' +
-                'font-family:var(--font-data);font-size:0.50rem;font-weight:600;' +
-                'color:var(--accent-gold);background:none;border:1px solid var(--accent-gold);' +
-                'border-radius:3px;padding:2px 8px;cursor:pointer;white-space:nowrap' +
-            '">Send to PM</button>' +
+        return '<div class="pm-reweight-row">' +
+            '<span class="pm-reweight-ticker">' + _esc(s.ticker || '') + '</span>' +
+            '<span class="pm-reweight-badge" style="background:' + actionColor + '">' + _esc(actionLabel.toUpperCase()) + '</span>' +
+            '<span class="pm-reweight-reason">' + _esc(s.reason || s.rationale || '') + '</span>' +
+            '<button class="pm-send-to-pm-btn pm-send-btn-small" data-ticker="' + _esc(s.ticker || '') + '" data-action="' + _esc(actionLabel) + '" data-reason="' + _esc(s.reason || '') + '">Send to PM</button>' +
         '</div>';
     });
     body.innerHTML = rows.join('');
@@ -845,10 +724,10 @@ function _renderChangeLog(changes) {
         else if (type === 'removed_position') { badgeColor = '#e74c3c'; badgeLabel = 'REMOVED'; }
         else if (type.indexOf('weight_') === 0) { badgeColor = 'var(--accent-gold)'; badgeLabel = 'WEIGHT'; }
 
-        html += '<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);align-items:center">' +
-            '<span style="font-family:var(--font-data);font-size:0.50rem;font-weight:700;padding:2px 6px;border-radius:3px;color:#fff;background:' + badgeColor + '">' + badgeLabel + '</span>' +
-            '<span style="font-weight:600;color:var(--text-primary);font-size:0.70rem">' + _esc(c.ticker || '') + '</span>' +
-            '<span style="font-size:0.62rem;color:var(--text-muted)">' + _esc(c.description || '') + '</span>' +
+        html += '<div class="pm-log-row">' +
+            '<span class="pm-log-badge" style="background:' + badgeColor + '">' + badgeLabel + '</span>' +
+            '<span class="pm-log-ticker">' + _esc(c.ticker || '') + '</span>' +
+            '<span class="pm-log-desc">' + _esc(c.description || '') + '</span>' +
         '</div>';
     });
 
@@ -867,27 +746,13 @@ function _renderChangeLog(changes) {
 // ============================================================
 
 function _sectionHeader(label) {
-    return '<div style="' +
-        'font-family:var(--font-data);font-size:0.56rem;font-weight:700;' +
-        'letter-spacing:0.10em;text-transform:uppercase;color:var(--accent-gold);' +
-        'margin-bottom:10px' +
-    '">' + label + '</div>';
+    return '<div class="pm-dash-header">' + label + '</div>';
 }
 
 function _metricStub(label, value) {
-    return '<div style="' +
-        'padding:12px 14px;background:var(--bg-card);border:1px solid var(--border);' +
-        'border-radius:6px;text-align:center' +
-    '">' +
-        '<div style="' +
-            'font-family:var(--font-data);font-size:0.56rem;font-weight:700;' +
-            'letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);' +
-            'margin-bottom:4px' +
-        '">' + label + '</div>' +
-        '<div style="' +
-            'font-family:var(--font-data);font-size:1.1rem;font-weight:700;' +
-            'color:var(--text-primary);opacity:' + (value === '--' ? '0.3' : '1') +
-        '">' + value + '</div>' +
+    return '<div class="pm-metric-card">' +
+        '<div class="pm-metric-label">' + label + '</div>' +
+        '<div class="pm-metric-value"' + (value === '--' ? ' style="opacity:0.3"' : '') + '>' + value + '</div>' +
     '</div>';
 }
 

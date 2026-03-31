@@ -493,7 +493,7 @@ export function renderEvidenceCard(card) {
   if (card.tension) {
     tensionHtml = '<div class="ec-tension">' +
       '<div class="ec-tension-label">Key Tension</div>' +
-      '<p>' + card.tension + '</p>' +
+      '<p class="rs-text">' + card.tension + '</p>' +
     '</div>';
   }
 
