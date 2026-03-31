@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.5,
-      "status": "MODERATE",
-      "weighted_inconsistency": 3.0,
-      "last_updated": "2026-03-31T19:05:02.388328+11:00"
+      "survival_score": 0.34,
+      "status": "LOW",
+      "weighted_inconsistency": 3,
+      "last_updated": "2026-03-31T08:59:03.738Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.6,
+      "survival_score": 0.4,
       "status": "MODERATE",
-      "weighted_inconsistency": 2.0,
-      "last_updated": "2026-03-31T19:05:02.388328+11:00"
+      "weighted_inconsistency": 2,
+      "last_updated": "2026-03-31T08:59:03.738Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Cost pressures, competitive threats, or macro headwinds.",
       "upside": null,
       "risk_plain": "Material downside if multiple risks crystallise simultaneously.",
-      "survival_score": 0.3,
-      "status": "LOW",
-      "weighted_inconsistency": 4.0,
-      "last_updated": "2026-03-31T19:05:02.388328+11:00"
+      "survival_score": 0.18,
+      "status": "VERY_LOW",
+      "weighted_inconsistency": 4,
+      "last_updated": "2026-03-31T08:59:03.738Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -47,10 +47,10 @@
       "what_to_watch": "Industry disruption signals and regulatory changes.",
       "upside": null,
       "risk_plain": "If disruption materialises, prior assumptions become invalid.",
-      "survival_score": 0.15,
-      "status": "LOW",
-      "weighted_inconsistency": 5.0,
-      "last_updated": "2026-03-31T19:05:02.388328+11:00"
+      "survival_score": 0.08,
+      "status": "VERY_LOW",
+      "weighted_inconsistency": 5,
+      "last_updated": "2026-03-31T08:59:03.738Z"
     }
   },
   "dominant": "N2",
@@ -64,7 +64,7 @@
   "price_signals": [],
   "editorial_override": null,
   "price_history": [
-    31.0,
+    31,
     31.55,
     32.79,
     32.35,
@@ -127,5 +127,112 @@
   ],
   "weighting": null,
   "three_layer_signal": null,
-  "valuation_range": null
+  "valuation_range": null,
+  "priceHistory": [
+    18.77
+  ],
+  "freshness": {
+    "pricePctChange": 0,
+    "urgency": 0,
+    "status": "OK",
+    "badge": "ok"
+  },
+  "last_price_update": "2026-03-31T08:59:03.644Z",
+  "technicalAnalysis": {
+    "date": "31 March 2026",
+    "period": "1 Year",
+    "source": "Continuum Technical Intelligence",
+    "regime": "Downtrend",
+    "clarity": "Clear",
+    "price": {
+      "current": 18.77,
+      "currency": "A$"
+    },
+    "movingAverages": {
+      "ma50": {
+        "value": 23.3,
+        "date": "31 Mar 2026"
+      },
+      "ma200": {
+        "value": 34.7,
+        "date": "31 Mar 2026"
+      },
+      "crossover": {
+        "type": "Death Cross",
+        "date": "March 2026",
+        "description": "50-day MA crossed below 200-day MA (death cross)"
+      },
+      "priceVsMa50": -19.5,
+      "priceVsMa200": -45.8
+    },
+    "trend": {
+      "direction": "Down",
+      "duration": "12 months",
+      "structure": "Price in downtrend relative to 50-day and 200-day moving averages.",
+      "peak": {
+        "price": 55.44,
+        "date": "Recent"
+      },
+      "trough": {
+        "price": 16.74,
+        "date": "Recent"
+      },
+      "drawdown": -66.1
+    },
+    "keyLevels": {
+      "support": {
+        "price": 18.08,
+        "method": "Recent low / swing support"
+      },
+      "resistance": {
+        "price": 22.51,
+        "method": "Recent high / swing resistance"
+      },
+      "fiftyTwoWeekHigh": {
+        "price": 55.44,
+        "date": "Last 12 months"
+      },
+      "fiftyTwoWeekLow": {
+        "price": 16.74,
+        "date": "Last 12 months"
+      }
+    },
+    "volume": {
+      "latestVs20DayAvg": 1,
+      "latestDate": "31 March 2026",
+      "priorSpikes": []
+    },
+    "volatility": {
+      "latestDailyRange": {
+        "high": 18.77,
+        "low": 18.14,
+        "date": "31 March 2026"
+      },
+      "latestRangePercent": 4,
+      "avgDailyRangePercent30": 4,
+      "avgDailyRangePercent90": 4
+    },
+    "meanReversion": {
+      "vsMa50": -19.5,
+      "vsMa200": -45.8,
+      "rangePosition": 5,
+      "rangeHigh": 55.44,
+      "rangeLow": 16.74
+    },
+    "inflectionPoints": [],
+    "relativePerformance": {
+      "vsIndex": {
+        "name": "S&P/ASX 200",
+        "period": "12 months",
+        "stockReturn": 12.1,
+        "indexReturn": 6.5,
+        "relativeReturn": 5.6
+      }
+    }
+  },
+  "price_evidence": {
+    "last_run": "2026-03-31T08:59:03.738Z",
+    "classification": "NOTABLE"
+  },
+  "last_research_update": "2026-03-31T08:59:03.738Z"
 }
