@@ -13,7 +13,7 @@
 
 import { STOCK_DATA } from '../lib/state.js';
 import { CACHE_VERSION } from '../data/loader.js';
-import { fetchPriceDrivers } from '../pages/report-sections.js';
+import { fetchPriceDrivers } from './report/price-drivers.js';
 import { API_BASE } from '../lib/api-config.js';
 
 // ============================================================
