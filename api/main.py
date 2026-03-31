@@ -203,6 +203,32 @@ async def lifespan(app: FastAPI):
                     await embed_all_passages()
                 except Exception as e:
                     logger.warning("[AutoRetry] Re-ingest after %s failed: %s", ticker, e)
+
+                # Post-initiation: NotebookLM provisioning
+                try:
+                    refreshed = _load_research(ticker)
+                    company_name = refreshed.get("company", ticker)
+                    nb_id = await notebook_context.provision_notebook(ticker, company_name)
+                    if nb_id:
+                        logger.info("[AutoRetry] NotebookLM provisioned for %s: %s", ticker, nb_id)
+                    else:
+                        logger.warning("[AutoRetry] NotebookLM provisioning returned None for %s", ticker)
+                except Exception as nlm_err:
+                    logger.warning("[AutoRetry] NotebookLM provisioning failed for %s (non-fatal): %s", ticker, nlm_err)
+
+                # Post-initiation: macro sensitivity inference
+                try:
+                    from web_search import SECTOR_COMMODITY_MAP
+                    import macro_sensitivity as _ms
+                    res = _load_research(ticker)
+                    sector = res.get("sector", "")
+                    scm_entry = SECTOR_COMMODITY_MAP.get(ticker)
+                    entries = _ms.infer_macro_sensitivity(ticker, scm_entry, sector)
+                    if entries:
+                        await _ms.write_sensitivity(ticker, entries, source="inferred")
+                        logger.info("[AutoRetry] Macro sensitivity inferred for %s: %d entries", ticker, len(entries))
+                except Exception as ms_err:
+                    logger.warning("[AutoRetry] Macro sensitivity inference failed for %s (non-fatal): %s", ticker, ms_err)
             except Exception as e:
                 logger.error("[AutoRetry] %s retry failed: %s", ticker, e, exc_info=True)
         if retried:
