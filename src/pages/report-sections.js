@@ -282,6 +282,21 @@ export function renderSkewBar(data) {
   '</div>';
 }
 
+/**
+ * Derive direction CSS class from dirText momentum label.
+ * Rising/Upside/Building/Confirmed = gaining weight = green (dir-up).
+ * Falling/Downside/Declining = losing weight = red (dir-down).
+ * Steady/Contained/Stable = unchanged = amber (dir-neutral).
+ */
+function _dirTextToCls(text) {
+  if (!text) return null;
+  const t = text.toLowerCase();
+  if (t.indexOf('rising') >= 0 || t.indexOf('upside') >= 0 || t.indexOf('building') >= 0 || t.indexOf('confirmed') >= 0) return 'dir-up';
+  if (t.indexOf('falling') >= 0 || t.indexOf('downside') >= 0 || t.indexOf('declining') >= 0) return 'dir-down';
+  if (t.indexOf('steady') >= 0 || t.indexOf('contained') >= 0 || t.indexOf('stable') >= 0 || t.indexOf('base') >= 0 || t.indexOf('awaiting') >= 0 || t.indexOf('watching') >= 0 || t.indexOf('priced') >= 0) return 'dir-neutral';
+  return null;
+}
+
 export function renderVerdict(data) {
   const v = data.verdict;
   if (!v || !v.scores || !v.scores.length) return '';
@@ -295,12 +310,16 @@ export function renderVerdict(data) {
   let scoresHtml = '';
   for (let i = 0; i < v.scores.length; i++) {
     const s = v.scores[i];
-    let dirCls = hyps[i] ? hyps[i].dirClass || 'dir-neutral' : 'dir-neutral';
-    if (s.dirText) {
-      const dt = s.dirText.toLowerCase();
-      if (dt.indexOf('up') >= 0 || dt.indexOf('positive') >= 0) dirCls = 'dir-positive';
-      else if (dt.indexOf('down') >= 0 || dt.indexOf('negative') >= 0) dirCls = 'dir-negative';
-      else if (dt.indexOf('base') >= 0 || dt.indexOf('neutral') >= 0) dirCls = 'dir-neutral';
+    // Use explicit dirColor-derived class first, then derive from dirText momentum,
+    // then fall back to hypothesis direction class.
+    let dirCls;
+    if (s.dirColor) {
+      // Explicit colour in data: map back to CSS class
+      if (s.dirColor.indexOf('green') >= 0) dirCls = 'dir-up';
+      else if (s.dirColor.indexOf('red') >= 0) dirCls = 'dir-down';
+      else dirCls = 'dir-neutral';
+    } else {
+      dirCls = _dirTextToCls(s.dirText) || (hyps[i] ? hyps[i].dirClass || 'dir-neutral' : 'dir-neutral');
     }
     const dirAttr = ' data-dir="' + dirCls + '"';
     scoresHtml += '<div class="vs-item ' + dirCls + '"' + dirAttr + '>' +
