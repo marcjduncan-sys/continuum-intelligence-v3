@@ -18,6 +18,7 @@
 
 import { STOCK_DATA } from '../lib/state.js';
 import { normaliseScores } from '../lib/dom.js';
+import { svgCoord, formatPrice, formatPercent, formatSignedPercent } from '../lib/format.js';
 
 // ============================================================
 // SHARED UTILITIES
@@ -69,10 +70,10 @@ function sparkSVG(prices, w, h) {
   for (let j = 0; j < prices.length; j++) {
     const x = pad + j * stepX;
     const y = h - pad - ((prices[j] - min) / range) * (h - pad * 2);
-    pts += x.toFixed(1) + ',' + y.toFixed(1) + ' ';
-    fill += ' ' + x.toFixed(1) + ',' + y.toFixed(1);
+    pts += svgCoord(x) + ',' + svgCoord(y) + ' ';
+    fill += ' ' + svgCoord(x) + ',' + svgCoord(y);
   }
-  fill += ' ' + (pad + (prices.length - 1) * stepX).toFixed(1) + ',' + (h - pad);
+  fill += ' ' + svgCoord(pad + (prices.length - 1) * stepX) + ',' + (h - pad);
   const last = prices[prices.length - 1], first = prices[0];
   const color = last > first * 1.02 ? '#0B6623' : last < first * 0.98 ? '#B22234' : '#996515';
   const gid = 'sg' + Math.floor(Math.random() * 99999);
@@ -631,12 +632,12 @@ function buildSparkSection(stock) {
   let sMin = p[0], sMax = p[0];
   for (let i = 1; i < p.length; i++) { if (p[i] < sMin) sMin = p[i]; if (p[i] > sMax) sMax = p[i]; }
   const sLast = p[p.length - 1], sFirst = p[0];
-  const sChg = ((sLast / sFirst - 1) * 100).toFixed(1);
+  const sChg = formatSignedPercent((sLast / sFirst - 1) * 100);
   return '<div class="spark">' +
     '<div class="spark-meta">' +
       '<span class="lbl">1-YEAR PRICE HISTORY (' + esc(stock.currency || 'A$') + ')</span>' +
-      '<span>Low: ' + esc(stock.currency || 'A$') + sMin.toFixed(2) + ' &nbsp;&bull;&nbsp; High: ' + esc(stock.currency || 'A$') + sMax.toFixed(2) + '</span>' +
-      '<span class="spark-chg ' + (sLast >= sFirst ? 'chg-pos' : 'chg-neg') + '">' + (sLast >= sFirst ? '+' : '') + sChg + '% (1Y)</span>' +
+      '<span>Low: ' + esc(stock.currency || 'A$') + formatPrice(sMin) + ' &nbsp;&bull;&nbsp; High: ' + esc(stock.currency || 'A$') + formatPrice(sMax) + '</span>' +
+      '<span class="spark-chg ' + (sLast >= sFirst ? 'chg-pos' : 'chg-neg') + '">' + sChg + ' (1Y)</span>' +
     '</div>' + sparkSVG(p, 680, 52) + '</div>';
 }
 
@@ -698,13 +699,13 @@ function buildBriefing(stock) {
     const pirMin = Math.min.apply(null, pirPrices), pirMax = Math.max.apply(null, pirPrices), pirR = pirMax - pirMin || 1;
     let markers = '';
     for (let wi = 0; wi < pirWorlds.length; wi++) {
-      const w = pirWorlds[wi], wPct = ((parseFloat(w.price) - pirMin) / pirR * 100).toFixed(1);
-      markers += '<div class="pir-w" style="left:' + wPct + '%"><div class="pir-tick"></div><div class="pir-price">' + esc(stock.currency || 'A$') + parseFloat(w.price).toFixed(0) + '</div><div class="pir-lbl">' + esc(w.label) + '</div></div>';
+      const w = pirWorlds[wi], wPct = svgCoord((parseFloat(w.price) - pirMin) / pirR * 100);
+      markers += '<div class="pir-w" style="left:' + wPct + '%"><div class="pir-tick"></div><div class="pir-price">' + esc(stock.currency || 'A$') + formatPrice(w.price, 0) + '</div><div class="pir-lbl">' + esc(w.label) + '</div></div>';
     }
-    const cPct = Math.min(100, Math.max(0, ((pirCur - pirMin) / pirR * 100))).toFixed(1);
+    const cPct = svgCoord(Math.min(100, Math.max(0, ((pirCur - pirMin) / pirR * 100))));
     pirHTML = '<div class="ib-block"><div class="lbl ib-blbl">POSITION IN RANGE</div>' +
       '<div class="pir-wrap"><div class="pir-bar">' + markers +
-        '<div class="pir-cur" style="left:' + cPct + '%"><div class="pir-dot">&#9679;</div><div class="pir-cur-price">' + esc(stock.currency || 'A$') + pirCur.toFixed(2) + '</div></div>' +
+        '<div class="pir-cur" style="left:' + cPct + '%"><div class="pir-dot">&#9679;</div><div class="pir-cur-price">' + esc(stock.currency || 'A$') + formatPrice(pirCur) + '</div></div>' +
       '</div></div>' +
       (stock.hero.position_in_range.note ? '<div style="font-size:5.5pt;color:var(--tx3);font-style:italic;margin-top:3px">' + esc(stock.hero.position_in_range.note) + '</div>' : '') +
     '</div>';
@@ -715,11 +716,11 @@ function buildBriefing(stock) {
   if (stock.priceHistory && stock.priceHistory.length > 10) {
     let sp = stock.priceHistory, spMin = sp[0], spMax = sp[0];
     for (let spi = 1; spi < sp.length; spi++) { if (sp[spi] < spMin) spMin = sp[spi]; if (sp[spi] > spMax) spMax = sp[spi]; }
-    const spLast = sp[sp.length - 1], spFirst = sp[0], spChg = ((spLast / spFirst - 1) * 100).toFixed(1);
+    const spLast = sp[sp.length - 1], spFirst = sp[0], spChg = formatSignedPercent((spLast / spFirst - 1) * 100);
     sparkHTML = '<div class="ib-block"><div class="lbl ib-blbl">1-YEAR PRICE HISTORY</div>' +
-      '<div class="spark-meta" style="margin-bottom:1px"><span>Low: ' + esc(stock.currency || 'A$') + spMin.toFixed(2) + '</span>' +
-        '<span class="spark-chg ' + (spLast >= spFirst ? 'chg-pos' : 'chg-neg') + '">' + (spLast >= spFirst ? '+' : '') + spChg + '% (1Y)</span>' +
-        '<span>High: ' + esc(stock.currency || 'A$') + spMax.toFixed(2) + '</span></div>' +
+      '<div class="spark-meta" style="margin-bottom:1px"><span>Low: ' + esc(stock.currency || 'A$') + formatPrice(spMin) + '</span>' +
+        '<span class="spark-chg ' + (spLast >= spFirst ? 'chg-pos' : 'chg-neg') + '">' + spChg + ' (1Y)</span>' +
+        '<span>High: ' + esc(stock.currency || 'A$') + formatPrice(spMax) + '</span></div>' +
       sparkSVG(sp, 550, 50) + '</div>';
   }
 

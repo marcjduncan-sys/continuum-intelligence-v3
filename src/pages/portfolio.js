@@ -6,6 +6,7 @@ import { computeSkewScore, normaliseScores } from '../lib/dom.js';
 import { buildCoverageData } from './home.js';
 import { on } from '../lib/data-events.js';
 import { API_BASE } from '../lib/api-config.js';
+import { formatPrice, formatPercent, formatSignedPercent } from '../lib/format.js';
 
 // Coverage data matching portal reports (built dynamically from STOCK_DATA)
 let COVERAGE_DATA = null;
@@ -318,9 +319,9 @@ export function renderPortfolioFromSaved(positions) {
 export function formatNum(n, decimals) {
   if (n === null || n === undefined || isNaN(n)) return '--';
   const abs = Math.abs(n);
-  if (abs >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (abs >= 1000000) return formatPrice(n / 1000000, 1) + 'M';
   if (abs >= 1000) return n.toLocaleString('en-AU', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-  return n.toFixed(decimals);
+  return formatPrice(n, decimals);
 }
 
 export function renderPortfolioDiagnostics(positions, grossExposure) {
@@ -442,7 +443,7 @@ export function renderMandateBreaches(positions, grossExposure) {
     if (wt > maxSingle) {
       flags.push({
         severity: 'breach',
-        text: p.ticker + ' at ' + (wt * 100).toFixed(1) + '% exceeds ' + (maxSingle * 100).toFixed(0) + '% single-name limit'
+        text: p.ticker + ' at ' + formatPercent(wt * 100) + ' exceeds ' + formatPercent(maxSingle * 100, 0) + ' single-name limit'
       });
     }
   });
@@ -455,7 +456,7 @@ export function renderMandateBreaches(positions, grossExposure) {
   if (top5Weight > maxTop5) {
     flags.push({
       severity: 'breach',
-      text: 'Top 5 concentration: ' + (top5Weight * 100).toFixed(1) + '% exceeds ' + (maxTop5 * 100).toFixed(0) + '% limit'
+      text: 'Top 5 concentration: ' + formatPercent(top5Weight * 100) + ' exceeds ' + formatPercent(maxTop5 * 100, 0) + ' limit'
     });
   }
 
@@ -470,7 +471,7 @@ export function renderMandateBreaches(positions, grossExposure) {
     if (s !== 'Unclassified' && sectorWeights[s] > maxSector) {
       flags.push({
         severity: 'breach',
-        text: s + ' sector at ' + (sectorWeights[s] * 100).toFixed(1) + '% exceeds ' + (maxSector * 100).toFixed(0) + '% sector limit'
+        text: s + ' sector at ' + formatPercent(sectorWeights[s] * 100) + ' exceeds ' + formatPercent(maxSector * 100, 0) + ' sector limit'
       });
     }
   });
@@ -480,7 +481,7 @@ export function renderMandateBreaches(positions, grossExposure) {
   if (cashEst < cashMin) {
     flags.push({
       severity: 'warning',
-      text: 'Estimated cash at ' + (cashEst * 100).toFixed(0) + '% is below ' + (cashMin * 100).toFixed(0) + '% minimum'
+      text: 'Estimated cash at ' + formatPercent(cashEst * 100, 0) + ' is below ' + formatPercent(cashMin * 100, 0) + ' minimum'
     });
   }
 
@@ -682,9 +683,9 @@ export function renderReweighting(positions, grossExposure) {
       '<td>' + s.company + '</td>' +
       '<td><span class="skew-badge ' + skewCls + '">' + skewArrow + '</span></td>' +
       '<td class="rw-units">' + formatNum(s.units, 0) + '</td>' +
-      '<td><span class="rw-pct">' + s.currentWeight.toFixed(1) + '%</span></td>' +
-      '<td><span class="rw-pct">' + s.suggestedWeight.toFixed(1) + '%</span></td>' +
-      '<td><span class="rw-delta ' + s.deltaCls + '">' + (s.delta >= 0 ? '+' : '') + s.delta.toFixed(1) + '%</span></td>' +
+      '<td><span class="rw-pct">' + formatPercent(s.currentWeight) + '</span></td>' +
+      '<td><span class="rw-pct">' + formatPercent(s.suggestedWeight) + '</span></td>' +
+      '<td><span class="rw-delta ' + s.deltaCls + '">' + formatSignedPercent(s.delta) + '</span></td>' +
       '<td><span class="rw-action ' + s.actionCls + '">' + s.action + '</span></td>' +
       '<td class="rw-shares">' + s.shareAction + '</td>' +
     '</tr>';
@@ -950,7 +951,7 @@ export function populateSidebar(ticker) {
   if (ref) {
     if (peValue === ' -- ' && ref.epsForward) {
       const currentP = parseFloat(stock._livePrice || stock.price || stock.current_price || 0);
-      if (currentP > 0) peValue = (currentP / ref.epsForward).toFixed(1) + 'x';
+      if (currentP > 0) peValue = formatPrice(currentP / ref.epsForward, 1) + 'x';
     }
     if (revGrowthValue === ' -- ' && ref.revenueGrowth != null) {
       revGrowthValue = (ref.revenueGrowth > 0 ? '+' : '') + ref.revenueGrowth + '%';
@@ -975,12 +976,12 @@ export function populateSidebar(ticker) {
     '<div class="hs-stock-ticker">' + (stock.tickerFull || stock.ticker || ticker) + '</div>' +
     '<div class="hs-price-row">';
   if (livePrice > 0) {
-    html += '<span class="hs-price">A$' + livePrice.toFixed(2) + '</span>';
+    html += '<span class="hs-price">A$' + formatPrice(livePrice) + '</span>';
   }
   if (changePct !== null) {
     const chgCls = changePct >= 0 ? 'pos' : 'neg';
     html += '<span class="hs-change-badge ' + chgCls + '">' +
-      (changePct >= 0 ? '+' : '') + changePct.toFixed(1) + '%</span>';
+      formatSignedPercent(changePct) + '</span>';
   }
   html += '</div>' +
     '<div class="hs-stock-name">' + (stock.company || '') + '</div>' +
@@ -1145,7 +1146,7 @@ export function renderConcentrationDetail(analytics) {
   if (maxEl) maxEl.textContent = _fmtWeight(conc.max_single_weight);
   if (top5El) top5El.textContent = _fmtWeight(conc.top5_weight);
   if (top10El) top10El.textContent = _fmtWeight(conc.top10_weight);
-  if (hhiEl) hhiEl.textContent = conc.hhi != null ? conc.hhi.toFixed(3) : '--';
+  if (hhiEl) hhiEl.textContent = formatPrice(conc.hhi, 3);
 
   const sectorsEl = document.getElementById('portConcSectors');
   if (sectorsEl && analytics.sector_exposure) {
@@ -1192,7 +1193,7 @@ export function renderConcentrationDetail(analytics) {
 
 function _fmtWeight(w) {
   if (w == null || isNaN(w)) return '--';
-  return (w * 100).toFixed(1) + '%';
+  return formatPercent(w * 100);
 }
 
 function _escText(str) {

@@ -9,6 +9,7 @@
  */
 
 import { API_BASE } from '../lib/api-config.js';
+import { formatPrice, formatPercent } from '../lib/format.js';
 
 export function renderPMPage() {
     const container = document.getElementById('page-pm');
@@ -758,19 +759,19 @@ function _metricStub(label, value) {
 
 function _fmtCurrency(val) {
     if (val == null || isNaN(val)) return '--';
-    if (val >= 1000000) return '$' + (val / 1000000).toFixed(1) + 'M';
-    if (val >= 1000) return '$' + (val / 1000).toFixed(0) + 'K';
-    return '$' + Number(val).toFixed(0);
+    if (val >= 1000000) return '$' + formatPrice(val / 1000000, 1) + 'M';
+    if (val >= 1000) return '$' + formatPrice(val / 1000, 0) + 'K';
+    return '$' + formatPrice(val, 0);
 }
 
 function _fmtPct(val) {
     if (val == null || isNaN(val)) return '--';
-    return (val * 100).toFixed(1) + '%';
+    return formatPercent(val * 100);
 }
 
 function _fmtPctDec(val) {
     if (val == null || isNaN(val)) return '--';
-    return (val * 100).toFixed(1) + '%';
+    return formatPercent(val * 100);
 }
 
 function _capitalize(str) {

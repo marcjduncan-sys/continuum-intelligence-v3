@@ -2,7 +2,7 @@
 // Extracted from index.html without logic changes
 
 import { STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA, FEATURED_ORDER, ANNOUNCEMENTS_DATA } from '../lib/state.js';
-import { renderSparkline, formatDateAEST, fmtPE } from '../lib/format.js';
+import { renderSparkline, formatDateAEST, fmtPE, formatPrice, formatPriceWithCurrency, formatPercent, formatSignedPercent, formatRatio, svgCoord } from '../lib/format.js';
 import { normaliseScores, computeSkewScore, _inferPolarity } from '../lib/dom.js';
 import { API_BASE } from '../lib/api-config.js';
 
@@ -122,7 +122,7 @@ export function renderReportHero(data) {
     let worldMarkersHtml = '';
     for (var i = 0; i < worlds.length; i++) {
       const w = worlds[i];
-      const pct = ((w.price - minP) / rangeP * 100).toFixed(1);
+      const pct = svgCoord((w.price - minP) / rangeP * 100);
       const probStr = pirWeights[i] != null ? ' (' + pirWeights[i] + '%)' : '';
       let metricHtml = '';
       if (pirDenom > 0 && w.price > 0) {
@@ -135,12 +135,12 @@ export function renderReportHero(data) {
       worldMarkersHtml +=
         '<div class="pir-world" style="left:' + pct + '%">' +
           '<div class="pir-world-tick"></div>' +
-          '<div class="pir-world-price">A$' + w.price.toFixed(0) + '</div>' +
+          '<div class="pir-world-price">' + formatPriceWithCurrency(w.price, 'A$', 0) + '</div>' +
           '<div class="pir-world-label">' + w.label + probStr + '</div>' +
           metricHtml +
         '</div>';
     }
-    const currentPct = ((current - minP) / rangeP * 100).toFixed(1);
+    const currentPct = svgCoord((current - minP) / rangeP * 100);
 
     // Probability-weighted average price
     let weightedAvgHtml = '';
@@ -150,13 +150,13 @@ export function renderReportHero(data) {
       for (let wi = 0; wi < worlds.length; wi++) {
         weightedAvg += (parseFloat(worlds[wi].probability) || 0) * worlds[wi].price;
       }
-      const wavgPct = ((weightedAvg - minP) / rangeP * 100).toFixed(1);
+      const wavgPct = svgCoord((weightedAvg - minP) / rangeP * 100);
       const wavgDelta = ((weightedAvg - current) / current * 100);
       const wavgDeltaCls = wavgDelta >= 0 ? 'upside' : 'downside';
-      const wavgDeltaLabel = (wavgDelta >= 0 ? '+' : '') + wavgDelta.toFixed(1) + '% ' + wavgDeltaCls;
+      const wavgDeltaLabel = formatSignedPercent(wavgDelta) + ' ' + wavgDeltaCls;
       weightedAvgHtml =
         '<div class="pir-weighted-avg" style="left:' + wavgPct + '%">' +
-          '<div class="pir-weighted-avg-label">A$' + weightedAvg.toFixed(2) + '</div>' +
+          '<div class="pir-weighted-avg-label">' + formatPriceWithCurrency(weightedAvg) + '</div>' +
           '<div class="pir-weighted-avg-delta ' + wavgDeltaCls + '">' + wavgDeltaLabel + '</div>' +
           '<div class="pir-weighted-avg-line"></div>' +
         '</div>';
@@ -170,7 +170,7 @@ export function renderReportHero(data) {
             worldMarkersHtml +
             '<div class="pir-current" style="left:' + currentPct + '%">' +
               '<div class="pir-current-dot">&#9679;</div>' +
-              '<div class="pir-current-label">A$' + current.toFixed(2) + '</div>' +
+              '<div class="pir-current-label">' + formatPriceWithCurrency(current) + '</div>' +
             '</div>' +
             weightedAvgHtml +
           '</div>' +
@@ -244,7 +244,7 @@ export function renderReportHero(data) {
           heroAnnouncementsHtml +
           '<div class="rh-right-bottom">' +
             sparklineHtml +
-            '<div class="rh-price"><span class="rh-price-currency">' + (data.currency || '') + '</span>' + (data.price != null ? parseFloat(data.price).toFixed(2) : '') + '</div>' +
+            '<div class="rh-price"><span class="rh-price-currency">' + (data.currency || '') + '</span>' + formatPrice(data.price) + '</div>' +
             '<div class="rh-metrics">' + metricsHtml + '</div>' +
           '</div>' +
         '</div>' +
@@ -823,28 +823,28 @@ export function renderTAChart(data) {
   for (let gv = Math.ceil(pMin / bestStep) * bestStep; gv <= pMax; gv += bestStep) {
     const gy = yPos(gv);
     if (gy < padT || gy > padT + cH) continue;
-    svg += '<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + (padL + cW) + '" y2="' + gy.toFixed(1) + '" stroke="' + C.grid + '" stroke-width="0.5"/>';
-    svg += '<text x="' + (padL - 8) + '" y="' + (gy + 3.5).toFixed(1) + '" text-anchor="end" fill="' + C.axisText + '" font-family="JetBrains Mono, monospace" font-size="9">' + cur + gv.toFixed(gv >= 100 ? 0 : 2) + '</text>';
+    svg += '<line x1="' + padL + '" y1="' + svgCoord(gy) + '" x2="' + (padL + cW) + '" y2="' + svgCoord(gy) + '" stroke="' + C.grid + '" stroke-width="0.5"/>';
+    svg += '<text x="' + (padL - 8) + '" y="' + svgCoord(gy + 3.5) + '" text-anchor="end" fill="' + C.axisText + '" font-family="JetBrains Mono, monospace" font-size="9">' + cur + formatPrice(gv, gv >= 100 ? 0 : 2) + '</text>';
   }
 
   if (supportPrice && supportPrice >= pMin && supportPrice <= pMax) {
     const sy = yPos(supportPrice);
-    svg += '<line x1="' + padL + '" y1="' + sy.toFixed(1) + '" x2="' + (padL + cW) + '" y2="' + sy.toFixed(1) + '" stroke="' + C.support + '" stroke-width="0.8" stroke-dasharray="6,4" opacity="0.6"/>';
-    svg += '<text x="' + (padL + 4) + '" y="' + (sy - 4).toFixed(1) + '" fill="' + C.support + '" font-family="JetBrains Mono, monospace" font-size="7.5" opacity="0.8">S ' + cur + supportPrice.toFixed(2) + '</text>';
+    svg += '<line x1="' + padL + '" y1="' + svgCoord(sy) + '" x2="' + (padL + cW) + '" y2="' + svgCoord(sy) + '" stroke="' + C.support + '" stroke-width="0.8" stroke-dasharray="6,4" opacity="0.6"/>';
+    svg += '<text x="' + (padL + 4) + '" y="' + svgCoord(sy - 4) + '" fill="' + C.support + '" font-family="JetBrains Mono, monospace" font-size="7.5" opacity="0.8">S ' + cur + formatPrice(supportPrice) + '</text>';
   }
   if (resistPrice && resistPrice >= pMin && resistPrice <= pMax) {
     const ry = yPos(resistPrice);
-    svg += '<line x1="' + padL + '" y1="' + ry.toFixed(1) + '" x2="' + (padL + cW) + '" y2="' + ry.toFixed(1) + '" stroke="' + C.resistance + '" stroke-width="0.8" stroke-dasharray="6,4" opacity="0.6"/>';
-    svg += '<text x="' + (padL + 4) + '" y="' + (ry - 4).toFixed(1) + '" fill="' + C.resistance + '" font-family="JetBrains Mono, monospace" font-size="7.5" opacity="0.8">R ' + cur + resistPrice.toFixed(2) + '</text>';
+    svg += '<line x1="' + padL + '" y1="' + svgCoord(ry) + '" x2="' + (padL + cW) + '" y2="' + svgCoord(ry) + '" stroke="' + C.resistance + '" stroke-width="0.8" stroke-dasharray="6,4" opacity="0.6"/>';
+    svg += '<text x="' + (padL + 4) + '" y="' + svgCoord(ry - 4) + '" fill="' + C.resistance + '" font-family="JetBrains Mono, monospace" font-size="7.5" opacity="0.8">R ' + cur + formatPrice(resistPrice) + '</text>';
   }
 
   if (highs && lows) {
     let hlUpper = '', hlLower = '';
     for (var i = 0; i < n; i++) {
       if (highs[i] == null || lows[i] == null) continue;
-      const x = xPos(i).toFixed(1);
-      hlUpper += (hlUpper === '' ? 'M' : 'L') + x + ',' + yPos(highs[i]).toFixed(1);
-      hlLower = x + ',' + yPos(lows[i]).toFixed(1) + (hlLower === '' ? '' : 'L' + hlLower);
+      const x = svgCoord(xPos(i));
+      hlUpper += (hlUpper === '' ? 'M' : 'L') + x + ',' + svgCoord(yPos(highs[i]));
+      hlLower = x + ',' + svgCoord(yPos(lows[i])) + (hlLower === '' ? '' : 'L' + hlLower);
     }
     if (hlUpper && hlLower) {
       svg += '<path d="' + hlUpper + 'L' + hlLower + 'Z" fill="' + C.hlBand + '" opacity="' + (isLight ? '0.08' : '0.06') + '"/>';
@@ -854,20 +854,20 @@ export function renderTAChart(data) {
   let ma200Path = '';
   for (var i = 0; i < n; i++) {
     if (ma200Arr[i] === null) continue;
-    ma200Path += (ma200Path === '' ? 'M' : 'L') + xPos(i).toFixed(1) + ',' + yPos(ma200Arr[i]).toFixed(1);
+    ma200Path += (ma200Path === '' ? 'M' : 'L') + svgCoord(xPos(i)) + ',' + svgCoord(yPos(ma200Arr[i]));
   }
   if (ma200Path) svg += '<path d="' + ma200Path + '" fill="none" stroke="' + C.ma200 + '" stroke-width="1.3" opacity="0.8"/>';
 
   let ma50Path = '';
   for (var i = 0; i < n; i++) {
     if (ma50Arr[i] === null) continue;
-    ma50Path += (ma50Path === '' ? 'M' : 'L') + xPos(i).toFixed(1) + ',' + yPos(ma50Arr[i]).toFixed(1);
+    ma50Path += (ma50Path === '' ? 'M' : 'L') + svgCoord(xPos(i)) + ',' + svgCoord(yPos(ma50Arr[i]));
   }
   if (ma50Path) svg += '<path d="' + ma50Path + '" fill="none" stroke="' + C.ma50 + '" stroke-width="1.3" opacity="0.8"/>';
 
-  let pricePath = 'M' + xPos(0).toFixed(1) + ',' + yPos(closes[0]).toFixed(1);
-  for (var i = 1; i < n; i++) pricePath += 'L' + xPos(i).toFixed(1) + ',' + yPos(closes[i]).toFixed(1);
-  const areaPath = pricePath + 'L' + xPos(n-1).toFixed(1) + ',' + (padT+cH) + 'L' + xPos(0).toFixed(1) + ',' + (padT+cH) + 'Z';
+  let pricePath = 'M' + svgCoord(xPos(0)) + ',' + svgCoord(yPos(closes[0]));
+  for (var i = 1; i < n; i++) pricePath += 'L' + svgCoord(xPos(i)) + ',' + svgCoord(yPos(closes[i]));
+  const areaPath = pricePath + 'L' + svgCoord(xPos(n-1)) + ',' + (padT+cH) + 'L' + svgCoord(xPos(0)) + ',' + (padT+cH) + 'Z';
   svg += '<defs><linearGradient id="priceGrad-' + data.ticker + '" x1="0" y1="0" x2="0" y2="1">';
   svg += '<stop offset="0%" stop-color="' + C.priceGradA + '" stop-opacity="' + (isLight ? '0.1' : '0.08') + '"/>';
   svg += '<stop offset="100%" stop-color="' + C.priceGradA + '" stop-opacity="0.01"/>';
@@ -877,9 +877,9 @@ export function renderTAChart(data) {
   svg += '<path d="' + pricePath + '" fill="none" stroke="' + C.price + '" stroke-width="1.4"/>';
 
   const lastX = xPos(n - 1), lastY = yPos(closes[n-1]);
-  svg += '<circle cx="' + lastX.toFixed(1) + '" cy="' + lastY.toFixed(1) + '" r="3.5" fill="' + C.dot + '" stroke="' + C.dotStroke + '" stroke-width="1.5"/>';
+  svg += '<circle cx="' + svgCoord(lastX) + '" cy="' + svgCoord(lastY) + '" r="3.5" fill="' + C.dot + '" stroke="' + C.dotStroke + '" stroke-width="1.5"/>';
   const labelX = lastX + 8 > W - padR - 60 ? lastX - 65 : lastX + 8;
-  svg += '<text x="' + labelX.toFixed(1) + '" y="' + (lastY + 3).toFixed(1) + '" fill="' + C.dot + '" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600">' + cur + curPrice.toFixed(2) + '</text>';
+  svg += '<text x="' + svgCoord(labelX) + '" y="' + svgCoord(lastY + 3) + '" fill="' + C.dot + '" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600">' + cur + formatPrice(curPrice) + '</text>';
 
   const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   if (useLive) {
@@ -894,8 +894,8 @@ export function renderTAChart(data) {
       if (lx < padL + 15 || lx > padL + cW - 15) continue;
       var label = monthNames[mm];
       if (mm === 0 || (i < step * 2)) label += " '" + String(yy).slice(2);
-      svg += '<text x="' + lx.toFixed(1) + '" y="' + (padT + cH + 22) + '" text-anchor="middle" fill="' + C.axisText + '" font-family="JetBrains Mono, monospace" font-size="7.5">' + label + '</text>';
-      svg += '<line x1="' + lx.toFixed(1) + '" y1="' + (padT + cH) + '" x2="' + lx.toFixed(1) + '" y2="' + (padT + cH + 4) + '" stroke="' + C.grid + '" stroke-width="0.5"/>';
+      svg += '<text x="' + svgCoord(lx) + '" y="' + (padT + cH + 22) + '" text-anchor="middle" fill="' + C.axisText + '" font-family="JetBrains Mono, monospace" font-size="7.5">' + label + '</text>';
+      svg += '<line x1="' + svgCoord(lx) + '" y1="' + (padT + cH) + '" x2="' + svgCoord(lx) + '" y2="' + (padT + cH + 4) + '" stroke="' + C.grid + '" stroke-width="0.5"/>';
     }
   } else {
     const reportDate = new Date(data.date);
@@ -909,8 +909,8 @@ export function renderTAChart(data) {
       if (labelDate.getMonth() === 0) label += " '" + String(labelDate.getFullYear()).slice(2);
       var lx = xPos(idx);
       if (lx < padL + 15 || lx > padL + cW - 15) continue;
-      svg += '<text x="' + lx.toFixed(1) + '" y="' + (padT + cH + 22) + '" text-anchor="middle" fill="' + C.axisText + '" font-family="JetBrains Mono, monospace" font-size="7.5">' + label + '</text>';
-      svg += '<line x1="' + lx.toFixed(1) + '" y1="' + (padT + cH) + '" x2="' + lx.toFixed(1) + '" y2="' + (padT + cH + 4) + '" stroke="' + C.grid + '" stroke-width="0.5"/>';
+      svg += '<text x="' + svgCoord(lx) + '" y="' + (padT + cH + 22) + '" text-anchor="middle" fill="' + C.axisText + '" font-family="JetBrains Mono, monospace" font-size="7.5">' + label + '</text>';
+      svg += '<line x1="' + svgCoord(lx) + '" y1="' + (padT + cH) + '" x2="' + svgCoord(lx) + '" y2="' + (padT + cH + 4) + '" stroke="' + C.grid + '" stroke-width="0.5"/>';
     }
   }
 
@@ -961,8 +961,8 @@ export function renderTechnicalAnalysis(data) {
     '<div class="ta-regime-item"><div class="ta-regime-label">Clarity</div><div class="ta-regime-value">' + (ta.clarity || '') + '</div></div>' +
     '<div class="ta-regime-item"><div class="ta-regime-label">Trend</div><div class="ta-regime-value ' + (/down/i.test(trendDir) ? 'ta-down' : /up|recover/i.test(trendDir) ? 'ta-up' : '') + '">' + trendDir + (trend.duration ? ' (' + trend.duration + ')' : '') + '</div></div>' +
     '<div class="ta-regime-item"><div class="ta-regime-label">Structure</div><div class="ta-regime-value">' + (trend.structure || '') + '</div></div>' +
-    (support.price != null ? '<div class="ta-regime-item"><div class="ta-regime-label">Support</div><div class="ta-regime-value">' + (price.currency || '') + support.price.toFixed(2) + '</div></div>' : '') +
-    (resistance.price != null ? '<div class="ta-regime-item"><div class="ta-regime-label">Resistance</div><div class="ta-regime-value">' + (price.currency || '') + resistance.price.toFixed(2) + '</div></div>' : '') +
+    (support.price != null ? '<div class="ta-regime-item"><div class="ta-regime-label">Support</div><div class="ta-regime-value">' + (price.currency || '') + formatPrice(support.price) + '</div></div>' : '') +
+    (resistance.price != null ? '<div class="ta-regime-item"><div class="ta-regime-label">Resistance</div><div class="ta-regime-value">' + (price.currency || '') + formatPrice(resistance.price) + '</div></div>' : '') +
   '</div>';
 
   const ma50 = ma.ma50 || {};
@@ -973,14 +973,14 @@ export function renderTechnicalAnalysis(data) {
     '</tr></thead><tbody>' +
     (ma50.value != null ? '<tr>' +
       '<td class="ta-label-cell">50-Day MA</td>' +
-      '<td>' + (price.currency || '') + ma50.value.toFixed(2) + '</td>' +
-      '<td style="color:' + (ma.priceVsMa50 >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (ma.priceVsMa50 >= 0 ? '+' : '') + (ma.priceVsMa50 != null ? ma.priceVsMa50.toFixed(1) : '0.0') + '%</td>' +
+      '<td>' + (price.currency || '') + formatPrice(ma50.value) + '</td>' +
+      '<td style="color:' + (ma.priceVsMa50 >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(ma.priceVsMa50) + '</td>' +
       '<td>As at ' + (ma50.date || '') + '</td>' +
     '</tr>' : '') +
     (ma200.value != null ? '<tr>' +
       '<td class="ta-label-cell">200-Day MA</td>' +
-      '<td>' + (price.currency || '') + ma200.value.toFixed(2) + '</td>' +
-      '<td style="color:' + (ma.priceVsMa200 >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (ma.priceVsMa200 >= 0 ? '+' : '') + (ma.priceVsMa200 != null ? ma.priceVsMa200.toFixed(1) : '0.0') + '%</td>' +
+      '<td>' + (price.currency || '') + formatPrice(ma200.value) + '</td>' +
+      '<td style="color:' + (ma.priceVsMa200 >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(ma.priceVsMa200) + '</td>' +
       '<td>As at ' + (ma200.date || '') + '</td>' +
     '</tr>' : '') +
     '</tbody></table>' : '';
@@ -1001,7 +1001,7 @@ export function renderTechnicalAnalysis(data) {
       const ip = ta.inflectionPoints[i];
       inflRows += '<tr>' +
         '<td class="ta-date-cell">' + ip.date + '</td>' +
-        '<td class="ta-price-cell">' + ta.price.currency + ip.price.toFixed(2) + '</td>' +
+        '<td class="ta-price-cell">' + ta.price.currency + formatPrice(ip.price) + '</td>' +
         '<td class="ta-event-cell">' + ip.event + '</td>' +
       '</tr>';
     }
@@ -1016,12 +1016,12 @@ export function renderTechnicalAnalysis(data) {
     volHtml = '<div class="ta-metrics-grid">' +
       '<div class="ta-metric-card">' +
         '<div class="ta-metric-card-title">Volume</div>' +
-        '<div class="ta-metric-row"><div class="ta-metric-name">Latest vs 20-day avg</div><div class="ta-metric-val">' + vol.latestVs20DayAvg.toFixed(1) + 'x</div></div>' +
+        '<div class="ta-metric-row"><div class="ta-metric-name">Latest vs 20-day avg</div><div class="ta-metric-val">' + formatRatio(vol.latestVs20DayAvg) + '</div></div>' +
         '<div class="ta-metric-row"><div class="ta-metric-name">Date</div><div class="ta-metric-val">' + (vol.latestDate || '') + '</div></div>';
     if (vol.priorSpikes) {
       for (let v = 0; v < vol.priorSpikes.length; v++) {
         const sp = vol.priorSpikes[v];
-        volHtml += '<div class="ta-metric-row"><div class="ta-metric-name">' + (sp.period || '') + '</div><div class="ta-metric-val">' + (sp.ratio != null ? sp.ratio.toFixed(1) : '0.0') + 'x <span class="ta-metric-desc">&mdash; ' + (sp.context || '') + '</span></div></div>';
+        volHtml += '<div class="ta-metric-row"><div class="ta-metric-name">' + (sp.period || '') + '</div><div class="ta-metric-val">' + formatRatio(sp.ratio) + ' <span class="ta-metric-desc">&mdash; ' + (sp.context || '') + '</span></div></div>';
       }
     }
     volHtml += '</div>';
@@ -1030,10 +1030,10 @@ export function renderTechnicalAnalysis(data) {
       volHtml +=
         '<div class="ta-metric-card">' +
           '<div class="ta-metric-card-title">Volatility</div>' +
-          '<div class="ta-metric-row"><div class="ta-metric-name">Latest daily range</div><div class="ta-metric-val">' + vola.latestRangePercent.toFixed(1) + '%</div></div>' +
-          '<div class="ta-metric-row"><div class="ta-metric-name">30-day avg range</div><div class="ta-metric-val">' + (vola.avgDailyRangePercent30 != null ? vola.avgDailyRangePercent30.toFixed(1) : '0.0') + '%</div></div>' +
-          '<div class="ta-metric-row"><div class="ta-metric-name">90-day avg range</div><div class="ta-metric-val">' + (vola.avgDailyRangePercent90 != null ? vola.avgDailyRangePercent90.toFixed(1) : '0.0') + '%</div></div>' +
-          (latestRange.high != null && latestRange.low != null ? '<div class="ta-metric-row"><div class="ta-metric-name">Latest session</div><div class="ta-metric-val">' + (price.currency || '') + latestRange.high.toFixed(2) + ' &ndash; ' + (price.currency || '') + latestRange.low.toFixed(2) + '</div></div>' : '') +
+          '<div class="ta-metric-row"><div class="ta-metric-name">Latest daily range</div><div class="ta-metric-val">' + formatPercent(vola.latestRangePercent) + '</div></div>' +
+          '<div class="ta-metric-row"><div class="ta-metric-name">30-day avg range</div><div class="ta-metric-val">' + formatPercent(vola.avgDailyRangePercent30) + '</div></div>' +
+          '<div class="ta-metric-row"><div class="ta-metric-name">90-day avg range</div><div class="ta-metric-val">' + formatPercent(vola.avgDailyRangePercent90) + '</div></div>' +
+          (latestRange.high != null && latestRange.low != null ? '<div class="ta-metric-row"><div class="ta-metric-name">Latest session</div><div class="ta-metric-val">' + (price.currency || '') + formatPrice(latestRange.high) + ' &ndash; ' + (price.currency || '') + formatPrice(latestRange.low) + '</div></div>' : '') +
         '</div>';
     }
     volHtml += '</div>';
@@ -1049,22 +1049,22 @@ export function renderTechnicalAnalysis(data) {
     mrHtml = '<div class="ta-mr-container">' +
       '<div class="ta-mr-title">Mean Reversion Positioning</div>' +
       '<div class="ta-mr-bar-track">' +
-        '<div class="ta-mr-ma200-marker" style="left:' + ma200Pct.toFixed(1) + '%"></div>' +
-        '<div class="ta-mr-ma50-marker" style="left:' + ma50Pct.toFixed(1) + '%"></div>' +
-        '<div class="ta-mr-marker" style="left:' + pricePct.toFixed(1) + '%"></div>' +
+        '<div class="ta-mr-ma200-marker" style="left:' + svgCoord(ma200Pct) + '%"></div>' +
+        '<div class="ta-mr-ma50-marker" style="left:' + svgCoord(ma50Pct) + '%"></div>' +
+        '<div class="ta-mr-marker" style="left:' + svgCoord(pricePct) + '%"></div>' +
       '</div>' +
       '<div class="ta-mr-bar-labels">' +
-        '<span>' + (price.currency || '') + mr.rangeLow.toFixed(2) + '</span>' +
-        '<span>' + (price.currency || '') + mr.rangeHigh.toFixed(2) + '</span>' +
+        '<span>' + (price.currency || '') + formatPrice(mr.rangeLow) + '</span>' +
+        '<span>' + (price.currency || '') + formatPrice(mr.rangeHigh) + '</span>' +
       '</div>' +
       '<div class="ta-mr-legend">' +
-        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-red)"></div>Price (' + (price.currency || '') + (price.current != null ? price.current.toFixed(2) : '0.00') + ')</div>' +
-        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-amber)"></div>50-Day MA (' + (price.currency || '') + (ma50.value != null ? ma50.value.toFixed(2) : '0.00') + ')</div>' +
-        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-blue)"></div>200-Day MA (' + (price.currency || '') + (ma200.value != null ? ma200.value.toFixed(2) : '0.00') + ')</div>' +
+        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-red)"></div>Price (' + (price.currency || '') + formatPrice(price.current) + ')</div>' +
+        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-amber)"></div>50-Day MA (' + (price.currency || '') + formatPrice(ma50.value) + ')</div>' +
+        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-blue)"></div>200-Day MA (' + (price.currency || '') + formatPrice(ma200.value) + ')</div>' +
     '</div>' +
     '<table class="ta-ma-table" style="margin-top:var(--space-sm)"><thead><tr><th>Measure</th><th>Value</th></tr></thead><tbody>' +
-      '<tr><td class="ta-label-cell">vs 50-Day MA</td><td style="color:var(--signal-red)">' + (mr.vsMa50 != null ? mr.vsMa50.toFixed(1) : '0.0') + '%</td></tr>' +
-      '<tr><td class="ta-label-cell">vs 200-Day MA</td><td style="color:var(--signal-red)">' + (mr.vsMa200 != null ? mr.vsMa200.toFixed(1) : '0.0') + '%</td></tr>' +
+      '<tr><td class="ta-label-cell">vs 50-Day MA</td><td style="color:var(--signal-red)">' + formatPercent(mr.vsMa50) + '</td></tr>' +
+      '<tr><td class="ta-label-cell">vs 200-Day MA</td><td style="color:var(--signal-red)">' + formatPercent(mr.vsMa200) + '</td></tr>' +
       '<tr><td class="ta-label-cell">12-Month Range Position</td><td>' + ((mr.rangePosition || 50) <= 50 ? 'Lower ' : 'Upper ') + (mr.rangePosition || 50) + '%</td></tr>' +
     '</tbody></table>' +
   '</div>';
@@ -1079,15 +1079,15 @@ export function renderTechnicalAnalysis(data) {
       '</tr></thead><tbody>' +
       '<tr>' +
         '<td style="font-family:var(--font-ui);font-weight:600;color:var(--text-primary)">' + rp.vsIndex.name + '</td>' +
-        '<td style="color:' + (rp.vsIndex.stockReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (rp.vsIndex.stockReturn >= 0 ? '+' : '') + rp.vsIndex.stockReturn.toFixed(1) + '%</td>' +
-        '<td style="color:' + (rp.vsIndex.indexReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (rp.vsIndex.indexReturn >= 0 ? '+' : '') + rp.vsIndex.indexReturn.toFixed(1) + '%</td>' +
-        '<td style="color:' + (rp.vsIndex.relativeReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (rp.vsIndex.relativeReturn >= 0 ? '+' : '') + rp.vsIndex.relativeReturn.toFixed(1) + '%</td>' +
+        '<td style="color:' + (rp.vsIndex.stockReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(rp.vsIndex.stockReturn) + '</td>' +
+        '<td style="color:' + (rp.vsIndex.indexReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(rp.vsIndex.indexReturn) + '</td>' +
+        '<td style="color:' + (rp.vsIndex.relativeReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(rp.vsIndex.relativeReturn) + '</td>' +
       '</tr>' +
       '<tr>' +
         '<td style="font-family:var(--font-ui);font-weight:600;color:var(--text-primary)">' + rp.vsSector.name + '</td>' +
-        '<td style="color:' + (rp.vsSector.stockReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (rp.vsSector.stockReturn >= 0 ? '+' : '') + rp.vsSector.stockReturn.toFixed(1) + '%</td>' +
-        '<td style="color:' + (rp.vsSector.sectorReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (rp.vsSector.sectorReturn >= 0 ? '+' : '') + rp.vsSector.sectorReturn.toFixed(1) + '%</td>' +
-        '<td style="color:' + (rp.vsSector.relativeReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + (rp.vsSector.relativeReturn >= 0 ? '+' : '') + rp.vsSector.relativeReturn.toFixed(1) + '%</td>' +
+        '<td style="color:' + (rp.vsSector.stockReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(rp.vsSector.stockReturn) + '</td>' +
+        '<td style="color:' + (rp.vsSector.sectorReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(rp.vsSector.sectorReturn) + '</td>' +
+        '<td style="color:' + (rp.vsSector.relativeReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(rp.vsSector.relativeReturn) + '</td>' +
       '</tr>' +
       '</tbody></table>';
   }
@@ -1096,10 +1096,10 @@ export function renderTechnicalAnalysis(data) {
   const ftw52Low = kl.fiftyTwoWeekLow || {};
   const levelsHtml = (support.price != null || resistance.price != null) ? '<div class="rs-subtitle">Key Levels</div>' +
     '<table class="ta-ma-table"><thead><tr><th>Level</th><th>Price</th><th>Derivation</th></tr></thead><tbody>' +
-    (support.price != null ? '<tr><td class="ta-label-cell">Support</td><td>' + (price.currency || '') + support.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + (support.method || '') + '</td></tr>' : '') +
-    (resistance.price != null ? '<tr><td class="ta-label-cell">Resistance</td><td>' + (price.currency || '') + resistance.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + (resistance.method || '') + '</td></tr>' : '') +
-    (ftw52High.price != null ? '<tr><td class="ta-label-cell">52-Week High</td><td>' + (price.currency || '') + ftw52High.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + (ftw52High.date || '') + '</td></tr>' : '') +
-    (ftw52Low.price != null ? '<tr><td class="ta-label-cell">52-Week Low</td><td>' + (price.currency || '') + ftw52Low.price.toFixed(2) + '</td><td style="font-family:var(--font-ui)">' + (ftw52Low.date || '') + '</td></tr>' : '') +
+    (support.price != null ? '<tr><td class="ta-label-cell">Support</td><td>' + (price.currency || '') + formatPrice(support.price) + '</td><td style="font-family:var(--font-ui)">' + (support.method || '') + '</td></tr>' : '') +
+    (resistance.price != null ? '<tr><td class="ta-label-cell">Resistance</td><td>' + (price.currency || '') + formatPrice(resistance.price) + '</td><td style="font-family:var(--font-ui)">' + (resistance.method || '') + '</td></tr>' : '') +
+    (ftw52High.price != null ? '<tr><td class="ta-label-cell">52-Week High</td><td>' + (price.currency || '') + formatPrice(ftw52High.price) + '</td><td style="font-family:var(--font-ui)">' + (ftw52High.date || '') + '</td></tr>' : '') +
+    (ftw52Low.price != null ? '<tr><td class="ta-label-cell">52-Week Low</td><td>' + (price.currency || '') + formatPrice(ftw52Low.price) + '</td><td style="font-family:var(--font-ui)">' + (ftw52Low.date || '') + '</td></tr>' : '') +
     '</tbody></table>' : '';
 
   const footerHtml = '<div class="ta-footer">' +
@@ -1203,7 +1203,7 @@ export function renderHypSidebar(data) {
   if (ref) {
     if (peValue === '\u2014' && ref.epsForward) {
       const currentP = parseFloat(data._livePrice || data.price || data.current_price || 0);
-      if (currentP > 0) peValue = (currentP / ref.epsForward).toFixed(1) + 'x';
+      if (currentP > 0) peValue = formatRatio(currentP / ref.epsForward);
     }
     if (revGrowthValue === '\u2014' && ref.revenueGrowth != null) {
       revGrowthValue = (ref.revenueGrowth > 0 ? '+' : '') + ref.revenueGrowth + '%';
@@ -1239,8 +1239,8 @@ export function renderHypSidebar(data) {
     if (livePrice < vrBear)      { vrZone = 'RED';   vrZoneCls = 'red'; }
     else if (livePrice > vrFair) { vrZone = 'GREEN'; vrZoneCls = 'green'; }
     else                         { vrZone = 'AMBER'; vrZoneCls = 'amber'; }
-    vrToBull = ((vrBull / livePrice - 1) * 100).toFixed(1);
-    vrToBear = ((vrBear / livePrice - 1) * 100).toFixed(1);
+    vrToBull = formatPrice((vrBull / livePrice - 1) * 100, 1);
+    vrToBear = formatPrice((vrBear / livePrice - 1) * 100, 1);
   }
 
   let inner = '';
@@ -1249,12 +1249,12 @@ export function renderHypSidebar(data) {
     '<div class="hs-stock-ticker">' + (data.tickerFull || data.ticker || ticker) + '</div>' +
     '<div class="hs-price-row">';
   if (livePrice > 0) {
-    inner += '<span class="hs-price">A$' + livePrice.toFixed(2) + '</span>';
+    inner += '<span class="hs-price">' + formatPriceWithCurrency(livePrice) + '</span>';
   }
   if (changePct !== null) {
     const chgCls = changePct >= 0 ? 'pos' : 'neg';
     inner += '<span class="hs-change-badge ' + chgCls + '">' +
-      (changePct >= 0 ? '+' : '') + changePct.toFixed(1) + '%</span>';
+      formatSignedPercent(changePct) + '</span>';
   }
   inner += '</div>' +
     '<div class="hs-stock-name">' + (data.company || '') + '</div>' +
@@ -1292,16 +1292,16 @@ export function renderHypSidebar(data) {
 
   if (vr && livePrice > 0) {
     const vrRange = vrBull - vrBear || 1;
-    const vrCurrPct = Math.min(100, Math.max(0, ((livePrice - vrBear) / vrRange * 100))).toFixed(1);
+    const vrCurrPct = svgCoord(Math.min(100, Math.max(0, ((livePrice - vrBear) / vrRange * 100))));
     inner += '<div class="hs-section-head">Valuation Range</div>' +
       '<div class="hs-val-section">' +
         '<div class="hs-val-header">' +
           '<span class="hs-val-zone ' + vrZoneCls + '">' + vrZone + '</span>' +
         '</div>' +
         '<div class="hs-val-levels">' +
-          '<span>Bear<br>A$' + vrBear.toFixed(2) + '</span>' +
-          '<span>Fair<br>A$' + vrFair.toFixed(2) + '</span>' +
-          '<span>Bull<br>A$' + vrBull.toFixed(2) + '</span>' +
+          '<span>Bear<br>' + formatPriceWithCurrency(vrBear) + '</span>' +
+          '<span>Fair<br>' + formatPriceWithCurrency(vrFair) + '</span>' +
+          '<span>Bull<br>' + formatPriceWithCurrency(vrBull) + '</span>' +
         '</div>' +
         '<div class="hs-val-bar">' +
           '<div class="hs-val-marker" style="left:' + vrCurrPct + '%"></div>' +
@@ -1704,7 +1704,7 @@ export function initNarrativeTimelineChart(ticker) {
                 const label = context.dataset.label || '';
                 const value = context.parsed.y;
                 if (context.dataset.yAxisID === 'yPrice') {
-                  return label + ': $' + (value !== null ? value.toFixed(2) : ' -- ');
+                  return label + ': $' + formatPrice(value);
                 }
                 return label + ': ' + (value !== null ? value + '%' : ' -- ');
               }
@@ -1729,7 +1729,7 @@ export function initNarrativeTimelineChart(ticker) {
             ticks: {
               color: textColor,
               font: { family: "'JetBrains Mono', monospace", size: 9 },
-              callback: function(value) { return '$' + value.toFixed(0); }
+              callback: function(value) { return '$' + formatPrice(value, 0); }
             },
             title: {
               display: true,
@@ -1823,19 +1823,19 @@ export function renderSignalBars(data) {
     if (data._liveChangePct != null && !isNaN(data._liveChangePct)) {
       var chg = parseFloat(data._liveChangePct);
       dailyCls    = chg >= 0 ? 'pos' : 'neg';
-      dailyChange = (chg >= 0 ? '+' : '') + chg.toFixed(1) + '% today';
+      dailyChange = formatSignedPercent(chg) + ' today';
     } else if (ph && ph.length >= 2) {
       const last2 = parseFloat(ph[ph.length - 1]);
       const prev2 = parseFloat(ph[ph.length - 2]);
       if (!isNaN(last2) && !isNaN(prev2) && prev2 !== 0) {
         var chg = (last2 - prev2) / prev2 * 100;
         dailyCls    = chg >= 0 ? 'pos' : 'neg';
-        dailyChange = (chg >= 0 ? '+' : '') + chg.toFixed(1) + '% today';
+        dailyChange = formatSignedPercent(chg) + ' today';
       }
     }
     let fromPeak = '', fromPeakCls = '';
     if (ta.trend && ta.trend.drawdown != null) {
-      fromPeak    = ta.trend.drawdown.toFixed(1) + '% from peak';
+      fromPeak    = formatPercent(ta.trend.drawdown) + ' from peak';
       fromPeakCls = ta.trend.drawdown < 0 ? 'neg' : 'pos';
     }
     rows +=
@@ -1844,7 +1844,7 @@ export function renderSignalBars(data) {
         '<span class="sb-row-label">Technical Indicators</span>' +
         '<span class="sb-badge ' + regimeCls + '">' + badgeLabel + '</span>' +
         '<div class="sb-items">' +
-          (currentP ? '<span class="sb-item">A$' + currentP.toFixed(2) + '</span><span class="sb-sep">|</span>' : '') +
+          (currentP ? '<span class="sb-item">' + formatPriceWithCurrency(currentP) + '</span><span class="sb-sep">|</span>' : '') +
           (dailyChange ? '<span class="sb-item ' + dailyCls + '">' + dailyChange + '</span>' : '') +
           (fromPeak    ? '<span class="sb-sep">|</span><span class="sb-item ' + fromPeakCls + '">' + fromPeak + '</span>' : '') +
         '</div>' +
@@ -2300,9 +2300,8 @@ export function renderPriceDrivers(data) {
   // Performance grid helper
   function _fmtCell(val) {
     if (val == null) return '<span class="pd-perf-cell pd-perf-flat">N/A</span>';
-    const dir = val > 0 ? '+' : '';
     const cls = val > 0.1 ? 'pd-perf-up' : val < -0.1 ? 'pd-perf-down' : 'pd-perf-flat';
-    return '<span class="pd-perf-cell ' + cls + '">' + dir + val.toFixed(1) + '%</span>';
+    return '<span class="pd-perf-cell ' + cls + '">' + formatSignedPercent(val) + '</span>';
   }
 
   // Performance grid
@@ -2614,9 +2613,8 @@ export function renderPriceDriversContent(container, driverData) {
   // Performance grid helper
   function _fmtCell(val) {
     if (val == null) return '<span class="pd-perf-cell pd-perf-flat">N/A</span>';
-    const dir = val > 0 ? '+' : '';
     const cls = val > 0.1 ? 'pd-perf-up' : val < -0.1 ? 'pd-perf-down' : 'pd-perf-flat';
-    return '<span class="pd-perf-cell ' + cls + '">' + dir + val.toFixed(1) + '%</span>';
+    return '<span class="pd-perf-cell ' + cls + '">' + formatSignedPercent(val) + '</span>';
   }
 
   // Performance grid

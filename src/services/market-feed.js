@@ -13,6 +13,7 @@
  */
 
 import { STOCK_DATA, REFERENCE_DATA } from '../lib/state.js';
+import { formatPrice, formatChange, formatSignedPercent } from '../lib/format.js';
 import { LiveData, fetchAndPatchLive, updateLiveUI } from './live-data.js';
 
 // ============================================================
@@ -187,9 +188,9 @@ function updateHomeCardPrice(ticker, price, change, changePct, currency, directi
     const cls = change >= 0 ? 'positive' : 'negative';
     priceEl.innerHTML =
         '<span style="font-size:0.8rem; color:var(--text-muted)">' + currency + '</span>' +
-        price.toFixed(2) +
+        formatPrice(price) +
         '<span class="fc-live-dot"></span>' +
-        '<div class="fc-price-change ' + cls + '">' + sign + change.toFixed(2) + ' (' + sign + changePct.toFixed(1) + '%)</div>';
+        '<div class="fc-price-change ' + cls + '">' + formatChange(change) + ' (' + formatSignedPercent(changePct) + ')</div>';
 
     // Flash animation on price change
     if (direction) {
@@ -217,8 +218,8 @@ function renderTickerStrip(data) {
             const cls = p.c >= 0 ? 'positive' : 'negative';
             items += '<span class="pt-item" onclick="navigate(\'report-' + ticker + '\')">' +
                 '<span class="pt-ticker">' + ticker + '</span>' +
-                '<span class="pt-price">' + (p.cur || 'A$') + p.p.toFixed(2) + '</span>' +
-                '<span class="pt-change ' + cls + '">' + sign + p.cp.toFixed(1) + '%</span>' +
+                '<span class="pt-price">' + (p.cur || 'A$') + formatPrice(p.p) + '</span>' +
+                '<span class="pt-change ' + cls + '">' + formatSignedPercent(p.cp) + '</span>' +
             '</span>';
         });
     }
