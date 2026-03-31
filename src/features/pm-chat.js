@@ -14,6 +14,7 @@
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { API_BASE } from '../lib/api-config.js';
+import { onStateChange, getState, STATES } from './portfolio-state.js';
 
 // ============================================================
 // CONFIGURATION
@@ -884,7 +885,24 @@ export function initPMChat() {
     } catch(e) { // Expected: localStorage may not have this key
     }
 
-    // Listen for portfolio sync from Portfolio page
+    // BEAD-019: Observe portfolio state machine transitions.
+    onStateChange(function(newState) {
+        if (newState === STATES.READY) {
+            _checkExistingPortfolio();
+        } else if (newState === STATES.EMPTY) {
+            if (portfolioBadge) {
+                portfolioBadge.textContent = 'NO PORTFOLIO';
+                portfolioBadge.classList.remove('pm-badge-active');
+            }
+        } else if (newState === STATES.ERROR) {
+            if (portfolioBadge) {
+                portfolioBadge.textContent = 'PORTFOLIO ERROR';
+                portfolioBadge.classList.remove('pm-badge-active');
+            }
+        }
+    });
+
+    // Legacy event listeners kept for backward compatibility.
     window.addEventListener('ci:portfolio:synced', function(e) {
         if (portfolioBadge) {
             const n = e.detail && e.detail.holdings ? e.detail.holdings : 0;
@@ -893,7 +911,6 @@ export function initPMChat() {
         }
     });
 
-    // Listen for portfolio clear
     window.addEventListener('ci:portfolio:cleared', function() {
         if (portfolioBadge) {
             portfolioBadge.textContent = 'NO PORTFOLIO';

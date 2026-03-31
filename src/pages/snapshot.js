@@ -3,8 +3,8 @@
 
 import { STOCK_DATA, SNAPSHOT_DATA, SNAPSHOT_ORDER } from '../lib/state.js';
 import { normaliseScores, computeSkewScore } from '../lib/dom.js';
+import { prepareHypotheses } from '../features/report/hypothesis.js';
 import { renderPDFDownload } from './report-sections.js';
-import { prepareHypotheses } from './report-sections.js';
 import { on } from '../lib/data-events.js';
 import { renderedSnapshots } from '../lib/router.js';
 import { formatDateAEST, formatPrice, formatPercent } from '../lib/format.js';

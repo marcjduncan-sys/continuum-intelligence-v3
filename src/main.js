@@ -32,7 +32,8 @@ import { renderOpsPage } from './pages/ops.js';
 import { initStalenessBadge } from './features/staleness-badge.js';
 
 // Report sections (needed for router callbacks)
-import { setupScrollSpy, initNarrativeTimelineChart, destroyNarrativeTimelineChart } from './pages/report-sections.js';
+import { initNarrativeTimelineChart, destroyNarrativeTimelineChart } from './features/report/narrative-timeline.js';
+import { setupScrollSpy } from './pages/report-sections.js';
 
 // Features
 import { initAuth, showAuthModal, hideAuthModal } from './features/auth.js';
