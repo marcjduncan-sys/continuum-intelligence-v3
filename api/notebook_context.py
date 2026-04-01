@@ -390,15 +390,23 @@ async def run_deep_extraction(ticker: str) -> dict[str, str | None]:
 
     notebook_id = await get_notebook_id(ticker)
     if not notebook_id:
+        logger.warning(
+            "Deep extraction: no notebook registered for %s -- corpus will be empty. "
+            "Provision via POST /api/notebooks/ensure-all or add to notebooklm-notebooks.json",
+            ticker,
+        )
         return {}
 
     if not _HAS_NOTEBOOKLM:
+        logger.warning("Deep extraction: notebooklm-py not installed, skipping %s", ticker)
         return {}
 
     if not _nlm_auth_ok:
+        logger.warning("Deep extraction: auth expired, skipping %s", ticker)
         return {}
 
     if not config.NOTEBOOKLM_AUTH_JSON:
+        logger.warning("Deep extraction: NOTEBOOKLM_AUTH_JSON not set, skipping %s", ticker)
         return {}
 
     results: dict[str, str | None] = {}
@@ -486,15 +494,22 @@ async def query_notebook_batch(ticker: str) -> dict[str, str | None]:
 
     notebook_id = await get_notebook_id(ticker)
     if not notebook_id:
+        logger.warning(
+            "Notebook batch query: no notebook registered for %s -- skipping",
+            ticker,
+        )
         return {}
 
     if not _HAS_NOTEBOOKLM:
+        logger.warning("Notebook batch query: notebooklm-py not installed, skipping %s", ticker)
         return {}
 
     if not _nlm_auth_ok:
+        logger.warning("Notebook batch query: auth expired, skipping %s", ticker)
         return {}
 
     if not config.NOTEBOOKLM_AUTH_JSON:
+        logger.warning("Notebook batch query: NOTEBOOKLM_AUTH_JSON not set, skipping %s", ticker)
         return {}
 
     results: dict[str, str | None] = {}

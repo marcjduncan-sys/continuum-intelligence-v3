@@ -498,6 +498,11 @@ async def _run_single_in_batch(
                     gathered["notebook_corpus"] = corpus
                     dims_populated = corpus.get("_dimensionsPopulated", 0)
                     logger.info(f"[BATCH][{ticker}] Track 6: Deep extraction completed ({dims_populated} dimensions)")
+                else:
+                    logger.warning(
+                        f"[BATCH][{ticker}] Track 6: No corpus extracted -- "
+                        f"Analyst Chat will have no NotebookLM context for this ticker"
+                    )
             except Exception as e:
                 logger.warning(f"[BATCH][{ticker}] Track 6 notebook corpus failed (non-fatal): {e}")
 
@@ -1372,6 +1377,11 @@ async def run_refresh(ticker: str, regime_context: dict | None = None, force_cor
                     gathered["notebook_corpus"] = corpus
                     dims_populated = corpus.get("_dimensionsPopulated", 0)
                     logger.info(f"[{ticker}] Track 6: Deep extraction completed ({dims_populated} dimensions)")
+                else:
+                    logger.warning(
+                        f"[{ticker}] Track 6: No corpus extracted -- "
+                        f"Analyst Chat will have no NotebookLM context for this ticker"
+                    )
             except Exception as e:
                 logger.warning(f"[{ticker}] Track 6 notebook corpus failed (non-fatal): {e}")
 

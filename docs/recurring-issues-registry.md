@@ -637,3 +637,39 @@ When fixing any bug, use this checklist:
 - **Fix layer:** BOUNDARY
 - **Regression gate:** 4 Vitest tests in `src/features/pm-chat-state.test.js`
 - **Recurrence risk:** LOW -- single observer pattern replaces multiple independent event listeners
+
+---
+
+## Bug Family 10: Silent Integration Degradation (No Reconciliation Loop)
+
+**Occurrences:** 1 confirmed (NotebookLM), pattern likely present in other fire-and-forget integrations
+**Period:** Since NotebookLM integration launch through 2026-04-02
+**Files hit:** `api/notebook_context.py`, `api/main.py`, `api/refresh.py`, `data/config/notebooklm-notebooks.json`
+
+### Pattern
+
+External integration provisioning runs once (at add-stock or startup scaffold retry). If it fails silently (auth expired, timeout, transient error), the ticker is permanently degraded with no reconciliation process to detect or repair the gap. The system reports healthy because each individual failure is handled gracefully (returns None, logs warning, continues). The cumulative effect is invisible.
+
+### Distinguishing characteristics
+
+- Fire-and-forget provisioning with no periodic reconciliation
+- Silent fallback that masks total integration failure (Analyst Chat works without corpus, just worse)
+- No cross-reference between "what should exist" and "what does exist"
+- JSON fallback file manually maintained, never synced from authoritative DB source
+
+### 2026-04-02 BEAD-020: NotebookLM Registry Gap -- 24 of 45 Tickers Unprovisioned
+- **Family:** 10 (Silent Integration Degradation)
+- **Symptom:** Analyst Chat returned "meaningful gap" for management questions on GNP despite rich data existing in the NotebookLM notebook. Investigation revealed 24 of 45 tickers (53%) had no notebook ID in the registry. Zero tickers had persisted `notebookCorpus` in their research JSON.
+- **Root cause:** `provision_notebook()` only ran at AddStock time (once) and startup scaffold retry (once). No process ever asked "which tickers have research but no notebook?" If auth was expired at provisioning time, the ticker silently got no notebook forever. The JSON registry (`data/config/notebooklm-notebooks.json`) was manually maintained with 22 entries and never synced from the DB. Track 6 in refresh silently skipped tickers without notebooks (returned empty dict).
+- **Fix:** Added `ensure_all_notebooks()` to `api/notebook_context.py` which cross-references all research files against the DB registry, retries failed/timed-out entries, and provisions missing tickers sequentially. Called on startup (120s delay) and every 6 hours via periodic loop. Added admin endpoints: `POST /api/notebooks/ensure-all` (immediate trigger) and `POST /api/notebooks/sync-registry` (DB to JSON sync). Auth expiry still blocks provisioning but the next run after auth refresh catches everything missed.
+- **Fix layer:** BOUNDARY (reconciliation loop at the registry level, not patching individual consumers)
+- **Regression gate:** Fly.io logs `[NotebookSync]` entries on every startup and 6-hour cycle. `GET /api/notebooks/status` surfaces full registry state. `GET /api/notebooks/pending` lists unprovisioned tickers.
+- **Recurrence risk:** LOW for notebook provisioning. MEDIUM for the general pattern -- other fire-and-forget integrations should be audited for the same silent degradation (see checklist below).
+
+### Audit checklist for Family 10 pattern
+
+When adding any new external integration, verify:
+1. Is there a reconciliation loop that periodically checks "expected vs actual"?
+2. Does silent failure aggregate into invisible degradation?
+3. Is there an admin endpoint to surface the gap?
+4. Does the periodic retry handle auth expiry recovery?
