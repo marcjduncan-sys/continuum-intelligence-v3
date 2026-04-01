@@ -139,14 +139,16 @@ async def main():
     skipped = sum(1 for _, _, msg in results if 'Already populated' in msg)
 
     logger.info(
-        f"Backfill complete: {succeeded} succeeded, {failed} failed, "
-        f"{skipped} skipped out of {len(tickers)} total"
+        "Backfill complete: %d succeeded, %d failed, "
+        "%d skipped out of %d tickers",
+        succeeded, failed, skipped, len(tickers),
     )
 
-    # Return non-zero if any failures
-    if failed > 0:
-        sys.exit(1)
+    # Log individual failures for follow-up
+    for ticker, success, msg in results:
+        if not success and 'Already populated' not in msg:
+            logger.warning("  FAILED: %s -- %s", ticker, msg)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())
