@@ -56,7 +56,7 @@
   "dominant": "N2",
   "confidence": "LOW",
   "alert_state": "NORMAL",
-  "current_price": 2.73,
+  "current_price": 2.69,
   "big_picture": "Sigma Healthcare (ASX: SIG) – coverage initiated. Full analysis pending.",
   "last_flip": null,
   "narrative_history": [],
@@ -263,160 +263,111 @@
     2.65,
     2.67,
     2.7,
-    2.73
+    2.73,
+    2.69
   ],
   "freshness": {
-    "pricePctChange": 1.1,
+    "pricePctChange": -1.5,
     "urgency": 0,
     "status": "OK",
     "badge": "ok"
   },
-  "last_price_update": "2026-04-01T05:35:48.939Z",
+  "last_price_update": "2026-04-01T23:55:29.233Z",
   "technicalAnalysis": {
-    "date": "11 February 2026",
+    "date": "01 April 2026",
     "period": "1 Year",
     "source": "Continuum Technical Intelligence",
-    "regime": "Range-bound",
-    "clarity": "Clear",
+    "regime": "Downtrend",
+    "clarity": "Mixed",
     "price": {
-      "current": 2.73,
+      "current": 2.69,
       "currency": "A$"
     },
     "movingAverages": {
       "ma50": {
-        "value": 2.95,
-        "date": "11 Feb 2026"
+        "value": 2.9,
+        "date": "01 Apr 2026"
       },
       "ma200": {
-        "value": 2.99,
-        "date": "11 Feb 2026"
+        "value": 3,
+        "date": "01 Apr 2026"
       },
-      "crossover": null,
-      "priceVsMa50": 6.5,
-      "priceVsMa200": 5.1
+      "crossover": {
+        "type": "Death Cross",
+        "date": "April 2026",
+        "description": "50-day MA crossed below 200-day MA (death cross)"
+      },
+      "priceVsMa50": -4.9,
+      "priceVsMa200": -7.7
     },
     "trend": {
-      "direction": "Up",
-      "duration": "2 months",
-      "structure": "Narrow range stock; recent breakout toward 52-week highs from A$2.83 base",
+      "direction": "Down",
+      "duration": "12 months",
+      "structure": "Price in downtrend relative to 50-day and 200-day moving averages.",
       "peak": {
-        "price": 3.27,
-        "date": "w/c 24 February 2025"
+        "price": 3.26,
+        "date": "Recent"
       },
       "trough": {
-        "price": 2.74,
-        "date": "w/c 14 July 2025"
+        "price": 2.6,
+        "date": "Recent"
       },
-      "drawdown": -4
+      "drawdown": -16.3
     },
     "keyLevels": {
       "support": {
-        "price": 2.9,
-        "method": "Prior consolidation floor and 50-day MA"
+        "price": 2.6,
+        "method": "Recent low / swing support"
       },
       "resistance": {
-        "price": 3.27,
-        "method": "12-month high (Feb 2025)"
+        "price": 2.85,
+        "method": "Recent high / swing resistance"
       },
       "fiftyTwoWeekHigh": {
-        "price": 3.27,
-        "date": "w/c 24 February 2025"
+        "price": 3.26,
+        "date": "Last 12 months"
       },
       "fiftyTwoWeekLow": {
-        "price": 2.74,
-        "date": "w/c 14 July 2025"
+        "price": 2.6,
+        "date": "Last 12 months"
       }
     },
     "volume": {
-      "latestVs20DayAvg": 1.3,
-      "latestDate": "11 February 2026",
-      "priorSpikes": [
-        {
-          "period": "w/c 1 September 2025",
-          "ratio": 1.8,
-          "context": "Break above A$3.00; Chemist Warehouse merger speculation"
-        },
-        {
-          "period": "w/c 26 January 2026",
-          "ratio": 1.6,
-          "context": "Rally from A$2.83 to A$3.09; momentum building"
-        }
-      ]
+      "latestVs20DayAvg": 1,
+      "latestDate": "01 April 2026",
+      "priorSpikes": []
     },
     "volatility": {
       "latestDailyRange": {
-        "high": 3.16,
-        "low": 3.09,
-        "date": "11 February 2026"
+        "high": 2.73,
+        "low": 2.65,
+        "date": "01 April 2026"
       },
-      "latestRangePercent": 2.3,
-      "avgDailyRangePercent30": 1.2,
-      "avgDailyRangePercent90": 1.4
+      "latestRangePercent": 1.8,
+      "avgDailyRangePercent30": 1.8,
+      "avgDailyRangePercent90": 1.8
     },
     "meanReversion": {
-      "vsMa50": 6.5,
-      "vsMa200": 5.1,
-      "rangePosition": 75,
-      "rangeHigh": 3.27,
-      "rangeLow": 2.74
+      "vsMa50": -4.9,
+      "vsMa200": -7.7,
+      "rangePosition": 19,
+      "rangeHigh": 3.26,
+      "rangeLow": 2.6
     },
-    "inflectionPoints": [
-      {
-        "date": "w/c 24 February 2025",
-        "price": 3.27,
-        "event": "12-month high"
-      },
-      {
-        "date": "w/c 14 July 2025",
-        "price": 2.74,
-        "event": "12-month low"
-      },
-      {
-        "date": "w/c 1 September 2025",
-        "price": 3.04,
-        "event": "Breaks back above A$3.00"
-      },
-      {
-        "date": "w/c 6 October 2025",
-        "price": 3.15,
-        "event": "Approaches 12-month high; fails to break through"
-      },
-      {
-        "date": "w/c 8 December 2025",
-        "price": 2.76,
-        "event": "Retests lows; A$2.74 support holds"
-      },
-      {
-        "date": "w/c 26 January 2026",
-        "price": 3.09,
-        "event": "Rally resumes; momentum building"
-      },
-      {
-        "date": "11 February 2026",
-        "price": 3.14,
-        "event": "Approaching 12-month high resistance at A$3.27"
-      }
-    ],
+    "inflectionPoints": [],
     "relativePerformance": {
       "vsIndex": {
-        "name": "S&amp;P/ASX 200",
+        "name": "S&P/ASX 200",
         "period": "12 months",
-        "stockReturn": 12.5,
-        "indexReturn": 6.9,
-        "relativeReturn": 5.6
-      },
-      "vsSector": {
-        "name": "S&amp;P/ASX Healthcare",
-        "period": "12 months",
-        "stockReturn": 12.5,
-        "sectorReturn": -24.9,
-        "relativeReturn": 37.4
+        "stockReturn": -4.9,
+        "indexReturn": 6.5,
+        "relativeReturn": -11.4
       }
     }
   },
   "price_evidence": {
-    "last_run": "2026-04-01T21:32:35.600Z",
+    "last_run": "2026-04-01T23:55:29.363Z",
     "classification": "NOISE"
   },
-  "last_research_update": "2026-04-01T21:32:35.600Z"
+  "last_research_update": "2026-04-01T23:55:29.363Z"
 }

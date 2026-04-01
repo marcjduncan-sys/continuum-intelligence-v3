@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result and forward guidance.",
       "upside": "Material re-rating if execution surprises to the upside.",
       "risk_plain": "If growth disappoints, this narrative weakens.",
-      "survival_score": 0.23,
+      "survival_score": 0.25,
       "status": "LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-04-01T21:32:35.600Z"
+      "last_updated": "2026-04-01T23:55:29.363Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -23,10 +23,10 @@
       "what_to_watch": "Margin trends and competitive dynamics.",
       "upside": null,
       "risk_plain": "If the base case is already priced in, limited upside from here.",
-      "survival_score": 0.23,
+      "survival_score": 0.25,
       "status": "LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-04-01T21:32:35.600Z"
+      "last_updated": "2026-04-01T23:55:29.363Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Cost pressures, competitive threats, or macro headwinds.",
       "upside": null,
       "risk_plain": "Material downside if multiple risks crystallise simultaneously.",
-      "survival_score": 0.27,
+      "survival_score": 0.25,
       "status": "LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-04-01T21:32:35.600Z"
+      "last_updated": "2026-04-01T23:55:29.363Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -47,25 +47,25 @@
       "what_to_watch": "Industry disruption signals and regulatory changes.",
       "upside": null,
       "risk_plain": "If disruption materialises, prior assumptions become invalid.",
-      "survival_score": 0.27,
+      "survival_score": 0.25,
       "status": "LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-04-01T21:32:35.600Z"
+      "last_updated": "2026-04-01T23:55:29.363Z"
     }
   },
-  "dominant": "N3",
+  "dominant": "N1",
   "confidence": "LOW",
   "alert_state": "NORMAL",
-  "current_price": 160.27,
+  "current_price": 161.23,
   "big_picture": "REA Group Limited (ASX: REA) -- coverage initiated. Full analysis pending.",
   "last_flip": {
-    "date": "2026-03-18",
-    "from": "N1",
-    "to": "N3",
-    "trigger": "Automated: survival score shift (Growth/Recovery → Risk/Downside)",
-    "price_at_flip": 162.34,
-    "from_survival": 0.23,
-    "to_survival": 0.27
+    "date": "2026-04-01",
+    "from": "N3",
+    "to": "N1",
+    "trigger": "Automated: survival score shift (Risk/Downside → Growth/Recovery)",
+    "price_at_flip": 161.23,
+    "from_survival": 0.25,
+    "to_survival": 0.25
   },
   "narrative_history": [
     {
@@ -85,6 +85,15 @@
       "price_at_flip": 168.88,
       "from_survival": 0.24,
       "to_survival": 0.26
+    },
+    {
+      "date": "2026-03-18",
+      "from": "N1",
+      "to": "N3",
+      "trigger": "Automated: survival score shift (Growth/Recovery → Risk/Downside)",
+      "price_at_flip": 162.34,
+      "from_survival": 0.23,
+      "to_survival": 0.27
     }
   ],
   "evidence_items": [],
@@ -465,68 +474,69 @@
     156.42,
     161.07,
     159.04,
-    160.27
+    160.27,
+    161.23
   ],
   "freshness": {
-    "pricePctChange": 0.8,
+    "pricePctChange": 0.6,
     "urgency": 0,
     "status": "OK",
     "badge": "ok"
   },
-  "last_price_update": "2026-04-01T05:35:48.934Z",
+  "last_price_update": "2026-04-01T23:55:29.224Z",
   "price_evidence": {
-    "last_run": "2026-04-01T21:32:35.600Z",
+    "last_run": "2026-04-01T23:55:29.363Z",
     "classification": "NOTABLE"
   },
-  "last_research_update": "2026-04-01T21:32:35.600Z",
+  "last_research_update": "2026-04-01T23:55:29.363Z",
   "technicalAnalysis": {
-    "date": "02 March 2026",
+    "date": "01 April 2026",
     "period": "1 Year",
     "source": "Continuum Technical Intelligence",
     "regime": "Downtrend",
-    "clarity": "Mixed",
+    "clarity": "Clear",
     "price": {
-      "current": 160.27,
+      "current": 161.23,
       "currency": "A$"
     },
     "movingAverages": {
       "ma50": {
-        "value": 177.7,
-        "date": "02 Mar 2026"
+        "value": 167.9,
+        "date": "01 Apr 2026"
       },
       "ma200": {
-        "value": 179.8,
-        "date": "02 Mar 2026"
+        "value": 183.2,
+        "date": "01 Apr 2026"
       },
       "crossover": {
         "type": "Death Cross",
-        "date": "March 2026",
-        "description": "50-day MA below 200-day MA (death cross)"
+        "date": "April 2026",
+        "description": "50-day MA crossed below 200-day MA (death cross)"
       },
-      "priceVsMa50": -6.7,
-      "priceVsMa200": -7.8
+      "priceVsMa50": -4.5,
+      "priceVsMa200": -12.5
     },
     "trend": {
       "direction": "Down",
-      "duration": "3 months",
+      "duration": "5 months",
       "structure": "Price in downtrend relative to 50-day and 200-day moving averages.",
       "peak": {
-        "price": 195.82,
+        "price": 222.6,
         "date": "Recent"
       },
       "trough": {
-        "price": 152.9,
+        "price": 151,
         "date": "Recent"
       },
-      "drawdown": -37
+      "drawdown": -39.1
     },
     "keyLevels": {
       "support": {
-        "price": 152.9,
+        "price": 151,
         "method": "Recent low / swing support"
       },
       "resistance": {
-        "price": 182.39,
+        "price": 174.01,
         "method": "Recent high / swing resistance"
       },
       "fiftyTwoWeekHigh": {
@@ -534,40 +544,40 @@
         "date": "Last 12 months"
       },
       "fiftyTwoWeekLow": {
-        "price": 152.9,
+        "price": 151,
         "date": "Last 12 months"
       }
     },
     "volume": {
       "latestVs20DayAvg": 1,
-      "latestDate": "02 March 2026",
+      "latestDate": "01 April 2026",
       "priorSpikes": []
     },
     "volatility": {
       "latestDailyRange": {
-        "high": 165.8,
-        "low": 164.38,
-        "date": "02 March 2026"
+        "high": 160.27,
+        "low": 156.42,
+        "date": "01 April 2026"
       },
-      "latestRangePercent": 2.4,
-      "avgDailyRangePercent30": 2.4,
-      "avgDailyRangePercent90": 2.4
+      "latestRangePercent": 1.9,
+      "avgDailyRangePercent30": 1.9,
+      "avgDailyRangePercent90": 1.9
     },
     "meanReversion": {
-      "vsMa50": -6.7,
-      "vsMa200": -7.8,
-      "rangePosition": 11,
+      "vsMa50": -4.5,
+      "vsMa200": -12.5,
+      "rangePosition": 8,
       "rangeHigh": 263.16,
-      "rangeLow": 152.9
+      "rangeLow": 151
     },
     "inflectionPoints": [],
     "relativePerformance": {
       "vsIndex": {
         "name": "S&P/ASX 200",
         "period": "12 months",
-        "stockReturn": -12.8,
+        "stockReturn": -27.9,
         "indexReturn": 6.5,
-        "relativeReturn": -19.3
+        "relativeReturn": -34.4
       }
     }
   }

@@ -11,10 +11,10 @@
       "what_to_watch": "Iron ore prices, Pilbara shipment volumes, C1 cost trajectory.",
       "upside": "Material re-rating if iron ore prices sustain above US$100/t and copper ramp accelerates.",
       "risk_plain": "If iron ore breaks below US$90/t, earnings compress significantly.",
-      "survival_score": 0.45,
+      "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-04-01T21:32:35.600Z"
+      "last_updated": "2026-04-01T23:55:29.363Z"
     },
     "N2": {
       "label": "Energy Transition Portfolio",
@@ -23,10 +23,10 @@
       "what_to_watch": "Oyu Tolgoi ramp-up progress, copper prices, Arcadium integration, lithium price recovery.",
       "upside": "If copper and lithium contribute 30-40% of EBITDA by 2030, significant re-rating potential.",
       "risk_plain": "If growth projects face cost overruns or commodity prices remain depressed, capital is destroyed.",
-      "survival_score": 0.45,
+      "survival_score": 0.46,
       "status": "MODERATE",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-04-01T21:32:35.600Z"
+      "last_updated": "2026-04-01T23:55:29.363Z"
     },
     "N3": {
       "label": "China Demand Slowdown",
@@ -53,19 +53,19 @@
       "last_updated": "2026-04-01T07:56:47.823Z"
     }
   },
-  "dominant": "N1",
+  "dominant": "N2",
   "confidence": "LOW",
   "alert_state": "OVERCORRECTION",
-  "current_price": 167.09,
+  "current_price": 165.63,
   "big_picture": "Rio Tinto Limited (ASX: RIO) – coverage initiated. Full analysis pending.",
   "last_flip": {
     "date": "2026-04-01",
-    "from": "N2",
-    "to": "N1",
-    "trigger": "Automated: survival score shift (Energy Transition Portfolio → Iron Ore Cash Generation)",
-    "price_at_flip": 167.09,
-    "from_survival": 0.45,
-    "to_survival": 0.45
+    "from": "N1",
+    "to": "N2",
+    "trigger": "Automated: survival score shift (Iron Ore Cash Generation → Energy Transition Portfolio)",
+    "price_at_flip": 165.63,
+    "from_survival": 0.44,
+    "to_survival": 0.46
   },
   "narrative_history": [
     {
@@ -472,6 +472,15 @@
       "price_at_flip": 167.09,
       "from_survival": 0.44,
       "to_survival": 0.46
+    },
+    {
+      "date": "2026-04-01",
+      "from": "N2",
+      "to": "N1",
+      "trigger": "Automated: survival score shift (Energy Transition Portfolio → Iron Ore Cash Generation)",
+      "price_at_flip": 167.09,
+      "from_survival": 0.45,
+      "to_survival": 0.45
     }
   ],
   "evidence_items": [
@@ -821,138 +830,105 @@
     161.43,
     169.49,
     167.73,
-    167.09
+    167.09,
+    165.63
   ],
   "freshness": {
-    "pricePctChange": -0.4,
+    "pricePctChange": -0.9,
     "urgency": 0,
     "status": "OK",
     "badge": "ok"
   },
-  "last_price_update": "2026-04-01T05:35:48.936Z",
+  "last_price_update": "2026-04-01T23:55:29.229Z",
   "technicalAnalysis": {
-    "date": "14 February 2026",
-    "period": "12 months",
-    "source": "ASX / Yahoo Finance",
-    "regime": "Range-bound – Mean Reverting",
-    "clarity": "Low directional clarity, commodity-driven",
+    "date": "01 April 2026",
+    "period": "1 Year",
+    "source": "Continuum Technical Intelligence",
+    "regime": "Consolidation",
+    "clarity": "Mixed",
     "price": {
-      "current": 167.09,
+      "current": 165.63,
       "currency": "A$"
     },
     "movingAverages": {
       "ma50": {
-        "value": 116.8,
-        "date": "14 Feb 2026"
+        "value": 158.4,
+        "date": "01 Apr 2026"
       },
       "ma200": {
-        "value": 114.5,
-        "date": "14 Feb 2026"
+        "value": 130.3,
+        "date": "01 Apr 2026"
       },
       "crossover": {
-        "type": "Neutral",
-        "date": "N/A",
-        "description": "50-day MA marginally above 200-day MA ($2.30 spread). No decisive crossover signal. MAs are converging, indicating lack of trend conviction."
+        "type": "Golden Cross",
+        "date": "April 2026",
+        "description": "50-day MA crossed above 200-day MA (golden cross)"
       },
-      "priceVsMa50": 1.4,
-      "priceVsMa200": 3.4
+      "priceVsMa50": 5.5,
+      "priceVsMa200": 28.2
     },
     "trend": {
-      "direction": "Range-bound",
-      "duration": "6 months",
-      "structure": "Range-bound between A$105 and A$130 since August 2025. Multiple failed breakouts above $125 and failed breakdowns below $108. Stock is a commodity price proxy with limited independent trend.",
+      "direction": "Sideways",
+      "duration": "12 months",
+      "structure": "Price in sidewaystrend relative to 50-day and 200-day moving averages.",
       "peak": {
-        "price": 130.5,
-        "date": "Mar 2025"
+        "price": 169.74,
+        "date": "Recent"
       },
       "trough": {
-        "price": 99.8,
-        "date": "Sep 2025"
+        "price": 101.83,
+        "date": "Recent"
       },
-      "drawdown": -9.2
+      "drawdown": -1.6
     },
     "keyLevels": {
       "support": {
-        "price": 108,
-        "method": "Multiple bounce level + 200-week MA convergence"
+        "price": 144.41,
+        "method": "Recent low / swing support"
       },
       "resistance": {
-        "price": 130,
-        "method": "Multiple rejection level + prior high cluster"
+        "price": 167.09,
+        "method": "Recent high / swing resistance"
       },
       "fiftyTwoWeekHigh": {
-        "price": 130.5,
-        "date": "Mar 2025"
+        "price": 169.74,
+        "date": "Last 12 months"
       },
       "fiftyTwoWeekLow": {
-        "price": 99.8,
-        "date": "Sep 2025"
+        "price": 101.83,
+        "date": "Last 12 months"
       }
     },
     "volume": {
-      "latestVs20DayAvg": 0.05,
-      "latestDate": "14 Feb 2026",
-      "priorSpikes": [
-        {
-          "period": "Feb 2025",
-          "ratio": 3.2,
-          "context": "CY2024 results + dividend announcement"
-        },
-        {
-          "period": "Sep 2025",
-          "ratio": 2.5,
-          "context": "China stimulus package announcement drove 8% rally"
-        }
-      ]
+      "latestVs20DayAvg": 1,
+      "latestDate": "01 April 2026",
+      "priorSpikes": []
     },
     "volatility": {
       "latestDailyRange": {
-        "high": 119.5,
-        "low": 117.8,
-        "date": "14 Feb 2026"
+        "high": 167.09,
+        "low": 161.43,
+        "date": "01 April 2026"
       },
-      "latestRangePercent": 1.43,
-      "avgDailyRangePercent30": 1.65,
-      "avgDailyRangePercent90": 1.8
+      "latestRangePercent": 1.9,
+      "avgDailyRangePercent30": 1.9,
+      "avgDailyRangePercent90": 1.9
     },
     "meanReversion": {
-      "vsMa50": 1.4,
-      "vsMa200": 3.4,
-      "rangePosition": 61,
-      "rangeHigh": 130.5,
-      "rangeLow": 99.8
+      "vsMa50": 5.5,
+      "vsMa200": 28.2,
+      "rangePosition": 96,
+      "rangeHigh": 169.74,
+      "rangeLow": 101.83
     },
-    "inflectionPoints": [
-      {
-        "date": "Feb 2025",
-        "price": 125,
-        "event": "CY2024 results – solid but priced in, stock sold off 5%"
-      },
-      {
-        "date": "Sep 2025",
-        "price": 99.8,
-        "event": "Iron ore below US$90/t briefly – stock hit 52-week low"
-      },
-      {
-        "date": "Oct 2025",
-        "price": 120,
-        "event": "China stimulus package – 20% rally in 3 weeks"
-      }
-    ],
+    "inflectionPoints": [],
     "relativePerformance": {
       "vsIndex": {
         "name": "S&P/ASX 200",
         "period": "12 months",
-        "stockReturn": -9.2,
-        "indexReturn": 6.9,
-        "relativeReturn": -16.1
-      },
-      "vsSector": {
-        "name": "S&P/ASX Materials",
-        "period": "12 months",
-        "stockReturn": -9.2,
-        "sectorReturn": 31.7,
-        "relativeReturn": -40.9
+        "stockReturn": 45.4,
+        "indexReturn": 6.5,
+        "relativeReturn": 38.9
       }
     }
   },
@@ -967,8 +943,8 @@
     "message": "5-day cumulative move of +26.6% exceeds 15% threshold – possible overcorrection"
   },
   "price_evidence": {
-    "last_run": "2026-04-01T21:32:35.600Z",
+    "last_run": "2026-04-01T23:55:29.363Z",
     "classification": "NOTABLE"
   },
-  "last_research_update": "2026-04-01T21:32:35.600Z"
+  "last_research_update": "2026-04-01T23:55:29.363Z"
 }

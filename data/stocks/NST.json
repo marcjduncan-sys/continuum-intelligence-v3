@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result, operational update, and macro developments.",
       "upside": "Material re-rating if scenario plays out.",
       "risk_plain": "Monitor for change in probability weight.",
-      "survival_score": 0.45,
+      "survival_score": 0.44,
       "status": "MODERATE",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-04-01T07:56:47.830Z"
+      "last_updated": "2026-04-01T23:55:29.363Z"
     },
     "N2": {
       "label": "Base Case",
@@ -23,10 +23,10 @@
       "what_to_watch": "Next earnings result, operational update, and macro developments.",
       "upside": null,
       "risk_plain": "Monitor for change in probability weight.",
-      "survival_score": 0.45,
+      "survival_score": 0.46,
       "status": "MODERATE",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-04-01T07:56:47.830Z"
+      "last_updated": "2026-04-01T23:55:29.363Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -53,19 +53,19 @@
       "last_updated": "2026-04-01T07:56:47.830Z"
     }
   },
-  "dominant": "N1",
+  "dominant": "N2",
   "confidence": "LOW",
   "alert_state": "OVERCORRECTION",
-  "current_price": 22.1,
+  "current_price": 22.71,
   "big_picture": "Northern Star Resources at A$18.55 – following a +16.2% single-session surge – is beginning to close the gap to its 52-week high of A$31.73, but the stock still embeds a 35% discount that implies the market is not yet fully crediting gold at US$5,023/oz as sustainable or NST's operational delivery a",
   "last_flip": {
     "date": "2026-04-01",
-    "from": "N2",
-    "to": "N1",
-    "trigger": "Automated: survival score shift (Base Case → Growth/Recovery)",
-    "price_at_flip": 22.1,
-    "from_survival": 0.45,
-    "to_survival": 0.45
+    "from": "N1",
+    "to": "N2",
+    "trigger": "Automated: survival score shift (Growth/Recovery → Base Case)",
+    "price_at_flip": 22.71,
+    "from_survival": 0.44,
+    "to_survival": 0.46
   },
   "narrative_history": [
     {
@@ -112,6 +112,15 @@
       "price_at_flip": 22.1,
       "from_survival": 0.44,
       "to_survival": 0.46
+    },
+    {
+      "date": "2026-04-01",
+      "from": "N2",
+      "to": "N1",
+      "trigger": "Automated: survival score shift (Base Case → Growth/Recovery)",
+      "price_at_flip": 22.1,
+      "from_survival": 0.45,
+      "to_survival": 0.45
     }
   ],
   "evidence_items": [
@@ -312,42 +321,43 @@
     20.36,
     21.83,
     22.02,
-    22.1
+    22.1,
+    22.71
   ],
   "freshness": {
-    "pricePctChange": 0.4,
+    "pricePctChange": 2.8,
     "urgency": 0,
     "status": "OK",
     "badge": "ok"
   },
-  "last_price_update": "2026-04-01T05:35:48.923Z",
-  "last_research_update": "2026-04-01T21:32:35.600Z",
+  "last_price_update": "2026-04-01T23:55:29.209Z",
+  "last_research_update": "2026-04-01T23:55:29.363Z",
   "technicalAnalysis": {
-    "date": "17 March 2026",
+    "date": "01 April 2026",
     "period": "1 Year",
     "source": "Continuum Technical Intelligence",
     "regime": "Downtrend",
     "clarity": "Clear",
     "price": {
-      "current": 22.1,
+      "current": 22.71,
       "currency": "A$"
     },
     "movingAverages": {
       "ma50": {
-        "value": 27.3,
-        "date": "17 Mar 2026"
+        "value": 25.7,
+        "date": "01 Apr 2026"
       },
       "ma200": {
-        "value": 22.5,
-        "date": "17 Mar 2026"
+        "value": 22.6,
+        "date": "01 Apr 2026"
       },
       "crossover": {
         "type": "Golden Cross",
-        "date": "March 2026",
+        "date": "April 2026",
         "description": "50-day MA crossed above 200-day MA (golden cross)"
       },
-      "priceVsMa50": -24.4,
-      "priceVsMa200": -8.4
+      "priceVsMa50": -14.1,
+      "priceVsMa200": -2
     },
     "trend": {
       "direction": "Down",
@@ -361,15 +371,15 @@
         "price": 15.3,
         "date": "Recent"
       },
-      "drawdown": -34.9
+      "drawdown": -30.3
     },
     "keyLevels": {
       "support": {
-        "price": 20.58,
+        "price": 17.21,
         "method": "Recent low / swing support"
       },
       "resistance": {
-        "price": 31.73,
+        "price": 26.98,
         "method": "Recent high / swing resistance"
       },
       "fiftyTwoWeekHigh": {
@@ -383,23 +393,23 @@
     },
     "volume": {
       "latestVs20DayAvg": 1,
-      "latestDate": "17 March 2026",
+      "latestDate": "01 April 2026",
       "priorSpikes": []
     },
     "volatility": {
       "latestDailyRange": {
-        "high": 20.66,
-        "low": 20.66,
-        "date": "17 March 2026"
+        "high": 22.1,
+        "low": 20.36,
+        "date": "01 April 2026"
       },
-      "latestRangePercent": 3,
-      "avgDailyRangePercent30": 3,
-      "avgDailyRangePercent90": 3
+      "latestRangePercent": 3.9,
+      "avgDailyRangePercent30": 3.9,
+      "avgDailyRangePercent90": 3.9
     },
     "meanReversion": {
-      "vsMa50": -24.4,
-      "vsMa200": -8.4,
-      "rangePosition": 32,
+      "vsMa50": -14.1,
+      "vsMa200": -2,
+      "rangePosition": 41,
       "rangeHigh": 31.73,
       "rangeLow": 15.3
     },
@@ -408,15 +418,15 @@
       "vsIndex": {
         "name": "S&P/ASX 200",
         "period": "12 months",
-        "stockReturn": 15,
+        "stockReturn": 17.2,
         "indexReturn": 6.5,
-        "relativeReturn": 8.5
+        "relativeReturn": 10.7
       }
     }
   },
   "price_evidence": {
-    "last_run": "2026-04-01T21:32:35.600Z",
-    "classification": "SIGNIFICANT"
+    "last_run": "2026-04-01T23:55:29.363Z",
+    "classification": "MATERIAL"
   },
   "_overcorrection": {
     "active": true,

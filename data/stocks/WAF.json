@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result, operational update, and macro developments.",
       "upside": "Material re-rating if scenario plays out.",
       "risk_plain": "Monitor for change in probability weight.",
-      "survival_score": 0.44,
+      "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-04-01T21:32:35.600Z"
+      "last_updated": "2026-04-01T23:55:29.363Z"
     },
     "N2": {
       "label": "Base Case",
@@ -23,10 +23,10 @@
       "what_to_watch": "Next earnings result, operational update, and macro developments.",
       "upside": null,
       "risk_plain": "Monitor for change in probability weight.",
-      "survival_score": 0.46,
+      "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-04-01T21:32:35.600Z"
+      "last_updated": "2026-04-01T23:55:29.363Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -53,19 +53,19 @@
       "last_updated": "2026-04-01T07:56:47.828Z"
     }
   },
-  "dominant": "N2",
+  "dominant": "N1",
   "confidence": "LOW",
   "alert_state": "OVERCORRECTION",
-  "current_price": 3.4,
+  "current_price": 3.43,
   "big_picture": "At A$3.01, WAF is priced as a high-risk, single-jurisdiction gold producer with a meaningful probability of operational disruption -- a characterisation that appears increasingly difficult to reconcile with a A$567M NPAT delivered in FY2025 and gold trading at US$5,024/oz. The market is applying a s",
   "last_flip": {
     "date": "2026-04-01",
-    "from": "N1",
-    "to": "N2",
-    "trigger": "Automated: survival score shift (Growth/Recovery → Base Case)",
-    "price_at_flip": 3.4,
-    "from_survival": 0.44,
-    "to_survival": 0.46
+    "from": "N2",
+    "to": "N1",
+    "trigger": "Automated: survival score shift (Base Case → Growth/Recovery)",
+    "price_at_flip": 3.43,
+    "from_survival": 0.45,
+    "to_survival": 0.45
   },
   "narrative_history": [
     {
@@ -103,6 +103,15 @@
       "price_at_flip": 3.4,
       "from_survival": 0.45,
       "to_survival": 0.45
+    },
+    {
+      "date": "2026-04-01",
+      "from": "N1",
+      "to": "N2",
+      "trigger": "Automated: survival score shift (Growth/Recovery → Base Case)",
+      "price_at_flip": 3.4,
+      "from_survival": 0.44,
+      "to_survival": 0.46
     }
   ],
   "evidence_items": [
@@ -301,47 +310,48 @@
     3.2,
     3.36,
     3.41,
-    3.4
+    3.4,
+    3.43
   ],
   "freshness": {
-    "pricePctChange": -0.3,
+    "pricePctChange": 0.9,
     "urgency": 0,
     "status": "OK",
     "badge": "ok"
   },
-  "last_price_update": "2026-04-01T05:35:48.943Z",
-  "last_research_update": "2026-04-01T21:32:35.600Z",
+  "last_price_update": "2026-04-01T23:55:29.239Z",
+  "last_research_update": "2026-04-01T23:55:29.363Z",
   "technicalAnalysis": {
-    "date": "17 March 2026",
+    "date": "01 April 2026",
     "period": "1 Year",
     "source": "Continuum Technical Intelligence",
-    "regime": "Downtrend",
-    "clarity": "Clear",
+    "regime": "Uptrend",
+    "clarity": "Mixed",
     "price": {
-      "current": 3.4,
+      "current": 3.43,
       "currency": "A$"
     },
     "movingAverages": {
       "ma50": {
-        "value": 3.4,
-        "date": "17 Mar 2026"
+        "value": 3.3,
+        "date": "01 Apr 2026"
       },
       "ma200": {
-        "value": 2.8,
-        "date": "17 Mar 2026"
+        "value": 2.9,
+        "date": "01 Apr 2026"
       },
       "crossover": {
         "type": "Golden Cross",
-        "date": "March 2026",
+        "date": "April 2026",
         "description": "50-day MA crossed above 200-day MA (golden cross)"
       },
-      "priceVsMa50": -14,
-      "priceVsMa200": 4.1
+      "priceVsMa50": 2.1,
+      "priceVsMa200": 19
     },
     "trend": {
-      "direction": "Down",
+      "direction": "Up",
       "duration": "12 months",
-      "structure": "Price in downtrend relative to 50-day and 200-day moving averages.",
+      "structure": "Price in uptrend relative to 50-day and 200-day moving averages.",
       "peak": {
         "price": 3.91,
         "date": "Recent"
@@ -350,15 +360,15 @@
         "price": 2.08,
         "date": "Recent"
       },
-      "drawdown": -24.8
+      "drawdown": -13
     },
     "keyLevels": {
       "support": {
-        "price": 2.78,
+        "price": 2.76,
         "method": "Recent low / swing support"
       },
       "resistance": {
-        "price": 3.63,
+        "price": 3.4,
         "method": "Recent high / swing resistance"
       },
       "fiftyTwoWeekHigh": {
@@ -372,23 +382,23 @@
     },
     "volume": {
       "latestVs20DayAvg": 1,
-      "latestDate": "17 March 2026",
+      "latestDate": "01 April 2026",
       "priorSpikes": []
     },
     "volatility": {
       "latestDailyRange": {
-        "high": 2.94,
-        "low": 2.78,
-        "date": "17 March 2026"
+        "high": 3.4,
+        "low": 3.2,
+        "date": "01 April 2026"
       },
-      "latestRangePercent": 2.7,
-      "avgDailyRangePercent30": 2.7,
-      "avgDailyRangePercent90": 2.7
+      "latestRangePercent": 3.1,
+      "avgDailyRangePercent30": 3.1,
+      "avgDailyRangePercent90": 3.1
     },
     "meanReversion": {
-      "vsMa50": -14,
-      "vsMa200": 4.1,
-      "rangePosition": 46,
+      "vsMa50": 2.1,
+      "vsMa200": 19,
+      "rangePosition": 72,
       "rangeHigh": 3.91,
       "rangeLow": 2.08
     },
@@ -397,14 +407,14 @@
       "vsIndex": {
         "name": "S&P/ASX 200",
         "period": "12 months",
-        "stockReturn": 27.8,
+        "stockReturn": 50.4,
         "indexReturn": 6.5,
-        "relativeReturn": 21.3
+        "relativeReturn": 43.9
       }
     }
   },
   "price_evidence": {
-    "last_run": "2026-04-01T21:32:35.600Z",
+    "last_run": "2026-04-01T23:55:29.363Z",
     "classification": "SIGNIFICANT"
   },
   "_overcorrection": {
