@@ -714,4 +714,3 @@ def select_dimensions(question: str) -> list[str]:
 
     # No match: return all 12 deep extraction dimensions
     return [dim for dim, _ in DEEP_EXTRACTION_QUERIES]
-       
