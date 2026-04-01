@@ -81,6 +81,16 @@ def _build_research_summary(data: dict) -> str:
         if clean:
             lines.append(f"Narrative stability: {clean[:200]}")
 
+    # Inject forensic corpus dimensions most relevant for confirm/contradict classification
+    corpus = data.get("notebookCorpus", {})
+    if corpus and corpus.get("_extractedAt"):
+        _INSIGHT_DIMS = ("key_assumptions", "variant_perception", "catalyst_timeline", "earnings_quality")
+        for dim in _INSIGHT_DIMS:
+            text = corpus.get(dim)
+            if text:
+                label = dim.replace("_", " ").title()
+                lines.append(f"{label}: {text[:500]}")
+
     return "\n".join(lines) if lines else "No research summary available."
 
 
