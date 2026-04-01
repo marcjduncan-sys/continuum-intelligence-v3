@@ -653,6 +653,145 @@ def build_corpus_section(ticker: str, corpus: dict[str, str | None], max_chars: 
     return result
 
 
+async def ensure_all_notebooks() -> dict[str, str]:
+    """Provision notebooks for all tickers that have research but no notebook.
+
+    Cross-references research files in data/research/ against the notebook
+    registry (DB + JSON fallback). Any ticker without an active or manual
+    notebook gets provisioned sequentially to respect NotebookLM rate limits.
+
+    Returns a dict of {ticker: notebook_id} for newly provisioned notebooks.
+    Never raises -- all errors are caught and logged.
+    """
+    from pathlib import Path
+
+    if not _HAS_NOTEBOOKLM:
+        logger.info("ensure_all_notebooks: notebooklm-py not installed, skipping")
+        return {}
+
+    if not _nlm_auth_ok:
+        logger.warning("ensure_all_notebooks: auth expired, skipping")
+        return {}
+
+    if not config.NOTEBOOKLM_AUTH_JSON:
+        logger.warning("ensure_all_notebooks: NOTEBOOKLM_AUTH_JSON not set, skipping")
+        return {}
+
+    data_dir = Path(config.PROJECT_ROOT) / "data" / "research"
+    if not data_dir.exists():
+        logger.info("ensure_all_notebooks: no data/research directory, skipping")
+        return {}
+
+    # Collect all tickers with research files
+    all_tickers = []
+    ticker_companies: dict[str, str] = {}
+    for f in sorted(data_dir.glob("*.json")):
+        if f.name.startswith("_"):
+            continue
+        ticker = f.stem.upper()
+        try:
+            import json as _json
+            with open(f) as fh:
+                research = _json.load(fh)
+            ticker_companies[ticker] = research.get("company", ticker)
+            all_tickers.append(ticker)
+        except Exception:
+            continue
+
+    if not all_tickers:
+        logger.info("ensure_all_notebooks: no research files found")
+        return {}
+
+    # Load current registry from DB
+    db_registry = await _load_registry_from_db()
+
+    # Also check JSON fallback for manual entries
+    json_registry = config.NOTEBOOKLM_TICKER_NOTEBOOKS or {}
+
+    # Identify tickers without active notebooks
+    missing = []
+    for ticker in all_tickers:
+        if ticker in db_registry:
+            continue
+        if json_registry.get(ticker, ""):
+            continue
+        missing.append(ticker)
+
+    if not missing:
+        logger.info(
+            "ensure_all_notebooks: all %d tickers have notebooks", len(all_tickers)
+        )
+        return {}
+
+    logger.info(
+        "ensure_all_notebooks: %d of %d tickers missing notebooks: %s",
+        len(missing), len(all_tickers), missing,
+    )
+
+    # Also find tickers with failed/timed-out status that should be retried
+    try:
+        import db
+        pool = await db.get_pool()
+        if pool:
+            async with pool.acquire() as conn:
+                failed_rows = await conn.fetch(
+                    "SELECT ticker FROM notebook_registry "
+                    "WHERE status IN ('failed', 'timeout') "
+                    "AND (updated_at IS NULL OR updated_at < NOW() - INTERVAL '1 hour')"
+                )
+                failed_tickers = {row["ticker"] for row in failed_rows}
+                # Add failed tickers that are not already in missing
+                for t in failed_tickers:
+                    if t not in missing and t in ticker_companies:
+                        missing.append(t)
+                if failed_tickers:
+                    logger.info(
+                        "ensure_all_notebooks: %d failed/timed-out tickers eligible for retry: %s",
+                        len(failed_tickers), sorted(failed_tickers),
+                    )
+    except Exception as exc:
+        logger.warning("ensure_all_notebooks: failed to query failed tickers: %s", exc)
+
+    # Provision sequentially (respect NotebookLM rate limits + Fly.io memory)
+    provisioned: dict[str, str] = {}
+    for ticker in missing:
+        if not _nlm_auth_ok:
+            logger.warning(
+                "ensure_all_notebooks: auth expired mid-run after %d provisions, stopping",
+                len(provisioned),
+            )
+            break
+
+        company = ticker_companies.get(ticker, ticker)
+        try:
+            nb_id = await provision_notebook(ticker, company)
+            if nb_id:
+                provisioned[ticker] = nb_id
+                logger.info(
+                    "ensure_all_notebooks: provisioned %s (%s) -> %s",
+                    ticker, company, nb_id,
+                )
+            else:
+                logger.warning(
+                    "ensure_all_notebooks: provisioning returned None for %s", ticker
+                )
+        except Exception as exc:
+            logger.warning(
+                "ensure_all_notebooks: provisioning failed for %s: %s", ticker, exc
+            )
+
+        # Brief pause between provisions to avoid rate limiting
+        await asyncio.sleep(5)
+
+    logger.info(
+        "ensure_all_notebooks: completed. Provisioned %d of %d missing tickers. "
+        "Total coverage: %d/%d",
+        len(provisioned), len(missing),
+        len(all_tickers) - len(missing) + len(provisioned), len(all_tickers),
+    )
+    return provisioned
+
+
 def select_dimensions(question: str) -> list[str]:
     """Select relevant dimensions for a Strategist Chat question.
 

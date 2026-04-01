@@ -238,6 +238,43 @@ async def lifespan(app: FastAPI):
 
     monitored_task(_retry_incomplete_coverage(), name="retry_incomplete_coverage")
 
+    # Auto-provision NotebookLM notebooks for all tickers missing them.
+    # Runs once on startup (after scaffolds settle) and then every 6 hours
+    # to catch tickers added during auth-expired windows or transient failures.
+    async def _ensure_notebooks_startup():
+        await asyncio.sleep(120)  # Let scaffold retry + embedding finish
+        try:
+            provisioned = await notebook_context.ensure_all_notebooks()
+            if provisioned:
+                logger.info(
+                    "[NotebookSync] Startup provisioned %d notebooks: %s",
+                    len(provisioned), list(provisioned.keys()),
+                )
+            else:
+                logger.info("[NotebookSync] Startup: all tickers have notebooks")
+        except Exception as exc:
+            logger.warning("[NotebookSync] Startup provisioning failed (non-fatal): %s", exc)
+
+    monitored_task(_ensure_notebooks_startup(), name="ensure_notebooks_startup")
+
+    # Periodic notebook provisioning retry (every 6 hours)
+    async def _notebook_provision_loop():
+        while True:
+            await asyncio.sleep(6 * 3600)  # 6 hours
+            try:
+                provisioned = await notebook_context.ensure_all_notebooks()
+                if provisioned:
+                    logger.info(
+                        "[NotebookSync] Periodic: provisioned %d notebooks: %s",
+                        len(provisioned), list(provisioned.keys()),
+                    )
+                else:
+                    logger.info("[NotebookSync] Periodic: all tickers have notebooks")
+            except Exception as exc:
+                logger.warning("[NotebookSync] Periodic provisioning failed (non-fatal): %s", exc)
+
+    monitored_task(_notebook_provision_loop(), name="notebook_provision_loop")
+
     # Periodic database pool health check (every 60s)
     async def _db_health_loop():
         while True:
@@ -861,6 +898,63 @@ async def notebooks_status():
             return {"registry": [dict(r) for r in rows]}
     except Exception as exc:
         return {"error": str(exc), "registry": []}
+
+
+@app.post("/api/notebooks/sync-registry", dependencies=[Depends(verify_api_key)])
+async def notebooks_sync_registry():
+    """Sync DB notebook registry to the JSON fallback file.
+
+    Reads all active/manual entries from the database and writes them to
+    data/config/notebooklm-notebooks.json. This keeps the JSON fallback
+    current so it can serve as a safety net when the DB is unavailable.
+    """
+    pool = await db.get_pool()
+    if pool is None:
+        return {"error": "database not available", "synced": 0}
+    try:
+        async with pool.acquire() as conn:
+            rows = await conn.fetch(
+                "SELECT ticker, notebook_id FROM notebook_registry "
+                "WHERE notebook_id IS NOT NULL AND status IN ('active', 'manual') "
+                "ORDER BY ticker"
+            )
+        db_map = {row["ticker"]: row["notebook_id"] for row in rows}
+        if not db_map:
+            return {"error": "no active notebooks in DB", "synced": 0}
+
+        json_path = Path(config.PROJECT_ROOT) / "data" / "config" / "notebooklm-notebooks.json"
+        output = {
+            "_comment": "Per-ticker NotebookLM notebook IDs. Add a new entry here when you create a notebook for a ticker. No Fly.io env var change needed.",
+            "_format": '{ "TICKER": "notebook-id-uuid" }',
+            **db_map,
+        }
+        with open(json_path, "w") as f:
+            json.dump(output, f, indent=2)
+            f.write("\n")
+
+        logger.info("[NotebookSync] Synced %d notebook entries to JSON fallback", len(db_map))
+        return {"synced": len(db_map), "tickers": sorted(db_map.keys())}
+    except Exception as exc:
+        logger.error("[NotebookSync] Registry sync failed: %s", exc)
+        return {"error": str(exc), "synced": 0}
+
+
+@app.post("/api/notebooks/ensure-all", dependencies=[Depends(verify_api_key)])
+async def notebooks_ensure_all():
+    """Trigger immediate provisioning of all tickers missing notebooks.
+
+    Useful after an auth reset to backfill all missing notebooks without
+    waiting for the next scheduled run.
+    """
+    try:
+        provisioned = await notebook_context.ensure_all_notebooks()
+        return {
+            "provisioned": len(provisioned),
+            "tickers": provisioned,
+        }
+    except Exception as exc:
+        logger.error("[NotebookSync] ensure-all failed: %s", exc)
+        return {"error": str(exc), "provisioned": 0}
 
 
 @app.get("/api/macro/state")
