@@ -430,7 +430,12 @@ def _build_context(passages: list[dict], ticker: str) -> str:
 
     lines = [f"## Research Context for {ticker}\n"]
     for i, p in enumerate(passages, 1):
-        lines.append(f"### Passage {i} [{p['section']}/{p['subsection']}]")
+        origin = p.get("source_origin", "platform")
+        if origin.startswith("user:"):
+            source_label = f" [EXTERNAL: {origin.replace('user:', '')}]"
+        else:
+            source_label = ""
+        lines.append(f"### Passage {i} [{p['section']}/{p['subsection']}]{source_label}")
         lines.append(p["content"])
         lines.append("")
     return "\n".join(lines)
