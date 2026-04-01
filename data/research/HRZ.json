@@ -5,12 +5,11 @@
   "company": "Horizon Minerals Limited",
   "sector": "Materials",
   "sectorSub": "Gold Mining",
-  "price": 0.89,
+  "price": 0.94,
   "currency": "A$",
   "date": "1 April 2026",
   "reportId": "HRZ-2026-001",
   "priceHistory": [
-    0.85,
     0.84,
     0.78,
     0.82,
@@ -261,7 +260,8 @@
     0.9,
     0.92,
     0.87,
-    0.89
+    0.89,
+    0.94
   ],
   "heroDescription": "Boorara Gold Project &bull; Hub-and-Spoke Model &bull; Kalgoorlie Goldfields",
   "heroCompanyDescription": "Horizon Minerals Limited (ASX: HRZ) is a Western Australian gold developer transitioning toward production in the Eastern Goldfields around Kalgoorlie-Boulder, one of the world's premier gold mining districts. The flagship Boorara project has advanced from development planning to active ore logistics, with the company announcing in March 2026 that Boorara mined ore stockpiles will support the ramp-up of Black Swan processing – confirming the capital-light toll treatment strategy.",
@@ -931,7 +931,7 @@
     "regime": "Downtrend",
     "clarity": "Clear",
     "price": {
-      "current": 0.89,
+      "current": 0.94,
       "currency": "A$"
     },
     "movingAverages": {
@@ -1017,16 +1017,21 @@
     }
   },
   "_overcorrection": {
-    "active": true,
+    "active": false,
     "triggerType": "SINGLE_DAY",
     "triggerDate": "2026-03-25",
     "triggerPrice": 0.93,
     "direction": "up",
     "movePct": 14.81,
     "reviewDate": "2026-04-01",
-    "message": "Single-day move of +14.8% exceeds 10% threshold – possible overcorrection"
+    "message": "Single-day move of +14.8% exceeds 10% threshold – possible overcorrection",
+    "reviewResult": {
+      "reversal_pct": -7.3,
+      "confirmed": false,
+      "message": "Overcorrection NOT confirmed – price held"
+    }
   },
-  "_alertState": "OVERCORRECTION",
+  "_alertState": "NORMAL",
   "hero": {
     "embedded_thesis": "At A$0.89, the market is pricing HRZ at a meaningful discount to its 52-week high of A$1.51, despite gold trading at an extraordinary US$5,027/oz and the company having taken concrete steps toward production at Black Swan. The current price embeds a credible but not fully de-risked production transition via toll treatment, with the recently completed SPP providing near-term cash runway. The valuation implies the market is applying a discount for execution risk on the Boorara-to-Black Swan processing ramp, residual funding uncertainty, and the predominantly retail register's tendency toward volatility. At this level, the stock appears to underweight the gold price tailwind relative to the production risk premium being applied.",
     "skew": "UPSIDE",

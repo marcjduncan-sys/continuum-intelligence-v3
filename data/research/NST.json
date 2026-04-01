@@ -5,12 +5,11 @@
   "company": "Northern Star Resources Limited",
   "sector": "Basic Materials",
   "sectorSub": "Gold",
-  "price": 20.36,
+  "price": 22.1,
   "currency": "A$",
   "date": "1 April 2026",
   "reportId": "NST-2026-001",
   "priceHistory": [
-    18.45,
     18.85,
     18.6,
     19.52,
@@ -261,7 +260,8 @@
     18.76,
     18.55,
     19.51,
-    20.36
+    20.36,
+    22.1
   ],
   "heroDescription": "Gold &bull; ASX-Listed",
   "heroCompanyDescription": "Northern Star Resources Limited (ASX: NST) is one of Australia's largest gold producers, operating a portfolio of world-class assets primarily in Western Australia and Alaska. The company's flagship operations include the KCGM (Kalgoorlie Consolidated Gold Mines) super-pit in Kalgoorlie – one of the world's largest open-pit gold mines – and the Pogo mine in Alaska, providing multi-jurisdictional diversification and significant production scale.",
@@ -864,7 +864,7 @@
     "regime": "Downtrend",
     "clarity": "Clear",
     "price": {
-      "current": 20.36,
+      "current": 22.1,
       "currency": "A$"
     },
     "movingAverages": {
@@ -1780,6 +1780,15 @@
     },
     "monitoring_trigger": "Confirmation of sustained KCGM mill throughput at or above 20 Mtpa annualised rate in a quarterly production report, accompanied by no further FY26 or FY27 production guidance downgrade"
   },
-  "_overcorrection": null,
-  "_alertState": "NORMAL"
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-04-01",
+    "triggerPrice": 22.1,
+    "direction": "up",
+    "movePct": 13.28,
+    "reviewDate": "2026-04-08",
+    "message": "Single-day move of +13.3% exceeds 10% threshold – possible overcorrection"
+  },
+  "_alertState": "OVERCORRECTION"
 }

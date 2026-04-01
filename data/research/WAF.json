@@ -5,12 +5,11 @@
   "company": "West African Resources Limited",
   "sector": "Basic Materials",
   "sectorSub": "Gold",
-  "price": 3.2,
+  "price": 3.4,
   "currency": "A$",
   "date": "1 April 2026",
   "reportId": "WAF-2026-001",
   "priceHistory": [
-    2.34,
     2.26,
     2.08,
     2.2,
@@ -261,7 +260,8 @@
     3.03,
     3.01,
     3.05,
-    3.2
+    3.2,
+    3.4
   ],
   "heroDescription": "Gold &bull; ASX-Listed",
   "heroCompanyDescription": "West African Resources Limited (ASX: WAF) is an ASX-listed gold producer with its primary operating asset, the Sanbrado Gold Mine, located in Burkina Faso, West Africa. The company poured first gold at Sanbrado in 2020 and has rapidly grown into a significant mid-tier producer, reporting a Net Profit After Tax of A$567 million for the 2025 financial year -- a result that underscores the mine's exceptional cash generation capacity at elevated gold prices.",
@@ -892,7 +892,7 @@
     "regime": "Downtrend",
     "clarity": "Clear",
     "price": {
-      "current": 3.2,
+      "current": 3.4,
       "currency": "A$"
     },
     "movingAverages": {
@@ -1918,6 +1918,15 @@
     },
     "monitoring_trigger": "Any formal resolution or escalation of the Burkina Faso government's demand for an additional 35% of Kiaka SA, including binding arbitration, negotiated agreement, or government decree; and release of Q1 2026 production/cost guidance confirming Kiaka ramp-up trajectory."
   },
-  "_overcorrection": null,
-  "_alertState": "NORMAL"
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-04-01",
+    "triggerPrice": 3.4,
+    "direction": "up",
+    "movePct": 12.96,
+    "reviewDate": "2026-04-08",
+    "message": "Single-day move of +13.0% exceeds 10% threshold – possible overcorrection"
+  },
+  "_alertState": "OVERCORRECTION"
 }

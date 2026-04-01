@@ -5,7 +5,7 @@
   "company": "Ora Banda Mining Limited",
   "sector": "Basic Materials",
   "sectorSub": "Gold",
-  "price": 1.16,
+  "price": 1.25,
   "currency": "A$",
   "date": "1 April 2026",
   "reportId": "OBM-2026-001",
@@ -259,7 +259,8 @@
     1.13,
     1.12,
     1.11,
-    1.16
+    1.16,
+    1.25
   ],
   "heroDescription": "Gold &bull; ASX-Listed",
   "heroCompanyDescription": "Ora Banda Mining Limited (ASX: OBM) is an Australian gold producer and developer focused on its Davyhurst project in the Ora Banda district of Western Australia, a historically productive region within the Eastern Goldfields. The company has undergone a significant operational and resource transformation, reporting record half-year gold production of 62,631 ounces for the six months to 31 December 2025, with first-half revenue surging 80% to A$336.3 million alongside higher net income.",
@@ -881,7 +882,7 @@
     "regime": "Downtrend",
     "clarity": "Clear",
     "price": {
-      "current": 1.16,
+      "current": 1.25,
       "currency": "A$"
     },
     "movingAverages": {
@@ -1630,6 +1631,15 @@
       }
     }
   },
-  "_overcorrection": null,
-  "_alertState": "NORMAL"
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-04-01",
+    "triggerPrice": 1.25,
+    "direction": "up",
+    "movePct": 11.61,
+    "reviewDate": "2026-04-08",
+    "message": "Single-day move of +11.6% exceeds 10% threshold – possible overcorrection"
+  },
+  "_alertState": "OVERCORRECTION"
 }

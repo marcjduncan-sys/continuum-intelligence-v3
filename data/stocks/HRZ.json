@@ -14,7 +14,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-03-30T08:03:58.384Z"
+      "last_updated": "2026-04-01T07:56:47.819Z"
     },
     "N2": {
       "label": "Base Case/Managed",
@@ -26,7 +26,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-03-30T08:03:58.384Z"
+      "last_updated": "2026-04-01T07:56:47.819Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -38,7 +38,7 @@
       "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-03-30T23:57:33.227Z"
+      "last_updated": "2026-04-01T07:56:47.819Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -50,12 +50,12 @@
       "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-03-30T23:57:33.227Z"
+      "last_updated": "2026-04-01T07:56:47.819Z"
     }
   },
   "dominant": "N3",
   "confidence": "LOW",
-  "alert_state": "OVERCORRECTION",
+  "alert_state": "NORMAL",
   "current_price": 0.94,
   "big_picture": "Horizon Minerals Limited (ASX: HRZ) – coverage initiated. Full analysis pending.",
   "last_flip": {
@@ -377,6 +377,13 @@
       "severity": "AMBER",
       "message": "Single-day move of +14.8% exceeds 10% threshold – possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-04-01",
+      "type": "OVERCORRECTION_REVIEW",
+      "severity": "AMBER",
+      "message": "Overcorrection NOT confirmed – price held",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -499,11 +506,20 @@
       "cumulative_20d": -36.96,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-04-01",
+      "classification": "NOTABLE",
+      "daily_change_pct": 4.44,
+      "volume_multiplier": 1,
+      "cumulative_5d": -1.14,
+      "cumulative_20d": -36.96,
+      "results_day": false,
+      "overcorrection_active": false
     }
   ],
   "editorial_override": null,
   "price_history": [
-    1.08,
     1.06,
     1.08,
     1.02,
@@ -562,7 +578,8 @@
     0.85,
     0.93,
     0.9,
-    0.87
+    0.87,
+    0.94
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -759,14 +776,19 @@
     }
   },
   "_overcorrection": {
-    "active": true,
+    "active": false,
     "triggerType": "SINGLE_DAY",
     "triggerDate": "2026-03-25",
     "triggerPrice": 0.93,
     "direction": "up",
     "movePct": 14.81,
     "reviewDate": "2026-04-01",
-    "message": "Single-day move of +14.8% exceeds 10% threshold – possible overcorrection"
+    "message": "Single-day move of +14.8% exceeds 10% threshold – possible overcorrection",
+    "reviewResult": {
+      "reversal_pct": -7.3,
+      "confirmed": false,
+      "message": "Overcorrection NOT confirmed – price held"
+    }
   },
   "price_evidence": {
     "last_run": "2026-04-01T07:18:19.737Z",

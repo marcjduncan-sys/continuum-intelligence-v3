@@ -5,7 +5,7 @@
   "company": "WIA Gold Limited",
   "sector": "Basic Materials",
   "sectorSub": "Gold",
-  "price": 0.41,
+  "price": 0.46,
   "currency": "A$",
   "date": "1 April 2026",
   "reportId": "WIA-2026-001",
@@ -260,7 +260,8 @@
     0.39,
     0.38,
     0.39,
-    0.41
+    0.41,
+    0.46
   ],
   "heroDescription": "Gold &bull; ASX-Listed",
   "heroCompanyDescription": "WIA Gold Limited (ASX: WIA) is an ASX-listed gold exploration and development company focused on its flagship Kokoseb Gold Project in north-west Namibia, which forms part of the larger Damaran Project covering more than 2,700 square kilometres across 12 tenements. The company delivered a Scoping Study for Kokoseb in early March 2026 confirming an 11.3-year life of mine with approximately 146,000 ounces of annual gold production, marking a significant transition from pure exploration to development-stage status.",
@@ -881,7 +882,7 @@
     "regime": "Downtrend",
     "clarity": "Clear",
     "price": {
-      "current": 0.41,
+      "current": 0.46,
       "currency": "A$"
     },
     "movingAverages": {
@@ -1502,6 +1503,15 @@
       }
     }
   },
-  "_overcorrection": null,
-  "_alertState": "NORMAL"
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "SINGLE_DAY",
+    "triggerDate": "2026-04-01",
+    "triggerPrice": 0.46,
+    "direction": "up",
+    "movePct": 17.95,
+    "reviewDate": "2026-04-08",
+    "message": "Single-day move of +17.9% exceeds 10% threshold – possible overcorrection"
+  },
+  "_alertState": "OVERCORRECTION"
 }
