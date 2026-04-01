@@ -132,6 +132,7 @@ These were set during Phase B and must not be changed without explicit instructi
 | Phase 2 (auth + persistence) | COMPLETE | OTP email via Resend API, JWT HS256, conversation DB |
 | Phase 3 (sign-in + summarisation) | COMPLETE | Rolling summarisation, sign-in button |
 | Gold Agent (Phase 4) | LIVE | 7-query NLM runner + Claude synthesis. Auth expires every 1-2 weeks. |
+| NotebookLM Corpus | LIVE | 24 tickers registered. Analyst Chat + Track 6 + coverage initiation. Auto-provisioning confirmed. |
 | Batch Analysis (Phase 8) | LIVE | Cron 02:00 AEDT daily |
 | Proactive Insights (Phase 9) | LIVE | Cron 03:00 AEDT Mon-Fri |
 | PM Chat (Phases A-F) | CANARY | Shell, portfolio DB, analytics, constitution, personalisation, memory, handoff |
@@ -144,14 +145,17 @@ These were set during Phase B and must not be changed without explicit instructi
 
 **NOTEBOOKLM_AUTH_JSON** credentials expire every 1-2 weeks. Run `Get NotebookLM Auth.bat` from Desktop (OneDrive Desktop). It auto-deploys to Fly.io via `flyctl`, resets auth, and retries pending notebooks. The only manual step is the Google sign-in.
 
-**NotebookLM integration -- known issues and history:**
-- `notebooklm-py` `ChatAPI.ask()` uses `question=` not `message=`. Fixed in commit `3d17c92e` (2026-03-31). Prior to this fix, all Analyst Chat and refresh Track 6 corpus queries were silently failing for every ticker. All 22 original notebooks had research generated without corpus context.
-- Auto-provisioning runs inside `_tracked_coverage_initiation()`. The `_retry_incomplete_coverage()` startup path was missing provisioning until commit `5aa61e01`. If a stock is added and the initial coverage is interrupted (Fly.io restart, timeout), the auto-retry will now provision the notebook.
-- Provisioning uses `mode="deep"` (commit `c30cc6f4`). Fast research yields too few documents. Timeout is 300s.
-- After adding source documents to a NotebookLM notebook, trigger a refresh (`POST /api/refresh/TICKER`) to re-synthesise the research report with the new corpus context. Analyst Chat picks up new sources immediately without a refresh.
-- After any change to `notebook_context.py`, verify the fix works end-to-end: check Fly.io logs for `Track 6: NotebookLM corpus retrieved` during a refresh, and test Analyst Chat with a question only answerable from NotebookLM sources.
+**NotebookLM integration -- operational status:**
+- **LIVE** across three pipelines: Analyst Chat (inline corpus query), refresh Track 6 (batch 4-dimension queries), and coverage initiation/hypothesis synthesis (corpus section injection).
+- 24 tickers registered in `data/config/notebooklm-notebooks.json`. New tickers (360, LNW, CNI) auto-provisioned via `_tracked_coverage_initiation()` and confirmed working in production (Fly.io deploys #114-#120, 2026-03-31).
+- Auto-provisioning also covers the `_retry_incomplete_coverage()` startup path (commit `5aa61e01`). Provisioning uses `mode="deep"` with 300s timeout.
+- Query timeout: 60s (commit `93a59ce8`). Context cap: 6,000 chars.
+- After adding source documents to a NotebookLM notebook, trigger a refresh (`POST /api/refresh/TICKER`) to re-synthesise with new corpus context. Analyst Chat picks up new sources immediately without a refresh.
+- After any change to `notebook_context.py`, verify end-to-end: check Fly.io logs for `Track 6: NotebookLM corpus retrieved` during a refresh, and test Analyst Chat with a question only answerable from NotebookLM sources.
 
-**SNX NotebookLM notebook** (`c5470e1a`) currently contains RMS documents. Must be repopulated with SNX-specific source material before re-running the gold agent.
+**NotebookLM integration -- resolved issues (historical):**
+- `ChatAPI.ask()` parameter name: `question=` not `message=`. Fixed commit `3d17c92e` (2026-03-31). All 22 original notebooks had research generated without corpus context prior to this fix.
+- SNX notebook (`c5470e1a`) contained RMS documents. Resolved by removing SNX from the notebook registry (commit `f1b3ebe4`). SNX requires a new dedicated notebook before gold agent can run against it.
 
 **Do not fix without instruction:**
 - `previousSkew` is empty string on first Fly.io refresh after fresh deploy. Expected; momentum arrows suppressed when empty.
@@ -170,7 +174,7 @@ These were set during Phase B and must not be changed without explicit instructi
 - **`npm run build` copies `data/` via a Vite plugin, not `publicDir`.** Verify new data files land in `dist/data/` after build.
 - **SheetJS is lazy-loaded on portfolio upload interaction only** from a CDN URL in a `data-src` attribute.
 - **`marked` and `DOMPurify` are bundled npm dependencies.** `chat.js` imports them as ES modules. CDN script tags and regex fallback parser were removed.
-- **NotebookLM queries fail silently by design.** `notebook_context.py` catches all exceptions and returns `None`. If Track 6 stops producing corpus context, check Fly.io logs for `NotebookLM query failed` warnings. The most common failures are: auth expiry (cookie rotation), wrong API parameter names (library updates), and missing notebook registry entries.
+- **NotebookLM queries fail silently by design.** `notebook_context.py` catches all exceptions and returns `None`. If Track 6 stops producing corpus context, check Fly.io logs for `NotebookLM query failed` warnings. The most common failures are: auth expiry (cookie rotation every 1-2 weeks) and missing notebook registry entries.
 
 ---
 

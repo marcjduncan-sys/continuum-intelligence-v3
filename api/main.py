@@ -493,8 +493,27 @@ async def research_chat(request: Request, body: ResearchChatRequest, background_
         )
         context = _build_context(passages, ticker)
 
-    # Query NotebookLM corpus (supplementary context, silent failure)
-    nlm_context = await notebook_context.query_notebook(ticker, body.question)
+    # Load persisted corpus (fast, reliable) with live query fallback
+    nlm_context = None
+    try:
+        research_path = Path(__file__).parent.parent / "data" / "research" / f"{ticker}.json"
+        if research_path.exists():
+            with open(research_path) as f:
+                research_data = json.load(f)
+            persisted_corpus = research_data.get("notebookCorpus", {})
+            if persisted_corpus and persisted_corpus.get("_extractedAt"):
+                # Select relevant dimensions for the user's question
+                relevant_dims = notebook_context.select_dimensions(body.question)
+                filtered = {k: v for k, v in persisted_corpus.items()
+                            if k in relevant_dims and isinstance(v, str)}
+                if filtered:
+                    nlm_context = notebook_context.build_corpus_section(ticker, filtered)
+    except Exception as exc:
+        logger.debug("Persisted corpus load failed for %s: %s", ticker, exc)
+
+    # Fallback to live NLM query if no persisted corpus
+    if not nlm_context:
+        nlm_context = await notebook_context.query_notebook(ticker, body.question)
 
     # Build messages for Claude
     messages = []
@@ -1650,11 +1669,11 @@ async def add_stock(
 # Refresh endpoints
 # ---------------------------------------------------------------------------
 
-def _run_refresh_background(ticker: str, regime_context: dict | None = None):
+def _run_refresh_background(ticker: str, regime_context: dict | None = None, force_corpus: bool = False):
     """Run refresh in a new event loop (for BackgroundTasks)."""
     loop = asyncio.new_event_loop()
     try:
-        loop.run_until_complete(run_refresh(ticker, regime_context=regime_context))
+        loop.run_until_complete(run_refresh(ticker, regime_context=regime_context, force_corpus=force_corpus))
     finally:
         loop.close()
 
@@ -1665,12 +1684,16 @@ async def trigger_refresh(
     request: Request,
     ticker: str,
     background_tasks: BackgroundTasks,
+    force_corpus: bool = False,
     _=Depends(verify_api_key),
 ):
     """
     Trigger a data refresh for a single stock.
 
     Returns 409 if a refresh is already running for this ticker.
+
+    Query parameters:
+    - force_corpus: If true, bypass freshness skip and force re-extraction of corpus.
     """
     ticker = ticker.upper()
     if not TICKER_PATTERN.match(ticker):
@@ -1690,7 +1713,7 @@ async def trigger_refresh(
         raise api_error(409, ErrorCode.CONFLICT, f"Refresh already in progress for {ticker}")
 
     # Create job and launch in background
-    background_tasks.add_task(_run_refresh_background, ticker)
+    background_tasks.add_task(_run_refresh_background, ticker, force_corpus=force_corpus)
 
     # Pre-create the job entry so status polling works immediately
     if not get_job(ticker) or get_job(ticker).status in ("completed", "failed"):

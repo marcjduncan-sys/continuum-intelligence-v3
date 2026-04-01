@@ -474,12 +474,30 @@ async def _run_single_in_batch(
                 return None
 
         async def _batch_notebook_corpus():
-            """Track 6: NotebookLM corpus context (parallel)."""
+            """Track 6: NotebookLM corpus context with freshness skip (parallel)."""
             try:
-                corpus = await notebook_context.query_notebook_batch(ticker)
-                if corpus:
+                # Check for existing corpus and its age
+                existing_corpus = research.get("notebookCorpus", {})
+                extracted_at_str = existing_corpus.get("_extractedAt")
+                force_corpus = gathered.get("force_corpus", False)
+
+                if extracted_at_str and not force_corpus:
+                    try:
+                        extracted_at = datetime.fromisoformat(extracted_at_str)
+                        age_hours = (datetime.now(timezone.utc) - extracted_at).total_seconds() / 3600
+                        if age_hours < 24:
+                            gathered["notebook_corpus"] = existing_corpus
+                            logger.info(f"[BATCH][{ticker}] Track 6: Using cached corpus (age {age_hours:.1f}h)")
+                            return
+                    except (ValueError, TypeError):
+                        pass
+
+                # Fetch fresh corpus via deep extraction
+                corpus = await notebook_context.run_deep_extraction(ticker)
+                if corpus and isinstance(corpus, dict) and corpus.get("_extractedAt"):
                     gathered["notebook_corpus"] = corpus
-                    logger.info(f"[BATCH][{ticker}] Track 6: NotebookLM corpus retrieved ({len([v for v in corpus.values() if v])} dimensions)")
+                    dims_populated = corpus.get("_dimensionsPopulated", 0)
+                    logger.info(f"[BATCH][{ticker}] Track 6: Deep extraction completed ({dims_populated} dimensions)")
             except Exception as e:
                 logger.warning(f"[BATCH][{ticker}] Track 6 notebook corpus failed (non-fatal): {e}")
 
@@ -1193,7 +1211,7 @@ say "Event occurred [date]; outcome details pending data update."
 # Main refresh pipeline
 # ---------------------------------------------------------------------------
 
-async def run_refresh(ticker: str, regime_context: dict | None = None) -> dict:
+async def run_refresh(ticker: str, regime_context: dict | None = None, force_corpus: bool = False) -> dict:
     """
     Execute the full 4-stage refresh pipeline for a single stock.
 
@@ -1208,6 +1226,8 @@ async def run_refresh(ticker: str, regime_context: dict | None = None) -> dict:
     regime_context : dict, optional
         If provided (from regime refresh endpoint), injected into gathered data
         so LLM prompts address the macro regime shift explicitly.
+    force_corpus : bool, optional
+        If True, bypass the 24h freshness skip and force re-extraction of corpus.
 
     Returns
     -------
@@ -1242,6 +1262,10 @@ async def run_refresh(ticker: str, regime_context: dict | None = None) -> dict:
         # Inject regime context if this refresh was triggered by a regime break
         if regime_context:
             gathered["regime_context"] = regime_context
+
+        # Inject force_corpus flag for Track 6
+        if force_corpus:
+            gathered["force_corpus"] = True
 
         # ---- Track 2: Evidence + Synthesis (sequential within track) ----
         async def _track_evidence_and_synthesis():
@@ -1322,14 +1346,32 @@ async def run_refresh(ticker: str, regime_context: dict | None = None) -> dict:
                     job.stage_errors.append(f"Track 5 (gold): {e}")
                 return None
 
-        # ---- Track 6: NotebookLM corpus context (parallel) ----
+        # ---- Track 6: NotebookLM corpus context with freshness skip (parallel) ----
         async def _track_notebook_corpus():
-            """Track 6: query NotebookLM for corpus context to enrich generation."""
+            """Track 6: deep extraction with 24h freshness skip."""
             try:
-                corpus = await notebook_context.query_notebook_batch(ticker)
-                if corpus:
+                # Check for existing corpus and its age
+                existing_corpus = research.get("notebookCorpus", {})
+                extracted_at_str = existing_corpus.get("_extractedAt")
+                force_corpus = gathered.get("force_corpus", False)
+
+                if extracted_at_str and not force_corpus:
+                    try:
+                        extracted_at = datetime.fromisoformat(extracted_at_str)
+                        age_hours = (datetime.now(timezone.utc) - extracted_at).total_seconds() / 3600
+                        if age_hours < 24:
+                            gathered["notebook_corpus"] = existing_corpus
+                            logger.info(f"[{ticker}] Track 6: Using cached corpus (age {age_hours:.1f}h)")
+                            return
+                    except (ValueError, TypeError):
+                        pass
+
+                # Fetch fresh corpus via deep extraction
+                corpus = await notebook_context.run_deep_extraction(ticker)
+                if corpus and isinstance(corpus, dict) and corpus.get("_extractedAt"):
                     gathered["notebook_corpus"] = corpus
-                    logger.info(f"[{ticker}] Track 6: NotebookLM corpus retrieved ({len([v for v in corpus.values() if v])} dimensions)")
+                    dims_populated = corpus.get("_dimensionsPopulated", 0)
+                    logger.info(f"[{ticker}] Track 6: Deep extraction completed ({dims_populated} dimensions)")
             except Exception as e:
                 logger.warning(f"[{ticker}] Track 6 notebook corpus failed (non-fatal): {e}")
 
@@ -2566,6 +2608,11 @@ def _merge_updates(
     if gold_result and isinstance(gold_result, dict):
         updated["goldAnalysis"] = gold_result
 
+    # -- NotebookLM corpus persistence --
+    corpus = gathered.get("notebook_corpus")
+    if corpus and isinstance(corpus, dict) and corpus.get("_extractedAt"):
+        updated["notebookCorpus"] = corpus
+
     # -- Timestamp --
     updated["date"] = now
     updated["_lastRefreshed"] = datetime.now(timezone.utc).isoformat()
@@ -2998,6 +3045,11 @@ def _merge_initiation(
                 updated["identity"] = {}
             updated["identity"]["rows"] = new_rows
             logger.info(f"[{ticker}] Rebuilt identity table ({existing_na} N/As replaced)")
+
+    # -- NotebookLM corpus persistence --
+    corpus = gathered.get("notebook_corpus")
+    if corpus and isinstance(corpus, dict) and corpus.get("_extractedAt"):
+        updated["notebookCorpus"] = corpus
 
     # -- Timestamp --
     updated["date"] = now

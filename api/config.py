@@ -153,6 +153,9 @@ NOTEBOOKLM_TICKER_NOTEBOOKS: dict = {**_nlm_file_map, **_nlm_env_map}
 NOTEBOOKLM_CONTEXT_MAX_CHARS = int(os.getenv("NOTEBOOKLM_CONTEXT_MAX_CHARS", "6000"))
 NOTEBOOKLM_QUERY_TIMEOUT_SECONDS = int(os.getenv("NOTEBOOKLM_QUERY_TIMEOUT_SECONDS", "60"))
 
+# [O] Max chars for full corpus section in generation prompts (default 48000, ~12k tokens)
+NOTEBOOKLM_CORPUS_MAX_CHARS_TOTAL = int(os.getenv("NOTEBOOKLM_CORPUS_MAX_CHARS_TOTAL", "48000"))
+
 # ---------------------------------------------------------------------------
 # Auth
 # ---------------------------------------------------------------------------

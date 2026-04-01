@@ -19,6 +19,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
+from datetime import datetime, timezone
 from typing import Any, Optional
 
 import config
@@ -29,6 +30,7 @@ try:
     from notebooklm import NotebookLMClient
     _HAS_NOTEBOOKLM = True
 except ImportError:
+    NotebookLMClient = None  # allow patch() in tests
     _HAS_NOTEBOOKLM = False
 
 # ---------------------------------------------------------------------------
@@ -344,6 +346,133 @@ GENERATION_QUERIES: list[tuple[str, str]] = [
     ("catalysts", "What are the upcoming catalysts, strategic initiatives, expansion plans, or corporate actions?"),
 ]
 
+# ---------------------------------------------------------------------------
+# Deep extraction pipeline: forensic 12-dimension extraction
+# ---------------------------------------------------------------------------
+
+NO_DATA_SENTINEL = "NO_DATA_AVAILABLE"
+
+_ANTI_HALLUCINATION_SUFFIX = (
+    " If the uploaded documents do not contain specific data to answer this, "
+    "output the exact phrase 'NO_DATA_AVAILABLE'. Do not infer or guess."
+)
+
+DEEP_EXTRACTION_QUERIES: list[tuple[str, str]] = [
+    ("earnings_quality", "What specific accounting policies, revenue recognition methods, and non-recurring items appear in the financial statements? Identify any changes in accounting treatment between periods." + _ANTI_HALLUCINATION_SUFFIX),
+    ("earnings_composition", "Break down revenue and earnings by segment, geography, and customer concentration. What percentage of revenue comes from the top 3 customers or contracts?" + _ANTI_HALLUCINATION_SUFFIX),
+    ("cash_flow_reconciliation", "Quantify the exact variance between statutory/GAAP net income, management's 'underlying/adjusted' income, and free cash flow. Identify specific add-backs, working capital anomalies, and capitalised vs expensed costs." + _ANTI_HALLUCINATION_SUFFIX),
+    ("structural_growth", "What are the specific organic growth drivers vs acquisition-driven growth? Quantify the capex, R&D, and reinvestment rates relative to depreciation." + _ANTI_HALLUCINATION_SUFFIX),
+    ("competitive_position", "What are the specific barriers to entry, switching costs, or network effects? How has market share moved over the last 3 years?" + _ANTI_HALLUCINATION_SUFFIX),
+    ("margin_decomposition", "Decompose gross and operating margins by segment. What are the specific cost drivers, input cost exposures, and pricing power indicators?" + _ANTI_HALLUCINATION_SUFFIX),
+    ("capital_allocation", "What is management's track record on capital allocation: M&A returns, buyback timing, dividend sustainability, and balance sheet leverage trajectory?" + _ANTI_HALLUCINATION_SUFFIX),
+    ("governance_flags", "What are the specific related-party transactions, executive compensation structures, board independence issues, or insider trading patterns?" + _ANTI_HALLUCINATION_SUFFIX),
+    ("disclosure_quality", "How transparent are the disclosures? Identify areas where management provides less detail than peers, or where disclosures have changed between periods." + _ANTI_HALLUCINATION_SUFFIX),
+    ("variant_perception", "What claims does management make that are not independently verifiable from the source documents? Where does the company's narrative diverge from the financial data?" + _ANTI_HALLUCINATION_SUFFIX),
+    ("key_assumptions", "What are the 3-5 assumptions that must be true for the current valuation to be justified? What evidence exists for or against each?" + _ANTI_HALLUCINATION_SUFFIX),
+    ("catalyst_timeline", "What specific dated events (results, contract renewals, regulatory decisions, debt maturities) could materially change the investment thesis in the next 12 months?" + _ANTI_HALLUCINATION_SUFFIX),
+]
+
+
+_EXTRACTION_CONCURRENCY = 3
+_EXTRACTION_STAGGER_SECONDS = 1.5
+
+
+async def run_deep_extraction(ticker: str) -> dict[str, str | None]:
+    """Query the ticker's NotebookLM notebook with deep extraction queries.
+
+    Runs all DEEP_EXTRACTION_QUERIES with semaphore-controlled concurrency (max 3).
+    Returns a dict keyed by dimension name with metadata fields (_extractedAt,
+    _notebookId, _queryCount, _dimensionsPopulated). Filters out NO_DATA_SENTINEL
+    and responses < 20 chars. Returns empty dict if no notebook, auth expired,
+    or library not installed.
+    """
+    global _nlm_auth_ok, _nlm_last_error
+
+    notebook_id = await get_notebook_id(ticker)
+    if not notebook_id:
+        return {}
+
+    if not _HAS_NOTEBOOKLM:
+        return {}
+
+    if not _nlm_auth_ok:
+        return {}
+
+    if not config.NOTEBOOKLM_AUTH_JSON:
+        return {}
+
+    results: dict[str, str | None] = {}
+    semaphore = asyncio.Semaphore(_EXTRACTION_CONCURRENCY)
+
+    try:
+        async with await NotebookLMClient.from_storage() as client:
+
+            async def _query_one(dimension: str, question: str) -> tuple[str, str | None]:
+                async with semaphore:
+                    query = f"Regarding {ticker}: {question}"
+                    try:
+                        response = await asyncio.wait_for(
+                            client.chat.ask(notebook_id=notebook_id, question=query),
+                            timeout=config.NOTEBOOKLM_QUERY_TIMEOUT_SECONDS,
+                        )
+                        text = response.text if hasattr(response, "text") else str(response)
+
+                        # Filter out NO_DATA_SENTINEL
+                        if NO_DATA_SENTINEL in text:
+                            logger.info("Deep extraction: %s/%s returned NO_DATA_AVAILABLE", ticker, dimension)
+                            return dimension, None
+
+                        # Filter out responses < 20 chars
+                        if not text or len(text) < 20:
+                            logger.info("Deep extraction: empty response for %s/%s", ticker, dimension)
+                            return dimension, None
+
+                        # Cap at max chars
+                        if len(text) > config.NOTEBOOKLM_CONTEXT_MAX_CHARS:
+                            text = text[:config.NOTEBOOKLM_CONTEXT_MAX_CHARS]
+
+                        return dimension, text
+                    except asyncio.TimeoutError:
+                        logger.warning("Deep extraction timeout for %s/%s", ticker, dimension)
+                        return dimension, None
+                    except Exception as exc:
+                        err_str = str(exc).lower()
+                        if any(marker in err_str for marker in _AUTH_ERROR_MARKERS):
+                            if _nlm_auth_ok:
+                                _nlm_auth_ok = False
+                                _nlm_last_error = f"NotebookLM auth expired: {exc}"
+                                logger.warning("Deep extraction: auth expired for %s: %s", ticker, exc)
+                        else:
+                            logger.warning("Deep extraction query failed for %s/%s: %s", ticker, dimension, exc)
+                        return dimension, None
+                    finally:
+                        # Stagger the requests to avoid rate limiting
+                        await asyncio.sleep(_EXTRACTION_STAGGER_SECONDS)
+
+            pairs = await asyncio.gather(
+                *[_query_one(dim, q) for dim, q in DEEP_EXTRACTION_QUERIES]
+            )
+            results = dict(pairs)
+
+    except Exception as exc:
+        err_str = str(exc).lower()
+        if any(marker in err_str for marker in _AUTH_ERROR_MARKERS):
+            _nlm_auth_ok = False
+            _nlm_last_error = f"NotebookLM auth expired: {exc}"
+            logger.warning("Deep extraction: auth expired during session for %s: %s", ticker, exc)
+        else:
+            logger.warning("Deep extraction session failed for %s: %s", ticker, exc)
+        return {}
+
+    # Add metadata fields
+    dimensions_with_content = sum(1 for v in results.values() if v is not None)
+    results["_extractedAt"] = datetime.now(timezone.utc).isoformat()
+    results["_notebookId"] = notebook_id
+    results["_queryCount"] = 12
+    results["_dimensionsPopulated"] = dimensions_with_content
+
+    return results
+
 
 async def query_notebook_batch(ticker: str) -> dict[str, str | None]:
     """Query the ticker's NotebookLM notebook with the generation battery.
@@ -419,30 +548,170 @@ async def query_notebook_batch(ticker: str) -> dict[str, str | None]:
     return results
 
 
-def build_corpus_section(ticker: str, corpus: dict[str, str | None]) -> str:
+_DEFAULT_CORPUS_MAX_CHARS = 48_000
+
+_DIMENSION_LABELS: dict[str, str] = {
+    # v2 deep extraction dimensions
+    "earnings_quality": "Earnings Quality Assessment",
+    "earnings_composition": "Revenue & Earnings Composition",
+    "cash_flow_reconciliation": "Cash Flow Reconciliation",
+    "structural_growth": "Structural Growth Analysis",
+    "competitive_position": "Competitive Position & Moat",
+    "margin_decomposition": "Margin Decomposition",
+    "capital_allocation": "Capital Allocation Track Record",
+    "governance_flags": "Governance & Red Flags",
+    "disclosure_quality": "Disclosure Quality",
+    "variant_perception": "Variant Perception",
+    "key_assumptions": "Key Thesis Assumptions",
+    "catalyst_timeline": "Catalyst Timeline",
+    # v1 backward compatibility
+    "operations": "Operations & Assets",
+    "financials": "Financials & Guidance",
+    "risks": "Risks & Controversies",
+    "catalysts": "Catalysts & Strategy",
+}
+
+# Priority order for truncation: key_assumptions, variant_perception,
+# cash_flow_reconciliation, earnings_quality, catalyst_timeline, then alphabetically
+_TRUNCATION_PRIORITY = [
+    "key_assumptions",
+    "variant_perception",
+    "cash_flow_reconciliation",
+    "earnings_quality",
+    "catalyst_timeline",
+]
+
+
+def build_corpus_section(ticker: str, corpus: dict[str, str | None], max_chars: int = _DEFAULT_CORPUS_MAX_CHARS) -> str:
     """Format notebook corpus responses into a prompt section.
+
+    Handles all 12 deep extraction dimensions plus 4 v1 dimensions.
+    Skips keys starting with _ (metadata). Applies proportional truncation if
+    total exceeds max_chars, with priority order.
 
     Returns empty string if no dimension has content.
     """
-    _LABELS = {
-        "operations": "Operations & Assets",
-        "financials": "Financials & Guidance",
-        "risks": "Risks & Controversies",
-        "catalysts": "Catalysts & Strategy",
-    }
-    parts = [
+    header = [
         f"\n## Source Document Context for {ticker}",
         "The following is grounded in curated research documents (annual reports, "
         "filings, presentations). Use it to anchor your analysis with specific "
         "facts, figures, and operational detail. Do not reproduce verbatim.",
     ]
-    has_content = False
-    for key, label in _LABELS.items():
+    header_text = "\n".join(header)
+
+    # Filter and format corpus sections (skip metadata keys starting with _)
+    sections: list[tuple[str, str, str]] = []  # (key, label, text)
+    for key, label in _DIMENSION_LABELS.items():
         text = corpus.get(key)
-        if text:
+        if text and not key.startswith("_"):
+            sections.append((key, label, text))
+
+    if not sections:
+        return ""
+
+    # If total length is under budget, include all sections
+    total_length = sum(len(f"\n### {label}\n{text}") for _, label, text in sections)
+    if total_length + len(header_text) <= max_chars:
+        parts = [header_text]
+        for _, label, text in sections:
             parts.append(f"\n### {label}")
             parts.append(text)
-            has_content = True
-    if not has_content:
-        return ""
-    return "\n".join(parts)
+        return "\n".join(parts)
+
+    # Otherwise, apply proportional truncation with priority
+    available_chars = max(500, max_chars - len(header_text))  # Minimum 500 chars for content
+    section_chars = available_chars // len(sections)
+
+    # Sort sections by truncation priority
+    def priority_index(section: tuple[str, str, str]) -> tuple[int, str]:
+        key = section[0]
+        if key in _TRUNCATION_PRIORITY:
+            return (_TRUNCATION_PRIORITY.index(key), key)
+        return (len(_TRUNCATION_PRIORITY), key)
+
+    sections.sort(key=priority_index)
+
+    parts = [header_text]
+    current_length = len(header_text)
+    for _, label, text in sections:
+        if current_length >= max_chars:
+            break
+        # Truncate to fit remaining budget
+        remaining = max_chars - current_length
+        label_len = len(f"\n### {label}\n")
+        if remaining > label_len:
+            truncated = text[:remaining - label_len] if len(text) > remaining - label_len else text
+            if truncated:
+                parts.append(f"\n### {label}")
+                parts.append(truncated)
+                current_length += label_len + len(truncated)
+
+    result = "\n".join(parts)
+    # Final safety truncation
+    if len(result) > max_chars:
+        result = result[:max_chars]
+    return result
+
+
+def select_dimensions(question: str) -> list[str]:
+    """Select relevant dimensions for a Strategist Chat question.
+
+    Routes based on keyword matches in the question. Returns a list of dimension
+    keys to extract. Falls back to all 12 dimensions if no keywords match.
+
+    Routing rules:
+    - earnings/profit/revenue/income/accounting -> earnings_quality, earnings_composition, cash_flow_reconciliation
+    - growth/market share/moat/competitive/barriers -> structural_growth, competitive_position
+    - margin/cost/pricing/input/opex/scale -> margin_decomposition, capital_allocation
+    - governance/board/insider/compensation/related party/disclosure/transparency -> governance_flags, disclosure_quality
+    - thesis/assumption/valuation/catalyst/event/trigger/risk/variant -> variant_perception, key_assumptions, catalyst_timeline
+    - cash flow/fcf/working capital/capex/free cash/add-back/adjusted/underlying/statutory -> cash_flow_reconciliation, capital_allocation
+    - m&a/acquisition/goodwill/intangible/synergy -> structural_growth, capital_allocation
+    """
+    question_lower = question.lower()
+
+    # Build a set of matching dimensions
+    matched = set()
+
+    # Earnings group
+    earnings_keywords = ("earnings", "profit", "revenue", "income", "accounting", "fiscal", "net income")
+    if any(kw in question_lower for kw in earnings_keywords):
+        matched.update(["earnings_quality", "earnings_composition", "cash_flow_reconciliation"])
+
+    # Growth & competitive group
+    growth_keywords = ("growth", "market share", "moat", "competitive", "barriers", "organic", "expansion")
+    if any(kw in question_lower for kw in growth_keywords):
+        matched.update(["structural_growth", "competitive_position"])
+
+    # Margin & cost group
+    margin_keywords = ("margin", "cost", "pricing", "input", "opex", "cogs", "scale", "efficiency")
+    if any(kw in question_lower for kw in margin_keywords):
+        matched.update(["margin_decomposition", "capital_allocation"])
+
+    # Governance & disclosure group
+    governance_keywords = ("governance", "board", "insider", "compensation", "related party", "disclosure", "transparency")
+    if any(kw in question_lower for kw in governance_keywords):
+        matched.update(["governance_flags", "disclosure_quality"])
+
+    # Thesis & assumptions group
+    thesis_keywords = ("thesis", "assumption", "valuation", "catalyst", "event", "trigger", "risk", "variant")
+    if any(kw in question_lower for kw in thesis_keywords):
+        matched.update(["variant_perception", "key_assumptions", "catalyst_timeline"])
+
+    # Cash flow & capital group
+    cashflow_keywords = ("cash flow", "fcf", "working capital", "capex", "free cash", "add-back", "adjusted", "underlying", "statutory")
+    if any(kw in question_lower for kw in cashflow_keywords):
+        matched.update(["cash_flow_reconciliation", "capital_allocation"])
+
+    # M&A group
+    mna_keywords = ("m&a", "acquisition", "goodwill", "intangible", "synergy", "merger")
+    if any(kw in question_lower for kw in mna_keywords):
+        matched.update(["structural_growth", "capital_allocation"])
+
+    # If matches found, return the matched set (deduplicated)
+    if matched:
+        return sorted(list(matched))
+
+    # No match: return all 12 deep extraction dimensions
+    return [dim for dim, _ in DEEP_EXTRACTION_QUERIES]
+       
