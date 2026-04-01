@@ -11,10 +11,10 @@
       "what_to_watch": "Next earnings result, operational update, and macro developments.",
       "upside": "Material re-rating if scenario plays out.",
       "risk_plain": "Monitor for change in probability weight.",
-      "survival_score": 0.25,
+      "survival_score": 0.33,
       "status": "LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-04-01T07:56:47.834Z"
+      "last_updated": "2026-04-01T09:03:58.886Z"
     },
     "N2": {
       "label": "Base Case",
@@ -23,10 +23,10 @@
       "what_to_watch": "Next earnings result, operational update, and macro developments.",
       "upside": null,
       "risk_plain": "Monitor for change in probability weight.",
-      "survival_score": 0.25,
+      "survival_score": 0.33,
       "status": "LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-04-01T07:56:47.834Z"
+      "last_updated": "2026-04-01T09:03:58.886Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -35,10 +35,10 @@
       "what_to_watch": "Next earnings result, operational update, and macro developments.",
       "upside": null,
       "risk_plain": "Significant downside if this scenario crystallises.",
-      "survival_score": 0.28,
+      "survival_score": 0.2,
       "status": "LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-04-01T07:56:47.834Z"
+      "last_updated": "2026-04-01T09:03:58.886Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -47,27 +47,37 @@
       "what_to_watch": "Next earnings result, operational update, and macro developments.",
       "upside": null,
       "risk_plain": "Significant downside if this scenario crystallises.",
-      "survival_score": 0.22,
-      "status": "LOW",
+      "survival_score": 0.14,
+      "status": "VERY_LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-04-01T07:56:47.834Z"
+      "last_updated": "2026-04-01T09:03:58.886Z"
     }
   },
-  "dominant": "N3",
+  "dominant": "N1",
   "confidence": "LOW",
   "alert_state": "OVERCORRECTION",
   "current_price": 1.25,
   "big_picture": "At A$1.13 – up 31.9% on the session and near the 52-week high of A$1.67 – OBM is priced as a credible but unfunded gold developer at an early but accelerating stage of a resource re-rating cycle. The market has rapidly absorbed the tenfold Round Dam resource upgrade, the Little Gem and Sapphire Tren",
   "last_flip": {
-    "date": "2026-03-30",
-    "from": "N2",
-    "to": "N3",
-    "trigger": "Automated: survival score shift (Base Case → Risk/Downside)",
-    "price_at_flip": 1.1,
-    "from_survival": 0.29,
-    "to_survival": 0.32
+    "date": "2026-04-01",
+    "from": "N3",
+    "to": "N1",
+    "trigger": "Automated: survival score shift (Risk/Downside → Growth/Recovery)",
+    "price_at_flip": 1.25,
+    "from_survival": 0.2,
+    "to_survival": 0.33
   },
-  "narrative_history": [],
+  "narrative_history": [
+    {
+      "date": "2026-03-30",
+      "from": "N2",
+      "to": "N3",
+      "trigger": "Automated: survival score shift (Base Case → Risk/Downside)",
+      "price_at_flip": 1.1,
+      "from_survival": 0.29,
+      "to_survival": 0.32
+    }
+  ],
   "evidence_items": [
     {
       "date": "2026-04-01",
@@ -274,7 +284,7 @@
     "badge": "ok"
   },
   "last_price_update": "2026-04-01T05:35:48.925Z",
-  "last_research_update": "2026-04-01T07:18:19.737Z",
+  "last_research_update": "2026-04-01T09:03:58.886Z",
   "technicalAnalysis": {
     "date": "30 March 2026",
     "period": "1 Year",
@@ -368,8 +378,8 @@
     }
   },
   "price_evidence": {
-    "last_run": "2026-04-01T07:18:19.737Z",
-    "classification": "MATERIAL"
+    "last_run": "2026-04-01T09:03:58.886Z",
+    "classification": "SIGNIFICANT"
   },
   "_overcorrection": {
     "active": true,
