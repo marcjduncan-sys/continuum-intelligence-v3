@@ -25,5 +25,4 @@ if [ -n "$VIOLATIONS" ]; then
   exit 1
 fi
 
-echo "Config drift check: CLEAN"
-exit 0
+echo "Config drift check: CLEAN" 

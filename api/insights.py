@@ -19,10 +19,11 @@ from datetime import datetime, timedelta, timezone
 import httpx
 
 import config
+import notebook_context
 
 logger = logging.getLogger(__name__)
 
-_HAIKU_MODEL = "claude-haiku-4-5-20251001"
+_CLASSIFY_MODEL = config.ANTHROPIC_MODEL
 _RENOTIFY_DAYS = 7
 _CONSOLIDATE_TYPES = ["positional", "tactical"]
 _GITHUB_PAGES_BASE = (
@@ -47,7 +48,7 @@ def _fetch_research(ticker: str) -> dict | None:
         return None
 
 
-def _build_research_summary(data: dict) -> str:
+def _build_research_summary(data: dict, ticker: str = "") -> str:
     """
     Extract a compact text summary of current research state for Haiku context.
     Includes: overall skew, top-3 hypothesis scores, narrative stability.
@@ -81,15 +82,17 @@ def _build_research_summary(data: dict) -> str:
         if clean:
             lines.append(f"Narrative stability: {clean[:200]}")
 
-    # Inject forensic corpus dimensions most relevant for confirm/contradict classification
+    # Append persisted forensic corpus if available
     corpus = data.get("notebookCorpus", {})
     if corpus and corpus.get("_extractedAt"):
-        _INSIGHT_DIMS = ("key_assumptions", "variant_perception", "catalyst_timeline", "earnings_quality")
-        for dim in _INSIGHT_DIMS:
-            text = corpus.get(dim)
-            if text:
-                label = dim.replace("_", " ").title()
-                lines.append(f"{label}: {text[:500]}")
+        corpus_text = notebook_context.build_corpus_section(
+            ticker,
+            {k: v for k, v in corpus.items() if not k.startswith("_") and isinstance(v, str)},
+            max_chars=4000,
+        )
+        if corpus_text:
+            lines.append("")
+            lines.append(corpus_text)
 
     return "\n".join(lines) if lines else "No research summary available."
 
@@ -255,7 +258,7 @@ def _classify(memory_content: str, research_summary: str):
     try:
         client = config.get_anthropic_client()
         msg = client.messages.create(
-            model=_HAIKU_MODEL,
+            model=_CLASSIFY_MODEL,
             max_tokens=80,
             messages=[{"role": "user", "content": prompt}],
         )
@@ -290,7 +293,7 @@ async def scan_ticker(pool, ticker: str) -> dict:
     if not research_data:
         return {"ticker": ticker, "memories_checked": 0, "notifications_inserted": 0}
 
-    research_summary = _build_research_summary(research_data)
+    research_summary = _build_research_summary(research_data, ticker)
     memories = await _get_active_memories(pool, ticker)
 
     memories_checked = 0

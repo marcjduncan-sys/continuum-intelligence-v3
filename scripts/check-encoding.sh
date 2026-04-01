@@ -103,9 +103,8 @@ if [ $FOUND -eq 1 ]; then
   echo "ENCODING CHECK: FAILED"
   echo ""
   echo "Fix the source at the boundary where the contamination enters."
-  echo "Do not patch downstream. See docs/recurring-issues-registry.md Family 1."
+  echo "Do not patch downstream -- fix where the bad text enters the system."
   exit 1
 fi
 
 echo "ENCODING CHECK: CLEAN"
-exit 0

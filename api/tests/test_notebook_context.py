@@ -786,7 +786,6 @@ class TestSelectDimensions:
     def test_returns_list_of_strings(self):
         """select_dimensions should return a list of dimension names."""
         import notebook_context
-
-        result = notebook_context.select_dimensions("What is the earnings quality?")
+        result = notebook_context.select_dimensions("test question")
         assert isinstance(result, list)
         assert all(isinstance(d, str) for d in result)
