@@ -136,7 +136,7 @@ External Research renumbered from Section 12 to 09 (2026-03-27). Gold section re
 5. **Vitest snapshot tests** for each section's HTML output given known input data.
 6. **Extract to `src/pages/report-sections/`** -- one file per section once the monolith exceeds 800 lines (it is currently at 2,726).
 
-### Status: UNFIXED -- reactive patches only. File is 3.4x the 800-line threshold.
+### Status: FIXED (BEADs 012-017, 2026-04-01). Monolith decomposed from 2,760 lines to 23-line barrel re-export. 13 domain modules in src/features/report/. Formatting library in src/lib/format.js. Zero .toFixed() calls outside format.js.
 
 ---
 
@@ -220,7 +220,7 @@ Portfolio state is split across frontend globals, localStorage, and Fly.io datab
 3. **DB migration:** add `direction` ENUM column to holdings table. Drop notes-field workaround.
 4. **Integration test:** simulate boot sequence through to PM Chat receiving portfolio.
 
-### Status: PARTIALLY FIXED -- boot order race resolved, but no state machine, no DB migration, notes-field workaround still active
+### Status: FIXED (BEADs 009-010, 018-019, 2026-04-01). Boot readiness protocol (src/lib/boot.js), portfolio state machine (src/features/portfolio-state.js), DB migration 022 (signed quantities), PM Chat observer pattern via onStateChange().
 
 ---
 

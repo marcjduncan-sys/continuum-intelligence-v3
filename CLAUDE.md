@@ -12,7 +12,7 @@ You are a senior engineer maintaining a production equity research platform used
 npm run dev          # Dev server on port 5000, proxies /api -> localhost:8000
 npm run build        # Vite build -> dist/; copies data/ -> dist/data/
 npm run test         # Jest suite (tests/, src/**/*.test.js) -- 61 tests
-npm run test:unit    # Vitest suite -- what CI runs; must pass before pushing -- 308 tests
+npm run test:unit    # Vitest suite -- what CI runs; must pass before pushing -- 402 tests
 # Python tests: 427 sync passing + 28 async (require pytest-asyncio, not installed locally)
 npm run test:all     # Jest + Vitest combined -- 263 tests total
 npm run lint         # ESLint over scripts/, src/, and public/js/
@@ -101,6 +101,18 @@ After fixing a bug, log it using this format:
 
 The iron rule: every fix must be a boundary fix, not a symptom fix. A boundary fix intercepts the defect where it enters the system (the sanitiser, the schema loader, the config validator). A symptom fix patches the rendering or display. Symptom fixes do not prevent recurrence.
 
+### Report renderer decomposition (`src/features/report/`)
+
+The report monolith (`report-sections.js`, formerly 2,760 lines) was decomposed into 13 domain modules during the Platform Hardening Programme. `report-sections.js` is now a 23-line barrel re-export that imports from:
+
+`evidence.js`, `footer.js`, `gold.js`, `hero.js`, `hypothesis.js`, `identity.js`, `narrative-timeline.js`, `narrative.js`, `price-drivers.js`, `shared.js`, `sidebar.js`, `signal-bars.js`, `technical.js`
+
+New report rendering logic goes in the appropriate domain module. No single module should exceed 500 lines. All numeric formatting uses `src/lib/format.js` (no direct `.toFixed()` calls).
+
+### Portfolio state machine (`src/features/portfolio-state.js`)
+
+All portfolio state changes go through explicit transitions in the state machine. Invalid transitions throw. PM Chat observes via `onStateChange()`, never polls. DB migration `022_portfolio_signed_quantities.sql` enables signed quantities (short positions ready when needed).
+
 ### Portfolio system frozen design decisions
 
 These were set during Phase B and must not be changed without explicit instruction:
@@ -111,7 +123,7 @@ These were set during Phase B and must not be changed without explicit instructi
 
 ---
 
-## Current State -- 2026-03-27
+## Current State -- 2026-04-01
 
 | Area | Status | Key detail |
 |------|--------|------------|
@@ -128,7 +140,7 @@ These were set during Phase B and must not be changed without explicit instructi
 | Price Drivers | LIVE | Per-ticker workflow with freshness skip and credit exhaustion guard |
 | Infrastructure | Cloudflare Pages (frontend) + Fly.io (backend) | GitHub Pages disabled |
 
-**Test counts (as of last sweep):** 234 Vitest, 427 sync pytest, 28 async pytest.
+**Test counts (as of last sweep):** 402 Vitest, 427 sync pytest, 28 async pytest.
 
 **NOTEBOOKLM_AUTH_JSON** credentials expire every 1-2 weeks. Run `Get NotebookLM Auth.bat` from Desktop (OneDrive Desktop). It auto-deploys to Fly.io via `flyctl`, resets auth, and retries pending notebooks. The only manual step is the Google sign-in.
 
@@ -181,3 +193,36 @@ These were set during Phase B and must not be changed without explicit instructi
 - Commit messages: imperative mood, present tense, referencing the specific file or feature. Match the pattern in `git log`.
 - Variable declarations in classic scripts (`js/`, `scripts/`): use `var`. In `src/`: `const`/`let` per existing file convention.
 - Do not add JSDoc to functions you did not write. Do not remove existing JSDoc.
+
+---
+
+## Quality Protocol
+
+### Session Start
+Read docs/recurring-issues-registry.md before writing any fix.
+Check the registry for prior art on the current issue.
+
+### Pre-Commit Checklist
+npm run test:all                    # Count must not decrease
+npm run build                       # Must pass
+bash scripts/check-encoding.sh      # Must be CLEAN
+bash scripts/check-config-drift.sh  # Must be CLEAN (if backend changed)
+bash scripts/check-css-tokens.sh    # Must be CLEAN (if CSS changed)
+git diff --staged --name-only       # Verify only your files staged
+
+### Enforcement Boundaries
+- LLM outputs: sanitise_text() at entry, before merge/store
+- Numbers: src/lib/format.js only, never raw .toFixed()
+- Report modules: src/features/report/*.js, no file > 500 lines
+- Portfolio state: transitions through portfolio-state.js only
+- Schemas: declared in schema-manifest.js, loader logs 404s
+- Config: all env vars in config.py only
+- CSS layout: tokens from tokens.css, no hardcoded px >= 400
+- Boot: new subsystems register with src/lib/boot.js
+- Dependencies: exact versions, no ^ or ~
+
+### Bug Fixing Protocol
+1. Check registry for prior art
+2. Fix at BOUNDARY (where defect enters), not SYMPTOM (where it shows)
+3. Add regression gate (test or CI check)
+4. Log in registry
