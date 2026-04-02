@@ -52,6 +52,9 @@ import { initSourcesPanel, appendSource } from './features/sources-panel.js';
 // Deep Research page
 import { initDeepResearch } from './pages/deep-research.js';
 
+// Workstation page
+import { initWorkstationPage, renderWorkstationPage } from './pages/workstation.js';
+
 // Services
 import { MarketFeed } from './services/market-feed.js';
 import { prefetchAllLiveData, fetchAndPatchLive } from './services/live-data.js';
@@ -320,6 +323,7 @@ async function boot() {
     populateSidebar: populateSidebar,
     initNarrativeTimelineChart: initNarrativeTimelineChart,
     fetchAndPatchLive: fetchAndPatchLive,
+    renderWorkstationPage: renderWorkstationPage,
     initPersonalisationDemo: window.initPersonalisationDemo,
     initSourcesOnReport: function(ticker) {
       const t = ticker.toLowerCase();
@@ -380,6 +384,7 @@ async function boot() {
   initSubsystem('AddStock', initAddStock);
   initSubsystem('DeepResearch', function() { initDeepResearch('deep-research-container'); });
   initSubsystem('AlertPanel', initAlertPanel);
+  initSubsystem('Workstation', initWorkstationPage, { after: ['DataLoader'] });
 
   if (import.meta.env && import.meta.env.DEV) {
     console.log('[Boot] Subsystem status:', getBootStatus());

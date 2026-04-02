@@ -184,6 +184,10 @@ export function route() {
     isValidRoute = (typeof SNAPSHOT_DATA !== 'undefined' && SNAPSHOT_DATA.hasOwnProperty(snapTicker)) ||
                    (typeof STOCK_DATA !== 'undefined' && STOCK_DATA.hasOwnProperty(snapTicker));
   }
+  if (!isValidRoute && hash.startsWith('workstation-')) {
+    const wsTicker = hash.replace('workstation-', '');
+    isValidRoute = /^[A-Z0-9]{1,6}$/.test(wsTicker);
+  }
   if (!isValidRoute) {
     // Invalid route -- fall back to home
     document.getElementById('page-home').classList.add('active');
@@ -192,7 +196,7 @@ export function route() {
   }
 
   // Auto-create page divs for dynamically added stocks (safe -- validated above)
-  if ((hash.startsWith('report-') || hash.startsWith('deep-report-') || hash.startsWith('snapshot-')) && !document.getElementById('page-' + hash)) {
+  if ((hash.startsWith('report-') || hash.startsWith('deep-report-') || hash.startsWith('snapshot-') || hash.startsWith('workstation-')) && !document.getElementById('page-' + hash)) {
     const div = document.createElement('div');
     div.className = 'page';
     div.id = 'page-' + hash;
@@ -286,6 +290,19 @@ export function route() {
             });
           }
         }
+      }
+    }
+  }
+
+  // Lazy render workstation pages on first visit
+  if (hash.startsWith('workstation-')) {
+    const wsTicker = hash.replace('workstation-', '');
+    if (!renderedPages.has(hash)) {
+      const wsContainer = document.getElementById('page-' + hash);
+      if (wsContainer && _pageRenderers.renderWorkstationPage) {
+        _pageRenderers.renderWorkstationPage(wsTicker, wsContainer, function() {
+          renderedPages.add(hash);
+        });
       }
     }
   }
