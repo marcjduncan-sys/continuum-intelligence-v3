@@ -4,7 +4,8 @@
 // coverage data, and building snapshot data from stock data.
 // ============================================================
 
-import { STOCK_DATA, SNAPSHOT_DATA } from '../lib/state.js';
+import { STOCK_DATA, SNAPSHOT_DATA, WORKSTATION_DATA } from '../lib/state.js';
+import { validateWorkstationPayload } from '../features/workstation/ws-schema-validator.js';
 import { computeSkewScore, normaliseScores } from '../lib/dom.js';
 import { validateResearchFields, REQUIRED_STOCKS_FIELDS } from './schema-manifest.js';
 import { formatPrice, formatPercent } from '../lib/format.js';
@@ -443,4 +444,96 @@ export function buildSnapshotFromStock(ticker) {
       { label: 'NEXT: Mar 2026' }
     ]
   };
+}
+
+// Workstation data cache version. Bump when workstation schema changes.
+export var WS_CACHE_VERSION = 'ws-v1';
+
+/**
+ * Load workstation data for a ticker.
+ * Fetches data/workstation/{TICKER}.json, validates, and stores in state.
+ * Uses localStorage cache (24h TTL), same pattern as loadFullResearchData.
+ *
+ * @param {string} ticker
+ * @param {function} callback - Called with payload or null on error/validation failure
+ */
+export function loadWorkstationData(ticker, callback) {
+  // Check if already in state
+  const existing = WORKSTATION_DATA[ticker];
+  if (existing) {
+    if (callback) callback(existing);
+    return;
+  }
+
+  // Check localStorage cache
+  const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+  try {
+    const cacheKey = 'ci_workstation_' + ticker;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const cachedData = JSON.parse(cached);
+      const cacheAge = cachedData._lastRefreshed
+        ? Date.now() - new Date(cachedData._lastRefreshed).getTime()
+        : Infinity;
+      if (cachedData._cacheVersion === WS_CACHE_VERSION && cacheAge < CACHE_TTL_MS) {
+        WORKSTATION_DATA[ticker] = cachedData;
+        console.log('[WorkstationLoader] Loaded CACHED workstation for ' + ticker);
+        if (callback) callback(cachedData);
+        return;
+      }
+    }
+  } catch (cacheErr) {
+    console.warn('[WorkstationLoader] Cache read failed:', cacheErr);
+  }
+
+  // Fetch from file
+  const url = 'data/workstation/' + ticker + '.json';
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      try {
+        const payload = JSON.parse(xhr.responseText);
+
+        // Validate against schema
+        const validation = validateWorkstationPayload(payload);
+        if (!validation.valid) {
+          console.error('[WorkstationLoader] Schema validation failed for ' + ticker + ':', validation.errors.join('; '));
+          if (callback) callback(null);
+          return;
+        }
+        if (validation.warnings && validation.warnings.length > 0) {
+          console.warn('[WorkstationLoader] Validation warnings for ' + ticker + ':', validation.warnings.join('; '));
+        }
+
+        // Cache to localStorage
+        try {
+          payload._lastRefreshed = new Date().toISOString();
+          payload._cacheVersion = WS_CACHE_VERSION;
+          localStorage.setItem('ci_workstation_' + ticker, JSON.stringify(payload));
+        } catch (writeErr) {
+          console.warn('[WorkstationLoader] Cache write failed:', writeErr);
+        }
+
+        // Store in state
+        WORKSTATION_DATA[ticker] = payload;
+        console.log('[WorkstationLoader] Loaded workstation data for ' + ticker);
+        if (callback) callback(payload);
+      } catch (parseErr) {
+        console.error('[WorkstationLoader] Failed to parse workstation data for ' + ticker + ':', parseErr);
+        if (callback) callback(null);
+      }
+    } else if (xhr.status === 404) {
+      console.warn('[WorkstationLoader] No workstation data found for ' + ticker + ' (HTTP 404)');
+      if (callback) callback(null);
+    } else {
+      console.error('[WorkstationLoader] Failed to fetch workstation data for ' + ticker + ': HTTP ' + xhr.status);
+      if (callback) callback(null);
+    }
+  };
+  xhr.onerror = function() {
+    console.error('[WorkstationLoader] Network error fetching workstation data for ' + ticker);
+    if (callback) callback(null);
+  };
+  xhr.send();
 }
