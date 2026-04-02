@@ -40,8 +40,8 @@ const bhpData = {
 
 describe('initWorkstationLivePrice', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
     destroyWorkstationLivePrice();
+    vi.clearAllMocks();
   });
 
   it('registers a listener with MarketFeed', () => {
@@ -60,6 +60,7 @@ describe('initWorkstationLivePrice', () => {
 
 describe('destroyWorkstationLivePrice', () => {
   beforeEach(() => {
+    destroyWorkstationLivePrice();
     vi.clearAllMocks();
   });
 
