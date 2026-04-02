@@ -26,6 +26,7 @@ let _lastFetchTime = null;
 let _isPolling = false;
 let _pollCount = 0;
 let _errorCount = 0;
+const _priceListeners = [];
 
 // Polling intervals (ms)
 const INTERVAL_MARKET_OPEN = 60 * 1000;     // 60s during trading
@@ -168,6 +169,14 @@ function applyServerPrices(data) {
             }
 
             _lastPrices[ticker] = newPrice;
+
+            // Notify workstation price listeners
+            if (_priceListeners.length > 0) {
+              for (let _pl = 0; _pl < _priceListeners.length; _pl++) {
+                try { _priceListeners[_pl](ticker, newPrice); } catch(e) { /* silent -- listener errors must not break feed */ }
+              }
+            }
+
             updated++;
         }
     }
@@ -442,10 +451,23 @@ async function loadAnnouncements() {
     }
 }
 
+function addPriceListener(fn) {
+  if (typeof fn === 'function' && _priceListeners.indexOf(fn) < 0) {
+    _priceListeners.push(fn);
+  }
+}
+
+function removePriceListener(fn) {
+  const idx = _priceListeners.indexOf(fn);
+  if (idx >= 0) _priceListeners.splice(idx, 1);
+}
+
 export const MarketFeed = {
     start: start,
     refreshNow: refreshNow,
     getMarketStatus: getMarketStatus,
     loadAnnouncements: loadAnnouncements,
-    updateStatusBar: updateStatusBar
+    updateStatusBar: updateStatusBar,
+    addPriceListener: addPriceListener,
+    removePriceListener: removePriceListener
 };
