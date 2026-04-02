@@ -14,7 +14,7 @@
       "survival_score": 0.22,
       "status": "LOW",
       "weighted_inconsistency": 2,
-      "last_updated": "2026-04-02T03:45:53.991Z"
+      "last_updated": "2026-04-02T07:44:02.384Z"
     },
     "N2": {
       "label": "Base Case",
@@ -26,7 +26,7 @@
       "survival_score": 0.22,
       "status": "LOW",
       "weighted_inconsistency": 3,
-      "last_updated": "2026-04-02T03:45:53.991Z"
+      "last_updated": "2026-04-02T07:44:02.384Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -38,7 +38,7 @@
       "survival_score": 0.28,
       "status": "LOW",
       "weighted_inconsistency": 4,
-      "last_updated": "2026-04-02T03:45:53.991Z"
+      "last_updated": "2026-04-02T07:44:02.384Z"
     },
     "N4": {
       "label": "Disruption/Catalyst",
@@ -50,12 +50,12 @@
       "survival_score": 0.28,
       "status": "LOW",
       "weighted_inconsistency": 5,
-      "last_updated": "2026-04-02T03:45:53.991Z"
+      "last_updated": "2026-04-02T07:44:02.384Z"
     }
   },
   "dominant": "N3",
   "confidence": "LOW",
-  "alert_state": "NORMAL",
+  "alert_state": "OVERCORRECTION",
   "current_price": 13.02,
   "big_picture": "At A$12.46, Evolution Mining is priced for a world where gold's extraordinary run above US$5,000/oz is either temporary or being eroded by cost inflation – yet gold has continued to strengthen, now at US$5,027/oz and up 3.0% today. The stock's 23% discount to its 52-week high of A$17.67 represents e",
   "last_flip": {
@@ -68,7 +68,15 @@
     "to_survival": 0.31
   },
   "narrative_history": [],
-  "evidence_items": [],
+  "evidence_items": [
+    {
+      "date": "2026-04-02",
+      "type": "OVERCORRECTION_TRIGGER",
+      "severity": "AMBER",
+      "message": "5-day cumulative move of +18.7% exceeds 15% threshold – possible overcorrection",
+      "auto_generated": true
+    }
+  ],
   "price_signals": [
     {
       "date": "2026-03-30",
@@ -99,11 +107,20 @@
       "cumulative_20d": -29.49,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-04-02",
+      "classification": "NOTABLE",
+      "daily_change_pct": 4.49,
+      "volume_multiplier": 1,
+      "cumulative_5d": 18.7,
+      "cumulative_20d": -19.09,
+      "results_day": false,
+      "overcorrection_active": true
     }
   ],
   "editorial_override": null,
   "price_history": [
-    12.82,
     12.99,
     12.74,
     12.82,
@@ -162,7 +179,8 @@
     12.9,
     12.64,
     12.46,
-    13.65
+    13.65,
+    13.02
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -367,5 +385,15 @@
   "price_evidence": {
     "last_run": "2026-04-02T07:10:18.333Z",
     "classification": "NOTABLE"
+  },
+  "_overcorrection": {
+    "active": true,
+    "triggerType": "FIVE_DAY_CUMULATIVE",
+    "triggerDate": "2026-04-02",
+    "triggerPrice": 13.02,
+    "direction": "up",
+    "movePct": 4.49,
+    "reviewDate": "2026-04-09",
+    "message": "5-day cumulative move of +18.7% exceeds 15% threshold – possible overcorrection"
   }
 }

@@ -11,10 +11,10 @@
       "what_to_watch": "Q3 FY26 margins and online penetration rate. If Australian Food EBIT margin holds above 5.5% and e-commerce grows >20% YoY, this narrative strengthens.",
       "upside": "If digital transformation accelerates and margins expand further, the market could re-rate the stock to a premium multiple, driving 15-20% upside.",
       "risk_plain": "If competition from ALDI and Costco intensifies faster than expected, margin recovery could stall.",
-      "survival_score": 0.44,
+      "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 1.2,
-      "last_updated": "2026-04-02T07:10:18.333Z"
+      "last_updated": "2026-04-02T07:44:02.362Z"
     },
     "N2": {
       "label": "Managed/Base Case",
@@ -23,10 +23,10 @@
       "what_to_watch": "Revenue growth vs CPI inflation. If top-line growth consistently falls below inflation, the base case weakens.",
       "upside": "Steady dividend growth and defensive positioning could attract capital in a risk-off market environment.",
       "risk_plain": "If the economy slows significantly, even defensive names like Woolworths could see pressure on volumes.",
-      "survival_score": 0.46,
+      "survival_score": 0.45,
       "status": "MODERATE",
       "weighted_inconsistency": 2.1,
-      "last_updated": "2026-04-02T07:10:18.333Z"
+      "last_updated": "2026-04-02T07:44:02.362Z"
     },
     "N3": {
       "label": "Risk/Downside",
@@ -38,7 +38,7 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 4.8,
-      "last_updated": "2026-03-19T07:17:33.130Z"
+      "last_updated": "2026-04-02T07:44:02.362Z"
     },
     "N4": {
       "label": "Disruption",
@@ -50,12 +50,12 @@
       "survival_score": 0.05,
       "status": "VERY_LOW",
       "weighted_inconsistency": 6.3,
-      "last_updated": "2026-03-19T07:17:33.130Z"
+      "last_updated": "2026-04-02T07:44:02.362Z"
     }
   },
   "dominant": "N2",
   "confidence": "LOW",
-  "alert_state": "OVERCORRECTION",
+  "alert_state": "NORMAL",
   "alert_started": null,
   "current_price": 37.01,
   "big_picture": "Woolworths is Australia's largest supermarket chain, with around 37% market share. The company is currently in a recovery phase after a period of competitive pressure, with improving margins and a growing digital business.",
@@ -740,6 +740,13 @@
       "severity": "AMBER",
       "message": "Single-day move of +13.2% exceeds 10% threshold – possible overcorrection",
       "auto_generated": true
+    },
+    {
+      "date": "2026-04-02",
+      "type": "OVERCORRECTION_REVIEW",
+      "severity": "AMBER",
+      "message": "Overcorrection NOT confirmed – price held",
+      "auto_generated": true
     }
   ],
   "price_signals": [
@@ -872,6 +879,16 @@
       "cumulative_20d": 21.45,
       "results_day": false,
       "overcorrection_active": false
+    },
+    {
+      "date": "2026-04-02",
+      "classification": "NOTABLE",
+      "daily_change_pct": 2.75,
+      "volume_multiplier": 1,
+      "cumulative_5d": 13.4,
+      "cumulative_20d": 21.45,
+      "results_day": false,
+      "overcorrection_active": false
     }
   ],
   "editorial_override": null,
@@ -899,7 +916,8 @@
     32.5,
     32.45,
     36.02,
-    36.74
+    36.74,
+    37.01
   ],
   "weighting": null,
   "three_layer_signal": {
@@ -1106,13 +1124,18 @@
   },
   "last_research_update": "2026-04-02T07:10:18.333Z",
   "_overcorrection": {
-    "active": true,
+    "active": false,
     "triggerType": "SINGLE_DAY",
     "triggerDate": "2026-03-19",
     "triggerPrice": 36.74,
     "direction": "up",
     "movePct": 13.22,
     "reviewDate": "2026-03-26",
-    "message": "Single-day move of +13.2% exceeds 10% threshold – possible overcorrection"
+    "message": "Single-day move of +13.2% exceeds 10% threshold – possible overcorrection",
+    "reviewResult": {
+      "reversal_pct": -5.6,
+      "confirmed": false,
+      "message": "Overcorrection NOT confirmed – price held"
+    }
   }
 }
