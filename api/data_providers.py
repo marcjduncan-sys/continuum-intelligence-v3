@@ -381,64 +381,19 @@ async def fetch_alpha_vantage(ticker: str) -> dict[str, Any]:
 
 
 # =========================================================================
-# 3. ASX Direct JSON — Structured Announcements
+# 3. ASX Direct JSON — RETIRED (endpoint /asx/1/ removed by ASX ~Q1 2026)
 # =========================================================================
+# The /asx/1/company/{ticker}/announcements endpoint was retired by ASX.
+# All requests return {"error_code":"uri-not-found"}.
+# Structured announcement data now comes from fetch_asx_announcements()
+# which uses the MarkitDigital API (asx.api.markitdigital.com).
+# This stub is retained so callers that still reference it get a clean
+# empty list without Sentry noise. Remove the stub once all callers
+# are migrated (see gather_all in web_search.py).
 
 async def fetch_asx_announcements_json(ticker: str) -> list[dict[str, Any]]:
-    """
-    Fetch structured announcements from ASX's direct JSON endpoint.
-    Returns list of announcements with type classification and price-sensitive flag.
-    Falls back gracefully if ASX blocks the request (403).
-    """
-    url = f"https://www.asx.com.au/asx/1/company/{ticker}/announcements"
-    headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
-        ),
-        "Accept": "application/json",
-    }
-
-    try:
-        async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
-            resp = await client.get(
-                url, params={"count": 20, "market_sensitive": "false"}, headers=headers
-            )
-            if resp.status_code == 200:
-                data = resp.json()
-                items = data.get("data", [])
-                announcements = []
-                for item in items:
-                    announcements.append({
-                        "headline": item.get("header"),
-                        "date": item.get("document_date"),
-                        "url": item.get("url"),
-                        "price_sensitive": item.get("price_sensitive", False),
-                        "announcement_type": _classify_announcement(
-                            item.get("header", "")
-                        ),
-                        "pages": item.get("number_of_pages"),
-                        "source": "ASX Direct",
-                    })
-                logger.info(
-                    f"[{ticker}] ASX Direct JSON: {len(announcements)} announcements"
-                )
-                return announcements
-            elif resp.status_code == 403:
-                logger.warning(
-                    f"[{ticker}] ASX Direct JSON blocked (403). "
-                    "Falling back to RSS."
-                )
-                return []
-            else:
-                logger.warning(
-                    f"[{ticker}] ASX Direct JSON returned {resp.status_code}"
-                )
-                return []
-    except Exception as e:
-        logger.error(f"[{ticker}] ASX Direct JSON error: {e}")
-        return []
+    """RETIRED: ASX /asx/1/ endpoint no longer exists. Returns empty list."""
+    return []
 
 
 def _classify_announcement(headline: str) -> str:

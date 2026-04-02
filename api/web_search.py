@@ -841,13 +841,18 @@ async def fetch_asx_announcements(ticker: str, days: int = 30) -> list[dict[str,
             if not doc_url and doc_key:
                 doc_url = f"https://www.asx.com.au/asxpdf/{doc_key}.pdf"
 
+            headline = item.get("headline", "")
             announcements.append({
                 "date": ann_date.strftime("%Y-%m-%d"),
-                "title": item.get("headline", ""),
+                "title": headline,
+                "headline": headline,
                 "url": doc_url,
                 "market_sensitive": item.get("isPriceSensitive", False),
+                "price_sensitive": item.get("isPriceSensitive", False),
                 "type": item.get("announcementType", ""),
+                "announcement_type": data_providers._classify_announcement(headline),
                 "size": item.get("fileSize", ""),
+                "source": "ASX MarkitDigital",
             })
 
         return announcements
@@ -1105,7 +1110,13 @@ async def gather_all_data(
 
     # --- External data-provider tasks (graceful: skip if API key missing) ---
     eodhd_task = data_providers.fetch_eodhd_fundamentals(ticker)
-    asx_json_task = data_providers.fetch_asx_announcements_json(ticker)
+    # ASX Direct JSON (/asx/1/) was retired by ASX ~Q1 2026. Structured
+    # announcement data now comes from fetch_asx_announcements() above
+    # (MarkitDigital API), which already includes announcement_type and
+    # price_sensitive fields. The asx_json_task slot is kept as a no-op
+    # to preserve provider_tasks index alignment; the return dict uses
+    # the enriched announcements list instead.
+    asx_json_task = data_providers.fetch_asx_announcements_json(ticker)  # returns [] (retired stub)
     rba_task = data_providers.fetch_rba_yields()
     finnhub_task = data_providers.fetch_finnhub_peers(ticker)
     twelve_task = data_providers.fetch_twelve_data_ta(ticker)
@@ -1188,7 +1199,7 @@ async def gather_all_data(
             provider_results.append(r)
 
     fundamentals = provider_results[0]          # dict from EODHD
-    asx_announcements_json = provider_results[1] # list from ASX direct
+    _asx_json_retired = provider_results[1]     # always [] (ASX /asx/1/ retired)
     rba_yields = provider_results[2]            # dict from RBA
     us_peers = provider_results[3]              # dict from Finnhub
     technical_indicators = provider_results[4]  # dict from Twelve Data
@@ -1202,7 +1213,10 @@ async def gather_all_data(
         "macro_context": macro_context,
         # --- Phase: Data Source Expansion ---
         "fundamentals": fundamentals,
-        "asx_announcements_structured": asx_announcements_json,
+        # Structured announcements now come from the MarkitDigital feed
+        # (fetch_asx_announcements), enriched with announcement_type and
+        # price_sensitive fields. The old ASX Direct JSON endpoint is retired.
+        "asx_announcements_structured": announcements,
         "rba_yields": rba_yields,
         "us_peers": us_peers,
         "technical_indicators": technical_indicators,
