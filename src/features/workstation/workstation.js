@@ -20,6 +20,7 @@ import { renderWsRevisions } from './ws-revisions.js';
 import { renderWsDeepResearch } from './ws-deep-research.js';
 import { renderWsQuality } from './ws-quality.js';
 import { renderWsChat } from './ws-chat.js';
+import '../../styles/workstation.css';
 
 // Re-export all section renderers so callers can import individual sections
 // from the barrel without reaching into individual module files.
