@@ -1,313 +1,85 @@
+// @vitest-environment jsdom
 /**
- * BMAD Test Suite: Add Stock Frontend Pipeline
- * =============================================
- * Tests the frontend hydration chain that converts reference.json data
- * into displayable tile metrics. Covers:
- *   - compute() metric derivation from REFERENCE_DATA
- *   - hydrateFeaturedMetrics() patching N/A values
- *   - The null-reference failure mode that causes "Analysis pending"
- *   - renderFeaturedCard() output for pending vs populated states
- *
- * Run: npx vitest run src/pages/home.test.js
+ * Home page barrel tests.
+ * Tests the new coverage command surface architecture.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
-  compute,
-  hydrateFeaturedMetrics,
-  hydrate,
-} from '../data/dynamics.js';
-import {
-  STOCK_DATA, REFERENCE_DATA,
-  initStockData, initReferenceData,
+  STOCK_DATA, FRESHNESS_DATA, REFERENCE_DATA, WORKSTATION_DATA, WORKSTATION_STATUS, BATCH_STATUS,
+  initStockData, initFreshnessData, initReferenceData, initWorkstationData, initWorkstationStatus, updateBatchStatus, resetBatchStatus
 } from '../lib/state.js';
-import { renderFeaturedCard } from './home.js';
+import { initHomePage, sortCoverageTable } from './home.js';
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function clearState() {
+// Clean state before each test
+beforeEach(() => {
   for (var k in STOCK_DATA) delete STOCK_DATA[k];
+  for (var k in FRESHNESS_DATA) delete FRESHNESS_DATA[k];
   for (var k in REFERENCE_DATA) delete REFERENCE_DATA[k];
-}
+  for (var k in WORKSTATION_DATA) delete WORKSTATION_DATA[k];
+  for (var k in WORKSTATION_STATUS) delete WORKSTATION_STATUS[k];
+  resetBatchStatus();
 
-function seedStock(ticker, stockOverrides, refOverrides) {
-  initStockData({
-    [ticker]: Object.assign({
-      ticker: ticker,
-      tickerFull: ticker + '.AX',
-      company: ticker + ' Corp',
-      sector: 'Test Sector',
-      price: 10.00,
-      currency: 'A$',
-      priceHistory: [8, 9, 10, 11, 12, 10],
-      featuredMetrics: [
-        { label: 'Mkt Cap', value: 'N/A', color: '' },
-        { label: 'Fwd P/E', value: 'N/A', color: '' },
-        { label: 'Div Yield', value: 'N/A', color: '' },
-        { label: 'Drawdown', value: '-16.7%', color: '' },
-      ],
-      featuredRationale: 'Test rationale',
-      skew: { direction: 'neutral', rationale: 'Test' },
-      hypotheses: [
-        { label: 'N1', score: '30%', direction: 'upside' },
-        { label: 'N2', score: '40%', direction: 'neutral' },
-        { label: 'N3', score: '20%', direction: 'downside' },
-        { label: 'N4', score: '10%', direction: 'downside' },
-      ],
-    }, stockOverrides),
-  });
-  initReferenceData({
-    [ticker]: Object.assign({
-      sharesOutstanding: null,
-      epsForward: null,
-      epsTrailing: null,
-      divPerShare: null,
-      analystTarget: null,
-      archetype: 'diversified',
-      _anchors: { price: 10.00, marketCapStr: null, pe: null, divYield: null },
-    }, refOverrides),
-  });
-}
+  // Reset DOM
+  document.body.innerHTML = '';
+});
 
-beforeEach(clearState);
-
-// ---------------------------------------------------------------------------
-// compute() – metric derivation
-// ---------------------------------------------------------------------------
-
-describe('compute() with null reference data (the bug)', () => {
-  it('returns null marketCap when sharesOutstanding is null', () => {
-    seedStock('IPX', { price: 3.52 }, { sharesOutstanding: null });
-    const result = compute('IPX');
-    expect(result.marketCap).toBeNull();
-    expect(result.fmt.marketCap).toBeNull();
+describe('initHomePage', () => {
+  it('does not throw when #page-home container is missing', () => {
+    expect(() => initHomePage()).not.toThrow();
   });
 
-  it('returns null forwardPE when epsForward is null', () => {
-    seedStock('IPX', { price: 3.52 }, { epsForward: null });
-    const result = compute('IPX');
-    expect(result.forwardPE).toBeNull();
-    expect(result.fmt.forwardPE).toBeNull();
+  it('does not throw when #page-home exists but STOCK_DATA is empty', () => {
+    document.body.innerHTML = '<div id="page-home" class="active"></div>';
+    expect(() => initHomePage()).not.toThrow();
   });
 
-  it('returns null divYield when divPerShare is null', () => {
-    seedStock('IPX', { price: 3.52 }, { divPerShare: null });
-    const result = compute('IPX');
-    expect(result.divYield).toBeNull();
-    expect(result.fmt.divYield).toBeNull();
+  it('renders coverage table inside #page-home', () => {
+    document.body.innerHTML = '<div id="page-home" class="active"></div>';
+    initStockData({ BHP: { company: 'BHP Group', price: 45, hypotheses: [] } });
+    initHomePage();
+    const container = document.getElementById('page-home');
+    expect(container.innerHTML).toContain('coverage-table');
+  });
+
+  it('renders one row per ticker in STOCK_DATA', () => {
+    document.body.innerHTML = '<div id="page-home" class="active"></div>';
+    initStockData({
+      BHP: { company: 'BHP Group', price: 45, hypotheses: [] },
+      CBA: { company: 'Commonwealth Bank', price: 130, hypotheses: [] }
+    });
+    initHomePage();
+    const container = document.getElementById('page-home');
+    const rows = container.querySelectorAll('tr[data-ticker]');
+    expect(rows.length).toBe(2);
+  });
+
+  it('renders signal badges with new taxonomy (no bull/bear/neutral text)', () => {
+    document.body.innerHTML = '<div id="page-home" class="active"></div>';
+    initStockData({
+      BHP: { company: 'BHP Group', price: 45, hypotheses: [{ score: 8, direction: 'upside', title: 'Iron ore' }] }
+    });
+    initHomePage();
+    const container = document.getElementById('page-home');
+    expect(container.innerHTML).not.toContain('>bull<');
+    expect(container.innerHTML).not.toContain('>bear<');
+    expect(container.innerHTML).not.toContain('>neutral<');
+    // Should use new taxonomy
+    expect(container.innerHTML.toLowerCase()).toMatch(/upside|balanced|downside/);
+  });
+
+  it('renders filter bar with signal chips', () => {
+    document.body.innerHTML = '<div id="page-home" class="active"></div>';
+    initHomePage();
+    const container = document.getElementById('page-home');
+    expect(container.innerHTML).toContain('filter-chip');
+    expect(container.innerHTML).toContain('filter-bar');
   });
 });
 
-describe('compute() with populated reference data (the fix)', () => {
-  it('computes marketCap from sharesOutstanding', () => {
-    seedStock('QAN', { price: 8.34 }, { sharesOutstanding: 1220 });
-    const result = compute('QAN');
-    // marketCap = price * sharesOutstanding / 1000 = 8.34 * 1220 / 1000 = ~10.17
-    expect(result.marketCap).toBeCloseTo(8.34 * 1220 / 1000, 1);
-    expect(result.fmt.marketCap).toContain('$');
-  });
-
-  it('computes forwardPE from epsForward', () => {
-    seedStock('QAN', { price: 8.34 }, { epsForward: 0.667 });
-    const result = compute('QAN');
-    expect(result.forwardPE).toBeCloseTo(8.34 / 0.667, 1);
-    expect(result.fmt.forwardPE).toMatch(/\d+\.\dx$/);
-  });
-
-  it('computes divYield from divPerShare', () => {
-    seedStock('QAN', { price: 8.34 }, { divPerShare: 0.20 });
-    const result = compute('QAN');
-    expect(result.divYield).toBeCloseTo((0.20 / 8.34) * 100, 1);
-    expect(result.fmt.divYield).toMatch(/\d+\.\d+%$/);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// hydrateFeaturedMetrics() – patching N/A values
-// ---------------------------------------------------------------------------
-
-describe('hydrateFeaturedMetrics()', () => {
-  it('does NOT overwrite N/A when computed values are null', () => {
-    seedStock('IPX', {}, { sharesOutstanding: null, epsForward: null, divPerShare: null });
-    const stock = STOCK_DATA['IPX'];
-    const computed = compute('IPX');
-    hydrateFeaturedMetrics(stock, computed);
-
-    const mktCap = stock.featuredMetrics.find(m => m.label === 'Mkt Cap');
-    expect(mktCap.value).toBe('N/A');  // Still N/A because computed.fmt.marketCap is null
-  });
-
-  it('DOES overwrite N/A when computed values are populated', () => {
-    seedStock('QAN', { price: 8.34 }, {
-      sharesOutstanding: 1220,
-      epsForward: 0.667,
-      divPerShare: 0.20,
-    });
-    const stock = STOCK_DATA['QAN'];
-    const computed = compute('QAN');
-    hydrateFeaturedMetrics(stock, computed);
-
-    const mktCap = stock.featuredMetrics.find(m => m.label === 'Mkt Cap');
-    expect(mktCap.value).not.toBe('N/A');
-    expect(mktCap.value).toContain('$');
-
-    const pe = stock.featuredMetrics.find(m => m.label === 'Fwd P/E');
-    expect(pe.value).not.toBe('N/A');
-    expect(pe.value).toMatch(/x$/);
-
-    const div = stock.featuredMetrics.find(m => m.label === 'Div Yield');
-    expect(div.value).not.toBe('N/A');
-    expect(div.value).toMatch(/%$/);
-  });
-
-  it('always updates Drawdown from priceHistory', () => {
-    seedStock('TEST', { price: 10, priceHistory: [8, 9, 12, 11, 10] }, { sharesOutstanding: null });
-    const stock = STOCK_DATA['TEST'];
-    const computed = compute('TEST');
-    hydrateFeaturedMetrics(stock, computed);
-
-    const dd = stock.featuredMetrics.find(m => m.label === 'Drawdown');
-    expect(dd.value).not.toBe('N/A');
-    // Drawdown from high of 12: (10-12)/12 = -16.7%, formatted as &darr;17%
-    expect(dd.value).toMatch(/\d+%/);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// hydrate() full pipeline
-// ---------------------------------------------------------------------------
-
-describe('hydrate() end-to-end', () => {
-  it('with null reference data, featuredMetrics stay N/A (the bug)', () => {
-    seedStock('IPX', { price: 3.52 }, {
-      sharesOutstanding: null,
-      epsForward: null,
-      divPerShare: null,
-    });
-    hydrate('IPX');
-    const stock = STOCK_DATA['IPX'];
-    const mktCap = stock.featuredMetrics.find(m => m.label === 'Mkt Cap');
-    expect(mktCap.value).toBe('N/A');
-  });
-
-  it('with populated reference data, featuredMetrics are populated (the fix)', () => {
-    seedStock('QAN', { price: 8.34 }, {
-      sharesOutstanding: 1220,
-      epsForward: 0.667,
-      divPerShare: 0.20,
-    });
-    hydrate('QAN');
-    const stock = STOCK_DATA['QAN'];
-
-    const mktCap = stock.featuredMetrics.find(m => m.label === 'Mkt Cap');
-    expect(mktCap.value).not.toBe('N/A');
-
-    const pe = stock.featuredMetrics.find(m => m.label === 'Fwd P/E');
-    expect(pe.value).not.toBe('N/A');
-
-    const div = stock.featuredMetrics.find(m => m.label === 'Div Yield');
-    expect(div.value).not.toBe('N/A');
-  });
-});
-
-// ---------------------------------------------------------------------------
-// renderFeaturedCard() – Analysis pending detection
-// ---------------------------------------------------------------------------
-
-describe('renderFeaturedCard() pending state', () => {
-  it('renders "Analysis pending" when 3 of 4 metrics are N/A', () => {
-    seedStock('IPX', {
-      price: 3.52,
-      featuredMetrics: [
-        { label: 'Mkt Cap', value: 'N/A', color: '' },
-        { label: 'Fwd P/E', value: 'N/A', color: '' },
-        { label: 'Div Yield', value: 'N/A', color: '' },
-        { label: 'Drawdown', value: '-60.3%', color: '' },
-      ],
-    });
-    const html = renderFeaturedCard(STOCK_DATA['IPX']);
-    expect(html).toContain('Analysis pending');
-    expect(html).toContain('fc-pending');
-  });
-
-  it('renders full card when 2+ metrics are populated', () => {
-    seedStock('QAN', {
-      price: 8.34,
-      featuredMetrics: [
-        { label: 'Mkt Cap', value: 'A$10.2B', color: '' },
-        { label: 'Fwd P/E', value: '12.5x', color: '' },
-        { label: 'Div Yield', value: '2.4%', color: '' },
-        { label: 'Drawdown', value: '-27.5%', color: '' },
-      ],
-    });
-    const html = renderFeaturedCard(STOCK_DATA['QAN']);
-    expect(html).not.toContain('Analysis pending');
-    expect(html).not.toContain('fc-pending');
-    expect(html).toContain('A$10.2B');
-    expect(html).toContain('12.5x');
-  });
-
-  it('renders full card after hydrate() with populated reference data', () => {
-    seedStock('QAN', {
-      price: 8.34,
-      featuredMetrics: [
-        { label: 'Mkt Cap', value: 'N/A', color: '' },
-        { label: 'Fwd P/E', value: 'N/A', color: '' },
-        { label: 'Div Yield', value: 'N/A', color: '' },
-        { label: 'Drawdown', value: '-27.5%', color: '' },
-      ],
-    }, {
-      sharesOutstanding: 1220,
-      epsForward: 0.667,
-      divPerShare: 0.20,
-    });
-
-    // Before hydration: should be pending
-    const beforeHtml = renderFeaturedCard(STOCK_DATA['QAN']);
-    expect(beforeHtml).toContain('Analysis pending');
-
-    // After hydration: should be populated
-    hydrate('QAN');
-    const afterHtml = renderFeaturedCard(STOCK_DATA['QAN']);
-    expect(afterHtml).not.toContain('Analysis pending');
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Regression guards
-// ---------------------------------------------------------------------------
-
-describe('Regression guards', () => {
-  it('hydrate does not crash when REFERENCE_DATA entry is missing', () => {
-    initStockData({ GHOST: { price: 5.00, priceHistory: [5] } });
-    // No REFERENCE_DATA entry for GHOST
-    const result = hydrate('GHOST');
-    expect(result).toBeNull();
-  });
-
-  it('hydrate does not crash when featuredMetrics is missing', () => {
-    seedStock('BARE', { price: 5.00 }, { sharesOutstanding: 100 });
-    delete STOCK_DATA['BARE'].featuredMetrics;
-    // Should not throw
-    const result = hydrate('BARE');
-    expect(result).toBeDefined();
-  });
-
-  it('hydrate does not crash when priceHistory is empty', () => {
-    seedStock('EMPTY', { price: 5.00, priceHistory: [] }, { sharesOutstanding: 100 });
-    const result = hydrate('EMPTY');
-    expect(result).toBeDefined();
-    expect(result.high52).toBeNull();
-  });
-
-  it('compute handles zero price gracefully', () => {
-    seedStock('ZERO', { price: 0 }, { sharesOutstanding: 100, epsForward: 0.5 });
-    const result = compute('ZERO');
-    expect(result.price).toBe(0);
-    expect(result.marketCap).toBe(0);
-    // divYield with no divPerShare (default null in seed) should be null
-    expect(result.divYield).toBeNull();
+describe('sortCoverageTable', () => {
+  it('is exported as a no-op function for backward compatibility', () => {
+    expect(typeof sortCoverageTable).toBe('function');
+    expect(() => sortCoverageTable()).not.toThrow();
   });
 });
