@@ -12,6 +12,7 @@ import { getHomeState, resetHomeState, toggleSort, updateHomeState } from '../fe
 import { renderCoverageTable, renderCoverageTableBody } from '../features/home/coverage-table.js';
 import { renderKpiBand } from '../features/home/kpi-band.js';
 import { renderIntelligenceRail } from '../features/home/intelligence-rail.js';
+import { renderHealthBanner } from '../features/home/home-health-banner.js';
 
 // Cached rows for the current render cycle.
 var _currentRows = [];
@@ -91,6 +92,19 @@ function _bindTableEvents(container) {
 
 function _bindFilterEvents(container) {
   container.addEventListener('click', function(e) {
+    // Health banner action
+    var bannerBtn = e.target.closest('[data-health-action="show-failed"]');
+    if (bannerBtn) {
+      updateHomeState({ filterExtraction: 'failed' });
+      _rerenderBody(container);
+      // Update the extraction chip to reflect the new filter
+      var chips = container.querySelectorAll('.filter-chip[data-filter-group="extraction"]');
+      for (var i = 0; i < chips.length; i++) {
+        chips[i].classList.toggle('active', chips[i].getAttribute('data-filter-value') === 'failed');
+      }
+      return;
+    }
+
     var chip = e.target.closest('.filter-chip[data-filter-group]');
     if (!chip) return;
     var group = chip.getAttribute('data-filter-group');
@@ -187,7 +201,9 @@ export function initHomePage() {
   var state = getHomeState();
   var displayRows = _getFilteredSorted(state);
 
+  var totalTickers = Object.keys(STOCK_DATA).length;
   container.innerHTML =
+    renderHealthBanner(BATCH_STATUS, totalTickers) +
     '<div class="home-layout">' +
     '<div class="home-main">' +
     renderKpiBand(_currentRows, BATCH_STATUS) +

@@ -432,6 +432,40 @@
     color: var(--signal-red);
 }
 
+/* --- Health Banner --- */
+.health-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: 6px;
+    font-size: var(--font-size-xs);
+    margin-bottom: var(--space-md);
+    gap: var(--space-md);
+}
+.health-banner--warning {
+    background: rgba(212, 160, 60, 0.12);
+    border: 1px solid rgba(212, 160, 60, 0.3);
+    color: var(--signal-amber);
+}
+.health-banner--critical {
+    background: rgba(224, 93, 93, 0.12);
+    border: 1px solid rgba(224, 93, 93, 0.3);
+    color: var(--signal-red);
+}
+.health-banner__action {
+    background: none;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.health-banner__action:hover { opacity: 0.8; }
+
 /* --- Intelligence Rail --- */
 .intelligence-rail {
     display: flex;
