@@ -22,6 +22,30 @@ const ANNOUNCEMENTS_DATA = {};
 /** @type {{ [ticker: string]: object }} */
 const WORKSTATION_DATA = {};
 
+/**
+ * Per-ticker extraction status metadata.
+ * Keys are ticker strings. Values track extraction pipeline state.
+ * @type {{ [ticker: string]: { status: string, hasPayload: boolean, lastSuccessfulAt: string|null, lastAttemptAt: string|null, lastErrorCode: string|null, lastErrorSummary: string|null, payloadGeneratedAt: string|null } }}
+ */
+const WORKSTATION_STATUS = {};
+
+/**
+ * Batch extraction run metadata.
+ * Singleton object tracking the most recent batch run.
+ * @type {{ runId: string|null, startedAt: string|null, completedAt: string|null, totalTickers: number, succeeded: number, failed: number, stale: number, missing: number, status: string }}
+ */
+const BATCH_STATUS = {
+  runId: null,
+  startedAt: null,
+  completedAt: null,
+  totalTickers: 0,
+  succeeded: 0,
+  failed: 0,
+  stale: 0,
+  missing: 0,
+  status: 'unknown'
+};
+
 // --- Config constants ---
 
 // Featured card display order (dynamically derived from STOCK_DATA keys)
@@ -182,6 +206,40 @@ export function initWorkstationData(data) {
   Object.assign(WORKSTATION_DATA, data);
 }
 
+/** Get workstation status for a ticker */
+export function getWorkstationStatus(ticker) {
+  return WORKSTATION_STATUS[ticker];
+}
+
+/** Set workstation status for a ticker */
+export function setWorkstationStatus(ticker, status) {
+  WORKSTATION_STATUS[ticker] = status;
+}
+
+/** Get the current batch status */
+export function getBatchStatus() {
+  return BATCH_STATUS;
+}
+
+/** Update batch status (merge) */
+export function updateBatchStatus(patch) {
+  Object.assign(BATCH_STATUS, patch);
+}
+
+/** Initialise workstation status for multiple tickers */
+export function initWorkstationStatus(data) {
+  Object.assign(WORKSTATION_STATUS, data);
+}
+
+/** Reset batch status to defaults */
+export function resetBatchStatus() {
+  Object.assign(BATCH_STATUS, {
+    runId: null, startedAt: null, completedAt: null,
+    totalTickers: 0, succeeded: 0, failed: 0, stale: 0, missing: 0,
+    status: 'unknown'
+  });
+}
+
 // --- Export raw objects for backward compatibility ---
 export {
   STOCK_DATA,
@@ -191,6 +249,8 @@ export {
   COVERAGE_DATA,
   TC_DATA,
   ANNOUNCEMENTS_DATA,
-  WORKSTATION_DATA
+  WORKSTATION_DATA,
+  WORKSTATION_STATUS,
+  BATCH_STATUS
 };
 // Note: FEATURED_ORDER, SNAPSHOT_ORDER, and COMING_SOON are exported inline above.
