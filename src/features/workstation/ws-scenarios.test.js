@@ -9,9 +9,9 @@ describe('renderWsScenarios', () => {
     expect(html).toContain('id="ws-scenarios"');
   });
 
-  it('renders the §02 Scenarios heading', () => {
+  it('renders the 02 Scenarios heading', () => {
     const html = renderWsScenarios(bhpFixture);
-    expect(html).toContain('§02 Scenarios');
+    expect(html).toContain('02 / Scenarios');
   });
 
   it('renders all 4 BHP scenario cards', () => {

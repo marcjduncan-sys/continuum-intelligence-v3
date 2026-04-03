@@ -1,5 +1,5 @@
 /**
- * Workstation Section Renderer: §04 Risks
+ * Workstation Section Renderer: 04 Risks
  * Pure function. No DOM. No state imports. Returns an HTML string.
  */
 
@@ -62,7 +62,7 @@ function renderRiskRow(item) {
 }
 
 /**
- * Render the §04 Risks section card.
+ * Render the 04 Risks section card.
  *
  * @param {object} data - Full workstation payload.
  * @returns {string} HTML string.
@@ -79,7 +79,7 @@ export function renderWsRisks(data) {
 
   return (
     '<section class="ws-section ws-section--risks" id="ws-risks">' +
-      '<h2 class="ws-section__heading">\u00a704 Risks</h2>' +
+      '<h2 class="ws-section__heading">04 / Risks</h2>' +
       '<div class="ws-risks">' +
         (headline ? '<p class="ws-section__headline">' + headline + '</p>' : '') +
         '<table class="ws-risk-table">' +

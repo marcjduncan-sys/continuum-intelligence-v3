@@ -1,5 +1,5 @@
 /**
- * Workstation Section Renderer: §03 Valuation
+ * Workstation Section Renderer: 03 Valuation
  * Pure function. No DOM. No state imports. Returns an HTML string.
  */
 
@@ -44,7 +44,7 @@ function renderSensitivityRows(rows) {
 }
 
 /**
- * Render the §03 Valuation section.
+ * Render the 03 Valuation section.
  *
  * @param {object} data - Full workstation payload.
  * @returns {string} HTML string.
@@ -85,7 +85,7 @@ export function renderWsValuation(data) {
     : '';
 
   return `<section class="ws-section ws-section--valuation" id="ws-valuation">
-  <h2 class="ws-section__heading">§03 Valuation</h2>
+  <h2 class="ws-section__heading">03 / Valuation</h2>
   <p class="ws-section__headline">${headline}</p>
   <div class="ws-valuation">
     ${bridgeHtml}

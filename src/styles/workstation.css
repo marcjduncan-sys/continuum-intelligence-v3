@@ -286,22 +286,52 @@
 
 /* Scenarios */
 .ws-scenarios__grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-md);
-  flex-wrap: wrap;
   margin-bottom: var(--space-md);
+}
+@media (max-width: 900px) {
+  .ws-scenarios__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 .ws-scenario-card {
   flex: 1 1 130px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
   border-radius: 6px;
   padding: var(--space-md);
 }
-.ws-scenario-card--bull { border-top: 3px solid var(--signal-green); }
-.ws-scenario-card--base { border-top: 3px solid var(--accent-teal); }
-.ws-scenario-card--bear { border-top: 3px solid var(--signal-red); }
-.ws-scenario-card--stretch { border-top: 3px solid var(--accent-strat); }
+.ws-scenario-card--bull {
+  border: 1px solid #ccead8;
+  background: #f4fbf6;
+  border-top: 3px solid var(--signal-green);
+}
+.ws-scenario-card--base {
+  border: 1px solid #d6e3f0;
+  background: #f5f9fd;
+  border-top: 3px solid var(--accent-teal);
+}
+.ws-scenario-card--bear {
+  border: 1px solid #f0d6d6;
+  background: #fdf5f5;
+  border-top: 3px solid var(--signal-red);
+}
+.ws-scenario-card--stretch {
+  border: 1px solid #dbd6f0;
+  background: #f8f5fd;
+  border-top: 3px solid var(--accent-strat);
+}
+/* Dark mode overrides for scenario cards */
+@media (prefers-color-scheme: dark) {
+  .ws-scenario-card--bull { border-color: rgba(61,170,109,0.3); background: rgba(61,170,109,0.06); border-top-color: var(--signal-green); }
+  .ws-scenario-card--base { border-color: rgba(34,184,167,0.3); background: rgba(34,184,167,0.06); border-top-color: var(--accent-teal); }
+  .ws-scenario-card--bear { border-color: rgba(224,93,93,0.3); background: rgba(224,93,93,0.06); border-top-color: var(--signal-red); }
+  .ws-scenario-card--stretch { border-color: rgba(91,141,239,0.3); background: rgba(91,141,239,0.06); border-top-color: var(--accent-strat); }
+}
+[data-theme="dark"] .ws-scenario-card--bull { border-color: rgba(61,170,109,0.3); background: rgba(61,170,109,0.06); border-top-color: var(--signal-green); }
+[data-theme="dark"] .ws-scenario-card--base { border-color: rgba(34,184,167,0.3); background: rgba(34,184,167,0.06); border-top-color: var(--accent-teal); }
+[data-theme="dark"] .ws-scenario-card--bear { border-color: rgba(224,93,93,0.3); background: rgba(224,93,93,0.06); border-top-color: var(--signal-red); }
+[data-theme="dark"] .ws-scenario-card--stretch { border-color: rgba(91,141,239,0.3); background: rgba(91,141,239,0.06); border-top-color: var(--accent-strat); }
 .ws-scenario-card__header {
   display: flex;
   justify-content: space-between;
@@ -322,8 +352,9 @@
 }
 .ws-scenario-card__price {
   font-size: var(--font-size-lg);
-  font-weight: 700;
-  font-family: var(--font-data);
+  font-weight: 800;
+  font-family: var(--font-ui);
+  letter-spacing: -0.03em;
   margin-bottom: var(--space-xs);
 }
 .ws-scenario-card__desc {
@@ -336,6 +367,8 @@
   color: var(--text-muted);
   font-family: var(--font-data);
   margin: 0;
+  white-space: nowrap;
+  overflow-x: auto;
 }
 
 /* Valuation */
@@ -735,6 +768,50 @@
 .ws-chat__suggested-btn:hover {
   border-color: var(--accent-teal);
   background: rgba(34,184,167,0.06);
+}
+
+/* Chat composer */
+.ws-chat__composer {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid var(--border);
+  align-items: flex-end;
+}
+.ws-chat__textarea {
+  flex: 1;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-xs);
+  color: var(--text-primary);
+  resize: vertical;
+  min-height: 36px;
+  line-height: 1.5;
+}
+.ws-chat__textarea:focus {
+  outline: none;
+  border-color: var(--accent-teal);
+}
+.ws-chat__textarea::placeholder {
+  color: var(--text-muted);
+}
+.ws-chat__send {
+  background: var(--accent-teal);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.ws-chat__send:hover {
+  opacity: 0.85;
 }
 
 /* Loading / error states */

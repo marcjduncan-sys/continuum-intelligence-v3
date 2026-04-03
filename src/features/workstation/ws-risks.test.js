@@ -41,9 +41,9 @@ describe('renderWsRisks -- structure', () => {
     expect(html).toContain('id="ws-risks"');
   });
 
-  it('renders §04 Risks heading', () => {
+  it('renders 04 Risks heading', () => {
     const html = renderWsRisks(bhpFixture);
-    expect(html).toContain('\u00a704 Risks');
+    expect(html).toContain('04 / Risks');
   });
 
   it('renders the headline from BHP fixture', () => {

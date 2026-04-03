@@ -144,6 +144,20 @@ function renderSuggestedQuestion(question) {
 }
 
 /**
+ * Render the chat composer with textarea and send button.
+ *
+ * @returns {string}
+ */
+function renderComposer() {
+  return (
+    '<div class="ws-chat__composer">' +
+      '<textarea class="ws-chat__textarea" placeholder="Ask about this stock..." rows="2"></textarea>' +
+      '<button class="ws-chat__send">Send</button>' +
+    '</div>'
+  );
+}
+
+/**
  * Render the Research Discussion chat panel.
  *
  * This is a static render of the chat_seed data. Interactive tab filtering
@@ -174,6 +188,7 @@ export function renderWsChat(data) {
   const filtersHtml = renderFilterTabs(threadLabels);
   const messagesHtml = messages.map(renderMessage).join('');
   const suggestedHtml = renderSuggestedQuestion(seed.suggested_question);
+  const composerHtml = renderComposer();
 
   return (
     '<aside class="ws-chat" id="ws-chat">' +
@@ -186,6 +201,7 @@ export function renderWsChat(data) {
         messagesHtml +
       '</div>' +
       suggestedHtml +
+      composerHtml +
     '</aside>'
   );
 }

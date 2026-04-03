@@ -1,5 +1,5 @@
 /**
- * Workstation Section Renderer: §02 Scenarios
+ * Workstation Section Renderer: 02 Scenarios
  * Pure function. No DOM. No state imports. Returns an HTML string.
  */
 
@@ -35,7 +35,7 @@ function renderScenarioCard(scenario) {
 }
 
 /**
- * Render the §02 Scenarios section.
+ * Render the 02 Scenarios section.
  *
  * @param {object} data - Full workstation payload.
  * @returns {string} HTML string.
@@ -59,7 +59,7 @@ export function renderWsScenarios(data) {
     : '';
 
   return `<section class="ws-section ws-section--scenarios" id="ws-scenarios">
-  <h2 class="ws-section__heading">§02 Scenarios</h2>
+  <h2 class="ws-section__heading">02 / Scenarios</h2>
   <div class="ws-scenarios__grid">
     ${cardHtml}
   </div>

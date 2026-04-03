@@ -30,7 +30,7 @@ export function renderWorkstationPage(ticker, container, onRendered) {
 
   // Show loading spinner
   container.innerHTML =
-    '<div class="ws-loading">Loading workstation for ' + ticker + '\u2026</div>';
+    '<div class="ws-loading">Loading workstation for ' + ticker + '...</div>';
 
   // If already in state, render immediately
   const existing = getWorkstation(ticker);

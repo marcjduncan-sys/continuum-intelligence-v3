@@ -57,14 +57,14 @@ function escapeText(val) {
 
 // Section anchor definitions for the subnav. Order matches left-column render order.
 const SECTION_ANCHORS = [
-  { href: '#ws-thesis',        label: '\u00a701 Thesis' },
-  { href: '#ws-scenarios',     label: '\u00a702 Scenarios' },
-  { href: '#ws-valuation',     label: '\u00a703 Valuation' },
-  { href: '#ws-risks',         label: '\u00a704 Risks' },
-  { href: '#ws-evidence',      label: '\u00a705 Evidence' },
-  { href: '#ws-revisions',     label: '\u00a706 Revisions' },
-  { href: '#ws-deep-research', label: '\u00a707 Deep Research' },
-  { href: '#ws-quality',       label: '\u00a708 Quality' }
+  { href: '#ws-thesis',        label: '01 / Thesis' },
+  { href: '#ws-scenarios',     label: '02 / Scenarios' },
+  { href: '#ws-valuation',     label: '03 / Valuation' },
+  { href: '#ws-risks',         label: '04 / Risks' },
+  { href: '#ws-evidence',      label: '05 / Evidence' },
+  { href: '#ws-revisions',     label: '06 / Revisions' },
+  { href: '#ws-deep-research', label: '07 / Deep Research' },
+  { href: '#ws-quality',       label: '08 / Quality' }
 ];
 
 /**
@@ -79,7 +79,7 @@ function renderTopbar(ticker) {
   return (
     '<header class="ws-topbar">' +
       '<div class="ws-topbar__left">' +
-        '<a class="ws-topbar__back" href="#home">\u2190 Home</a>' +
+        '<a class="ws-topbar__back" href="#home">Home</a>' +
       '</div>' +
       '<div class="ws-topbar__right">' +
         '<span class="ws-topbar__ticker">' + safeTicker + '</span>' +
@@ -213,14 +213,14 @@ export function renderWorkstation(data) {
 
   const subnav =
     '<nav class="ws-subnav">' +
-      '<a href="#ws-thesis" class="ws-subnav__link">\u00a701 Thesis</a>' +
-      '<a href="#ws-scenarios" class="ws-subnav__link">\u00a702 Scenarios</a>' +
-      '<a href="#ws-valuation" class="ws-subnav__link">\u00a703 Valuation</a>' +
-      '<a href="#ws-risks" class="ws-subnav__link">\u00a704 Risks</a>' +
-      '<a href="#ws-evidence" class="ws-subnav__link">\u00a705 Evidence</a>' +
-      '<a href="#ws-revisions" class="ws-subnav__link">\u00a706 Revisions</a>' +
-      '<a href="#ws-deep-research" class="ws-subnav__link">\u00a707 Deep Research</a>' +
-      '<a href="#ws-quality" class="ws-subnav__link">\u00a708 Quality</a>' +
+      '<a href="#ws-thesis" class="ws-subnav__link">01 / Thesis</a>' +
+      '<a href="#ws-scenarios" class="ws-subnav__link">02 / Scenarios</a>' +
+      '<a href="#ws-valuation" class="ws-subnav__link">03 / Valuation</a>' +
+      '<a href="#ws-risks" class="ws-subnav__link">04 / Risks</a>' +
+      '<a href="#ws-evidence" class="ws-subnav__link">05 / Evidence</a>' +
+      '<a href="#ws-revisions" class="ws-subnav__link">06 / Revisions</a>' +
+      '<a href="#ws-deep-research" class="ws-subnav__link">07 / Deep Research</a>' +
+      '<a href="#ws-quality" class="ws-subnav__link">08 / Quality</a>' +
     '</nav>';
 
   const heroBand =

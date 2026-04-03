@@ -1,12 +1,12 @@
 /**
- * Workstation Section Renderer: §01 Thesis
+ * Workstation Section Renderer: 01 Thesis
  * Pure function. No DOM. No state imports. Returns an HTML string.
  */
 
 import { sanitiseInlineHtml } from './ws-computed.js';
 
 /**
- * Render the §01 Thesis section card.
+ * Render the 01 Thesis section card.
  *
  * @param {object} data - Full workstation payload.
  * @returns {string} HTML string.
@@ -40,7 +40,7 @@ export function renderWsThesis(data) {
     : '';
 
   return `<section class="ws-section ws-section--thesis" id="ws-thesis">
-  <h2 class="ws-section__heading">§01 Thesis</h2>
+  <h2 class="ws-section__heading">01 / Thesis</h2>
   <div class="ws-thesis">
     <p class="ws-thesis__headline">${headline}</p>
     <div class="ws-thesis__bluf">${bluf}</div>

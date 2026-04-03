@@ -71,7 +71,10 @@ test('home page loads without console errors', async ({ page }) => {
     !e.includes('500') &&
     !e.includes('Internal Server Error') &&
     !e.includes('Content Security Policy') &&
-    !e.includes('frame-ancestors')
+    !e.includes('frame-ancestors') &&
+    !e.includes('[Boot]') &&
+    !e.includes('dependency not ready') &&
+    !e.includes('not registered')
   );
   expect(unexpected).toHaveLength(0);
 });

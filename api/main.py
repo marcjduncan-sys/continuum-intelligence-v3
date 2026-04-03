@@ -50,6 +50,7 @@ from portfolio_api import router as portfolio_router
 from pm_ops import router as pm_ops_router
 from source_upload import router as source_upload_router
 from economist_api import router as economist_router
+from extraction import router as extraction_router
 from ingest import ingest, embed_all_passages, get_tickers, get_passage_count
 from refresh import (
     RefreshJob, refresh_jobs, get_job, is_running, run_refresh,
@@ -387,6 +388,9 @@ async def verify_api_key(api_key: str | None = Depends(_api_key_header)):
 
 # Economist endpoints (always enabled, auth-gated except /health)
 app.include_router(economist_router, dependencies=[Depends(verify_api_key)])
+
+# Workstation extraction endpoint (auth-gated)
+app.include_router(extraction_router, dependencies=[Depends(verify_api_key)])
 
 
 # Anthropic client (delegates to shared singleton in config)

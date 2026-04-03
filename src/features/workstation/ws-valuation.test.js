@@ -9,9 +9,9 @@ describe('renderWsValuation', () => {
     expect(html).toContain('id="ws-valuation"');
   });
 
-  it('renders the §03 Valuation heading', () => {
+  it('renders the 03 Valuation heading', () => {
     const html = renderWsValuation(bhpFixture);
-    expect(html).toContain('§03 Valuation');
+    expect(html).toContain('03 / Valuation');
   });
 
   it('renders the headline text', () => {

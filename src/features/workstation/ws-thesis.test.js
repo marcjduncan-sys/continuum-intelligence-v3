@@ -9,9 +9,9 @@ describe('renderWsThesis', () => {
     expect(html).toContain('id="ws-thesis"');
   });
 
-  it('renders the §01 Thesis heading', () => {
+  it('renders the 01 Thesis heading', () => {
     const html = renderWsThesis(bhpFixture);
-    expect(html).toContain('§01 Thesis');
+    expect(html).toContain('01 / Thesis');
   });
 
   it('renders the headline text', () => {
