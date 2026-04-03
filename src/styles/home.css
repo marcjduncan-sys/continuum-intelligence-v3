@@ -432,6 +432,115 @@
     color: var(--signal-red);
 }
 
+/* --- Intelligence Rail --- */
+.intelligence-rail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    align-self: start;
+}
+.rail-section {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.rail-section__header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+}
+.rail-section__title {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    flex: 1;
+}
+.rail-section__count {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--accent-teal);
+    background: rgba(34, 184, 167, 0.12);
+    padding: 1px 6px;
+    border-radius: 10px;
+}
+.rail-section__toggle {
+    background: none;
+    border: none;
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 2px;
+}
+.rail-section__content {
+    padding: var(--space-sm) var(--space-md);
+}
+.rail-empty {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    padding: var(--space-xs) 0;
+}
+.rail-alert-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-xs);
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+.rail-alert-item:last-child { border-bottom: none; }
+.rail-alert-item__ticker {
+    font-family: var(--font-data);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--accent-teal);
+    min-width: 36px;
+}
+.rail-alert-item__msg {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+.rail-signal-dist {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+.rail-signal-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.rail-signal-count {
+    font-family: var(--font-data);
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.rail-health {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.rail-health-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+.rail-health-value { font-weight: 700; color: var(--text-primary); }
+.rail-health-value--amber { color: var(--signal-amber); }
+.rail-health-value--red { color: var(--signal-red); }
+.rail-health-value--muted { color: var(--text-muted); }
+.rail-health-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: var(--space-xs);
+}
+
 /* --- Responsive --- */
 @media (max-width: 899px) {
     .home-layout {

@@ -11,6 +11,7 @@ import { buildCoverageRows, sortCoverageRows, filterCoverageRows } from '../feat
 import { getHomeState, resetHomeState, toggleSort, updateHomeState } from '../features/home/home-state.js';
 import { renderCoverageTable, renderCoverageTableBody } from '../features/home/coverage-table.js';
 import { renderKpiBand } from '../features/home/kpi-band.js';
+import { renderIntelligenceRail } from '../features/home/intelligence-rail.js';
 
 // Cached rows for the current render cycle.
 var _currentRows = [];
@@ -192,6 +193,7 @@ export function initHomePage() {
     renderKpiBand(_currentRows, BATCH_STATUS) +
     renderCoverageTable(displayRows, state) +
     '</div>' +
+    renderIntelligenceRail(_currentRows, BATCH_STATUS, state.selectedTicker) +
     '</div>';
 
   _bindTableEvents(container);
