@@ -1,8 +1,9 @@
 import {
-  STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA, SNAPSHOT_DATA,
-  initStockData, initReferenceData, initFreshnessData,
+  STOCK_DATA, REFERENCE_DATA, FRESHNESS_DATA, SNAPSHOT_DATA, WORKSTATION_DATA,
+  initStockData, initReferenceData, initFreshnessData, initWorkstationData,
   getStock, getAllTickers, setStockData, patchStock,
   getReference, getFreshness,
+  getWorkstation, setWorkstation, getAllWorkstationTickers, clearWorkstation,
   FEATURED_ORDER, SNAPSHOT_ORDER, VALID_STATIC_PAGES,
 } from './state.js';
 
@@ -12,6 +13,7 @@ beforeEach(() => {
   for (var k in REFERENCE_DATA) delete REFERENCE_DATA[k];
   for (var k in FRESHNESS_DATA) delete FRESHNESS_DATA[k];
   for (var k in SNAPSHOT_DATA) delete SNAPSHOT_DATA[k];
+  for (var k in WORKSTATION_DATA) delete WORKSTATION_DATA[k];
 });
 
 describe('VALID_STATIC_PAGES', () => {
@@ -104,5 +106,45 @@ describe('Reference and Freshness accessors', () => {
   it('stores and retrieves freshness data', () => {
     initFreshnessData({ CBA: { updatedAt: '2026-02-27' } });
     expect(getFreshness('CBA')).toEqual({ updatedAt: '2026-02-27' });
+  });
+});
+
+describe('Workstation accessor functions', () => {
+  it('WORKSTATION_DATA starts as an object', () => {
+    expect(typeof WORKSTATION_DATA).toBe('object');
+    expect(WORKSTATION_DATA).toEqual({});
+  });
+  it('getWorkstation returns undefined for unknown ticker', () => {
+    expect(getWorkstation('XYZ')).toBeUndefined();
+  });
+  it('setWorkstation stores and getWorkstation retrieves', () => {
+    setWorkstation('CBA', { position: 'long', shares: 1000 });
+    expect(getWorkstation('CBA')).toEqual({ position: 'long', shares: 1000 });
+  });
+  it('initWorkstationData merges multiple tickers via Object.assign', () => {
+    initWorkstationData({ CBA: { position: 'long' }, WBC: { position: 'short' } });
+    expect(getWorkstation('CBA')).toEqual({ position: 'long' });
+    expect(getWorkstation('WBC')).toEqual({ position: 'short' });
+  });
+  it('getAllWorkstationTickers returns correct keys', () => {
+    initWorkstationData({ CBA: { position: 'long' }, WBC: { position: 'short' }, ASX: { position: 'hold' } });
+    const tickers = getAllWorkstationTickers();
+    expect(tickers).toContain('CBA');
+    expect(tickers).toContain('WBC');
+    expect(tickers).toContain('ASX');
+    expect(tickers).toHaveLength(3);
+  });
+  it('clearWorkstation removes a specific ticker', () => {
+    initWorkstationData({ CBA: { position: 'long' }, WBC: { position: 'short' } });
+    clearWorkstation('CBA');
+    expect(getWorkstation('CBA')).toBeUndefined();
+    expect(getWorkstation('WBC')).toEqual({ position: 'short' });
+    expect(getAllWorkstationTickers()).toEqual(['WBC']);
+  });
+  it('setWorkstation does not affect STOCK_DATA (isolation test)', () => {
+    initStockData({ CBA: { price: 130 } });
+    setWorkstation('CBA', { position: 'long' });
+    expect(getStock('CBA')).toEqual({ price: 130 });
+    expect(getWorkstation('CBA')).toEqual({ position: 'long' });
   });
 });

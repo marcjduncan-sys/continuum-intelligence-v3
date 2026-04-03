@@ -19,6 +19,8 @@ const COVERAGE_DATA = {};
 const TC_DATA = {};
 /** @type {{ [ticker: string]: Array }} */
 const ANNOUNCEMENTS_DATA = {};
+/** @type {{ [ticker: string]: object }} */
+const WORKSTATION_DATA = {};
 
 // --- Config constants ---
 
@@ -118,6 +120,26 @@ export function getTcData(ticker) {
   return TC_DATA[ticker];
 }
 
+/** Get workstation data for a ticker */
+export function getWorkstation(ticker) {
+  return WORKSTATION_DATA[ticker];
+}
+
+/** Set workstation data for a ticker */
+export function setWorkstation(ticker, data) {
+  WORKSTATION_DATA[ticker] = data;
+}
+
+/** Get all workstation tickers */
+export function getAllWorkstationTickers() {
+  return Object.keys(WORKSTATION_DATA);
+}
+
+/** Clear workstation data for a specific ticker */
+export function clearWorkstation(ticker) {
+  delete WORKSTATION_DATA[ticker];
+}
+
 // --- Bulk initialisation ---
 
 /** Merge data into STOCK_DATA */
@@ -155,6 +177,11 @@ export function initAnnouncementsData(data) {
   Object.assign(ANNOUNCEMENTS_DATA, data);
 }
 
+/** Merge data into WORKSTATION_DATA */
+export function initWorkstationData(data) {
+  Object.assign(WORKSTATION_DATA, data);
+}
+
 // --- Export raw objects for backward compatibility ---
 export {
   STOCK_DATA,
@@ -163,6 +190,7 @@ export {
   SNAPSHOT_DATA,
   COVERAGE_DATA,
   TC_DATA,
-  ANNOUNCEMENTS_DATA
+  ANNOUNCEMENTS_DATA,
+  WORKSTATION_DATA
 };
 // Note: FEATURED_ORDER, SNAPSHOT_ORDER, and COMING_SOON are exported inline above.
