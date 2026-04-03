@@ -10,6 +10,7 @@ import { on } from '../lib/data-events.js';
 import { buildCoverageRows, sortCoverageRows, filterCoverageRows } from '../features/home/home-selectors.js';
 import { getHomeState, resetHomeState, toggleSort, updateHomeState } from '../features/home/home-state.js';
 import { renderCoverageTable, renderCoverageTableBody } from '../features/home/coverage-table.js';
+import { renderKpiBand } from '../features/home/kpi-band.js';
 
 // Cached rows for the current render cycle.
 var _currentRows = [];
@@ -188,6 +189,7 @@ export function initHomePage() {
   container.innerHTML =
     '<div class="home-layout">' +
     '<div class="home-main">' +
+    renderKpiBand(_currentRows, BATCH_STATUS) +
     renderCoverageTable(displayRows, state) +
     '</div>' +
     '</div>';

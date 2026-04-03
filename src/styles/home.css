@@ -172,6 +172,41 @@
     color: var(--text-muted);
 }
 
+/* --- KPI Band --- */
+.kpi-band {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+    overflow-x: auto;
+}
+.kpi-card {
+    flex: 1;
+    min-width: 120px;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.kpi-card__label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
+}
+.kpi-card__value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.kpi-card__value--green { color: var(--signal-green); }
+.kpi-card__value--red { color: var(--signal-red); }
+.kpi-card__value--amber { color: var(--signal-amber); }
+.kpi-card__delta {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
 /* --- Home Page Layout --- */
 .home-layout {
     display: grid;
