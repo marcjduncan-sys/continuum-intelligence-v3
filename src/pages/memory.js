@@ -110,11 +110,12 @@ function _getTypeConfig(type) {
 }
 
 // ============================================================
-// CSS INJECTION
+// CSS INJECTION -- styles now loaded via src/styles/memory.css (index.css import)
 // ============================================================
 
 function _injectCSS() {
-    if (document.getElementById('journal-page-css')) return;
+    // No-op: styles loaded statically via memory.css
+    return;
     const style = document.createElement('style');
     style.id = 'journal-page-css';
     style.textContent =
@@ -237,7 +238,8 @@ const PM_ACTION_CONFIG = {
 // ============================================================
 
 function _injectPMCSS() {
-    if (document.getElementById('pm-journal-css')) return;
+    // No-op: styles loaded statically via memory.css
+    return;
     const style = document.createElement('style');
     style.id = 'pm-journal-css';
     style.textContent =
