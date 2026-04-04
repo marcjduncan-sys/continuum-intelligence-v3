@@ -10,7 +10,6 @@
 
 import { API_BASE } from '../lib/api-config.js';
 import { formatPrice, formatPercent } from '../lib/format.js';
-import { renderChatPanel } from '../features/report/chat-panel.js';
 
 export function renderPMPage() {
     const container = document.getElementById('page-pm');
@@ -149,7 +148,7 @@ export function renderPMPage() {
     container.innerHTML =
         '<div class="workstation">' +
             '<div class="content-col">' + contentCol + '</div>' +
-            renderChatPanel({ ticker: '', company: 'Portfolio Manager' }) +
+            '<div id="pm-workstation-slot" class="chat-panel pm-panel-slot"></div>' +
         '</div>';
 
     container.dataset.rendered = '1';

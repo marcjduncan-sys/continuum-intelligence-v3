@@ -4,7 +4,7 @@
 import { STOCK_DATA } from '../lib/state.js';
 import { renderSourceUploadZone } from '../features/source-upload.js';
 
-import { renderReportHero, renderDecisionRibbon } from '../features/report/hero.js';
+import { renderReportHero, renderDecisionRibbon, renderDeepResearchHero } from '../features/report/hero.js';
 import { renderChatPanel } from '../features/report/chat-panel.js';
 import { renderSkewBar, renderVerdict, renderHypotheses, prepareHypotheses, renderOvercorrectionBanner } from '../features/report/hypothesis.js';
 import { renderEvidence, renderDiscriminators, renderTripwires, renderGaps } from '../features/report/evidence.js';
@@ -58,10 +58,7 @@ export function renderReport(data) {
     }
     const deepSectionNav = '<div class="section-nav"><div class="section-nav-inner">' + deepNavHtml + '</div></div>';
 
-    return renderReportHero(data) +
-      renderSignalBars(data) +
-      renderSkewBar(data) +
-      renderVerdict(data) +
+    return renderDeepResearchHero(data) +
       deepSectionNav +
       '<div class="report-content">' +
         '<div class="report-main deep-report-main">' + deepMainContent + sourcesSection(data.ticker) + '</div>' +

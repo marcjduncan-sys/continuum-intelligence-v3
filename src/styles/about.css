@@ -1,0 +1,441 @@
+/* ===========================================================================
+   ABOUT PAGE
+   Prototype: 09-about.html
+   Classes: manifesto-hero, about-section, method-grid, principle-list,
+            diff-table, team-grid, cta-block
+   =========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   MANIFESTO HERO
+   --------------------------------------------------------------------------- */
+
+.manifesto-hero {
+    background: linear-gradient(160deg, #0f2438, #1a3958, #234d78);
+    padding: 80px 20px;
+    text-align: center;
+    color: #fff;
+}
+
+.mh-inner {
+    max-width: var(--content-width-report);
+    margin: 0 auto;
+}
+
+.mh-eyebrow {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .18em;
+    color: rgba(255,255,255,.45);
+    font-weight: 900;
+    margin-bottom: 16px;
+}
+
+.mh-title {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -.06em;
+    line-height: 1.08;
+    margin: 0 0 20px;
+}
+
+.mh-title span {
+    color: #60a5fa;
+}
+
+.mh-body {
+    font-size: 16px;
+    line-height: 1.75;
+    color: rgba(255,255,255,.65);
+    margin-bottom: 28px;
+}
+
+.mh-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.mh-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+}
+
+.mh-stat-v {
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.04em;
+}
+
+.mh-stat-k {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: rgba(255,255,255,.45);
+    font-weight: 900;
+}
+
+/* ---------------------------------------------------------------------------
+   PAGE BODY
+   --------------------------------------------------------------------------- */
+
+.about-body {
+    max-width: var(--content-width-xl);
+    margin: 0 auto;
+    padding: 48px 20px;
+}
+
+/* ---------------------------------------------------------------------------
+   ABOUT SECTION
+   --------------------------------------------------------------------------- */
+
+.about-section {
+    margin-bottom: 48px;
+}
+
+.as-eyebrow {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--muted);
+    font-weight: 900;
+    margin-bottom: 8px;
+}
+
+.as-title {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -.04em;
+    margin: 0 0 16px;
+    color: var(--text);
+}
+
+.as-body {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-2);
+    margin-bottom: 16px;
+}
+
+.as-body strong {
+    color: var(--text);
+}
+
+.as-divider {
+    height: 1px;
+    background: var(--line);
+    margin: 48px 0;
+}
+
+/* ---------------------------------------------------------------------------
+   METHODOLOGY GRID
+   --------------------------------------------------------------------------- */
+
+.method-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.method-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+}
+
+.mc-number {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -.06em;
+    color: var(--blue);
+    opacity: .3;
+    margin-bottom: 8px;
+}
+
+.mc-title {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+.mc-body {
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text-2);
+}
+
+.mc-body strong {
+    color: var(--text);
+}
+
+/* ---------------------------------------------------------------------------
+   PRINCIPLES LIST
+   --------------------------------------------------------------------------- */
+
+.principle-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.principle-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    align-items: start;
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+}
+
+.pi-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    background: var(--blue-soft);
+    border: 1px solid #c8d8ea;
+}
+
+.pi-title {
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 4px;
+    color: var(--text);
+}
+
+.pi-body {
+    font-size: 12px;
+    line-height: 1.65;
+    color: var(--text-2);
+}
+
+/* ---------------------------------------------------------------------------
+   DIFFERENTIATION TABLE
+   --------------------------------------------------------------------------- */
+
+.diff-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+}
+
+.diff-table th {
+    padding: 10px 14px;
+    background: var(--surface-3);
+    border-bottom: 1px solid var(--line);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+    font-weight: 900;
+    text-align: left;
+}
+
+.diff-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line-2);
+    font-size: 12px;
+    vertical-align: top;
+    color: var(--text-2);
+}
+
+.diff-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.diff-table tr:hover td {
+    background: var(--surface-2);
+}
+
+.diff-check {
+    color: var(--green);
+    font-weight: 900;
+}
+
+.diff-cross {
+    color: var(--red);
+    font-weight: 900;
+}
+
+.diff-label {
+    font-weight: 800;
+    color: var(--text);
+}
+
+/* ---------------------------------------------------------------------------
+   TEAM GRID
+   --------------------------------------------------------------------------- */
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.team-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.tc-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(160deg, #234d78, #1a3958);
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 900;
+    margin: 0 auto 12px;
+}
+
+.tc-name {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    margin-bottom: 3px;
+    color: var(--text);
+}
+
+.tc-role {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+
+.tc-bio {
+    font-size: 11px;
+    line-height: 1.65;
+    color: var(--text-2);
+}
+
+/* ---------------------------------------------------------------------------
+   CTA BLOCK
+   --------------------------------------------------------------------------- */
+
+.cta-block {
+    background: linear-gradient(160deg, #1a3958, #0f2438);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    color: #fff;
+    margin-top: 48px;
+}
+
+.cta-title {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -.04em;
+    margin-bottom: 10px;
+}
+
+.cta-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,.6);
+    margin-bottom: 24px;
+}
+
+.cta-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.cta-btn {
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.1);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background .12s;
+    font-family: inherit;
+}
+
+.cta-btn:hover {
+    background: rgba(255,255,255,.18);
+}
+
+.cta-btn.primary {
+    background: #fff;
+    color: var(--blue);
+    border-color: #fff;
+}
+
+.cta-btn.primary:hover {
+    background: rgba(255,255,255,.9);
+}
+
+/* ---------------------------------------------------------------------------
+   RESPONSIVE
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 800px) {
+    .mh-title {
+        font-size: 30px;
+    }
+
+    .method-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .team-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mh-stats {
+        gap: 24px;
+    }
+}
+
+@media (max-width: 600px) {
+    .manifesto-hero {
+        padding: 48px 16px;
+    }
+
+    .about-body {
+        padding: 32px 16px;
+    }
+
+    .cta-block {
+        padding: 28px 20px;
+    }
+
+    .cta-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .diff-table th:nth-child(3),
+    .diff-table th:nth-child(4),
+    .diff-table td:nth-child(3),
+    .diff-table td:nth-child(4) {
+        display: none;
+    }
+}

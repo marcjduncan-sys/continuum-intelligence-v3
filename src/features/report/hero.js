@@ -346,3 +346,57 @@ export function renderReportHero(data) {
     nextDecisionHtml +
   '</div></div>';
 }
+
+export function renderDeepResearchHero(data) {
+  const dc = data.deepContent || {};
+  const livePrice = data._livePrice || data.price || '';
+
+  // Progress track -- 5 research stages derived from deepContent
+  const steps = [
+    { label: 'Data Fetch',    status: dc.sections ? 'done'   : 'pending' },
+    { label: 'Evidence Map',  status: dc.sections ? 'done'   : 'pending' },
+    { label: 'ACH Analysis',  status: dc.stance   ? 'done'   : 'pending' },
+    { label: 'Synthesis',     status: dc.executiveSummary ? 'active' : 'pending' },
+    { label: 'Review',        status: 'active' },
+  ];
+  let progressHtml = '<div class="progress-track">';
+  for (var pi = 0; pi < steps.length; pi++) {
+    const s = steps[pi];
+    progressHtml +=
+      '<div class="progress-step' + (s.status === 'done' ? ' done' : s.status === 'active' ? ' active' : '') + '">' +
+        '<div class="ps-num">0' + (pi + 1) + '</div>' +
+        '<div class="ps-label">' + s.label + '</div>' +
+        '<div class="ps-status">' + (s.status === 'done' ? 'Complete' : s.status === 'active' ? 'In progress' : 'Pending') + '</div>' +
+      '</div>';
+  }
+  progressHtml += '</div>';
+
+  // Stats strip
+  const evCount = (dc.sections || []).reduce(function(n, s) { return n + (s.evidence ? s.evidence.length : 0); }, 0);
+  const secCount = (dc.sections || []).length;
+  const stanceLabel = dc.stance || 'Pending';
+
+  const statsHtml =
+    '<div class="dr-hero-meta">' +
+      '<div class="dr-hero-stat"><div class="dr-hero-stat-k">Stance</div><div class="dr-hero-stat-v">' + stanceLabel + '</div></div>' +
+      (evCount ? '<div class="dr-hero-stat"><div class="dr-hero-stat-k">Evidence Items</div><div class="dr-hero-stat-v">' + evCount + '</div></div>' : '') +
+      (secCount ? '<div class="dr-hero-stat"><div class="dr-hero-stat-k">Sections</div><div class="dr-hero-stat-v">' + secCount + '</div></div>' : '') +
+      (livePrice ? '<div class="dr-hero-stat"><div class="dr-hero-stat-k">Price</div><div class="dr-hero-stat-v">' + formatPrice(livePrice) + '</div></div>' : '') +
+    '</div>';
+
+  return renderRefreshControls(data) +
+    '<div class="dr-hero">' +
+      '<div class="dr-hero-top">' +
+        '<div>' +
+          '<div class="dr-hero-badge"><span class="dot"></span>Deep Research</div>' +
+          '<div class="dr-hero-title">' + (data.company || data.ticker || '') + '</div>' +
+          '<div class="dr-hero-sub">' + (data.sector || '') + (data.exchange ? ' &middot; ' + data.exchange : '') + '</div>' +
+          statsHtml +
+        '</div>' +
+        '<div class="dr-hero-actions">' +
+          '<button class="btn-light btn-white" onclick="navigate(\'report-' + data.ticker + '\')">&#8592; Standard Report</button>' +
+        '</div>' +
+      '</div>' +
+      progressHtml +
+    '</div>';
+}
