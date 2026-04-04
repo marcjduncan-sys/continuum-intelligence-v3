@@ -327,8 +327,8 @@ export function route() {
     document.getElementById('page-home').classList.add('active');
   }
 
-  // Update nav links -- add aria-current for a11y
-  document.querySelectorAll('.nav-links a').forEach(a => {
+  // Update subnav links -- add aria-current for a11y
+  document.querySelectorAll('.ci-strip-inner a[data-nav]').forEach(a => {
     a.classList.remove('active');
     a.removeAttribute('aria-current');
     if (a.dataset.nav === hash || (hash.startsWith('report-') && a.dataset.nav === 'home') || (hash.startsWith('deep-report-') && a.dataset.nav === 'deep-research') || (hash.startsWith('snapshot-') && a.dataset.nav === 'deep-research')) {
