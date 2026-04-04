@@ -131,6 +131,35 @@
   --font-size-2xl: 2rem;
 }
 
+/* Dark mode override layer */
+[data-theme="dark"] {
+  --app: #0f1218;
+  --surface: #171c26;
+  --surface-2: #1c2230;
+  --surface-3: #212838;
+  --line: #2a3346;
+  --line-2: #232c3d;
+  --text: #e0e4ec;
+  --text-2: #b0bac8;
+  --muted: #7a8698;
+  --soft: #5e6a7c;
+  --blue: #5b9bd5;
+  --blue-mid: #4a87c2;
+  --blue-soft: rgba(91,155,213,0.12);
+  --green: #4aba7a;
+  --green-soft: rgba(74,186,122,0.10);
+  --red: #d46a66;
+  --red-soft: rgba(212,106,102,0.10);
+  --amber: #c9952e;
+  --amber-soft: rgba(201,149,46,0.10);
+  --violet: #9580d1;
+  --violet-soft: rgba(149,128,209,0.10);
+  --gold: #c9a44a;
+  --gold-soft: rgba(201,164,74,0.10);
+  --shadow: 0 10px 24px rgba(0,0,0,.25);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,.35);
+}
+
 /* Signal colour utility classes */
 .signal-positive { color: var(--green); }
 .signal-negative { color: var(--red); }

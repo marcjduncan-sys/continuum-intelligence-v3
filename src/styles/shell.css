@@ -18,6 +18,13 @@
 .ci-topbar.scrolled {
   box-shadow: 0 2px 16px rgba(16, 32, 51, 0.08);
 }
+[data-theme="dark"] .ci-topbar {
+  background: rgba(23, 28, 38, 0.92);
+  border-bottom-color: var(--line-2);
+}
+[data-theme="dark"] .ci-topbar.scrolled {
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+}
 .ci-topbar-inner {
   max-width: var(--shell-max);
   margin: 0 auto;
