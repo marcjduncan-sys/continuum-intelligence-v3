@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Continuum Intelligence — Portfolio Light V3</title>
+<style>
+  :root{
+    --app:#f4f5f7;
+    --surface:#ffffff;
+    --surface-2:#fafbfc;
+    --surface-3:#f1f4f7;
+    --line:#d9e0e8;
+    --line-2:#e7ecf1;
+    --text:#132233;
+    --text-2:#304255;
+    --muted:#66788c;
+    --soft:#7c8b9c;
+    --blue:#1f4b7a;
+    --blue-2:#2f6da9;
+    --blue-soft:#e9f0f8;
+    --green:#2f8659;
+    --green-soft:#edf7f1;
+    --red:#b64a46;
+    --red-soft:#fceeed;
+    --amber:#94630d;
+    --amber-soft:#fff4df;
+    --violet:#6e58aa;
+    --violet-soft:#f1edfc;
+    --shadow:0 8px 20px rgba(16,32,51,.05);
+    --radius:12px;
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  }
+
+  *{box-sizing:border-box}
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--app);
+    color:var(--text);
+    font-family:var(--sans);
+    font-variant-numeric: tabular-nums;
+  }
+  a{text-decoration:none;color:inherit}
+  button,input,select{font:inherit}
+  strong{font-weight:700}
+  .num,.mono{
+    font-family:var(--mono);
+    font-variant-numeric:tabular-nums lining-nums;
+  }
+
+  .topbar{
+    position:sticky;
+    top:0;
+    z-index:90;
+    display:grid;
+    grid-template-columns:220px 1fr auto auto;
+    gap:12px;
+    align-items:center;
+    height:50px;
+    padding:0 16px;
+    background:rgba(255,255,255,.94);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.01em}
+  .mark{
+    width:24px;height:24px;border-radius:6px;display:grid;place-items:center;
+    background:linear-gradient(180deg,#214a75,#173653);color:#fff;font-size:11px;border:1px solid #2a5a87;
+  }
+  .search{
+    height:34px;display:flex;align-items:center;gap:8px;padding:0 10px;
+    border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);
+  }
+  .search input{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-size:12px}
+  .kbd-row{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:11px}
+  .kbd{
+    padding:3px 6px;border-radius:6px;border:1px solid var(--line);
+    background:var(--surface);font-family:var(--mono);color:var(--text);
+  }
+  .actions{display:flex;gap:8px}
+  .btn{
+    height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--line);
+    background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;
+  }
+  .btn.primary{background:linear-gradient(180deg,#234d78,#1b3c60);border-color:#224c75;color:#fff}
+
+  .subnav{
+    position:sticky; top:50px; z-index:85;
+    display:flex; gap:8px; align-items:center; overflow:auto;
+    padding:8px 16px; background:rgba(244,245,247,.96); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .subnav a{
+    white-space:nowrap;
+    padding:6px 10px; border-radius:999px; border:1px solid var(--line);
+    background:var(--surface); color:var(--text-2); font-size:11px; font-weight:700; letter-spacing:.02em;
+  }
+  .subnav a.active,.subnav a:hover{background:var(--blue-soft); color:var(--blue); border-color:#c8d8ea}
+
+  .app{max-width:1560px;margin:0 auto;padding:14px}
+  .hero,.section,.side-section{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+  }
+  .hero{padding:12px;margin-bottom:14px}
+  .hero-head{
+    display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;
+  }
+  .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:800;margin-bottom:4px}
+  .title{margin:0;font-size:23px;line-height:1.04;letter-spacing:-.03em}
+  .subtitle{margin-top:4px;font-size:12px;line-height:1.45;color:var(--muted)}
+  .pill-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .tag{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:4px 8px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface-2);font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);
+  }
+  .tag.blue{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+  .tag.green{background:var(--green-soft);border-color:#cce6d6;color:var(--green)}
+  .tag.red{background:var(--red-soft);border-color:#f0d0ce;color:var(--red)}
+  .tag.amber{background:var(--amber-soft);border-color:#f1deb2;color:var(--amber)}
+  .tag.violet{background:var(--violet-soft);border-color:#ddd5f5;color:var(--violet)}
+
+  .hero-grid{
+    margin-top:10px;
+    display:grid;
+    grid-template-columns:1.25fr .75fr;
+    gap:10px;
+  }
+  .hero-summary,.hero-feed{
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--surface-2);
+  }
+  .hero-row{
+    display:grid;
+    grid-template-columns:122px 1fr 122px 1fr 122px 1fr;
+    border-bottom:1px solid var(--line-2);
+  }
+  .hero-row:last-child{border-bottom:0}
+  .hero-k{
+    padding:8px;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--muted);
+    font-weight:800;
+    background:var(--surface-3);
+  }
+  .hero-v{
+    padding:8px;
+    font-size:12px;
+    line-height:1.42;
+    color:var(--text-2);
+  }
+  .feed-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:8px 10px;border-bottom:1px solid var(--line-2);background:var(--surface-3);
+  }
+  .feed-title{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+  .feed-list{display:grid;gap:0}
+  .feed-item{
+    padding:8px 10px;border-bottom:1px solid var(--line-2);font-size:12px;line-height:1.45;color:var(--text-2);
+  }
+  .feed-item:last-child{border-bottom:0}
+  .feed-item .head{display:flex;justify-content:space-between;gap:8px}
+  .feed-item .body{margin-top:4px}
+
+  .layout{
+    display:grid;
+    grid-template-columns:minmax(0,76%) minmax(310px,24%);
+    gap:14px;
+    align-items:start;
+  }
+  .main{display:grid;gap:12px}
+  .side{
+    display:grid;gap:12px;
+    position:sticky; top:98px; align-self:start;
+  }
+
+  .section,.side-section{padding:12px}
+  .section-head{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;
+  }
+  .section-title{margin:0;font-size:17px;line-height:1.14;letter-spacing:-.02em}
+  .paragraph{margin:0;font-size:13px;line-height:1.55;color:var(--text-2)}
+  .tiny{font-size:11px;line-height:1.45;color:var(--muted)}
+
+  .filters{
+    display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;
+    margin-bottom:10px;
+  }
+  .chipbar{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{
+    padding:6px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);
+    font-size:11px;font-weight:700;color:var(--text-2);cursor:pointer;
+  }
+  .chip.active{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+
+  .metric-strip{
+    display:grid;grid-template-columns:repeat(6,1fr);gap:8px;
+  }
+  .metric{
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--surface-2);
+    padding:10px;
+  }
+  .metric .k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+  .metric .v{margin-top:4px;font-size:18px;font-weight:800;letter-spacing:-.02em}
+  .metric .x{margin-top:4px;font-size:11px;line-height:1.4;color:var(--text-2)}
+
+  .table-wrap{overflow:auto;max-height:720px}
+  table{width:100%;border-collapse:collapse}
+  th,td{
+    padding:8px 6px;
+    border-bottom:1px solid var(--line-2);
+    text-align:left;
+    vertical-align:top;
+    font-size:12px;
+  }
+  th{
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:800;
+    background:var(--surface-2);
+    position:sticky;
+    top:0;
+    cursor:pointer;
+    user-select:none;
+  }
+  th.sortable:hover{color:var(--blue)}
+  tr:last-child td{border-bottom:0}
+  .holding-name{font-weight:800;color:var(--text)}
+  .holding-sub{margin-top:2px;font-size:10px;color:var(--muted)}
+  .action-cell .tag,.rating-cell .tag{font-size:9px}
+  .status-grid{display:grid;gap:8px}
+  .status-row{
+    display:grid;grid-template-columns:110px 1fr auto;gap:10px;align-items:start;
+    padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);
+  }
+  .status-row .l{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+  .status-row .m{font-size:12px;line-height:1.48;color:var(--text-2)}
+
+  .sector-table td,.sector-table th{padding:7px 6px}
+  .rebalance{display:grid;gap:8px}
+  .rebalance-row{
+    display:grid;grid-template-columns:82px 1fr 82px 92px;gap:10px;align-items:center;
+    padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);
+  }
+  .rebalance-row .name{font-size:12px;font-weight:800;color:var(--text)}
+  .rebalance-row .delta{font-size:12px;font-weight:800;font-family:var(--mono)}
+  .rebalance-row .desc{font-size:12px;line-height:1.45;color:var(--text-2)}
+
+  .rule-list{display:grid;gap:8px}
+  .rule{
+    padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);
+  }
+  .rule strong{display:block;font-size:12px;color:var(--text)}
+  .rule span{display:block;margin-top:4px;font-size:11px;line-height:1.45;color:var(--text-2)}
+
+  .preview-grid{display:grid;gap:8px}
+  .preview{
+    padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);
+  }
+  .preview .k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+  .preview .v{margin-top:5px;font-size:16px;font-weight:800}
+  .preview .x{margin-top:4px;font-size:11px;color:var(--text-2);line-height:1.42}
+
+  body.compact{
+    font-size:11px;
+  }
+  body.compact .hero,
+  body.compact .section,
+  body.compact .side-section,
+  body.compact .metric,
+  body.compact .status-row,
+  body.compact .rebalance-row,
+  body.compact .rule,
+  body.compact .preview{
+    padding:4px 6px !important;
+  }
+  body.compact .hero-k,
+  body.compact .hero-v,
+  body.compact th,
+  body.compact td,
+  body.compact .metric .x,
+  body.compact .status-row .m,
+  body.compact .rule span,
+  body.compact .tiny,
+  body.compact .paragraph,
+  body.compact .feed-item{
+    font-size:10px !important;
+  }
+  body.compact .title{font-size:20px}
+  body.compact .section-title{font-size:15px}
+  body.compact .subtitle,
+  body.compact .metric .x,
+  body.compact .holding-sub{
+    display:none !important;
+  }
+  body.compact .hero-summary,
+  body.compact .hero-feed{margin-top:4px}
+  body.compact .chip{padding:4px 7px;font-size:10px}
+  body.compact .tag{padding:3px 6px;font-size:9px}
+  body.compact .btn{height:28px;font-size:11px;padding:0 8px}
+  body.compact .feed-item .body{display:none}
+  body.compact .table-wrap{max-height:840px}
+
+  @media (max-width:1360px){
+    .metric-strip{grid-template-columns:repeat(3,1fr)}
+    .layout{grid-template-columns:1fr}
+    .side{position:static}
+    .hero-grid{grid-template-columns:1fr}
+  }
+  @media (max-width:920px){
+    .topbar{grid-template-columns:1fr;height:auto;padding:12px}
+    .kbd-row{display:none}
+    .hero-head,.metric-strip,.filters{grid-template-columns:1fr}
+    .hero-row{grid-template-columns:1fr}
+    .rebalance-row{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <div class="mark">CI</div>
+    <div>Continuum Intelligence</div>
+  </div>
+
+  <div class="search">
+    <span>⌕</span>
+    <input value="CI Portfolio Light V3 - research-led portfolio monitor" />
+  </div>
+
+  <div class="kbd-row">
+    <span class="kbd">/</span><span>Search</span>
+    <span class="kbd">R</span><span>Risk feed</span>
+    <span class="kbd">H</span><span>Holdings</span>
+    <span class="kbd">P</span><span>Preview</span>
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="densityToggle">Compact mode</button>
+    <button class="btn" id="resetPreview">Reset preview</button>
+    <button class="btn primary" id="applyPreview">Rebalance</button>
+  </div>
+</div>
+
+<nav class="subnav">
+  <a href="#">Home</a>
+  <a href="#">Research</a>
+  <a href="#">PM chat</a>
+  <a href="#">Analyst chat</a>
+  <a href="#">Journal</a>
+  <a href="#" class="active">Portfolio</a>
+  <a href="#">Settings</a>
+</nav>
+
+<div class="app">
+  <section class="hero">
+    <div class="hero-head">
+      <div>
+        <div class="eyebrow">Portfolio</div>
+        <h1 class="title">Core ASX Long Portfolio</h1>
+        <div class="subtitle">Research-led portfolio monitor. Risk, liquidity and MCTR are shown as API-fed execution constraints, not as CI’s core product identity.</div>
+      </div>
+      <div class="pill-row">
+        <span class="tag blue">Book type: Long-only</span>
+        <span class="tag green">Mandate: Within range</span>
+        <span class="tag amber">Risk feed: API</span>
+      </div>
+    </div>
+
+    <div class="hero-grid">
+      <div class="hero-summary">
+        <div class="hero-row">
+          <div class="hero-k">NAV</div>
+          <div class="hero-v"><span class="num" id="navValue">A$126.4m</span></div>
+          <div class="hero-k">Cash</div>
+          <div class="hero-v"><span class="num" id="cashValue">8.70%</span> inside <span class="num">5-10%</span> band</div>
+          <div class="hero-k">Net beta</div>
+          <div class="hero-v"><span class="num">0.94x</span> versus <span class="num">1.00x</span> ceiling</div>
+        </div>
+        <div class="hero-row">
+          <div class="hero-k">Top 5 concentration</div>
+          <div class="hero-v"><span class="num" id="top5Value">37.60%</span> versus <span class="num">45.0%</span> threshold</div>
+          <div class="hero-k">Largest position</div>
+          <div class="hero-v"><span class="num" id="largestValue">9.60%</span> in <span class="mono" id="largestName">BHP</span></div>
+          <div class="hero-k">Materials exposure</div>
+          <div class="hero-v"><span class="num" id="materialsValue">28.40%</span> versus <span class="num">30.0%</span> cap</div>
+        </div>
+        <div class="hero-row">
+          <div class="hero-k">Primary action</div>
+          <div class="hero-v">Trim <span class="mono">CBA</span> and <span class="mono">WES</span>; add <span class="mono">CSL</span>, <span class="mono">NST</span>, <span class="mono">XRO</span></div>
+          <div class="hero-k">Avg DTL</div>
+          <div class="hero-v"><span class="num" id="avgDtlValue">2.40d</span> at <span class="num">20%</span> ADV participation</div>
+          <div class="hero-k">Portfolio stance</div>
+          <div class="hero-v"><span class="tag blue">EW risk</span> <span class="tag green">OW alpha bucket</span></div>
+        </div>
+      </div>
+
+      <div class="hero-feed">
+        <div class="feed-head">
+          <div class="feed-title">Research and risk feed</div>
+          <div class="tag amber">External API</div>
+        </div>
+        <div class="feed-list">
+          <div class="feed-item">
+            <div class="head"><span>Latest PM signal</span><span class="mono">09:18</span></div>
+            <div class="body">Trim low-upside defensives before adding to higher-EWP names.</div>
+          </div>
+          <div class="feed-item">
+            <div class="head"><span>Risk provider</span><span class="mono">Axioma / Barra slot</span></div>
+            <div class="body">MCTR, covariance and factor exposures are intended to be piped in via API.</div>
+          </div>
+          <div class="feed-item">
+            <div class="head"><span>Execution model</span><span class="mono">20% ADV</span></div>
+            <div class="body">DTL assumes capped participation and can be previewed post-trade before routing.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="layout">
+    <main class="main">
+      <section class="section">
+        <div class="filters">
+          <div class="chipbar">
+            <button class="chip active">All holdings</button>
+            <button class="chip">OW</button>
+            <button class="chip">EW</button>
+            <button class="chip">UW</button>
+            <button class="chip">Trim candidates</button>
+            <button class="chip">Add candidates</button>
+          </div>
+          <button class="btn">View: Research + execution</button>
+          <button class="btn">Sort: Click table headers</button>
+          <button class="btn">Export</button>
+        </div>
+
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Portfolio summary</div>
+            <h2 class="section-title">The portfolio is inside mandate. The live decision is capital efficiency and sequencing, not broad de-risking.</h2>
+          </div>
+          <span class="tag blue">Research-led</span>
+        </div>
+
+        <div class="metric-strip">
+          <div class="metric">
+            <div class="k">YTD return</div>
+            <div class="v num">+11.8%</div>
+            <div class="x">Benchmark <span class="num">+7.1%</span></div>
+          </div>
+          <div class="metric">
+            <div class="k">30d vol</div>
+            <div class="v num">14.2%</div>
+            <div class="x">Cap <span class="num">16.0%</span></div>
+          </div>
+          <div class="metric">
+            <div class="k">Tracking error</div>
+            <div class="v num">5.3%</div>
+            <div class="x">Within PM tolerance</div>
+          </div>
+          <div class="metric">
+            <div class="k">Gross exposure</div>
+            <div class="v num">91.3%</div>
+            <div class="x">Cash drag visible</div>
+          </div>
+          <div class="metric">
+            <div class="k">Book ADV usage</div>
+            <div class="v num">14.8%</div>
+            <div class="x">At execution cap</div>
+          </div>
+          <div class="metric">
+            <div class="k">Average MCTR</div>
+            <div class="v num">117 bps</div>
+            <div class="x">Top names dominate risk</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Holdings</div>
+            <h2 class="section-title">Hard mechanics only. Sortable columns. No visual risk heuristics.</h2>
+          </div>
+          <span class="tag green">Institutional table</span>
+        </div>
+
+        <div class="table-wrap">
+          <table id="holdingsTable">
+            <thead>
+              <tr>
+                <th class="sortable" data-key="name">Name</th>
+                <th class="sortable" data-key="rating">Rating</th>
+                <th class="sortable" data-key="action">Action</th>
+                <th class="sortable" data-key="weight">Weight</th>
+                <th class="sortable" data-key="spot">Spot</th>
+                <th class="sortable" data-key="ewp">EWP</th>
+                <th class="sortable" data-key="upside">Upside</th>
+                <th class="sortable" data-key="beta">Beta</th>
+                <th class="sortable" data-key="vol">30d Vol</th>
+                <th class="sortable" data-key="adv">ADV</th>
+                <th class="sortable" data-key="dtl">DTL</th>
+                <th class="sortable" data-key="mctr">MCTR</th>
+              </tr>
+            </thead>
+            <tbody id="holdingsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Risk and mandate</div>
+            <h2 class="section-title">There are no active mandate breaches, but two constraints are close enough to affect trade sequencing.</h2>
+          </div>
+          <span class="tag amber">Sequencing matters</span>
+        </div>
+
+        <div class="status-grid">
+          <div class="status-row">
+            <div class="l">Sector cap</div>
+            <div class="m">Materials at <span class="num" id="materialsStatus">28.4%</span> versus a <span class="num">30.0%</span> limit. Another materials add is possible only if funded elsewhere or sized carefully.</div>
+            <div><span class="tag amber">Tight</span></div>
+          </div>
+          <div class="status-row">
+            <div class="l">Single-name cap</div>
+            <div class="m"><span class="mono" id="largestStatusName">BHP</span> at <span class="num" id="largestStatusWeight">9.6%</span> versus a <span class="num">10.0%</span> ceiling. No spare capacity for a full-size add.</div>
+            <div><span class="tag amber">Tight</span></div>
+          </div>
+          <div class="status-row">
+            <div class="l">Cash band</div>
+            <div class="m">Cash at <span class="num" id="cashStatus">8.7%</span> sits within the <span class="num">5-10%</span> target range. No forced deployment.</div>
+            <div><span class="tag green">OK</span></div>
+          </div>
+          <div class="status-row">
+            <div class="l">Risk source</div>
+            <div class="m">MCTR, factor risk, covariance and liquidity constraints are intended to be sourced externally via API. CI remains the research and portfolio decision layer.</div>
+            <div><span class="tag blue">API-fed</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Sector exposure</div>
+            <h2 class="section-title">Materials and financials still dominate the book. Healthcare and software remain the cleanest diversification destinations.</h2>
+          </div>
+          <span class="tag blue">Exposure map</span>
+        </div>
+
+        <div class="table-wrap">
+          <table class="sector-table">
+            <thead>
+              <tr>
+                <th>Sector</th>
+                <th>Weight</th>
+                <th>Limit</th>
+                <th>Slack</th>
+                <th>MCTR</th>
+              </tr>
+            </thead>
+            <tbody id="sectorBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <aside class="side">
+      <section class="side-section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Pre-trade preview</div>
+            <h2 class="section-title">Dynamic post-trade projection</h2>
+          </div>
+          <span class="tag green">Live preview</span>
+        </div>
+
+        <div class="preview-grid">
+          <div class="preview">
+            <div class="k">Post-trade cash</div>
+            <div class="v num" id="previewCash">8.70%</div>
+            <div class="x">Projected after selected rotation.</div>
+          </div>
+          <div class="preview">
+            <div class="k">Post-trade materials</div>
+            <div class="v num" id="previewMaterials">28.40%</div>
+            <div class="x">Compared with <span class="num">30.0%</span> cap.</div>
+          </div>
+          <div class="preview">
+            <div class="k">Largest position</div>
+            <div class="v"><span class="mono" id="previewLargestName">BHP</span> <span class="num" id="previewLargestWeight">9.60%</span></div>
+            <div class="x">Compared with <span class="num">10.0%</span> cap.</div>
+          </div>
+          <div class="preview">
+            <div class="k">Rebalance funding</div>
+            <div class="v num" id="previewFunding">0 bps</div>
+            <div class="x">Net trade impact after selected rows.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="side-section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Rebalancing signals</div>
+            <h2 class="section-title">Strict action language only</h2>
+          </div>
+          <span class="tag blue">Action list</span>
+        </div>
+
+        <div class="rebalance">
+          <div class="rebalance-row">
+            <div class="name">UW</div>
+            <div class="desc"><span class="mono">CBA</span> remains the cleanest source of funds. Low upside, low DTL, negative EWP.</div>
+            <div class="delta neg">-150 bps</div>
+            <div><span class="tag red">Trim</span></div>
+          </div>
+          <div class="rebalance-row">
+            <div class="name">EW</div>
+            <div class="desc"><span class="mono">WES</span> is quality, but upside is too low relative to capital demand elsewhere.</div>
+            <div class="delta neg">-75 bps</div>
+            <div><span class="tag red">Trim</span></div>
+          </div>
+          <div class="rebalance-row">
+            <div class="name">OW</div>
+            <div class="desc"><span class="mono">CSL</span> offers the best combination of upside and diversification benefit.</div>
+            <div class="delta pos">+75 bps</div>
+            <div><span class="tag green">Add</span></div>
+          </div>
+          <div class="rebalance-row">
+            <div class="name">OW</div>
+            <div class="desc"><span class="mono">NST</span> has the strongest upside in the current book but uses materials headroom.</div>
+            <div class="delta pos">+75 bps</div>
+            <div><span class="tag green">Add</span></div>
+          </div>
+          <div class="rebalance-row">
+            <div class="name">OW</div>
+            <div class="desc"><span class="mono">XRO</span> improves EWP and diversifies the book away from resources.</div>
+            <div class="delta pos">+75 bps</div>
+            <div><span class="tag green">Add</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="side-section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Execution rules</div>
+            <h2 class="section-title">Liquidity is a live constraint</h2>
+          </div>
+          <span class="tag amber">20% ADV</span>
+        </div>
+
+        <div class="rule-list">
+          <div class="rule">
+            <strong>ADV assumption</strong>
+            <span>DTL assumes a maximum participation rate of <span class="num">20%</span> of average daily traded value.</span>
+          </div>
+          <div class="rule">
+            <strong>Hard rule</strong>
+            <span>No position should be taken above <span class="num">4.0d</span> DTL without explicit override.</span>
+          </div>
+          <div class="rule">
+            <strong>Current outlier</strong>
+            <span><span class="mono">XRO</span> at <span class="num">3.2d</span> and <span class="mono">WES</span> at <span class="num">2.9d</span> are slower than the rest of the book.</span>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+  const initialHoldings = [
+    {name:'BHP', sector:'Materials', rating:'OW', action:'Hold', weight:9.60, spot:52.56, ewp:56.55, upside:7.6, beta:1.02, vol:18.1, adv:43.2, dtl:1.4, mctr:180},
+    {name:'CSL', sector:'Healthcare', rating:'OW', action:'Add', weight:8.40, spot:309.20, ewp:338.00, upside:9.3, beta:0.86, vol:13.2, adv:31.4, dtl:1.7, mctr:112},
+    {name:'CBA', sector:'Financials', rating:'UW', action:'Trim', weight:7.80, spot:196.30, ewp:180.00, upside:-8.3, beta:0.71, vol:10.4, adv:118.6, dtl:0.4, mctr:64},
+    {name:'NST', sector:'Materials', rating:'OW', action:'Add', weight:7.20, spot:19.85, ewp:22.60, upside:13.9, beta:0.98, vol:21.6, adv:18.3, dtl:2.5, mctr:152},
+    {name:'WES', sector:'Consumer', rating:'EW', action:'Trim', weight:6.90, spot:73.10, ewp:75.00, upside:2.6, beta:0.78, vol:11.3, adv:15.1, dtl:2.9, mctr:58},
+    {name:'RIO', sector:'Materials', rating:'EW', action:'Hold', weight:6.40, spot:118.40, ewp:122.10, upside:3.1, beta:1.06, vol:19.2, adv:27.4, dtl:1.5, mctr:144},
+    {name:'XRO', sector:'Technology', rating:'OW', action:'Add', weight:5.80, spot:156.60, ewp:176.00, upside:12.4, beta:1.18, vol:23.4, adv:11.4, dtl:3.2, mctr:131},
+    {name:'MQG', sector:'Financials', rating:'EW', action:'Hold', weight:5.60, spot:200.40, ewp:214.00, upside:6.8, beta:1.12, vol:18.7, adv:22.8, dtl:1.6, mctr:117}
+  ];
+
+  const sectorData = [
+    {sector:'Materials', weight:28.4, limit:'30.0%', slack:1.6, mctr:476},
+    {sector:'Financials', weight:19.7, limit:'25.0%', slack:5.3, mctr:213},
+    {sector:'Healthcare', weight:11.3, limit:'20.0%', slack:8.7, mctr:112},
+    {sector:'Consumer', weight:10.1, limit:'20.0%', slack:9.9, mctr:84},
+    {sector:'Technology', weight:8.4, limit:'15.0%', slack:6.6, mctr:131},
+    {sector:'Cash', weight:8.7, limit:'5-10%', slack:null, mctr:0}
+  ];
+
+  let holdings = [...initialHoldings];
+  let sortState = { key: 'mctr', dir: 'desc' };
+  let previewApplied = false;
+
+  function fmtPct(x, digits=1){
+    return `${x.toFixed(digits)}%`;
+  }
+  function fmtMoney(x){
+    return `A$${x.toFixed(2)}`;
+  }
+  function fmtAdv(x){
+    return `A$${x.toFixed(1)}m`;
+  }
+  function fmtDays(x){
+    return `${x.toFixed(1)}d`;
+  }
+  function fmtBps(x){
+    return `${Math.round(x)} bps`;
+  }
+  function ratingTag(r){
+    if (r === 'OW') return 'green';
+    if (r === 'UW') return 'red';
+    return 'amber';
+  }
+  function actionTag(a){
+    if (a === 'Add') return 'green';
+    if (a === 'Trim' || a === 'Liquidate') return 'red';
+    return 'blue';
+  }
+
+  function sortHoldings(key, dir){
+    holdings.sort((a,b)=>{
+      let av = a[key], bv = b[key];
+      if (typeof av === 'string' && typeof bv === 'string'){
+        return dir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+      }
+      return dir === 'asc' ? av - bv : bv - av;
+    });
+  }
+
+  function renderHoldings(){
+    sortHoldings(sortState.key, sortState.dir);
+    const tbody = document.getElementById('holdingsBody');
+    tbody.innerHTML = holdings.map(h => `
+      <tr>
+        <td>
+          <div class="holding-name">${h.name}</div>
+          <div class="holding-sub">${h.sector}</div>
+        </td>
+        <td class="rating-cell"><span class="tag ${ratingTag(h.rating)}">${h.rating}</span></td>
+        <td class="action-cell"><span class="tag ${actionTag(h.action)}">${h.action}</span></td>
+        <td class="weight-cell num">${fmtPct(h.weight,2)}</td>
+        <td class="spot-cell num">${h.spot.toFixed(2)}</td>
+        <td class="ewp-cell num">${h.ewp.toFixed(2)}</td>
+        <td class="num ${h.upside >= 0 ? 'pos' : 'neg'}">${h.upside >= 0 ? '+' : ''}${h.upside.toFixed(1)}%</td>
+        <td class="num">${h.beta.toFixed(2)}x</td>
+        <td class="num">${fmtPct(h.vol,1)}</td>
+        <td class="adv-cell num">${fmtAdv(h.adv)}</td>
+        <td class="dtl-cell num">${fmtDays(h.dtl)}</td>
+        <td class="mctr-cell num">${fmtBps(h.mctr)}</td>
+      </tr>
+    `).join('');
+  }
+
+  function renderSectors(currentMaterials){
+    const tbody = document.getElementById('sectorBody');
+    tbody.innerHTML = sectorData.map(s => {
+      const weight = s.sector === 'Materials' ? currentMaterials : s.weight;
+      const slackCell = s.slack === null ? 'n/a' : `${(s.sector === 'Materials' ? (30 - currentMaterials) : s.slack).toFixed(1)}%`;
+      return `
+        <tr>
+          <td><strong>${s.sector}</strong></td>
+          <td class="num">${fmtPct(weight,1)}</td>
+          <td class="num">${s.limit}</td>
+          <td class="num">${slackCell}</td>
+          <td class="num">${fmtBps(s.mctr)}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function calcPreview(){
+    const trades = [
+      {name:'CBA', delta:-1.50, sector:'Financials'},
+      {name:'WES', delta:-0.75, sector:'Consumer'},
+      {name:'CSL', delta:+0.75, sector:'Healthcare'},
+      {name:'NST', delta:+0.75, sector:'Materials'},
+      {name:'XRO', delta:+0.75, sector:'Technology'}
+    ];
+    const funded = trades.reduce((a,t)=>a+t.delta,0);
+    const cash = 8.7 - funded; // adds positive delta reduce cash, trims negative increase cash
+    const materials = 28.4 + 0.75;
+    const updated = holdings.map(h => {
+      const t = trades.find(x=>x.name===h.name);
+      return t ? {...h, weight: +(h.weight + t.delta).toFixed(2)} : {...h};
+    });
+    const largest = updated.reduce((a,b)=>a.weight >= b.weight ? a : b);
+    const avgDtl = updated.reduce((a,h)=>a+h.dtl,0) / updated.length;
+    return { cash, materials, largest, funded, avgDtl, updated };
+  }
+
+  function applyPreviewState(applied){
+    const preview = calcPreview();
+    const currentCash = applied ? preview.cash : 8.7;
+    const currentMaterials = applied ? preview.materials : 28.4;
+    const currentLargest = applied ? preview.largest : {name:'BHP', weight:9.6};
+    const currentAvgDtl = applied ? preview.avgDtl : 2.4;
+
+    document.getElementById('previewCash').textContent = fmtPct(currentCash,2);
+    document.getElementById('previewMaterials').textContent = fmtPct(currentMaterials,2);
+    document.getElementById('previewLargestName').textContent = currentLargest.name;
+    document.getElementById('previewLargestWeight').textContent = fmtPct(currentLargest.weight,2);
+    document.getElementById('previewFunding').textContent = `${preview.funded > 0 ? '+' : ''}${Math.round(preview.funded*100)} bps`;
+
+    document.getElementById('cashValue').textContent = fmtPct(currentCash,2);
+    document.getElementById('materialsValue').textContent = fmtPct(currentMaterials,2);
+    document.getElementById('largestName').textContent = currentLargest.name;
+    document.getElementById('largestValue').textContent = fmtPct(currentLargest.weight,2);
+    document.getElementById('avgDtlValue').textContent = fmtDays(currentAvgDtl);
+    document.getElementById('top5Value').textContent = applied ? '38.35%' : '37.60%';
+
+    document.getElementById('materialsStatus').textContent = fmtPct(currentMaterials,1);
+    document.getElementById('largestStatusName').textContent = currentLargest.name;
+    document.getElementById('largestStatusWeight').textContent = fmtPct(currentLargest.weight,1);
+    document.getElementById('cashStatus').textContent = fmtPct(currentCash,1);
+
+    renderSectors(currentMaterials);
+  }
+
+  document.querySelectorAll('th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const key = th.dataset.key;
+      if (sortState.key === key) {
+        sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortState.key = key;
+        sortState.dir = ['name','rating','action'].includes(key) ? 'asc' : 'desc';
+      }
+      renderHoldings();
+    });
+  });
+
+  const densityToggle = document.getElementById('densityToggle');
+  if (densityToggle) {
+    densityToggle.addEventListener('click', () => {
+      document.body.classList.toggle('compact');
+      densityToggle.textContent = document.body.classList.contains('compact') ? 'Standard mode' : 'Compact mode';
+    });
+  }
+
+  document.getElementById('applyPreview').addEventListener('click', () => {
+    previewApplied = !previewApplied;
+    document.getElementById('applyPreview').textContent = previewApplied ? 'Preview applied' : 'Rebalance';
+    applyPreviewState(previewApplied);
+  });
+
+  document.getElementById('resetPreview').addEventListener('click', () => {
+    previewApplied = false;
+    document.getElementById('applyPreview').textContent = 'Rebalance';
+    applyPreviewState(false);
+  });
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+
+  renderHoldings();
+  applyPreviewState(false);
+</script>
+</body>
+</html>

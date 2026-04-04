@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Continuum Intelligence — Portfolio Light V2</title>
+<style>
+  :root{
+    --app:#f4f5f7;
+    --surface:#ffffff;
+    --surface-2:#fafbfc;
+    --surface-3:#f1f4f7;
+    --line:#d9e0e8;
+    --line-2:#e7ecf1;
+    --text:#132233;
+    --text-2:#304255;
+    --muted:#66788c;
+    --soft:#7c8b9c;
+    --blue:#1f4b7a;
+    --blue-2:#2f6da9;
+    --blue-soft:#e9f0f8;
+    --green:#2f8659;
+    --green-soft:#edf7f1;
+    --red:#b64a46;
+    --red-soft:#fceeed;
+    --amber:#94630d;
+    --amber-soft:#fff4df;
+    --violet:#6e58aa;
+    --violet-soft:#f1edfc;
+    --shadow:0 8px 20px rgba(16,32,51,.05);
+    --radius:12px;
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  }
+
+  *{box-sizing:border-box}
+  html,body{
+    margin:0;padding:0;background:var(--app);color:var(--text);font-family:var(--sans);
+    font-variant-numeric: tabular-nums;
+  }
+  a{text-decoration:none;color:inherit}
+  button,input,select{font:inherit}
+  strong{font-weight:700}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums lining-nums}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums lining-nums}
+
+  .topbar{
+    position:sticky; top:0; z-index:90;
+    display:grid; grid-template-columns:220px 1fr auto auto; gap:12px; align-items:center;
+    height:50px; padding:0 16px;
+    background:rgba(255,255,255,.94);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.01em}
+  .mark{
+    width:24px;height:24px;border-radius:6px;display:grid;place-items:center;
+    background:linear-gradient(180deg,#214a75,#173653);color:#fff;font-size:11px;border:1px solid #2a5a87;
+  }
+  .search{
+    height:34px;display:flex;align-items:center;gap:8px;padding:0 10px;
+    border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);
+  }
+  .search input{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-size:12px}
+  .kbd-row{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:11px}
+  .kbd{
+    padding:3px 6px;border-radius:6px;border:1px solid var(--line);
+    background:var(--surface);font-family:var(--mono);color:var(--text);
+  }
+  .actions{display:flex;gap:8px}
+  .btn{
+    height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--line);
+    background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;
+  }
+  .btn.primary{background:linear-gradient(180deg,#234d78,#1b3c60);border-color:#224c75;color:#fff}
+
+  .subnav{
+    position:sticky; top:50px; z-index:85;
+    display:flex; gap:8px; align-items:center; overflow:auto;
+    padding:8px 16px; background:rgba(244,245,247,.96); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .subnav a{
+    white-space:nowrap;
+    padding:6px 10px; border-radius:999px; border:1px solid var(--line);
+    background:var(--surface); color:var(--text-2); font-size:11px; font-weight:700; letter-spacing:.02em;
+  }
+  .subnav a.active,.subnav a:hover{background:var(--blue-soft); color:var(--blue); border-color:#c8d8ea}
+
+  .app{max-width:1540px;margin:0 auto;padding:14px}
+  .hero,.section,.side-section{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+  }
+  .hero{padding:12px;margin-bottom:14px}
+  .hero-head{
+    display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;
+  }
+  .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:800;margin-bottom:4px}
+  .title{margin:0;font-size:23px;line-height:1.04;letter-spacing:-.03em}
+  .subtitle{margin-top:4px;font-size:12px;line-height:1.45;color:var(--muted)}
+  .pill-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .tag{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:4px 8px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface-2);font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);
+  }
+  .tag.blue{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+  .tag.green{background:var(--green-soft);border-color:#cce6d6;color:var(--green)}
+  .tag.red{background:var(--red-soft);border-color:#f0d0ce;color:var(--red)}
+  .tag.amber{background:var(--amber-soft);border-color:#f1deb2;color:var(--amber)}
+  .tag.violet{background:var(--violet-soft);border-color:#ddd5f5;color:var(--violet)}
+
+  .hero-summary{
+    margin-top:10px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--surface-2);
+  }
+  .hero-row{
+    display:grid;
+    grid-template-columns:120px 1fr 110px 1fr 110px 1fr;
+    border-bottom:1px solid var(--line-2);
+  }
+  .hero-row:last-child{border-bottom:0}
+  .hero-k{
+    padding:8px 8px;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--muted);
+    font-weight:800;
+    background:var(--surface-3);
+  }
+  .hero-v{
+    padding:8px 8px;
+    font-size:12px;
+    line-height:1.42;
+    color:var(--text-2);
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns:minmax(0,74%) minmax(320px,26%);
+    gap:14px;
+    align-items:start;
+  }
+  .main{display:grid;gap:12px}
+  .side{
+    display:grid;gap:12px;
+    position:sticky; top:98px; align-self:start;
+  }
+
+  .section,.side-section{padding:12px}
+  .section-head{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;
+  }
+  .section-title{margin:0;font-size:17px;line-height:1.14;letter-spacing:-.02em}
+  .paragraph{margin:0;font-size:13px;line-height:1.55;color:var(--text-2)}
+  .tiny{font-size:11px;line-height:1.45;color:var(--muted)}
+
+  .filters{
+    display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;
+    margin-bottom:10px;
+  }
+  .chipbar{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{
+    padding:6px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);
+    font-size:11px;font-weight:700;color:var(--text-2);cursor:pointer;
+  }
+  .chip.active{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+
+  .metric-strip{
+    display:grid;grid-template-columns:repeat(6,1fr);gap:8px;
+  }
+  .metric{
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--surface-2);
+    padding:10px;
+  }
+  .metric .k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+  .metric .v{margin-top:4px;font-size:18px;font-weight:800;letter-spacing:-.02em}
+  .metric .x{margin-top:4px;font-size:11px;line-height:1.4;color:var(--text-2)}
+
+  .table-wrap{overflow:auto}
+  table{width:100%;border-collapse:collapse}
+  th,td{
+    padding:8px 6px;
+    border-bottom:1px solid var(--line-2);
+    text-align:left;
+    vertical-align:top;
+    font-size:12px;
+  }
+  th{
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:800;
+    background:var(--surface-2);
+    position:sticky;
+    top:0;
+  }
+  tr:last-child td{border-bottom:0}
+  .holding-name{font-weight:800;color:var(--text)}
+  .holding-sub{margin-top:2px;font-size:10px;color:var(--muted)}
+  .action-cell .tag{font-size:9px}
+  .risk-cell,.weight-cell,.spot-cell,.ewp-cell,.adv-cell,.dtl-cell,.mctr-cell{font-family:var(--mono)}
+
+  .status-grid{display:grid;gap:8px}
+  .status-row{
+    display:grid;grid-template-columns:110px 1fr auto;gap:10px;align-items:start;
+    padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);
+  }
+  .status-row .l{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+  .status-row .m{font-size:12px;line-height:1.48;color:var(--text-2)}
+
+  .sector-table td,.sector-table th{padding:7px 6px}
+  .rebalance{display:grid;gap:8px}
+  .rebalance-row{
+    display:grid;grid-template-columns:80px 1fr 82px 92px;gap:10px;align-items:center;
+    padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);
+  }
+  .rebalance-row .name{font-size:12px;font-weight:800;color:var(--text)}
+  .rebalance-row .delta{font-size:12px;font-weight:800;font-family:var(--mono)}
+  .rebalance-row .desc{font-size:12px;line-height:1.45;color:var(--text-2)}
+
+  .rule-list{display:grid;gap:8px}
+  .rule{
+    padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);
+  }
+  .rule strong{display:block;font-size:12px;color:var(--text)}
+  .rule span{display:block;margin-top:4px;font-size:11px;line-height:1.45;color:var(--text-2)}
+
+  /* Compact mode: ruthless */
+  body.compact .hero,
+  body.compact .section,
+  body.compact .side-section,
+  body.compact .metric,
+  body.compact .status-row,
+  body.compact .rebalance-row,
+  body.compact .rule{
+    padding:4px 6px !important;
+  }
+  body.compact .hero-row .hero-k,
+  body.compact .hero-row .hero-v,
+  body.compact th,
+  body.compact td,
+  body.compact .metric .x,
+  body.compact .status-row .m,
+  body.compact .rule span,
+  body.compact .tiny{
+    font-size:10px !important;
+  }
+  body.compact .title{font-size:20px}
+  body.compact .section-title{font-size:15px}
+  body.compact .subtitle,
+  body.compact .metric .x,
+  body.compact .holding-sub{
+    display:none !important;
+  }
+  body.compact .hero-summary{margin-top:6px}
+  body.compact .chip{padding:4px 7px;font-size:10px}
+  body.compact .tag{padding:3px 6px;font-size:9px}
+  body.compact .btn{height:28px;font-size:11px;padding:0 8px}
+
+  @media (max-width:1340px){
+    .metric-strip{grid-template-columns:repeat(3,1fr)}
+    .layout{grid-template-columns:1fr}
+    .side{position:static}
+  }
+  @media (max-width:920px){
+    .topbar{grid-template-columns:1fr;height:auto;padding:12px}
+    .kbd-row{display:none}
+    .hero-head,.metric-strip,.filters{grid-template-columns:1fr}
+    .hero-row{grid-template-columns:1fr}
+    .rebalance-row{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <div class="mark">CI</div>
+    <div>Continuum Intelligence</div>
+  </div>
+
+  <div class="search">
+    <span>⌕</span>
+    <input value="CI Portfolio Light V2 - institutional adjustments" />
+  </div>
+
+  <div class="kbd-row">
+    <span class="kbd">/</span><span>Search</span>
+    <span class="kbd">R</span><span>Risk</span>
+    <span class="kbd">H</span><span>Holdings</span>
+    <span class="kbd">M</span><span>Mandate</span>
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="densityToggle">Compact mode</button>
+    <button class="btn">Saved views</button>
+    <button class="btn primary">Rebalance</button>
+  </div>
+</div>
+
+<nav class="subnav">
+  <a href="#">Home</a>
+  <a href="#">Research</a>
+  <a href="#">PM chat</a>
+  <a href="#">Analyst chat</a>
+  <a href="#">Journal</a>
+  <a href="#" class="active">Portfolio</a>
+  <a href="#">Settings</a>
+</nav>
+
+<div class="app">
+  <section class="hero">
+    <div class="hero-head">
+      <div>
+        <div class="eyebrow">Portfolio</div>
+        <h1 class="title">Core ASX Long Portfolio</h1>
+        <div class="subtitle">Institutional version. Hard metrics first. No narrative labels, no visual heuristics, no soft taxonomy.</div>
+      </div>
+      <div class="pill-row">
+        <span class="tag blue">Book type: Long-only</span>
+        <span class="tag green">Mandate: Within range</span>
+        <span class="tag amber">Turnover: Low</span>
+      </div>
+    </div>
+
+    <div class="hero-summary">
+      <div class="hero-row">
+        <div class="hero-k">NAV</div>
+        <div class="hero-v"><span class="num">A$126.4m</span></div>
+        <div class="hero-k">Cash</div>
+        <div class="hero-v"><span class="num">8.7%</span> inside <span class="num">5-10%</span> band</div>
+        <div class="hero-k">Net beta</div>
+        <div class="hero-v"><span class="num">0.94x</span> versus <span class="num">1.00x</span> ceiling</div>
+      </div>
+      <div class="hero-row">
+        <div class="hero-k">Top 5 concentration</div>
+        <div class="hero-v"><span class="num">37.6%</span> versus <span class="num">45.0%</span> threshold</div>
+        <div class="hero-k">Largest position</div>
+        <div class="hero-v"><span class="num">9.6%</span> in <span class="mono">BHP</span> versus <span class="num">10.0%</span> cap</div>
+        <div class="hero-k">Sector tightness</div>
+        <div class="hero-v">Materials at <span class="num">28.4%</span> versus <span class="num">30.0%</span> cap</div>
+      </div>
+      <div class="hero-row">
+        <div class="hero-k">Primary action</div>
+        <div class="hero-v">Trim <span class="mono">CBA</span> and <span class="mono">WES</span>; add <span class="mono">CSL</span>, <span class="mono">NST</span>, <span class="mono">XRO</span></div>
+        <div class="hero-k">Execution watch</div>
+        <div class="hero-v">Largest DTL in book is <span class="num">3.9d</span>; liquidity remains acceptable</div>
+        <div class="hero-k">Portfolio rating</div>
+        <div class="hero-v"><span class="tag blue">EW risk</span> / <span class="tag green">OW alpha bucket</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="layout">
+    <main class="main">
+      <section class="section">
+        <div class="filters">
+          <div class="chipbar">
+            <button class="chip active">All holdings</button>
+            <button class="chip">OW</button>
+            <button class="chip">EW</button>
+            <button class="chip">UW</button>
+            <button class="chip">Trim candidates</button>
+            <button class="chip">Add candidates</button>
+          </div>
+          <button class="btn">View: Risk</button>
+          <button class="btn">Sort: MCTR</button>
+          <button class="btn">Export</button>
+        </div>
+
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Portfolio summary</div>
+            <h2 class="section-title">The portfolio is inside mandate. The live decision is capital efficiency, not gross de-risking.</h2>
+          </div>
+          <span class="tag blue">Live book</span>
+        </div>
+
+        <div class="metric-strip">
+          <div class="metric">
+            <div class="k">YTD return</div>
+            <div class="v num">+11.8%</div>
+            <div class="x">Benchmark <span class="num">+7.1%</span></div>
+          </div>
+          <div class="metric">
+            <div class="k">30d vol</div>
+            <div class="v num">14.2%</div>
+            <div class="x">Cap <span class="num">16.0%</span></div>
+          </div>
+          <div class="metric">
+            <div class="k">Tracking error</div>
+            <div class="v num">5.3%</div>
+            <div class="x">Within PM tolerance</div>
+          </div>
+          <div class="metric">
+            <div class="k">Gross exposure</div>
+            <div class="v num">91.3%</div>
+            <div class="x">Long-only cash drag visible</div>
+          </div>
+          <div class="metric">
+            <div class="k">Book ADV usage</div>
+            <div class="v num">14.8%</div>
+            <div class="x">Assumes 20% ADV max clip</div>
+          </div>
+          <div class="metric">
+            <div class="k">Avg DTL</div>
+            <div class="v num">2.4d</div>
+            <div class="x">At 20% ADV participation</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Holdings</div>
+            <h2 class="section-title">Hard mechanics only: weight, spot, EWP, beta, volatility, ADV, DTL, MCTR and action.</h2>
+          </div>
+          <span class="tag green">Institutional table</span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Rating</th>
+                <th>Action</th>
+                <th>Weight</th>
+                <th>Spot</th>
+                <th>EWP</th>
+                <th>Upside</th>
+                <th>Beta</th>
+                <th>30d Vol</th>
+                <th>ADV</th>
+                <th>DTL</th>
+                <th>MCTR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="holding-name">BHP</div>
+                  <div class="holding-sub">Materials</div>
+                </td>
+                <td><span class="tag blue">OW</span></td>
+                <td class="action-cell"><span class="tag blue">Hold</span></td>
+                <td class="weight-cell num">9.60%</td>
+                <td class="spot-cell num">52.56</td>
+                <td class="ewp-cell num">56.55</td>
+                <td class="num pos">+7.6%</td>
+                <td class="num">1.02x</td>
+                <td class="num">18.1%</td>
+                <td class="adv-cell num">A$43.2m</td>
+                <td class="dtl-cell num">1.4d</td>
+                <td class="mctr-cell num">180 bps</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="holding-name">CSL</div>
+                  <div class="holding-sub">Healthcare</div>
+                </td>
+                <td><span class="tag blue">OW</span></td>
+                <td class="action-cell"><span class="tag green">Add</span></td>
+                <td class="weight-cell num">8.40%</td>
+                <td class="spot-cell num">309.20</td>
+                <td class="ewp-cell num">338.00</td>
+                <td class="num pos">+9.3%</td>
+                <td class="num">0.86x</td>
+                <td class="num">13.2%</td>
+                <td class="adv-cell num">A$31.4m</td>
+                <td class="dtl-cell num">1.7d</td>
+                <td class="mctr-cell num">112 bps</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="holding-name">CBA</div>
+                  <div class="holding-sub">Financials</div>
+                </td>
+                <td><span class="tag red">UW</span></td>
+                <td class="action-cell"><span class="tag red">Trim</span></td>
+                <td class="weight-cell num">7.80%</td>
+                <td class="spot-cell num">196.30</td>
+                <td class="ewp-cell num">180.00</td>
+                <td class="num neg">-8.3%</td>
+                <td class="num">0.71x</td>
+                <td class="num">10.4%</td>
+                <td class="adv-cell num">A$118.6m</td>
+                <td class="dtl-cell num">0.4d</td>
+                <td class="mctr-cell num">64 bps</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="holding-name">NST</div>
+                  <div class="holding-sub">Gold</div>
+                </td>
+                <td><span class="tag blue">OW</span></td>
+                <td class="action-cell"><span class="tag green">Add</span></td>
+                <td class="weight-cell num">7.20%</td>
+                <td class="spot-cell num">19.85</td>
+                <td class="ewp-cell num">22.60</td>
+                <td class="num pos">+13.9%</td>
+                <td class="num">0.98x</td>
+                <td class="num">21.6%</td>
+                <td class="adv-cell num">A$18.3m</td>
+                <td class="dtl-cell num">2.5d</td>
+                <td class="mctr-cell num">152 bps</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="holding-name">WES</div>
+                  <div class="holding-sub">Consumer</div>
+                </td>
+                <td><span class="tag amber">EW</span></td>
+                <td class="action-cell"><span class="tag red">Trim</span></td>
+                <td class="weight-cell num">6.90%</td>
+                <td class="spot-cell num">73.10</td>
+                <td class="ewp-cell num">75.00</td>
+                <td class="num pos">+2.6%</td>
+                <td class="num">0.78x</td>
+                <td class="num">11.3%</td>
+                <td class="adv-cell num">A$15.1m</td>
+                <td class="dtl-cell num">2.9d</td>
+                <td class="mctr-cell num">58 bps</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="holding-name">RIO</div>
+                  <div class="holding-sub">Materials</div>
+                </td>
+                <td><span class="tag amber">EW</span></td>
+                <td class="action-cell"><span class="tag blue">Hold</span></td>
+                <td class="weight-cell num">6.40%</td>
+                <td class="spot-cell num">118.40</td>
+                <td class="ewp-cell num">122.10</td>
+                <td class="num pos">+3.1%</td>
+                <td class="num">1.06x</td>
+                <td class="num">19.2%</td>
+                <td class="adv-cell num">A$27.4m</td>
+                <td class="dtl-cell num">1.5d</td>
+                <td class="mctr-cell num">144 bps</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="holding-name">XRO</div>
+                  <div class="holding-sub">Technology</div>
+                </td>
+                <td><span class="tag blue">OW</span></td>
+                <td class="action-cell"><span class="tag green">Add</span></td>
+                <td class="weight-cell num">5.80%</td>
+                <td class="spot-cell num">156.60</td>
+                <td class="ewp-cell num">176.00</td>
+                <td class="num pos">+12.4%</td>
+                <td class="num">1.18x</td>
+                <td class="num">23.4%</td>
+                <td class="adv-cell num">A$11.4m</td>
+                <td class="dtl-cell num">3.2d</td>
+                <td class="mctr-cell num">131 bps</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="holding-name">MQG</div>
+                  <div class="holding-sub">Financials</div>
+                </td>
+                <td><span class="tag amber">EW</span></td>
+                <td class="action-cell"><span class="tag blue">Hold</span></td>
+                <td class="weight-cell num">5.60%</td>
+                <td class="spot-cell num">200.40</td>
+                <td class="ewp-cell num">214.00</td>
+                <td class="num pos">+6.8%</td>
+                <td class="num">1.12x</td>
+                <td class="num">18.7%</td>
+                <td class="adv-cell num">A$22.8m</td>
+                <td class="dtl-cell num">1.6d</td>
+                <td class="mctr-cell num">117 bps</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Risk and mandate</div>
+            <h2 class="section-title">The hard truth: there are no active mandate breaches, but two constraints are close enough to affect trade sequencing.</h2>
+          </div>
+          <span class="tag amber">Sequencing matters</span>
+        </div>
+
+        <div class="status-grid">
+          <div class="status-row">
+            <div class="l">Sector cap</div>
+            <div class="m">Materials at <span class="num">28.4%</span> versus a <span class="num">30.0%</span> limit. Another materials add is possible only if funded from elsewhere or sized carefully.</div>
+            <div><span class="tag amber">Tight</span></div>
+          </div>
+          <div class="status-row">
+            <div class="l">Single-name cap</div>
+            <div class="m"><span class="mono">BHP</span> at <span class="num">9.6%</span> versus a <span class="num">10.0%</span> ceiling. No spare capacity for a full-size add.</div>
+            <div><span class="tag amber">Tight</span></div>
+          </div>
+          <div class="status-row">
+            <div class="l">Cash band</div>
+            <div class="m">Cash at <span class="num">8.7%</span> sits within the <span class="num">5-10%</span> target range. No forced deployment.</div>
+            <div><span class="tag green">OK</span></div>
+          </div>
+          <div class="status-row">
+            <div class="l">Portfolio beta</div>
+            <div class="m">Beta at <span class="num">0.94x</span> is inside the <span class="num">1.00x</span> ceiling. The book is not over-geared to market direction.</div>
+            <div><span class="tag green">OK</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Sector exposure</div>
+            <h2 class="section-title">Materials and financials still dominate the book. Healthcare and software remain the cleanest diversification destinations.</h2>
+          </div>
+          <span class="tag blue">Exposure map</span>
+        </div>
+
+        <div class="table-wrap">
+          <table class="sector-table">
+            <thead>
+              <tr>
+                <th>Sector</th>
+                <th>Weight</th>
+                <th>Limit</th>
+                <th>Slack</th>
+                <th>MCTR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Materials</strong></td>
+                <td class="num">28.4%</td>
+                <td class="num">30.0%</td>
+                <td class="num">1.6%</td>
+                <td class="num">476 bps</td>
+              </tr>
+              <tr>
+                <td><strong>Financials</strong></td>
+                <td class="num">19.7%</td>
+                <td class="num">25.0%</td>
+                <td class="num">5.3%</td>
+                <td class="num">213 bps</td>
+              </tr>
+              <tr>
+                <td><strong>Healthcare</strong></td>
+                <td class="num">11.3%</td>
+                <td class="num">20.0%</td>
+                <td class="num">8.7%</td>
+                <td class="num">112 bps</td>
+              </tr>
+              <tr>
+                <td><strong>Consumer</strong></td>
+                <td class="num">10.1%</td>
+                <td class="num">20.0%</td>
+                <td class="num">9.9%</td>
+                <td class="num">84 bps</td>
+              </tr>
+              <tr>
+                <td><strong>Technology</strong></td>
+                <td class="num">8.4%</td>
+                <td class="num">15.0%</td>
+                <td class="num">6.6%</td>
+                <td class="num">131 bps</td>
+              </tr>
+              <tr>
+                <td><strong>Cash</strong></td>
+                <td class="num">8.7%</td>
+                <td class="num">5-10%</td>
+                <td class="num">n/a</td>
+                <td class="num">0 bps</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <aside class="side">
+      <section class="side-section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Rebalancing signals</div>
+            <h2 class="section-title">Use strict action language only.</h2>
+          </div>
+          <span class="tag blue">Action list</span>
+        </div>
+
+        <div class="rebalance">
+          <div class="rebalance-row">
+            <div class="name">UW</div>
+            <div class="desc"><span class="mono">CBA</span> remains the cleanest source of funds. Low upside, low DTL, negative EWP.</div>
+            <div class="delta neg">-150 bps</div>
+            <div><span class="tag red">Trim</span></div>
+          </div>
+          <div class="rebalance-row">
+            <div class="name">EW</div>
+            <div class="desc"><span class="mono">WES</span> is quality, but upside is too low relative to capital demand elsewhere.</div>
+            <div class="delta neg">-75 bps</div>
+            <div><span class="tag red">Trim</span></div>
+          </div>
+          <div class="rebalance-row">
+            <div class="name">OW</div>
+            <div class="desc"><span class="mono">CSL</span> offers the best combination of upside and diversification benefit.</div>
+            <div class="delta pos">+75 bps</div>
+            <div><span class="tag green">Add</span></div>
+          </div>
+          <div class="rebalance-row">
+            <div class="name">OW</div>
+            <div class="desc"><span class="mono">NST</span> has the highest upside in the book but uses materials headroom.</div>
+            <div class="delta pos">+75 bps</div>
+            <div><span class="tag green">Add</span></div>
+          </div>
+          <div class="rebalance-row">
+            <div class="name">OW</div>
+            <div class="desc"><span class="mono">XRO</span> improves EWP and diversifies the book away from resources.</div>
+            <div class="delta pos">+75 bps</div>
+            <div><span class="tag green">Add</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="side-section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Execution rules</div>
+            <h2 class="section-title">Liquidity is a live constraint, not a footnote.</h2>
+          </div>
+          <span class="tag amber">20% ADV</span>
+        </div>
+
+        <div class="rule-list">
+          <div class="rule">
+            <strong>ADV assumption</strong>
+            <span>DTL assumes a maximum participation rate of <span class="num">20%</span> of average daily traded value.</span>
+          </div>
+          <div class="rule">
+            <strong>Hard rule</strong>
+            <span>No position should be taken above <span class="num">4.0d</span> DTL without explicit override.</span>
+          </div>
+          <div class="rule">
+            <strong>Current outlier</strong>
+            <span><span class="mono">XRO</span> at <span class="num">3.2d</span> and <span class="mono">WES</span> at <span class="num">2.9d</span> are slower than the rest of the book.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="side-section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">System note</div>
+            <h2 class="section-title">Backend status</h2>
+          </div>
+          <span class="tag red">Prototype</span>
+        </div>
+
+        <div class="paragraph">
+          This page is a static prototype only. It is <strong>not</strong> currently calculating risk live through Aladdin, Axioma, Barra or any other external engine. The values shown for <span class="mono">ADV</span>, <span class="mono">DTL</span> and <span class="mono">MCTR</span> are illustrative placeholders to establish the correct institutional interface grammar.
+        </div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+  const densityToggle = document.getElementById('densityToggle');
+  const chips = document.querySelectorAll('.chip');
+
+  if (densityToggle) {
+    densityToggle.addEventListener('click', () => {
+      document.body.classList.toggle('compact');
+      densityToggle.textContent = document.body.classList.contains('compact') ? 'Standard mode' : 'Compact mode';
+    });
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

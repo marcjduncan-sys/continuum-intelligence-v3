@@ -13,6 +13,7 @@ import { API_BASE } from './api-config.js';
 // --- Router state ---
 const renderedPages = new Set();
 const renderedSnapshots = new Set();
+let _prevHash = null;
 
 // Railway API base (centralised in api-config.js)
 const _REFRESH_API_BASE = API_BASE;
@@ -160,6 +161,17 @@ function renderStockReport(hash, ticker) {
  */
 export function route() {
   const hash = window.location.hash.slice(1) || 'home';
+
+  // Undock PM panel when leaving the PM page
+  if (_prevHash === 'pm' && hash !== 'pm') {
+    const panel = document.getElementById('pm-panel');
+    if (panel && panel._pmOriginalParent) {
+      panel._pmOriginalParent.appendChild(panel);
+      panel.classList.remove('pm-panel--docked');
+      delete panel._pmOriginalParent;
+    }
+  }
+
   const pages = document.querySelectorAll('.page');
   pages.forEach(p => p.classList.remove('active'));
 
@@ -254,6 +266,19 @@ export function route() {
     _pageRenderers.renderPMPage();
   }
 
+  // Dock PM panel into workstation slot when on PM page
+  if (hash === 'pm') {
+    requestAnimationFrame(function() {
+      const slot = document.getElementById('pm-workstation-slot');
+      const panel = document.getElementById('pm-panel');
+      if (slot && panel && !panel.classList.contains('pm-panel--docked')) {
+        panel._pmOriginalParent = panel.parentNode;
+        slot.appendChild(panel);
+        panel.classList.add('pm-panel--docked');
+      }
+    });
+  }
+
   // Lazy render ops page (URL-only, no nav link)
   if (hash === 'ops' && _pageRenderers.renderOpsPage) {
     _pageRenderers.renderOpsPage();
@@ -327,8 +352,8 @@ export function route() {
     document.getElementById('page-home').classList.add('active');
   }
 
-  // Update nav links -- add aria-current for a11y
-  document.querySelectorAll('.nav-links a').forEach(a => {
+  // Update subnav links -- add aria-current for a11y
+  document.querySelectorAll('.ci-strip-inner a[data-nav]').forEach(a => {
     a.classList.remove('active');
     a.removeAttribute('aria-current');
     if (a.dataset.nav === hash || (hash.startsWith('report-') && a.dataset.nav === 'home') || (hash.startsWith('deep-report-') && a.dataset.nav === 'deep-research') || (hash.startsWith('snapshot-') && a.dataset.nav === 'deep-research')) {
@@ -344,6 +369,8 @@ export function route() {
       : hash.replace('report-', '');
     if (_pageRenderers.populateSidebar) _pageRenderers.populateSidebar(ticker);
   }
+
+  _prevHash = hash;
 }
 
 // Export the Sets for external access if needed

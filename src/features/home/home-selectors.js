@@ -161,6 +161,7 @@ export function buildCoverageRows(sources) {
     return {
       ticker: ticker,
       name: stock.company || ticker,
+      sector: stock.sector || '',
       price: price,
       dayChangePct: dayChangePct,
       signal: signal,

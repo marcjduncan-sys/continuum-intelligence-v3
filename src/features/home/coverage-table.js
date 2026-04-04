@@ -7,22 +7,39 @@
 import { formatPrice, formatSignedPercent } from '../../lib/format.js';
 
 var COLUMNS = [
-  { key: 'ticker',            label: 'Ticker',     sortable: true  },
-  { key: 'name',              label: 'Company',    sortable: true  },
-  { key: 'price',             label: 'Price',      sortable: true  },
-  { key: 'dayChangePct',      label: 'Day',        sortable: true  },
-  { key: 'signal',            label: 'Signal',     sortable: true  },
-  { key: 'convictionPct',     label: 'Conviction', sortable: true  },
-  { key: 'ewpVsSpotPct',      label: 'EWP/Spot',   sortable: true  },
-  { key: 'freshnessHours',    label: 'Freshness',  sortable: true  },
-  { key: 'dtc',               label: 'DTC',        sortable: true  },
-  { key: 'attentionScore',    label: 'Attention',  sortable: true  }
+  { key: 'ticker',         label: 'Stock',       sortable: true  },
+  { key: 'sector',         label: 'Sector',      sortable: true  },
+  { key: 'price',          label: 'Price',       sortable: true  },
+  { key: 'dayChangePct',   label: '1D',          sortable: true  },
+  { key: 'signal',         label: 'Verdict',     sortable: true  },
+  { key: null,             label: 'Thesis Skew', sortable: false },
+  { key: 'convictionPct',  label: 'Conviction',  sortable: true  },
+  { key: 'freshnessHours', label: 'Updated',     sortable: true  },
+  { key: null,             label: '',            sortable: false }
 ];
 
-function _signalBadge(signal) {
+function _verdictTag(signal) {
+  if (signal === 'upside')   return '<span class="tag green">Upside</span>';
+  if (signal === 'downside') return '<span class="tag red">Downside</span>';
+  return '<span class="tag amber">Balanced</span>';
+}
+
+function _verdictBadge(signal) {
   return '<span class="signal-badge signal-badge--' + signal + '">' +
     signal.charAt(0).toUpperCase() + signal.slice(1) +
     '</span>';
+}
+
+function _thesisSkew(signal, convictionPct) {
+  var pct = convictionPct != null ? convictionPct : 0;
+  var cls = signal === 'upside' ? 'pos' : signal === 'downside' ? 'neg' : 'neu';
+  var strength = pct >= 80 ? 'Strong' : pct >= 60 ? 'Moderate' : 'Balanced';
+  var label = signal === 'upside'
+    ? (strength === 'Balanced' ? 'Upside skew' : strength + ' upside')
+    : signal === 'downside'
+    ? (strength === 'Balanced' ? 'Downside skew' : strength + ' downside')
+    : 'Balanced skew';
+  return '<span class="' + cls + '">' + label + '</span>';
 }
 
 function _convictionCell(convictionPct) {
@@ -30,35 +47,31 @@ function _convictionCell(convictionPct) {
     return '<span class="metric-unavailable">--</span>';
   }
   var pct = Math.round(convictionPct);
-  return '<div class="conviction-bar ci-confidence-bar-wrap">' +
-    '<div class="conviction-bar__fill ci-confidence-bar-fill" style="width:' + pct + '%"></div>' +
-    '<span class="conviction-bar__label">' + pct + '%</span>' +
+  return '<div class="confidence-bar">' +
+    '<div class="conf-track"><div class="conf-fill" style="width:' + pct + '%"></div></div>' +
+    '<span class="conf-pct">' + pct + '%</span>' +
     '</div>';
 }
 
-function _freshnessCell(freshnessHours) {
+function _updatedCell(freshnessHours) {
+  var dotCls = (!isFinite(freshnessHours) || freshnessHours > 72) ? 'stale' : 'fresh';
+  var label;
   if (!isFinite(freshnessHours)) {
-    return '<span class="freshness-badge freshness-badge--red">Stale</span>';
+    label = 'Unknown';
+  } else if (freshnessHours < 24) {
+    label = 'Today';
+  } else {
+    var days = Math.round(freshnessHours / 24);
+    var d = new Date(Date.now() - days * 86400000);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    label = d.getDate() + ' ' + months[d.getMonth()];
   }
-  if (freshnessHours > 72) {
-    return '<span class="freshness-badge freshness-badge--red">' + Math.round(freshnessHours / 24) + 'd</span>';
-  }
-  if (freshnessHours > 48) {
-    return '<span class="freshness-badge freshness-badge--amber">' + Math.round(freshnessHours) + 'h</span>';
-  }
-  return '<span class="freshness-badge freshness-badge--green">' + Math.round(freshnessHours) + 'h</span>';
-}
-
-function _dtcCell(dtc) {
-  if (dtc == null) return '<span class="metric-unavailable">--</span>';
-  if (dtc <= 3) return '<span class="dtc-imminent">' + dtc + 'd</span>';
-  if (dtc <= 7) return '<span class="dtc-soon">' + dtc + 'd</span>';
-  return '<span>' + dtc + 'd</span>';
+  return '<span class="status-dot ' + dotCls + '"></span> <span class="updated">' + label + '</span>';
 }
 
 function _changeClass(val) {
-  if (val > 0) return 'td-change--positive';
-  if (val < 0) return 'td-change--negative';
+  if (val > 0) return 'pos';
+  if (val < 0) return 'neg';
   return '';
 }
 
@@ -71,10 +84,10 @@ function _changeClass(val) {
 export function renderCoverageTableHeader(sortColumn, sortDirection) {
   var ths = COLUMNS.map(function(col) {
     var indicator = '';
-    if (col.sortable && sortColumn === col.key) {
+    if (col.sortable && col.key && sortColumn === col.key) {
       indicator = '<span class="sort-indicator">' + (sortDirection === 'asc' ? '&#9650;' : '&#9660;') + '</span>';
     }
-    var sortAttr = col.sortable ? ' data-sort-col="' + col.key + '"' : '';
+    var sortAttr = (col.sortable && col.key) ? ' data-sort-col="' + col.key + '"' : '';
     return '<th' + sortAttr + '>' + col.label + indicator + '</th>';
   }).join('');
   return '<thead><tr>' + ths + '</tr></thead>';
@@ -86,22 +99,23 @@ export function renderCoverageTableHeader(sortColumn, sortDirection) {
  * @returns {string}
  */
 export function renderCoverageTableRow(row) {
-  var changeClass = _changeClass(row.dayChangePct);
-  var ewpStr = row.ewpVsSpotPct != null
-    ? formatSignedPercent(row.ewpVsSpotPct)
-    : '<span class="metric-unavailable">--</span>';
+  var chgCls = _changeClass(row.dayChangePct);
+  var chgStr = formatSignedPercent(row.dayChangePct);
 
   return '<tr data-ticker="' + row.ticker + '">' +
-    '<td class="td-ticker"><span class="ci-ticker-badge">' + row.ticker + '</span></td>' +
-    '<td class="td-name">' + row.name + '</td>' +
-    '<td class="td-price" data-home-price="' + row.ticker + '">' + formatPrice(row.price) + '</td>' +
-    '<td class="td-change ' + changeClass + '" data-home-change="' + row.ticker + '">' + formatSignedPercent(row.dayChangePct) + '</td>' +
-    '<td class="td-signal">' + _signalBadge(row.signal) + '</td>' +
-    '<td class="td-conviction">' + _convictionCell(row.convictionPct) + '</td>' +
-    '<td class="td-ewp">' + ewpStr + '</td>' +
-    '<td class="td-freshness">' + _freshnessCell(row.freshnessHours) + '</td>' +
-    '<td class="td-dtc">' + _dtcCell(row.dtc) + '</td>' +
-    '<td class="td-attention">' + Math.round(row.attentionScore) + '</td>' +
+    '<td><div class="td-ticker">' +
+      '<div class="t-badge">' + row.ticker + '</div>' +
+      '<div><div class="t-name">' + (row.name || row.ticker) + '</div>' +
+      '<div class="t-sector">ASX: ' + row.ticker + '</div></div>' +
+    '</div></td>' +
+    '<td>' + (row.sector || '--') + '</td>' +
+    '<td><span class="price-val" data-home-price="' + row.ticker + '">' + formatPrice(row.price) + '</span></td>' +
+    '<td><span class="chg ' + chgCls + '" data-home-change="' + row.ticker + '">' + chgStr + '</span></td>' +
+    '<td>' + _verdictTag(row.signal) + '</td>' +
+    '<td>' + _thesisSkew(row.signal, row.convictionPct) + '</td>' +
+    '<td>' + _convictionCell(row.convictionPct) + '</td>' +
+    '<td>' + _updatedCell(row.freshnessHours) + '</td>' +
+    '<td><button class="tbl-action" data-action-ticker="' + row.ticker + '">View</button></td>' +
     '</tr>';
 }
 
@@ -112,7 +126,7 @@ export function renderCoverageTableRow(row) {
  */
 export function renderCoverageTableBody(rows) {
   if (!rows || rows.length === 0) {
-    return '<tr><td colspan="10" class="table-empty">No coverage names match the current filters.</td></tr>';
+    return '<tr><td colspan="9" class="table-empty">No coverage names match the current filters.</td></tr>';
   }
   return rows.map(renderCoverageTableRow).join('');
 }
@@ -158,7 +172,7 @@ export function renderFilterBar(homeState) {
  */
 export function renderCoverageTable(rows, homeState) {
   return renderFilterBar(homeState) +
-    '<div class="coverage-table-wrap">' +
+    '<div class="coverage-wrap">' +
     '<table class="coverage-table ci-table">' +
     renderCoverageTableHeader(homeState.sortColumn, homeState.sortDirection) +
     '<tbody class="coverage-tbody">' +

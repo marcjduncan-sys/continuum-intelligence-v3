@@ -1417,3 +1417,508 @@
         min-width: 15px;
     }
 }
+
+/* ===========================================================================
+   W4C SETTINGS LAYOUT
+   Prototype: 08-personalisation.html
+   Supplements the pn-* wizard with a settings-card aesthetic for when the
+   personalisation page uses a settings layout (settings-layout, settings-nav,
+   settings-section) rather than the wizard shell.
+   =========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   PAGE HEADER (settings mode)
+   --------------------------------------------------------------------------- */
+
+.pn-settings-header {
+    margin-bottom: 28px;
+}
+
+.pn-settings-eyebrow {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--muted);
+    font-weight: 900;
+    margin-bottom: 6px;
+}
+
+.pn-settings-title {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -.04em;
+    margin: 0 0 6px;
+    color: var(--text);
+}
+
+.pn-settings-sub {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* ---------------------------------------------------------------------------
+   SETTINGS LAYOUT (two-column: nav + content)
+   --------------------------------------------------------------------------- */
+
+.settings-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+/* ---------------------------------------------------------------------------
+   SETTINGS NAV (sticky left col)
+   --------------------------------------------------------------------------- */
+
+.settings-nav {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 72px;
+}
+
+.sn-item {
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: background .12s;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.sn-item:hover {
+    background: var(--surface-2);
+}
+
+.sn-item.active {
+    background: var(--blue-soft);
+    color: var(--blue);
+}
+
+.sn-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    background: var(--surface-3);
+    border: 1px solid var(--line);
+    flex-shrink: 0;
+}
+
+.sn-item.active .sn-icon {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
+}
+
+.sn-divider {
+    height: 1px;
+    background: var(--line);
+    margin: 6px 4px;
+}
+
+/* ---------------------------------------------------------------------------
+   SETTINGS CONTENT (right col, stacked cards)
+   --------------------------------------------------------------------------- */
+
+.settings-content {
+    display: grid;
+    gap: 16px;
+}
+
+/* ---------------------------------------------------------------------------
+   SETTINGS SECTION (individual card)
+   --------------------------------------------------------------------------- */
+
+.settings-section {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+}
+
+.ss-header {
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line-2);
+}
+
+.ss-eyebrow {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--muted);
+    font-weight: 900;
+    margin-bottom: 4px;
+}
+
+.ss-title {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -.025em;
+    margin: 0;
+    color: var(--text);
+}
+
+.ss-sub {
+    margin-top: 3px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+/* ---------------------------------------------------------------------------
+   FORM ROWS (label + control pairs within a settings section)
+   --------------------------------------------------------------------------- */
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line-2);
+}
+
+.form-row:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.form-row:first-child {
+    padding-top: 0;
+}
+
+.form-label {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.form-desc {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+.form-control {
+    flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   TOGGLE (on/off switch)
+   --------------------------------------------------------------------------- */
+
+.toggle {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    cursor: pointer;
+}
+
+.toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--line);
+    border-radius: 999px;
+    transition: background .2s;
+}
+
+.toggle input:checked + .toggle-track {
+    background: var(--blue);
+}
+
+.toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    transition: transform .2s;
+}
+
+.toggle input:checked ~ .toggle-thumb {
+    transform: translateX(18px);
+}
+
+/* ---------------------------------------------------------------------------
+   FORM INPUTS (select + text within settings sections)
+   --------------------------------------------------------------------------- */
+
+select.form-select {
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    outline: 0;
+    font-family: inherit;
+}
+
+select.form-select:focus {
+    border-color: var(--blue);
+    outline: none;
+}
+
+input.form-input {
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 12px;
+    outline: 0;
+    width: 180px;
+    font-family: inherit;
+}
+
+input.form-input:focus {
+    border-color: var(--blue);
+    background: var(--surface);
+}
+
+/* ---------------------------------------------------------------------------
+   PROFILE CARD
+   --------------------------------------------------------------------------- */
+
+.profile-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface-2);
+    margin-bottom: 16px;
+}
+
+.profile-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: linear-gradient(160deg, #234d78, #1a3958);
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+
+.profile-name {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    color: var(--text);
+}
+
+.profile-role {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+.profile-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px;
+    border-radius: 8px;
+    background: var(--blue-soft);
+    border: 1px solid #c8d8ea;
+    font-size: 10px;
+    font-weight: 900;
+    color: var(--blue);
+    margin-top: 6px;
+}
+
+/* ---------------------------------------------------------------------------
+   COVERAGE UNIVERSE GRID
+   --------------------------------------------------------------------------- */
+
+.coverage-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.cov-sector {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    background: var(--surface);
+}
+
+.cov-sector-title {
+    font-size: 11px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.cov-stock {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--line-2);
+    font-size: 11px;
+}
+
+.cov-stock:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.cov-ticker {
+    font-weight: 900;
+    color: var(--blue);
+}
+
+.cov-name {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.cov-check {
+    width: 16px;
+    height: 16px;
+    border-radius: 5px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.cov-check.checked {
+    background: var(--blue);
+    border-color: var(--blue);
+}
+
+.cov-check.checked::after {
+    content: '\2713';
+    font-size: 9px;
+    color: #fff;
+    font-weight: 900;
+}
+
+/* ---------------------------------------------------------------------------
+   ALERT THRESHOLDS GRID
+   --------------------------------------------------------------------------- */
+
+.threshold-grid {
+    display: grid;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.threshold-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface-2);
+}
+
+.th-label {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.th-desc {
+    font-size: 10px;
+    color: var(--muted);
+}
+
+.th-value {
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--blue);
+    min-width: 50px;
+    text-align: right;
+}
+
+input[type=range] {
+    width: 100px;
+    accent-color: var(--blue);
+}
+
+/* ---------------------------------------------------------------------------
+   RESPONSIVE (settings layout)
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+    .settings-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-nav {
+        position: static;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 6px;
+    }
+
+    .sn-item {
+        flex: 0 0 auto;
+    }
+
+    .sn-divider {
+        display: none;
+    }
+
+    .coverage-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .coverage-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .threshold-item {
+        grid-template-columns: 1fr auto;
+    }
+
+    .threshold-item input[type=range] {
+        display: none;
+    }
+}

@@ -445,7 +445,20 @@ async function boot() {
     if (toggle) toggle.classList.toggle('open');
   });
 
-  // --- Mobile nav toggle ---
+  // --- Search shortcut: / key focuses search input ---
+  document.addEventListener('keydown', function(e) {
+    if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+      const searchInput = document.getElementById('ciSearchInput');
+      if (searchInput) searchInput.focus();
+    }
+    if (e.key === 'Escape') {
+      const searchInput = document.getElementById('ciSearchInput');
+      if (document.activeElement === searchInput) searchInput.blur();
+    }
+  });
+
+  // --- Mobile nav toggle (legacy, menuToggle button removed from DOM) ---
   const menuBtn = document.getElementById('menuToggle');
   const navLinks = document.querySelector('.ci-topbar-nav');
   if (menuBtn && navLinks) {

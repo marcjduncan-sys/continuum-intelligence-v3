@@ -10,8 +10,6 @@ import { on } from '../lib/data-events.js';
 import { buildCoverageRows, sortCoverageRows, filterCoverageRows } from '../features/home/home-selectors.js';
 import { getHomeState, resetHomeState, toggleSort, updateHomeState } from '../features/home/home-state.js';
 import { renderCoverageTable, renderCoverageTableBody } from '../features/home/coverage-table.js';
-import { renderKpiBand } from '../features/home/kpi-band.js';
-import { renderIntelligenceRail } from '../features/home/intelligence-rail.js';
 import { renderHealthBanner } from '../features/home/home-health-banner.js';
 
 // Cached rows for the current render cycle.
@@ -52,7 +50,6 @@ function _bindTableEvents(container) {
     if (th) {
       toggleSort(th.getAttribute('data-sort-col'));
       _rerenderBody(container);
-      // Update sort indicators in header
       var thead = container.querySelector('thead');
       if (thead) {
         var state = getHomeState();
@@ -92,12 +89,10 @@ function _bindTableEvents(container) {
 
 function _bindFilterEvents(container) {
   container.addEventListener('click', function(e) {
-    // Health banner action
     var bannerBtn = e.target.closest('[data-health-action="show-failed"]');
     if (bannerBtn) {
       updateHomeState({ filterExtraction: 'failed' });
       _rerenderBody(container);
-      // Update the extraction chip to reflect the new filter
       var chips = container.querySelectorAll('.filter-chip[data-filter-group="extraction"]');
       for (var i = 0; i < chips.length; i++) {
         chips[i].classList.toggle('active', chips[i].getAttribute('data-filter-value') === 'failed');
@@ -113,7 +108,6 @@ function _bindFilterEvents(container) {
     if (group === 'staleness') updateHomeState({ filterStaleness: value });
     if (group === 'extraction') updateHomeState({ filterExtraction: value });
 
-    // Update active chip within the group
     var groupEl = chip.closest('.filter-group');
     if (groupEl) {
       var chips = groupEl.querySelectorAll('.filter-chip');
@@ -151,22 +145,19 @@ function _handleStockUpdate(ticker) {
     dayChangePct = ((price - previousClose) / previousClose) * 100;
   }
 
-  // Patch price cell
   var priceEl = homePage.querySelector('[data-home-price="' + ticker + '"]');
   if (priceEl) {
-    var { formatPrice, formatSignedPercent } = _getFormatFns();
-    priceEl.textContent = formatPrice(price);
+    var fmt = _getFormatFns();
+    priceEl.textContent = fmt.formatPrice(price);
   }
 
-  // Patch change cell
   var changeEl = homePage.querySelector('[data-home-change="' + ticker + '"]');
   if (changeEl) {
-    var { formatSignedPercent: fsp } = _getFormatFns();
-    changeEl.textContent = fsp(dayChangePct);
-    changeEl.className = 'td-change ' + (dayChangePct > 0 ? 'td-change--positive' : dayChangePct < 0 ? 'td-change--negative' : '');
+    var fmt2 = _getFormatFns();
+    changeEl.textContent = fmt2.formatSignedPercent(dayChangePct);
+    changeEl.className = 'chg ' + (dayChangePct > 0 ? 'pos' : dayChangePct < 0 ? 'neg' : '');
   }
 
-  // Update cached row price for future re-renders
   for (var i = 0; i < _currentRows.length; i++) {
     if (_currentRows[i].ticker === ticker) {
       _currentRows[i].price = price;
@@ -176,40 +167,296 @@ function _handleStockUpdate(ticker) {
   }
 }
 
-function _renderHero() {
-  return '<div class="ci-hero home-hero">' +
-    '<div class="ci-brand-mark ci-gradient-mark home-hero__mark" aria-hidden="true">' +
-      '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;fill:rgba(255,255,255,0.9)">' +
-        '<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>' +
-      '</svg>' +
+function _getFormatFns() {
+  return {
+    formatPrice: function(v) { return isNaN(v) ? '--' : 'A$' + v.toFixed(2); },
+    formatSignedPercent: function(v) { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; }
+  };
+}
+
+// ── Hero ─────────────────────────────────────────────────────
+
+function _renderHero(rows) {
+  var total = rows ? rows.length : 0;
+  var upside = 0, downside = 0, neutral = 0, highConviction = 0;
+  if (rows) {
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i].signal === 'upside') upside++;
+      else if (rows[i].signal === 'downside') downside++;
+      else neutral++;
+      if (rows[i].convictionPct != null && rows[i].convictionPct >= 80) highConviction++;
+    }
+  }
+
+  return '<section class="hero">' +
+    '<div class="hero-head">' +
+    '<div class="hero-identity">' +
+    '<div class="hero-mark">CI</div>' +
+    '<div>' +
+    '<h1 class="hero-title">Continuum Intelligence</h1>' +
+    '<div class="hero-sub">' +
+    '<span>Independent Cross-Domain Equity Research</span>' +
+    '<span class="sep">·</span>' +
+    '<span>ASX Coverage Universe</span>' +
     '</div>' +
-    '<h1 class="ci-hero-title home-hero__title">We map evidence, not opinions.</h1>' +
-    '<div class="ci-hero-meta">' +
-      '<span>25 ASX Equities</span>' +
-      '<span class="ci-hero-meta-sep">|</span>' +
-      '<span>10 Evidence Domains</span>' +
-      '<span class="ci-hero-meta-sep">|</span>' +
-      '<span>ACH Framework</span>' +
+    '<div class="hero-cred">Built by former UBS &amp; Goldman Sachs executives &ndash; no conflicts, no investment banking revenue to protect</div>' +
     '</div>' +
-    '<div class="ci-hero-cred">' +
-      '<span class="ci-tag">Built by former UBS and Goldman Sachs executives</span>' +
-      '<span class="ci-tag">Cross-Domain Research</span>' +
-      '<span class="ci-tag">Evidence-Driven</span>' +
+    '</div>' +
+    '<div class="hero-tags">' +
+    '<span class="tag blue">' + total + ' Stocks Covered</span>' +
+    '<span class="tag green">ACH Methodology</span>' +
+    '<span class="tag gold">Institutional Grade</span>' +
+    '<span class="tag violet">10 Evidence Domains</span>' +
+    '</div>' +
+    '</div>' +
+    '<div class="stat-ribbon">' +
+    '<div class="stat-row">' +
+    '<div class="stat-k">Coverage</div>' +
+    '<div class="stat-v">' + total + ' <small>ASX-listed stocks</small></div>' +
+    '<div class="stat-k">High Conviction</div>' +
+    '<div class="stat-v neu">' + highConviction + ' <small>skews ≥80% confidence</small></div>' +
+    '<div class="stat-k">Upside Skew</div>' +
+    '<div class="stat-v pos">' + upside + ' <small>stocks</small></div>' +
+    '<div class="stat-k">Downside Skew</div>' +
+    '<div class="stat-v neg">' + downside + ' <small>stocks</small></div>' +
+    '<div class="stat-k">Neutral</div>' +
+    '<div class="stat-v">' + neutral + ' <small>stocks</small></div>' +
+    '<div class="stat-k">Last Refresh</div>' +
+    '<div class="stat-v"><small>Platform data</small></div>' +
+    '</div>' +
+    '</div>' +
+    '</section>';
+}
+
+// ── Market bar (IDs preserved for market-feed.js patching) ───
+
+function _renderMarketBar() {
+  return '<div class="market-bar" id="market-status-bar">' +
+    '<div class="market-left">' +
+    '<div class="market-dot" id="msb-dot"></div>' +
+    '<span class="market-label" id="msb-label">ASX</span>' +
+    '<span class="market-updated" id="msb-updated"></span>' +
+    '</div>' +
+    '<div class="market-indices" id="market-indices"></div>' +
+    '<div class="market-right">' +
+    '<span class="market-updated" id="msb-feed-status">Loading prices\u2026</span>' +
+    '<button class="refresh-btn" id="msb-refresh">REFRESH</button>' +
     '</div>' +
     '</div>';
 }
 
-// Lazy import to keep this module from requiring format.js at definition time.
-// format.js is always available since it's bundled -- this just avoids circular-import risk.
-function _getFormatFns() {
-  // format.js functions are synchronously available; this is not async.
-  // We call them inline via the module-level import in coverage-table.js.
-  // For the live-patch case here, inline the formatting to avoid a second import.
-  return {
-    formatPrice: function(v) { return isNaN(v) ? '--' : v.toFixed(2); },
-    formatSignedPercent: function(v) { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; }
-  };
+// ── Featured research ─────────────────────────────────────────
+
+function _renderFeaturedSection(rows) {
+  if (!rows || rows.length === 0) return '';
+
+  var sorted = rows.slice().sort(function(a, b) {
+    return (b.convictionPct || 0) - (a.convictionPct || 0);
+  });
+  var featured = sorted.slice(0, 6);
+
+  var cards = featured.map(function(row) {
+    var pct = row.convictionPct != null ? Math.round(row.convictionPct) : null;
+    var signalTag = row.signal === 'upside'
+      ? '<span class="tag green">Upside</span>'
+      : row.signal === 'downside'
+      ? '<span class="tag red">Downside</span>'
+      : '<span class="tag amber">Balanced</span>';
+    var confTag = pct != null ? '<span class="tag">' + pct + '%</span>' : '';
+    var priceStr = row.price ? 'A$' + row.price.toFixed(2) : '--';
+    var chgStr = row.dayChangePct != null
+      ? (row.dayChangePct >= 0 ? '+' : '') + row.dayChangePct.toFixed(1) + '%'
+      : '';
+    var chgCls = row.dayChangePct > 0 ? 'pos' : row.dayChangePct < 0 ? 'neg' : '';
+
+    return '<div class="research-card" data-research-ticker="' + row.ticker + '">' +
+      '<div class="rc-head">' +
+      '<div class="rc-ticker">' + row.ticker + '</div>' +
+      '<div class="rc-tags">' + signalTag + confTag + '</div>' +
+      '</div>' +
+      '<div class="rc-company">' + (row.name || row.ticker) + '</div>' +
+      '<div class="rc-sector">' + (row.sector || '') + '</div>' +
+      '<div class="rc-footer">' +
+      '<span class="rc-meta"></span>' +
+      '<span class="rc-price" data-featured-price="' + row.ticker + '">' + priceStr + '</span>' +
+      '<span class="rc-chg ' + chgCls + '">' + chgStr + '</span>' +
+      '</div>' +
+      '</div>';
+  }).join('');
+
+  return '<section class="section">' +
+    '<div class="section-header">' +
+    '<div>' +
+    '<div class="eyebrow">Latest Research</div>' +
+    '<h2 class="sec-title">Featured Analysis</h2>' +
+    '<p class="sec-sub">Highest conviction positions across the coverage universe.</p>' +
+    '</div>' +
+    '</div>' +
+    '<div class="featured-grid" id="featured-grid">' + cards + '</div>' +
+    '</section>';
 }
+
+// ── Coverage universe section ─────────────────────────────────
+
+function _renderCoverageSection(displayRows, state, totalTickers, batchStatus) {
+  var healthBanner = renderHealthBanner(batchStatus, totalTickers);
+  return '<section class="section">' +
+    '<div class="section-header">' +
+    '<div>' +
+    '<div class="eyebrow">Research Coverage</div>' +
+    '<h2 class="sec-title">Coverage Universe</h2>' +
+    '<p class="sec-sub">ASX equities under active coverage. Click any row to open the full research page.</p>' +
+    '</div>' +
+    '<div style="display:flex;gap:8px">' +
+    '<button class="btn btn-add-stock" id="btn-add-stock" onclick="openAddStockModal()">+ Add Stock</button>' +
+    '<button class="btn btn-refresh-all" id="btn-refresh-all" onclick="triggerRefreshAll()">&#8635; Refresh All</button>' +
+    '</div>' +
+    '</div>' +
+    (healthBanner || '') +
+    renderCoverageTable(displayRows, state) +
+    '</section>';
+}
+
+// ── Announcements section (IDs preserved for market-feed.js) ──
+
+function _renderAnnouncementsSection() {
+  return '<section class="section" id="announcements-panel" style="display:none">' +
+    '<div class="section-header">' +
+    '<div>' +
+    '<div class="eyebrow">Market Intelligence</div>' +
+    '<h2 class="sec-title">Latest ASX Announcements</h2>' +
+    '<p class="sec-sub" id="ann-updated">Coverage universe announcements from the last 48 hours.</p>' +
+    '</div>' +
+    '</div>' +
+    '<ul class="ann-list" id="ann-list"><li style="color:var(--muted);font-size:12px">No announcements loaded yet.</li></ul>' +
+    '</section>';
+}
+
+// ── Right rail ────────────────────────────────────────────────
+
+function _renderAlertsCard(rows) {
+  var alertRows = (rows || []).filter(function(r) { return r.alertFlags && r.alertFlags.length > 0; });
+
+  var items = alertRows.length === 0
+    ? '<div style="padding:14px;font-size:12px;color:var(--muted)">No active alerts.</div>'
+    : alertRows.slice(0, 5).map(function(row) {
+        var flags = row.alertFlags;
+        var msg = '';
+        var iconType = 'signal';
+        if (flags.indexOf('signal-changed') !== -1) {
+          msg = 'Signal changed to ' + row.signal;
+          iconType = row.signal === 'upside' ? 'upside' : row.signal === 'downside' ? 'downside' : 'signal';
+        } else if (flags.indexOf('imminent-catalyst') !== -1) {
+          msg = row.signal + ' thesis, catalyst within 3 days';
+          iconType = 'macro';
+        } else if (flags.indexOf('large-move') !== -1) {
+          var chg = row.dayChangePct;
+          msg = 'Large move: ' + (chg >= 0 ? '+' : '') + chg.toFixed(1) + '%';
+          iconType = chg > 0 ? 'upside' : 'downside';
+        } else if (flags.indexOf('stale-research') !== -1) {
+          msg = 'Research stale (> 72h)';
+          iconType = 'macro';
+        } else {
+          msg = flags[0];
+        }
+        var icon = iconType === 'upside' ? '↑' : iconType === 'downside' ? '↓' : '!';
+        return '<div class="alert-item">' +
+          '<div class="alert-icon ' + iconType + '">' + icon + '</div>' +
+          '<div>' +
+          '<div class="alert-ticker">' + row.ticker + ' · ' + (row.signal.charAt(0).toUpperCase() + row.signal.slice(1)) + '</div>' +
+          '<div class="alert-text">' + msg + '</div>' +
+          '</div>' +
+          '<div class="alert-time">Now</div>' +
+          '</div>';
+      }).join('');
+
+  return '<div class="rail-card">' +
+    '<div class="rail-head">' +
+    '<div class="rail-eyebrow">Thesis Monitor</div>' +
+    '<h2 class="rail-title">Alerts &amp; Signals</h2>' +
+    '<p class="rail-sub">Evidence events that materially affect active theses.</p>' +
+    '</div>' +
+    '<div class="alert-list">' + items + '</div>' +
+    '</div>';
+}
+
+function _renderConvictionCard(rows) {
+  var sorted = (rows || []).slice().sort(function(a, b) {
+    return (b.convictionPct || 0) - (a.convictionPct || 0);
+  });
+  var top = sorted.slice(0, 6);
+
+  var items = top.map(function(row) {
+    var pct = row.convictionPct != null ? Math.round(row.convictionPct) : 0;
+    var signalStr = row.signal.charAt(0).toUpperCase() + row.signal.slice(1);
+    var tagCls = row.signal === 'upside' ? 'green' : row.signal === 'downside' ? 'red' : 'amber';
+    var strength = pct >= 80 ? 'Strong' : pct >= 60 ? 'Moderate' : 'Developing';
+    return '<div class="signal-row">' +
+      '<div>' +
+      '<div class="signal-label">' + row.ticker + ' &ndash; ' + (row.name || row.ticker) + '</div>' +
+      '<div class="signal-sub">' + signalStr + ' · ' + (row.sector || 'Equity') + ' · ' + pct + '%</div>' +
+      '</div>' +
+      '<span class="tag ' + tagCls + '" style="font-size:9px">' + strength + '</span>' +
+      '</div>';
+  }).join('');
+
+  return '<div class="rail-card">' +
+    '<div class="rail-head">' +
+    '<div class="rail-eyebrow">Conviction Snapshot</div>' +
+    '<h2 class="rail-title">High Conviction Skews</h2>' +
+    '<p class="rail-sub">Stocks where evidence confidence is ≥80%. Actionable extremes only.</p>' +
+    '</div>' +
+    '<div>' + (items || '<div style="padding:14px;font-size:12px;color:var(--muted)">No data yet.</div>') + '</div>' +
+    '</div>';
+}
+
+function _renderWatchlistCard(rows) {
+  var sorted = (rows || []).slice().sort(function(a, b) {
+    return (b.convictionPct || 0) - (a.convictionPct || 0);
+  });
+  var top = sorted.slice(0, 5);
+
+  var items = top.map(function(row) {
+    var pct = row.convictionPct != null ? Math.round(row.convictionPct) : 0;
+    var signalStr = row.signal.charAt(0).toUpperCase() + row.signal.slice(1);
+    var tagCls = row.signal === 'upside' ? 'green' : row.signal === 'downside' ? 'red' : 'amber';
+    var priceStr = row.price ? 'A$' + row.price.toFixed(2) : '--';
+    var chgStr = row.dayChangePct != null
+      ? (row.dayChangePct >= 0 ? '+' : '') + row.dayChangePct.toFixed(1) + '%'
+      : '';
+    var chgCls = row.dayChangePct > 0 ? 'pos' : row.dayChangePct < 0 ? 'neg' : '';
+    return '<div class="wl-item" data-wl-ticker="' + row.ticker + '">' +
+      '<div class="wl-badge">' + row.ticker + '</div>' +
+      '<div>' +
+      '<div class="wl-name">' + (row.name || row.ticker) + '</div>' +
+      '<div class="wl-sector"><span class="tag ' + tagCls + '" style="font-size:9px;padding:3px 6px">' + signalStr + ' · ' + pct + '%</span></div>' +
+      '</div>' +
+      '<div class="wl-right">' +
+      '<div class="wl-price" data-wl-price="' + row.ticker + '">' + priceStr + '</div>' +
+      '<div class="wl-chg ' + chgCls + '">' + chgStr + '</div>' +
+      '</div>' +
+      '</div>';
+  }).join('');
+
+  return '<div class="rail-card">' +
+    '<div class="rail-head">' +
+    '<div class="rail-eyebrow">Quick Access</div>' +
+    '<h2 class="rail-title">Watchlist</h2>' +
+    '<p class="rail-sub">Your pinned stocks. Click any row to open the full research page.</p>' +
+    '</div>' +
+    '<div class="watchlist">' + (items || '<div style="padding:14px;font-size:12px;color:var(--muted)">No coverage loaded.</div>') + '</div>' +
+    '</div>';
+}
+
+function _renderRightRail(rows, batchStatus) {
+  return '<aside class="home-right-rail">' +
+    _renderAlertsCard(rows) +
+    _renderConvictionCard(rows) +
+    _renderWatchlistCard(rows) +
+    '</aside>';
+}
+
+// ── Entry point ───────────────────────────────────────────────
 
 export function initHomePage() {
   var t0 = performance.now();
@@ -223,24 +470,48 @@ export function initHomePage() {
 
   var state = getHomeState();
   var displayRows = _getFilteredSorted(state);
-
   var totalTickers = Object.keys(STOCK_DATA).length;
+
   container.innerHTML =
-    _renderHero() +
-    renderKpiBand(_currentRows, BATCH_STATUS) +
-    renderHealthBanner(BATCH_STATUS, totalTickers) +
-    '<div class="home-layout">' +
-    '<div class="home-main">' +
-    renderCoverageTable(displayRows, state) +
+    '<div class="home-grid">' +
+    '<div class="home-main-col">' +
+    _renderHero(_currentRows) +
+    _renderMarketBar() +
+    _renderFeaturedSection(_currentRows) +
+    _renderCoverageSection(displayRows, state, totalTickers, BATCH_STATUS) +
+    _renderAnnouncementsSection() +
     '</div>' +
-    '<aside class="ci-rail">' +
-    renderIntelligenceRail(_currentRows, BATCH_STATUS, state.selectedTicker) +
-    '</aside>' +
+    _renderRightRail(_currentRows, BATCH_STATUS) +
     '</div>';
 
   _bindTableEvents(container);
   _bindFilterEvents(container);
   _bindSearchEvents(container);
+
+  // Watchlist rail navigation
+  container.addEventListener('click', function(e) {
+    var wl = e.target.closest('[data-wl-ticker]');
+    if (wl && window.navigate) {
+      var ticker = wl.getAttribute('data-wl-ticker');
+      var row = null;
+      for (var i = 0; i < _currentRows.length; i++) {
+        if (_currentRows[i].ticker === ticker) { row = _currentRows[i]; break; }
+      }
+      var target = row ? row.routeTarget.replace('#', '') : ('report-' + ticker);
+      window.navigate(target);
+    }
+    // Featured card navigation
+    var rc = e.target.closest('[data-research-ticker]');
+    if (rc && window.navigate) {
+      var rticker = rc.getAttribute('data-research-ticker');
+      var rrow = null;
+      for (var j = 0; j < _currentRows.length; j++) {
+        if (_currentRows[j].ticker === rticker) { rrow = _currentRows[j]; break; }
+      }
+      var rtarget = rrow ? rrow.routeTarget.replace('#', '') : ('report-' + rticker);
+      window.navigate(rtarget);
+    }
+  });
 
   on('stock:updated', function(evt) {
     _handleStockUpdate(evt.ticker);
@@ -256,7 +527,6 @@ export function initHomePage() {
 export function sortCoverageTable() {}
 
 // Keep for backward compatibility (live-data.js imports this).
-// Returns empty string -- featured cards are no longer rendered by home.js.
 export function renderFeaturedCard() { return ''; }
 
 // Keep for backward compatibility (portfolio.js imports this).

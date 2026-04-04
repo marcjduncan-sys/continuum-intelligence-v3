@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Continuum Intelligence — Journal</title>
+<style>
+
+  :root{
+    --app:#f4f5f7;
+    --surface:#ffffff;
+    --surface-2:#fafbfc;
+    --surface-3:#f1f4f7;
+    --line:#d9e0e8;
+    --line-2:#e7ecf1;
+    --text:#132233;
+    --text-2:#304255;
+    --muted:#66788c;
+    --soft:#7c8b9c;
+    --blue:#1f4b7a;
+    --blue-2:#2f6da9;
+    --blue-soft:#e9f0f8;
+    --green:#2f8659;
+    --green-soft:#edf7f1;
+    --red:#b64a46;
+    --red-soft:#fceeed;
+    --amber:#94630d;
+    --amber-soft:#fff4df;
+    --violet:#6e58aa;
+    --violet-soft:#f1edfc;
+    --shadow:0 10px 24px rgba(16,32,51,.06);
+    --radius:14px;
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--app);color:var(--text);font-family:var(--sans)}
+  a{text-decoration:none;color:inherit}
+  button,input,textarea{font:inherit}
+  strong{font-weight:800}
+
+  .topbar{
+    position:sticky; top:0; z-index:90;
+    display:grid; grid-template-columns:220px 1fr auto auto; gap:12px; align-items:center;
+    height:50px; padding:0 16px;
+    background:rgba(255,255,255,.94);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.01em}
+  .mark{
+    width:24px;height:24px;border-radius:8px;display:grid;place-items:center;
+    background:linear-gradient(180deg,#214a75,#173653);color:#fff;font-size:11px;border:1px solid #2a5a87;
+  }
+  .search{
+    height:34px;display:flex;align-items:center;gap:8px;padding:0 10px;
+    border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);
+  }
+  .search input{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-size:12px}
+  .kbd-row{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:11px}
+  .kbd{
+    padding:3px 6px;border-radius:7px;border:1px solid var(--line);
+    background:var(--surface);font-family:var(--mono);color:var(--text);
+  }
+  .actions{display:flex;gap:8px}
+  .btn{
+    height:32px;padding:0 10px;border-radius:9px;border:1px solid var(--line);
+    background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;
+  }
+  .btn.primary{background:linear-gradient(180deg,#234d78,#1b3c60);border-color:#224c75;color:#fff}
+
+  .subnav{
+    position:sticky; top:50px; z-index:85;
+    display:flex; gap:8px; align-items:center; overflow:auto;
+    padding:8px 16px; background:rgba(244,245,247,.96); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .subnav a{
+    white-space:nowrap;
+    padding:6px 10px; border-radius:999px; border:1px solid var(--line);
+    background:var(--surface); color:var(--text-2); font-size:11px; font-weight:700; letter-spacing:.02em;
+  }
+  .subnav a.active,
+  .subnav a:hover{background:var(--blue-soft); color:var(--blue); border-color:#c8d8ea}
+
+  .app{max-width:1500px;margin:0 auto;padding:14px}
+
+  .hero,.panel,.sidepanel,.chat-shell,.section{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+  }
+
+  .hero{padding:14px;margin-bottom:14px}
+  .hero-head{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start}
+  .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:800;margin-bottom:4px}
+  .title{margin:0;font-size:24px;line-height:1.05;letter-spacing:-.03em}
+  .subtitle{margin-top:5px;font-size:12px;line-height:1.5;color:var(--muted)}
+  .pill-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .tag{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:5px 8px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface-2);font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);
+  }
+  .tag.blue{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+  .tag.green{background:var(--green-soft);border-color:#cce6d6;color:var(--green)}
+  .tag.red{background:var(--red-soft);border-color:#f0d0ce;color:var(--red)}
+  .tag.amber{background:var(--amber-soft);border-color:#f1deb2;color:var(--amber)}
+  .tag.violet{background:var(--violet-soft);border-color:#ddd5f5;color:var(--violet)}
+
+  .metric-grid{margin-top:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .metric{
+    border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:11px;
+  }
+  .metric .k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+  .metric .v{margin-top:6px;font-size:20px;font-weight:800;letter-spacing:-.03em}
+  .metric .x{margin-top:5px;font-size:12px;line-height:1.45;color:var(--text-2)}
+
+  .layout{display:grid;gap:14px;align-items:start}
+  .panel, .section, .sidepanel{padding:14px}
+  .panel-head, .section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+  .panel-title, .section-title{margin:0;font-size:18px;line-height:1.16;letter-spacing:-.025em}
+  .paragraph{margin:0;font-size:13px;line-height:1.6;color:var(--text-2)}
+  .tiny{font-size:11px;line-height:1.48;color:var(--muted)}
+
+  .chipbar{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{
+    padding:6px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);
+    font-size:11px;font-weight:700;color:var(--text-2);cursor:pointer;
+  }
+  .chip.active{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+
+  .side-list{display:grid;gap:8px}
+  .side-item{
+    padding:10px 11px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);
+  }
+  .side-item strong{display:block;font-size:12px;color:var(--text)}
+  .side-item span{display:block;margin-top:5px;font-size:11px;line-height:1.5;color:var(--text-2)}
+
+  .mini-bar{
+    position:relative;height:8px;border-radius:999px;overflow:hidden;
+    background:#e9eef4;border:1px solid #d6dfe8;
+  }
+  .fill{position:absolute;inset:0 auto 0 0;border-radius:999px}
+  .fill.base{background:linear-gradient(90deg,#2e6aa6,#78a5d7)}
+  .fill.good{background:linear-gradient(90deg,#2f8659,#62b082)}
+  .fill.bad{background:linear-gradient(90deg,#b64a46,#dc8784)}
+  .fill.amber{background:linear-gradient(90deg,#94630d,#d2a34a)}
+  .fill.violet{background:linear-gradient(90deg,#6e58aa,#9b89ce)}
+
+  .pos{color:var(--green);font-weight:800}
+  .neg{color:var(--red);font-weight:800}
+  .neu{color:var(--blue);font-weight:800}
+  .vio{color:var(--violet);font-weight:800}
+
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap}
+
+  @media (max-width:1200px){
+    .metric-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:900px){
+    .topbar{grid-template-columns:1fr;height:auto;padding:12px}
+    .kbd-row{display:none}
+    .hero-head,.metric-grid{grid-template-columns:1fr}
+  }
+</style>
+
+
+.layout{grid-template-columns:minmax(0,72%) minmax(300px,28%)}
+.card-grid{display:grid;gap:10px}
+.entry{padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}
+.entry-top{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
+.entry-title{margin:0;font-size:16px;line-height:1.18;letter-spacing:-.02em}
+.entry-meta{margin-top:4px;font-size:11px;color:var(--muted);line-height:1.45}
+.entry-body{margin-top:9px;font-size:13px;line-height:1.58;color:var(--text-2)}
+.entry-foot{margin-top:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:8px;border-top:1px solid var(--line-2)}
+.filters{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;margin-bottom:12px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:11px}
+.stat .k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+.stat .v{margin-top:6px;font-size:20px;font-weight:800;letter-spacing:-.03em}
+.stat .x{margin-top:5px;font-size:12px;line-height:1.45;color:var(--text-2)}
+@media (max-width:1200px){ .layout{grid-template-columns:1fr} .stat-grid{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:900px){ .filters,.stat-grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><div class="mark">CI</div><div>Continuum Intelligence</div></div>
+  <div class="search"><span>⌕</span><input value="Journal - decisions and insights" /></div>
+  <div class="kbd-row"><span class="kbd">/</span><span>Search</span><span class="kbd">D</span><span>Decisions</span><span class="kbd">I</span><span>Insights</span></div>
+  <div class="actions"><button class="btn" id="densityToggle">Compact mode</button><button class="btn">Archive</button><button class="btn primary">Export journal</button></div>
+</div>
+
+<nav class="subnav">
+  <a href="#">Home</a>
+  <a href="#">Research</a>
+  <a href="#">PM chat</a>
+  <a href="#">Analyst chat</a>
+  <a href="#" class="active">Journal</a>
+  <a href="#">Portfolio</a>
+  <a href="#">Settings</a>
+</nav>
+
+<div class="app">
+  <section class="hero">
+    <div class="hero-head">
+      <div>
+        <div class="eyebrow">Journal</div>
+        <h1 class="title">Decisions and insights</h1>
+        <div class="subtitle">The journal page uses the same theme, but behaves more like an audit trail and memory system than a dashboard. It is chronological, filterable, and built for retrieval.</div>
+      </div>
+      <div class="pill-row">
+        <span class="tag blue">Decisions: 42</span>
+        <span class="tag green">Insights: 117</span>
+        <span class="tag amber">Archived: 18</span>
+      </div>
+    </div>
+
+    <div class="stat-grid" style="margin-top:12px">
+      <div class="stat"><div class="k">Latest decision</div><div class="v">Trim CBA</div><div class="x">Logged today at 09:11.</div></div>
+      <div class="stat"><div class="k">Most discussed ticker</div><div class="v">BHP</div><div class="x">12 journal references in 30 days.</div></div>
+      <div class="stat"><div class="k">Recent regime</div><div class="v">Selective risk-on</div><div class="x">No broad de-risking required.</div></div>
+      <div class="stat"><div class="k">Decision hit rate</div><div class="v">68%</div><div class="x">Internal rolling score.</div></div>
+    </div>
+  </section>
+
+  <div class="layout">
+    <main class="section">
+      <div class="filters">
+        <div class="chipbar">
+          <button class="chip active">All entries</button>
+          <button class="chip">Decisions</button>
+          <button class="chip">Insights</button>
+          <button class="chip">Archived</button>
+          <button class="chip">Portfolio</button>
+          <button class="chip">Ticker-specific</button>
+        </div>
+        <button class="btn">Sort: Newest</button>
+        <button class="btn">Last 30 days</button>
+      </div>
+
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Timeline</div>
+          <h2 class="section-title">The conclusion first: the journal should feel like a decision memory, not a notes dump.</h2>
+        </div>
+        <span class="tag blue">Chronological</span>
+      </div>
+
+      <div class="card-grid">
+        <article class="entry">
+          <div class="entry-top">
+            <div>
+              <h3 class="entry-title">Trim CBA by 150 bps to fund higher-EWP adds</h3>
+              <div class="entry-meta">Decision • Portfolio • 3 April 2026 • Confidence 81%</div>
+            </div>
+            <span class="tag red">Decision</span>
+          </div>
+          <div class="entry-body"><strong>Conclusion:</strong> CBA remains a high-quality holding, but the valuation already prices that quality. The portfolio can improve expected return and diversification by recycling capital into CSL, NST and XRO. <br><br><strong>Why it mattered:</strong> this was not a risk reduction trade. It was a capital-efficiency trade.</div>
+          <div class="entry-foot">
+            <div class="btnrow">
+              <span class="tag blue">Portfolio</span>
+              <span class="tag violet">CBA</span>
+            </div>
+            <div class="tiny">Open source thread</div>
+          </div>
+        </article>
+
+        <article class="entry">
+          <div class="entry-top">
+            <div>
+              <h3 class="entry-title">BHP rerating depends more on copper than the market still thinks</h3>
+              <div class="entry-meta">Insight • BHP • 2 April 2026 • Confidence 76%</div>
+            </div>
+            <span class="tag green">Insight</span>
+          </div>
+          <div class="entry-body"><strong>Conclusion:</strong> copper at 51% of H1 FY26 underlying EBITDA changes the stock’s framing. The stock should not be treated as only an iron ore cash machine any longer. <br><br><strong>Why it mattered:</strong> it justified maintaining a constructive EWP despite macro caution on China.</div>
+          <div class="entry-foot">
+            <div class="btnrow">
+              <span class="tag blue">BHP</span>
+              <span class="tag amber">Materials</span>
+            </div>
+            <div class="tiny">Open source thread</div>
+          </div>
+        </article>
+
+        <article class="entry">
+          <div class="entry-top">
+            <div>
+              <h3 class="entry-title">CSL is the cleanest add when diversification matters as much as upside</h3>
+              <div class="entry-meta">Decision • Portfolio • 1 April 2026 • Confidence 73%</div>
+            </div>
+            <span class="tag red">Decision</span>
+          </div>
+          <div class="entry-body"><strong>Conclusion:</strong> if only one add can be made, it should be CSL ahead of NST because it improves both EWP and diversification. <br><br><strong>Why it mattered:</strong> sector concentration in materials remained tight, making healthcare the better incremental destination for fresh capital.</div>
+          <div class="entry-foot">
+            <div class="btnrow">
+              <span class="tag blue">CSL</span>
+              <span class="tag green">Portfolio</span>
+            </div>
+            <div class="tiny">Open source thread</div>
+          </div>
+        </article>
+
+        <article class="entry">
+          <div class="entry-top">
+            <div>
+              <h3 class="entry-title">China PMI recovery is supportive, but not enough to carry the whole BHP thesis</h3>
+              <div class="entry-meta">Insight • Macro • 31 March 2026 • Confidence 70%</div>
+            </div>
+            <span class="tag green">Insight</span>
+          </div>
+          <div class="entry-body"><strong>Conclusion:</strong> China should be treated as a stabiliser rather than the full investment case. <br><br><strong>Why it mattered:</strong> it kept scenario weights centred on Base rather than forcing a stronger Bull case.</div>
+          <div class="entry-foot">
+            <div class="btnrow">
+              <span class="tag amber">China macro</span>
+              <span class="tag blue">BHP</span>
+            </div>
+            <div class="tiny">Open source thread</div>
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <aside class="sidepanel">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Journal controls</div>
+          <h2 class="section-title">Quick views</h2>
+        </div>
+        <span class="tag blue">Filters</span>
+      </div>
+
+      <div class="side-list">
+        <div class="side-item"><strong>Recent decisions</strong><span>12 in the last 30 days.</span></div>
+        <div class="side-item"><strong>Recent insights</strong><span>34 in the last 30 days.</span></div>
+        <div class="side-item"><strong>Top recurring theme</strong><span>Capital efficiency versus broad de-risking.</span></div>
+        <div class="side-item"><strong>Most linked source</strong><span>PM Chat portfolio rebalance thread.</span></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+  const densityToggle = document.getElementById('densityToggle');
+  const chips = document.querySelectorAll('.chip');
+
+  if (densityToggle) {
+    densityToggle.addEventListener('click', () => {
+      document.body.classList.toggle('compact');
+      densityToggle.textContent = document.body.classList.contains('compact') ? 'Standard mode' : 'Compact mode';
+    });
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

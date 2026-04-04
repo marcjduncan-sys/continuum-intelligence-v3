@@ -40,24 +40,24 @@
 <!-- ============================================================
      TOPBAR
      ============================================================ -->
-<nav class="ci-topbar" id="siteNav" aria-label="Primary navigation">
+<header class="ci-topbar" id="siteNav" role="banner">
     <div class="ci-topbar-inner">
-        <a class="ci-brand" onclick="navigate('home')" href="#home">
+        <a class="ci-brand" onclick="navigate('home')" href="#home" aria-label="Continuum Intelligence home">
             <div class="ci-brand-mark" aria-hidden="true">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
             </div>
             <span class="ci-brand-name">Contin<span>uu</span>m Inte<span>ll</span>igence</span>
         </a>
-        <nav class="ci-topbar-nav" aria-label="Site sections">
-            <a href="#home" class="active" data-nav="home">Research</a>
-            <a href="#deep-research" data-nav="deep-research">Deep Research</a>
-            <a href="#comparator" data-nav="comparator">Comparator</a>
-            <a href="#portfolio" data-nav="portfolio">Portfolio</a>
-            <a href="#personalisation" data-nav="personalisation">Personalisation</a>
-            <a href="#memory" data-nav="memory">Journal</a>
-            <a href="#pm" data-nav="pm">PM</a>
-            <a href="#about" data-nav="about">About</a>
-        </nav>
+        <div class="ci-search" role="search">
+            <span class="ci-search-icon" aria-hidden="true">⌕</span>
+            <input id="ciSearchInput" type="search" placeholder="Search coverage universe…" aria-label="Search coverage universe" autocomplete="off" />
+        </div>
+        <div class="ci-kbd-row" aria-label="Keyboard shortcuts">
+            <span class="ci-kbd" aria-hidden="true">/</span><span>Search</span>
+            <span class="ci-kbd" aria-hidden="true">S</span><span>Sort</span>
+            <span class="ci-kbd" aria-hidden="true">C</span><span>Catalysts</span>
+            <span class="ci-kbd" aria-hidden="true">R</span><span>Ratings</span>
+        </div>
         <div class="ci-topbar-actions">
             <button class="ci-signin-btn" id="ciSignInBtn" aria-label="Sign in to save history">Sign in</button>
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
@@ -66,23 +66,29 @@
             </button>
         </div>
     </div>
-</nav>
+</header>
 
-<!-- Capability Strip -->
-<div class="ci-strip" id="integrationsBar">
+<!-- Capability strip (platform navigation) -->
+<nav class="ci-strip" id="integrationsBar" aria-label="Platform navigation">
   <div class="ci-strip-inner">
-    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--live"></span>Live Research</span>
-    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--live"></span>Analyst Chat</span>
-    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--live"></span>Gold Agent</span>
-    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--live"></span>ACH Framework</span>
-    <div class="ci-strip-divider" aria-hidden="true"></div>
-    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>Bloomberg</span>
-    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>Risk</span>
-    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>Team Chat</span>
-    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>Trading</span>
-    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>News</span>
+    <span class="cap-label">Platform</span>
+    <a class="cap-chip live active" href="#home" data-nav="home"><span class="dot"></span>Research</a>
+    <a class="cap-chip live" href="#deep-research" data-nav="deep-research"><span class="dot"></span>Deep Research</a>
+    <a class="cap-chip live" href="#portfolio" data-nav="portfolio"><span class="dot"></span>Portfolio Intelligence</a>
+    <a class="cap-chip live" href="#comparator" data-nav="comparator"><span class="dot"></span>Thesis Comparator</a>
+    <a class="cap-chip live" href="#pm" data-nav="pm"><span class="dot"></span>PM Dashboard</a>
+    <a class="cap-chip live" href="#memory" data-nav="memory"><span class="dot"></span>Analyst Journal</a>
+    <a class="cap-chip live" href="#personalisation" data-nav="personalisation"><span class="dot"></span>Settings</a>
+    <a class="cap-chip live" href="#about" data-nav="about"><span class="dot"></span>About</a>
+    <div class="cap-divider"></div>
+    <span class="cap-label">Integrations</span>
+    <span class="cap-chip soon"><span class="dot"></span>Bloomberg Terminal</span>
+    <span class="cap-chip soon"><span class="dot"></span>Risk Engine</span>
+    <span class="cap-chip soon"><span class="dot"></span>Team Chat</span>
+    <span class="cap-chip soon"><span class="dot"></span>Execution</span>
+    <span class="cap-chip soon"><span class="dot"></span>News Feed</span>
   </div>
-</div>
+</nav>
 
 <!-- ============================================================
      MAIN CONTENT
@@ -93,85 +99,7 @@
      PAGE: HOME
      ============================================================ -->
 <div class="page active" id="page-home">
-
-    <div class="page-inner">
-        <div class="hero">
-            <div class="hero-tagline">Independent Cross-Domain Equity Research</div>
-            <h1 class="hero-title">We map evidence, not opinions.</h1>
-            <p class="hero-subtitle">Systematic analysis across ten evidence domains using the Analysis of Competing Hypotheses framework. Every claim sourced. Every hypothesis tested.</p>
-            <p class="hero-cred">Built by former UBS and Goldman Sachs executives.</p>
-        </div>
-
-        <!-- Price Ticker Strip -->
-        <div class="price-ticker-strip" id="price-ticker-strip" style="display:none"></div>
-
-        <!-- Market Status Bar -->
-        <div class="market-status-bar" id="market-status-bar">
-            <div class="msb-left">
-                <span class="msb-dot closed" id="msb-dot"></span>
-                <span class="msb-label closed" id="msb-label">ASX CLOSED</span>
-                <span class="msb-updated" id="msb-updated"></span>
-            </div>
-            <div class="msb-right">
-                <span class="msb-updated" id="msb-feed-status">Loading prices...</span>
-                <button class="msb-refresh-btn" id="msb-refresh" onclick="MarketFeed.refreshNow()" title="Refresh prices">REFRESH</button>
-            </div>
-        </div>
-
-        <!-- Announcements Panel -->
-        <div class="announcements-panel" id="announcements-panel" style="display:none">
-            <div class="ann-header">
-                <div class="ann-title">Latest ASX Announcements</div>
-                <span class="msb-updated" id="ann-updated"></span>
-            </div>
-            <ul class="ann-list" id="ann-list">
-                <li class="ann-empty">No announcements loaded yet</li>
-            </ul>
-        </div>
-
-        <!-- Featured Reports -->
-        <div class="section-header">
-            <div class="section-title">Latest Research</div>
-            <div class="home-search">
-                <div class="home-search-wrap">
-                    <svg class="home-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" class="home-search-input" id="home-stock-search" placeholder="Search stocks…" autocomplete="off" spellcheck="false" aria-label="Search research reports">
-                </div>
-                <div class="home-search-results" id="home-search-results"></div>
-            </div>
-        </div>
-
-        <div class="featured-grid" id="featured-grid"></div>
-
-        <!-- Coverage Universe -->
-        <div class="section-header" style="display:flex;align-items:center;justify-content:space-between">
-            <div class="section-title">Coverage Universe</div>
-            <div style="display:flex;gap:10px;align-items:center">
-                <button class="btn-add-stock" id="btn-add-stock" onclick="openAddStockModal()">
-                    + Add Stock
-                </button>
-                <button class="btn-refresh-all" id="btn-refresh-all" onclick="triggerRefreshAll()">
-                    &#8635; Refresh All Research
-                </button>
-            </div>
-        </div>
-
-        <table class="coverage-table" id="coverage-table">
-            <thead>
-                <tr>
-                    <th>ASX</th>
-                    <th>Company</th>
-                    <th>Sector</th>
-                    <th>Price</th>
-                    <th class="sortable" onclick="sortCoverageTable()" id="th-skew">Thesis Skew <span class="sort-arrow" id="skew-sort-arrow">&#9650;</span></th>
-                    <th>Updated</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="coverage-body"></tbody>
-        </table>
-    </div>
-
+    <!-- Populated by initHomePage() in src/pages/home.js -->
 </div>
 
 <!-- ============================================================

@@ -4,6 +4,104 @@
 import { STOCK_DATA, ANNOUNCEMENTS_DATA, FEATURED_ORDER } from '../../lib/state.js';
 import { renderSparkline, formatDateAEST, fmtPE, formatPrice, formatPriceWithCurrency, svgCoord, formatSignedPercent } from '../../lib/format.js';
 
+export function renderRefreshControls(data) {
+  return '<div class="refresh-controls">' +
+    '<button class="btn-refresh" id="refresh-btn-' + data.ticker + '" onclick="triggerRefresh(\'' + data.ticker + '\')">' +
+      '<span class="refresh-icon">&#8635;</span> Update' +
+    '</button>' +
+    '<span id="staleness-mount-' + (data.ticker || '').toLowerCase() + '"></span>' +
+    '<span class="refresh-timestamp" id="refresh-ts-' + data.ticker + '">' +
+      (data.date ? 'Last updated: ' + formatDateAEST(data.date) : '') +
+    '</span>' +
+    '<div class="refresh-progress" id="refresh-progress-' + data.ticker + '" style="display:none">' +
+      '<div class="progress-bar"><div class="progress-fill" id="refresh-fill-' + data.ticker + '"></div></div>' +
+      '<span class="progress-label" id="refresh-label-' + data.ticker + '">Searching for new data...</span>' +
+    '</div>' +
+  '</div>';
+}
+
+export function renderDecisionRibbon(data) {
+  const livePrice = data._livePrice || data.price || '';
+  const verdictClass = data.hero && data.hero.skew === 'UPSIDE' ? 'upside' :
+    data.hero && data.hero.skew === 'DOWNSIDE' ? 'downside' : 'balanced';
+  const verdictLabel = data.hero && data.hero.skew
+    ? data.hero.skew.charAt(0) + data.hero.skew.slice(1).toLowerCase()
+    : 'Balanced';
+
+  // EWP worlds strip
+  let ewpHtml = '';
+  if (data.hero && data.hero.position_in_range && data.hero.position_in_range.worlds && data.hero.position_in_range.worlds.length) {
+    const worlds = data.hero.position_in_range.worlds;
+    const current = parseFloat(livePrice) || 0;
+    let ewpCells = '';
+    for (var wi = 0; wi < worlds.length; wi++) {
+      const w = worlds[wi];
+      const wPrice = parseFloat(w.price) || 0;
+      ewpCells += '<div class="ewp-cell">' +
+        '<div class="ewp-label">' + (w.label || '') + '</div>' +
+        '<div class="ewp-price">' + formatPriceWithCurrency(wPrice, 'A$', 0) + '</div>' +
+      '</div>';
+    }
+    if (current > 0) {
+      ewpCells += '<div class="ewp-cell ewp-cell--current highlight">' +
+        '<div class="ewp-label">Current</div>' +
+        '<div class="ewp-price">' + formatPriceWithCurrency(current, 'A$') + '</div>' +
+      '</div>';
+    }
+    ewpHtml = '<div class="ewp-strip">' + ewpCells + '</div>';
+  }
+
+  // Key stats from heroMetrics (up to 5)
+  let statsHtml = '';
+  if (data.heroMetrics && data.heroMetrics.length) {
+    let cells = '';
+    const count = Math.min(data.heroMetrics.length, 5);
+    for (var mi = 0; mi < count; mi++) {
+      const m = data.heroMetrics[mi];
+      const valCls = 'dr-stat-value' + (m.colorClass ? ' ' + m.colorClass : '');
+      cells += '<div class="dr-stat">' +
+        '<div class="dr-stat-label">' + m.label + '</div>' +
+        '<div class="' + valCls + '">' + m.value + '</div>' +
+      '</div>';
+    }
+    statsHtml = '<div class="dr-stats">' + cells + '</div>';
+  }
+
+  // Prev/next stock navigation
+  const _navTickers = (typeof FEATURED_ORDER !== 'undefined') ? FEATURED_ORDER : Object.keys(STOCK_DATA);
+  const _navIdx = _navTickers.indexOf(data.ticker);
+  const _prevTicker = _navTickers[(_navIdx - 1 + _navTickers.length) % _navTickers.length];
+  const _nextTicker = _navTickers[(_navIdx + 1) % _navTickers.length];
+  const stockNavHtml = '<div class="rh-stock-nav-bar">' +
+    '<div class="rh-stock-nav">' +
+      '<a href="#report-' + _prevTicker + '" onclick="navigate(\'report-' + _prevTicker + '\');return false;">&lsaquo; ' + _prevTicker + '</a>' +
+      '<a href="#report-' + _nextTicker + '" onclick="navigate(\'report-' + _nextTicker + '\');return false;">' + _nextTicker + ' &rsaquo;</a>' +
+    '</div>' +
+  '</div>';
+
+  return stockNavHtml +
+    '<div class="decision-ribbon">' +
+      '<div class="dr-head">' +
+        '<div class="dr-badge">' + (data.ticker || '') + '</div>' +
+        '<div class="dr-meta">' +
+          '<div class="dr-company">' + (data.company || data.ticker || '') + '</div>' +
+          '<div class="dr-sub">' +
+            (data.sector || '') +
+            (data.exchange ? ' &middot; ' + data.exchange : '') +
+            (data.date ? ' &middot; ' + formatDateAEST(data.date) : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="dr-verdict-block">' +
+          '<span class="verdict-tag ' + verdictClass + '">' + verdictLabel + '</span>' +
+          (livePrice ? '<div class="dr-live-price">' + formatPrice(livePrice) + '</div>' : '') +
+        '</div>' +
+      '</div>' +
+      ewpHtml +
+      statsHtml +
+      renderRefreshControls(data) +
+    '</div>';
+}
+
 export function renderReportHero(data) {
   if (!data.heroMetrics || !data.heroMetrics.length) return '';
   let metricsHtml = '';
@@ -247,4 +345,58 @@ export function renderReportHero(data) {
     skewIndicatorHtml +
     nextDecisionHtml +
   '</div></div>';
+}
+
+export function renderDeepResearchHero(data) {
+  const dc = data.deepContent || {};
+  const livePrice = data._livePrice || data.price || '';
+
+  // Progress track -- 5 research stages derived from deepContent
+  const steps = [
+    { label: 'Data Fetch',    status: dc.sections ? 'done'   : 'pending' },
+    { label: 'Evidence Map',  status: dc.sections ? 'done'   : 'pending' },
+    { label: 'ACH Analysis',  status: dc.stance   ? 'done'   : 'pending' },
+    { label: 'Synthesis',     status: dc.executiveSummary ? 'active' : 'pending' },
+    { label: 'Review',        status: 'active' },
+  ];
+  let progressHtml = '<div class="progress-track">';
+  for (var pi = 0; pi < steps.length; pi++) {
+    const s = steps[pi];
+    progressHtml +=
+      '<div class="progress-step' + (s.status === 'done' ? ' done' : s.status === 'active' ? ' active' : '') + '">' +
+        '<div class="ps-num">0' + (pi + 1) + '</div>' +
+        '<div class="ps-label">' + s.label + '</div>' +
+        '<div class="ps-status">' + (s.status === 'done' ? 'Complete' : s.status === 'active' ? 'In progress' : 'Pending') + '</div>' +
+      '</div>';
+  }
+  progressHtml += '</div>';
+
+  // Stats strip
+  const evCount = (dc.sections || []).reduce(function(n, s) { return n + (s.evidence ? s.evidence.length : 0); }, 0);
+  const secCount = (dc.sections || []).length;
+  const stanceLabel = dc.stance || 'Pending';
+
+  const statsHtml =
+    '<div class="dr-hero-meta">' +
+      '<div class="dr-hero-stat"><div class="dr-hero-stat-k">Stance</div><div class="dr-hero-stat-v">' + stanceLabel + '</div></div>' +
+      (evCount ? '<div class="dr-hero-stat"><div class="dr-hero-stat-k">Evidence Items</div><div class="dr-hero-stat-v">' + evCount + '</div></div>' : '') +
+      (secCount ? '<div class="dr-hero-stat"><div class="dr-hero-stat-k">Sections</div><div class="dr-hero-stat-v">' + secCount + '</div></div>' : '') +
+      (livePrice ? '<div class="dr-hero-stat"><div class="dr-hero-stat-k">Price</div><div class="dr-hero-stat-v">' + formatPrice(livePrice) + '</div></div>' : '') +
+    '</div>';
+
+  return renderRefreshControls(data) +
+    '<div class="dr-hero">' +
+      '<div class="dr-hero-top">' +
+        '<div>' +
+          '<div class="dr-hero-badge"><span class="dot"></span>Deep Research</div>' +
+          '<div class="dr-hero-title">' + (data.company || data.ticker || '') + '</div>' +
+          '<div class="dr-hero-sub">' + (data.sector || '') + (data.exchange ? ' &middot; ' + data.exchange : '') + '</div>' +
+          statsHtml +
+        '</div>' +
+        '<div class="dr-hero-actions">' +
+          '<button class="btn-light btn-white" onclick="navigate(\'report-' + data.ticker + '\')">&#8592; Standard Report</button>' +
+        '</div>' +
+      '</div>' +
+      progressHtml +
+    '</div>';
 }

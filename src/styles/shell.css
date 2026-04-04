@@ -31,9 +31,9 @@
   padding: 0 var(--shell-pad);
   height: 100%;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 220px 1fr auto auto;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 /* Brand mark */
@@ -69,36 +69,58 @@
 }
 .ci-brand-name span { color: var(--green); }
 
-/* Topbar centre: nav links */
-.ci-topbar-nav {
+/* Topbar centre: search input */
+.ci-search {
+  height: 34px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  gap: 8px;
+  padding: 0 10px;
+  border-radius: var(--r-search);
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--muted);
   min-width: 0;
 }
-.ci-topbar-nav::-webkit-scrollbar { display: none; }
-.ci-topbar-nav a {
-  font-size: 13px;
-  font-weight: 500;
+.ci-search-icon {
+  flex-shrink: 0;
+  font-size: 14px;
   color: var(--muted);
-  padding: 6px 10px;
-  border-radius: 7px;
-  white-space: nowrap;
-  transition: color 0.15s, background 0.15s;
-  text-decoration: none;
 }
-.ci-topbar-nav a:hover {
+.ci-search input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
   color: var(--text);
-  background: var(--surface-3);
+  font-size: 12px;
+  font-family: var(--font-ui);
+  min-width: 0;
 }
-.ci-topbar-nav a.active {
-  color: var(--blue);
-  background: var(--blue-soft);
-  font-weight: 600;
+.ci-search input::placeholder { color: var(--muted); }
+
+/* Topbar column 3: keyboard shortcut hints */
+.ci-kbd-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 11px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
+.ci-kbd {
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text);
+}
+
+/* Legacy topbar nav -- hidden (links moved to subnav strip) */
+.ci-topbar-nav { display: none; }
 
 /* Topbar right: actions */
 .ci-topbar-actions {
@@ -108,65 +130,120 @@
   flex-shrink: 0;
 }
 
-/* ── Capability Strip ── */
+/* ── Capability strip (platform navigation layer) ── */
 .ci-strip {
-  position: fixed;
+  position: sticky;
   top: var(--topbar-h);
   left: 0; right: 0;
-  z-index: 99;
-  height: var(--strip-h);
-  background: var(--surface);
-  border-bottom: 1px solid var(--line-2);
+  z-index: 85;
+  background: rgba(244,245,247,.97);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
   display: flex;
   align-items: center;
-  justify-content: center;
+}
+[data-theme="dark"] .ci-strip {
+  background: rgba(23,28,38,.97);
 }
 .ci-strip-inner {
   max-width: var(--shell-max);
   margin: 0 auto;
-  padding: 0 var(--shell-pad);
+  padding: 7px var(--shell-pad);
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   overflow-x: auto;
   scrollbar-width: none;
 }
 .ci-strip-inner::-webkit-scrollbar { display: none; }
 
-/* Chips inside the strip */
+/* Strip section label */
+.cap-label {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+/* Cap chip -- base style for both live and soon chips */
+.cap-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: default;
+  text-decoration: none;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+a.cap-chip { cursor: pointer; }
+a.cap-chip:hover,
+a.cap-chip.active {
+  background: var(--blue-soft);
+  border-color: #c8d8ea;
+  color: var(--blue);
+}
+.cap-chip.soon {
+  opacity: 0.7;
+}
+.cap-chip .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+.cap-chip.live .dot { background: var(--green); }
+.cap-chip.soon .dot { background: var(--amber); }
+
+/* Strip divider */
+.cap-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--line);
+  flex-shrink: 0;
+  margin: 0 4px;
+}
+
+/* Legacy chip styles (kept for backward compat) */
 .ci-strip .ci-chip {
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 10px;
+  padding: 6px 10px;
   border-radius: var(--r-pill);
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 700;
   color: var(--text-2);
-  background: var(--surface-3);
-  border: 1px solid var(--line-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
   white-space: nowrap;
   flex-shrink: 0;
   transition: background 0.15s;
 }
-.ci-strip .ci-chip:hover { background: var(--line-2); }
+.ci-strip .ci-chip:hover { background: var(--blue-soft); color: var(--blue); border-color: #c8d8ea; }
 .ci-strip .ci-chip-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
 }
 .ci-strip .ci-chip-dot--live { background: var(--green); }
 .ci-strip .ci-chip-dot--soon { background: var(--amber); }
 .ci-strip .ci-chip-dot--dim  { background: var(--muted); opacity: 0.5; }
-
 .ci-strip-divider {
-  width: 1px;
-  height: 16px;
-  background: var(--line);
-  margin: 0 4px;
-  flex-shrink: 0;
+  width: 1px; height: 16px; background: var(--line); margin: 0 4px; flex-shrink: 0;
 }
 
 /* ── App shell container ── */
@@ -174,7 +251,7 @@
   max-width: var(--shell-max);
   margin: 0 auto;
   padding: 0 var(--shell-pad);
-  padding-top: calc(var(--topbar-h) + var(--strip-h) + 20px);
+  padding-top: calc(var(--topbar-h) + 20px);
   padding-bottom: 80px;
 }
 
@@ -193,6 +270,24 @@
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--line-2) transparent;
+}
+/* Workstation layout: content col + 520px panel (stock detail, portfolio, etc.) */
+.ci-workstation {
+  display: grid;
+  grid-template-columns: minmax(0, 68%) minmax(340px, 32%);
+  gap: 14px;
+  align-items: start;
+}
+.ci-workstation-panel {
+  position: sticky;
+  top: calc(var(--topbar-h) + var(--strip-h) + 14px);
+  align-self: start;
+}
+@media (max-width: 1400px) {
+  .ci-workstation {
+    grid-template-columns: 1fr;
+  }
+  .ci-workstation-panel { position: static; }
 }
 .ci-rail::-webkit-scrollbar { width: 4px; }
 .ci-rail::-webkit-scrollbar-track { background: transparent; }

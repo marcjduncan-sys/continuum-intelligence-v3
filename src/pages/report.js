@@ -4,7 +4,8 @@
 import { STOCK_DATA } from '../lib/state.js';
 import { renderSourceUploadZone } from '../features/source-upload.js';
 
-import { renderReportHero } from '../features/report/hero.js';
+import { renderReportHero, renderDecisionRibbon, renderDeepResearchHero } from '../features/report/hero.js';
+import { renderChatPanel } from '../features/report/chat-panel.js';
 import { renderSkewBar, renderVerdict, renderHypotheses, prepareHypotheses, renderOvercorrectionBanner } from '../features/report/hypothesis.js';
 import { renderEvidence, renderDiscriminators, renderTripwires, renderGaps } from '../features/report/evidence.js';
 import { renderTechnicalAnalysis } from '../features/report/technical.js';
@@ -57,10 +58,7 @@ export function renderReport(data) {
     }
     const deepSectionNav = '<div class="section-nav"><div class="section-nav-inner">' + deepNavHtml + '</div></div>';
 
-    return renderReportHero(data) +
-      renderSignalBars(data) +
-      renderSkewBar(data) +
-      renderVerdict(data) +
+    return renderDeepResearchHero(data) +
       deepSectionNav +
       '<div class="report-content">' +
         '<div class="report-main deep-report-main">' + deepMainContent + sourcesSection(data.ticker) + '</div>' +
@@ -71,8 +69,27 @@ export function renderReport(data) {
       floatingToggle;
   }
 
-  // Standard report: existing flow with sources section
-  const mainContent =
+  // Standard report: redesigned two-column layout
+  const t = data.ticker.toLowerCase();
+  const navItems = [
+    ['identity', 'Identity'],
+    ['hypotheses', 'Thesis'],
+    ['narrative', 'Narrative'],
+    ['evidence', 'Evidence'],
+  ];
+  if (data.technicalAnalysis) navItems.push(['technical', 'Technical']);
+  if (data.goldAgent || data.goldAnalysis) navItems.push(['gold-analysis', 'Gold']);
+  navItems.push(['sources', 'Ext. Research']);
+
+  let subnavHtml = '<nav class="subnav">';
+  for (var ni = 0; ni < navItems.length; ni++) {
+    const activeCls = ni === 0 ? ' active' : '';
+    subnavHtml += '<a href="#' + t + '-' + navItems[ni][0] + '" class="subnav-item' + activeCls + '">' + navItems[ni][1] + '</a>';
+  }
+  subnavHtml += '</nav>';
+
+  const contentCol =
+    renderDecisionRibbon(data) +
     renderPriceDriversPlaceholder(data.ticker) +
     renderOvercorrectionBanner(data) +
     renderIdentity(data) +
@@ -90,14 +107,10 @@ export function renderReport(data) {
   // Trigger async price drivers fetch after render
   requestAnimationFrame(function() { fetchPriceDrivers(data.ticker); });
 
-  return renderReportHero(data) +
-    renderSignalBars(data) +
-    renderSkewBar(data) +
-    renderVerdict(data) +
-    renderSectionNav(data) +
-    '<div class="report-content">' +
-      '<div class="report-main">' + mainContent + '</div>' +
-      renderHypSidebar(data) +
+  return subnavHtml +
+    '<div class="workstation">' +
+      '<div class="content-col">' + contentCol + '</div>' +
+      renderChatPanel(data) +
     '</div>' +
     renderPDFDownload(data) +
     renderReportFooter(data) +
