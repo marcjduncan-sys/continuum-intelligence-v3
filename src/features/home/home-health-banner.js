@@ -22,11 +22,12 @@ export function renderHealthBanner(batchStatus, totalTickers) {
 
   if (completeness >= 0.95) return '';
 
-  var severity = completeness >= 0.85 ? 'warning' : 'critical';
+  var isCritical = completeness < 0.85;
+  var severity = isCritical ? 'critical' : 'warning';
   var refreshed = succeeded + ' / ' + total + ' refreshed';
 
-  return '<div class="health-banner health-banner--' + severity + '">' +
+  return '<div class="ci-callout' + (isCritical ? ' ci-callout--critical' : '') + ' health-banner health-banner--' + severity + '">' +
     'Coverage update partial: ' + refreshed +
-    '<button class="health-banner__action" data-health-action="show-failed">Show affected names</button>' +
+    '<button class="ci-callout-action health-banner__action" data-health-action="show-failed">Show affected names</button>' +
     '</div>';
 }

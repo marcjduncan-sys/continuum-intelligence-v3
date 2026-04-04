@@ -1,5 +1,5 @@
 // ============================================================
-// KPI-BAND.JS -- Compact KPI band for the Home page.
+// KPI-BAND.JS -- Compact stat ribbon for the Home page.
 // Renders six metric cards above the coverage table.
 // Pure renderer: receives rows and batchStatus as arguments.
 // ============================================================
@@ -7,7 +7,7 @@
 import { formatPrice, formatSignedPercent } from '../../lib/format.js';
 
 /**
- * Render the KPI band HTML string.
+ * Render the KPI band / stat ribbon HTML string.
  * @param {import('./home-selectors.js').CoverageRow[]} rows
  * @param {object} batchStatus - BATCH_STATUS object
  * @returns {string}
@@ -16,44 +16,39 @@ export function renderKpiBand(rows, batchStatus) {
   if (!rows) rows = [];
   var bs = batchStatus || {};
 
-  // 1. Portfolio value -- sum of prices across coverage (market indicator proxy)
-  var totalValue = 0;
-  for (var i = 0; i < rows.length; i++) {
-    totalValue += (rows[i].price || 0);
-  }
+  // 1. Coverage count
+  var total = rows.length;
 
-  // 2. Day P&L direction -- net sum of dayChangePct (signed, directional indicator)
+  // 2. Avg day change
   var netChange = 0;
   for (var i = 0; i < rows.length; i++) {
     netChange += (rows[i].dayChangePct || 0);
   }
   var netChangeStr = formatSignedPercent(netChange / Math.max(rows.length, 1));
-  var netChangeClass = netChange > 0 ? 'kpi-card__value--green' : netChange < 0 ? 'kpi-card__value--red' : '';
+  var netChangeDelta = netChange > 0 ? 'delta--up' : netChange < 0 ? 'delta--down' : '';
 
-  // 3. Signal changes -- count rows where signalChanged is true
+  // 3. Signal changes
   var signalChangedCount = 0;
   for (var i = 0; i < rows.length; i++) {
     if (rows[i].signalChanged) signalChangedCount++;
   }
 
-  // 4. Stale names -- count rows where freshnessHours > 48
+  // 4. Stale names
   var staleCount = 0;
   for (var i = 0; i < rows.length; i++) {
     if (rows[i].freshnessHours > 48) staleCount++;
   }
-  var staleClass = staleCount > 0 ? 'kpi-card__value--amber' : '';
 
-  // 5. Coverage health -- ready vs total
+  // 5. Extraction health
   var readyCount = 0;
   var failedCount = 0;
   for (var i = 0; i < rows.length; i++) {
     if (rows[i].workstationStatus === 'ready') readyCount++;
     if (rows[i].workstationStatus === 'failed') failedCount++;
   }
-  var total = rows.length;
   var healthDelta = failedCount > 0 ? failedCount + ' failed' : staleCount + ' stale';
 
-  // 6. Top mover -- row with largest absolute dayChangePct
+  // 6. Top mover
   var topMover = null;
   var topAbs = -1;
   for (var i = 0; i < rows.length; i++) {
@@ -61,22 +56,22 @@ export function renderKpiBand(rows, batchStatus) {
     if (abs > topAbs) { topAbs = abs; topMover = rows[i]; }
   }
   var topMoverStr = topMover ? (topMover.ticker + ' ' + formatSignedPercent(topMover.dayChangePct)) : '--';
-  var topMoverClass = topMover && topMover.dayChangePct > 0 ? 'kpi-card__value--green' : topMover && topMover.dayChangePct < 0 ? 'kpi-card__value--red' : '';
+  var topMoverDelta = topMover && topMover.dayChangePct > 0 ? 'delta--up' : topMover && topMover.dayChangePct < 0 ? 'delta--down' : '';
 
-  function card(label, value, valueCls, delta) {
-    return '<div class="kpi-card">' +
-      '<div class="kpi-card__label">' + label + '</div>' +
-      '<div class="kpi-card__value ' + (valueCls || '') + '">' + value + '</div>' +
-      '<div class="kpi-card__delta">' + (delta || '') + '</div>' +
+  function stat(label, value, deltaCls, deltaText) {
+    return '<div class="ci-stat kpi-card">' +
+      '<div class="ci-stat-label">' + label + '</div>' +
+      '<div class="ci-stat-value">' + value + '</div>' +
+      '<div class="ci-stat-delta ci-stat-delta--' + (deltaCls || '') + '">' + (deltaText || '') + '</div>' +
       '</div>';
   }
 
-  return '<div class="kpi-band">' +
-    card('Coverage', total + ' names', '', readyCount + ' ready') +
-    card('Avg Move', netChangeStr, netChangeClass, 'day change avg') +
-    card('Signal Changes', signalChangedCount + ' of ' + total, '', 'since last session') +
-    card('Stale Names', staleCount, staleClass, 'of ' + total + ' covered') +
-    card('Extractions', readyCount + ' / ' + total, readyCount === total ? 'kpi-card__value--green' : '', healthDelta) +
-    card('Top Mover', topMoverStr, topMoverClass, 'largest abs move') +
+  return '<div class="ci-stat-ribbon kpi-band">' +
+    stat('Coverage', total + ' names', '', readyCount + ' ready') +
+    stat('Avg Move', netChangeStr, netChangeDelta, 'day change avg') +
+    stat('Signal Changes', signalChangedCount + ' of ' + total, '', 'since last session') +
+    stat('Stale Names', staleCount, staleCount > 0 ? 'down' : '', 'of ' + total + ' covered') +
+    stat('Extractions', readyCount + ' / ' + total, readyCount === total ? 'up' : '', healthDelta) +
+    stat('Top Mover', topMoverStr, topMoverDelta, 'largest abs move') +
     '</div>';
 }

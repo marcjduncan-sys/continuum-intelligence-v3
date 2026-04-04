@@ -7,7 +7,7 @@
 import { formatSignedPercent } from '../../lib/format.js';
 
 /**
- * Render a single rail section.
+ * Render a single rail section using ci-rail-card markup.
  * @param {string} key - section identifier
  * @param {string} title - display title
  * @param {number|null} count - badge count (null = hide badge)
@@ -15,14 +15,16 @@ import { formatSignedPercent } from '../../lib/format.js';
  * @returns {string}
  */
 function _railSection(key, title, count, content) {
-  var badge = count != null ? '<span class="rail-section__count">' + count + '</span>' : '';
-  return '<div class="rail-section" data-rail-section="' + key + '">' +
-    '<div class="rail-section__header">' +
-      '<span class="rail-section__title">' + title + '</span>' +
+  var badge = count != null
+    ? '<span class="ci-badge rail-section__count">' + count + '</span>'
+    : '';
+  return '<div class="ci-rail-card rail-section" data-rail-section="' + key + '">' +
+    '<div class="ci-rail-card-head rail-section__header">' +
+      '<span class="ci-rail-title rail-section__title">' + title + '</span>' +
       badge +
-      '<button class="rail-section__toggle" aria-expanded="true">&#9650;</button>' +
+      '<button class="ci-action-btn rail-section__toggle" aria-expanded="true">&#9650;</button>' +
     '</div>' +
-    '<div class="rail-section__content">' + content + '</div>' +
+    '<div class="ci-rail-card-body rail-section__content">' + content + '</div>' +
     '</div>';
 }
 
@@ -39,29 +41,38 @@ function _alertsContent(rows) {
   var items = alertRows.slice(0, 5).map(function(row) {
     var flags = row.alertFlags;
     var msg = '';
+    var iconCls = 'ci-alert-icon--amber';
     if (flags.indexOf('signal-changed') !== -1) {
       msg = 'Signal changed to ' + row.signal.charAt(0).toUpperCase() + row.signal.slice(1);
+      iconCls = row.signal === 'upside' ? 'ci-alert-icon--up' : row.signal === 'downside' ? 'ci-alert-icon--down' : 'ci-alert-icon--amber';
     } else if (flags.indexOf('imminent-catalyst') !== -1) {
       msg = row.signal.charAt(0).toUpperCase() + row.signal.slice(1) + ' thesis, catalyst within 3 days';
+      iconCls = 'ci-alert-icon--amber';
     } else if (flags.indexOf('stale-extraction') !== -1) {
       msg = row.signal.charAt(0).toUpperCase() + row.signal.slice(1) + ' signal and stale extraction';
+      iconCls = 'ci-alert-icon--amber';
     } else if (flags.indexOf('stale-research') !== -1) {
       msg = 'Research stale (> 72h)';
+      iconCls = 'ci-alert-icon--amber';
     } else if (flags.indexOf('large-move') !== -1) {
       msg = 'Large move: ' + formatSignedPercent(row.dayChangePct);
+      iconCls = row.dayChangePct > 0 ? 'ci-alert-icon--up' : 'ci-alert-icon--down';
     } else {
       msg = flags[0];
     }
-    return '<div class="rail-alert-item">' +
-      '<span class="rail-alert-item__ticker">' + row.ticker + '</span>' +
-      '<span class="rail-alert-item__msg">' + msg + '</span>' +
+    return '<div class="ci-alert-item">' +
+      '<div class="ci-alert-icon ' + iconCls + '">!</div>' +
+      '<div class="ci-alert-text">' +
+        '<span class="ci-ticker-badge rail-alert-item__ticker">' + row.ticker + '</span> ' +
+        '<span class="rail-alert-item__msg">' + msg + '</span>' +
+      '</div>' +
       '</div>';
   });
   return items.join('');
 }
 
 /**
- * Build signals content (portfolio distribution, no per-ticker selection in v1).
+ * Build signals content -- portfolio signal distribution.
  * @param {import('./home-selectors.js').CoverageRow[]} rows
  * @returns {string}
  */
@@ -69,27 +80,22 @@ function _signalsContent(rows) {
   var upside = 0, balanced = 0, downside = 0;
   for (var i = 0; i < rows.length; i++) {
     if (rows[i].signal === 'upside') upside++;
-    else if (rows[i].balanced === 'balanced' || rows[i].signal === 'balanced') balanced++;
+    else if (rows[i].signal === 'balanced') balanced++;
     else if (rows[i].signal === 'downside') downside++;
-  }
-  // Recount balanced properly
-  balanced = 0;
-  for (var i = 0; i < rows.length; i++) {
-    if (rows[i].signal === 'balanced') balanced++;
   }
 
   return '<div class="rail-signal-dist">' +
-    '<div class="rail-signal-row">' +
-      '<span class="signal-badge signal-badge--upside">Upside</span>' +
-      '<span class="rail-signal-count">' + upside + '</span>' +
+    '<div class="ci-signal-row rail-signal-row">' +
+      '<span class="signal-badge signal-badge--upside ci-signal-label">Upside</span>' +
+      '<span class="ci-signal-count rail-signal-count">' + upside + '</span>' +
     '</div>' +
-    '<div class="rail-signal-row">' +
-      '<span class="signal-badge signal-badge--balanced">Balanced</span>' +
-      '<span class="rail-signal-count">' + balanced + '</span>' +
+    '<div class="ci-signal-row rail-signal-row">' +
+      '<span class="signal-badge signal-badge--balanced ci-signal-label">Balanced</span>' +
+      '<span class="ci-signal-count rail-signal-count">' + balanced + '</span>' +
     '</div>' +
-    '<div class="rail-signal-row">' +
-      '<span class="signal-badge signal-badge--downside">Downside</span>' +
-      '<span class="rail-signal-count">' + downside + '</span>' +
+    '<div class="ci-signal-row rail-signal-row">' +
+      '<span class="signal-badge signal-badge--downside ci-signal-label">Downside</span>' +
+      '<span class="ci-signal-count rail-signal-count">' + downside + '</span>' +
     '</div>' +
     '</div>';
 }
@@ -126,7 +132,7 @@ function _healthContent(rows, batchStatus) {
  * Render the full intelligence rail HTML string.
  * @param {import('./home-selectors.js').CoverageRow[]} rows
  * @param {object} batchStatus - BATCH_STATUS object
- * @param {string|null} selectedTicker - currently selected ticker (unused in v1, deferred to H5)
+ * @param {string|null} selectedTicker - currently selected ticker (deferred)
  * @returns {string}
  */
 export function renderIntelligenceRail(rows, batchStatus, selectedTicker) {
