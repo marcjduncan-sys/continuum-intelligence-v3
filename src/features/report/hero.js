@@ -2,7 +2,7 @@
 // Extracted from report-sections.js without logic changes
 
 import { STOCK_DATA, ANNOUNCEMENTS_DATA, FEATURED_ORDER } from '../../lib/state.js';
-import { renderSparkline, formatDateAEST, fmtPE, formatPrice, formatPriceWithCurrency, svgCoord, formatSignedPercent } from '../../lib/format.js';
+import { renderSparkline, formatDateAEST, fmtPE, formatPrice, formatPriceWithCurrency, svgCoord, formatSignedPercent, fmtB } from '../../lib/format.js';
 
 export function renderRefreshControls(data) {
   return '<div class="refresh-controls">' +
@@ -59,6 +59,25 @@ export function renderDecisionRibbon(data) {
   const gapSign = ewpGap >= 0 ? '+' : '';
   const gapLabel = ewpGap >= 0 ? 'Upside to EWP' : 'Downside to EWP';
 
+  // Confidence: % of total hypothesis weight in the dominant skew direction
+  let confidenceHtml = 'TBC';
+  let confidenceSub = 'Evidence weight';
+  if (data.hypotheses && data.hypotheses.length && data.hero && data.hero.skew) {
+    const dominant = data.hero.skew.toLowerCase();
+    let totalScore = 0, domScore = 0;
+    for (let ci = 0; ci < data.hypotheses.length; ci++) {
+      const sc = parseFloat(data.hypotheses[ci].score) || 0;
+      totalScore += sc;
+      if ((data.hypotheses[ci].direction || '').toLowerCase() === dominant) domScore += sc;
+    }
+    if (totalScore > 0) {
+      const pct = Math.round(domScore / totalScore * 100);
+      confidenceHtml = pct + '%';
+      const strength = pct >= 70 ? 'Strong' : pct >= 40 ? 'Moderate' : 'Low';
+      confidenceSub = 'Evidence weight &middot; ' + strength + ' skew';
+    }
+  }
+
   // Evidence domain count
   const evCount = (data.evidence && data.evidence.cards) ? data.evidence.cards.length : 0;
 
@@ -83,8 +102,8 @@ export function renderDecisionRibbon(data) {
       '</div>' +
       '<div class="ewp-cell">' +
         '<div class="ewp-k">Confidence</div>' +
-        '<div style="font-size:18px;font-weight:800;color:var(--blue);">TBC</div>' +
-        '<div class="ewp-sub">Evidence weight</div>' +
+        '<div class="ewp-v" style="color:var(--blue);">' + confidenceHtml + '</div>' +
+        '<div class="ewp-sub">' + confidenceSub + '</div>' +
       '</div>' +
     '</div>' +
     '<div class="ewp-methodology">' +
@@ -98,21 +117,34 @@ export function renderDecisionRibbon(data) {
   let bearTarget = '';
   for (let wi = 0; wi < worlds.length; wi++) {
     const wl = (worlds[wi].label || '').toLowerCase();
-    if (wl.indexOf('bull') >= 0) bullTarget = formatPriceWithCurrency(worlds[wi].price, currency, 0);
-    if (wl.indexOf('bear') >= 0) bearTarget = formatPriceWithCurrency(worlds[wi].price, currency, 0);
+    if (wl.indexOf('bull') >= 0) bullTarget = formatPriceWithCurrency(worlds[wi].price, currency, 2);
+    if (wl.indexOf('bear') >= 0) bearTarget = formatPriceWithCurrency(worlds[wi].price, currency, 2);
   }
-  const marketCap = data.marketCap || (data.heroMetrics && data.heroMetrics[0] ? data.heroMetrics[0].value : 'TBC');
-  // Find 52W range from heroMetrics
-  let range52w = 'TBC';
+  // Issue 6: search heroMetrics by 'cap' label; format raw number if needed
+  let marketCap = 'TBC';
   if (data.heroMetrics) {
     for (let mi = 0; mi < data.heroMetrics.length; mi++) {
       const lbl = (data.heroMetrics[mi].label || '').toLowerCase();
-      if (lbl.indexOf('52') >= 0 || lbl.indexOf('range') >= 0 || lbl.indexOf('high') >= 0) {
-        range52w = data.heroMetrics[mi].value || 'TBC';
+      if (lbl.indexOf('cap') >= 0) {
+        const raw = data.heroMetrics[mi].value;
+        marketCap = (typeof raw === 'number') ? fmtB(raw / 1e9) : (raw || 'TBC');
         break;
       }
     }
   }
+  if (marketCap === 'TBC' && data.marketCap) {
+    marketCap = (typeof data.marketCap === 'number') ? fmtB(data.marketCap / 1e9) : data.marketCap;
+  }
+  // Issue 14: 52W range as low -- high en-dash format
+  let range52wLow = '', range52wHigh = '';
+  if (data.heroMetrics) {
+    for (let mi = 0; mi < data.heroMetrics.length; mi++) {
+      const lbl = (data.heroMetrics[mi].label || '').toLowerCase();
+      if (lbl.indexOf('high') >= 0) range52wHigh = data.heroMetrics[mi].value || '';
+      else if (lbl.indexOf('low') >= 0) range52wLow = data.heroMetrics[mi].value || '';
+    }
+  }
+  const range52w = (range52wLow && range52wHigh) ? range52wLow + ' \u2013 ' + range52wHigh : (range52wHigh || range52wLow || 'TBC');
 
   const statsHtml = '<div class="dr-stats">' +
     '<div class="dr-stat"><div class="dr-stat-k">Market Cap</div><div class="dr-stat-v">' + marketCap + '</div></div>' +
@@ -140,8 +172,7 @@ export function renderDecisionRibbon(data) {
     priceChgHtml = '<div class="dr-live-price">Live <strong>' + formatPriceWithCurrency(current, currency) + '</strong></div>';
   }
 
-  return stockNavHtml +
-    '<div class="decision-ribbon">' +
+  return '<div class="decision-ribbon">' +
       '<div class="dr-head">' +
         '<div class="dr-badge">' + (data.ticker || '') + '</div>' +
         '<div>' +

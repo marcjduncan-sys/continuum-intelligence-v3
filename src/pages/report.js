@@ -41,12 +41,6 @@ function sourcesSection(ticker) {
 export function renderReport(data) {
   prepareHypotheses(data);
 
-  const floatingToggle =
-    '<button class="sections-float-toggle" onclick="window.toggleAllSections(this)" data-state="expanded" aria-label="Collapse all sections">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="18 15 12 9 6 15"/></svg>' +
-      '<span>Collapse All</span>' +
-    '</button>';
-
   // Deep research: hybrid layout -- existing hero chrome, long-form body
   if (data._deepResearch && data.deepContent) {
     const deepMainContent = renderDeepContent(data);
@@ -69,8 +63,7 @@ export function renderReport(data) {
         renderHypSidebar(data) +
       '</div>' +
       renderPDFDownload(data) +
-      renderReportFooter(data) +
-      floatingToggle;
+      renderReportFooter(data);
   }
 
   // Standard report: redesigned two-column layout
@@ -150,6 +143,5 @@ export function renderReport(data) {
       renderChatPanel(data) +
     '</div>' +
     renderPDFDownload(data) +
-    renderReportFooter(data) +
-    floatingToggle;
+    renderReportFooter(data);
 }

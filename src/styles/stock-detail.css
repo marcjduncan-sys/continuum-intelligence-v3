@@ -857,12 +857,12 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #fff;
+  color: var(--text);
 }
-.ach-case.bull  .ach-case-head { background: linear-gradient(135deg, #2d6a4f, #1e4d38); }
-.ach-case.base  .ach-case-head { background: linear-gradient(135deg, #5a6b76, #3d474f); }
-.ach-case.bear  .ach-case-head { background: linear-gradient(135deg, #9a2c2c, #6b1f1f); }
-.ach-case.swing .ach-case-head { background: linear-gradient(135deg, #7c4d3f, #5a3329); }
+.ach-case.bull  .ach-case-head { background: linear-gradient(135deg, #edf7f1, #f4fbf7); }
+.ach-case.base  .ach-case-head { background: linear-gradient(135deg, #e9f0f8, #f2f6fb); }
+.ach-case.bear  .ach-case-head { background: linear-gradient(135deg, #fceeed, #fef6f6); }
+.ach-case.swing .ach-case-head { background: linear-gradient(135deg, #f1edfc, #f7f4fe); }
 
 .ach-case-icon {
   width: 32px;
@@ -870,19 +870,27 @@
   border-radius: 8px;
   display: grid;
   place-items: center;
-  font-size: 16px;
+  font-size: 9px;
   font-weight: 900;
-  background: rgba(255, 255, 255, 0.15);
+  letter-spacing: 0.05em;
+  color: #fff;
   flex-shrink: 0;
 }
+.ach-case.bull  .ach-case-icon { background: #2d6a4f; }
+.ach-case.base  .ach-case-icon { background: #234d78; }
+.ach-case.bear  .ach-case-icon { background: #9a2c2c; }
+.ach-case.swing .ach-case-icon { background: #6b4d8a; }
 
 .ach-case-label {
   font-size: 9px;
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  opacity: 0.8;
 }
+.ach-case.bull  .ach-case-label { color: #2d6a4f; }
+.ach-case.base  .ach-case-label { color: #234d78; }
+.ach-case.bear  .ach-case-label { color: #9a2c2c; }
+.ach-case.swing .ach-case-label { color: #6b4d8a; }
 
 .ach-case-title {
   font-size: 14px;
@@ -902,43 +910,38 @@
 .ach-case-bluf strong { color: var(--text); }
 
 .ach-case-meta {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--line);
-}
-
-.ach-price-target,
-.ach-probability {
+  margin-left: auto;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
-.ach-price-target .label,
-.ach-probability .label {
-  font-size: 9px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-}
-
-.ach-price-target .value,
-.ach-probability .value {
-  font-size: 15px;
+.ach-price-target {
+  font-size: 16px;
   font-weight: 800;
-  color: var(--text);
+  letter-spacing: -0.02em;
+  text-align: right;
+}
+.ach-case.bull  .ach-price-target { color: #2d6a4f; }
+.ach-case.base  .ach-price-target { color: #234d78; }
+.ach-case.bear  .ach-price-target { color: #9a2c2c; }
+.ach-case.swing .ach-price-target { color: #6b4d8a; }
+
+.ach-probability {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-align: right;
 }
 
 .ach-evidence {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 12px;
-  padding-bottom: 12px;
+  gap: 1px;
+  background: var(--line);
+  border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
 
@@ -946,6 +949,8 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding: 12px 14px;
+  background: var(--surface-2);
 }
 
 .ach-ev-head {
@@ -980,6 +985,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding: 10px 14px;
 }
 
 .contrib-label {
@@ -1610,3 +1616,9 @@
   border-bottom: none;
   padding-bottom: 0;
 }
+
+/* ── REDESIGN OVERRIDES: hide legacy chrome not in prototype ── */
+/* Issue 11: stock prev/next nav arrows */
+.rh-stock-nav-bar { display: none; }
+/* Issue 12: floating Collapse All toggle */
+.sections-float-toggle { display: none; }

@@ -386,3 +386,8 @@ a.cap-chip.active {
     gap: 24px;
   }
 }
+
+/* Report pages: hide global footer (rendered after dynamically-appended page div)
+   and keyboard shortcut hints (home-page-specific controls) */
+[data-route-type="report"] .ci-footer { display: none; }
+[data-route-type="report"] .ci-kbd-row { display: none; }

@@ -11,9 +11,10 @@ export function renderRiskRegister(data) {
   let risksHtml = '';
   let riskCount = 0;
 
-  if (tripwires && tripwires.items && tripwires.items.length) {
-    for (let i = 0; i < tripwires.items.length; i++) {
-      const tw = tripwires.items[i];
+  const tripwireItems = tripwires && (tripwires.items || tripwires.cards || []);
+  if (tripwireItems && tripwireItems.length) {
+    for (let i = 0; i < tripwireItems.length; i++) {
+      const tw = tripwireItems[i];
       const title = tw.title || tw.label || ('Tripwire ' + (i + 1));
       const body = tw.description || tw.detail || tw.text || '';
       // Assign severity based on position: first items are higher severity
@@ -33,9 +34,10 @@ export function renderRiskRegister(data) {
   }
 
   // Also pull from gaps if available
-  if (gaps && gaps.items && gaps.items.length) {
-    for (let i = 0; i < gaps.items.length && riskCount < 6; i++) {
-      const gap = gaps.items[i];
+  const gapItems = gaps && (gaps.items || gaps.coverageRows || []);
+  if (gapItems && gapItems.length) {
+    for (let i = 0; i < gapItems.length && riskCount < 6; i++) {
+      const gap = gapItems[i];
       const title = gap.title || gap.label || ('Evidence Gap ' + (i + 1));
       const body = gap.description || gap.detail || gap.text || '';
 
