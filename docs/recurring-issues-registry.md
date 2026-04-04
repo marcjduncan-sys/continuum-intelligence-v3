@@ -687,3 +687,52 @@ When adding any new external integration, verify:
 - **Likely family:** Family 2 (Report rendering regressions) or Family 4 (Schema mismatches). The fix is a null guard at the renderer boundary, not a data patch.
 - **Impact:** 1 test failure (1019/1020 passing). ASB report may render with a blank or broken discriminator row in production. No crash due to try/catch in the render pipeline.
 - **Fix approach:** Add null guard in the discriminator renderer where `diagnosticityClass` is accessed. Verify ASB renders cleanly. Do not patch the research JSON.
+
+---
+
+## Follow-On Items Logged 2026-04-04 (Phase 6 Shell Rebuild, post-merge)
+
+Items identified during the W4 audit pass. None are regressions introduced by Phase 6. All pre-date the branch. Logged here for tracking; fix when each reaches its natural QA pass.
+
+### FO-001: home.spec.js environment dependency on local backend
+
+- **Status:** OPEN
+- **File:** `tests/e2e/home.spec.js:11`
+- **Symptom:** "page loads without console errors" fails because the Vite proxy forwards `/api/*` calls to `localhost:8000` (Fly.io backend), which is not running locally. 4x HTTP 500 errors slip past the `[Boot]`/`subsystem`/`favicon` filter.
+- **Fix approach:** Either (a) add `!e.includes('Failed to load resource')` to the filter for expected backend-offline errors, or (b) mock the API proxy in the Playwright config using `page.route()` for the known API paths. Do not change the app.
+
+### FO-002: home.spec.js filter chip test captures hidden rows
+
+- **Status:** OPEN
+- **File:** `tests/e2e/home.spec.js:44`
+- **Symptom:** After clicking the Upside filter chip, `page.locator('.signal-badge').allInnerTexts()` returns badges from hidden rows, so `badges.every(b => b === 'Upside')` is false.
+- **Fix approach:** Change the selector to only count visible badges: `page.locator('.signal-badge:visible')` or `page.locator('tr:visible .signal-badge')`. Alternatively, increase `waitForTimeout` if the filter applies asynchronously.
+
+### FO-003: 7x .toFixed() calls in home.js bypass format.js (Quality-gate Rule 2)
+
+- **Status:** OPEN
+- **File:** `src/pages/home.js` (lines 172, 173, 266, 268, 354, 423, 425)
+- **Symptom:** Inline `formatPrice` and `formatSignedPercent` helpers defined inside `home.js` rather than imported from `src/lib/format.js`. No user-visible bug currently, but creates divergence risk (Bug Family 2 pattern).
+- **Fix approach:** Remove inline helpers. Import `formatPrice`, `formatPercent`, `formatChange` from `src/lib/format.js`. Adjust call sites. Run unit tests.
+
+### FO-004: Em dashes in data/stocks/MSB.json, MYX.json, PYC.json
+
+- **Status:** OPEN
+- **Files:** `data/stocks/MSB.json` (4 occurrences), `data/stocks/MYX.json` (4 occurrences), `data/stocks/PYC.json` (3 occurrences)
+- **Symptom:** Hypothesis case titles contain U+2014 em dashes in the `title` field. Style violation per CI content standards (use en-dashes or restructured sentences).
+- **Family:** Family 1 (encoding/content contamination from LLM outputs)
+- **Fix approach:** Replace `—` (U+2014) with ` - ` or ` -- ` in hypothesis titles. Run `scripts/check-encoding.sh` to confirm clean.
+
+### FO-005: batch.css hardcoded font stack not in design tokens
+
+- **Status:** OPEN
+- **File:** `src/styles/batch.css` (lines 146, 186, 298)
+- **Symptom:** `'JetBrains Mono', 'SF Mono', monospace` declared inline rather than via a CSS custom property. Not blocked by the token linter (linter only checks `width`/`max-width` px values), but creates a maintenance inconsistency.
+- **Fix approach:** Add `--font-mono-code: 'JetBrains Mono', 'SF Mono', monospace` to `tokens.css` and reference it in `batch.css`. Low priority; address during next batch UI pass.
+
+### FO-006: Dark mode palette contrast failures (token-level)
+
+- **Status:** OPEN -- deferred to dark mode QA pass
+- **Tokens:** `--red` (#a83232 on dark surfaces: ratio 2.79, fails all WCAG thresholds), `--green` (#2e7d52 on dark: ratio 3.52-3.68, fails AA body), `--muted` (#6b7280 on dark: ratio 3.67-3.83, fails AA body)
+- **Symptom:** Status colours in dark mode do not meet WCAG AA for body text. No user-visible issue in light mode (light-first redesign). Identified by UXFront contrast audit.
+- **Fix approach:** Adjust dark-mode token values in `tokens.css` under `[data-theme="dark"]` override block. Increase luminosity of `--red`, `--green`, `--muted` for dark backgrounds only. Verify on rendered dark mode pages with Playwright computed-styles audit.
