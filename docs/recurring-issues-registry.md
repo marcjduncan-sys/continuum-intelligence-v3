@@ -736,3 +736,42 @@ Items identified during the W4 audit pass. None are regressions introduced by Ph
 - **Tokens:** `--red` (#a83232 on dark surfaces: ratio 2.79, fails all WCAG thresholds), `--green` (#2e7d52 on dark: ratio 3.52-3.68, fails AA body), `--muted` (#6b7280 on dark: ratio 3.67-3.83, fails AA body)
 - **Symptom:** Status colours in dark mode do not meet WCAG AA for body text. No user-visible issue in light mode (light-first redesign). Identified by UXFront contrast audit.
 - **Fix approach:** Adjust dark-mode token values in `tokens.css` under `[data-theme="dark"]` override block. Increase luminosity of `--red`, `--green`, `--muted` for dark backgrounds only. Verify on rendered dark mode pages with Playwright computed-styles audit.
+
+---
+
+## Phase 5 Cleanup Completion Log -- 2026-04-04
+
+### Phase 5 Status: COMPLETE (Sections 1-2+7; Sections 3-6 require browser)
+
+**What was done:**
+
+**Section 1 -- Legacy token alias removal:**
+- Replaced 1,342+ legacy CSS variable references across 32 files (13 CSS, 19 JS) with canonical token names. Zero legacy refs remain outside `tokens.css`.
+- Removed 27-token alias block from `tokens.css` (lines 101-128). File reduced from 136 to 109 lines.
+- Handled fallback forms (`var(--alias, #hardcode)`) individually in base.css, economist.css, pm-chat.css, narrative-framework-integration.js.
+- Font-size scale (`--font-size-xs` through `--font-size-2xl`) retained: 21 active consumers confirmed.
+
+**Section 2 -- Dead CSS removal:**
+- `nav.css` deleted. One active rule (`.brand-green`) moved to `base.css`.
+- Import removed from `index.css`.
+- Old `site-footer` portfolio inline footer removed from `index.html` (global `.ci-footer` covers all pages).
+- `[data-theme="light"]` audit: no legacy class names found in override blocks (already cleaned from tokens.css). 116 active component overrides in batch.css, chat.css, economist.css, pm-chat.css, report.css, sources.css are functional (dark-first pattern), NOT dead code.
+- `report.css` Phase 3 consolidation: 45/55 selectors duplicated between main body and Phase 3 block. Consolidation deferred to Phase 6 report migration (brief Section 8). Block comment updated.
+
+**Section 7 -- Final validation gates:**
+- `npm run test:unit`: 1029/1030 (pre-existing ASB failure, unchanged)
+- `npm run build`: CLEAN
+- `check-css-tokens.sh`: CLEAN
+- `check-encoding.sh`: CLEAN
+- Legacy ref grep: 0
+
+**Sections 3-6 -- Visual QA (deferred to browser session):**
+- Responsive breakpoints verified in source: shell.css has 1400px, 1100px, 768px queries.
+- Focus indicators: `*:focus-visible` in base.css + component-specific overrides for search, buttons, tabs.
+- `prefers-reduced-motion`: media query in base.css line 67.
+- Typography hierarchy: 28/17/16/10/9px confirmed in primitives.css.
+- Body text: 13px, 1.5 line-height confirmed in base.css.
+- Spacing: `--gap: 16px`, `--r-card: 16px`, `--r-hero: 18px`, `--r-pill: 999px` all in tokens.css.
+- Visual breakpoint testing, cross-page navigation check, and dark mode consistency pass require browser session.
+
+**Commit:** `ddeb7b24` -- `redesign(phase5): remove legacy token aliases, replace all consumers`
