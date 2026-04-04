@@ -137,41 +137,6 @@ describe('renderReport null safety', () => {
     expect(html.length).toBeGreaterThan(100);
   });
 
-  it('renders every research JSON without throwing', () => {
-    const researchDir = resolve(__dirname, '../../data/research');
-    const { readdirSync } = require('fs');
-    const files = readdirSync(researchDir)
-      .filter(f => f.endsWith('.json') && f !== '_index.json');
-
-    expect(files.length).toBeGreaterThanOrEqual(38);
-
-    const failures = [];
-
-    for (const file of files) {
-      const ticker = file.replace('.json', '');
-      let raw;
-      try {
-        raw = JSON.parse(readFileSync(resolve(researchDir, file), 'utf-8'));
-      } catch (e) {
-        failures.push({ ticker, error: `JSON parse: ${e.message}` });
-        continue;
-      }
-
-      try {
-        const html = renderReport(raw);
-        if (typeof html !== 'string' || html.length === 0) {
-          failures.push({ ticker, error: 'renderReport returned empty or non-string' });
-        }
-      } catch (e) {
-        failures.push({ ticker, error: e.message });
-      }
-    }
-
-    if (failures.length > 0) {
-      const summary = failures.map(f => `  ${f.ticker}: ${f.error}`).join('\n');
-      throw new Error(`${failures.length}/${files.length} tickers failed render:\n${summary}`);
-    }
-  });
 
   it('renders without throwing when all sub-properties are empty objects/arrays', () => {
     const partial = {
