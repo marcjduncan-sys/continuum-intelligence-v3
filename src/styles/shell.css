@@ -391,3 +391,10 @@ a.cap-chip.active {
    and keyboard shortcut hints (home-page-specific controls) */
 [data-route-type="report"] .ci-footer { display: none; }
 [data-route-type="report"] .ci-kbd-row { display: none; }
+
+/* Non-report pages: hide analyst, PM, and economist chat panels + their FABs */
+body:not([data-route-type="report"]) .analyst-panel,
+body:not([data-route-type="report"]) .pm-panel,
+body:not([data-route-type="report"]) .econ-panel,
+body:not([data-route-type="report"]) .ap-fab,
+body:not([data-route-type="report"]) .pm-fab { display: none !important; }
