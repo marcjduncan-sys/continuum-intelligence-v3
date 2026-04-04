@@ -10,128 +10,146 @@
 
 import { API_BASE } from '../lib/api-config.js';
 import { formatPrice, formatPercent } from '../lib/format.js';
+import { renderChatPanel } from '../features/report/chat-panel.js';
 
 export function renderPMPage() {
     const container = document.getElementById('page-pm');
     if (!container || container.dataset.rendered === '1') return;
 
+    const heroHtml =
+        '<div class="pm-hero">' +
+            '<div class="pm-hero-top">' +
+                '<div>' +
+                    '<div class="pm-hero-sub">PORTFOLIO MANAGER</div>' +
+                    '<div class="pm-hero-title">Portfolio Dashboard</div>' +
+                    '<div class="pm-hero-date" id="pmHeroDate"></div>' +
+                '</div>' +
+                '<div class="pm-actions">' +
+                    '<button id="pmRefreshDiag" class="btn-light">&#8635; Refresh</button>' +
+                '</div>' +
+            '</div>' +
+            '<div class="pm-kpi-grid">' +
+                '<div class="pm-kpi"><div class="pm-kpi-k">Total Value</div><div class="pm-kpi-v" id="pmKpiValue">--</div></div>' +
+                '<div class="pm-kpi"><div class="pm-kpi-k">Positions</div><div class="pm-kpi-v" id="pmKpiPositions">--</div></div>' +
+                '<div class="pm-kpi"><div class="pm-kpi-k">Cash</div><div class="pm-kpi-v" id="pmKpiCash">--</div></div>' +
+                '<div class="pm-kpi"><div class="pm-kpi-k">Portfolio</div><div class="pm-kpi-v pm-kpi-v--name" id="pmKpiName">None</div></div>' +
+            '</div>' +
+        '</div>';
+
+    const contentCol =
+        heroHtml +
+
+        // --- Portfolio selector (hidden ID preserved for JS) ---
+        '<div id="pmPortfolioSelector" class="pm-port-selector-wrap" style="display:none">' +
+            '<div class="pm-port-selector">' +
+                '<div class="pm-port-selector-dot"></div>' +
+                '<div style="flex:1">' +
+                    '<div class="pm-port-selector-kicker">PORTFOLIO</div>' +
+                    '<div id="pmPortfolioName" class="pm-port-selector-name">No portfolio loaded</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
+
+        // --- Summary metrics (JS populates these) ---
+        '<div id="pmSnapshotSummary" class="pm-dashboard-section">' +
+            '<div class="pm-grid-3">' +
+                _metricStub('Total Value', '--') +
+                _metricStub('Cash', '--') +
+                _metricStub('Positions', '--') +
+            '</div>' +
+        '</div>' +
+
+        // --- Mandate settings (BEAD-003) ---
+        '<div id="pmMandateSettings" class="pm-dashboard-section" style="display:none">' +
+            _sectionHeader('MANDATE SETTINGS') +
+            '<div id="pmMandateSettingsBody" class="pm-dashboard-body">No mandate configured</div>' +
+        '</div>' +
+
+        // --- Mandate breaches (BEAD-004) ---
+        '<div id="pmMandateBreaches" class="pm-dashboard-section" style="display:none">' +
+            _sectionHeader('MANDATE BREACHES') +
+            '<div id="pmMandateBreachesBody" class="pm-dashboard-body">No breaches</div>' +
+        '</div>' +
+
+        // --- Concentration bar (Phase C) ---
+        '<div id="pmConcentration" class="pm-dashboard-section">' +
+            _sectionHeader('CONCENTRATION') +
+            '<div class="pm-grid-4">' +
+                _metricStub('Max Single', '--') +
+                _metricStub('Top 5', '--') +
+                _metricStub('Top 10', '--') +
+                _metricStub('Score', '--') +
+            '</div>' +
+        '</div>' +
+
+        // --- Top positions (Phase C) ---
+        '<div id="pmTopPositions" class="pm-dashboard-section">' +
+            _sectionHeader('TOP POSITIONS') +
+            '<div id="pmTopPositionsBody" class="pm-dashboard-body">No portfolio loaded</div>' +
+        '</div>' +
+
+        // --- Alignment matrix (BEAD-005) ---
+        '<div id="pmAlignmentMatrix" class="pm-dashboard-section" style="display:none">' +
+            _sectionHeader('ALIGNMENT MATRIX') +
+            '<div id="pmAlignmentMatrixBody" class="pm-dashboard-body">No portfolio loaded</div>' +
+        '</div>' +
+
+        // --- Sector exposure (Phase C) ---
+        '<div id="pmSectorExposure" class="pm-dashboard-section">' +
+            _sectionHeader('SECTOR EXPOSURE') +
+            '<div id="pmSectorExposureBody" class="pm-dashboard-body">No portfolio loaded</div>' +
+        '</div>' +
+
+        // --- Theme exposure (BEAD-002) ---
+        '<div id="pmThemeExposure" class="pm-dashboard-section" style="display:none">' +
+            _sectionHeader('THEME EXPOSURE') +
+            '<div id="pmThemeExposureBody" class="pm-dashboard-body">No portfolio loaded</div>' +
+        '</div>' +
+
+        // --- Hypothesis DNA (BEAD-006) ---
+        '<div id="pmHypothesisDNA" class="pm-dashboard-section" style="display:none">' +
+            _sectionHeader('HYPOTHESIS DNA') +
+            '<div id="pmHypothesisDNABody" class="pm-dashboard-body">No portfolio loaded</div>' +
+        '</div>' +
+
+        // --- Hedge gaps (BEAD-007) ---
+        '<div id="pmHedgeGaps" class="pm-dashboard-section" style="display:none">' +
+            _sectionHeader('HEDGE GAP ALERTS') +
+            '<div id="pmHedgeGapsBody" class="pm-dashboard-body">No gaps detected</div>' +
+        '</div>' +
+
+        // --- Reweighting signals (BEAD-008) ---
+        '<div id="pmReweighting" class="pm-dashboard-section" style="display:none">' +
+            _sectionHeader('REWEIGHTING SIGNALS') +
+            '<div id="pmReweightingBody" class="pm-dashboard-body">No signals</div>' +
+        '</div>' +
+
+        // --- Change detection (BEAD-009) ---
+        '<div id="pmChangeLog" class="pm-dashboard-section" style="display:none">' +
+            _sectionHeader('CHANGE LOG') +
+            '<div id="pmChangeLogBody" class="pm-dashboard-body">No changes detected</div>' +
+        '</div>' +
+
+        // --- Flags (Phase C) ---
+        '<div id="pmFlags" class="pm-dashboard-section pm-flags-section">' +
+            _sectionHeader('RISK FLAGS') +
+            '<div id="pmFlagsBody" class="pm-dashboard-body">No flags</div>' +
+        '</div>' +
+
+        // --- How to start ---
+        '<div class="pm-how-to-start">' +
+            '<div class="pm-how-to-start-title">HOW TO START</div>' +
+            '<p class="pm-how-to-start-desc">' +
+                'Switch to PM mode using the Analyst/PM toggle in the right panel header, ' +
+                'then ask a portfolio-level question. Load a portfolio to see analytics, ' +
+                'concentration, and risk flags updated in real time.' +
+            '</p>' +
+        '</div>';
+
     container.innerHTML =
-        '<div class="pm-page-inner">' +
-
-            // --- Header ---
-            '<div class="pm-page-header">' +
-                '<div class="pm-page-kicker">PORTFOLIO MANAGER</div>' +
-                '<h1 class="pm-page-title">Portfolio construction, sizing, exposure and risk decisions</h1>' +
-                '<p class="pm-page-desc">PM Chat is your portfolio-level decision surface. It handles position sizing, concentration analysis, sector exposure, source-of-funds decisions, and prioritised portfolio actions. For stock-level thesis and evidence, use the Analyst.</p>' +
-            '</div>' +
-
-            // --- Portfolio selector placeholder ---
-            '<div id="pmPortfolioSelector" class="pm-port-selector-wrap">' +
-                '<div class="pm-port-selector">' +
-                    '<div class="pm-port-selector-dot"></div>' +
-                    '<div style="flex:1">' +
-                        '<div class="pm-port-selector-kicker">PORTFOLIO</div>' +
-                        '<div id="pmPortfolioName" class="pm-port-selector-name">No portfolio loaded</div>' +
-                    '</div>' +
-                    '<button id="pmRefreshDiag" class="pm-port-selector-btn">Refresh</button>' +
-                '</div>' +
-            '</div>' +
-
-            // --- Summary metrics ---
-            '<div id="pmSnapshotSummary" class="pm-dashboard-section">' +
-                '<div class="pm-grid-3">' +
-                    _metricStub('Total Value', '--') +
-                    _metricStub('Cash', '--') +
-                    _metricStub('Positions', '--') +
-                '</div>' +
-            '</div>' +
-
-            // --- Mandate settings (BEAD-003) ---
-            '<div id="pmMandateSettings" class="pm-dashboard-section" style="display:none">' +
-                _sectionHeader('MANDATE SETTINGS') +
-                '<div id="pmMandateSettingsBody" class="pm-dashboard-body">No mandate configured</div>' +
-            '</div>' +
-
-            // --- Mandate breaches (BEAD-004) ---
-            '<div id="pmMandateBreaches" class="pm-dashboard-section" style="display:none">' +
-                _sectionHeader('MANDATE BREACHES') +
-                '<div id="pmMandateBreachesBody" class="pm-dashboard-body">No breaches</div>' +
-            '</div>' +
-
-            // --- Concentration bar (Phase C) ---
-            '<div id="pmConcentration" class="pm-dashboard-section">' +
-                _sectionHeader('CONCENTRATION') +
-                '<div class="pm-grid-4">' +
-                    _metricStub('Max Single', '--') +
-                    _metricStub('Top 5', '--') +
-                    _metricStub('Top 10', '--') +
-                    _metricStub('Score', '--') +
-                '</div>' +
-            '</div>' +
-
-            // --- Top positions (Phase C) ---
-            '<div id="pmTopPositions" class="pm-dashboard-section">' +
-                _sectionHeader('TOP POSITIONS') +
-                '<div id="pmTopPositionsBody" class="pm-dashboard-body">No portfolio loaded</div>' +
-            '</div>' +
-
-            // --- Alignment matrix (BEAD-005) ---
-            '<div id="pmAlignmentMatrix" class="pm-dashboard-section" style="display:none">' +
-                _sectionHeader('ALIGNMENT MATRIX') +
-                '<div id="pmAlignmentMatrixBody" class="pm-dashboard-body">No portfolio loaded</div>' +
-            '</div>' +
-
-            // --- Sector exposure (Phase C) ---
-            '<div id="pmSectorExposure" class="pm-dashboard-section">' +
-                _sectionHeader('SECTOR EXPOSURE') +
-                '<div id="pmSectorExposureBody" class="pm-dashboard-body">No portfolio loaded</div>' +
-            '</div>' +
-
-            // --- Theme exposure (BEAD-002) ---
-            '<div id="pmThemeExposure" class="pm-dashboard-section" style="display:none">' +
-                _sectionHeader('THEME EXPOSURE') +
-                '<div id="pmThemeExposureBody" class="pm-dashboard-body">No portfolio loaded</div>' +
-            '</div>' +
-
-            // --- Hypothesis DNA (BEAD-006) ---
-            '<div id="pmHypothesisDNA" class="pm-dashboard-section" style="display:none">' +
-                _sectionHeader('HYPOTHESIS DNA') +
-                '<div id="pmHypothesisDNABody" class="pm-dashboard-body">No portfolio loaded</div>' +
-            '</div>' +
-
-            // --- Hedge gaps (BEAD-007) ---
-            '<div id="pmHedgeGaps" class="pm-dashboard-section" style="display:none">' +
-                _sectionHeader('HEDGE GAP ALERTS') +
-                '<div id="pmHedgeGapsBody" class="pm-dashboard-body">No gaps detected</div>' +
-            '</div>' +
-
-            // --- Reweighting signals (BEAD-008) ---
-            '<div id="pmReweighting" class="pm-dashboard-section" style="display:none">' +
-                _sectionHeader('REWEIGHTING SIGNALS') +
-                '<div id="pmReweightingBody" class="pm-dashboard-body">No signals</div>' +
-            '</div>' +
-
-            // --- Change detection (BEAD-009) ---
-            '<div id="pmChangeLog" class="pm-dashboard-section" style="display:none">' +
-                _sectionHeader('CHANGE LOG') +
-                '<div id="pmChangeLogBody" class="pm-dashboard-body">No changes detected</div>' +
-            '</div>' +
-
-            // --- Flags (Phase C) ---
-            '<div id="pmFlags" class="pm-dashboard-section pm-flags-section">' +
-                _sectionHeader('RISK FLAGS') +
-                '<div id="pmFlagsBody" class="pm-dashboard-body">No flags</div>' +
-            '</div>' +
-
-            // --- How to start ---
-            '<div class="pm-how-to-start">' +
-                '<div class="pm-how-to-start-title">HOW TO START</div>' +
-                '<p class="pm-how-to-start-desc">' +
-                    'Switch to PM mode using the Analyst/PM toggle in the right panel header, ' +
-                    'then ask a portfolio-level question. Load a portfolio to see analytics, ' +
-                    'concentration, and risk flags updated in real time.' +
-                '</p>' +
-            '</div>' +
+        '<div class="workstation">' +
+            '<div class="content-col">' + contentCol + '</div>' +
+            renderChatPanel({ ticker: '', company: 'Portfolio Manager' }) +
         '</div>';
 
     container.dataset.rendered = '1';

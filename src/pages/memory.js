@@ -766,7 +766,35 @@ function _renderByDate(memories) {
 export async function renderMemoryPage() {
     _injectCSS();
     _injectPMCSS();
-    const container = document.getElementById('page-memory');
+    const outerContainer = document.getElementById('page-memory');
+    if (!outerContainer) return;
+
+    // Inject workstation scaffold once; subsequent writes target #jnl-content
+    if (!outerContainer.querySelector('#jnl-content')) {
+        const chatPanelHtml = '<div class="chat-panel jnl-chat-col" id="jnl-chat">' +
+            '<div class="cp-head"><div class="cp-tabs">' +
+                '<button class="cp-tab" data-tab="analyst">Analyst</button>' +
+                '<button class="cp-tab" data-tab="pm">PM</button>' +
+                '<button class="cp-tab active" data-tab="strat">Strategist</button>' +
+            '</div></div>' +
+            '<div class="cp-context-bar"><span class="cp-context-label">Journal context loaded</span></div>' +
+            '<div class="cp-stream"><div class="cp-placeholder">Ask the Strategist&hellip;</div></div>' +
+            '<div class="cp-suggestions">' +
+                '<button class="cp-suggestion-btn">Summarise my thesis evolution</button>' +
+                '<button class="cp-suggestion-btn">What am I most conflicted on?</button>' +
+            '</div>' +
+            '<div class="cp-composer"><div class="cp-composer-inner">' +
+                '<input type="text" class="cp-input" placeholder="Ask the strategist&hellip;" autocomplete="off" />' +
+                '<button class="send-btn" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>' +
+            '</div></div>' +
+        '</div>';
+        outerContainer.innerHTML =
+            '<div class="jnl-workspace">' +
+                '<div class="jnl-content-col" id="jnl-content"></div>' +
+                chatPanelHtml +
+            '</div>';
+    }
+    const container = document.getElementById('jnl-content');
     if (!container) return;
 
     container.innerHTML = '<div class="jnl-loading">Loading journal...</div>';
