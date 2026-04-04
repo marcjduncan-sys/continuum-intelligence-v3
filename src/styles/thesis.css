@@ -76,8 +76,8 @@
 }
 
 .tc-stock-card.selected {
-    border-color: var(--accent-teal);
-    background: rgba(26, 158, 143, 0.1);
+    border-color: var(--blue);
+    background: var(--blue-soft);
 }
 
 .tc-stock-ticker {
@@ -133,20 +133,19 @@
     gap: var(--space-sm);
     margin-top: var(--space-lg);
     padding: 14px 32px;
-    background: var(--accent-teal);
+    background: var(--blue);
     border: none;
-    border-radius: 8px;
-    color: white;
-    font-size: 0.9rem;
+    border-radius: var(--r-button);
+    color: #fff;
+    font-family: var(--font-ui);
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 150ms ease;
+    transition: opacity 0.15s;
 }
 
 .tc-analyze-btn:hover {
-    background: #158a7d;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(26, 158, 143, 0.3);
+    opacity: 0.85;
 }
 
 /* Results */
@@ -165,7 +164,7 @@
 .tc-banner.n2 { background: rgba(212, 160, 60, 0.1); border-color: var(--signal-amber); }
 .tc-banner.n3 { background: rgba(212, 85, 85, 0.1); border-color: var(--signal-red); }
 .tc-banner.n4 { background: rgba(74, 142, 204, 0.1); border-color: var(--signal-blue); }
-.tc-banner.uphill { background: var(--bg-warning); border-color: var(--signal-amber); border-style: dashed; }
+.tc-banner.uphill { background: var(--amber-soft); border-color: var(--signal-amber); border-style: dashed; }
 
 .tc-banner-label {
     font-size: 0.75rem;
@@ -353,7 +352,7 @@
 
 .tc-evidence-icon.support { background: rgba(61, 170, 109, 0.2); color: var(--text-primary); }
 .tc-evidence-icon.contradict { background: rgba(212, 85, 85, 0.2); color: var(--text-primary); }
-.tc-evidence-icon.disc { color: var(--accent, #3498db); }
+.tc-evidence-icon.disc { color: var(--blue); }
 
 /* Loading state */
 .tc-loading {
@@ -366,7 +365,7 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--text-muted, #888);
+    background: var(--blue);
     animation: tc-pulse 1.2s ease-in-out infinite;
 }
 .tc-loading-dot:nth-child(2) { animation-delay: 0.2s; }
@@ -378,10 +377,10 @@
 .tc-banner.loading { opacity: 0.7; }
 
 /* Error state */
-.tc-banner.error { border-left: 4px solid var(--danger, #e74c3c); }
+.tc-banner.error { border-left: 4px solid var(--red); }
 
 /* Contrarian alignment */
-.tc-banner.contrarian { background: var(--bg-warning); border-color: var(--signal-amber); border-style: dashed; }
+.tc-banner.contrarian { background: var(--amber-soft); border-color: var(--signal-amber); border-style: dashed; }
 .tc-banner.contrarian .tc-banner-label { color: var(--signal-amber); }
 .tc-banner.contrarian .tc-banner-hypothesis { color: var(--signal-amber); }
 

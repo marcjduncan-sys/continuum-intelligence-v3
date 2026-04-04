@@ -5,11 +5,11 @@
 /* --- Snapshot Grid (listing page) --- */
 .snapshot-grid,
 #snapshot-grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 20px !important;
-    width: 100% !important;
-    padding: 20px 0 !important;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+    padding: 20px 0;
 }
 
 /* Snapshot container is a wrapper  --  grid is on .snap-grid child */
@@ -34,17 +34,18 @@
 
 .snapshot-card,
 [class*="snapshot-card"] {
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
-    padding: var(--space-lg); cursor: pointer; transition: border-color 0.2s, transform 0.15s;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
+    background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-card);
+    padding: var(--space-lg); cursor: pointer; transition: border-color 0.2s, box-shadow 0.15s;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    box-shadow: var(--shadow);
 }
-.snapshot-card:hover { border-color: var(--accent-teal); transform: translateY(-2px); }
+.snapshot-card:hover { border-color: var(--blue); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
 .snapshot-card .sc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-sm); }
 .snapshot-card .sc-ticker { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; }
 .snapshot-card .sc-company { font-size: 0.78rem; color: var(--text-secondary); margin-bottom: var(--space-xs); }
-.snapshot-card .sc-sector { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-teal); background: rgba(26,158,143,0.15); padding: 3px 8px; border-radius: 3px; display: inline-block; margin-bottom: var(--space-sm); }
+.snapshot-card .sc-sector { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-teal); background: var(--blue-soft); padding: 3px 8px; border-radius: 3px; display: inline-block; margin-bottom: var(--space-sm); }
 .snapshot-card .sc-price { font-family: var(--font-data); font-size: 1.2rem; font-weight: 700; }
 .snapshot-card .sc-price-currency { font-size: 0.75rem; color: var(--text-muted); }
 .snapshot-card .sc-meta { display: flex; gap: var(--space-md); margin-top: var(--space-sm); flex-wrap: wrap; }
@@ -62,7 +63,7 @@
 .snap-header-left { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
 .snap-ticker { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
 .snap-company-name { font-size: 0.85rem; color: var(--text-secondary); }
-.snap-sector-tag { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-teal); background: rgba(26,158,143,0.15); padding: 3px 8px; border-radius: 3px; }
+.snap-sector-tag { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-teal); background: var(--blue-soft); padding: 3px 8px; border-radius: 3px; }
 .snap-header-right { display: flex; align-items: center; gap: 20px; }
 .snap-logo-mark { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
 .snap-logo-mark .brand-green { color: #3DAA6D; }
@@ -82,9 +83,9 @@
 .snap-risk-skew-bar { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); margin-bottom: 10px; flex-wrap: wrap; }
 .snap-risk-skew-label { font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
 .snap-risk-skew-badge { font-family: var(--font-data); font-size: 0.85rem; font-weight: 800; letter-spacing: 0.04em; padding: 4px 14px; border-radius: 3px; }
-.snap-risk-skew-badge.downside { background: rgba(212,85,85,0.12); color: var(--signal-red); border: 1px solid rgba(212,85,85,0.3); }
-.snap-risk-skew-badge.upside { background: rgba(61,170,109,0.12); color: var(--signal-green); border: 1px solid rgba(61,170,109,0.3); }
-.snap-risk-skew-badge.balanced { background: rgba(212,160,60,0.12); color: var(--signal-amber); border: 1px solid rgba(212,160,60,0.3); }
+.snap-risk-skew-badge.downside { background: var(--red-soft); color: var(--red); border: 1px solid var(--red); }
+.snap-risk-skew-badge.upside { background: var(--green-soft); color: var(--green); border: 1px solid var(--green); }
+.snap-risk-skew-badge.balanced { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber); }
 .snap-risk-skew-rationale { font-size: 0.65rem; color: var(--text-secondary); line-height: 1.4; flex: 1; min-width: 200px; }
 
 .snap-main-grid { display: grid; grid-template-columns: 280px 1fr 280px; gap: 10px; }
