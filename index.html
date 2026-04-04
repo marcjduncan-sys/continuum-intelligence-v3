@@ -38,14 +38,17 @@
 <div id="a11y-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
 <!-- ============================================================
-     NAVIGATION
+     TOPBAR
      ============================================================ -->
-<nav class="site-nav" id="siteNav" aria-label="Primary navigation">
-    <div class="nav-inner">
-        <a class="nav-brand" onclick="navigate('home')">
-            <div class="nav-brand-text">Contin<span class="brand-green">uu</span>m Inte<span class="brand-green">ll</span>igence</div>
+<nav class="ci-topbar" id="siteNav" aria-label="Primary navigation">
+    <div class="ci-topbar-inner">
+        <a class="ci-brand" onclick="navigate('home')" href="#home">
+            <div class="ci-brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <span class="ci-brand-name">Contin<span>uu</span>m Inte<span>ll</span>igence</span>
         </a>
-        <div class="nav-links">
+        <nav class="ci-topbar-nav" aria-label="Site sections">
             <a href="#home" class="active" data-nav="home">Research</a>
             <a href="#deep-research" data-nav="deep-research">Deep Research</a>
             <a href="#comparator" data-nav="comparator">Comparator</a>
@@ -54,8 +57,8 @@
             <a href="#memory" data-nav="memory">Journal</a>
             <a href="#pm" data-nav="pm">PM</a>
             <a href="#about" data-nav="about">About</a>
-        </div>
-        <div class="nav-actions">
+        </nav>
+        <div class="ci-topbar-actions">
             <button class="ci-signin-btn" id="ciSignInBtn" aria-label="Sign in to save history">Sign in</button>
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
                 <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -65,17 +68,19 @@
     </div>
 </nav>
 
-<!-- Integrations Bar (coming soon tabs) -->
-<div class="integrations-bar" id="integrationsBar">
-  <div class="integ-bar-inner integ-bar-teaser" role="presentation" aria-label="Coming soon integrations">
-    <span class="integ-teaser-label">COMING SOON</span>
-    <span class="integ-divider" aria-hidden="true"></span>
-    <span class="integ-soon-chip">Bloomberg</span>
-    <span class="integ-soon-chip">Risk</span>
-    <span class="integ-soon-chip">Team Chat</span>
-    <span class="integ-soon-chip">Trading</span>
-    <span class="integ-soon-chip">Analyst Chat</span>
-    <span class="integ-soon-chip">News</span>
+<!-- Capability Strip -->
+<div class="ci-strip" id="integrationsBar">
+  <div class="ci-strip-inner">
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--live"></span>Live Research</span>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--live"></span>Analyst Chat</span>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--live"></span>Gold Agent</span>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--live"></span>ACH Framework</span>
+    <div class="ci-strip-divider" aria-hidden="true"></div>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>Bloomberg</span>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>Risk</span>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>Team Chat</span>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>Trading</span>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>News</span>
   </div>
 </div>
 
@@ -167,31 +172,6 @@
         </table>
     </div>
 
-    <!-- Home Footer -->
-    <footer class="site-footer" role="contentinfo">
-        <div class="footer-inner">
-            <div class="footer-top">
-                <div>
-                    <div class="footer-brand-name">Contin<span class="brand-green">uu</span>m Inte<span class="brand-green">ll</span>igence</div>
-                    <div class="footer-tagline">Independent cross-domain equity research. Evidence-driven analysis for institutional and sophisticated investors.</div>
-                </div>
-                <div class="footer-links">
-                    <div class="footer-links-col">
-                        <h2 class="footer-col-heading">Research</h2>
-                        <div id="footer-research-links"></div>
-                    </div>
-                    <div class="footer-links-col">
-                        <h2 class="footer-col-heading">Company</h2>
-                        <a href="#about" onclick="navigate('about')">About &amp; Methodology</a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the Analysis of Competing Hypotheses (ACH) methodology. No buy, sell, or hold recommendations are made. Readers should consult their own financial advisors.</div>
-                <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
-            </div>
-        </div>
-    </footer>
 </div>
 
 <!-- ============================================================
@@ -208,14 +188,6 @@
         <div id="deep-research-container"></div>
     </div>
 
-    <footer class="site-footer" role="contentinfo">
-        <div class="footer-inner">
-            <div class="footer-bottom">
-                <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the ACH methodology.</div>
-                <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
-            </div>
-        </div>
-    </footer>
 </div>
 
 <!-- Snapshot Report Pages (dynamically rendered) -->
@@ -665,6 +637,32 @@
 
 
 
+
+<!-- Global Footer -->
+<footer class="ci-footer" role="contentinfo">
+  <div class="ci-footer-inner">
+    <div class="ci-footer-top">
+      <div>
+        <div class="ci-footer-brand-name">Contin<span>uu</span>m Inte<span>ll</span>igence</div>
+        <div class="ci-footer-tagline">Independent cross-domain equity research. Evidence-driven analysis for institutional and sophisticated investors.</div>
+      </div>
+      <div class="ci-footer-links">
+        <div class="ci-footer-links-col">
+          <h2>Research</h2>
+          <div id="footer-research-links"></div>
+        </div>
+        <div class="ci-footer-links-col">
+          <h2>Company</h2>
+          <a href="#about" onclick="navigate('about')">About &amp; Methodology</a>
+        </div>
+      </div>
+    </div>
+    <div class="ci-footer-bottom">
+      <div class="ci-footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the Analysis of Competing Hypotheses (ACH) methodology. No buy, sell, or hold recommendations are made. Readers should consult their own financial advisors.</div>
+      <div class="ci-footer-meta">&copy; 2026 Continuum Intelligence</div>
+    </div>
+  </div>
+</footer>
 
 </main><!-- /main-content -->
 
