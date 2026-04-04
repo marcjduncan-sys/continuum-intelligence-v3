@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Continuum Intelligence - BHP Research</title>
+<style>
+  :root{
+    --app:#f4f5f7;
+    --surface:#ffffff;
+    --surface-2:#fafbfc;
+    --surface-3:#f1f4f7;
+    --line:#d9e0e8;
+    --line-2:#e7ecf1;
+    --text:#132233;
+    --text-2:#304255;
+    --muted:#66788c;
+    --soft:#7c8b9c;
+    --blue:#1f4b7a;
+    --blue-soft:#e9f0f8;
+    --green:#2f8659;
+    --green-soft:#edf7f1;
+    --red:#b64a46;
+    --red-soft:#fceeed;
+    --amber:#94630d;
+    --amber-soft:#fff4df;
+    --violet:#6e58aa;
+    --violet-soft:#f1edfc;
+    --shadow:0 10px 24px rgba(16,32,51,.06);
+    --radius:14px;
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--app);color:var(--text);font-family:var(--sans);scroll-behavior:smooth}
+  a{text-decoration:none;color:inherit}
+  button,input,textarea{font:inherit}
+  strong{font-weight:800}
+
+  body.compact .section,
+  body.compact .hero,
+  body.compact .chat-shell,
+  body.compact .decision-row,
+  body.compact .chat-message{padding-top:10px;padding-bottom:10px}
+
+  .topbar{
+    position:sticky; top:0; z-index:90;
+    display:grid; grid-template-columns:220px 1fr auto auto; gap:12px; align-items:center;
+    height:50px; padding:0 16px;
+    background:rgba(255,255,255,.94);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.01em}
+  .mark{
+    width:24px;height:24px;border-radius:8px;display:grid;place-items:center;
+    background:linear-gradient(180deg,#214a75,#173653);color:#fff;font-size:11px;border:1px solid #2a5a87;
+  }
+  .search{
+    height:34px;display:flex;align-items:center;gap:8px;padding:0 10px;
+    border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);
+  }
+  .search input{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-size:12px}
+  .kbd-row{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:11px}
+  .kbd{
+    padding:3px 6px;border-radius:7px;border:1px solid var(--line);
+    background:var(--surface);font-family:var(--mono);color:var(--text);
+  }
+  .actions{display:flex;gap:8px}
+  .btn{
+    height:32px;padding:0 10px;border-radius:9px;border:1px solid var(--line);
+    background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;
+  }
+  .btn.primary{background:linear-gradient(180deg,#234d78,#1b3c60);border-color:#224c75;color:#fff}
+
+  .subnav{
+    position:sticky; top:50px; z-index:85;
+    display:flex; gap:8px; align-items:center; overflow:auto;
+    padding:8px 16px; background:rgba(244,245,247,.96); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .subnav a{
+    white-space:nowrap;
+    padding:6px 10px; border-radius:999px; border:1px solid var(--line);
+    background:var(--surface); color:var(--text-2); font-size:11px; font-weight:700; letter-spacing:.02em;
+  }
+  .subnav a.active,
+  .subnav a:hover{
+    background:var(--blue-soft); color:var(--blue); border-color:#c8d8ea;
+  }
+
+  .app{
+    max-width:1500px;
+    margin:0 auto;
+    padding:14px;
+  }
+
+  .hero{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:14px;
+    box-shadow:var(--shadow);
+  }
+  .hero-head{
+    display:grid; grid-template-columns:1fr auto; gap:12px; align-items:start;
+  }
+  .identity{display:flex;gap:12px;align-items:flex-start}
+  .ticker{
+    width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+    background:linear-gradient(180deg,#234d78,#1a3958);color:#fff;font-size:12px;font-weight:800;border:1px solid #275783;
+  }
+  h1{
+    margin:0;
+    font-size:26px;
+    line-height:1.02;
+    letter-spacing:-.03em;
+  }
+  .meta{
+    margin-top:4px;
+    display:flex;flex-wrap:wrap;gap:8px;
+    color:var(--muted);font-size:12px;
+  }
+  .pill-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .tag{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:5px 8px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface-2);font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);
+  }
+  .tag.blue{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+  .tag.green{background:var(--green-soft);border-color:#cce6d6;color:var(--green)}
+  .tag.red{background:var(--red-soft);border-color:#f0d0ce;color:var(--red)}
+  .tag.amber{background:var(--amber-soft);border-color:#f1deb2;color:var(--amber)}
+  .tag.violet{background:var(--violet-soft);border-color:#ddd5f5;color:var(--violet)}
+
+  .decision-ribbon{
+    margin-top:12px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--surface-2);
+  }
+  .decision-row{
+    display:grid;
+    grid-template-columns:125px 1fr 130px 1fr 130px 1fr;
+    border-bottom:1px solid var(--line-2);
+  }
+  .decision-row:last-child{border-bottom:0}
+  .decision-k{
+    padding:9px 10px;
+    font-size:10px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:800;
+    background:var(--surface-3);
+  }
+  .decision-v{
+    padding:9px 10px;
+    font-size:13px;
+    line-height:1.42;
+    color:var(--text-2);
+  }
+
+  .summary-note{
+    margin-top:10px;
+    padding:11px 12px;
+    border:1px solid #d8e3ef;
+    border-radius:12px;
+    background:linear-gradient(180deg,#f8fbfe,#f2f7fc);
+    font-size:13px;
+    line-height:1.52;
+    color:var(--text-2);
+  }
+
+  .workspace{
+    margin-top:14px;
+    display:grid;
+    grid-template-columns:minmax(0,68%) minmax(340px,32%);
+    gap:14px;
+    align-items:start;
+  }
+
+  .left-col{display:grid;gap:12px}
+  .right-col{
+    position:sticky;
+    top:98px;
+    align-self:start;
+  }
+
+  .section,
+  .chat-shell{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+  }
+
+  .section{padding:14px}
+  .section-header{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;
+  }
+  .eyebrow{
+    font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:800;margin-bottom:4px;
+  }
+  .title{
+    margin:0;
+    font-size:18px;
+    line-height:1.16;
+    letter-spacing:-.025em;
+  }
+  .subtitle{
+    margin-top:5px;
+    font-size:12px;
+    line-height:1.5;
+    color:var(--muted);
+  }
+  .paragraph{
+    margin:0;
+    font-size:13px;
+    line-height:1.62;
+    color:var(--text-2);
+  }
+  .tiny{
+    font-size:11px;
+    line-height:1.48;
+    color:var(--muted);
+  }
+
+  .bluf{
+    padding:12px;
+    border:1px solid #d8e3ef;
+    border-radius:12px;
+    background:linear-gradient(180deg,#f8fbfe,#f2f7fc);
+  }
+
+  .two-col{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+
+  .mini-card{
+    padding:11px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:var(--surface-2);
+  }
+  .mini-card .k{
+    font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800;
+  }
+  .mini-card .v{
+    margin-top:6px;font-size:15px;font-weight:800;letter-spacing:-.02em;
+  }
+  .mini-card .x{
+    margin-top:5px;font-size:12px;color:var(--text-2);line-height:1.45;
+  }
+
+  .scenario-table td:nth-child(3),
+  .scenario-table td:nth-child(4){white-space:nowrap}
+
+  .bridge{
+    display:grid;gap:10px;margin-bottom:10px;
+  }
+  .bridge-row{
+    display:grid;
+    grid-template-columns:124px 1fr 70px;
+    gap:10px;
+    align-items:center;
+  }
+  .bridge-name{font-size:12px;font-weight:800;color:var(--text-2)}
+  .bar{
+    position:relative;height:10px;border-radius:999px;overflow:hidden;
+    background:#e9eef4;border:1px solid #d6dfe8;
+  }
+  .fill{
+    position:absolute;inset:0 auto 0 0;border-radius:999px;
+  }
+  .fill.base{background:linear-gradient(90deg,#2e6aa6,#78a5d7)}
+  .fill.good{background:linear-gradient(90deg,#2f8659,#62b082)}
+  .fill.bad{background:linear-gradient(90deg,#b64a46,#dc8784)}
+  .fill.swing{background:linear-gradient(90deg,#6e58aa,#9b89ce)}
+
+  table{width:100%;border-collapse:collapse}
+  th,td{
+    padding:9px 8px;
+    border-bottom:1px solid var(--line-2);
+    text-align:left;
+    vertical-align:top;
+    font-size:12px;
+  }
+  th{
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:800;
+  }
+  tr:last-child td{border-bottom:0}
+  .pos{color:var(--green);font-weight:800}
+  .neg{color:var(--red);font-weight:800}
+  .neu{color:var(--blue);font-weight:800}
+  .vio{color:var(--violet);font-weight:800}
+
+  .risk-grid{
+    display:grid;
+    gap:8px;
+  }
+  .risk-item{
+    display:grid;
+    grid-template-columns:120px 1fr auto;
+    gap:12px;
+    align-items:start;
+    padding:10px 11px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:var(--surface-2);
+  }
+  .risk-label{
+    font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800;
+  }
+  .risk-text{
+    font-size:13px;line-height:1.52;color:var(--text-2);
+  }
+
+  .evidence-list{
+    display:grid;
+    gap:8px;
+  }
+  .evidence-item{
+    display:grid;
+    grid-template-columns:108px 1fr 110px;
+    gap:12px;
+    align-items:start;
+    padding:10px 11px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:var(--surface-2);
+  }
+  .chip-stack{display:flex;flex-wrap:wrap;gap:5px}
+  .chip{
+    padding:4px 7px;border-radius:999px;border:1px solid var(--line);
+    background:#fff;color:var(--muted);font-size:10px;font-weight:700;
+  }
+  .evidence-text{
+    font-size:13px;line-height:1.55;color:var(--text-2);
+  }
+  .evidence-side{
+    display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px;
+  }
+
+  .spark-wrap{
+    display:grid;
+    grid-template-columns:54px 1fr;
+    gap:8px;
+    align-items:center;
+  }
+  .spark{
+    position:relative;height:8px;border-radius:999px;overflow:hidden;
+    background:#e9eef4;border:1px solid #d6dfe8;
+  }
+
+  .collapsible{
+    overflow:hidden;
+    max-height:220px;
+    position:relative;
+    transition:max-height .25s ease;
+  }
+  .collapsible.expanded{max-height:1200px}
+  .fade{
+    position:absolute;left:0;right:0;bottom:0;height:84px;
+    background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,1));
+  }
+  .collapsible.expanded .fade{display:none}
+  .section-actions{
+    margin-top:10px;
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+  }
+
+  .chat-shell{
+    overflow:hidden;
+  }
+  .chat-top{
+    padding:12px 12px 10px 12px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#fff,#f9fbfd);
+  }
+  .chat-title{
+    margin:0;
+    font-size:18px;
+    line-height:1.18;
+    letter-spacing:-.02em;
+  }
+  .chat-sub{
+    margin-top:5px;
+    font-size:12px;
+    line-height:1.5;
+    color:var(--muted);
+  }
+
+  .chat-stats{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;
+  }
+  .chat-stat{
+    padding:9px;
+    border:1px solid var(--line);
+    border-radius:11px;
+    background:var(--surface-2);
+  }
+  .chat-stat .k{
+    font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800;
+  }
+  .chat-stat .v{
+    margin-top:5px;font-size:15px;font-weight:800;
+  }
+
+  .chat-tabs{
+    display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;
+  }
+  .tab{
+    padding:6px 9px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface);color:var(--text-2);font-size:10px;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:.04em;
+  }
+  .tab.active{
+    background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue);
+  }
+
+  .chat-stream{
+    padding:12px;
+    display:grid;
+    gap:10px;
+    max-height:820px;
+    overflow:auto;
+    background:var(--surface);
+  }
+  .chat-message{
+    padding:11px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:var(--surface-2);
+  }
+  .chat-head{
+    display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:7px;
+  }
+  .role{
+    display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;
+  }
+  .role-badge{
+    width:22px;height:22px;border-radius:8px;display:grid;place-items:center;
+    border:1px solid var(--line);font-size:10px;
+  }
+  .role.analyst .role-badge{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+  .role.pm .role-badge{background:var(--amber-soft);border-color:#f1deb2;color:var(--amber)}
+  .role.strategist .role-badge{background:var(--violet-soft);border-color:#ddd5f5;color:var(--violet)}
+  .chat-meta{
+    display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+    color:var(--muted);font-size:10px;
+  }
+  .chat-body{
+    font-size:13px;
+    line-height:1.6;
+    color:var(--text-2);
+  }
+  .thread-box{
+    margin-top:8px;padding-top:8px;border-top:1px dashed #d4dde6;display:grid;gap:6px;
+  }
+  .thread-title{
+    font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800;
+  }
+
+  .chat-input{
+    padding:11px 12px 12px 12px;
+    border-top:1px solid var(--line);
+    background:var(--surface-2);
+  }
+  .composer{
+    display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;
+  }
+  .composer textarea{
+    min-height:70px;
+    width:100%;
+    resize:none;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:#fff;
+    padding:11px;
+    color:var(--text);
+    outline:none;
+  }
+
+  @media (max-width:1400px){
+    .decision-row{grid-template-columns:120px 1fr 120px 1fr}
+    .workspace{grid-template-columns:1fr}
+    .right-col{position:static}
+    .chat-stream{max-height:none}
+  }
+  @media (max-width:980px){
+    .topbar{grid-template-columns:1fr;height:auto;padding:12px}
+    .kbd-row{display:none}
+    .hero-head,
+    .two-col,
+    .chat-stats{grid-template-columns:1fr}
+    .decision-row,
+    .grid3{grid-template-columns:1fr}
+    .summary-note{font-size:12px}
+    .risk-item,
+    .evidence-item,
+    .composer{grid-template-columns:1fr}
+  }
+</style>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="mark">CI</div>
+    <div>Continuum Intelligence</div>
+  </div>
+
+  <div class="search">
+    <span>⌕</span>
+    <input value="BHP Group (ASX: BHP) - research redesign close to original page rhythm" />
+  </div>
+
+  <div class="kbd-row">
+    <span class="kbd">/</span><span>Search</span>
+    <span class="kbd">E</span><span>EWP</span>
+    <span class="kbd">R</span><span>Risks</span>
+    <span class="kbd">C</span><span>Chat</span>
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="densityToggle">Compact mode</button>
+    <button class="btn">Pin view</button>
+    <button class="btn primary">Compare</button>
+  </div>
+</div>
+
+<nav class="subnav" id="subnav">
+  <a href="#thesis" class="active">Thesis</a>
+  <a href="#scenarios">Scenarios</a>
+  <a href="#valuation">Valuation & EWP</a>
+  <a href="#risks">Risks</a>
+  <a href="#evidence">Evidence</a>
+  <a href="#revisions">What changed</a>
+  <a href="#research">Deep research</a>
+  <a href="#quality">Quality & capital allocation</a>
+  <a href="#chat-anchor">Chat</a>
+</nav>
+
+<div class="app">
+  <section class="hero">
+    <div class="hero-head">
+      <div class="identity">
+        <div class="ticker">BHP</div>
+        <div>
+          <h1>BHP Group</h1>
+          <div class="meta">
+            <span>ASX: BHP</span>
+            <span>•</span>
+            <span>Diversified mining</span>
+            <span>•</span>
+            <span>Light mode</span>
+            <span>•</span>
+            <span>Updated 2 April 2026</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pill-row">
+        <span class="tag green">Verdict: Accumulate</span>
+        <span class="tag blue">Skew: Moderate upside</span>
+        <span class="tag amber">Confidence: 76%</span>
+      </div>
+    </div>
+
+    <div class="decision-ribbon">
+      <div class="decision-row">
+        <div class="decision-k">Spot price</div>
+        <div class="decision-v"><strong>A$52.56</strong></div>
+        <div class="decision-k">Expected weighted price</div>
+        <div class="decision-v"><strong class="neu">A$56.55</strong> or <strong class="pos">+7.6%</strong> versus spot. EWP is the only effective target.</div>
+        <div class="decision-k">Forward yield</div>
+        <div class="decision-v"><strong>3.7% - 4.0%</strong> using current payout assumptions.</div>
+      </div>
+      <div class="decision-row">
+        <div class="decision-k">Key commodity lever</div>
+        <div class="decision-v"><strong>Copper</strong>. Copper contributed <strong>51%</strong> of H1 FY26 underlying EBITDA.</div>
+        <div class="decision-k">Escondida</div>
+        <div class="decision-v"><strong>646 kt</strong> H1 FY26 production. FY26 guidance <strong>1.2-1.275 Mt</strong>.</div>
+        <div class="decision-k">Capital allocation</div>
+        <div class="decision-v">Operate inside the <strong>US$10-20bn</strong> net debt range and preserve the payout framework.</div>
+      </div>
+      <div class="decision-row">
+        <div class="decision-k">China macro</div>
+        <div class="decision-v">March official manufacturing PMI at <strong>50.4</strong>. Supportive, but not enough on its own.</div>
+        <div class="decision-k">Iron ore sensitivity</div>
+        <div class="decision-v">The thesis weakens quickly if realised pricing drifts toward the low <strong>US$80s/t</strong>.</div>
+        <div class="decision-k">Next catalyst</div>
+        <div class="decision-v">Clean evidence that FY26 copper guidance of <strong>1.9-2.0 Mt</strong> can be delivered while China demand stays stable.</div>
+      </div>
+    </div>
+
+    <div class="summary-note">
+      <strong>Bottom line:</strong> BHP remains investable because the market still frames it primarily as an iron ore cash machine, while the earnings mix is becoming more copper-led and strategically higher quality. The redesign here keeps the original product’s dense vertical research rhythm, reduces shell chrome, removes MOAT entirely, and keeps collaborative chat visible without allowing it to become the whole product.
+    </div>
+  </section>
+
+  <div class="workspace">
+    <main class="left-col">
+      <section class="section" id="thesis">
+        <div class="section-header">
+          <div>
+            <div class="eyebrow">01 / Thesis</div>
+            <h2 class="title">The decision is straightforward: <strong>BHP works if copper keeps taking mix while iron ore remains good enough to fund returns.</strong></h2>
+            <div class="subtitle">This is a refinement of the original research page language, not a new workstation shell.</div>
+          </div>
+          <span class="tag blue">Decision-first</span>
+        </div>
+
+        <div class="bluf">
+          <div class="paragraph">
+            <strong>At A$52.56, the market is paying for durable cash flow but not fully for a higher-quality commodity mix.</strong>
+            The base case only needs three things to remain true: <strong>iron ore above roughly US$90/t</strong>,
+            <strong>FY26 copper guidance of 1.9-2.0 Mt stays credible</strong>, and management keeps allocating capital
+            inside the <strong>strong balance sheet plus minimum 50% payout framework</strong>.
+            If those hold, <strong>EWP of A$56.55</strong> is reasonable.
+          </div>
+        </div>
+
+        <div class="two-col" style="margin-top:12px">
+          <div>
+            <p class="paragraph">
+              <strong>What changed in the story is earnings mix.</strong> Copper generated the largest share of H1 FY26 underlying EBITDA,
+              which matters because copper deserves a higher strategic multiple than bulk commodities when supply is structurally tight.
+              BHP also retains visible copper growth options at <strong>Escondida, South Australia, Vicuña and Resolution</strong>,
+              while iron ore still funds the balance sheet and dividend base.
+            </p>
+          </div>
+          <div class="mini-card">
+            <div class="k">What changes my mind</div>
+            <div class="x"><strong>Iron ore below the mid-US$80s/t, a copper delivery miss, or capital intensity rising without a clear return uplift.</strong> Any of those would compress the EWP quickly.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="scenarios">
+        <div class="section-header">
+          <div>
+            <div class="eyebrow">02 / Scenarios</div>
+            <h2 class="title"><strong>EWP is the only target.</strong> Bull, Base, Bear and Swing exist only to explain the weighting behind it.</h2>
+          </div>
+          <span class="tag green">EWP-linked</span>
+        </div>
+
+        <table class="scenario-table">
+          <thead>
+            <tr>
+              <th>Case</th>
+              <th>Decision-relevant conclusion</th>
+              <th>Probability</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="pos"><strong>Bull</strong></td>
+              <td><strong>China stimulus transmits into better steel demand, copper stays tight, and BHP gets paid more explicitly for copper mix shift.</strong></td>
+              <td>25%</td>
+              <td class="pos">A$63.00</td>
+            </tr>
+            <tr>
+              <td class="neu"><strong>Base</strong></td>
+              <td><strong>Iron ore stays serviceable, Escondida lands cleanly, and the dividend / balance-sheet combination holds the valuation together.</strong></td>
+              <td>45%</td>
+              <td class="neu">A$56.00</td>
+            </tr>
+            <tr>
+              <td class="neg"><strong>Bear</strong></td>
+              <td><strong>China steel weakens, iron ore contracts into the low US$80s/t, and higher growth spend reduces support for rerating.</strong></td>
+              <td>20%</td>
+              <td class="neg">A$44.00</td>
+            </tr>
+            <tr>
+              <td class="vio"><strong>Swing</strong></td>
+              <td><strong>Copper and iron ore both surprise positively while long-dated copper options are capitalised more aggressively by the market.</strong></td>
+              <td>10%</td>
+              <td class="vio">A$68.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section" id="valuation">
+        <div class="section-header">
+          <div>
+            <div class="eyebrow">03 / Valuation & EWP</div>
+            <h2 class="title"><strong>EWP at A$56.55 is actionable only because the cash-return base remains credible.</strong></h2>
+          </div>
+          <span class="tag blue">+7.6%</span>
+        </div>
+
+        <div class="bridge">
+          <div class="bridge-row">
+            <div class="bridge-name">Bear</div>
+            <div class="bar"><div class="fill bad" style="width:65%"></div></div>
+            <div class="neg"><strong>A$44</strong></div>
+          </div>
+          <div class="bridge-row">
+            <div class="bridge-name">Base</div>
+            <div class="bar"><div class="fill base" style="width:83%"></div></div>
+            <div class="neu"><strong>A$56</strong></div>
+          </div>
+          <div class="bridge-row">
+            <div class="bridge-name">Bull</div>
+            <div class="bar"><div class="fill good" style="width:93%"></div></div>
+            <div class="pos"><strong>A$63</strong></div>
+          </div>
+          <div class="bridge-row">
+            <div class="bridge-name">Swing</div>
+            <div class="bar"><div class="fill swing" style="width:100%"></div></div>
+            <div class="vio"><strong>A$68</strong></div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Driver</th>
+              <th>Current framing</th>
+              <th>Why it matters</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Iron ore</strong></td>
+              <td>Realised around the mid-<strong>US$80s/t</strong> in H1 FY26</td>
+              <td>Still funds the distribution base and covers a large share of capex flexibility.</td>
+            </tr>
+            <tr>
+              <td><strong>Copper</strong></td>
+              <td>Largest share of H1 FY26 underlying EBITDA at <strong>51%</strong></td>
+              <td>Now the clearest route to multiple support and earnings mix improvement.</td>
+            </tr>
+            <tr>
+              <td><strong>Escondida</strong></td>
+              <td><strong>646 kt</strong> H1 FY26 production; FY26 guidance <strong>1.2-1.275 Mt</strong></td>
+              <td>This is the single most important operating proof point in the copper thesis.</td>
+            </tr>
+            <tr>
+              <td><strong>Dividend</strong></td>
+              <td>Supportive yield of about <strong>3.7% - 4.0%</strong></td>
+              <td>Downside support matters; yield keeps the name investable even if rerating is delayed.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section" id="risks">
+        <div class="section-header">
+          <div>
+            <div class="eyebrow">04 / Risks</div>
+            <h2 class="title"><strong>The stock de-rates if China weakens faster than copper strengthens.</strong> That is the first-order risk.</h2>
+          </div>
+          <span class="tag red">Downside map</span>
+        </div>
+
+        <div class="risk-grid">
+          <div class="risk-item">
+            <div class="risk-label">Risk 01</div>
+            <div class="risk-text"><strong>China macro rollback.</strong> If policy remains only loosely supportive rather than forceful, steel demand can disappoint and iron ore fails to hold a constructive deck.</div>
+            <div><span class="tag red">High</span></div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-label">Risk 02</div>
+            <div class="risk-text"><strong>Escondida execution.</strong> Throughput can improve while grade slips. If recoveries or feed grade disappoint, copper upside compresses quickly.</div>
+            <div><span class="tag amber">Medium</span></div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-label">Risk 03</div>
+            <div class="risk-text"><strong>Capital allocation drift.</strong> Growth must remain disciplined. The case weakens if Jansen, Chile or future copper options absorb cash without visible return uplift.</div>
+            <div><span class="tag amber">Medium</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="evidence">
+        <div class="section-header">
+          <div>
+            <div class="eyebrow">05 / Evidence</div>
+            <h2 class="title"><strong>The most important evidence is whether BHP’s copper execution now deserves a different market framing.</strong></h2>
+          </div>
+          <span class="tag blue">High-signal only</span>
+        </div>
+
+        <div class="evidence-list">
+          <div class="evidence-item">
+            <div class="chip-stack">
+              <span class="chip">Copper</span>
+              <span class="chip">Mix shift</span>
+            </div>
+            <div class="evidence-text">
+              <strong>Copper contributed 51% of H1 FY26 underlying EBITDA.</strong><br>
+              Interpretation: this is not cosmetic. It means the rerating logic is less dependent on iron ore than the market still treats it.
+            </div>
+            <div class="evidence-side">
+              <span class="tag green">Core</span>
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <div class="chip-stack">
+              <span class="chip">Escondida</span>
+              <span class="chip">Throughput</span>
+            </div>
+            <div class="evidence-text">
+              <strong>Escondida delivered 646 kt in H1 FY26 and BHP is guiding to 1.2-1.275 Mt for FY26.</strong><br>
+              Interpretation: this is the cleanest operating support for the Base case.
+            </div>
+            <div class="evidence-side">
+              <span class="tag green">Supportive</span>
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <div class="chip-stack">
+              <span class="chip">Iron ore</span>
+              <span class="chip">Cash base</span>
+            </div>
+            <div class="evidence-text">
+              <strong>Iron ore still funds the balance-sheet elasticity needed to support both shareholder returns and selective growth.</strong><br>
+              Interpretation: the case still breaks fastest through iron ore even if copper is the rerating lever.
+            </div>
+            <div class="evidence-side">
+              <span class="tag blue">Important</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="revisions">
+        <div class="section-header">
+          <div>
+            <div class="eyebrow">06 / What changed</div>
+            <h2 class="title"><strong>What changed is not just price. It is earnings mix and the probability of copper-led outperformance.</strong></h2>
+          </div>
+          <span class="tag violet">Inline deltas</span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Line item</th>
+              <th>Old</th>
+              <th>New</th>
+              <th>Delta</th>
+              <th>Read-through</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>FY26 EBITDA</strong></td>
+              <td>US$28.4bn</td>
+              <td>US$29.7bn</td>
+              <td>
+                <div class="spark-wrap">
+                  <div class="pos"><strong>+4.6%</strong></div>
+                  <div class="spark"><div class="fill good" style="width:46%"></div></div>
+                </div>
+              </td>
+              <td>Copper price and mix did more work than previously assumed.</td>
+            </tr>
+            <tr>
+              <td><strong>FY26 DPS</strong></td>
+              <td>US$1.27</td>
+              <td>US$1.33</td>
+              <td>
+                <div class="spark-wrap">
+                  <div class="pos"><strong>+4.7%</strong></div>
+                  <div class="spark"><div class="fill good" style="width:47%"></div></div>
+                </div>
+              </td>
+              <td>Distribution support remains part of the downside case, not just the upside case.</td>
+            </tr>
+            <tr>
+              <td><strong>EWP</strong></td>
+              <td>A$54.20</td>
+              <td>A$56.55</td>
+              <td>
+                <div class="spark-wrap">
+                  <div class="pos"><strong>+4.3%</strong></div>
+                  <div class="spark"><div class="fill good" style="width:43%"></div></div>
+                </div>
+              </td>
+              <td>Raised because copper execution probability improved, not because the multiple was stretched.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section" id="research">
+        <div class="section-header">
+          <div>
+            <div class="eyebrow">07 / Deep research</div>
+            <h2 class="title"><strong>The case is strongest when read as a portfolio of cash engines rather than a single-commodity view.</strong></h2>
+            <div class="subtitle">The stock’s resilience still comes from iron ore. Its rerating potential increasingly comes from copper.</div>
+          </div>
+          <span class="tag amber">Expandable</span>
+        </div>
+
+        <div class="collapsible" id="researchBody">
+          <p class="paragraph"><strong>BHP’s current valuation is still anchored by iron ore economics, but the forward narrative is increasingly determined by copper.</strong> Iron ore still provides the scale, margin and cash-return base, while copper now provides the cleaner structural growth angle. That mix reduces the chance the market can continue to price BHP as merely a China steel-cycle expression.</p>
+          <p class="paragraph" style="margin-top:10px"><strong>The critical operating asset is Escondida.</strong> The raised FY26 production range supports the Base case, but it also makes Escondida the first place to look for disappointment if the thesis starts to weaken. The market will forgive modest capex if copper execution remains strong. It will not forgive cost inflation plus weak grade delivery.</p>
+          <p class="paragraph" style="margin-top:10px"><strong>China remains the largest external variable.</strong> A PMI above 50 is supportive, but it is not the same as a forceful demand impulse. The EWP therefore works only while the copper uplift is large enough to offset a middling rather than exuberant China backdrop.</p>
+          <div class="fade"></div>
+        </div>
+
+        <div class="section-actions">
+          <div class="tiny">Preview mode shows the highest-utility portion first.</div>
+          <button class="btn" id="expandResearch">Expand full research</button>
+        </div>
+      </section>
+
+      <section class="section" id="quality">
+        <div class="section-header">
+          <div>
+            <div class="eyebrow">08 / Quality & capital allocation</div>
+            <h2 class="title"><strong>The quality case matters only because it protects cash returns while funding selective growth.</strong></h2>
+          </div>
+          <span class="tag blue">Snapshot</span>
+        </div>
+
+        <div class="grid3">
+          <div class="mini-card">
+            <div class="k">WAIO cost position</div>
+            <div class="v">Sector-leading</div>
+            <div class="x">Protects margins even if iron ore weakens.</div>
+          </div>
+          <div class="mini-card">
+            <div class="k">Capital allocation</div>
+            <div class="v">Disciplined, still capex-heavy</div>
+            <div class="x">Must keep returns credible while absorbing potash and copper growth.</div>
+          </div>
+          <div class="mini-card">
+            <div class="k">Balance sheet</div>
+            <div class="v">Inside US$10-20bn</div>
+            <div class="x">Allows both distributions and selective reinvestment.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="right-col" id="chat-anchor">
+      <section class="chat-shell">
+        <div class="chat-top">
+          <div class="eyebrow">Collaborative chat</div>
+          <h2 class="chat-title"><strong>Visible and useful, but no longer redefining the whole page.</strong></h2>
+          <div class="chat-sub">Chat remains on-screen as a persistent interpretive layer. It references only actual platform sections: Valuation & EWP, Risks, China macro, Escondida and Capital Allocation.</div>
+
+          <div class="chat-stats">
+            <div class="chat-stat">
+              <div class="k">Pinned conclusion</div>
+              <div class="v">Copper matters more</div>
+            </div>
+            <div class="chat-stat">
+              <div class="k">Most sensitive variable</div>
+              <div class="v">China + iron ore</div>
+            </div>
+            <div class="chat-stat">
+              <div class="k">Working EWP</div>
+              <div class="v">A$56.55</div>
+            </div>
+          </div>
+
+          <div class="chat-tabs">
+            <button class="tab active" data-thread="all">All roles</button>
+            <button class="tab" data-thread="valuation">Valuation & EWP</button>
+            <button class="tab" data-thread="china">China macro</button>
+            <button class="tab" data-thread="escondida">Escondida</button>
+            <button class="tab" data-thread="capital">Capital allocation</button>
+          </div>
+        </div>
+
+        <div class="chat-stream" id="chatStream">
+          <div class="chat-message" data-thread="valuation">
+            <div class="chat-head">
+              <div class="role analyst">
+                <span class="role-badge">A</span>
+                <span>Analyst</span>
+              </div>
+              <div class="chat-meta">
+                <span>09:14</span>
+                <span class="tag blue">Base</span>
+                <span class="tag">Valuation & EWP</span>
+              </div>
+            </div>
+            <div class="chat-body">
+              <strong>Conclusion:</strong> the EWP deserves to sit above spot because the earnings mix has changed faster than the market’s framing. Copper at <strong>51%</strong> of H1 FY26 underlying EBITDA means the stock is no longer being driven only by iron ore conviction.
+              <br><br>
+              <strong>Decision implication:</strong> I am comfortable with <strong>A$56.55</strong> only while FY26 copper guidance of <strong>1.9-2.0 Mt</strong> remains credible and iron ore stays serviceable enough to defend the distribution base.
+            </div>
+          </div>
+
+          <div class="chat-message" data-thread="china">
+            <div class="chat-head">
+              <div class="role strategist">
+                <span class="role-badge">S</span>
+                <span>Strategist</span>
+              </div>
+              <div class="chat-meta">
+                <span>09:20</span>
+                <span class="tag amber">Macro</span>
+                <span class="tag">China macro</span>
+              </div>
+            </div>
+            <div class="chat-body">
+              <strong>Conclusion:</strong> China is supportive, not explosive. The PMIs and policy stance stabilise the floor for steel demand, but they do not justify an aggressive iron ore rerating by themselves.
+              <br><br>
+              <strong>Decision implication:</strong> the stock still needs copper to do the heavy lifting for upside. If China merely muddles through, BHP can still work, but only because the copper mix shift is real.
+            </div>
+            <div class="thread-box">
+              <div class="thread-title">Pinned exchange</div>
+              <div class="tiny">Strategist view: treat China as a stabiliser, not the entire thesis. PM agrees unless policy expands into clearer property or infrastructure demand.</div>
+            </div>
+          </div>
+
+          <div class="chat-message" data-thread="escondida">
+            <div class="chat-head">
+              <div class="role pm">
+                <span class="role-badge">P</span>
+                <span>PM</span>
+              </div>
+              <div class="chat-meta">
+                <span>09:28</span>
+                <span class="tag green">Bull driver</span>
+                <span class="tag">Escondida</span>
+              </div>
+            </div>
+            <div class="chat-body">
+              <strong>Conclusion:</strong> Escondida is the operational hinge. The current production and guidance ranges are enough to keep the Base case constructive.
+              <br><br>
+              <strong>Decision implication:</strong> if grade weakness overwhelms throughput gains, I would cut the EWP before I touched the China probabilities. Asset-level evidence matters more than macro storytelling here.
+            </div>
+          </div>
+
+          <div class="chat-message" data-thread="capital">
+            <div class="chat-head">
+              <div class="role analyst">
+                <span class="role-badge">A</span>
+                <span>Analyst</span>
+              </div>
+              <div class="chat-meta">
+                <span>09:34</span>
+                <span class="tag red">Guardrail</span>
+                <span class="tag">Capital allocation</span>
+              </div>
+            </div>
+            <div class="chat-body">
+              <strong>Conclusion:</strong> the stock loses support if investors stop trusting the balance between distributions and growth. The <strong>US$10-20bn</strong> net debt range and current payout framework are central to the case.
+              <br><br>
+              <strong>Decision implication:</strong> I would not pay a higher multiple for BHP if capital intensity drifts upward without an equally clear return pathway from copper or potash.
+            </div>
+          </div>
+
+          <div class="chat-message" data-thread="valuation">
+            <div class="chat-head">
+              <div class="role pm">
+                <span class="role-badge">P</span>
+                <span>PM</span>
+              </div>
+              <div class="chat-meta">
+                <span>09:41</span>
+                <span class="tag violet">Swing</span>
+                <span class="tag">Valuation & EWP</span>
+              </div>
+            </div>
+            <div class="chat-body">
+              <strong>Conclusion:</strong> the Swing case is real but should stay small. I would not size off Swing. I would size off Base, then let Swing be upside convexity.
+              <br><br>
+              <strong>Decision implication:</strong> that is why the current EWP should stay at <strong>A$56.55</strong>, not higher.
+            </div>
+            <div class="thread-box">
+              <div class="thread-title">Pinned exchange</div>
+              <div class="tiny">PM view: Base does enough work. Swing is valuable but not necessary. Strategist agrees and prefers evidence-led rerating over narrative-led expansion.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <div class="composer">
+            <textarea>Ask Analyst / PM / Strategist about iron ore sensitivity, Escondida execution, dividend sustainability, or China macro transmission…</textarea>
+            <button class="btn primary">Send</button>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+  const densityToggle = document.getElementById('densityToggle');
+  const expandResearch = document.getElementById('expandResearch');
+  const researchBody = document.getElementById('researchBody');
+  const tabs = document.querySelectorAll('.tab');
+  const messages = document.querySelectorAll('.chat-message');
+  const navLinks = document.querySelectorAll('.subnav a');
+  const sections = document.querySelectorAll('.left-col .section');
+
+  if (densityToggle) {
+    densityToggle.addEventListener('click', () => {
+      document.body.classList.toggle('compact');
+      densityToggle.textContent = document.body.classList.contains('compact') ? 'Standard mode' : 'Compact mode';
+    });
+  }
+
+  if (expandResearch && researchBody) {
+    expandResearch.addEventListener('click', () => {
+      researchBody.classList.toggle('expanded');
+      expandResearch.textContent = researchBody.classList.contains('expanded') ? 'Collapse full research' : 'Expand full research';
+    });
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const key = tab.dataset.thread;
+      messages.forEach(msg => {
+        msg.style.display = (key === 'all' || msg.dataset.thread === key) ? 'block' : 'none';
+      });
+    });
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => link.classList.remove('active'));
+        const active = document.querySelector('.subnav a[href="#' + entry.target.id + '"]');
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-35% 0px -55% 0px', threshold: 0.01 });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+</body>
+</html>

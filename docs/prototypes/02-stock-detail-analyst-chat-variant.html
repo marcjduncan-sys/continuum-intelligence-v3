@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Continuum Intelligence — Analyst Chat</title>
+<style>
+
+  :root{
+    --app:#f4f5f7;
+    --surface:#ffffff;
+    --surface-2:#fafbfc;
+    --surface-3:#f1f4f7;
+    --line:#d9e0e8;
+    --line-2:#e7ecf1;
+    --text:#132233;
+    --text-2:#304255;
+    --muted:#66788c;
+    --soft:#7c8b9c;
+    --blue:#1f4b7a;
+    --blue-2:#2f6da9;
+    --blue-soft:#e9f0f8;
+    --green:#2f8659;
+    --green-soft:#edf7f1;
+    --red:#b64a46;
+    --red-soft:#fceeed;
+    --amber:#94630d;
+    --amber-soft:#fff4df;
+    --violet:#6e58aa;
+    --violet-soft:#f1edfc;
+    --shadow:0 10px 24px rgba(16,32,51,.06);
+    --radius:14px;
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--app);color:var(--text);font-family:var(--sans)}
+  a{text-decoration:none;color:inherit}
+  button,input,textarea{font:inherit}
+  strong{font-weight:800}
+
+  .topbar{
+    position:sticky; top:0; z-index:90;
+    display:grid; grid-template-columns:220px 1fr auto auto; gap:12px; align-items:center;
+    height:50px; padding:0 16px;
+    background:rgba(255,255,255,.94);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.01em}
+  .mark{
+    width:24px;height:24px;border-radius:8px;display:grid;place-items:center;
+    background:linear-gradient(180deg,#214a75,#173653);color:#fff;font-size:11px;border:1px solid #2a5a87;
+  }
+  .search{
+    height:34px;display:flex;align-items:center;gap:8px;padding:0 10px;
+    border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);
+  }
+  .search input{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-size:12px}
+  .kbd-row{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:11px}
+  .kbd{
+    padding:3px 6px;border-radius:7px;border:1px solid var(--line);
+    background:var(--surface);font-family:var(--mono);color:var(--text);
+  }
+  .actions{display:flex;gap:8px}
+  .btn{
+    height:32px;padding:0 10px;border-radius:9px;border:1px solid var(--line);
+    background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;
+  }
+  .btn.primary{background:linear-gradient(180deg,#234d78,#1b3c60);border-color:#224c75;color:#fff}
+
+  .subnav{
+    position:sticky; top:50px; z-index:85;
+    display:flex; gap:8px; align-items:center; overflow:auto;
+    padding:8px 16px; background:rgba(244,245,247,.96); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .subnav a{
+    white-space:nowrap;
+    padding:6px 10px; border-radius:999px; border:1px solid var(--line);
+    background:var(--surface); color:var(--text-2); font-size:11px; font-weight:700; letter-spacing:.02em;
+  }
+  .subnav a.active,
+  .subnav a:hover{background:var(--blue-soft); color:var(--blue); border-color:#c8d8ea}
+
+  .app{max-width:1500px;margin:0 auto;padding:14px}
+
+  .hero,.panel,.sidepanel,.chat-shell,.section{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+  }
+
+  .hero{padding:14px;margin-bottom:14px}
+  .hero-head{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start}
+  .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:800;margin-bottom:4px}
+  .title{margin:0;font-size:24px;line-height:1.05;letter-spacing:-.03em}
+  .subtitle{margin-top:5px;font-size:12px;line-height:1.5;color:var(--muted)}
+  .pill-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .tag{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:5px 8px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface-2);font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);
+  }
+  .tag.blue{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+  .tag.green{background:var(--green-soft);border-color:#cce6d6;color:var(--green)}
+  .tag.red{background:var(--red-soft);border-color:#f0d0ce;color:var(--red)}
+  .tag.amber{background:var(--amber-soft);border-color:#f1deb2;color:var(--amber)}
+  .tag.violet{background:var(--violet-soft);border-color:#ddd5f5;color:var(--violet)}
+
+  .metric-grid{margin-top:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .metric{
+    border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:11px;
+  }
+  .metric .k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+  .metric .v{margin-top:6px;font-size:20px;font-weight:800;letter-spacing:-.03em}
+  .metric .x{margin-top:5px;font-size:12px;line-height:1.45;color:var(--text-2)}
+
+  .layout{display:grid;gap:14px;align-items:start}
+  .panel, .section, .sidepanel{padding:14px}
+  .panel-head, .section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+  .panel-title, .section-title{margin:0;font-size:18px;line-height:1.16;letter-spacing:-.025em}
+  .paragraph{margin:0;font-size:13px;line-height:1.6;color:var(--text-2)}
+  .tiny{font-size:11px;line-height:1.48;color:var(--muted)}
+
+  .chipbar{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{
+    padding:6px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);
+    font-size:11px;font-weight:700;color:var(--text-2);cursor:pointer;
+  }
+  .chip.active{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+
+  .side-list{display:grid;gap:8px}
+  .side-item{
+    padding:10px 11px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);
+  }
+  .side-item strong{display:block;font-size:12px;color:var(--text)}
+  .side-item span{display:block;margin-top:5px;font-size:11px;line-height:1.5;color:var(--text-2)}
+
+  .mini-bar{
+    position:relative;height:8px;border-radius:999px;overflow:hidden;
+    background:#e9eef4;border:1px solid #d6dfe8;
+  }
+  .fill{position:absolute;inset:0 auto 0 0;border-radius:999px}
+  .fill.base{background:linear-gradient(90deg,#2e6aa6,#78a5d7)}
+  .fill.good{background:linear-gradient(90deg,#2f8659,#62b082)}
+  .fill.bad{background:linear-gradient(90deg,#b64a46,#dc8784)}
+  .fill.amber{background:linear-gradient(90deg,#94630d,#d2a34a)}
+  .fill.violet{background:linear-gradient(90deg,#6e58aa,#9b89ce)}
+
+  .pos{color:var(--green);font-weight:800}
+  .neg{color:var(--red);font-weight:800}
+  .neu{color:var(--blue);font-weight:800}
+  .vio{color:var(--violet);font-weight:800}
+
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap}
+
+  @media (max-width:1200px){
+    .metric-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:900px){
+    .topbar{grid-template-columns:1fr;height:auto;padding:12px}
+    .kbd-row{display:none}
+    .hero-head,.metric-grid{grid-template-columns:1fr}
+  }
+</style>
+
+
+.layout{grid-template-columns:minmax(0,66%) minmax(340px,34%)}
+.chat-shell{overflow:hidden}
+.chat-top{padding:14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fff,#f9fbfd)}
+.chat-title{margin:0;font-size:18px;line-height:1.16;letter-spacing:-.02em}
+.chat-sub{margin-top:5px;font-size:12px;line-height:1.5;color:var(--muted)}
+.chat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tab{padding:6px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--text-2);font-size:10px;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:.04em}
+.tab.active{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+.chat-stream{padding:12px;display:grid;gap:10px;max-height:720px;overflow:auto;background:var(--surface)}
+.chat-message{padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.chat-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:7px}
+.role{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800}
+.role-badge{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;border:1px solid var(--line);font-size:10px}
+.role.analyst .role-badge{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+.role.research .role-badge{background:var(--green-soft);border-color:#cce6d6;color:var(--green)}
+.role.system .role-badge{background:var(--violet-soft);border-color:#ddd5f5;color:var(--violet)}
+.chat-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:10px}
+.chat-body{font-size:13px;line-height:1.6;color:var(--text-2)}
+.chat-compose{padding:12px;border-top:1px solid var(--line);background:var(--surface-2)}
+.compose-grid{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+.compose-grid textarea{min-height:74px;resize:none;border:1px solid var(--line);border-radius:12px;background:#fff;padding:11px;color:var(--text);outline:none}
+.context-grid{display:grid;gap:12px}
+.context-block{padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.context-block h3{margin:0 0 8px 0;font-size:13px;line-height:1.2}
+.context-block p{margin:0;font-size:12px;line-height:1.5;color:var(--text-2)}
+.list{display:grid;gap:7px}
+.list-item{padding:8px 0;border-bottom:1px solid var(--line-2);font-size:12px;color:var(--text-2);line-height:1.45}
+.list-item:last-child{border-bottom:0;padding-bottom:0}
+@media (max-width:1200px){ .layout{grid-template-columns:1fr} .chat-stream{max-height:none} }
+@media (max-width:900px){ .compose-grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><div class="mark">CI</div><div>Continuum Intelligence</div></div>
+  <div class="search"><span>⌕</span><input value="Analyst Chat - BHP Group" /></div>
+  <div class="kbd-row"><span class="kbd">/</span><span>Search</span><span class="kbd">T</span><span>Ticker</span><span class="kbd">E</span><span>Evidence</span></div>
+  <div class="actions"><button class="btn" id="densityToggle">Compact mode</button><button class="btn">Ticker switcher</button><button class="btn primary">Run research</button></div>
+</div>
+
+<nav class="subnav">
+  <a href="#">Home</a>
+  <a href="#">Research</a>
+  <a href="#">PM chat</a>
+  <a href="#" class="active">Analyst chat</a>
+  <a href="#">Journal</a>
+  <a href="#">Portfolio</a>
+  <a href="#">Settings</a>
+</nav>
+
+<div class="app">
+  <section class="hero">
+    <div class="hero-head">
+      <div>
+        <div class="eyebrow">Analyst chat</div>
+        <h1 class="title">BHP Group</h1>
+        <div class="subtitle">Same visual system, but the page is research-first: ticker context, evidence and scenario structure feed the conversation.</div>
+      </div>
+      <div class="pill-row">
+        <span class="tag blue">ASX: BHP</span>
+        <span class="tag green">Coverage active</span>
+        <span class="tag amber">Last refreshed 2 Apr 2026</span>
+      </div>
+    </div>
+
+    <div class="metric-grid">
+      <div class="metric"><div class="k">Current price</div><div class="v">A$52.56</div><div class="x">Reference spot.</div></div>
+      <div class="metric"><div class="k">EWP</div><div class="v">A$56.55</div><div class="x"><span class="pos">+7.6%</span> versus spot.</div></div>
+      <div class="metric"><div class="k">Skew</div><div class="v">Base-upside</div><div class="x">Copper mix is improving quality.</div></div>
+      <div class="metric"><div class="k">Confidence</div><div class="v">76%</div><div class="x">Evidence stack is supportive.</div></div>
+    </div>
+  </section>
+
+  <div class="layout">
+    <section class="chat-shell">
+      <div class="chat-top">
+        <div class="eyebrow">Conversation</div>
+        <h2 class="chat-title">The operating question: what matters more now, copper execution or China macro?</h2>
+        <div class="chat-sub">Analyst Chat should feel like a working research notebook with structure. The side panel holds the ticker evidence; the stream turns it into an actionable view.</div>
+        <div class="chat-tabs">
+          <button class="tab active" data-thread="all">All</button>
+          <button class="tab" data-thread="thesis">Thesis</button>
+          <button class="tab" data-thread="risks">Risks</button>
+          <button class="tab" data-thread="valuation">Valuation</button>
+        </div>
+      </div>
+
+      <div class="chat-stream" id="chatStream">
+        <div class="chat-message" data-thread="thesis">
+          <div class="chat-head">
+            <div class="role analyst"><span class="role-badge">A</span><span>Analyst</span></div>
+            <div class="chat-meta"><span>08:58</span><span class="tag blue">Thesis</span><span class="tag">BHP</span></div>
+          </div>
+          <div class="chat-body"><strong>Conclusion:</strong> BHP is no longer just an iron ore cash machine. The stock now deserves to be framed as a copper-heavier, higher-quality cash-return compounder. <br><br><strong>Decision implication:</strong> the market is still underweighting the significance of copper at <strong>51%</strong> of H1 FY26 underlying EBITDA.</div>
+        </div>
+
+        <div class="chat-message" data-thread="valuation">
+          <div class="chat-head">
+            <div class="role research"><span class="role-badge">R</span><span>Research context</span></div>
+            <div class="chat-meta"><span>09:03</span><span class="tag green">Valuation</span><span class="tag">EWP</span></div>
+          </div>
+          <div class="chat-body"><strong>Conclusion:</strong> the base case remains intact because copper execution and iron ore cash generation both still support the distribution base. <br><br><strong>Decision implication:</strong> EWP of <strong>A$56.55</strong> stays defensible while Escondida lands inside guidance and iron ore remains at least serviceable.</div>
+        </div>
+
+        <div class="chat-message" data-thread="risks">
+          <div class="chat-head">
+            <div class="role system"><span class="role-badge">S</span><span>System</span></div>
+            <div class="chat-meta"><span>09:08</span><span class="tag amber">Risk</span><span class="tag">China macro</span></div>
+          </div>
+          <div class="chat-body"><strong>Conclusion:</strong> China is supportive, but not strong enough to drive the whole thesis alone. <br><br><strong>Decision implication:</strong> if China weakens faster than copper strengthens, the stock de-rates. That remains the first-order risk even though the narrative has improved.</div>
+        </div>
+
+        <div class="chat-message" data-thread="thesis">
+          <div class="chat-head">
+            <div class="role analyst"><span class="role-badge">A</span><span>Analyst</span></div>
+            <div class="chat-meta"><span>09:16</span><span class="tag violet">Key point</span><span class="tag">Escondida</span></div>
+          </div>
+          <div class="chat-body"><strong>Conclusion:</strong> Escondida is the proof asset. H1 production of <strong>646 kt</strong> and the raised FY26 range of <strong>1.2-1.275 Mt</strong> matter more than broad corporate rhetoric. <br><br><strong>Decision implication:</strong> if Escondida misses, the market will question the mix-shift thesis immediately.</div>
+        </div>
+      </div>
+
+      <div class="chat-compose">
+        <div class="compose-grid">
+          <textarea>Ask about thesis, risks, valuation, capital allocation, or how the evidence changes the scenario weights…</textarea>
+          <button class="btn primary">Send</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="context-grid">
+      <section class="sidepanel">
+        <div class="panel-head">
+          <div><div class="eyebrow">Ticker context</div><h2 class="panel-title">Snapshot</h2></div>
+          <span class="tag blue">Loaded</span>
+        </div>
+        <div class="side-list">
+          <div class="side-item"><strong>Spot / EWP</strong><span>A$52.56 / A$56.55</span></div>
+          <div class="side-item"><strong>Primary driver</strong><span>Copper mix shift.</span></div>
+          <div class="side-item"><strong>Primary risk</strong><span>China-driven iron ore weakness.</span></div>
+        </div>
+      </section>
+
+      <section class="sidepanel">
+        <div class="panel-head">
+          <div><div class="eyebrow">Evidence stack</div><h2 class="panel-title">Most important facts</h2></div>
+          <span class="tag green">Supportive</span>
+        </div>
+        <div class="list">
+          <div class="list-item"><strong>Copper contributed 51% of H1 FY26 underlying EBITDA.</strong></div>
+          <div class="list-item"><strong>Escondida produced 646 kt in H1 FY26.</strong></div>
+          <div class="list-item"><strong>FY26 group copper guidance is 1.9-2.0 Mt.</strong></div>
+          <div class="list-item"><strong>Iron ore still funds the balance-sheet elasticity.</strong></div>
+        </div>
+      </section>
+
+      <section class="sidepanel">
+        <div class="panel-head">
+          <div><div class="eyebrow">Scenario weights</div><h2 class="panel-title">Current frame</h2></div>
+          <span class="tag amber">Base-led</span>
+        </div>
+        <table class="table-mini">
+          <tr><th>Bull</th><td>25% / A$63</td></tr>
+          <tr><th>Base</th><td>45% / A$56</td></tr>
+          <tr><th>Bear</th><td>20% / A$44</td></tr>
+          <tr><th>Swing</th><td>10% / A$68</td></tr>
+        </table>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+  const densityToggle = document.getElementById('densityToggle');
+  const tabs = document.querySelectorAll('.tab');
+  const messages = document.querySelectorAll('.chat-message');
+
+  if (densityToggle) {
+    densityToggle.addEventListener('click', () => {
+      document.body.classList.toggle('compact');
+      densityToggle.textContent = document.body.classList.contains('compact') ? 'Standard mode' : 'Compact mode';
+    });
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const key = tab.dataset.thread;
+      messages.forEach(msg => {
+        msg.style.display = (key === 'all' || msg.dataset.thread === key) ? 'block' : 'none';
+      });
+    });
+  });
+</script>
+</body>
+</html>
