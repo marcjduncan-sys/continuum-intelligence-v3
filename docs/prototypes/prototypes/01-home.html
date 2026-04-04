@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Continuum Intelligence — Home Light V2</title>
+<style>
+  :root{
+    --app:#f4f5f7;
+    --surface:#ffffff;
+    --surface-2:#fafbfc;
+    --surface-3:#f1f4f7;
+    --line:#d9e0e8;
+    --line-2:#e7ecf1;
+    --text:#132233;
+    --text-2:#304255;
+    --muted:#66788c;
+    --soft:#7c8b9c;
+    --blue:#1f4b7a;
+    --blue-2:#2f6da9;
+    --blue-soft:#e9f0f8;
+    --green:#2f8659;
+    --green-soft:#edf7f1;
+    --red:#b64a46;
+    --red-soft:#fceeed;
+    --amber:#94630d;
+    --amber-soft:#fff4df;
+    --violet:#6e58aa;
+    --violet-soft:#f1edfc;
+    --shadow:0 8px 20px rgba(16,32,51,.05);
+    --radius:12px;
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  }
+
+  *{box-sizing:border-box}
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--app);
+    color:var(--text);
+    font-family:var(--sans);
+    font-variant-numeric: tabular-nums;
+  }
+  a{text-decoration:none;color:inherit}
+  button,input{font:inherit}
+  .num,.mono{
+    font-family:var(--mono);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .topbar{
+    position:sticky; top:0; z-index:90;
+    display:grid; grid-template-columns:220px 1fr auto auto; gap:12px; align-items:center;
+    height:50px; padding:0 16px;
+    background:rgba(255,255,255,.94);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.01em}
+  .mark{
+    width:24px;height:24px;border-radius:6px;display:grid;place-items:center;
+    background:linear-gradient(180deg,#214a75,#173653);color:#fff;font-size:11px;border:1px solid #2a5a87;
+  }
+  .search{
+    height:34px;display:flex;align-items:center;gap:8px;padding:0 10px;
+    border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);
+  }
+  .search input{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-size:12px}
+  .kbd-row{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:11px}
+  .kbd{
+    padding:3px 6px;border-radius:6px;border:1px solid var(--line);
+    background:var(--surface);font-family:var(--mono);color:var(--text);
+  }
+  .actions{display:flex;gap:8px}
+  .btn{
+    height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--line);
+    background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;
+  }
+  .btn.primary{background:linear-gradient(180deg,#234d78,#1b3c60);border-color:#224c75;color:#fff}
+
+  .subnav{
+    position:sticky; top:50px; z-index:85;
+    display:flex; gap:8px; align-items:center; overflow:auto;
+    padding:8px 16px; background:rgba(244,245,247,.96); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .subnav a{
+    white-space:nowrap;
+    padding:6px 10px; border-radius:999px; border:1px solid var(--line);
+    background:var(--surface); color:var(--text-2); font-size:11px; font-weight:700; letter-spacing:.02em;
+  }
+  .subnav a.active,.subnav a:hover{background:var(--blue-soft); color:var(--blue); border-color:#c8d8ea}
+
+  .app{max-width:1560px;margin:0 auto;padding:14px}
+  .hero,.section{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+  }
+  .hero{padding:12px;margin-bottom:14px}
+  .hero-head{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:12px;
+    align-items:start;
+  }
+  .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:800;margin-bottom:4px}
+  .title{margin:0;font-size:23px;line-height:1.04;letter-spacing:-.03em}
+  .subtitle{margin-top:4px;font-size:12px;line-height:1.45;color:var(--muted)}
+  .pill-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .tag{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:4px 8px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface-2);font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);
+  }
+  .tag.blue{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+  .tag.green{background:var(--green-soft);border-color:#cce6d6;color:var(--green)}
+  .tag.red{background:var(--red-soft);border-color:#f0d0ce;color:var(--red)}
+  .tag.amber{background:var(--amber-soft);border-color:#f1deb2;color:var(--amber)}
+
+  .hero-summary{
+    margin-top:10px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--surface-2);
+  }
+  .hero-row{
+    display:grid;
+    grid-template-columns:126px 1fr 126px 1fr 126px 1fr;
+    border-bottom:1px solid var(--line-2);
+  }
+  .hero-row:last-child{border-bottom:0}
+  .hero-k{
+    padding:8px;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--muted);
+    font-weight:800;
+    background:var(--surface-3);
+  }
+  .hero-v{
+    padding:8px;
+    font-size:12px;
+    line-height:1.42;
+    color:var(--text-2);
+  }
+
+  .section{padding:12px}
+  .section-head{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;
+  }
+  .section-title{margin:0;font-size:17px;line-height:1.14;letter-spacing:-.02em}
+  .filters{
+    display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;
+    margin-bottom:10px;
+  }
+  .chipbar{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{
+    padding:6px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);
+    font-size:11px;font-weight:700;color:var(--text-2);cursor:pointer;
+  }
+  .chip.active{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+
+  .metric-strip{
+    display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:10px;
+  }
+  .metric{
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--surface-2);
+    padding:10px;
+  }
+  .metric .k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+  .metric .v{margin-top:4px;font-size:18px;font-weight:800;letter-spacing:-.02em}
+  .metric .x{margin-top:4px;font-size:11px;line-height:1.4;color:var(--text-2)}
+
+  .table-wrap{overflow:auto;max-height:760px}
+  table{width:100%;border-collapse:collapse}
+  th,td{
+    padding:8px 6px;
+    border-bottom:1px solid var(--line-2);
+    text-align:left;
+    vertical-align:top;
+    font-size:12px;
+  }
+  th{
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:800;
+    background:var(--surface-2);
+    position:sticky;
+    top:0;
+    cursor:pointer;
+    user-select:none;
+  }
+  th.sortable:hover{color:var(--blue)}
+  tr:last-child td{border-bottom:0}
+  .asset-name{font-weight:800;color:var(--text)}
+  .asset-sub{margin-top:2px;font-size:10px;color:var(--muted)}
+  .rating-cell .tag{font-size:9px}
+  .scenario-text{font-size:11px;line-height:1.4;white-space:nowrap}
+  .next-cat{font-size:11px;line-height:1.35;color:var(--text-2)}
+
+  body.compact{
+    font-size:11px;
+  }
+  body.compact .hero,
+  body.compact .section,
+  body.compact .metric{
+    padding:4px 6px !important;
+  }
+  body.compact .hero-k,
+  body.compact .hero-v,
+  body.compact th,
+  body.compact td,
+  body.compact .metric .x,
+  body.compact .next-cat{
+    font-size:10px !important;
+  }
+  body.compact .title{font-size:20px}
+  body.compact .section-title{font-size:15px}
+  body.compact .subtitle,
+  body.compact .metric .x,
+  body.compact .asset-sub{
+    display:none !important;
+  }
+  body.compact .chip{padding:4px 7px;font-size:10px}
+  body.compact .tag{padding:3px 6px;font-size:9px}
+  body.compact .btn{height:28px;font-size:11px;padding:0 8px}
+  body.compact .table-wrap{max-height:900px}
+
+  @media (max-width:1360px){
+    .metric-strip{grid-template-columns:repeat(3,1fr)}
+  }
+  @media (max-width:920px){
+    .topbar{grid-template-columns:1fr;height:auto;padding:12px}
+    .kbd-row{display:none}
+    .hero-head,.metric-strip,.filters{grid-template-columns:1fr}
+    .hero-row{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <div class="mark">CI</div>
+    <div>Continuum Intelligence</div>
+  </div>
+
+  <div class="search">
+    <span>⌕</span>
+    <input value="Home screener - institutional universe view" />
+  </div>
+
+  <div class="kbd-row">
+    <span class="kbd">/</span><span>Search</span>
+    <span class="kbd">S</span><span>Sort</span>
+    <span class="kbd">C</span><span>Catalysts</span>
+    <span class="kbd">R</span><span>Ratings</span>
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="densityToggle">Compact mode</button>
+    <button class="btn">Saved screens</button>
+    <button class="btn primary">New screen</button>
+  </div>
+</div>
+
+<nav class="subnav">
+  <a href="#" class="active">Home</a>
+  <a href="#">Research</a>
+  <a href="#">PM chat</a>
+  <a href="#">Analyst chat</a>
+  <a href="#">Journal</a>
+  <a href="#">Portfolio</a>
+  <a href="#">Settings</a>
+</nav>
+
+<div class="app">
+  <section class="hero">
+    <div class="hero-head">
+      <div>
+        <div class="eyebrow">Home</div>
+        <h1 class="title">Coverage universe</h1>
+        <div class="subtitle">Institutional screener view. Maximum actionable density. Forward-looking catalysts, not narrative cards.</div>
+      </div>
+      <div class="pill-row">
+        <span class="tag blue">Coverage: 24</span>
+        <span class="tag green">OW: 9</span>
+        <span class="tag amber">72h catalysts: 3</span>
+      </div>
+    </div>
+
+    <div class="hero-summary">
+      <div class="hero-row">
+        <div class="hero-k">Best EWP upside</div>
+        <div class="hero-v"><span class="mono">NST</span> <span class="num pos">+13.9%</span></div>
+        <div class="hero-k">Negative skew</div>
+        <div class="hero-v"><span class="mono">CBA</span> <span class="num neg">-8.3%</span></div>
+        <div class="hero-k">Nearest catalyst</div>
+        <div class="hero-v"><span class="mono">SUN</span> <span class="num">08 Apr</span> (Investor Day)</div>
+      </div>
+      <div class="hero-row">
+        <div class="hero-k">Average OW upside</div>
+        <div class="hero-v"><span class="num">+9.1%</span></div>
+        <div class="hero-k">Average confidence</div>
+        <div class="hero-v"><span class="num">73%</span></div>
+        <div class="hero-k">Highest confidence</div>
+        <div class="hero-v"><span class="mono">CBA</span> <span class="num">81%</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="filters">
+      <div class="chipbar">
+        <button class="chip active">All</button>
+        <button class="chip">OW</button>
+        <button class="chip">EW</button>
+        <button class="chip">UW</button>
+        <button class="chip">Next 72h</button>
+        <button class="chip">Materials</button>
+        <button class="chip">Financials</button>
+        <button class="chip">Healthcare</button>
+      </div>
+      <button class="btn">View: Institutional screener</button>
+      <button class="btn">Sort: Click headers</button>
+      <button class="btn">Export</button>
+    </div>
+
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Screener</div>
+        <h2 class="section-title">The home page is now a dense universe table. The PM scans columns for mispricing, conviction and catalyst timing.</h2>
+      </div>
+      <span class="tag blue">Table-first</span>
+    </div>
+
+    <div class="metric-strip">
+      <div class="metric">
+        <div class="k">Average EWP upside</div>
+        <div class="v num">+8.4%</div>
+        <div class="x">Across live coverage.</div>
+      </div>
+      <div class="metric">
+        <div class="k">High-confidence names</div>
+        <div class="v num">7</div>
+        <div class="x">At or above 75% confidence.</div>
+      </div>
+      <div class="metric">
+        <div class="k">OW coverage</div>
+        <div class="v num">9</div>
+        <div class="x">Highest-conviction relative calls.</div>
+      </div>
+      <div class="metric">
+        <div class="k">UW coverage</div>
+        <div class="v num">4</div>
+        <div class="x">Negative skew or stretched valuation.</div>
+      </div>
+      <div class="metric">
+        <div class="k">Next 7d catalysts</div>
+        <div class="v num">6</div>
+        <div class="x">Event-dense watchlist.</div>
+      </div>
+      <div class="metric">
+        <div class="k">Most active sector</div>
+        <div class="v">Materials</div>
+        <div class="x">Copper, iron ore and gold remain dense.</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="screenerTable">
+        <thead>
+          <tr>
+            <th class="sortable" data-key="asset">Asset</th>
+            <th class="sortable" data-key="rating">Rating</th>
+            <th class="sortable" data-key="spot">Spot</th>
+            <th class="sortable" data-key="ewp">EWP</th>
+            <th class="sortable" data-key="skew">Skew</th>
+            <th class="sortable" data-key="confidence">Confidence</th>
+            <th>Scenario math</th>
+            <th class="sortable" data-key="catalystDate">Next catalyst</th>
+          </tr>
+        </thead>
+        <tbody id="screenerBody"></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+  const rows = [
+    {asset:'BHP', name:'BHP Group', sector:'Materials', rating:'OW', spot:52.56, ewp:56.55, skew:7.6, confidence:76, bear:44, bearP:20, base:56, baseP:45, bull:63, bullP:25, catalystDate:'2026-04-18', catalystLabel:'18 Apr (Ops Review)'},
+    {asset:'RIO', name:'Rio Tinto', sector:'Materials', rating:'EW', spot:118.40, ewp:122.10, skew:3.1, confidence:68, bear:102, bearP:22, base:122, baseP:48, bull:132, bullP:20, catalystDate:'2026-04-15', catalystLabel:'15 Apr (Production)'},
+    {asset:'CBA', name:'Commonwealth Bank', sector:'Financials', rating:'UW', spot:196.30, ewp:180.00, skew:-8.3, confidence:81, bear:162, bearP:30, base:180, baseP:50, bull:205, bullP:12, catalystDate:'2026-05-08', catalystLabel:'08 May (Q3 Update)'},
+    {asset:'CSL', name:'CSL', sector:'Healthcare', rating:'OW', spot:309.20, ewp:338.00, skew:9.3, confidence:73, bear:286, bearP:20, base:338, baseP:50, bull:362, bullP:22, catalystDate:'2026-04-24', catalystLabel:'24 Apr (Investor Briefing)'},
+    {asset:'WES', name:'Wesfarmers', sector:'Consumer', rating:'EW', spot:73.10, ewp:75.00, skew:2.6, confidence:66, bear:66, bearP:24, base:75, baseP:52, bull:80, bullP:16, catalystDate:'2026-04-29', catalystLabel:'29 Apr (Quarterly Sales)'},
+    {asset:'NST', name:'Northern Star', sector:'Gold', rating:'OW', spot:19.85, ewp:22.60, skew:13.9, confidence:72, bear:17.8, bearP:18, base:22.6, baseP:47, bull:25.0, bullP:27, catalystDate:'2026-04-11', catalystLabel:'11 Apr (Production)'},
+    {asset:'XRO', name:'Xero', sector:'Technology', rating:'OW', spot:156.60, ewp:176.00, skew:12.4, confidence:71, bear:142, bearP:20, base:176, baseP:45, bull:189, bullP:25, catalystDate:'2026-04-28', catalystLabel:'28 Apr (Strategy Day)'},
+    {asset:'MQG', name:'Macquarie Group', sector:'Financials', rating:'EW', spot:200.40, ewp:214.00, skew:6.8, confidence:69, bear:182, bearP:22, base:214, baseP:48, bull:232, bullP:20, catalystDate:'2026-05-03', catalystLabel:'03 May (Full Year)'},
+    {asset:'SUN', name:'Suncorp', sector:'Financials', rating:'EW', spot:17.42, ewp:18.05, skew:3.6, confidence:65, bear:16.1, bearP:24, base:18.1, baseP:50, bull:19.0, bullP:18, catalystDate:'2026-04-08', catalystLabel:'08 Apr (Investor Day)'},
+    {asset:'GMG', name:'Goodman Group', sector:'REITs', rating:'OW', spot:36.10, ewp:39.40, skew:9.1, confidence:70, bear:32.5, bearP:18, base:39.4, baseP:46, bull:42.8, bullP:24, catalystDate:'2026-04-22', catalystLabel:'22 Apr (Quarterly Update)'}
+  ];
+
+  let screener = [...rows];
+  let sortState = { key: 'skew', dir: 'desc' };
+
+  function fmtMoney(x){
+    return typeof x === 'number' && x < 100 ? x.toFixed(2) : x.toFixed(2);
+  }
+
+  function ratingTag(r){
+    if (r === 'OW') return 'green';
+    if (r === 'UW') return 'red';
+    return 'amber';
+  }
+
+  function scenarioHTML(r){
+    const bearClass = 'neg';
+    const baseClass = 'neu';
+    const bullClass = 'pos';
+    return `
+      <span class="${bearClass} mono">${r.bear} (${r.bearP}%)</span>
+      <span class="mono"> | </span>
+      <span class="${baseClass} mono">${r.base} (${r.baseP}%)</span>
+      <span class="mono"> | </span>
+      <span class="${bullClass} mono">${r.bull} (${r.bullP}%)</span>
+    `;
+  }
+
+  function sortRows(){
+    screener.sort((a,b) => {
+      let av = a[sortState.key];
+      let bv = b[sortState.key];
+      if (typeof av === 'string' && typeof bv === 'string'){
+        return sortState.dir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+      }
+      return sortState.dir === 'asc' ? av - bv : bv - av;
+    });
+  }
+
+  function render(){
+    sortRows();
+    const tbody = document.getElementById('screenerBody');
+    tbody.innerHTML = screener.map(r => `
+      <tr>
+        <td>
+          <div class="asset-name">${r.asset}</div>
+          <div class="asset-sub">${r.name} • ${r.sector}</div>
+        </td>
+        <td class="rating-cell"><span class="tag ${ratingTag(r.rating)}">${r.rating}</span></td>
+        <td class="num">${fmtMoney(r.spot)}</td>
+        <td class="num">${fmtMoney(r.ewp)}</td>
+        <td class="num ${r.skew >= 0 ? 'pos' : 'neg'}">${r.skew >= 0 ? '+' : ''}${r.skew.toFixed(1)}%</td>
+        <td class="num">${r.confidence}%</td>
+        <td class="scenario-text">${scenarioHTML(r)}</td>
+        <td class="next-cat"><span class="mono">${r.catalystLabel}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  document.querySelectorAll('th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const key = th.dataset.key;
+      if (sortState.key === key){
+        sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortState.key = key;
+        sortState.dir = ['asset','rating','catalystDate'].includes(key) ? 'asc' : 'desc';
+      }
+      render();
+    });
+  });
+
+  document.getElementById('densityToggle').addEventListener('click', () => {
+    document.body.classList.toggle('compact');
+    document.getElementById('densityToggle').textContent =
+      document.body.classList.contains('compact') ? 'Standard mode' : 'Compact mode';
+  });
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+
+  render();
+</script>
+</body>
+</html>
