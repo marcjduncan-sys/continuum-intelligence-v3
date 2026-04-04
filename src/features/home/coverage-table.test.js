@@ -193,8 +193,8 @@ describe('renderFilterBar', () => {
   it('marks active chip with active class', () => {
     const html = renderFilterBar({ ...defaultState, filterSignal: 'upside' });
     expect(html).toContain('data-filter-value="upside"');
-    // The upside chip should have 'active' class
-    expect(html).toMatch(/class="filter-chip active"[^>]*data-filter-value="upside"|data-filter-value="upside"[^>]*class="filter-chip active"/);
+    // The upside chip should have 'active' class (may include ci-chip class too)
+    expect(html).toMatch(/class="filter-chip[^"]*active[^"]*"[^>]*data-filter-value="upside"|data-filter-value="upside"[^>]*class="filter-chip[^"]*active[^"]*"/);
   });
 
   it('renders search input', () => {

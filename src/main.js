@@ -447,7 +447,7 @@ async function boot() {
 
   // --- Mobile nav toggle ---
   const menuBtn = document.getElementById('menuToggle');
-  const navLinks = document.querySelector('.nav-links');
+  const navLinks = document.querySelector('.ci-topbar-nav');
   if (menuBtn && navLinks) {
     menuBtn.addEventListener('click', function() {
       navLinks.classList.toggle('open');

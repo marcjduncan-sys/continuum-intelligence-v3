@@ -78,9 +78,10 @@
 html { scroll-behavior: smooth; overflow-x: hidden; }
 body {
     font-family: var(--font-ui);
+    font-size: 13px;
     background: var(--bg-page);
     color: var(--text-primary);
-    line-height: 1.6;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
@@ -112,7 +113,7 @@ a:hover { color: var(--accent-sage); }
 [data-theme="light"] .theme-toggle .icon-moon { display: none; }
 
 /* --- Page Container --- */
-.page { display: none; min-height: calc(100vh - var(--nav-height)); padding-top: 96px; padding-bottom: 88px; }
+.page { display: none; min-height: calc(100vh - var(--topbar-h) - var(--strip-h)); padding-top: calc(var(--topbar-h) + var(--strip-h) + 20px); padding-bottom: 88px; }
 .page.active { display: block; }
 .page-inner {
     max-width: var(--max-width);

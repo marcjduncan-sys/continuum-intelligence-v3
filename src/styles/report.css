@@ -2203,3 +2203,314 @@
 
 .rs-text p { font-size: inherit; line-height: inherit; margin: 0 0 var(--space-sm) 0; }
 .rs-text p:last-child { margin-bottom: 0; }
+
+/* ============================================================
+   Phase 3 Redesign: Report page outer shell overrides.
+   These rules use the new token system and override the legacy
+   dark-first styles above. Inner section content styles are
+   migrated incrementally.
+   ============================================================ */
+
+/* ── Stock nav bar ── */
+.rh-stock-nav-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line-2);
+  position: sticky;
+  top: calc(var(--topbar-h) + var(--strip-h));
+  z-index: 10;
+}
+.rh-stock-nav a {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.rh-stock-nav a:hover { color: var(--text); }
+
+/* ── Report hero: light card ── */
+.report-hero {
+  background: var(--surface);
+  padding: 24px 0;
+  margin-top: 0;
+  padding-top: 24px;
+  border-bottom: 1px solid var(--line-2);
+}
+.report-hero-inner {
+  max-width: var(--shell-max);
+  padding: 0 var(--shell-pad);
+}
+.report-back {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.report-back:hover { color: var(--text); }
+
+/* ── Ticker and type ── */
+.rh-type {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--soft);
+}
+.rh-ticker {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+.rh-company {
+  font-size: 13px;
+  color: var(--muted);
+}
+.rh-sector-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  background: var(--blue-soft);
+  color: var(--blue);
+  border: 1px solid transparent;
+  margin-top: 6px;
+}
+.rh-company-desc {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+/* ── Price ── */
+.rh-price {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+.rh-price-currency {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-right: 2px;
+}
+
+/* ── Spec section ── */
+.rh-spec-section {
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line-2);
+  padding: 16px 0;
+}
+.rh-spec-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.rh-spec-text { font-size: 13px; color: var(--text-2); line-height: 1.5; }
+.rh-skew-up      { color: var(--green); font-weight: 700; }
+.rh-skew-down    { color: var(--red);   font-weight: 700; }
+.rh-skew-balanced { color: var(--amber); font-weight: 700; }
+
+/* ── Announcements ── */
+.rh-ann-header {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0;
+}
+.rh-ann-more { color: var(--blue); font-weight: 500; margin-left: 8px; font-size: 11px; }
+.rh-ann-item {
+  font-size: 12px;
+  color: var(--text-2);
+  border-bottom: 1px solid var(--line-2);
+  padding: 4px 0;
+}
+.rh-ann-item:last-child { border-bottom: none; }
+.rh-ann-date { color: var(--muted); margin-right: 6px; font-size: 11px; }
+.rh-ann-headline a { color: var(--blue); }
+.rh-ann-headline a:hover { color: var(--text); }
+
+/* ── Refresh controls ── */
+.btn-refresh {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--r-button);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-refresh:hover { background: var(--surface-3); }
+
+/* ── Report layout ── */
+.report-content {
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  padding: 20px var(--shell-pad) 80px;
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+  align-items: start;
+}
+.report-main {
+  min-width: 0;
+}
+
+/* ── Report sections: white card style ── */
+.report-section {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-card);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.rs-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line-2);
+  cursor: pointer;
+}
+.rs-header:hover { background: var(--blue-soft); }
+.rs-number {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--soft);
+  width: 20px;
+  flex-shrink: 0;
+}
+.rs-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.rs-toggle {
+  color: var(--muted);
+  font-size: 11px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-ui);
+}
+.rs-body {
+  padding: 16px;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.55;
+}
+
+/* ── Section nav tabs (deep research and section nav) ── */
+.section-nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line-2);
+  padding: 0 var(--shell-pad);
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.section-nav::-webkit-scrollbar { display: none; }
+.section-nav a {
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+  text-decoration: none;
+}
+.section-nav a:hover { color: var(--text-2); }
+.section-nav a.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+  font-weight: 600;
+}
+
+/* ── Hypothesis sidebar ── */
+.hyp-sidebar {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-card);
+  position: sticky;
+  top: calc(var(--topbar-h) + var(--strip-h) + 20px);
+  max-height: calc(100vh - var(--topbar-h) - var(--strip-h) - 40px);
+  overflow-y: auto;
+}
+
+/* ── Collapse all button ── */
+.sections-float-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 50;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--r-button);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background 0.15s;
+}
+.sections-float-toggle:hover { background: var(--surface-3); }
+
+/* ── PDF export button ── */
+.pdf-download-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--r-button);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.pdf-download-btn:hover { background: var(--surface-3); }
+
+/* ── Verdict / BLUF ── */
+.verdict-section {
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-card);
+  padding: 16px 20px;
+  margin-bottom: 12px;
+}
+.verdict-inner {
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+/* ── Hypothesis cards ── */
+.hyp-card {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-card);
+  padding: 14px;
+  margin-bottom: 8px;
+}
+.hyp-card.n1 { border-left: 3px solid var(--green); }
+.hyp-card.n2 { border-left: 3px solid var(--amber); }
+.hyp-card.n3 { border-left: 3px solid var(--red); }
+.hyp-card.n4 { border-left: 3px solid var(--blue); }

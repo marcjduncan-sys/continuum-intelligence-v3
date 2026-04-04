@@ -482,7 +482,7 @@
     background: var(--accent-gold);
     border-radius: 4px;
     cursor: pointer;
-    color: #0B1220;
+    color: var(--text);
     transition: background 0.15s, opacity 0.15s;
     flex-shrink: 0;
 }
@@ -508,7 +508,7 @@
     align-items: center;
     gap: 6px;
     background: var(--accent-gold);
-    color: #0B1220;
+    color: var(--text);
     border: none;
     border-radius: 24px;
     padding: 10px 16px;
@@ -712,42 +712,42 @@
 }
 
 /* ============================================================
-   PM PAGE REFACTORED STYLES (Light Theme Overrides)
+   PM PAGE REFACTORED STYLES (token-based, light-first)
    ============================================================ */
 
-[data-theme="light"] .pm-dashboard-body,
-[data-theme="light"] .pm-metric-card,
-[data-theme="light"] .pm-port-selector {
-    background: #FFFFFF;
-    border-color: #E2E8F0;
-    color: #4A5568;
+.pm-dashboard-body,
+.pm-metric-card,
+.pm-port-selector {
+    background: var(--surface);
+    border-color: var(--line-2);
+    color: var(--text-2);
 }
 
-[data-theme="light"] .pm-top-pos-row,
-[data-theme="light"] .pm-mandate-row,
-[data-theme="light"] .pm-breach-row,
-[data-theme="light"] .pm-align-row,
-[data-theme="light"] .pm-reweight-row,
-[data-theme="light"] .pm-dna-risk {
-    border-bottom-color: #F0F1F4;
+.pm-top-pos-row,
+.pm-mandate-row,
+.pm-breach-row,
+.pm-align-row,
+.pm-reweight-row,
+.pm-dna-risk {
+    border-bottom-color: var(--line-2);
 }
 
-[data-theme="light"] .pm-text-primary,
-[data-theme="light"] .pm-top-pos-ticker,
-[data-theme="light"] .pm-mandate-value,
-[data-theme="light"] .pm-dna-name,
-[data-theme="light"] .pm-reweight-ticker {
-    color: #1A1F2E;
+.pm-text-primary,
+.pm-top-pos-ticker,
+.pm-mandate-value,
+.pm-dna-name,
+.pm-reweight-ticker {
+    color: var(--text);
 }
 
-[data-theme="light"] .pm-text-muted,
-[data-theme="light"] .pm-metric-label {
-    color: #A0AEC0;
+.pm-text-muted,
+.pm-metric-label {
+    color: var(--muted);
 }
 
-[data-theme="light"] .pm-exposure-track,
-[data-theme="light"] .pm-dna-track {
-    background: #E2E8F0;
+.pm-exposure-track,
+.pm-dna-track {
+    background: var(--line-2);
 }
 
 /* ============================================================
@@ -900,8 +900,8 @@
 /* --- How to start banner --- */
 .pm-how-to-start {
     padding: 16px;
-    background: rgba(201, 169, 110, 0.05);
-    border-left: 2px solid rgba(201, 169, 110, 0.3);
+    background: var(--amber-soft);
+    border-left: 2px solid var(--gold);
     border-radius: 0 4px 4px 0;
 }
 .pm-how-to-start-title {
@@ -1172,7 +1172,7 @@
     white-space: nowrap;
 }
 .pm-send-btn-small:hover {
-    background: rgba(201, 169, 110, 0.1);
+    background: var(--amber-soft);
 }
 
 .pm-log-row {

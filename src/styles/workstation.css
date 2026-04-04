@@ -53,7 +53,7 @@
 .ws-subnav__link:hover,
 .ws-subnav__link.active {
   color: var(--accent-teal);
-  background: rgba(34, 184, 167, 0.1);
+  background: var(--blue-soft);
 }
 
 /* Hero band */
@@ -75,7 +75,7 @@
   font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--accent-teal);
-  background: rgba(34, 184, 167, 0.12);
+  background: var(--blue-soft);
   border: 1px solid rgba(34, 184, 167, 0.3);
   padding: 2px 8px;
   border-radius: 4px;
@@ -109,8 +109,8 @@
 .ws-tag--accumulate { color: var(--signal-green); background: rgba(61,170,109,0.12); border-color: rgba(61,170,109,0.3); }
 .ws-tag--strong-buy { color: var(--signal-green); background: rgba(61,170,109,0.2); border-color: rgba(61,170,109,0.4); }
 .ws-tag--hold { color: var(--signal-amber); background: rgba(212,160,60,0.12); border-color: rgba(212,160,60,0.3); }
-.ws-tag--reduce { color: var(--signal-red); background: rgba(224,93,93,0.12); border-color: rgba(224,93,93,0.3); }
-.ws-tag--sell { color: var(--signal-red); background: rgba(224,93,93,0.2); border-color: rgba(224,93,93,0.4); }
+.ws-tag--reduce { color: var(--signal-red); background: var(--red-soft); border-color: var(--line); }
+.ws-tag--sell { color: var(--signal-red); background: var(--red-soft); border-color: var(--line); }
 .ws-tag--skew { color: var(--accent-strat); background: rgba(91,141,239,0.12); border-color: rgba(91,141,239,0.3); }
 .ws-tag--confidence { color: var(--text-muted); background: var(--bg-elevated); border-color: var(--border); }
 
@@ -210,7 +210,7 @@
   margin-bottom: var(--space-xs);
   text-transform: uppercase;
 }
-.ws-severity--red { color: var(--signal-red); background: rgba(224,93,93,0.12); }
+.ws-severity--red { color: var(--signal-red); background: var(--red-soft); }
 .ws-severity--amber { color: var(--signal-amber); background: rgba(212,160,60,0.12); }
 .ws-severity--green { color: var(--signal-green); background: rgba(61,170,109,0.12); }
 .ws-severity--blue { color: var(--signal-blue); background: rgba(74,142,204,0.12); }
@@ -324,13 +324,13 @@
 /* Dark mode overrides for scenario cards */
 @media (prefers-color-scheme: dark) {
   .ws-scenario-card--bull { border-color: rgba(61,170,109,0.3); background: rgba(61,170,109,0.06); border-top-color: var(--signal-green); }
-  .ws-scenario-card--base { border-color: rgba(34,184,167,0.3); background: rgba(34,184,167,0.06); border-top-color: var(--accent-teal); }
-  .ws-scenario-card--bear { border-color: rgba(224,93,93,0.3); background: rgba(224,93,93,0.06); border-top-color: var(--signal-red); }
+  .ws-scenario-card--base { border-color: var(--line); background: var(--blue-soft); border-top-color: var(--accent-teal); }
+  .ws-scenario-card--bear { border-color: var(--line); background: var(--red-soft); border-top-color: var(--signal-red); }
   .ws-scenario-card--stretch { border-color: rgba(91,141,239,0.3); background: rgba(91,141,239,0.06); border-top-color: var(--accent-strat); }
 }
 [data-theme="dark"] .ws-scenario-card--bull { border-color: rgba(61,170,109,0.3); background: rgba(61,170,109,0.06); border-top-color: var(--signal-green); }
-[data-theme="dark"] .ws-scenario-card--base { border-color: rgba(34,184,167,0.3); background: rgba(34,184,167,0.06); border-top-color: var(--accent-teal); }
-[data-theme="dark"] .ws-scenario-card--bear { border-color: rgba(224,93,93,0.3); background: rgba(224,93,93,0.06); border-top-color: var(--signal-red); }
+[data-theme="dark"] .ws-scenario-card--base { border-color: var(--line); background: var(--blue-soft); border-top-color: var(--accent-teal); }
+[data-theme="dark"] .ws-scenario-card--bear { border-color: var(--line); background: var(--red-soft); border-top-color: var(--signal-red); }
 [data-theme="dark"] .ws-scenario-card--stretch { border-color: rgba(91,141,239,0.3); background: rgba(91,141,239,0.06); border-top-color: var(--accent-strat); }
 .ws-scenario-card__header {
   display: flex;
@@ -478,7 +478,7 @@
   font-size: 0.65rem;
   text-transform: uppercase;
 }
-.ws-risk-level--high { color: var(--signal-red); background: rgba(224,93,93,0.12); }
+.ws-risk-level--high { color: var(--signal-red); background: var(--red-soft); }
 .ws-risk-level--medium { color: var(--signal-amber); background: rgba(212,160,60,0.12); }
 .ws-risk-level--low { color: var(--signal-green); background: rgba(61,170,109,0.12); }
 .ws-risk-level--lowmedium { color: var(--signal-amber); background: rgba(212,160,60,0.08); }
@@ -504,7 +504,7 @@
 }
 .ws-evidence-cat--observed { color: var(--signal-green); background: rgba(61,170,109,0.12); }
 .ws-evidence-cat--inference { color: var(--signal-amber); background: rgba(212,160,60,0.12); }
-.ws-evidence-cat--tripwire { color: var(--signal-red); background: rgba(224,93,93,0.12); }
+.ws-evidence-cat--tripwire { color: var(--signal-red); background: var(--red-soft); }
 .ws-evidence-quality {
   font-size: 0.65rem;
   font-weight: 600;
@@ -516,7 +516,7 @@
 .ws-evidence-quality--blue { color: var(--signal-blue); background: rgba(74,142,204,0.12); }
 .ws-evidence-quality--amber { color: var(--signal-amber); background: rgba(212,160,60,0.12); }
 .ws-evidence-quality--green { color: var(--signal-green); background: rgba(61,170,109,0.12); }
-.ws-evidence-quality--red { color: var(--signal-red); background: rgba(224,93,93,0.12); }
+.ws-evidence-quality--red { color: var(--signal-red); background: var(--red-soft); }
 .ws-evidence-item__text {
   font-size: var(--font-size-sm);
   line-height: 1.5;
@@ -543,7 +543,7 @@
   vertical-align: middle;
 }
 .ws-revision-row--pos { background: rgba(61,170,109,0.03); }
-.ws-revision-row--neg { background: rgba(224,93,93,0.03); }
+.ws-revision-row--neg { background: var(--red-soft); }
 .ws-direction { font-size: var(--font-size-base); font-weight: 600; }
 .ws-direction--pos { color: var(--signal-green); }
 .ws-direction--neg { color: var(--signal-red); }
@@ -569,7 +569,7 @@
   transition: background 0.15s;
 }
 .ws-deep-research__toggle:hover {
-  background: rgba(34,184,167,0.1);
+  background: var(--blue-soft);
 }
 
 /* Quality tiles */
@@ -684,7 +684,7 @@
 .ws-chat__filter:hover { border-color: var(--accent-teal); color: var(--accent-teal); }
 .ws-chat__filter--active {
   border-color: var(--accent-teal);
-  background: rgba(34,184,167,0.12);
+  background: var(--blue-soft);
   color: var(--accent-teal);
 }
 .ws-chat__messages {
@@ -710,7 +710,7 @@
   padding: 2px 7px;
   border-radius: 3px;
 }
-.ws-chat-msg__role--analyst { color: var(--accent-teal); background: rgba(34,184,167,0.12); }
+.ws-chat-msg__role--analyst { color: var(--accent-teal); background: var(--blue-soft); }
 .ws-chat-msg__role--pm { color: var(--signal-amber); background: rgba(212,160,60,0.12); }
 .ws-chat-msg__role--strategist { color: var(--accent-strat); background: rgba(91,141,239,0.12); }
 .ws-chat-msg__tag {
@@ -721,7 +721,7 @@
 }
 .ws-chat-msg__tag--blue { color: var(--signal-blue); background: rgba(74,142,204,0.12); }
 .ws-chat-msg__tag--green { color: var(--signal-green); background: rgba(61,170,109,0.12); }
-.ws-chat-msg__tag--red { color: var(--signal-red); background: rgba(224,93,93,0.12); }
+.ws-chat-msg__tag--red { color: var(--signal-red); background: var(--red-soft); }
 .ws-chat-msg__tag--amber { color: var(--signal-amber); background: rgba(212,160,60,0.12); }
 .ws-chat-msg__tag--violet { color: var(--accent-strat); background: rgba(91,141,239,0.12); }
 .ws-chat-msg__time { font-size: 0.65rem; color: var(--text-muted); margin-left: auto; }
@@ -767,7 +767,7 @@
 }
 .ws-chat__suggested-btn:hover {
   border-color: var(--accent-teal);
-  background: rgba(34,184,167,0.06);
+  background: var(--blue-soft);
 }
 
 /* Chat composer */

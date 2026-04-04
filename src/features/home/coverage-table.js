@@ -30,8 +30,8 @@ function _convictionCell(convictionPct) {
     return '<span class="metric-unavailable">--</span>';
   }
   var pct = Math.round(convictionPct);
-  return '<div class="conviction-bar">' +
-    '<div class="conviction-bar__fill" style="width:' + pct + '%"></div>' +
+  return '<div class="conviction-bar ci-confidence-bar-wrap">' +
+    '<div class="conviction-bar__fill ci-confidence-bar-fill" style="width:' + pct + '%"></div>' +
     '<span class="conviction-bar__label">' + pct + '%</span>' +
     '</div>';
 }
@@ -92,7 +92,7 @@ export function renderCoverageTableRow(row) {
     : '<span class="metric-unavailable">--</span>';
 
   return '<tr data-ticker="' + row.ticker + '">' +
-    '<td class="td-ticker">' + row.ticker + '</td>' +
+    '<td class="td-ticker"><span class="ci-ticker-badge">' + row.ticker + '</span></td>' +
     '<td class="td-name">' + row.name + '</td>' +
     '<td class="td-price" data-home-price="' + row.ticker + '">' + formatPrice(row.price) + '</td>' +
     '<td class="td-change ' + changeClass + '" data-home-change="' + row.ticker + '">' + formatSignedPercent(row.dayChangePct) + '</td>' +
@@ -124,7 +124,7 @@ export function renderCoverageTableBody(rows) {
  */
 export function renderFilterBar(homeState) {
   function chip(value, active, group) {
-    var cls = 'filter-chip' + (active ? ' active' : '');
+    var cls = 'filter-chip ci-chip' + (active ? ' active' : '');
     return '<button class="' + cls + '" data-filter-group="' + group + '" data-filter-value="' + value + '">' + value.charAt(0).toUpperCase() + value.slice(1) + '</button>';
   }
 
@@ -141,9 +141,9 @@ export function renderFilterBar(homeState) {
   }).join('');
 
   return '<div class="filter-bar">' +
-    '<div class="filter-group"><span class="filter-group__label">Signal</span>' + signalChips + '</div>' +
-    '<div class="filter-group"><span class="filter-group__label">Freshness</span>' + stalenessChips + '</div>' +
-    '<div class="filter-group"><span class="filter-group__label">Extraction</span>' + extractionChips + '</div>' +
+    '<div class="filter-group"><span class="filter-group__label ci-micro">Signal</span>' + signalChips + '</div>' +
+    '<div class="filter-group"><span class="filter-group__label ci-micro">Freshness</span>' + stalenessChips + '</div>' +
+    '<div class="filter-group"><span class="filter-group__label ci-micro">Extraction</span>' + extractionChips + '</div>' +
     '<div class="filter-group filter-group--search">' +
       '<input class="filter-search" type="search" placeholder="Search ticker or company..." value="' + (homeState.searchQuery || '') + '" data-filter-search />' +
     '</div>' +
@@ -159,7 +159,7 @@ export function renderFilterBar(homeState) {
 export function renderCoverageTable(rows, homeState) {
   return renderFilterBar(homeState) +
     '<div class="coverage-table-wrap">' +
-    '<table class="coverage-table">' +
+    '<table class="coverage-table ci-table">' +
     renderCoverageTableHeader(homeState.sortColumn, homeState.sortDirection) +
     '<tbody class="coverage-tbody">' +
     renderCoverageTableBody(rows) +

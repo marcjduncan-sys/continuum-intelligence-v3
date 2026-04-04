@@ -38,14 +38,17 @@
 <div id="a11y-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
 <!-- ============================================================
-     NAVIGATION
+     TOPBAR
      ============================================================ -->
-<nav class="site-nav" id="siteNav" aria-label="Primary navigation">
-    <div class="nav-inner">
-        <a class="nav-brand" onclick="navigate('home')">
-            <div class="nav-brand-text">Contin<span class="brand-green">uu</span>m Inte<span class="brand-green">ll</span>igence</div>
+<nav class="ci-topbar" id="siteNav" aria-label="Primary navigation">
+    <div class="ci-topbar-inner">
+        <a class="ci-brand" onclick="navigate('home')" href="#home">
+            <div class="ci-brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <span class="ci-brand-name">Contin<span>uu</span>m Inte<span>ll</span>igence</span>
         </a>
-        <div class="nav-links">
+        <nav class="ci-topbar-nav" aria-label="Site sections">
             <a href="#home" class="active" data-nav="home">Research</a>
             <a href="#deep-research" data-nav="deep-research">Deep Research</a>
             <a href="#comparator" data-nav="comparator">Comparator</a>
@@ -54,8 +57,8 @@
             <a href="#memory" data-nav="memory">Journal</a>
             <a href="#pm" data-nav="pm">PM</a>
             <a href="#about" data-nav="about">About</a>
-        </div>
-        <div class="nav-actions">
+        </nav>
+        <div class="ci-topbar-actions">
             <button class="ci-signin-btn" id="ciSignInBtn" aria-label="Sign in to save history">Sign in</button>
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
                 <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -65,17 +68,19 @@
     </div>
 </nav>
 
-<!-- Integrations Bar (coming soon tabs) -->
-<div class="integrations-bar" id="integrationsBar">
-  <div class="integ-bar-inner integ-bar-teaser" role="presentation" aria-label="Coming soon integrations">
-    <span class="integ-teaser-label">COMING SOON</span>
-    <span class="integ-divider" aria-hidden="true"></span>
-    <span class="integ-soon-chip">Bloomberg</span>
-    <span class="integ-soon-chip">Risk</span>
-    <span class="integ-soon-chip">Team Chat</span>
-    <span class="integ-soon-chip">Trading</span>
-    <span class="integ-soon-chip">Analyst Chat</span>
-    <span class="integ-soon-chip">News</span>
+<!-- Capability Strip -->
+<div class="ci-strip" id="integrationsBar">
+  <div class="ci-strip-inner">
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--live"></span>Live Research</span>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--live"></span>Analyst Chat</span>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--live"></span>Gold Agent</span>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--live"></span>ACH Framework</span>
+    <div class="ci-strip-divider" aria-hidden="true"></div>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>Bloomberg</span>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>Risk</span>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>Team Chat</span>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>Trading</span>
+    <span class="ci-chip"><span class="ci-chip-dot ci-chip-dot--soon"></span>News</span>
   </div>
 </div>
 
@@ -167,31 +172,6 @@
         </table>
     </div>
 
-    <!-- Home Footer -->
-    <footer class="site-footer" role="contentinfo">
-        <div class="footer-inner">
-            <div class="footer-top">
-                <div>
-                    <div class="footer-brand-name">Contin<span class="brand-green">uu</span>m Inte<span class="brand-green">ll</span>igence</div>
-                    <div class="footer-tagline">Independent cross-domain equity research. Evidence-driven analysis for institutional and sophisticated investors.</div>
-                </div>
-                <div class="footer-links">
-                    <div class="footer-links-col">
-                        <h2 class="footer-col-heading">Research</h2>
-                        <div id="footer-research-links"></div>
-                    </div>
-                    <div class="footer-links-col">
-                        <h2 class="footer-col-heading">Company</h2>
-                        <a href="#about" onclick="navigate('about')">About &amp; Methodology</a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the Analysis of Competing Hypotheses (ACH) methodology. No buy, sell, or hold recommendations are made. Readers should consult their own financial advisors.</div>
-                <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
-            </div>
-        </div>
-    </footer>
 </div>
 
 <!-- ============================================================
@@ -199,23 +179,14 @@
      ============================================================ -->
 <div class="page" id="page-deep-research">
     <div class="page-inner">
-        <div class="hero" style="text-align:left; padding-bottom: var(--space-lg);">
-            <div class="hero-tagline">Deep Research</div>
-            <h1 class="hero-title" style="font-size:1.6rem">Evidence-driven research in depth</h1>
-            <p class="hero-subtitle" style="text-align:left; margin:0; max-width: none;">Each deep research page condenses a full Continuum report into a single landscape view: hypotheses, evidence matrix, discriminating data, and tripwires.</p>
+        <div class="ci-hero" style="margin-bottom: 20px;">
+            <p class="ci-micro">Deep Research</p>
+            <h1 class="ci-hero-title">Evidence-driven research in depth</h1>
+            <p class="ci-hero-meta">Each deep research page condenses a full Continuum report into a single landscape view: hypotheses, evidence matrix, discriminating data, and tripwires.</p>
         </div>
 
         <div id="deep-research-container"></div>
     </div>
-
-    <footer class="site-footer" role="contentinfo">
-        <div class="footer-inner">
-            <div class="footer-bottom">
-                <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the ACH methodology.</div>
-                <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
-            </div>
-        </div>
-    </footer>
 </div>
 
 <!-- Snapshot Report Pages (dynamically rendered) -->
@@ -452,48 +423,41 @@
      PAGE: ABOUT
      ============================================================ -->
 <div class="page" id="page-about">
-    <div class="about-content">
-        <div class="hero-tagline" style="text-align:left; margin-bottom: var(--space-lg);">Our Approach</div>
-        <h1 class="about-title">Evidence, not opinions.</h1>
+    <div class="page-inner">
+        <div class="about-content">
+            <p class="ci-micro" style="margin-bottom: 12px;">Our Approach</p>
+            <h1 class="about-title ci-hero-title">Evidence, not opinions.</h1>
 
-        <p class="about-text">Traditional equity research suffers from a structural problem: analysts form a thesis, then seek evidence to support it. This is confirmation bias operating at institutional scale, embedded in the business model of sell-side research.</p>
+            <p class="about-text">Traditional equity research suffers from a structural problem: analysts form a thesis, then seek evidence to support it. This is confirmation bias operating at institutional scale, embedded in the business model of sell-side research.</p>
 
-        <p class="about-text">We do the opposite. We collect evidence across <strong>ten independent domains</strong>, tag each piece with its epistemic quality, and then ask: which competing hypotheses does this evidence support or contradict?</p>
+            <p class="about-text">We do the opposite. We collect evidence across <strong>ten independent domains</strong>, tag each piece with its epistemic quality, and then ask: which competing hypotheses does this evidence support or contradict?</p>
 
-        <h2 class="about-subtitle">Analysis of Competing Hypotheses</h2>
+            <h2 class="about-subtitle ci-section-title">Analysis of Competing Hypotheses</h2>
 
-        <p class="about-text">Our methodology is built on the <strong>Analysis of Competing Hypotheses (ACH)</strong> framework, originally developed by Richards Heuer at the CIA for intelligence analysis. ACH forces the analyst to consider multiple explanations simultaneously, rather than anchoring on a single narrative.</p>
+            <p class="about-text">Our methodology is built on the <strong>Analysis of Competing Hypotheses (ACH)</strong> framework, originally developed by Richards Heuer at the CIA for intelligence analysis. ACH forces the analyst to consider multiple explanations simultaneously, rather than anchoring on a single narrative.</p>
 
-        <p class="about-text">For each stock, we define four competing hypotheses about the company's trajectory. We then systematically assess how each piece of evidence supports, contradicts, or is neutral to each hypothesis. The result is not a price target or a recommendation. It is a map of where the evidence actually points, and where the asymmetric risk sits.</p>
+            <p class="about-text">For each stock, we define four competing hypotheses about the company's trajectory. We then systematically assess how each piece of evidence supports, contradicts, or is neutral to each hypothesis. The result is not a price target or a recommendation. It is a map of where the evidence actually points, and where the asymmetric risk sits.</p>
 
-        <h2 class="about-subtitle">Ten Evidence Domains</h2>
+            <h2 class="about-subtitle ci-section-title">Ten Evidence Domains</h2>
 
-        <p class="about-text">We assess evidence across <strong>corporate communications</strong> (motivated but primary), <strong>regulatory filings</strong> (statutory, under oath), <strong>broker research</strong> (consensus view), <strong>competitor disclosures</strong> (independent), <strong>economic data</strong> (objective), <strong>alternative data</strong> (behavioural signals), <strong>academic research</strong> (peer-reviewed base rates), <strong>media and social</strong> (noise, but directionally informative), <strong>leadership and governance</strong> (board composition, skin in game, succession), and <strong>ownership and capital flows</strong> (register composition, substantial holder movements, short interest).</p>
+            <p class="about-text">We assess evidence across <strong>corporate communications</strong> (motivated but primary), <strong>regulatory filings</strong> (statutory, under oath), <strong>broker research</strong> (consensus view), <strong>competitor disclosures</strong> (independent), <strong>economic data</strong> (objective), <strong>alternative data</strong> (behavioural signals), <strong>academic research</strong> (peer-reviewed base rates), <strong>media and social</strong> (noise, but directionally informative), <strong>leadership and governance</strong> (board composition, skin in game, succession), and <strong>ownership and capital flows</strong> (register composition, substantial holder movements, short interest).</p>
 
-        <p class="about-text">Each domain receives an <strong>epistemic tag</strong> reflecting its reliability and motivation. Corporate communications are "Motivated." Regulatory filings are "Under Oath." Media is "Noise." We never treat all evidence as equal.</p>
+            <p class="about-text">Each domain receives an <strong>epistemic tag</strong> reflecting its reliability and motivation. Corporate communications are "Motivated." Regulatory filings are "Under Oath." Media is "Noise." We never treat all evidence as equal.</p>
 
-        <div class="about-subtitle">What We Are Not</div>
+            <h2 class="about-subtitle ci-section-title">What We Are Not</h2>
 
-        <p class="about-text">We do not make buy, sell, or hold recommendations. We do not set price targets. We do not build valuation models. We do not manage money or take positions. We map the evidence landscape and identify where the asymmetric risk sits. What you do with that is your decision.</p>
+            <p class="about-text">We do not make buy, sell, or hold recommendations. We do not set price targets. We do not build valuation models. We do not manage money or take positions. We map the evidence landscape and identify where the asymmetric risk sits. What you do with that is your decision.</p>
 
-        <div class="about-cred">
-            <p>Built by former UBS and Goldman Sachs executives with decades of institutional experience across equities, fixed income, and portfolio management. No conflicts of interest. No corporate relationships. No investment banking revenue to protect.</p>
-        </div>
+            <div class="about-cred ci-card">
+                <p>Built by former UBS and Goldman Sachs executives with decades of institutional experience across equities, fixed income, and portfolio management. No conflicts of interest. No corporate relationships. No investment banking revenue to protect.</p>
+            </div>
 
-        <div class="about-disclaimer">
-            <h2 class="about-disclaimer-heading">Legal Disclaimer</h2>
-            <p>Continuum Intelligence provides general information and analysis only. Nothing published on this portal constitutes personal financial advice under Australian law or any other jurisdiction. All factual claims are sourced from ASX filings, ACCC publications, ABS statistics, RBA data, company investor presentations, broker consensus data, and publicly available information. Hypothesis survival scores reflect editorial assessment based on the Analysis of Competing Hypotheses methodology. Readers should consult their own licensed financial advisors before making any investment decisions. Past performance is not indicative of future results. Continuum Intelligence, its principals, and contributors may hold positions in securities discussed. All content is provided "as is" without warranty of any kind.</p>
-        </div>
-    </div>
-
-    <footer class="site-footer" role="contentinfo">
-        <div class="footer-inner">
-            <div class="footer-bottom">
-                <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the ACH methodology.</div>
-                <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
+            <div class="about-disclaimer ci-card">
+                <h2 class="about-disclaimer-heading ci-micro">Legal Disclaimer</h2>
+                <p>Continuum Intelligence provides general information and analysis only. Nothing published on this portal constitutes personal financial advice under Australian law or any other jurisdiction. All factual claims are sourced from ASX filings, ACCC publications, ABS statistics, RBA data, company investor presentations, broker consensus data, and publicly available information. Hypothesis survival scores reflect editorial assessment based on the Analysis of Competing Hypotheses methodology. Readers should consult their own licensed financial advisors before making any investment decisions. Past performance is not indicative of future results. Continuum Intelligence, its principals, and contributors may hold positions in securities discussed. All content is provided "as is" without warranty of any kind.</p>
             </div>
         </div>
-    </footer>
+    </div>
 </div>
 
 <!-- ============================================================
@@ -510,9 +474,9 @@
 
         <div class="tc-card-container">
             <div id="tc-step-1">
-                <div class="section-header" style="margin-bottom: var(--space-lg);">
-                    <h2 class="section-title">Step 1: Select Company</h2>
-                    <span class="step-indicator">1 of 2</span>
+                <div class="section-header" style="margin-bottom: 16px;">
+                    <h2 class="section-title ci-section-title">Step 1: Select Company</h2>
+                    <span class="step-indicator ci-micro">1 of 2</span>
                 </div>
                 <label class="tc-step-label">Which stock does your thesis analyze?</label>
                 
@@ -522,9 +486,9 @@
             </div>
 
             <div class="tc-input-step" id="tc-step-2">
-                <div class="section-header" style="margin-bottom: var(--space-lg);">
-                    <h2 class="section-title">Step 2: Your Investment Thesis</h2>
-                    <span class="step-indicator">2 of 2</span>
+                <div class="section-header" style="margin-bottom: 16px;">
+                    <h2 class="section-title ci-section-title">Step 2: Your Investment Thesis</h2>
+                    <span class="step-indicator ci-micro">2 of 2</span>
                 </div>
                 <label for="tc-thesis-input" class="sr-only">Your investment thesis</label>
                 <textarea class="tc-textarea" id="tc-thesis-input" placeholder="Paste your investment thesis here..." aria-label="Paste your investment thesis here"></textarea>
@@ -565,15 +529,6 @@
         </div>
 
     </div>
-
-    <footer class="site-footer" role="contentinfo">
-        <div class="footer-inner">
-            <div class="footer-bottom">
-                <div class="footer-disclaimer">This comparator provides analysis based on publicly available research. It does not constitute investment advice.</div>
-                <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
-            </div>
-        </div>
-    </footer>
 </div>
 
 <!-- ============================================================
@@ -665,6 +620,32 @@
 
 
 
+
+<!-- Global Footer -->
+<footer class="ci-footer" role="contentinfo">
+  <div class="ci-footer-inner">
+    <div class="ci-footer-top">
+      <div>
+        <div class="ci-footer-brand-name">Contin<span>uu</span>m Inte<span>ll</span>igence</div>
+        <div class="ci-footer-tagline">Independent cross-domain equity research. Evidence-driven analysis for institutional and sophisticated investors.</div>
+      </div>
+      <div class="ci-footer-links">
+        <div class="ci-footer-links-col">
+          <h2>Research</h2>
+          <div id="footer-research-links"></div>
+        </div>
+        <div class="ci-footer-links-col">
+          <h2>Company</h2>
+          <a href="#about" onclick="navigate('about')">About &amp; Methodology</a>
+        </div>
+      </div>
+    </div>
+    <div class="ci-footer-bottom">
+      <div class="ci-footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the Analysis of Competing Hypotheses (ACH) methodology. No buy, sell, or hold recommendations are made. Readers should consult their own financial advisors.</div>
+      <div class="ci-footer-meta">&copy; 2026 Continuum Intelligence</div>
+    </div>
+  </div>
+</footer>
 
 </main><!-- /main-content -->
 

@@ -20,7 +20,12 @@
       "Bash(git tag*)",
       "Bash(grep:*)",
       "Bash(curl https://imaginative-vision-production-16cb.up.railway.app/api/health*)",
-      "Bash(curl https://imaginative-vision-production-16cb.up.railway.app/api/status*)"
+      "Bash(curl https://imaginative-vision-production-16cb.up.railway.app/api/status*)",
+      "Edit(~/.claude/skills/quality-gate/**)",
+      "Skill(ci:push-safe)",
+      "Skill(ci:push-safe:*)",
+      "Edit(~/.claude/skills/deploy/**)",
+      "Edit(~/.claude/skills/continuum-dev/**)"
     ],
     "deny": [
       "Bash(git push --force*)",
@@ -32,6 +37,16 @@
       "Bash(rm -rf dist*)",
       "Bash(npm run deploy:*)",
       "Bash(railway:*)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\User\\.claude\\skills",
+      "c:\\Users\\User\\continuum-intelligence-v3\\.git",
+      "c:\\Users\\User\\.claude",
+      "C:\\Users\\User\\.claude\\skills",
+      "C:\\Users\\User\\.claude\\skills\\continuum-dev",
+      "C:\\Users\\User\\.claude\\skills\\quality-gate",
+      "C:\\Users\\User\\.claude\\skills\\deploy",
+      "C:\\Users\\User\\continuum-intelligence-v3\\.git"
     ]
   },
   "hooks": {

@@ -1,0 +1,293 @@
+/* ============================================================
+   SHELL.CSS -- App shell: topbar, capability strip, layout grid, global footer.
+   All structural chrome that wraps every page.
+   ============================================================ */
+
+/* ── Topbar ── */
+.ci-topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  height: var(--topbar-h);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line-2);
+  transition: box-shadow 0.25s;
+}
+.ci-topbar.scrolled {
+  box-shadow: 0 2px 16px rgba(16, 32, 51, 0.08);
+}
+[data-theme="dark"] .ci-topbar {
+  background: rgba(23, 28, 38, 0.92);
+  border-bottom-color: var(--line-2);
+}
+[data-theme="dark"] .ci-topbar.scrolled {
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+}
+.ci-topbar-inner {
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  padding: 0 var(--shell-pad);
+  height: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Brand mark */
+.ci-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.ci-brand-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-topbar-mark);
+  background: linear-gradient(160deg, #234d78, #173653);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ci-brand-mark svg {
+  width: 14px;
+  height: 14px;
+  fill: rgba(255,255,255,0.9);
+}
+.ci-brand-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  white-space: nowrap;
+}
+.ci-brand-name span { color: var(--green); }
+
+/* Topbar centre: nav links */
+.ci-topbar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  min-width: 0;
+}
+.ci-topbar-nav::-webkit-scrollbar { display: none; }
+.ci-topbar-nav a {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  padding: 6px 10px;
+  border-radius: 7px;
+  white-space: nowrap;
+  transition: color 0.15s, background 0.15s;
+  text-decoration: none;
+}
+.ci-topbar-nav a:hover {
+  color: var(--text);
+  background: var(--surface-3);
+}
+.ci-topbar-nav a.active {
+  color: var(--blue);
+  background: var(--blue-soft);
+  font-weight: 600;
+}
+
+/* Topbar right: actions */
+.ci-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Capability Strip ── */
+.ci-strip {
+  position: fixed;
+  top: var(--topbar-h);
+  left: 0; right: 0;
+  z-index: 99;
+  height: var(--strip-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ci-strip-inner {
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  padding: 0 var(--shell-pad);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.ci-strip-inner::-webkit-scrollbar { display: none; }
+
+/* Chips inside the strip */
+.ci-strip .ci-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: var(--surface-3);
+  border: 1px solid var(--line-2);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.ci-strip .ci-chip:hover { background: var(--line-2); }
+.ci-strip .ci-chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ci-strip .ci-chip-dot--live { background: var(--green); }
+.ci-strip .ci-chip-dot--soon { background: var(--amber); }
+.ci-strip .ci-chip-dot--dim  { background: var(--muted); opacity: 0.5; }
+
+.ci-strip-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--line);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* ── App shell container ── */
+.ci-shell {
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  padding: 0 var(--shell-pad);
+  padding-top: calc(var(--topbar-h) + var(--strip-h) + 20px);
+  padding-bottom: 80px;
+}
+
+/* ── Two-column layout grid ── */
+.ci-layout {
+  display: grid;
+  grid-template-columns: 1fr var(--rail-w);
+  gap: var(--gap);
+  align-items: start;
+}
+.ci-main { min-width: 0; }
+.ci-rail {
+  position: sticky;
+  top: calc(var(--topbar-h) + var(--strip-h) + 20px);
+  max-height: calc(100vh - var(--topbar-h) - var(--strip-h) - 40px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-2) transparent;
+}
+.ci-rail::-webkit-scrollbar { width: 4px; }
+.ci-rail::-webkit-scrollbar-track { background: transparent; }
+.ci-rail::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+
+/* ── Global footer ── */
+.ci-footer {
+  background: var(--surface);
+  border-top: 1px solid var(--line-2);
+  margin-top: 48px;
+  padding: 32px var(--shell-pad);
+}
+.ci-footer-inner {
+  max-width: var(--shell-max);
+  margin: 0 auto;
+}
+.ci-footer-top {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  margin-bottom: 24px;
+}
+.ci-footer-brand-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.ci-footer-brand-name span { color: var(--green); }
+.ci-footer-tagline {
+  font-size: 12px;
+  color: var(--muted);
+  max-width: var(--modal-width-sm);
+  line-height: 1.5;
+}
+.ci-footer-links {
+  display: flex;
+  gap: 40px;
+}
+.ci-footer-links-col h2 {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.ci-footer-links-col a {
+  display: block;
+  font-size: 12px;
+  color: var(--text-2);
+  margin-bottom: 6px;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.ci-footer-links-col a:hover { color: var(--blue); }
+.ci-footer-bottom {
+  border-top: 1px solid var(--line-2);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ci-footer-disclaimer {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.ci-footer-meta {
+  font-size: 11px;
+  color: var(--soft);
+}
+
+/* ── Responsive breakpoints ── */
+@media (max-width: 1100px) {
+  .ci-layout {
+    grid-template-columns: 1fr;
+  }
+  .ci-rail {
+    position: static;
+    max-height: none;
+  }
+}
+@media (max-width: 768px) {
+  .ci-topbar-nav {
+    display: none;
+  }
+  .ci-topbar-inner {
+    grid-template-columns: auto 1fr auto;
+  }
+  .ci-footer-top {
+    grid-template-columns: 1fr;
+  }
+  .ci-footer-links {
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+}

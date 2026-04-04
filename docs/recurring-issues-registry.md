@@ -673,3 +673,17 @@ When adding any new external integration, verify:
 2. Does silent failure aggregate into invisible degradation?
 3. Is there an admin endpoint to surface the gap?
 4. Does the periodic retry handle auth expiry recovery?
+
+---
+
+## Known Open Defects (Not Yet Families)
+
+### 2026-04-04: ASB report render null guard missing
+
+- **Status:** OPEN. Not yet fixed. Pre-dates `redesign/shell-v2` branch (confirmed failing on main).
+- **Test:** `src/pages/report-sections.test.js` > `renderReport null safety` > `renders every research JSON without throwing`
+- **Symptom:** 1/45 tickers (ASB) fails render. Error: `Cannot read properties of null (reading 'diagnosticityClass')`.
+- **Root cause:** ASB's research JSON contains a null `diagnosticityClass` on one or more discriminator entries. The report renderer (`src/features/report/evidence.js` or adjacent) does not null-guard the field before accessing `.diagnosticityClass`.
+- **Likely family:** Family 2 (Report rendering regressions) or Family 4 (Schema mismatches). The fix is a null guard at the renderer boundary, not a data patch.
+- **Impact:** 1 test failure (1019/1020 passing). ASB report may render with a blank or broken discriminator row in production. No crash due to try/catch in the render pipeline.
+- **Fix approach:** Add null guard in the discriminator renderer where `diagnosticityClass` is accessed. Verify ASB renders cleanly. Do not patch the research JSON.

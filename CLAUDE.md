@@ -188,6 +188,10 @@ These were set during Phase B and must not be changed without explicit instructi
 - **If you find a bug unrelated to the current task:** record it in a note and raise it. Do not fix it inline.
 - **If Fly.io returns 5xx on `/api/refresh/TICKER`:** do not retry automatically. Check `/api/refresh/TICKER/status` first.
 - **When uncertain about environment:** `src/lib/api-config.js` is the canonical source. It returns `https://api.continuumintelligence.ai` for any non-localhost hostname.
+- **Before every commit:** run `git branch --show-current` and confirm it matches the intended branch. Never commit without verifying. After any cherry-pick or branch switch, re-verify before continuing.
+- **After every file edit:** run `git diff` to confirm the change persisted. Hooks and linters can silently revert edits. If a hook reverted your change, re-apply and commit in a single step.
+- **After pushing to production:** wait for the Fly.io deploy to complete, then `curl https://ci-api.fly.dev/api/health` to confirm the new code is live before reporting success.
+- **Persona-branch binding:** Named personas are hard-bound to branches. At session start, if a persona is assigned, run `git branch --show-current` and verify the branch matches: Surgeon → `surgeon*`, Quartermaster → `quartermaster*`, Magneto → `magneto*`, Sentinel → `sentinel*`, Enforcer → `enforcer*`. If the branch does not match, switch before any work begins. Before every commit, re-verify. Never commit persona work directly to `main` without explicit user instruction.
 
 ---
 
@@ -203,16 +207,57 @@ These were set during Phase B and must not be changed without explicit instructi
 ## Quality Protocol
 
 ### Session Start
+
+**Parallel Session Conflict Guard.** Before any work begins, run:
+
+```bash
+git status --porcelain
+git log --oneline --since="2 hours ago" --format="%h %s (%ar)"
+git stash list
+```
+
+If uncommitted changes exist, report them to the user before proceeding. If recent commits exist from the last 2 hours, list them -- a parallel session may have pushed work you need to pull. If stashes exist, list them.
+
+**Skill Loading Verification.** Log which skills are loaded this session:
+- quality-gate: YES/NO
+- continuum-dev: YES/NO
+
+Both must be loaded on every session that touches code. If not, stop and load before proceeding. If a commit is made without quality-gate loaded, note it in the commit message.
+
 Read docs/recurring-issues-registry.md before writing any fix.
 Check the registry for prior art on the current issue.
 
 ### Pre-Commit Checklist
+git branch --show-current           # Confirm branch before commit
 npm run test:all                    # Count must not decrease
 npm run build                       # Must pass
 bash scripts/check-encoding.sh      # Must be CLEAN
 bash scripts/check-config-drift.sh  # Must be CLEAN (if backend changed)
 bash scripts/check-css-tokens.sh    # Must be CLEAN (if CSS changed)
 git diff --staged --name-only       # Verify only your files staged
+
+### Impact Surface Scan Protocol
+
+Before editing any file, execute this grep sequence and state the results:
+
+```bash
+# 1. All call sites for the function/class/element you plan to change
+grep -rn 'FUNCTION_OR_CLASS_NAME' src/ --include='*.js' --include='*.py'
+
+# 2. All consumers of the file you plan to change
+grep -rn 'import.*FROM_THIS_FILE' src/ --include='*.js'
+
+# 3. All render surfaces for the affected data key
+grep -rn 'AFFECTED_DATA_KEY' src/ --include='*.js' | grep -v test
+```
+
+State in your response before proceeding:
+- **Root cause hypothesis:** Where the defect enters (not where it manifests)
+- **Affected surfaces:** Every file and function consuming the affected data
+- **Fix scope:** Which files will change and why
+- **Confirmed unaffected:** Files checked and confirmed safe
+
+The second surface rule: whenever a fix involves display logic, rendering, or CSS class assignment, grep for all places that value is rendered. Fix all surfaces. If you fix one and miss another, you have introduced a visual inconsistency.
 
 ### Enforcement Boundaries
 - LLM outputs: sanitise_text() at entry, before merge/store
@@ -230,3 +275,26 @@ git diff --staged --name-only       # Verify only your files staged
 2. Fix at BOUNDARY (where defect enters), not SYMPTOM (where it shows)
 3. Add regression gate (test or CI check)
 4. Log in registry
+
+### Fix-Chain Protocol
+
+When fixing any bug, run the chain before touching production code:
+
+1. **Write a failing test first.** Reproduce the symptom. Run it. Confirm it fails.
+2. **Trace downstream.** Before applying the fix, ask: "If I fix this, what is the next thing that will break?" Run:
+
+```bash
+grep -rn 'FIXED_FUNCTION\|FIXED_VARIABLE' src/ --include='*.js' --include='*.py' | grep -v test
+```
+
+3. **Fix all identified points in a single commit.** Do not fix one, deploy, discover the next, deploy again.
+4. **Run `npm run test:all`.** New failures after your fix are part of the same chain. Fix before committing.
+5. **Smoke-check affected endpoints** if the fix touches API routes or data pipelines:
+
+```bash
+curl -s https://ci-api.fly.dev/api/ENDPOINT | python3 -c "import sys,json; d=json.load(sys.stdin); print('OK' if 'EXPECTED_KEY' in d else 'MISSING')"
+```
+
+6. **Single commit with chain summary.** Commit message lists every issue resolved.
+
+If the chain does not converge after 3 iterations, stop and report to the user with a diagnosis. This usually signals a design problem, not a bug chain.

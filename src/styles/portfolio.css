@@ -90,10 +90,10 @@
 
 /* Concentration Score Colours */
 .portfolio-summary-value.conc-green { color: var(--signal-green); }
-.portfolio-summary-value.conc-amber { color: var(--signal-amber, #f59e0b); }
+.portfolio-summary-value.conc-amber { color: var(--amber); }
 .portfolio-summary-value.conc-red { color: var(--signal-red); }
 .portfolio-summary-value .conc-green { color: var(--signal-green); }
-.portfolio-summary-value .conc-amber { color: var(--signal-amber, #f59e0b); }
+.portfolio-summary-value .conc-amber { color: var(--amber); }
 .portfolio-summary-value .conc-muted { color: var(--text-muted); }
 
 /* Portfolio Table */
@@ -193,12 +193,12 @@
     border-color: var(--border-light);
 }
 .portfolio-btn.primary {
-    background: var(--accent-teal);
+    background: var(--blue);
     color: #fff;
-    border-color: var(--accent-teal);
+    border-color: var(--blue);
 }
 .portfolio-btn.primary:hover {
-    background: #1ab8a7;
+    opacity: 0.85;
 }
 
 /* ============================================================
@@ -349,8 +349,8 @@
     display: flex;
     gap: var(--space-lg);
     flex-wrap: wrap;
-    background: rgba(26, 158, 143, 0.06);
-    border: 1px solid rgba(26, 158, 143, 0.2);
+    background: var(--blue-soft);
+    border: 1px solid var(--line-2);
     border-radius: 6px;
     padding: var(--space-md) var(--space-lg);
     margin-bottom: var(--space-md);
@@ -408,7 +408,7 @@
 }
 .rw-bar {
     flex: 1; height: 8px;
-    background: rgba(255,255,255,0.06);
+    background: var(--surface-3);
     border-radius: 4px; overflow: hidden;
     position: relative;
 }
@@ -441,7 +441,7 @@
 .rw-stability { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.02em; white-space: nowrap; }
 .rw-stability::before { content: '\25CF  '; }
 .rw-stab-high { color: var(--signal-green); }
-.rw-stab-mid  { color: var(--signal-amber, #f59e0b); }
+.rw-stab-mid  { color: var(--amber); }
 .rw-stab-low  { color: var(--signal-red); }
 .rw-stab-none { color: var(--text-muted); }
 .rw-stab-none::before { content: ''; }
@@ -456,8 +456,8 @@
     flex-wrap: wrap;
     gap: var(--space-sm);
     padding: var(--space-md) var(--space-lg);
-    background: rgba(26, 158, 143, 0.04);
-    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--line);
 }
 .rw-sc-pill {
     display: inline-flex;
@@ -618,13 +618,13 @@
 }
 
 .port-conc-flag-warn .port-conc-flag-icon {
-    background: var(--signal-amber, #f59e0b);
-    color: var(--bg-body);
+    background: var(--amber);
+    color: var(--surface);
 }
 
 .port-conc-flag-info .port-conc-flag-icon {
     background: var(--text-muted);
-    color: var(--bg-body);
+    color: var(--surface);
 }
 
 .port-conc-flag-msg {
@@ -700,12 +700,12 @@
 
 .port-mandate-flag-breach .port-mandate-flag-icon {
     background: var(--signal-red);
-    color: var(--bg-body);
+    color: var(--surface);
 }
 
 .port-mandate-flag-warn .port-mandate-flag-icon {
-    background: var(--signal-amber, #f59e0b);
-    color: var(--bg-body);
+    background: var(--amber);
+    color: var(--surface);
 }
 
 .port-mandate-flag-msg {
@@ -714,29 +714,21 @@
     color: var(--text-secondary);
 }
 
-/* Light Theme Overrides */
-[data-theme="light"] .port-mandate-section {
-    background: #FFFFFF;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+/* Surface overrides -- light-first, token-driven */
+.port-mandate-section,
+.port-dna-card,
+.port-insight-card,
+.port-conc-section {
+    background: var(--surface);
+    box-shadow: var(--shadow);
 }
 
-[data-theme="light"] .port-dna-card,
-[data-theme="light"] .port-insight-card {
-    background: #FFFFFF;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+.port-dna-bar {
+    background: var(--surface-3);
 }
 
-[data-theme="light"] .port-dna-bar {
-    background: #F0F1F4;
-}
-
-[data-theme="light"] .port-conc-section {
-    background: #FFFFFF;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-}
-
-[data-theme="light"] .port-conc-metric {
-    background: #F7F8FA;
+.port-conc-metric {
+    background: var(--surface-2);
 }
 
 @media (max-width: 768px) {

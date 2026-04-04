@@ -176,6 +176,29 @@ function _handleStockUpdate(ticker) {
   }
 }
 
+function _renderHero() {
+  return '<div class="ci-hero home-hero">' +
+    '<div class="ci-brand-mark ci-gradient-mark home-hero__mark" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;fill:rgba(255,255,255,0.9)">' +
+        '<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>' +
+      '</svg>' +
+    '</div>' +
+    '<h1 class="ci-hero-title home-hero__title">We map evidence, not opinions.</h1>' +
+    '<div class="ci-hero-meta">' +
+      '<span>25 ASX Equities</span>' +
+      '<span class="ci-hero-meta-sep">|</span>' +
+      '<span>10 Evidence Domains</span>' +
+      '<span class="ci-hero-meta-sep">|</span>' +
+      '<span>ACH Framework</span>' +
+    '</div>' +
+    '<div class="ci-hero-cred">' +
+      '<span class="ci-tag">Built by former UBS and Goldman Sachs executives</span>' +
+      '<span class="ci-tag">Cross-Domain Research</span>' +
+      '<span class="ci-tag">Evidence-Driven</span>' +
+    '</div>' +
+    '</div>';
+}
+
 // Lazy import to keep this module from requiring format.js at definition time.
 // format.js is always available since it's bundled -- this just avoids circular-import risk.
 function _getFormatFns() {
@@ -203,13 +226,16 @@ export function initHomePage() {
 
   var totalTickers = Object.keys(STOCK_DATA).length;
   container.innerHTML =
+    _renderHero() +
+    renderKpiBand(_currentRows, BATCH_STATUS) +
     renderHealthBanner(BATCH_STATUS, totalTickers) +
     '<div class="home-layout">' +
     '<div class="home-main">' +
-    renderKpiBand(_currentRows, BATCH_STATUS) +
     renderCoverageTable(displayRows, state) +
     '</div>' +
+    '<aside class="ci-rail">' +
     renderIntelligenceRail(_currentRows, BATCH_STATUS, state.selectedTicker) +
+    '</aside>' +
     '</div>';
 
   _bindTableEvents(container);
