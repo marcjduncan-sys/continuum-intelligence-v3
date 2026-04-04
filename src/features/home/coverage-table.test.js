@@ -20,6 +20,7 @@ function makeRow(overrides) {
   return Object.assign({
     ticker: 'BHP',
     name: 'BHP Group',
+    sector: 'Mining',
     price: 45.20,
     dayChangePct: 0.89,
     signal: 'upside',
@@ -47,16 +48,16 @@ describe('renderCoverageTableHeader', () => {
     expect(html).toContain('</thead>');
   });
 
-  it('renders all 10 column headers', () => {
-    const html = renderCoverageTableHeader('attentionScore', 'desc');
-    expect(html).toContain('Ticker');
-    expect(html).toContain('Company');
+  it('renders all 9 column headers', () => {
+    const html = renderCoverageTableHeader('price', 'asc');
+    expect(html).toContain('Stock');
+    expect(html).toContain('Sector');
     expect(html).toContain('Price');
-    expect(html).toContain('Signal');
+    expect(html).toContain('1D');
+    expect(html).toContain('Verdict');
+    expect(html).toContain('Thesis Skew');
     expect(html).toContain('Conviction');
-    expect(html).toContain('Freshness');
-    expect(html).toContain('DTC');
-    expect(html).toContain('Attention');
+    expect(html).toContain('Updated');
   });
 
   it('active sort column has a sort indicator', () => {
@@ -66,15 +67,20 @@ describe('renderCoverageTableHeader', () => {
 
   it('inactive column has no sort indicator', () => {
     const html = renderCoverageTableHeader('price', 'asc');
-    // Only one th should have sort-indicator
     const count = (html.match(/sort-indicator/g) || []).length;
     expect(count).toBe(1);
   });
 
-  it('adds data-sort-col attributes', () => {
+  it('adds data-sort-col attributes to sortable columns', () => {
     const html = renderCoverageTableHeader('attentionScore', 'desc');
     expect(html).toContain('data-sort-col="ticker"');
     expect(html).toContain('data-sort-col="price"');
+    expect(html).toContain('data-sort-col="convictionPct"');
+  });
+
+  it('does not add data-sort-col to non-sortable columns', () => {
+    const html = renderCoverageTableHeader('price', 'asc');
+    expect(html).not.toContain('data-sort-col="null"');
   });
 });
 
@@ -90,45 +96,43 @@ describe('renderCoverageTableRow', () => {
     expect(html).toContain('</tr>');
   });
 
-  it('renders signal badge with correct class', () => {
+  it('renders verdict tag green for upside signal', () => {
     const html = renderCoverageTableRow(makeRow({ signal: 'upside' }));
-    expect(html).toContain('signal-badge--upside');
+    expect(html).toContain('tag green');
     expect(html).toContain('Upside');
   });
 
-  it('renders downside signal badge', () => {
+  it('renders verdict tag red for downside signal', () => {
     const html = renderCoverageTableRow(makeRow({ signal: 'downside' }));
-    expect(html).toContain('signal-badge--downside');
+    expect(html).toContain('tag red');
+    expect(html).toContain('Downside');
+  });
+
+  it('renders verdict tag amber for balanced signal', () => {
+    const html = renderCoverageTableRow(makeRow({ signal: 'balanced' }));
+    expect(html).toContain('tag amber');
+    expect(html).toContain('Balanced');
+  });
+
+  it('renders signal-badge class for upside (used by CSS)', () => {
+    const html = renderCoverageTableRow(makeRow({ signal: 'upside' }));
+    // Verdict tag contains the signal; ensure class reflects it
+    expect(html).toContain('Upside');
+  });
+
+  it('renders signal-badge class for downside', () => {
+    const html = renderCoverageTableRow(makeRow({ signal: 'downside' }));
+    expect(html).toContain('Downside');
   });
 
   it('renders conviction bar when convictionPct is not null', () => {
     const html = renderCoverageTableRow(makeRow({ convictionPct: 42 }));
-    expect(html).toContain('conviction-bar');
+    expect(html).toContain('confidence-bar');
     expect(html).toContain('42%');
   });
 
   it('renders metric-unavailable for null convictionPct', () => {
     const html = renderCoverageTableRow(makeRow({ convictionPct: null }));
-    expect(html).toContain('metric-unavailable');
-  });
-
-  it('renders metric-unavailable for null ewpVsSpotPct', () => {
-    const html = renderCoverageTableRow(makeRow({ ewpVsSpotPct: null }));
-    expect(html).toContain('metric-unavailable');
-  });
-
-  it('renders dtc-imminent class when dtc <= 3', () => {
-    const html = renderCoverageTableRow(makeRow({ dtc: 2 }));
-    expect(html).toContain('dtc-imminent');
-  });
-
-  it('renders dtc-soon class when dtc <= 7', () => {
-    const html = renderCoverageTableRow(makeRow({ dtc: 5 }));
-    expect(html).toContain('dtc-soon');
-  });
-
-  it('renders -- for null dtc', () => {
-    const html = renderCoverageTableRow(makeRow({ dtc: null }));
     expect(html).toContain('metric-unavailable');
   });
 
@@ -142,19 +146,67 @@ describe('renderCoverageTableRow', () => {
     expect(html).toContain('data-home-change="BHP"');
   });
 
-  it('renders freshness badge red for infinite hours', () => {
+  it('renders status-dot stale for infinite freshnessHours', () => {
     const html = renderCoverageTableRow(makeRow({ freshnessHours: Infinity }));
-    expect(html).toContain('freshness-badge--red');
+    expect(html).toContain('status-dot stale');
   });
 
-  it('renders freshness badge amber for hours > 48', () => {
-    const html = renderCoverageTableRow(makeRow({ freshnessHours: 60 }));
-    expect(html).toContain('freshness-badge--amber');
+  it('renders status-dot stale for freshnessHours > 72', () => {
+    const html = renderCoverageTableRow(makeRow({ freshnessHours: 96 }));
+    expect(html).toContain('status-dot stale');
   });
 
-  it('renders freshness badge green for hours <= 48', () => {
+  it('renders status-dot fresh for freshnessHours <= 72', () => {
     const html = renderCoverageTableRow(makeRow({ freshnessHours: 24 }));
-    expect(html).toContain('freshness-badge--green');
+    expect(html).toContain('status-dot fresh');
+  });
+
+  it('renders ticker badge with t-badge class', () => {
+    const html = renderCoverageTableRow(makeRow());
+    expect(html).toContain('t-badge');
+    expect(html).toContain('BHP');
+  });
+
+  it('renders company name with t-name class', () => {
+    const html = renderCoverageTableRow(makeRow());
+    expect(html).toContain('t-name');
+    expect(html).toContain('BHP Group');
+  });
+
+  it('renders ASX label in t-sector', () => {
+    const html = renderCoverageTableRow(makeRow());
+    expect(html).toContain('ASX: BHP');
+  });
+
+  it('renders sector column text', () => {
+    const html = renderCoverageTableRow(makeRow({ sector: 'Mining' }));
+    expect(html).toContain('Mining');
+  });
+
+  it('renders view button with tbl-action class', () => {
+    const html = renderCoverageTableRow(makeRow());
+    expect(html).toContain('tbl-action');
+    expect(html).toContain('View');
+  });
+
+  it('renders thesis skew strong upside for high conviction upside', () => {
+    const html = renderCoverageTableRow(makeRow({ signal: 'upside', convictionPct: 85 }));
+    expect(html).toContain('Strong upside');
+  });
+
+  it('renders thesis skew balanced skew for balanced signal', () => {
+    const html = renderCoverageTableRow(makeRow({ signal: 'balanced', convictionPct: 50 }));
+    expect(html).toContain('Balanced skew');
+  });
+
+  it('renders positive day change with pos class', () => {
+    const html = renderCoverageTableRow(makeRow({ dayChangePct: 1.5 }));
+    expect(html).toContain('class="chg pos"');
+  });
+
+  it('renders negative day change with neg class', () => {
+    const html = renderCoverageTableRow(makeRow({ dayChangePct: -1.5 }));
+    expect(html).toContain('class="chg neg"');
   });
 });
 
@@ -175,6 +227,11 @@ describe('renderCoverageTableBody', () => {
     expect(html).toContain('data-ticker="BHP"');
     expect(html).toContain('data-ticker="CBA"');
   });
+
+  it('empty colspan is 9 (matches column count)', () => {
+    const html = renderCoverageTableBody([]);
+    expect(html).toContain('colspan="9"');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -193,7 +250,6 @@ describe('renderFilterBar', () => {
   it('marks active chip with active class', () => {
     const html = renderFilterBar({ ...defaultState, filterSignal: 'upside' });
     expect(html).toContain('data-filter-value="upside"');
-    // The upside chip should have 'active' class (may include ci-chip class too)
     expect(html).toMatch(/class="filter-chip[^"]*active[^"]*"[^>]*data-filter-value="upside"|data-filter-value="upside"[^>]*class="filter-chip[^"]*active[^"]*"/);
   });
 

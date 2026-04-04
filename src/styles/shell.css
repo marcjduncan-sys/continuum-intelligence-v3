@@ -130,55 +130,96 @@
   flex-shrink: 0;
 }
 
-/* ── Subnav strip (page navigation layer) ── */
+/* ── Capability strip (platform navigation layer) ── */
 .ci-strip {
   position: sticky;
   top: var(--topbar-h);
   left: 0; right: 0;
   z-index: 85;
-  background: rgba(244,245,247,.96);
+  background: rgba(244,245,247,.97);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
   display: flex;
   align-items: center;
 }
+[data-theme="dark"] .ci-strip {
+  background: rgba(23,28,38,.97);
+}
 .ci-strip-inner {
   max-width: var(--shell-max);
   margin: 0 auto;
-  padding: 8px var(--shell-pad);
+  padding: 7px var(--shell-pad);
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   overflow-x: auto;
   scrollbar-width: none;
 }
 .ci-strip-inner::-webkit-scrollbar { display: none; }
 
-/* Nav links inside the strip */
-.ci-strip-inner a {
+/* Strip section label */
+.cap-label {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
   white-space: nowrap;
-  padding: 6px 10px;
-  border-radius: var(--r-pill);
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+/* Cap chip -- base style for both live and soon chips */
+.cap-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--surface);
   color: var(--text-2);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-decoration: none;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
   flex-shrink: 0;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  cursor: default;
+  text-decoration: none;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
-.ci-strip-inner a:hover,
-.ci-strip-inner a.active {
+a.cap-chip { cursor: pointer; }
+a.cap-chip:hover,
+a.cap-chip.active {
   background: var(--blue-soft);
-  color: var(--blue);
   border-color: #c8d8ea;
+  color: var(--blue);
+}
+.cap-chip.soon {
+  opacity: 0.7;
+}
+.cap-chip .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+.cap-chip.live .dot { background: var(--green); }
+.cap-chip.soon .dot { background: var(--amber); }
+
+/* Strip divider */
+.cap-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--line);
+  flex-shrink: 0;
+  margin: 0 4px;
 }
 
-/* Legacy chip styles (kept for backward compat during migration) */
+/* Legacy chip styles (kept for backward compat) */
 .ci-strip .ci-chip {
   display: flex;
   align-items: center;
