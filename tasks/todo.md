@@ -4,42 +4,63 @@
 
 ## Current Task
 
-**Gold Stock Coverage Pipeline -- Archetype System + Unified Gold Section**
+**Stock Detail Page -- Visual Remediation (15 issues vs. prototype 02-stock-detail.html)**
 
-Gold stocks render as broken/incomplete because the onboarding pipeline and display logic assume broker-covered, earnings-generating companies. Pre-production explorers (OBM, WIA, SNX) show all-N/A metrics, trigger the "Analysis Pending" gate, and have confusing dual gold sections.
-
-### Success Criteria
-
-- Every gold stock displays a populated card with archetype-appropriate metrics
-- No gold stock triggers "Analysis Pending" when analysis is complete
-- Gold analysis renders as a single nav entry (prefer goldAgent over goldAnalysis)
-- Add Stock pipeline applies correct metric template based on archetype
-- `isDataPending()` distinguishes "structurally unavailable" from "pipeline incomplete"
-
-### Stories (Critical Path: S0 → S1 → S2 → S3/S4 → S6. Parallel: S5, S7.)
-
-- [x] **S0** -- Fix OBM/SNX notebook ID collision. SNX set to PLACEHOLDER pending notebook creation.
-- [x] **S1** -- Add `archetype` to `reference.json` for all 32 tickers (7 archetypes: producer, developer, explorer, diversified, financial, tech, reit).
-- [x] **S2** -- Created `data/config/metric-templates.json` with 7 archetype-specific templates.
-- [x] **S3** -- `home.js` now imports REFERENCE_DATA, uses `_getArchetype()` for archetype lookup.
-- [x] **S4** -- `isDataPending()` now archetype-aware: explorer/developer only require Mkt Cap or Drawdown.
-- [x] **S5** -- Populated sharesOutstanding + marketCapStr for OBM (520M shares, A$775M), WIA (353M, A$177M), SNX (1860M, A$112M).
-- [x] **S6** -- Regenerated featuredMetrics in _index.json: NST/EVN/OBM use producer template, WIA/SNX use explorer, HRZ uses developer.
-- [x] **S7** -- Unified gold nav: single "Gold" entry, prefer goldAgent, fallback goldAnalysis. Removed duplicate Section 11 nav entry.
-- [ ] **S8** -- Run gold agent for SNX. Depends on S0 (user must create SNX notebook in NotebookLM first).
-- [x] **S9** -- `scaffold.py`: `_build_featured_metrics()` selects template by archetype. `build_reference_entry()` now includes archetype. `main.py` passes sector/industry to reference builder.
-- [x] **S10** -- `scaffold.py`: `infer_archetype()` with sector/sub-sector rules + `_ARCHETYPE_OVERRIDES` dict for known tickers.
-
-### Review
-
-<!-- Fill after completion -->
+Branch: `redesign/phase5-cleanup`
+Prototype: `docs/prototypes/02-stock-detail.html`
+Acceptance: Live `#report-BHP` visually matches prototype in structure and styling.
 
 ---
 
-## Backlog
+## Wave Plan (AWAITING USER APPROVAL)
 
-- [ ] Inject structured research context into analyst chat (prev current task -- paused)
-- [ ] Mandatory login enforcement
-- [ ] Technical analysis agent
-- [ ] Rates/property/banks agent
-- [ ] OHLCV Railway proxy
+### Wave 1A -- CSS quick wins (stock-detail.css only, no JS)
+- [ ] Issue 3: ACH card header backgrounds -- change dark gradients to light tints (4 lines at css:862-865) + update text colours for readability on light backgrounds
+- [ ] Issues 11-12: CSS hide for `.stock-nav-arrows` and `.sections-float-toggle`
+- [ ] Issue 4: Verify/fix `.ach-evidence` grid columns and `.ach-ev-col` padding
+
+### Wave 1B -- hero.js data fixes
+- [ ] Issue 8: Market cap -- prefer pre-formatted `heroMetrics[0].value` over raw `data.marketCap` integer
+- [ ] Issue 9: Confidence -- compute from `data.skew.score` or normalised hypothesis weights instead of hardcoded "TBC"
+- [ ] Issue 14: 52w range -- format as `A$low -- A$high` using en-dash
+- [ ] Issue 15: Price targets -- format with 2 decimal places
+
+### Wave 2A -- JS logic fixes
+- [ ] Issue 6: risk-register.js -- fix data field names: `tripwires.items` → `tripwires.cards`, `gaps.items` → `gaps.coverageRows`
+- [ ] Issue 10: Chat context chips -- investigate why `.cp-context-bar` renders vertically despite correct CSS; fix override
+
+### Wave 2B -- Requires investigation / discussion
+- [ ] Issue 1: Home content visible above stock detail -- inspect index.html for content outside `.page` containers (router and CSS show/hide are correct)
+- [ ] Issue 2: Topbar context-awareness -- significant feature change (home controls vs. stock breadcrumb + nav buttons)
+- [ ] Issue 5: Domain scores vs. source types -- DATA MODEL ISSUE: `evidence.cards` contains source type labels ("Corporate Communications") not domain labels ("Operational Performance"). Renderer is correct. Data pipeline change needed or design decision required.
+- [ ] Issue 13: Capability strip completeness -- verify index.html strip items against prototype
+
+### Wave 3 -- Final verification
+- [ ] Run `npm run test:unit` -- must hold at 1029 passing
+- [ ] Run `npm run build` -- must compile clean
+- [ ] Visual QA: compare live `#report-BHP` against prototype in parallel browser tabs
+
+---
+
+## Root Cause Summary (pre-implementation findings)
+
+| # | File | Root Cause |
+|---|------|------------|
+| 3 | stock-detail.css:862-865 | `.ach-case.bull/base/bear/swing .ach-case-head` gradients are dark (#2d6a4f etc.); prototype requires light (#edf7f1 etc.) |
+| 6 | risk-register.js:14,36 | Looks for `tripwires.items` (missing); data has `tripwires.cards` (8 items). Same for gaps. |
+| 8 | hero.js:104 | `data.marketCap` (raw int: 268129566720) takes priority over `heroMetrics[0].value` (formatted: 'A$253B') |
+| 9 | hero.js:86 | Confidence hardcoded as `TBC` |
+| 5 | evidence-domains.js | Renderer correct; data wrong -- `evidence.cards` holds source types not domain scores |
+| 7 | hero.js:74, stock-detail.css:219 | Both are correct -- `.highlight` applied to cell 2, CSS has dark gradient. May not be an actual issue. |
+| 10 | stock-detail.css:479 | `.cp-context-bar` base CSS is `display:flex` (horizontal) -- override somewhere else |
+| 1 | index.html (not checked) | Router and base.css page show/hide are correct; issue must be in HTML structure |
+
+---
+
+## Do Not Fix (unrelated findings)
+_none yet_
+
+---
+
+## Review
+_populated after implementation_
