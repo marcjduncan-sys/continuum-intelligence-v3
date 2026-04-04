@@ -16,7 +16,7 @@
 .ops-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--text-primary, #e0e0e0);
+  color: var(--text);
   margin: 0;
 }
 
@@ -28,7 +28,7 @@
 
 .ops-generated {
   font-size: 0.75rem;
-  color: var(--text-muted, #888);
+  color: var(--muted);
 }
 
 /* --- Status badges --- */
@@ -41,9 +41,9 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.ops-badge--ok { background: var(--brand-green, #00c49a); color: #000; }
-.ops-badge--warn { background: var(--amber, #f5a623); color: #000; }
-.ops-badge--err { background: var(--red, #e74c3c); color: #fff; }
+.ops-badge--ok { background: var(--green-soft); color: var(--green); }
+.ops-badge--warn { background: var(--amber-soft); color: var(--amber); }
+.ops-badge--err { background: var(--red-soft); color: var(--red); }
 
 /* --- Metrics grid --- */
 .ops-metrics-grid {
@@ -54,17 +54,18 @@
 }
 
 .ops-metric {
-  background: var(--card-bg, #1e1e2e);
-  border: 1px solid var(--border-color, #333);
-  border-radius: 8px;
-  padding: var(--space-sm, 8px) var(--space-md, 16px);
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-card);
+  padding: 8px 16px;
   text-align: center;
+  box-shadow: var(--shadow);
 }
 
 .ops-metric-value {
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--text-primary, #e0e0e0);
+  color: var(--text);
   line-height: 1.2;
 }
 
@@ -73,13 +74,13 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-muted, #888);
+  color: var(--muted);
   margin-top: 4px;
 }
 
 .ops-metric-sub {
   font-size: 0.7rem;
-  color: var(--text-muted, #888);
+  color: var(--muted);
 }
 
 /* --- Period selector --- */
@@ -91,27 +92,28 @@
 
 .ops-period-btn {
   padding: 4px 14px;
-  border: 1px solid var(--border-color, #333);
+  border: 1px solid var(--line-2);
   border-radius: 6px;
   background: transparent;
-  color: var(--text-muted, #888);
+  color: var(--muted);
   font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
 .ops-period-btn:hover {
-  background: var(--card-bg, #1e1e2e);
-  color: var(--text-primary, #e0e0e0);
+  background: var(--surface-2);
+  color: var(--text);
 }
 .ops-period-btn:focus-visible {
-  outline: 2px solid var(--brand-green, #00c49a);
+  outline: 2px solid var(--blue);
   outline-offset: 2px;
 }
 .ops-period-btn--active {
-  background: var(--brand-green, #00c49a);
-  color: #000;
-  border-color: var(--brand-green, #00c49a);
+  background: var(--blue-soft);
+  color: var(--blue);
+  border-color: var(--blue);
+  font-weight: 600;
 }
 
 /* --- Bar chart --- */
@@ -135,7 +137,7 @@
 .ops-bar {
   width: 100%;
   max-width: 24px;
-  background: var(--brand-green, #00c49a);
+  background: var(--blue);
   border-radius: 2px 2px 0 0;
   min-height: 2px;
   transition: height 0.2s;
@@ -143,7 +145,7 @@
 
 .ops-bar-label {
   font-size: 0.6rem;
-  color: var(--text-muted, #888);
+  color: var(--muted);
   margin-top: 2px;
   white-space: nowrap;
 }
@@ -158,9 +160,9 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--text-muted, #888);
+  color: var(--muted);
   margin: 0 0 var(--space-xs, 4px) 0;
-  border-bottom: 1px solid var(--border-color, #333);
+  border-bottom: 1px solid var(--line-2);
   padding-bottom: 4px;
 }
 
@@ -183,8 +185,8 @@
 .ops-table td {
   padding: 4px 8px;
   text-align: left;
-  border-bottom: 1px solid var(--border-color, #333);
-  color: var(--text-primary, #e0e0e0);
+  border-bottom: 1px solid var(--line-2);
+  color: var(--text);
 }
 
 .ops-table th {
@@ -192,7 +194,7 @@
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--text-muted, #888);
+  color: var(--muted);
 }
 
 .ops-num {
@@ -212,8 +214,8 @@
   font-weight: 600;
   text-transform: uppercase;
 }
-.ops-event-type--pm_request { background: var(--brand-green, #00c49a); color: #000; }
-.ops-event-type--handoff { background: var(--amber, #f5a623); color: #000; }
+.ops-event-type--pm_request { background: var(--blue); color: #000; }
+.ops-event-type--handoff { background: var(--amber); color: #000; }
 .ops-event-type--decision { background: #6c5ce7; color: #fff; }
 
 /* --- States --- */
@@ -228,14 +230,14 @@
 }
 
 .ops-state--loading {
-  color: var(--text-muted, #888);
+  color: var(--muted);
 }
 
 .ops-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid var(--border-color, #333);
-  border-top-color: var(--brand-green, #00c49a);
+  border: 3px solid var(--line-2);
+  border-top-color: var(--blue);
   border-radius: 50%;
   animation: ops-spin 0.8s linear infinite;
   margin-bottom: var(--space-sm, 8px);
@@ -246,7 +248,7 @@
 }
 
 .ops-state--error {
-  color: var(--red, #e74c3c);
+  color: var(--red);
 }
 
 .ops-error-title {
@@ -257,29 +259,29 @@
 
 .ops-error-detail {
   font-size: 0.85rem;
-  color: var(--text-muted, #888);
+  color: var(--muted);
   margin: 0 0 var(--space-md, 16px) 0;
 }
 
 .ops-retry-btn {
   padding: 6px 16px;
-  border: 1px solid var(--border-color, #333);
+  border: 1px solid var(--line-2);
   border-radius: 6px;
   background: transparent;
-  color: var(--text-primary, #e0e0e0);
+  color: var(--text);
   cursor: pointer;
   font-size: 0.85rem;
 }
 .ops-retry-btn:hover {
-  background: var(--card-bg, #1e1e2e);
+  background: var(--surface-2);
 }
 .ops-retry-btn:focus-visible {
-  outline: 2px solid var(--brand-green, #00c49a);
+  outline: 2px solid var(--blue);
   outline-offset: 2px;
 }
 
 .ops-state--zero {
-  color: var(--text-muted, #888);
+  color: var(--muted);
 }
 
 .ops-zero-title {

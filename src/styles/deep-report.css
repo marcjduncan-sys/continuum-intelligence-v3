@@ -3,6 +3,177 @@
    Prefix: .dr-* (safe to edit freely per CSS prefix registry)
    ================================================================ */
 
+/* --- Deep Research Listing: Sort Controls --- */
+.dr-sort-controls {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.dr-sort-btn {
+  padding: 4px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface-3);
+  color: var(--text-2);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.dr-sort-btn:hover { background: var(--line-2); }
+.dr-sort-btn.active {
+  background: var(--blue-soft);
+  border-color: var(--blue);
+  color: var(--blue);
+  font-weight: 600;
+}
+
+/* --- Deep Research Listing: Grid --- */
+.dr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+/* --- Deep Research Listing: Tile --- */
+.dr-tile {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-card);
+  padding: 16px;
+  cursor: pointer;
+  transition: box-shadow 0.15s, border-color 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dr-tile:hover {
+  box-shadow: var(--shadow);
+  border-color: var(--blue);
+}
+.dr-tile:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.dr-tile.dr-skew-upside  { border-left: 3px solid var(--green); }
+.dr-tile.dr-skew-downside { border-left: 3px solid var(--red); }
+.dr-tile.dr-skew-balanced { border-left: 3px solid var(--amber); }
+
+/* --- Tile header --- */
+.dr-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.dr-ticker {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.dr-company {
+  font-size: 12px;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+.dr-sector {
+  display: inline-block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* --- Skew badge --- */
+.dr-skew-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.dr-skew-badge.badge-upside   { background: var(--green-soft); color: var(--green); }
+.dr-skew-badge.badge-balanced { background: var(--amber-soft); color: var(--amber); }
+.dr-skew-badge.badge-downside { background: var(--red-soft);   color: var(--red); }
+
+/* --- Thesis text --- */
+.dr-thesis {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-2);
+  flex: 1;
+}
+
+/* --- Hypothesis bars --- */
+.dr-hyp-bars {
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  gap: 1px;
+}
+.dr-hyp-seg {
+  height: 100%;
+  border-radius: 2px;
+}
+.dr-hyp-seg.seg-upside   { background: var(--green); }
+.dr-hyp-seg.seg-downside { background: var(--red); }
+.dr-hyp-seg.seg-neutral  { background: var(--amber); }
+
+/* --- Hypothesis legend --- */
+.dr-hyp-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dr-hyp-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.dr-hyp-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* --- Tile footer --- */
+.dr-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-2);
+}
+.dr-evidence {
+  font-size: 11px;
+  color: var(--muted);
+}
+.dr-evidence-count {
+  font-weight: 700;
+  color: var(--blue);
+}
+.dr-catalyst {
+  font-size: 11px;
+  color: var(--muted);
+}
+.dr-catalyst-event {
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* --- Update old token references in report sub-sections --- */
+
 /* --- Stance Banner --- */
 .dr-stance-banner {
   display: flex;
@@ -59,7 +230,7 @@
   margin-bottom: 32px;
   padding: 20px 24px;
   background: var(--bg-elevated);
-  border-left: 4px solid var(--brand-green);
+  border-left: 4px solid var(--blue);
 }
 
 .dr-exec-lede {
@@ -129,7 +300,7 @@
   font-weight: 600;
   text-align: left;
   padding: 8px 12px;
-  border-bottom: 2px solid var(--border-subtle);
+  border-bottom: 2px solid var(--line-2);
   color: var(--text-secondary);
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -139,7 +310,7 @@
 
 .dr-table td {
   padding: 8px 12px;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--line-2);
   color: var(--text-primary);
   vertical-align: top;
 }
@@ -188,7 +359,7 @@
   color: var(--text-muted);
   margin: 0;
   padding-top: 8px;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--line-2);
 }
 
 /* --- Section body overrides for deep content --- */
