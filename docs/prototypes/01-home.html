@@ -3,496 +3,1463 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Continuum Intelligence — Home Light V2</title>
+<title>Continuum Intelligence — Institutional Equity Research</title>
+<meta name="description" content="Cross-domain equity research for sophisticated investors. Evidence-driven analysis using the Analysis of Competing Hypotheses framework. Built by former UBS and Goldman Sachs executives.">
 <style>
-  :root{
-    --app:#f4f5f7;
-    --surface:#ffffff;
+  :root {
+    --app:      #f4f5f7;
+    --surface:  #ffffff;
     --surface-2:#fafbfc;
     --surface-3:#f1f4f7;
-    --line:#d9e0e8;
-    --line-2:#e7ecf1;
-    --text:#132233;
-    --text-2:#304255;
-    --muted:#66788c;
-    --soft:#7c8b9c;
-    --blue:#1f4b7a;
-    --blue-2:#2f6da9;
+    --line:     #d9e0e8;
+    --line-2:   #e7ecf1;
+    --text:     #132233;
+    --text-2:   #304255;
+    --muted:    #66788c;
+    --soft:     #7c8b9c;
+    --blue:     #1f4b7a;
+    --blue-mid: #234d78;
     --blue-soft:#e9f0f8;
-    --green:#2f8659;
+    --green:    #2f8659;
     --green-soft:#edf7f1;
-    --red:#b64a46;
-    --red-soft:#fceeed;
-    --amber:#94630d;
+    --red:      #b64a46;
+    --red-soft: #fceeed;
+    --amber:    #94630d;
     --amber-soft:#fff4df;
-    --violet:#6e58aa;
+    --violet:   #6e58aa;
     --violet-soft:#f1edfc;
-    --shadow:0 8px 20px rgba(16,32,51,.05);
-    --radius:12px;
+    --gold:     #7a5c1e;
+    --gold-soft:#fdf6e3;
+    --shadow:   0 10px 24px rgba(16,32,51,.06);
+    --shadow-lg:0 16px 40px rgba(16,32,51,.10);
+    --radius:   14px;
     --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
 
-  *{box-sizing:border-box}
-  html,body{
-    margin:0;
-    padding:0;
-    background:var(--app);
-    color:var(--text);
-    font-family:var(--sans);
-    font-variant-numeric: tabular-nums;
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--app);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
   }
-  a{text-decoration:none;color:inherit}
-  button,input{font:inherit}
-  .num,.mono{
-    font-family:var(--mono);
-    font-variant-numeric: tabular-nums lining-nums;
+  a { text-decoration: none; color: inherit; }
+  button, input, textarea, select { font: inherit; }
+  strong { font-weight: 800; }
+
+  /* ── TOPBAR ─────────────────────────────────────────── */
+  .topbar {
+    position: sticky; top: 0; z-index: 90;
+    display: grid;
+    grid-template-columns: 240px 1fr auto auto;
+    gap: 12px; align-items: center;
+    height: 52px; padding: 0 20px;
+    background: rgba(255,255,255,.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 800; font-size: 13px; letter-spacing: .01em;
+    color: var(--text);
+  }
+  .mark {
+    width: 26px; height: 26px; border-radius: 8px;
+    display: grid; place-items: center;
+    background: linear-gradient(160deg, #234d78, #173653);
+    color: #fff; font-size: 10px; font-weight: 900;
+    border: 1px solid #2a5a87; letter-spacing: .04em;
+    flex-shrink: 0;
+  }
+  .brand-name { font-size: 13px; font-weight: 800; }
+  .brand-name span { color: var(--blue); }
+
+  .search {
+    height: 34px; display: flex; align-items: center; gap: 8px;
+    padding: 0 12px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--surface-2);
+    color: var(--muted); max-width: 520px; width: 100%;
+  }
+  .search svg { flex-shrink: 0; opacity: .55; }
+  .search input {
+    flex: 1; border: 0; outline: 0; background: transparent;
+    color: var(--text); font-size: 12px;
+  }
+  .search input::placeholder { color: var(--muted); }
+  .kbd-row {
+    display: flex; gap: 8px; align-items: center;
+    color: var(--muted); font-size: 11px; white-space: nowrap;
+  }
+  .kbd {
+    padding: 3px 6px; border-radius: 6px;
+    border: 1px solid var(--line); background: var(--surface);
+    font-family: var(--mono); color: var(--text-2); font-size: 10px;
+  }
+  .topbar-actions { display: flex; gap: 8px; align-items: center; }
+  .btn {
+    height: 32px; padding: 0 12px; border-radius: 9px;
+    border: 1px solid var(--line); background: var(--surface);
+    color: var(--text); display: inline-flex; align-items: center;
+    gap: 7px; cursor: pointer; font-size: 12px; font-weight: 700;
+    white-space: nowrap; transition: background .12s, border-color .12s;
+  }
+  .btn:hover { background: var(--surface-3); }
+  .btn.primary {
+    background: linear-gradient(160deg, #234d78, #1b3c60);
+    border-color: #224c75; color: #fff;
+  }
+  .btn.primary:hover { background: linear-gradient(160deg, #2a5a8a, #213f68); }
+  .btn-icon { width: 32px; padding: 0; justify-content: center; }
+
+  /* ── CAPABILITY STRIP ───────────────────────────────── */
+  .cap-strip {
+    position: sticky; top: 52px; z-index: 85;
+    display: flex; gap: 6px; align-items: center;
+    padding: 7px 20px; overflow-x: auto;
+    background: rgba(244,245,247,.97);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .cap-strip::-webkit-scrollbar { display: none; }
+  .cap-label {
+    font-size: 9px; font-weight: 900; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted);
+    white-space: nowrap; margin-right: 4px; flex-shrink: 0;
+  }
+  .cap-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 9px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--surface);
+    color: var(--text-2); font-size: 10px; font-weight: 800;
+    letter-spacing: .03em; white-space: nowrap; cursor: pointer;
+    transition: background .12s, border-color .12s;
+  }
+  .cap-chip:hover, .cap-chip.active {
+    background: var(--blue-soft); border-color: #c8d8ea; color: var(--blue);
+  }
+  .cap-chip .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--muted); flex-shrink: 0;
+  }
+  .cap-chip.live .dot { background: var(--green); }
+  .cap-chip.soon .dot { background: var(--amber); }
+  .cap-divider {
+    width: 1px; height: 16px; background: var(--line);
+    flex-shrink: 0; margin: 0 4px;
   }
 
-  .topbar{
-    position:sticky; top:0; z-index:90;
-    display:grid; grid-template-columns:220px 1fr auto auto; gap:12px; align-items:center;
-    height:50px; padding:0 16px;
-    background:rgba(255,255,255,.94);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--line);
+  /* ── APP SHELL ──────────────────────────────────────── */
+  .app {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 16px;
+    align-items: start;
   }
-  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.01em}
-  .mark{
-    width:24px;height:24px;border-radius:6px;display:grid;place-items:center;
-    background:linear-gradient(180deg,#214a75,#173653);color:#fff;font-size:11px;border:1px solid #2a5a87;
-  }
-  .search{
-    height:34px;display:flex;align-items:center;gap:8px;padding:0 10px;
-    border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);
-  }
-  .search input{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-size:12px}
-  .kbd-row{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:11px}
-  .kbd{
-    padding:3px 6px;border-radius:6px;border:1px solid var(--line);
-    background:var(--surface);font-family:var(--mono);color:var(--text);
-  }
-  .actions{display:flex;gap:8px}
-  .btn{
-    height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--line);
-    background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;
-  }
-  .btn.primary{background:linear-gradient(180deg,#234d78,#1b3c60);border-color:#224c75;color:#fff}
-
-  .subnav{
-    position:sticky; top:50px; z-index:85;
-    display:flex; gap:8px; align-items:center; overflow:auto;
-    padding:8px 16px; background:rgba(244,245,247,.96); backdrop-filter:blur(8px);
-    border-bottom:1px solid var(--line);
-  }
-  .subnav a{
-    white-space:nowrap;
-    padding:6px 10px; border-radius:999px; border:1px solid var(--line);
-    background:var(--surface); color:var(--text-2); font-size:11px; font-weight:700; letter-spacing:.02em;
-  }
-  .subnav a.active,.subnav a:hover{background:var(--blue-soft); color:var(--blue); border-color:#c8d8ea}
-
-  .app{max-width:1560px;margin:0 auto;padding:14px}
-  .hero,.section{
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:12px;
-    box-shadow:var(--shadow);
-  }
-  .hero{padding:12px;margin-bottom:14px}
-  .hero-head{
-    display:grid;
-    grid-template-columns:1fr auto;
-    gap:12px;
-    align-items:start;
-  }
-  .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:800;margin-bottom:4px}
-  .title{margin:0;font-size:23px;line-height:1.04;letter-spacing:-.03em}
-  .subtitle{margin-top:4px;font-size:12px;line-height:1.45;color:var(--muted)}
-  .pill-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-  .tag{
-    display:inline-flex;align-items:center;gap:6px;
-    padding:4px 8px;border-radius:999px;border:1px solid var(--line);
-    background:var(--surface-2);font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);
-  }
-  .tag.blue{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
-  .tag.green{background:var(--green-soft);border-color:#cce6d6;color:var(--green)}
-  .tag.red{background:var(--red-soft);border-color:#f0d0ce;color:var(--red)}
-  .tag.amber{background:var(--amber-soft);border-color:#f1deb2;color:var(--amber)}
-
-  .hero-summary{
-    margin-top:10px;
-    border:1px solid var(--line);
-    border-radius:10px;
-    overflow:hidden;
-    background:var(--surface-2);
-  }
-  .hero-row{
-    display:grid;
-    grid-template-columns:126px 1fr 126px 1fr 126px 1fr;
-    border-bottom:1px solid var(--line-2);
-  }
-  .hero-row:last-child{border-bottom:0}
-  .hero-k{
-    padding:8px;
-    font-size:10px;
-    text-transform:uppercase;
-    letter-spacing:.08em;
-    color:var(--muted);
-    font-weight:800;
-    background:var(--surface-3);
-  }
-  .hero-v{
-    padding:8px;
-    font-size:12px;
-    line-height:1.42;
-    color:var(--text-2);
+  .main-col { display: grid; gap: 14px; min-width: 0; }
+  .right-rail {
+    position: sticky; top: 110px;
+    display: grid; gap: 14px;
   }
 
-  .section{padding:12px}
-  .section-head{
-    display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;
+  /* ── HERO ───────────────────────────────────────────── */
+  .hero {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: var(--shadow);
   }
-  .section-title{margin:0;font-size:17px;line-height:1.14;letter-spacing:-.02em}
-  .filters{
-    display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;
-    margin-bottom:10px;
+  .hero-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px; align-items: start;
   }
-  .chipbar{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{
-    padding:6px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);
-    font-size:11px;font-weight:700;color:var(--text-2);cursor:pointer;
+  .hero-identity { display: flex; gap: 14px; align-items: flex-start; }
+  .hero-mark {
+    width: 46px; height: 46px; border-radius: 14px;
+    display: grid; place-items: center; flex-shrink: 0;
+    background: linear-gradient(160deg, #234d78, #1a3958);
+    color: #fff; font-size: 11px; font-weight: 900;
+    border: 1px solid #275783; letter-spacing: .04em;
   }
-  .chip.active{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue)}
+  .hero-title {
+    margin: 0; font-size: 28px; font-weight: 800;
+    line-height: 1.02; letter-spacing: -.035em; color: var(--text);
+  }
+  .hero-sub {
+    margin-top: 5px; font-size: 13px; color: var(--muted);
+    line-height: 1.5; display: flex; flex-wrap: wrap; gap: 8px;
+    align-items: center;
+  }
+  .hero-sub .sep { color: var(--line); }
+  .hero-cred {
+    margin-top: 10px;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px; border-radius: 8px;
+    border: 1px solid var(--gold-soft);
+    background: var(--gold-soft);
+    font-size: 11px; font-weight: 800; color: var(--gold);
+    letter-spacing: .02em;
+  }
+  .hero-tags {
+    display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;
+  }
+  .tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 9px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--surface-2);
+    font-size: 10px; font-weight: 800; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .tag.blue   { background: var(--blue-soft);   border-color: #c8d8ea; color: var(--blue); }
+  .tag.green  { background: var(--green-soft);  border-color: #cce6d6; color: var(--green); }
+  .tag.amber  { background: var(--amber-soft);  border-color: #f1deb2; color: var(--amber); }
+  .tag.violet { background: var(--violet-soft); border-color: #ddd5f5; color: var(--violet); }
+  .tag.gold   { background: var(--gold-soft);   border-color: #e8d9b0; color: var(--gold); }
 
-  .metric-strip{
-    display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:10px;
+  /* Platform stats ribbon */
+  .stat-ribbon {
+    margin-top: 16px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--surface-2);
   }
-  .metric{
-    border:1px solid var(--line);
-    border-radius:10px;
-    background:var(--surface-2);
-    padding:10px;
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    border-bottom: 1px solid var(--line-2);
   }
-  .metric .k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
-  .metric .v{margin-top:4px;font-size:18px;font-weight:800;letter-spacing:-.02em}
-  .metric .x{margin-top:4px;font-size:11px;line-height:1.4;color:var(--text-2)}
+  .stat-row:last-child { border-bottom: 0; }
+  .stat-k {
+    padding: 10px 12px;
+    font-size: 9px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted);
+    font-weight: 900; background: var(--surface-3);
+    border-right: 1px solid var(--line-2);
+  }
+  .stat-v {
+    padding: 10px 12px;
+    font-size: 14px; font-weight: 800;
+    letter-spacing: -.02em; color: var(--text);
+    border-right: 1px solid var(--line-2);
+  }
+  .stat-v:last-child { border-right: 0; }
+  .stat-v small {
+    display: block; font-size: 11px; font-weight: 500;
+    color: var(--muted); letter-spacing: 0; margin-top: 1px;
+  }
+  .stat-v.pos { color: var(--green); }
+  .stat-v.neg { color: var(--red); }
+  .stat-v.neu { color: var(--blue); }
 
-  .table-wrap{overflow:auto;max-height:760px}
-  table{width:100%;border-collapse:collapse}
-  th,td{
-    padding:8px 6px;
-    border-bottom:1px solid var(--line-2);
-    text-align:left;
-    vertical-align:top;
-    font-size:12px;
+  /* ── MARKET STATUS ──────────────────────────────────── */
+  .market-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 9px 14px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; box-shadow: var(--shadow);
   }
-  th{
-    font-size:10px;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    color:var(--muted);
-    font-weight:800;
-    background:var(--surface-2);
-    position:sticky;
-    top:0;
-    cursor:pointer;
-    user-select:none;
+  .market-left { display: flex; align-items: center; gap: 10px; }
+  .market-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--red); flex-shrink: 0;
   }
-  th.sortable:hover{color:var(--blue)}
-  tr:last-child td{border-bottom:0}
-  .asset-name{font-weight:800;color:var(--text)}
-  .asset-sub{margin-top:2px;font-size:10px;color:var(--muted)}
-  .rating-cell .tag{font-size:9px}
-  .scenario-text{font-size:11px;line-height:1.4;white-space:nowrap}
-  .next-cat{font-size:11px;line-height:1.35;color:var(--text-2)}
+  .market-dot.open { background: var(--green); }
+  .market-label {
+    font-size: 10px; font-weight: 900; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--text-2);
+  }
+  .market-updated { font-size: 11px; color: var(--muted); }
+  .market-indices { display: flex; gap: 16px; }
+  .market-index { display: flex; align-items: center; gap: 6px; }
+  .market-index-name {
+    font-size: 10px; font-weight: 800; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .market-index-val { font-size: 12px; font-weight: 800; color: var(--text); }
+  .market-index-chg { font-size: 11px; font-weight: 700; }
+  .market-index-chg.pos { color: var(--green); }
+  .market-index-chg.neg { color: var(--red); }
+  .market-right { display: flex; gap: 8px; align-items: center; }
+  .refresh-btn {
+    height: 28px; padding: 0 10px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--surface-2);
+    color: var(--muted); font-size: 10px; font-weight: 800;
+    letter-spacing: .06em; cursor: pointer;
+    transition: background .12s;
+  }
+  .refresh-btn:hover { background: var(--surface-3); color: var(--text); }
 
-  body.compact{
-    font-size:11px;
+  /* ── SECTION SHELL ──────────────────────────────────── */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--shadow);
   }
-  body.compact .hero,
-  body.compact .section,
-  body.compact .metric{
-    padding:4px 6px !important;
+  .section-header {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; gap: 12px; margin-bottom: 12px;
   }
-  body.compact .hero-k,
-  body.compact .hero-v,
-  body.compact th,
-  body.compact td,
-  body.compact .metric .x,
-  body.compact .next-cat{
-    font-size:10px !important;
+  .eyebrow {
+    font-size: 9px; text-transform: uppercase;
+    letter-spacing: .12em; color: var(--muted);
+    font-weight: 900; margin-bottom: 3px;
   }
-  body.compact .title{font-size:20px}
-  body.compact .section-title{font-size:15px}
-  body.compact .subtitle,
-  body.compact .metric .x,
-  body.compact .asset-sub{
-    display:none !important;
+  .sec-title {
+    margin: 0; font-size: 17px; font-weight: 800;
+    line-height: 1.18; letter-spacing: -.025em;
   }
-  body.compact .chip{padding:4px 7px;font-size:10px}
-  body.compact .tag{padding:3px 6px;font-size:9px}
-  body.compact .btn{height:28px;font-size:11px;padding:0 8px}
-  body.compact .table-wrap{max-height:900px}
+  .sec-sub {
+    margin-top: 4px; font-size: 12px;
+    color: var(--muted); line-height: 1.5;
+  }
 
-  @media (max-width:1360px){
-    .metric-strip{grid-template-columns:repeat(3,1fr)}
+  /* ── FEATURED RESEARCH GRID ─────────────────────────── */
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
   }
-  @media (max-width:920px){
-    .topbar{grid-template-columns:1fr;height:auto;padding:12px}
-    .kbd-row{display:none}
-    .hero-head,.metric-strip,.filters{grid-template-columns:1fr}
-    .hero-row{grid-template-columns:1fr}
+  .research-card {
+    padding: 13px;
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    background: var(--surface-2);
+    cursor: pointer;
+    transition: box-shadow .15s, border-color .15s;
+  }
+  .research-card:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: #c8d8ea;
+  }
+  .rc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 9px; }
+  .rc-ticker {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: grid; place-items: center; flex-shrink: 0;
+    background: linear-gradient(160deg, #234d78, #1a3958);
+    color: #fff; font-size: 10px; font-weight: 900;
+    border: 1px solid #275783; letter-spacing: .03em;
+  }
+  .rc-tags { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+  .rc-company { font-size: 14px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 2px; }
+  .rc-sector { font-size: 11px; color: var(--muted); }
+  .rc-body { margin-top: 9px; }
+  .rc-bluf {
+    font-size: 12px; line-height: 1.55; color: var(--text-2);
+    display: -webkit-box; -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .rc-footer {
+    margin-top: 10px; padding-top: 9px;
+    border-top: 1px solid var(--line-2);
+    display: flex; justify-content: space-between;
+    align-items: center; gap: 8px;
+  }
+  .rc-meta { font-size: 10px; color: var(--muted); }
+  .rc-price { font-size: 13px; font-weight: 800; color: var(--text); }
+  .rc-chg { font-size: 11px; font-weight: 700; }
+  .rc-chg.pos { color: var(--green); }
+  .rc-chg.neg { color: var(--red); }
+
+  /* ── COVERAGE TABLE ─────────────────────────────────── */
+  .coverage-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--line-2);
+    text-align: left; vertical-align: middle;
+    font-size: 12px;
+  }
+  th {
+    font-size: 9px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted);
+    font-weight: 900; background: var(--surface-3);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: 0; }
+  tr:hover td { background: var(--surface-2); }
+  .td-ticker {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .t-badge {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: grid; place-items: center; flex-shrink: 0;
+    background: linear-gradient(160deg, #234d78, #1a3958);
+    color: #fff; font-size: 9px; font-weight: 900;
+    border: 1px solid #275783; letter-spacing: .02em;
+  }
+  .t-name { font-weight: 800; font-size: 12px; }
+  .t-sector { font-size: 10px; color: var(--muted); }
+  .price-val { font-weight: 800; font-size: 13px; }
+  .chg { font-size: 11px; font-weight: 700; }
+  .chg.pos { color: var(--green); }
+  .chg.neg { color: var(--red); }
+  .pos { color: var(--green); font-weight: 800; }
+  .neg { color: var(--red); font-weight: 800; }
+  .neu { color: var(--blue); font-weight: 800; }
+  .vio { color: var(--violet); font-weight: 800; }
+  .confidence-bar {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .conf-track {
+    flex: 1; height: 6px; border-radius: 999px;
+    background: #e9eef4; border: 1px solid #d6dfe8;
+    overflow: hidden; min-width: 60px;
+  }
+  .conf-fill {
+    height: 100%; border-radius: 999px;
+    background: linear-gradient(90deg, #2e6aa6, #78a5d7);
+  }
+  .conf-pct { font-size: 11px; font-weight: 800; color: var(--text-2); white-space: nowrap; }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%; display: inline-block;
+  }
+  .status-dot.fresh { background: var(--green); }
+  .status-dot.stale { background: var(--amber); }
+  .updated { font-size: 11px; color: var(--muted); }
+  .tbl-action {
+    height: 26px; padding: 0 9px; border-radius: 7px;
+    border: 1px solid var(--line); background: var(--surface);
+    color: var(--text-2); font-size: 10px; font-weight: 800;
+    cursor: pointer; transition: background .12s;
+  }
+  .tbl-action:hover { background: var(--blue-soft); color: var(--blue); border-color: #c8d8ea; }
+
+  /* ── ANNOUNCEMENTS ──────────────────────────────────── */
+  .ann-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .ann-item {
+    display: grid; grid-template-columns: 60px 1fr auto;
+    gap: 10px; align-items: start;
+    padding: 9px 10px; border: 1px solid var(--line);
+    border-radius: 10px; background: var(--surface-2);
+  }
+  .ann-ticker { font-size: 10px; font-weight: 900; color: var(--blue); letter-spacing: .04em; }
+  .ann-title { font-size: 12px; line-height: 1.45; color: var(--text-2); }
+  .ann-time { font-size: 10px; color: var(--muted); white-space: nowrap; }
+
+  /* ── RIGHT RAIL ─────────────────────────────────────── */
+  .rail-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .rail-head {
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, #fff, #f9fbfd);
+  }
+  .rail-eyebrow {
+    font-size: 9px; text-transform: uppercase;
+    letter-spacing: .12em; color: var(--muted);
+    font-weight: 900; margin-bottom: 3px;
+  }
+  .rail-title {
+    margin: 0; font-size: 16px; font-weight: 800;
+    letter-spacing: -.02em;
+  }
+  .rail-sub { margin-top: 4px; font-size: 11px; color: var(--muted); line-height: 1.45; }
+
+  /* ── ALERTS & SIGNALS RAIL ─────────────────────────── */
+  .alert-list { display: grid; gap: 0; }
+  .alert-item {
+    display: grid; grid-template-columns: auto 1fr auto;
+    gap: 10px; align-items: start;
+    padding: 10px 14px; border-bottom: 1px solid var(--line-2);
+    cursor: pointer; transition: background .1s;
+  }
+  .alert-item:last-child { border-bottom: 0; }
+  .alert-item:hover { background: var(--surface-2); }
+  .alert-icon {
+    width: 28px; height: 28px; border-radius: 8px;
+    display: grid; place-items: center; flex-shrink: 0;
+    font-size: 11px; border: 1px solid var(--line);
+  }
+  .alert-icon.upside   { background: var(--green-soft); border-color: #cce6d6; color: var(--green); }
+  .alert-icon.downside { background: var(--red-soft);   border-color: #f0d0ce; color: var(--red); }
+  .alert-icon.balanced { background: var(--blue-soft);  border-color: #c8d8ea; color: var(--blue); }
+  .alert-icon.signal   { background: var(--violet-soft);border-color: #ddd5f5; color: var(--violet); }
+  .alert-icon.macro    { background: var(--amber-soft); border-color: #f1deb2; color: var(--amber); }
+  .alert-ticker {
+    font-size: 10px; font-weight: 900; letter-spacing: .05em;
+    color: var(--text); margin-bottom: 2px;
+  }
+  .alert-text { font-size: 11px; line-height: 1.48; color: var(--text-2); }
+  .alert-time { font-size: 10px; color: var(--muted); white-space: nowrap; margin-top: 1px; }
+
+  .signal-row {
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 8px; align-items: center;
+    padding: 8px 14px; border-bottom: 1px solid var(--line-2);
+  }
+  .signal-row:last-child { border-bottom: 0; }
+  .signal-label { font-size: 11px; font-weight: 800; color: var(--text-2); }
+  .signal-sub { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .signal-val { font-size: 12px; font-weight: 800; white-space: nowrap; }
+
+  /* Watchlist rail card */
+  .watchlist { display: grid; gap: 0; }
+  .wl-item {
+    display: grid; grid-template-columns: 36px 1fr auto;
+    gap: 10px; align-items: center;
+    padding: 9px 14px; border-bottom: 1px solid var(--line-2);
+    cursor: pointer; transition: background .1s;
+  }
+  .wl-item:last-child { border-bottom: 0; }
+  .wl-item:hover { background: var(--surface-2); }
+  .wl-badge {
+    width: 32px; height: 32px; border-radius: 9px;
+    display: grid; place-items: center;
+    background: linear-gradient(160deg, #234d78, #1a3958);
+    color: #fff; font-size: 9px; font-weight: 900;
+    border: 1px solid #275783; letter-spacing: .02em;
+  }
+  .wl-name { font-size: 12px; font-weight: 800; }
+  .wl-sector { font-size: 10px; color: var(--muted); }
+  .wl-right { text-align: right; }
+  .wl-price { font-size: 13px; font-weight: 800; }
+  .wl-chg { font-size: 10px; font-weight: 700; }
+
+  /* ── SECTION ACTIONS ────────────────────────────────── */
+  .section-actions {
+    margin-top: 12px; display: flex;
+    justify-content: space-between; align-items: center; gap: 10px;
+  }
+  .tiny { font-size: 11px; color: var(--muted); line-height: 1.45; }
+
+  /* ── FOOTER ─────────────────────────────────────────── */
+  .site-footer {
+    margin-top: 40px;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .footer-inner { max-width: 1600px; margin: 0 auto; padding: 28px 20px 20px; }
+  .footer-top {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 32px; margin-bottom: 24px;
+  }
+  .footer-brand { font-size: 14px; font-weight: 800; margin-bottom: 6px; }
+  .footer-brand span { color: var(--blue); }
+  .footer-tagline { font-size: 12px; color: var(--muted); line-height: 1.55; max-width: 340px; }
+  .footer-links { display: flex; gap: 40px; }
+  .footer-col h3 { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 900; margin: 0 0 10px; }
+  .footer-col a { display: block; font-size: 12px; color: var(--text-2); margin-bottom: 6px; }
+  .footer-col a:hover { color: var(--blue); }
+  .footer-bottom {
+    padding-top: 16px; border-top: 1px solid var(--line-2);
+    display: flex; justify-content: space-between;
+    align-items: flex-start; gap: 16px;
+  }
+  .footer-disclaimer { font-size: 11px; color: var(--muted); line-height: 1.55; max-width: 720px; }
+  .footer-meta { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+  /* ── RESPONSIVE ─────────────────────────────────────── */
+  @media (max-width: 1300px) {
+    .app { grid-template-columns: 1fr; }
+    .right-rail { position: static; grid-template-columns: repeat(2, 1fr); }
+    .featured-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-row { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 900px) {
+    .topbar { grid-template-columns: 1fr auto; height: auto; padding: 10px 14px; }
+    .kbd-row { display: none; }
+    .featured-grid { grid-template-columns: 1fr; }
+    .right-rail { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr; }
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+    .market-indices { display: none; }
   }
 </style>
 </head>
 <body>
-<div class="topbar">
+
+<!-- ============================================================
+     TOPBAR
+     ============================================================ -->
+<header class="topbar">
   <div class="brand">
     <div class="mark">CI</div>
-    <div>Continuum Intelligence</div>
+    <div class="brand-name">Contin<span>uu</span>m Inte<span>ll</span>igence</div>
   </div>
 
   <div class="search">
-    <span>⌕</span>
-    <input value="Home screener - institutional universe view" />
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input placeholder="Search stocks, sectors, hypotheses…" autocomplete="off" spellcheck="false" />
   </div>
 
   <div class="kbd-row">
     <span class="kbd">/</span><span>Search</span>
-    <span class="kbd">S</span><span>Sort</span>
-    <span class="kbd">C</span><span>Catalysts</span>
-    <span class="kbd">R</span><span>Ratings</span>
+    <span class="kbd">P</span><span>Portfolio</span>
+    <span class="kbd">C</span><span>Comparator</span>
+    <span class="kbd">A</span><span>Analyst</span>
   </div>
 
-  <div class="actions">
-    <button class="btn" id="densityToggle">Compact mode</button>
-    <button class="btn">Saved screens</button>
-    <button class="btn primary">New screen</button>
+  <div class="topbar-actions">
+    <button class="btn btn-icon" title="Notifications">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </button>
+    <button class="btn">Portfolio</button>
+    <button class="btn">Comparator</button>
+    <button class="btn primary">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Analyst
+    </button>
   </div>
+</header>
+
+<!-- ============================================================
+     CAPABILITY STRIP
+     ============================================================ -->
+<div class="cap-strip">
+  <span class="cap-label">Platform</span>
+  <a class="cap-chip active live"><span class="dot"></span>Research</a>
+  <a class="cap-chip live"><span class="dot"></span>Deep Research</a>
+  <a class="cap-chip live"><span class="dot"></span>Portfolio Intelligence</a>
+  <a class="cap-chip live"><span class="dot"></span>Thesis Comparator</a>
+  <a class="cap-chip live"><span class="dot"></span>Analyst Chat</a>
+  <a class="cap-chip live"><span class="dot"></span>PM Dashboard</a>
+  <div class="cap-divider"></div>
+  <span class="cap-label">Integrations</span>
+  <a class="cap-chip soon"><span class="dot"></span>Bloomberg Terminal</a>
+  <a class="cap-chip soon"><span class="dot"></span>Risk Engine</a>
+  <a class="cap-chip soon"><span class="dot"></span>Team Chat</a>
+  <a class="cap-chip soon"><span class="dot"></span>Execution</a>
+  <a class="cap-chip soon"><span class="dot"></span>News Feed</a>
 </div>
 
-<nav class="subnav">
-  <a href="#" class="active">Home</a>
-  <a href="#">Research</a>
-  <a href="#">PM chat</a>
-  <a href="#">Analyst chat</a>
-  <a href="#">Journal</a>
-  <a href="#">Portfolio</a>
-  <a href="#">Settings</a>
-</nav>
-
+<!-- ============================================================
+     APP SHELL
+     ============================================================ -->
 <div class="app">
-  <section class="hero">
-    <div class="hero-head">
+
+  <!-- ── MAIN COLUMN ──────────────────────────────────── -->
+  <div class="main-col">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-head">
+        <div class="hero-identity">
+          <div class="hero-mark">CI</div>
+          <div>
+            <h1 class="hero-title">Continuum Intelligence</h1>
+            <div class="hero-sub">
+              <span>Independent Cross-Domain Equity Research</span>
+              <span class="sep">·</span>
+              <span>ASX Coverage Universe</span>
+              <span class="sep">·</span>
+              <span>Updated 4 April 2026</span>
+            </div>
+            <div class="hero-cred">
+              Built by former UBS &amp; Goldman Sachs executives — no conflicts, no investment banking revenue to protect
+            </div>
+          </div>
+        </div>
+        <div class="hero-tags">
+          <span class="tag blue">21 Stocks Covered</span>
+          <span class="tag green">ACH Methodology</span>
+          <span class="tag gold">Institutional Grade</span>
+          <span class="tag violet">10 Evidence Domains</span>
+        </div>
+      </div>
+
+      <!-- Platform stats ribbon -->
+      <div class="stat-ribbon">
+        <div class="stat-row">
+          <div class="stat-k">Coverage</div>
+          <div class="stat-v">21 <small>ASX-listed stocks</small></div>
+          <div class="stat-k">High Conviction</div>
+          <div class="stat-v neu">7 <small>skews ≥80% confidence</small></div>
+          <div class="stat-k">Upside Skew</div>
+          <div class="stat-v pos">12 <small>stocks</small></div>
+          <div class="stat-k">Downside Skew</div>
+          <div class="stat-v neg">5 <small>stocks</small></div>
+          <div class="stat-k">Neutral</div>
+          <div class="stat-v">4 <small>stocks</small></div>
+          <div class="stat-k">Last Refresh</div>
+          <div class="stat-v">2 Apr 2026 <small>batch updated</small></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MARKET STATUS -->
+    <div class="market-bar">
+      <div class="market-left">
+        <div class="market-dot"></div>
+        <span class="market-label">ASX Closed</span>
+        <span class="market-updated">Next open: Mon 7 Apr · 10:00 AEST</span>
+      </div>
+      <div class="market-indices">
+        <div class="market-index">
+          <span class="market-index-name">XJO</span>
+          <span class="market-index-val">7,842.3</span>
+          <span class="market-index-chg neg">−1.24%</span>
+        </div>
+        <div class="market-index">
+          <span class="market-index-name">XMJ</span>
+          <span class="market-index-val">18,421.0</span>
+          <span class="market-index-chg pos">+0.38%</span>
+        </div>
+        <div class="market-index">
+          <span class="market-index-name">XHJ</span>
+          <span class="market-index-val">44,218.5</span>
+          <span class="market-index-chg pos">+0.61%</span>
+        </div>
+        <div class="market-index">
+          <span class="market-index-name">XFJ</span>
+          <span class="market-index-val">7,104.2</span>
+          <span class="market-index-chg neg">−0.52%</span>
+        </div>
+      </div>
+      <div class="market-right">
+        <span class="market-updated">Prices as at close 4 Apr 2026</span>
+        <button class="refresh-btn">REFRESH</button>
+      </div>
+    </div>
+
+    <!-- FEATURED RESEARCH -->
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">Latest Research</div>
+          <h2 class="sec-title">Featured Reports</h2>
+          <p class="sec-sub">Most recently updated research across the coverage universe.</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn">Filter</button>
+          <button class="btn primary">Refresh All</button>
+        </div>
+      </div>
+
+      <div class="featured-grid">
+
+        <!-- Card 1: BHP -->
+        <div class="research-card">
+          <div class="rc-head">
+            <div class="rc-ticker">BHP</div>
+            <div class="rc-tags">
+              <span class="tag green">Upside</span>
+              <span class="tag amber">76%</span>
+            </div>
+          </div>
+          <div class="rc-company">BHP Group</div>
+          <div class="rc-sector">Diversified Mining · ASX: BHP</div>
+          <div class="rc-body">
+            <p class="rc-bluf">Iron ore volume recovery and copper optionality provide asymmetric upside. Potash capital discipline remains the key swing factor. China stimulus trajectory is the primary macro tripwire.</p>
+          </div>
+          <div class="rc-footer">
+            <div>
+              <div class="rc-meta">Updated 2 Apr 2026</div>
+              <div style="display:flex;gap:5px;margin-top:4px;">
+                <span class="tag blue">Moderate skew</span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="rc-price">A$52.56</div>
+              <div class="rc-chg neg">−1.8%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: CSL -->
+        <div class="research-card">
+          <div class="rc-head">
+            <div class="rc-ticker">CSL</div>
+            <div class="rc-tags">
+              <span class="tag green">Upside</span>
+              <span class="tag amber">81%</span>
+            </div>
+          </div>
+          <div class="rc-company">CSL Limited</div>
+          <div class="rc-sector">Biotechnology · ASX: CSL</div>
+          <div class="rc-body">
+            <p class="rc-bluf">Plasma collection normalisation and Behring integration milestones are the dominant catalysts. Vifor integration drag is diminishing. Pipeline optionality underpriced by consensus.</p>
+          </div>
+          <div class="rc-footer">
+            <div>
+              <div class="rc-meta">Updated 1 Apr 2026</div>
+              <div style="display:flex;gap:5px;margin-top:4px;">
+                <span class="tag green">Strong skew</span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="rc-price">A$294.40</div>
+              <div class="rc-chg pos">+0.6%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: MQG -->
+        <div class="research-card">
+          <div class="rc-head">
+            <div class="rc-ticker">MQG</div>
+            <div class="rc-tags">
+              <span class="tag amber">Balanced</span>
+              <span class="tag amber">68%</span>
+            </div>
+          </div>
+          <div class="rc-company">Macquarie Group</div>
+          <div class="rc-sector">Diversified Financials · ASX: MQG</div>
+          <div class="rc-body">
+            <p class="rc-bluf">Infrastructure asset rotation cycle is the key value driver. Green energy transition mandates provide durable fee income. Near-term earnings are sensitive to deal timing and capital markets conditions.</p>
+          </div>
+          <div class="rc-footer">
+            <div>
+              <div class="rc-meta">Updated 31 Mar 2026</div>
+              <div style="display:flex;gap:5px;margin-top:4px;">
+                <span class="tag">Balanced skew</span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="rc-price">A$218.80</div>
+              <div class="rc-chg neg">−0.4%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: XRO -->
+        <div class="research-card">
+          <div class="rc-head">
+            <div class="rc-ticker">XRO</div>
+            <div class="rc-tags">
+              <span class="tag green">Upside</span>
+              <span class="tag amber">79%</span>
+            </div>
+          </div>
+          <div class="rc-company">Xero Limited</div>
+          <div class="rc-sector">Software & Services · ASX: XRO</div>
+          <div class="rc-body">
+            <p class="rc-bluf">UK and North American subscriber growth is accelerating ahead of consensus expectations. ARPU expansion through AI-embedded features is the primary medium-term earnings lever.</p>
+          </div>
+          <div class="rc-footer">
+            <div>
+              <div class="rc-meta">Updated 30 Mar 2026</div>
+              <div style="display:flex;gap:5px;margin-top:4px;">
+                <span class="tag blue">Moderate skew</span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="rc-price">A$148.20</div>
+              <div class="rc-chg pos">+1.2%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5: GMG -->
+        <div class="research-card">
+          <div class="rc-head">
+            <div class="rc-ticker">GMG</div>
+            <div class="rc-tags">
+              <span class="tag green">Upside</span>
+              <span class="tag amber">83%</span>
+            </div>
+          </div>
+          <div class="rc-company">Goodman Group</div>
+          <div class="rc-sector">Industrial REITs · ASX: GMG</div>
+          <div class="rc-body">
+            <p class="rc-bluf">Data centre development pipeline is structurally undervalued. Hyperscaler demand for power-dense logistics assets creates a durable earnings re-rating catalyst over the next 24 months.</p>
+          </div>
+          <div class="rc-footer">
+            <div>
+              <div class="rc-meta">Updated 28 Mar 2026</div>
+              <div style="display:flex;gap:5px;margin-top:4px;">
+                <span class="tag green">Strong skew</span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="rc-price">A$36.14</div>
+              <div class="rc-chg pos">+0.9%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6: WOW -->
+        <div class="research-card">
+          <div class="rc-head">
+            <div class="rc-ticker">WOW</div>
+            <div class="rc-tags">
+              <span class="tag red">Downside</span>
+              <span class="tag amber">71%</span>
+            </div>
+          </div>
+          <div class="rc-company">Woolworths Group</div>
+          <div class="rc-sector">Food & Staples Retailing · ASX: WOW</div>
+          <div class="rc-body">
+            <p class="rc-bluf">ACCC scrutiny and consumer sentiment headwinds are compressing margin recovery. Big W drag and the BIG W strategic review introduce execution risk. Competitive intensity from Aldi and Costco is underappreciated.</p>
+          </div>
+          <div class="rc-footer">
+            <div>
+              <div class="rc-meta">Updated 27 Mar 2026</div>
+              <div style="display:flex;gap:5px;margin-top:4px;">
+                <span class="tag red">Strong skew</span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="rc-price">A$28.46</div>
+              <div class="rc-chg neg">−2.1%</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- COVERAGE UNIVERSE TABLE -->
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">Coverage Universe</div>
+          <h2 class="sec-title">All Covered Stocks</h2>
+          <p class="sec-sub">21 ASX-listed companies across 9 sectors. Sorted by thesis skew conviction.</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn">+ Add Stock</button>
+          <button class="btn">Export</button>
+        </div>
+      </div>
+
+      <div class="coverage-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Stock</th>
+              <th>Sector</th>
+              <th>Price</th>
+              <th>1D Chg</th>
+              <th>Verdict</th>
+              <th>Thesis Skew</th>
+              <th>Confidence</th>
+              <th>Updated</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="td-ticker">
+                  <div class="t-badge">GMG</div>
+                  <div>
+                    <div class="t-name">Goodman Group</div>
+                    <div class="t-sector">ASX: GMG</div>
+                  </div>
+                </div>
+              </td>
+              <td>Industrial REITs</td>
+              <td><span class="price-val">A$36.14</span></td>
+              <td><span class="chg pos">+0.9%</span></td>
+              <td><span class="tag green">Upside</span></td>
+              <td><span class="pos">Strong skew</span></td>
+              <td>
+                <div class="confidence-bar">
+                  <div class="conf-track"><div class="conf-fill" style="width:83%"></div></div>
+                  <span class="conf-pct">83%</span>
+                </div>
+              </td>
+              <td><span class="status-dot fresh"></span> <span class="updated">28 Mar</span></td>
+              <td><button class="tbl-action">View</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="td-ticker">
+                  <div class="t-badge">CSL</div>
+                  <div>
+                    <div class="t-name">CSL Limited</div>
+                    <div class="t-sector">ASX: CSL</div>
+                  </div>
+                </div>
+              </td>
+              <td>Biotechnology</td>
+              <td><span class="price-val">A$294.40</span></td>
+              <td><span class="chg pos">+0.6%</span></td>
+              <td><span class="tag green">Upside</span></td>
+              <td><span class="pos">Strong skew</span></td>
+              <td>
+                <div class="confidence-bar">
+                  <div class="conf-track"><div class="conf-fill" style="width:81%"></div></div>
+                  <span class="conf-pct">81%</span>
+                </div>
+              </td>
+              <td><span class="status-dot fresh"></span> <span class="updated">1 Apr</span></td>
+              <td><button class="tbl-action">View</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="td-ticker">
+                  <div class="t-badge">XRO</div>
+                  <div>
+                    <div class="t-name">Xero Limited</div>
+                    <div class="t-sector">ASX: XRO</div>
+                  </div>
+                </div>
+              </td>
+              <td>Software & Services</td>
+              <td><span class="price-val">A$148.20</span></td>
+              <td><span class="chg pos">+1.2%</span></td>
+              <td><span class="tag green">Upside</span></td>
+              <td><span class="pos">Moderate skew</span></td>
+              <td>
+                <div class="confidence-bar">
+                  <div class="conf-track"><div class="conf-fill" style="width:79%"></div></div>
+                  <span class="conf-pct">79%</span>
+                </div>
+              </td>
+              <td><span class="status-dot fresh"></span> <span class="updated">30 Mar</span></td>
+              <td><button class="tbl-action">View</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="td-ticker">
+                  <div class="t-badge">BHP</div>
+                  <div>
+                    <div class="t-name">BHP Group</div>
+                    <div class="t-sector">ASX: BHP</div>
+                  </div>
+                </div>
+              </td>
+              <td>Diversified Mining</td>
+              <td><span class="price-val">A$52.56</span></td>
+              <td><span class="chg neg">−1.8%</span></td>
+              <td><span class="tag green">Upside</span></td>
+              <td><span class="pos">Moderate skew</span></td>
+              <td>
+                <div class="confidence-bar">
+                  <div class="conf-track"><div class="conf-fill" style="width:76%"></div></div>
+                  <span class="conf-pct">76%</span>
+                </div>
+              </td>
+              <td><span class="status-dot fresh"></span> <span class="updated">2 Apr</span></td>
+              <td><button class="tbl-action">View</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="td-ticker">
+                  <div class="t-badge">PME</div>
+                  <div>
+                    <div class="t-name">Pro Medicus</div>
+                    <div class="t-sector">ASX: PME</div>
+                  </div>
+                </div>
+              </td>
+              <td>Health Care Technology</td>
+              <td><span class="price-val">A$218.60</span></td>
+              <td><span class="chg pos">+0.3%</span></td>
+              <td><span class="tag green">Upside</span></td>
+              <td><span class="pos">Moderate skew</span></td>
+              <td>
+                <div class="confidence-bar">
+                  <div class="conf-track"><div class="conf-fill" style="width:74%"></div></div>
+                  <span class="conf-pct">74%</span>
+                </div>
+              </td>
+              <td><span class="status-dot fresh"></span> <span class="updated">29 Mar</span></td>
+              <td><button class="tbl-action">View</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="td-ticker">
+                  <div class="t-badge">WTC</div>
+                  <div>
+                    <div class="t-name">WiseTech Global</div>
+                    <div class="t-sector">ASX: WTC</div>
+                  </div>
+                </div>
+              </td>
+              <td>Software & Services</td>
+              <td><span class="price-val">A$104.80</span></td>
+              <td><span class="chg neg">−0.7%</span></td>
+              <td><span class="tag green">Upside</span></td>
+              <td><span class="pos">Moderate skew</span></td>
+              <td>
+                <div class="confidence-bar">
+                  <div class="conf-track"><div class="conf-fill" style="width:72%"></div></div>
+                  <span class="conf-pct">72%</span>
+                </div>
+              </td>
+              <td><span class="status-dot fresh"></span> <span class="updated">27 Mar</span></td>
+              <td><button class="tbl-action">View</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="td-ticker">
+                  <div class="t-badge">MQG</div>
+                  <div>
+                    <div class="t-name">Macquarie Group</div>
+                    <div class="t-sector">ASX: MQG</div>
+                  </div>
+                </div>
+              </td>
+              <td>Diversified Financials</td>
+              <td><span class="price-val">A$218.80</span></td>
+              <td><span class="chg neg">−0.4%</span></td>
+              <td><span class="tag amber">Balanced</span></td>
+              <td><span class="neu">Balanced skew</span></td>
+              <td>
+                <div class="confidence-bar">
+                  <div class="conf-track"><div class="conf-fill" style="width:68%"></div></div>
+                  <span class="conf-pct">68%</span>
+                </div>
+              </td>
+              <td><span class="status-dot fresh"></span> <span class="updated">31 Mar</span></td>
+              <td><button class="tbl-action">View</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="td-ticker">
+                  <div class="t-badge">GYG</div>
+                  <div>
+                    <div class="t-name">Guzman y Gomez</div>
+                    <div class="t-sector">ASX: GYG</div>
+                  </div>
+                </div>
+              </td>
+              <td>Consumer Services</td>
+              <td><span class="price-val">A$38.20</span></td>
+              <td><span class="chg neg">−1.1%</span></td>
+              <td><span class="tag amber">Balanced</span></td>
+              <td><span class="neu">Balanced skew</span></td>
+              <td>
+                <div class="confidence-bar">
+                  <div class="conf-track"><div class="conf-fill" style="width:65%"></div></div>
+                  <span class="conf-pct">65%</span>
+                </div>
+              </td>
+              <td><span class="status-dot stale"></span> <span class="updated">18 Mar</span></td>
+              <td><button class="tbl-action">View</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="td-ticker">
+                  <div class="t-badge">FMG</div>
+                  <div>
+                    <div class="t-name">Fortescue</div>
+                    <div class="t-sector">ASX: FMG</div>
+                  </div>
+                </div>
+              </td>
+              <td>Steel & Iron Ore</td>
+              <td><span class="price-val">A$16.84</span></td>
+              <td><span class="chg neg">−2.4%</span></td>
+              <td><span class="tag red">Downside</span></td>
+              <td><span class="neg">Strong skew</span></td>
+              <td>
+                <div class="confidence-bar">
+                  <div class="conf-track"><div class="conf-fill" style="width:73%"></div></div>
+                  <span class="conf-pct">73%</span>
+                </div>
+              </td>
+              <td><span class="status-dot fresh"></span> <span class="updated">2 Apr</span></td>
+              <td><button class="tbl-action">View</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="td-ticker">
+                  <div class="t-badge">WOW</div>
+                  <div>
+                    <div class="t-name">Woolworths Group</div>
+                    <div class="t-sector">ASX: WOW</div>
+                  </div>
+                </div>
+              </td>
+              <td>Food & Staples Retailing</td>
+              <td><span class="price-val">A$28.46</span></td>
+              <td><span class="chg neg">−2.1%</span></td>
+              <td><span class="tag red">Downside</span></td>
+              <td><span class="neg">Moderate skew</span></td>
+              <td>
+                <div class="confidence-bar">
+                  <div class="conf-track"><div class="conf-fill" style="width:71%"></div></div>
+                  <span class="conf-pct">71%</span>
+                </div>
+              </td>
+              <td><span class="status-dot fresh"></span> <span class="updated">27 Mar</span></td>
+              <td><button class="tbl-action">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-actions">
+        <span class="tiny">Showing 10 of 21 stocks. <a href="#" style="color:var(--blue);font-weight:700">View all coverage →</a></span>
+        <div style="display:flex;gap:8px">
+          <button class="btn">Sort by Confidence</button>
+          <button class="btn">Sort by Sector</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ASX ANNOUNCEMENTS -->
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">Market Intelligence</div>
+          <h2 class="sec-title">Latest ASX Announcements</h2>
+          <p class="sec-sub">Coverage universe announcements from the last 48 hours.</p>
+        </div>
+        <button class="btn">Refresh</button>
+      </div>
+      <ul class="ann-list">
+        <li class="ann-item">
+          <div class="ann-ticker">BHP</div>
+          <div class="ann-title">Quarterly Operations Report — Q3 FY2026. Iron ore shipments 68.4Mt, in line with guidance. Copper production 476kt, +4% vs pcp.</div>
+          <div class="ann-time">4 Apr · 08:30</div>
+        </li>
+        <li class="ann-item">
+          <div class="ann-ticker">CSL</div>
+          <div class="ann-title">Investor Day Presentation — FY2026 Outlook. Plasma collection volumes tracking ahead of internal targets. Behring integration on schedule.</div>
+          <div class="ann-time">3 Apr · 14:00</div>
+        </li>
+        <li class="ann-item">
+          <div class="ann-ticker">GMG</div>
+          <div class="ann-title">Data Centre Development Update. Three new hyperscaler pre-commitments secured in North America. Total pipeline now A$14.2bn.</div>
+          <div class="ann-time">3 Apr · 10:15</div>
+        </li>
+        <li class="ann-item">
+          <div class="ann-ticker">WOW</div>
+          <div class="ann-title">ACCC Supermarket Inquiry — Response to Draft Report. Company disputes key findings on pricing conduct. Regulatory outcome remains uncertain.</div>
+          <div class="ann-time">2 Apr · 16:45</div>
+        </li>
+        <li class="ann-item">
+          <div class="ann-ticker">XRO</div>
+          <div class="ann-title">Monthly Subscriber Update — March 2026. Global subscribers 4.2M, +18% YoY. UK growth +24%, North America +31%.</div>
+          <div class="ann-time">2 Apr · 09:00</div>
+        </li>
+      </ul>
+    </section>
+
+  </div><!-- /main-col -->
+
+  <!-- ── RIGHT RAIL ────────────────────────────────────── -->
+  <aside class="right-rail">
+
+    <!-- ALERTS & SIGNALS -->
+    <div class="rail-card">
+      <div class="rail-head">
+        <div class="rail-eyebrow">Thesis Monitor</div>
+        <h2 class="rail-title">Alerts &amp; Signals</h2>
+        <p class="rail-sub">Evidence events that materially affect active theses. Requires immediate review.</p>
+      </div>
+      <div class="alert-list">
+        <div class="alert-item">
+          <div class="alert-icon downside">↓</div>
+          <div>
+            <div class="alert-ticker">FMG · Downside</div>
+            <div class="alert-text">Iron ore spot price −3.2% overnight. Directly contradicts N2 recovery hypothesis. Confidence threshold at risk.</div>
+          </div>
+          <div class="alert-time">08:41</div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-icon macro">!</div>
+          <div>
+            <div class="alert-ticker">MACRO · Materials</div>
+            <div class="alert-text">US tariff escalation announced. BHP, FMG, WDS most exposed. China stimulus response is the key tripwire.</div>
+          </div>
+          <div class="alert-time">07:15</div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-icon upside">↑</div>
+          <div>
+            <div class="alert-ticker">GMG · Upside</div>
+            <div class="alert-text">Three new hyperscaler pre-commitments. Pipeline now A$14.2bn. Strengthens N1 data centre re-rating thesis.</div>
+          </div>
+          <div class="alert-time">Yesterday</div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-icon signal">~</div>
+          <div>
+            <div class="alert-ticker">CSL · Upside</div>
+            <div class="alert-text">Plasma collection volumes ahead of internal targets per Investor Day. Supports N1 normalisation hypothesis.</div>
+          </div>
+          <div class="alert-time">Yesterday</div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-icon downside">↓</div>
+          <div>
+            <div class="alert-ticker">WOW · Downside</div>
+            <div class="alert-text">ACCC draft report disputed. Regulatory outcome remains open. N3 regulatory risk hypothesis remains live.</div>
+          </div>
+          <div class="alert-time">2 Apr</div>
+        </div>
+      </div>
+      <div style="padding:10px 14px;border-top:1px solid var(--line-2)">
+        <span class="tiny" style="color:var(--blue);font-weight:700;cursor:pointer">View all thesis events →</span>
+      </div>
+    </div>
+
+    <!-- CONVICTION SIGNALS -->
+    <div class="rail-card">
+      <div class="rail-head">
+        <div class="rail-eyebrow">Conviction Snapshot</div>
+        <h2 class="rail-title">High Conviction Skews</h2>
+        <p class="rail-sub">Stocks where evidence confidence is ≥80%. Actionable extremes only.</p>
+      </div>
       <div>
-        <div class="eyebrow">Home</div>
-        <h1 class="title">Coverage universe</h1>
-        <div class="subtitle">Institutional screener view. Maximum actionable density. Forward-looking catalysts, not narrative cards.</div>
+        <div class="signal-row">
+          <div>
+            <div class="signal-label">GMG — Goodman Group</div>
+            <div class="signal-sub">Upside · Industrial REITs · 83%</div>
+          </div>
+          <span class="tag green" style="font-size:9px">Strong</span>
+        </div>
+        <div class="signal-row">
+          <div>
+            <div class="signal-label">CSL — CSL Limited</div>
+            <div class="signal-sub">Upside · Biotechnology · 81%</div>
+          </div>
+          <span class="tag green" style="font-size:9px">Strong</span>
+        </div>
+        <div class="signal-row">
+          <div>
+            <div class="signal-label">XRO — Xero Limited</div>
+            <div class="signal-sub">Upside · Software · 79%</div>
+          </div>
+          <span class="tag green" style="font-size:9px">Moderate</span>
+        </div>
+        <div class="signal-row">
+          <div>
+            <div class="signal-label">BHP — BHP Group</div>
+            <div class="signal-sub">Upside · Mining · 76%</div>
+          </div>
+          <span class="tag green" style="font-size:9px">Moderate</span>
+        </div>
+        <div class="signal-row">
+          <div>
+            <div class="signal-label">FMG — Fortescue</div>
+            <div class="signal-sub">Downside · Iron Ore · 73%</div>
+          </div>
+          <span class="tag red" style="font-size:9px">Strong</span>
+        </div>
+        <div class="signal-row">
+          <div>
+            <div class="signal-label">WOW — Woolworths</div>
+            <div class="signal-sub">Downside · Retail · 71%</div>
+          </div>
+          <span class="tag red" style="font-size:9px">Moderate</span>
+        </div>
       </div>
-      <div class="pill-row">
-        <span class="tag blue">Coverage: 24</span>
-        <span class="tag green">OW: 9</span>
-        <span class="tag amber">72h catalysts: 3</span>
+      <div style="padding:10px 14px;border-top:1px solid var(--line-2)">
+        <span class="tiny" style="color:var(--blue);font-weight:700;cursor:pointer">Open Analyst →</span>
       </div>
     </div>
 
-    <div class="hero-summary">
-      <div class="hero-row">
-        <div class="hero-k">Best EWP upside</div>
-        <div class="hero-v"><span class="mono">NST</span> <span class="num pos">+13.9%</span></div>
-        <div class="hero-k">Negative skew</div>
-        <div class="hero-v"><span class="mono">CBA</span> <span class="num neg">-8.3%</span></div>
-        <div class="hero-k">Nearest catalyst</div>
-        <div class="hero-v"><span class="mono">SUN</span> <span class="num">08 Apr</span> (Investor Day)</div>
+    <!-- WATCHLIST -->
+    <div class="rail-card">
+      <div class="rail-head">
+        <div class="rail-eyebrow">Quick Access</div>
+        <h2 class="rail-title">Watchlist</h2>
+        <p class="rail-sub">Your pinned stocks. Click any row to open the full research page.</p>
       </div>
-      <div class="hero-row">
-        <div class="hero-k">Average OW upside</div>
-        <div class="hero-v"><span class="num">+9.1%</span></div>
-        <div class="hero-k">Average confidence</div>
-        <div class="hero-v"><span class="num">73%</span></div>
-        <div class="hero-k">Highest confidence</div>
-        <div class="hero-v"><span class="mono">CBA</span> <span class="num">81%</span></div>
+      <div class="watchlist">
+        <div class="wl-item">
+          <div class="wl-badge">GMG</div>
+          <div>
+            <div class="wl-name">Goodman Group</div>
+            <div class="wl-sector"><span class="tag green" style="font-size:9px;padding:3px 6px">Upside · 83%</span></div>
+          </div>
+          <div class="wl-right">
+            <div class="wl-price">A$36.14</div>
+            <div class="wl-chg pos">+0.9%</div>
+          </div>
+        </div>
+        <div class="wl-item">
+          <div class="wl-badge">CSL</div>
+          <div>
+            <div class="wl-name">CSL Limited</div>
+            <div class="wl-sector"><span class="tag green" style="font-size:9px;padding:3px 6px">Upside · 81%</span></div>
+          </div>
+          <div class="wl-right">
+            <div class="wl-price">A$294.40</div>
+            <div class="wl-chg pos">+0.6%</div>
+          </div>
+        </div>
+        <div class="wl-item">
+          <div class="wl-badge">BHP</div>
+          <div>
+            <div class="wl-name">BHP Group</div>
+            <div class="wl-sector"><span class="tag green" style="font-size:9px;padding:3px 6px">Upside · 76%</span></div>
+          </div>
+          <div class="wl-right">
+            <div class="wl-price">A$52.56</div>
+            <div class="wl-chg neg">−1.8%</div>
+          </div>
+        </div>
+        <div class="wl-item">
+          <div class="wl-badge">FMG</div>
+          <div>
+            <div class="wl-name">Fortescue</div>
+            <div class="wl-sector"><span class="tag red" style="font-size:9px;padding:3px 6px">Downside · 73%</span></div>
+          </div>
+          <div class="wl-right">
+            <div class="wl-price">A$16.84</div>
+            <div class="wl-chg neg">−2.4%</div>
+          </div>
+        </div>
+        <div class="wl-item">
+          <div class="wl-badge">WOW</div>
+          <div>
+            <div class="wl-name">Woolworths Group</div>
+            <div class="wl-sector"><span class="tag red" style="font-size:9px;padding:3px 6px">Downside · 71%</span></div>
+          </div>
+          <div class="wl-right">
+            <div class="wl-price">A$28.46</div>
+            <div class="wl-chg neg">−2.1%</div>
+          </div>
+        </div>
       </div>
     </div>
-  </section>
 
-  <section class="section">
-    <div class="filters">
-      <div class="chipbar">
-        <button class="chip active">All</button>
-        <button class="chip">OW</button>
-        <button class="chip">EW</button>
-        <button class="chip">UW</button>
-        <button class="chip">Next 72h</button>
-        <button class="chip">Materials</button>
-        <button class="chip">Financials</button>
-        <button class="chip">Healthcare</button>
-      </div>
-      <button class="btn">View: Institutional screener</button>
-      <button class="btn">Sort: Click headers</button>
-      <button class="btn">Export</button>
-    </div>
+  </aside><!-- /right-rail -->
 
-    <div class="section-head">
+</div><!-- /app -->
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-top">
       <div>
-        <div class="eyebrow">Screener</div>
-        <h2 class="section-title">The home page is now a dense universe table. The PM scans columns for mispricing, conviction and catalyst timing.</h2>
+        <div class="footer-brand">Contin<span>uu</span>m Inte<span>ll</span>igence</div>
+        <div class="footer-tagline">Independent cross-domain equity research for institutional and sophisticated investors. Evidence-driven analysis using the Analysis of Competing Hypotheses framework. No conflicts. No investment banking revenue to protect.</div>
       </div>
-      <span class="tag blue">Table-first</span>
-    </div>
-
-    <div class="metric-strip">
-      <div class="metric">
-        <div class="k">Average EWP upside</div>
-        <div class="v num">+8.4%</div>
-        <div class="x">Across live coverage.</div>
-      </div>
-      <div class="metric">
-        <div class="k">High-confidence names</div>
-        <div class="v num">7</div>
-        <div class="x">At or above 75% confidence.</div>
-      </div>
-      <div class="metric">
-        <div class="k">OW coverage</div>
-        <div class="v num">9</div>
-        <div class="x">Highest-conviction relative calls.</div>
-      </div>
-      <div class="metric">
-        <div class="k">UW coverage</div>
-        <div class="v num">4</div>
-        <div class="x">Negative skew or stretched valuation.</div>
-      </div>
-      <div class="metric">
-        <div class="k">Next 7d catalysts</div>
-        <div class="v num">6</div>
-        <div class="x">Event-dense watchlist.</div>
-      </div>
-      <div class="metric">
-        <div class="k">Most active sector</div>
-        <div class="v">Materials</div>
-        <div class="x">Copper, iron ore and gold remain dense.</div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h3>Research</h3>
+          <a href="#">Coverage Universe</a>
+          <a href="#">Deep Research</a>
+          <a href="#">Thesis Comparator</a>
+          <a href="#">Portfolio Intelligence</a>
+        </div>
+        <div class="footer-col">
+          <h3>Platform</h3>
+          <a href="#">Analyst Chat</a>
+          <a href="#">PM Dashboard</a>
+          <a href="#">Personalisation</a>
+          <a href="#">Analyst Journal</a>
+        </div>
+        <div class="footer-col">
+          <h3>Company</h3>
+          <a href="#">About &amp; Methodology</a>
+          <a href="#">ACH Framework</a>
+          <a href="#">Legal Disclaimer</a>
+        </div>
       </div>
     </div>
-
-    <div class="table-wrap">
-      <table id="screenerTable">
-        <thead>
-          <tr>
-            <th class="sortable" data-key="asset">Asset</th>
-            <th class="sortable" data-key="rating">Rating</th>
-            <th class="sortable" data-key="spot">Spot</th>
-            <th class="sortable" data-key="ewp">EWP</th>
-            <th class="sortable" data-key="skew">Skew</th>
-            <th class="sortable" data-key="confidence">Confidence</th>
-            <th>Scenario math</th>
-            <th class="sortable" data-key="catalystDate">Next catalyst</th>
-          </tr>
-        </thead>
-        <tbody id="screenerBody"></tbody>
-      </table>
+    <div class="footer-bottom">
+      <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the Analysis of Competing Hypotheses (ACH) methodology. No buy, sell, or hold recommendations are made. Readers should consult their own licensed financial advisors before making any investment decisions. Past performance is not indicative of future results. Continuum Intelligence, its principals, and contributors may hold positions in securities discussed.</div>
+      <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
     </div>
-  </section>
-</div>
+  </div>
+</footer>
 
-<script>
-  const rows = [
-    {asset:'BHP', name:'BHP Group', sector:'Materials', rating:'OW', spot:52.56, ewp:56.55, skew:7.6, confidence:76, bear:44, bearP:20, base:56, baseP:45, bull:63, bullP:25, catalystDate:'2026-04-18', catalystLabel:'18 Apr (Ops Review)'},
-    {asset:'RIO', name:'Rio Tinto', sector:'Materials', rating:'EW', spot:118.40, ewp:122.10, skew:3.1, confidence:68, bear:102, bearP:22, base:122, baseP:48, bull:132, bullP:20, catalystDate:'2026-04-15', catalystLabel:'15 Apr (Production)'},
-    {asset:'CBA', name:'Commonwealth Bank', sector:'Financials', rating:'UW', spot:196.30, ewp:180.00, skew:-8.3, confidence:81, bear:162, bearP:30, base:180, baseP:50, bull:205, bullP:12, catalystDate:'2026-05-08', catalystLabel:'08 May (Q3 Update)'},
-    {asset:'CSL', name:'CSL', sector:'Healthcare', rating:'OW', spot:309.20, ewp:338.00, skew:9.3, confidence:73, bear:286, bearP:20, base:338, baseP:50, bull:362, bullP:22, catalystDate:'2026-04-24', catalystLabel:'24 Apr (Investor Briefing)'},
-    {asset:'WES', name:'Wesfarmers', sector:'Consumer', rating:'EW', spot:73.10, ewp:75.00, skew:2.6, confidence:66, bear:66, bearP:24, base:75, baseP:52, bull:80, bullP:16, catalystDate:'2026-04-29', catalystLabel:'29 Apr (Quarterly Sales)'},
-    {asset:'NST', name:'Northern Star', sector:'Gold', rating:'OW', spot:19.85, ewp:22.60, skew:13.9, confidence:72, bear:17.8, bearP:18, base:22.6, baseP:47, bull:25.0, bullP:27, catalystDate:'2026-04-11', catalystLabel:'11 Apr (Production)'},
-    {asset:'XRO', name:'Xero', sector:'Technology', rating:'OW', spot:156.60, ewp:176.00, skew:12.4, confidence:71, bear:142, bearP:20, base:176, baseP:45, bull:189, bullP:25, catalystDate:'2026-04-28', catalystLabel:'28 Apr (Strategy Day)'},
-    {asset:'MQG', name:'Macquarie Group', sector:'Financials', rating:'EW', spot:200.40, ewp:214.00, skew:6.8, confidence:69, bear:182, bearP:22, base:214, baseP:48, bull:232, bullP:20, catalystDate:'2026-05-03', catalystLabel:'03 May (Full Year)'},
-    {asset:'SUN', name:'Suncorp', sector:'Financials', rating:'EW', spot:17.42, ewp:18.05, skew:3.6, confidence:65, bear:16.1, bearP:24, base:18.1, baseP:50, bull:19.0, bullP:18, catalystDate:'2026-04-08', catalystLabel:'08 Apr (Investor Day)'},
-    {asset:'GMG', name:'Goodman Group', sector:'REITs', rating:'OW', spot:36.10, ewp:39.40, skew:9.1, confidence:70, bear:32.5, bearP:18, base:39.4, baseP:46, bull:42.8, bullP:24, catalystDate:'2026-04-22', catalystLabel:'22 Apr (Quarterly Update)'}
-  ];
-
-  let screener = [...rows];
-  let sortState = { key: 'skew', dir: 'desc' };
-
-  function fmtMoney(x){
-    return typeof x === 'number' && x < 100 ? x.toFixed(2) : x.toFixed(2);
-  }
-
-  function ratingTag(r){
-    if (r === 'OW') return 'green';
-    if (r === 'UW') return 'red';
-    return 'amber';
-  }
-
-  function scenarioHTML(r){
-    const bearClass = 'neg';
-    const baseClass = 'neu';
-    const bullClass = 'pos';
-    return `
-      <span class="${bearClass} mono">${r.bear} (${r.bearP}%)</span>
-      <span class="mono"> | </span>
-      <span class="${baseClass} mono">${r.base} (${r.baseP}%)</span>
-      <span class="mono"> | </span>
-      <span class="${bullClass} mono">${r.bull} (${r.bullP}%)</span>
-    `;
-  }
-
-  function sortRows(){
-    screener.sort((a,b) => {
-      let av = a[sortState.key];
-      let bv = b[sortState.key];
-      if (typeof av === 'string' && typeof bv === 'string'){
-        return sortState.dir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
-      }
-      return sortState.dir === 'asc' ? av - bv : bv - av;
-    });
-  }
-
-  function render(){
-    sortRows();
-    const tbody = document.getElementById('screenerBody');
-    tbody.innerHTML = screener.map(r => `
-      <tr>
-        <td>
-          <div class="asset-name">${r.asset}</div>
-          <div class="asset-sub">${r.name} • ${r.sector}</div>
-        </td>
-        <td class="rating-cell"><span class="tag ${ratingTag(r.rating)}">${r.rating}</span></td>
-        <td class="num">${fmtMoney(r.spot)}</td>
-        <td class="num">${fmtMoney(r.ewp)}</td>
-        <td class="num ${r.skew >= 0 ? 'pos' : 'neg'}">${r.skew >= 0 ? '+' : ''}${r.skew.toFixed(1)}%</td>
-        <td class="num">${r.confidence}%</td>
-        <td class="scenario-text">${scenarioHTML(r)}</td>
-        <td class="next-cat"><span class="mono">${r.catalystLabel}</span></td>
-      </tr>
-    `).join('');
-  }
-
-  document.querySelectorAll('th.sortable').forEach(th => {
-    th.addEventListener('click', () => {
-      const key = th.dataset.key;
-      if (sortState.key === key){
-        sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
-      } else {
-        sortState.key = key;
-        sortState.dir = ['asset','rating','catalystDate'].includes(key) ? 'asc' : 'desc';
-      }
-      render();
-    });
-  });
-
-  document.getElementById('densityToggle').addEventListener('click', () => {
-    document.body.classList.toggle('compact');
-    document.getElementById('densityToggle').textContent =
-      document.body.classList.contains('compact') ? 'Standard mode' : 'Compact mode';
-  });
-
-  document.querySelectorAll('.chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-    });
-  });
-
-  render();
-</script>
 </body>
 </html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About · Continuum Intelligence</title>
+<style>
+  :root {
+    --app:#f4f5f7;--surface:#ffffff;--surface-2:#fafbfc;--surface-3:#f1f4f7;
+    --line:#d9e0e8;--line-2:#e7ecf1;--text:#132233;--text-2:#304255;
+    --muted:#66788c;--blue:#1f4b7a;--blue-soft:#e9f0f8;
+    --green:#2f8659;--green-soft:#edf7f1;
+    --red:#b64a46;--red-soft:#fceeed;
+    --amber:#94630d;--amber-soft:#fff4df;
+    --violet:#6e58aa;--violet-soft:#f1edfc;
+    --shadow:0 8px 20px rgba(16,32,51,.06);--shadow-lg:0 16px 40px rgba(16,32,51,.10);
+    --sans:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--app);color:var(--text);font-family:var(--sans);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  a{text-decoration:none;color:inherit;}
+  button,input,textarea,select{font:inherit;}
+  .topbar{position:sticky;top:0;z-index:90;display:grid;grid-template-columns:240px 1fr auto auto;gap:12px;align-items:center;height:52px;padding:0 20px;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:13px;}
+  .mark{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(160deg,#234d78,#173653);color:#fff;font-size:10px;font-weight:900;border:1px solid #2a5a87;letter-spacing:.04em;flex-shrink:0;}
+  .search{height:34px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);max-width:520px;width:100%;}
+  .search input{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-size:12px;}
+  .search input::placeholder{color:var(--muted);}
+  .kbd{padding:3px 6px;border-radius:6px;border:1px solid var(--line);background:var(--surface);font-family:var(--mono);color:var(--text-2);font-size:10px;}
+  .topbar-ctx{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--muted);}
+  .topbar-ctx strong{color:var(--text);font-weight:800;}
+  .topbar-ctx a{color:var(--blue);font-weight:700;}
+  .topbar-actions{display:flex;gap:8px;align-items:center;}
+  .btn{height:32px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;transition:background .12s;}
+  .btn:hover{background:var(--surface-3);}
+  .btn.primary{background:linear-gradient(160deg,#234d78,#1b3c60);border-color:#224c75;color:#fff;}
+
+  /* MANIFESTO HERO */
+  .manifesto-hero{background:linear-gradient(160deg,#0f2438,#1a3958,#234d78);padding:80px 20px;text-align:center;color:#fff;}
+  .mh-inner{max-width:760px;margin:0 auto;}
+  .mh-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:rgba(255,255,255,.45);font-weight:900;margin-bottom:16px;}
+  .mh-title{font-size:42px;font-weight:800;letter-spacing:-.06em;line-height:1.08;margin:0 0 20px;}
+  .mh-title span{color:#60a5fa;}
+  .mh-body{font-size:16px;line-height:1.75;color:rgba(255,255,255,.65);margin-bottom:28px;}
+  .mh-stats{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;}
+  .mh-stat{display:flex;flex-direction:column;gap:4px;align-items:center;}
+  .mh-stat-v{font-size:28px;font-weight:800;color:#fff;letter-spacing:-.04em;}
+  .mh-stat-k{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.45);font-weight:900;}
+
+  /* PAGE BODY */
+  .page-body{max-width:1000px;margin:0 auto;padding:48px 20px;}
+
+  /* SECTION */
+  .about-section{margin-bottom:48px;}
+  .as-eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:900;margin-bottom:8px;}
+  .as-title{font-size:24px;font-weight:800;letter-spacing:-.04em;margin:0 0 16px;}
+  .as-body{font-size:14px;line-height:1.8;color:var(--text-2);margin-bottom:16px;}
+  .as-body strong{color:var(--text);}
+  .as-divider{height:1px;background:var(--line);margin:48px 0;}
+
+  /* METHODOLOGY */
+  .method-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:24px;}
+  .method-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow);}
+  .mc-number{font-size:32px;font-weight:800;letter-spacing:-.06em;color:var(--blue);opacity:.3;margin-bottom:8px;}
+  .mc-title{font-size:15px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px;}
+  .mc-body{font-size:12px;line-height:1.7;color:var(--text-2);}
+  .mc-body strong{color:var(--text);}
+
+  /* PRINCIPLES */
+  .principle-list{display:grid;gap:12px;margin-top:16px;}
+  .principle-item{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);}
+  .pi-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:18px;flex-shrink:0;background:var(--blue-soft);border:1px solid #c8d8ea;}
+  .pi-title{font-size:13px;font-weight:800;margin-bottom:4px;}
+  .pi-body{font-size:12px;line-height:1.65;color:var(--text-2);}
+
+  /* DIFFERENTIATION TABLE */
+  .diff-table{width:100%;border-collapse:collapse;margin-top:16px;}
+  .diff-table th{padding:10px 14px;background:var(--surface-3);border-bottom:1px solid var(--line);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:900;text-align:left;}
+  .diff-table td{padding:12px 14px;border-bottom:1px solid var(--line-2);font-size:12px;vertical-align:top;}
+  .diff-table tr:last-child td{border-bottom:0;}
+  .diff-table tr:hover td{background:var(--surface-2);}
+  .diff-check{color:var(--green);font-weight:900;}
+  .diff-cross{color:var(--red);font-weight:900;}
+  .diff-label{font-weight:800;color:var(--text);}
+
+  /* TEAM */
+  .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px;}
+  .team-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow);text-align:center;}
+  .tc-avatar{width:56px;height:56px;border-radius:16px;background:linear-gradient(160deg,#234d78,#1a3958);display:grid;place-items:center;color:#fff;font-size:20px;font-weight:900;margin:0 auto 12px;}
+  .tc-name{font-size:14px;font-weight:800;letter-spacing:-.02em;margin-bottom:3px;}
+  .tc-role{font-size:11px;color:var(--muted);margin-bottom:10px;}
+  .tc-bio{font-size:11px;line-height:1.65;color:var(--text-2);}
+
+  /* CTA */
+  .cta-block{background:linear-gradient(160deg,#1a3958,#0f2438);border-radius:20px;padding:40px;text-align:center;color:#fff;margin-top:48px;}
+  .cta-title{font-size:26px;font-weight:800;letter-spacing:-.04em;margin-bottom:10px;}
+  .cta-sub{font-size:14px;color:rgba(255,255,255,.6);margin-bottom:24px;}
+  .cta-actions{display:flex;justify-content:center;gap:12px;}
+  .cta-btn{height:40px;padding:0 20px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .12s;}
+  .cta-btn:hover{background:rgba(255,255,255,.18);}
+  .cta-btn.primary{background:#fff;color:var(--blue);border-color:#fff;}
+  .cta-btn.primary:hover{background:rgba(255,255,255,.9);}
+
+  .site-footer{margin-top:0;border-top:1px solid var(--line);background:var(--surface);padding:32px 20px 24px;}
+  .footer-inner{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;}
+  .footer-col-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--text);margin-bottom:10px;}
+  .footer-link{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;cursor:pointer;}
+  .footer-link:hover{color:var(--blue);}
+  .footer-bottom{max-width:1000px;margin:20px auto 0;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+  .footer-disclaimer{font-size:10px;color:var(--muted);line-height:1.7;max-width:600px;}
+  .footer-meta{font-size:10px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><div class="mark">CI</div><span>Continuum Intelligence</span></div>
+  <div class="search">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Search stocks, sectors, hypotheses…" />
+    <span class="kbd">⌘K</span>
+  </div>
+  <div class="topbar-ctx"><span>Page:</span><strong>About</strong><span>·</span><a href="index.html">Home</a></div>
+  <div class="topbar-actions">
+    <button class="btn">Contact</button>
+    <button class="btn primary">Request Access</button>
+  </div>
+</header>
+
+<!-- MANIFESTO HERO -->
+<div class="manifesto-hero">
+  <div class="mh-inner">
+    <div class="mh-eyebrow">Continuum Intelligence · Est. 2025</div>
+    <h1 class="mh-title">The end of the<br><span>sell-side opinion.</span></h1>
+    <p class="mh-body">We built Continuum Intelligence because the institutional investment process was broken. Not incrementally broken — fundamentally broken. Forty-page PDFs. Backward-engineered price targets. Selective evidence. A single, brittle number dressed up as analysis. We replaced all of it with something better: evidence mapping.</p>
+    <div class="mh-stats">
+      <div class="mh-stat"><div class="mh-stat-v">147+</div><div class="mh-stat-k">Evidence Items per Stock</div></div>
+      <div class="mh-stat"><div class="mh-stat-v">4</div><div class="mh-stat-k">ACH Cases per Thesis</div></div>
+      <div class="mh-stat"><div class="mh-stat-v">EWP</div><div class="mh-stat-k">Evidence Weighted Price</div></div>
+      <div class="mh-stat"><div class="mh-stat-v">Top 1%</div><div class="mh-stat-k">Investor Audience</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- THE PROBLEM -->
+  <div class="about-section">
+    <div class="as-eyebrow">The Problem</div>
+    <h2 class="as-title">Why the existing tools fail the best investors</h2>
+    <p class="as-body">The top 1% of institutional investors — portfolio managers running A$100M+ mandates, senior analysts at tier-one funds — have access to every terminal, every data feed, and every broker note. And yet, the core analytical process has not changed in 40 years. The sell-side produces a price target. The buy-side either agrees or disagrees. The evidence that drove the conclusion is buried in footnotes, if it appears at all.</p>
+    <p class="as-body">The result is a process that is <strong>opinion-heavy and evidence-light</strong>. Price targets are anchored to the analyst's prior view. Confidence intervals are invisible. The Bear Case is always a footnote, never a first-class hypothesis. And when the evidence changes, the price target rarely does — until it is too late.</p>
+    <p class="as-body">Continuum Intelligence was built to fix this. Not to add another data feed. Not to add another AI chatbot. To replace the analytical process itself.</p>
+  </div>
+
+  <div class="as-divider"></div>
+
+  <!-- THE METHODOLOGY -->
+  <div class="about-section">
+    <div class="as-eyebrow">The Methodology</div>
+    <h2 class="as-title">Analysis of Competing Hypotheses — adapted for institutional investment</h2>
+    <p class="as-body">The ACH methodology was developed by the US intelligence community as a structured analytical technique for evaluating competing hypotheses against a body of evidence. We adapted it for institutional investment research. The result is a framework that forces the analyst to consider all four scenarios — not just the one they already believe — and to weight each one by the evidence, not by conviction.</p>
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="mc-number">01</div>
+        <div class="mc-title">Four Named Cases</div>
+        <div class="mc-body">Every stock thesis is structured around four competing hypotheses: the <strong>Bull Case</strong>, the <strong>Base Case</strong>, the <strong>Bear Case</strong>, and the <strong>Swing Case</strong>. Each case is a first-class hypothesis with its own price target, probability weight, and evidence mapping. The Swing Case captures the asymmetric wildcard — the single factor that could resolve the thesis materially in either direction.</div>
+      </div>
+      <div class="method-card">
+        <div class="mc-number">02</div>
+        <div class="mc-title">Evidence For / Evidence Against</div>
+        <div class="mc-body">Every piece of evidence — ASX announcements, macro data, quantitative signals, management commentary, industry news — is classified as supporting or contradicting each case. The balance of evidence across all four cases determines the probability weight assigned to each. This is not a model. It is a structured evidence audit.</div>
+      </div>
+      <div class="method-card">
+        <div class="mc-number">03</div>
+        <div class="mc-title">The Evidence Weighted Price</div>
+        <div class="mc-body">The EWP is the platform's core proprietary output. It is calculated as the probability-weighted average of the four case price targets: <strong>EWP = (Bull × weight) + (Base × weight) + (Bear × weight) + (Swing × weight)</strong>. It is not a price target. It is a probability-weighted price derived from the evidence balance. It updates dynamically as new evidence enters the system.</div>
+      </div>
+      <div class="method-card">
+        <div class="mc-number">04</div>
+        <div class="mc-title">The EWP Gap</div>
+        <div class="mc-body">The gap between the live market price and the EWP is the platform's primary decision signal. A positive EWP gap indicates the evidence supports a higher price than the market is currently pricing. A negative EWP gap indicates the evidence supports a lower price. This is the most powerful single output on the platform — and it sits front and centre on every stock page.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="as-divider"></div>
+
+  <!-- PRINCIPLES -->
+  <div class="about-section">
+    <div class="as-eyebrow">Design Principles</div>
+    <h2 class="as-title">What we believe about how the best investors work</h2>
+    <div class="principle-list">
+      <div class="principle-item">
+        <div class="pi-icon">⚖</div>
+        <div><div class="pi-title">Evidence over opinion</div><div class="pi-body">Every output on the platform is derived from evidence, not from the analyst's prior view. The EWP is calculated from the evidence balance, not from a DCF model built backward from a conclusion. If the evidence changes, the EWP changes. Automatically.</div></div>
+      </div>
+      <div class="principle-item">
+        <div class="pi-icon">🔍</div>
+        <div><div class="pi-title">Transparency over black boxes</div><div class="pi-body">The EWP derivation is fully auditable. Every case weight, every price target, every evidence item is visible. There are no hidden models. The evidence-to-price chain is transparent by design. If you cannot explain why the EWP is what it is, the platform has failed.</div></div>
+      </div>
+      <div class="principle-item">
+        <div class="pi-icon">⚡</div>
+        <div><div class="pi-title">Speed over comprehensiveness</div><div class="pi-body">The Home page is designed to answer "what needs my attention?" in under 5 seconds. The Research page is designed to answer "what is the evidence gap?" in under 30 seconds. Information density is a feature, not a bug. We do not use whitespace to make the platform feel premium — we use precision.</div></div>
+      </div>
+      <div class="principle-item">
+        <div class="pi-icon">🤝</div>
+        <div><div class="pi-title">Intelligence that compounds</div><div class="pi-body">The AI agents — Analyst, Portfolio Manager, Strategist — are not chatbots. They are specialised intelligence agents that understand the ACH framework, the evidence dossier, and the portfolio context. Every response is grounded in evidence and cited back to the specific data point. The more you use the platform, the more the intelligence compounds.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="as-divider"></div>
+
+  <!-- DIFFERENTIATION -->
+  <div class="about-section">
+    <div class="as-eyebrow">Competitive Differentiation</div>
+    <h2 class="as-title">Why Continuum is different from every other platform</h2>
+    <table class="diff-table">
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th>Continuum Intelligence</th>
+          <th>Bloomberg / Refinitiv</th>
+          <th>Traditional Sell-Side</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="diff-label">Evidence-weighted price output</td><td class="diff-check">✓ EWP — core output</td><td class="diff-cross">✗ Not available</td><td class="diff-cross">✗ Not available</td></tr>
+        <tr><td class="diff-label">Four ACH case structure</td><td class="diff-check">✓ Bull / Base / Bear / Swing</td><td class="diff-cross">✗ Not available</td><td class="diff-cross">✗ Footnote at best</td></tr>
+        <tr><td class="diff-label">Evidence for / against mapping</td><td class="diff-check">✓ Per case, per domain</td><td class="diff-cross">✗ Not available</td><td class="diff-cross">✗ Selective at best</td></tr>
+        <tr><td class="diff-label">Real-time EWP updates</td><td class="diff-check">✓ Dynamic on new evidence</td><td class="diff-cross">✗ Not available</td><td class="diff-cross">✗ Quarterly at best</td></tr>
+        <tr><td class="diff-label">Specialised AI agents (3 roles)</td><td class="diff-check">✓ Analyst / PM / Strategist</td><td class="diff-cross">✗ Generic AI only</td><td class="diff-cross">✗ Not available</td></tr>
+        <tr><td class="diff-label">Portfolio EWP gap dashboard</td><td class="diff-check">✓ Full portfolio view</td><td class="diff-cross">✗ Not available</td><td class="diff-cross">✗ Not available</td></tr>
+        <tr><td class="diff-label">Auditable price derivation</td><td class="diff-check">✓ Full arithmetic visible</td><td class="diff-cross">✗ Not available</td><td class="diff-cross">✗ Model hidden</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="as-divider"></div>
+
+  <!-- TEAM -->
+  <div class="about-section">
+    <div class="as-eyebrow">The Team</div>
+    <h2 class="as-title">Built by investors, for investors</h2>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="tc-avatar">MR</div>
+        <div class="tc-name">Michael Reid</div>
+        <div class="tc-role">Co-Founder &amp; CEO</div>
+        <div class="tc-bio">Former Portfolio Manager at a top-tier Australian long/short equity fund. 18 years in institutional investment. Architect of the ACH investment framework.</div>
+      </div>
+      <div class="team-card">
+        <div class="tc-avatar">SK</div>
+        <div class="tc-name">Sarah Kim</div>
+        <div class="tc-role">Co-Founder &amp; CTO</div>
+        <div class="tc-bio">Former engineering lead at a major financial data platform. Expert in real-time evidence ingestion, NLP classification, and institutional-grade data architecture.</div>
+      </div>
+      <div class="team-card">
+        <div class="tc-avatar">JT</div>
+        <div class="tc-name">James Thornton</div>
+        <div class="tc-role">Head of Research</div>
+        <div class="tc-bio">Former senior analyst at a bulge-bracket investment bank. Specialist in the ACH methodology and its application to equity research. Oversees the evidence classification framework.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-block">
+    <div class="cta-title">Ready to replace the sell-side opinion?</div>
+    <div class="cta-sub">Continuum Intelligence is available to institutional investors by application. Top 1% only.</div>
+    <div class="cta-actions">
+      <button class="cta-btn primary">Request Access</button>
+      <button class="cta-btn">View the Platform</button>
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-col-title">Platform</div>
+      <a class="footer-link" href="index.html">Home</a>
+      <a class="footer-link" href="research.html">Research</a>
+      <a class="footer-link" href="deep-research.html">Deep Research</a>
+      <a class="footer-link" href="comparator.html">Thesis Comparator</a>
+      <a class="footer-link" href="portfolio.html">Portfolio Intelligence</a>
+      <a class="footer-link" href="pm-dashboard.html">PM Dashboard</a>
+    </div>
+    <div>
+      <div class="footer-col-title">Resources</div>
+      <a class="footer-link" href="journal.html">Analyst Journal</a>
+      <a class="footer-link" href="personalisation.html">Personalisation</a>
+      <a class="footer-link" href="#">ACH Methodology</a>
+      <a class="footer-link" href="#">EWP Explainer</a>
+      <a class="footer-link" href="#">API Documentation</a>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <a class="footer-link" href="about.html">About</a>
+      <a class="footer-link" href="#">Contact</a>
+      <a class="footer-link" href="#">Privacy Policy</a>
+      <a class="footer-link" href="#">Terms of Service</a>
+      <a class="footer-link" href="#">Request Access</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the ACH methodology. The EWP is a probability-weighted analytical output and is not a price target or investment recommendation. Continuum Intelligence Pty Ltd, its principals, and contributors may hold positions in securities discussed. AFSL application pending.</div>
+    <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
+  </div>
+</footer>
+</body>
+</html>
