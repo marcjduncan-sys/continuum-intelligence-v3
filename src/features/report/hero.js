@@ -22,50 +22,105 @@ export function renderRefreshControls(data) {
 
 export function renderDecisionRibbon(data) {
   const livePrice = data._livePrice || data.price || '';
+  const current = parseFloat(livePrice) || 0;
+  const currency = data.currency || 'A$';
   const verdictClass = data.hero && data.hero.skew === 'UPSIDE' ? 'upside' :
     data.hero && data.hero.skew === 'DOWNSIDE' ? 'downside' : 'balanced';
   const verdictLabel = data.hero && data.hero.skew
     ? data.hero.skew.charAt(0) + data.hero.skew.slice(1).toLowerCase()
     : 'Balanced';
 
-  // EWP worlds strip
-  let ewpHtml = '';
-  if (data.hero && data.hero.position_in_range && data.hero.position_in_range.worlds && data.hero.position_in_range.worlds.length) {
-    const worlds = data.hero.position_in_range.worlds;
-    const current = parseFloat(livePrice) || 0;
-    let ewpCells = '';
-    for (var wi = 0; wi < worlds.length; wi++) {
-      const w = worlds[wi];
-      const wPrice = parseFloat(w.price) || 0;
-      ewpCells += '<div class="ewp-cell">' +
-        '<div class="ewp-label">' + (w.label || '') + '</div>' +
-        '<div class="ewp-price">' + formatPriceWithCurrency(wPrice, 'A$', 0) + '</div>' +
-      '</div>';
+  // Chevron SVG for verdict tag
+  const chevronUp = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>';
+  const chevronDown = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>';
+  const verdictChevron = verdictClass === 'upside' ? chevronUp : verdictClass === 'downside' ? chevronDown : '';
+
+  // Calculate EWP from worlds
+  let ewpValue = 0;
+  const worlds = (data.hero && data.hero.position_in_range && data.hero.position_in_range.worlds) || [];
+  const norm = data.hypotheses ? (function() {
+    // Use normalised scores as probability weights
+    const hyps = data.hypotheses;
+    let total = 0;
+    for (let i = 0; i < hyps.length; i++) total += parseFloat(hyps[i].score) || 0;
+    return hyps.map(function(h) { return total > 0 ? (parseFloat(h.score) || 0) / total : 0; });
+  })() : [];
+
+  if (worlds.length) {
+    for (let wi = 0; wi < worlds.length; wi++) {
+      const prob = norm[wi] || (worlds[wi].probability || (1 / worlds.length));
+      ewpValue += (parseFloat(worlds[wi].price) || 0) * prob;
     }
-    if (current > 0) {
-      ewpCells += '<div class="ewp-cell ewp-cell--current highlight">' +
-        '<div class="ewp-label">Current</div>' +
-        '<div class="ewp-price">' + formatPriceWithCurrency(current, 'A$') + '</div>' +
-      '</div>';
-    }
-    ewpHtml = '<div class="ewp-strip">' + ewpCells + '</div>';
   }
 
-  // Key stats from heroMetrics (up to 5)
-  let statsHtml = '';
-  if (data.heroMetrics && data.heroMetrics.length) {
-    let cells = '';
-    const count = Math.min(data.heroMetrics.length, 5);
-    for (var mi = 0; mi < count; mi++) {
-      const m = data.heroMetrics[mi];
-      const valCls = 'dr-stat-value' + (m.colorClass ? ' ' + m.colorClass : '');
-      cells += '<div class="dr-stat">' +
-        '<div class="dr-stat-label">' + m.label + '</div>' +
-        '<div class="' + valCls + '">' + m.value + '</div>' +
-      '</div>';
-    }
-    statsHtml = '<div class="dr-stats">' + cells + '</div>';
+  // EWP gap
+  const ewpGap = current > 0 && ewpValue > 0 ? ((ewpValue - current) / current * 100) : 0;
+  const gapCls = ewpGap >= 0 ? 'pos' : 'neg';
+  const gapSign = ewpGap >= 0 ? '+' : '';
+  const gapLabel = ewpGap >= 0 ? 'Upside to EWP' : 'Downside to EWP';
+
+  // Evidence domain count
+  const evCount = (data.evidence && data.evidence.cards) ? data.evidence.cards.length : 0;
+
+  // Build EWP strip (4-column per prototype)
+  let ewpHtml = '';
+  if (ewpValue > 0 || current > 0) {
+    ewpHtml = '<div class="ewp-strip">' +
+      '<div class="ewp-cell">' +
+        '<div class="ewp-k">Live Market Price</div>' +
+        '<div class="ewp-v">' + formatPriceWithCurrency(current, currency) + '</div>' +
+        '<div class="ewp-sub">' + (data.exchange || 'ASX') + ' &middot; ' + (data.date ? formatDateAEST(data.date) : '') + '</div>' +
+      '</div>' +
+      '<div class="ewp-cell highlight">' +
+        '<div class="ewp-k">Evidence Weighted Price</div>' +
+        '<div class="ewp-v">' + formatPriceWithCurrency(ewpValue, currency) + '</div>' +
+        '<div class="ewp-sub">ACH probability-weighted &middot; ' + worlds.length + ' cases</div>' +
+      '</div>' +
+      '<div class="ewp-cell">' +
+        '<div class="ewp-k">EWP Gap</div>' +
+        '<div class="ewp-gap-v ' + gapCls + '">' + gapSign + ewpGap.toFixed(1) + '%</div>' +
+        '<div class="ewp-gap-badge ' + gapCls + '">' + (ewpGap >= 0 ? chevronUp : chevronDown) + ' ' + gapLabel + '</div>' +
+      '</div>' +
+      '<div class="ewp-cell">' +
+        '<div class="ewp-k">Confidence</div>' +
+        '<div style="font-size:18px;font-weight:800;color:var(--blue);">TBC</div>' +
+        '<div class="ewp-sub">Evidence weight</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ewp-methodology">' +
+      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+      ' EWP is derived from the probability-weighted price targets of all four ACH cases, adjusted by evidence strength. It is not a price target.' +
+    '</div>';
   }
+
+  // Key stats row (5 columns matching prototype)
+  let bullTarget = '';
+  let bearTarget = '';
+  for (let wi = 0; wi < worlds.length; wi++) {
+    const wl = (worlds[wi].label || '').toLowerCase();
+    if (wl.indexOf('bull') >= 0) bullTarget = formatPriceWithCurrency(worlds[wi].price, currency, 0);
+    if (wl.indexOf('bear') >= 0) bearTarget = formatPriceWithCurrency(worlds[wi].price, currency, 0);
+  }
+  const marketCap = data.marketCap || (data.heroMetrics && data.heroMetrics[0] ? data.heroMetrics[0].value : 'TBC');
+  // Find 52W range from heroMetrics
+  let range52w = 'TBC';
+  if (data.heroMetrics) {
+    for (let mi = 0; mi < data.heroMetrics.length; mi++) {
+      const lbl = (data.heroMetrics[mi].label || '').toLowerCase();
+      if (lbl.indexOf('52') >= 0 || lbl.indexOf('range') >= 0 || lbl.indexOf('high') >= 0) {
+        range52w = data.heroMetrics[mi].value || 'TBC';
+        break;
+      }
+    }
+  }
+
+  const statsHtml = '<div class="dr-stats">' +
+    '<div class="dr-stat"><div class="dr-stat-k">Market Cap</div><div class="dr-stat-v">' + marketCap + '</div></div>' +
+    '<div class="dr-stat"><div class="dr-stat-k">52W Range</div><div class="dr-stat-v">' + range52w + '</div></div>' +
+    '<div class="dr-stat"><div class="dr-stat-k">Bull Case Target</div><div class="dr-stat-v pos">' + (bullTarget || 'TBC') + '</div></div>' +
+    '<div class="dr-stat"><div class="dr-stat-k">Bear Case Target</div><div class="dr-stat-v neg">' + (bearTarget || 'TBC') + '</div></div>' +
+    '<div class="dr-stat"><div class="dr-stat-k">ACH Cases</div><div class="dr-stat-v neu">' + worlds.length + ' Active</div></div>' +
+  '</div>';
 
   // Prev/next stock navigation
   const _navTickers = (typeof FEATURED_ORDER !== 'undefined') ? FEATURED_ORDER : Object.keys(STOCK_DATA);
@@ -79,21 +134,28 @@ export function renderDecisionRibbon(data) {
     '</div>' +
   '</div>';
 
+  // Live price change display
+  let priceChgHtml = '';
+  if (livePrice) {
+    priceChgHtml = '<div class="dr-live-price">Live <strong>' + formatPriceWithCurrency(current, currency) + '</strong></div>';
+  }
+
   return stockNavHtml +
     '<div class="decision-ribbon">' +
       '<div class="dr-head">' +
         '<div class="dr-badge">' + (data.ticker || '') + '</div>' +
-        '<div class="dr-meta">' +
+        '<div>' +
           '<div class="dr-company">' + (data.company || data.ticker || '') + '</div>' +
-          '<div class="dr-sub">' +
-            (data.sector || '') +
-            (data.exchange ? ' &middot; ' + data.exchange : '') +
-            (data.date ? ' &middot; ' + formatDateAEST(data.date) : '') +
+          '<div class="dr-meta">' +
+            '<span>' + (data.sector || '') + '</span>' +
+            (data.exchange ? '<span class="sep">&middot;</span><span>' + data.exchange + ': ' + data.ticker + '</span>' : '') +
+            (data.date ? '<span class="sep">&middot;</span><span>Updated ' + formatDateAEST(data.date) + '</span>' : '') +
+            (evCount ? '<span class="sep">&middot;</span><span>' + evCount + ' Evidence Domains</span>' : '') +
           '</div>' +
         '</div>' +
         '<div class="dr-verdict-block">' +
-          '<span class="verdict-tag ' + verdictClass + '">' + verdictLabel + '</span>' +
-          (livePrice ? '<div class="dr-live-price">' + formatPrice(livePrice) + '</div>' : '') +
+          '<div class="verdict-tag ' + verdictClass + '">' + verdictChevron + ' ' + verdictLabel + '</div>' +
+          priceChgHtml +
         '</div>' +
       '</div>' +
       ewpHtml +

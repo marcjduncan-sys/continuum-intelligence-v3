@@ -221,7 +221,7 @@ export function renderPortfolio(positions, grossExposure) {
     }
 
     const pnlClass = p.pnlDollar >= 0 ? 'td-pnl-pos' : 'td-pnl-neg';
-    const skewBadge = p.skew ? '<span class="skew-badge ' + p.skew + '">' + (p.skew === 'upside' ? '&#9650; UPSIDE' : p.skew === 'downside' ? '&#9660; DOWNSIDE' : '&#9670; BALANCED') + '</span>' : '<span style="color:var(--muted)">N/A</span>';
+    const skewBadge = p.skew ? '<span class="skew-badge ' + p.skew + '">' + (p.skew === 'upside' ? '&#9650; UPSIDE' : p.skew === 'downside' ? '&#9660; DOWNSIDE' : '&#9670; BALANCED') + '</span>' : '<span style="color:var(--text-muted)">N/A</span>';
 
     const expDollar = p.exposureDollar != null ? p.exposureDollar : (p.marketValue || 0);
     const expSign = expDollar >= 0 ? '+' : '';

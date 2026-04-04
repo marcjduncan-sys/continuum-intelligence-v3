@@ -98,6 +98,34 @@
   --report-caption-size: 0.72rem;
   --report-metric-size: 0.82rem;
 
+  /* Legacy compatibility aliases -- remove in Phase 5 */
+  --bg-page: var(--app);
+  --bg-surface: var(--surface);
+  --bg-surface-alt: var(--surface-2);
+  --bg-header: var(--blue-soft);
+  --bg-elevated: var(--surface);
+  --bg-card: var(--surface);
+  --text-primary: var(--text);
+  --text-secondary: var(--text-2);
+  --text-muted: var(--muted);
+  --border: var(--line);
+  --border-light: var(--line-2);
+  --accent-teal: var(--blue);
+  --accent-sage: var(--green);
+  --accent-gold: var(--gold);
+  --accent-strat: var(--violet);
+  --signal-red: var(--red);
+  --signal-amber: var(--amber);
+  --signal-green: var(--green);
+  --signal-blue: var(--blue);
+  --font-ui-legacy: var(--font-ui);
+  --font-data: var(--font-mono);
+  --font-narrative: var(--font-ui);
+  --max-width: var(--shell-max);
+  --nav-height: var(--topbar-h);
+  --home-max-width: var(--shell-max);
+  --home-rail-width: var(--rail-w);
+
   /* Font size scale (preserved for legacy consumers) */
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;

@@ -76,7 +76,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--blue);
+    color: var(--accent-teal);
     flex-shrink: 0;
 }
 .ap-header-icon svg {
@@ -87,11 +87,11 @@ body.analyst-panel-open.ap-user-collapsed-active {
     overflow: hidden;
 }
 .ap-header-title {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.62rem;
     font-weight: 700;
     letter-spacing: 0.12em;
-    color: var(--blue);
+    color: var(--accent-teal);
     line-height: 1;
 }
 .ap-context-bar {
@@ -102,11 +102,11 @@ body.analyst-panel-open.ap-user-collapsed-active {
     overflow: hidden;
 }
 .ap-ticker-badge {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.58rem;
     font-weight: 700;
     letter-spacing: 0.08em;
-    color: var(--text);
+    color: var(--text-primary);
     background: rgba(34, 184, 167, 0.12);
     border: 1px solid rgba(34, 184, 167, 0.25);
     padding: 1px 6px;
@@ -124,7 +124,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.55rem;
     font-weight: 500;
     border-radius: 10px;
@@ -164,7 +164,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
     border-bottom: 1px solid var(--analyst-panel-border, rgba(255,255,255,0.08));
 }
 .tm-panel-title {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.06em;
@@ -217,13 +217,13 @@ body.analyst-panel-open.ap-user-collapsed-active {
     gap: 8px;
 }
 .tm-card-ticker {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.7rem;
     font-weight: 600;
     color: var(--text-primary, #e6edf3);
 }
 .tm-card-type {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.55rem;
     font-weight: 500;
     text-transform: uppercase;
@@ -253,7 +253,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
     margin-top: 2px;
 }
 .tm-action {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.6rem;
     font-weight: 500;
     color: var(--accent, #58a6ff);
@@ -311,10 +311,10 @@ body.analyst-panel-open.ap-user-collapsed-active {
 }
 .tm-log-date {
     color: var(--text-muted, #8b949e);
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
 }
 .tm-log-ticker {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-weight: 600;
     color: var(--text-primary, #e6edf3);
 }
@@ -335,15 +335,15 @@ body.analyst-panel-open.ap-user-collapsed-active {
 }
 
 .ap-profile-status {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.58rem;
-    color: var(--muted);
+    color: var(--text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .ap-profile-status.loaded {
-    color: var(--green);
+    color: var(--signal-green);
 }
 .ap-header-actions {
     display: flex;
@@ -363,13 +363,13 @@ body.analyst-panel-open.ap-user-collapsed-active {
     border: none;
     background: transparent;
     cursor: pointer;
-    color: var(--muted);
+    color: var(--text-muted);
     border-radius: 4px;
     transition: color 0.15s, background 0.15s;
 }
 .ap-clear-btn:hover,
 .ap-collapse-btn:hover {
-    color: var(--text);
+    color: var(--text-primary);
     background: rgba(255, 255, 255, 0.06);
 }
 .ap-clear-btn svg,
@@ -388,12 +388,12 @@ body.analyst-panel-open.ap-user-collapsed-active {
     flex-shrink: 0;
 }
 .ap-ticker-label {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.58rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--text-muted);
     white-space: nowrap;
 }
 .ap-ticker-select {
@@ -401,8 +401,8 @@ body.analyst-panel-open.ap-user-collapsed-active {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--analyst-panel-border);
     border-radius: 4px;
-    color: var(--text);
-    font-family: var(--font-mono);
+    color: var(--text-primary);
+    font-family: var(--font-data);
     font-size: 0.72rem;
     padding: 4px 8px;
     cursor: pointer;
@@ -415,7 +415,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
 }
 .ap-ticker-select option {
     background: #0E1624;
-    color: var(--text);
+    color: var(--text-primary);
 }
 
 /* -- Tooltips for header icon buttons -- */
@@ -428,8 +428,8 @@ body.analyst-panel-open.ap-user-collapsed-active {
     bottom: calc(100% + 6px);
     left: 50%;
     transform: translateX(-50%);
-    background: var(--surface);
-    color: var(--text);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
     font-size: 0.62rem;
     font-family: var(--font-ui);
     font-weight: 400;
@@ -468,18 +468,18 @@ body.analyst-panel-open.ap-user-collapsed-active {
     padding: 24px 0 16px;
 }
 .ap-welcome-title {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.62rem;
     font-weight: 700;
     letter-spacing: 0.10em;
     text-transform: uppercase;
-    color: var(--blue);
+    color: var(--accent-teal);
     margin-bottom: 8px;
 }
 .ap-welcome-text {
     font-size: 0.78rem;
     line-height: 1.6;
-    color: var(--muted);
+    color: var(--text-muted);
     margin-bottom: 16px;
 }
 .ap-suggestions {
@@ -493,7 +493,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
     border-radius: 4px;
     padding: 8px 10px;
     font-size: 0.75rem;
-    color: var(--text-2);
+    color: var(--text-secondary);
     cursor: pointer;
     text-align: left;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
@@ -502,7 +502,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
 .ap-suggestion:hover {
     background: rgba(34, 184, 167, 0.08);
     border-color: rgba(34, 184, 167, 0.2);
-    color: var(--text);
+    color: var(--text-primary);
 }
 
 /* --- Message rows (institutional style, NOT bubbles) --- */
@@ -520,27 +520,27 @@ body.analyst-panel-open.ap-user-collapsed-active {
     margin-bottom: 5px;
 }
 .ap-msg-role {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.58rem;
     font-weight: 700;
     letter-spacing: 0.10em;
     text-transform: uppercase;
 }
 .ap-msg-role.user {
-    color: var(--muted);
+    color: var(--text-muted);
 }
 .ap-msg-role.analyst {
-    color: var(--blue);
+    color: var(--accent-teal);
 }
 .ap-msg-time {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.58rem;
     color: rgba(255, 255, 255, 0.20);
 }
 .ap-msg-body {
     font-size: 0.80rem;
     line-height: 1.65;
-    color: var(--text-2);
+    color: var(--text-secondary);
 }
 .ap-msg-body p {
     margin: 0 0 6px;
@@ -549,7 +549,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
     margin-bottom: 0;
 }
 .ap-msg-body strong {
-    color: var(--text);
+    color: var(--text-primary);
     font-weight: 600;
 }
 .ap-msg-body ul,
@@ -561,7 +561,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
     margin-bottom: 2px;
 }
 .ap-msg-body code {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.75rem;
     background: rgba(255, 255, 255, 0.06);
     padding: 1px 4px;
@@ -573,12 +573,12 @@ body.analyst-panel-open.ap-user-collapsed-active {
     margin-top: 8px;
 }
 .ap-sources-toggle {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.58rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--text-muted);
     background: none;
     border: none;
     cursor: pointer;
@@ -589,7 +589,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
     transition: color 0.15s;
 }
 .ap-sources-toggle:hover {
-    color: var(--text-2);
+    color: var(--text-secondary);
 }
 .ap-sources-list {
     display: none;
@@ -602,13 +602,13 @@ body.analyst-panel-open.ap-user-collapsed-active {
 }
 .ap-source-item {
     font-size: 0.72rem;
-    color: var(--muted);
+    color: var(--text-muted);
     margin-bottom: 4px;
     line-height: 1.4;
 }
 .ap-source-domain {
-    color: var(--blue);
-    font-family: var(--font-mono);
+    color: var(--accent-teal);
+    font-family: var(--font-data);
     font-size: 0.65rem;
 }
 
@@ -620,12 +620,12 @@ body.analyst-panel-open.ap-user-collapsed-active {
     gap: 8px;
 }
 .ap-typing-label {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.58rem;
     font-weight: 700;
     letter-spacing: 0.10em;
     text-transform: uppercase;
-    color: var(--blue);
+    color: var(--accent-teal);
 }
 .ap-typing-dots {
     display: flex;
@@ -636,7 +636,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    background: var(--blue);
+    background: var(--accent-teal);
     animation: ap-dot-pulse 1.4s infinite ease-in-out;
 }
 .ap-typing-dot:nth-child(1) { animation-delay: 0s; }
@@ -652,10 +652,10 @@ body.analyst-panel-open.ap-user-collapsed-active {
     padding: 8px 10px;
     margin: 8px 0;
     background: rgba(212, 85, 85, 0.08);
-    border-left: 2px solid var(--red);
+    border-left: 2px solid var(--signal-red);
     border-radius: 0 4px 4px 0;
     font-size: 0.75rem;
-    color: var(--red);
+    color: var(--signal-red);
 }
 
 /* --- Input area --- */
@@ -672,7 +672,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--analyst-panel-border);
     border-radius: 4px;
-    color: var(--text);
+    color: var(--text-primary);
     font-family: var(--font-ui);
     font-size: 0.80rem;
     line-height: 1.5;
@@ -697,7 +697,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
     gap: 8px;
 }
 .ap-shortcut-hint {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.60rem;
     color: rgba(255, 255, 255, 0.20);
     letter-spacing: 0.04em;
@@ -710,7 +710,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
     align-items: center;
     justify-content: center;
     border: none;
-    background: var(--blue);
+    background: var(--accent-teal);
     border-radius: 4px;
     cursor: pointer;
     color: #0B1220;
@@ -738,7 +738,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
     z-index: calc(var(--analyst-panel-z) - 1);
     align-items: center;
     gap: 6px;
-    background: var(--blue);
+    background: var(--accent-teal);
     color: #0B1220;
     border: none;
     border-radius: 24px;
@@ -830,7 +830,7 @@ body.analyst-panel-open.ap-user-collapsed-active {
     color: #A0AEC0;
 }
 [data-theme="light"] .ap-input:focus {
-    border-color: var(--blue);
+    border-color: var(--accent-teal);
 }
 [data-theme="light"] .ap-msg-row {
     border-bottom-color: #F0F1F4;

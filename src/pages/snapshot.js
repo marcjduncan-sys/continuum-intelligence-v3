@@ -53,7 +53,7 @@ export function buildSnapshotFromStock(ticker) {
   // 3. Direction -> CSS class mappings
   const dirCls = { upside: 'snap-upside', downside: 'snap-downside', neutral: 'snap-neutral' };
   const dirSbCls = { upside: 'snap-sb-upside', downside: 'snap-sb-downside', neutral: 'snap-sb-neutral' };
-  const dirColor = { upside: 'var(--green)', downside: 'var(--red)', neutral: 'var(--amber)' };
+  const dirColor = { upside: 'var(--signal-green)', downside: 'var(--signal-red)', neutral: 'var(--signal-amber)' };
   const dirScoreCls = { upside: 'priced', downside: 'high', neutral: 'medium' };
   const statusTagMap = { priced: 'snap-tag-priced', accumulating: 'snap-tag-accumulating', active: 'snap-tag-tail', minimal: 'snap-tag-minimal' };
 
@@ -77,7 +77,7 @@ export function buildSnapshotFromStock(ticker) {
       label: 'N' + (i + 1) + ': ' + normScores[i] + '%'
     });
     survivalLegend.push({
-      color: dirColor[hyps[i].direction] || 'var(--amber)',
+      color: dirColor[hyps[i].direction] || 'var(--signal-amber)',
       label: hyps[i].title
     });
   }
@@ -477,12 +477,12 @@ export function renderSnapshotPage(data) {
           '<div class="snap-gaps-box">' +
             '<div class="snap-gap-row"><span class="snap-gap-domain">Regime</span><span class="snap-gap-status snap-gap-full">' + data.technicalAnalysis.regime + '</span></div>' +
             '<div class="snap-gap-row"><span class="snap-gap-domain">Trend</span><span class="snap-gap-status snap-gap-limited">' + data.technicalAnalysis.trend + '</span></div>' +
-            '<div class="snap-gap-row"><span class="snap-gap-domain">50-Day MA</span><span style="font-family:var(--font-mono);font-size:0.58rem;color:var(--text-2)">' + data.technicalAnalysis.ma50 + ' (' + data.technicalAnalysis.vsMa50 + ')</span></div>' +
-            '<div class="snap-gap-row"><span class="snap-gap-domain">200-Day MA</span><span style="font-family:var(--font-mono);font-size:0.58rem;color:var(--text-2)">' + data.technicalAnalysis.ma200 + ' (' + data.technicalAnalysis.vsMa200 + ')</span></div>' +
-            '<div class="snap-gap-row"><span class="snap-gap-domain">Support</span><span style="font-family:var(--font-mono);font-size:0.58rem;color:var(--green)">' + data.technicalAnalysis.support + '</span></div>' +
-            '<div class="snap-gap-row"><span class="snap-gap-domain">Resistance</span><span style="font-family:var(--font-mono);font-size:0.58rem;color:var(--red)">' + data.technicalAnalysis.resistance + '</span></div>' +
-            '<div class="snap-gap-row"><span class="snap-gap-domain">Range Position</span><span style="font-family:var(--font-mono);font-size:0.58rem;color:var(--red)">' + data.technicalAnalysis.rangePosition + '</span></div>' +
-            (data.technicalAnalysis.crossover ? '<div class="snap-gap-row"><span class="snap-gap-domain">Crossover</span><span style="font-family:var(--font-mono);font-size:0.5rem;color:var(--red)">' + data.technicalAnalysis.crossover + '</span></div>' : '') +
+            '<div class="snap-gap-row"><span class="snap-gap-domain">50-Day MA</span><span style="font-family:var(--font-data);font-size:0.58rem;color:var(--text-secondary)">' + data.technicalAnalysis.ma50 + ' (' + data.technicalAnalysis.vsMa50 + ')</span></div>' +
+            '<div class="snap-gap-row"><span class="snap-gap-domain">200-Day MA</span><span style="font-family:var(--font-data);font-size:0.58rem;color:var(--text-secondary)">' + data.technicalAnalysis.ma200 + ' (' + data.technicalAnalysis.vsMa200 + ')</span></div>' +
+            '<div class="snap-gap-row"><span class="snap-gap-domain">Support</span><span style="font-family:var(--font-data);font-size:0.58rem;color:var(--signal-green)">' + data.technicalAnalysis.support + '</span></div>' +
+            '<div class="snap-gap-row"><span class="snap-gap-domain">Resistance</span><span style="font-family:var(--font-data);font-size:0.58rem;color:var(--signal-red)">' + data.technicalAnalysis.resistance + '</span></div>' +
+            '<div class="snap-gap-row"><span class="snap-gap-domain">Range Position</span><span style="font-family:var(--font-data);font-size:0.58rem;color:var(--signal-red)">' + data.technicalAnalysis.rangePosition + '</span></div>' +
+            (data.technicalAnalysis.crossover ? '<div class="snap-gap-row"><span class="snap-gap-domain">Crossover</span><span style="font-family:var(--font-data);font-size:0.5rem;color:var(--signal-red)">' + data.technicalAnalysis.crossover + '</span></div>' : '') +
           '</div>' +
         '</div>' : '') +
         '<div><div class="snap-section-label">Unanswered Questions</div>' +

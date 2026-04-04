@@ -1,7 +1,6 @@
 // Hypothesis section renderers
 // Extracted from report-sections.js without logic changes
 
-import { RS_HDR } from './shared.js';
 import { normaliseScores, computeSkewScore, _inferPolarity } from '../../lib/dom.js';
 
 export function renderSkewBar(data) {
@@ -83,61 +82,153 @@ export function renderHypotheses(data) {
   const t = data.ticker.toLowerCase();
   let cardsHtml = '';
   const norm = normaliseScores(data.hypotheses);
+  const worlds = (data.hero && data.hero.position_in_range && data.hero.position_in_range.worlds) || [];
+  const currency = data.currency || 'A$';
+
+  // Map hypotheses to case classes and labels: BULL, BASE, BEAR, SWING
+  const caseClasses = [];
+  const caseLabels = [];
+  let bullIndex = -1, baseIndex = -1, bearIndex = -1, swingIndex = -1;
 
   for (let i = 0; i < data.hypotheses.length; i++) {
     const h = data.hypotheses[i];
-    const normScore = norm[i] + '%';
-    const normWidth = norm[i] + '%';
+    let caseClass = null;
+    let caseLabel = null;
 
-    let requiresHtml = '';
-    if (h.requires && h.requires.length > 0) {
-      requiresHtml = '<div class="hc-subtitle">Requires</div><ul class="hc-list requires">';
-      for (let r = 0; r < h.requires.length; r++) {
-        requiresHtml += '<li>' + h.requires[r] + '</li>';
-      }
-      requiresHtml += '</ul>';
+    if (h.direction === 'upside' && bullIndex === -1) {
+      caseClass = 'bull';
+      caseLabel = 'BULL';
+      bullIndex = i;
+    } else if (h.direction === 'neutral' && baseIndex === -1) {
+      caseClass = 'base';
+      caseLabel = 'BASE';
+      baseIndex = i;
+    } else if (h.direction === 'downside' && bearIndex === -1) {
+      caseClass = 'bear';
+      caseLabel = 'BEAR';
+      bearIndex = i;
+    } else if (h.direction === 'downside' && swingIndex === -1) {
+      caseClass = 'swing';
+      caseLabel = 'SWING';
+      swingIndex = i;
+    } else if (h.direction === 'neutral' && swingIndex === -1) {
+      caseClass = 'swing';
+      caseLabel = 'SWING';
+      swingIndex = i;
+    } else {
+      // Fallback for remaining cases
+      caseClass = 'swing';
+      caseLabel = 'SWING';
     }
 
-    let supportHtml = '';
-    if (h.supporting && h.supporting.length > 0) {
-      supportHtml = '<div class="hc-subtitle">' + h.supportingLabel + '</div><ul class="hc-list supports">';
-      for (let s = 0; s < h.supporting.length; s++) {
-        supportHtml += '<li>' + h.supporting[s] + '</li>';
+    caseClasses.push(caseClass);
+    caseLabels.push(caseLabel);
+  }
+
+  // Render ACH case cards
+  for (let i = 0; i < data.hypotheses.length; i++) {
+    const h = data.hypotheses[i];
+    const normScore = norm[i];
+    const scorePct = normScore + '%';
+    const caseClass = caseClasses[i] || 'swing';
+    const caseLabel = caseLabels[i] || 'SWING';
+
+    // Get price target from worlds by matching case class to world label
+    let priceTarget = '';
+    for (let w = 0; w < worlds.length; w++) {
+      const world = worlds[w];
+      const worldLabelLower = (world.label || '').toLowerCase();
+      if (worldLabelLower.indexOf(caseClass) >= 0) {
+        priceTarget = currency + world.price;
+        break;
       }
-      supportHtml += '</ul>';
     }
 
-    let contradictHtml = '';
-    if (h.contradicting && h.contradicting.length > 0) {
-      contradictHtml = '<div class="hc-subtitle">' + h.contradictingLabel + '</div><ul class="hc-list contradicts">';
-      for (let c = 0; c < h.contradicting.length; c++) {
-        contradictHtml += '<li>' + h.contradicting[c] + '</li>';
-      }
-      contradictHtml += '</ul>';
-    }
-
-    const tierMatch = (h.tier || '').toUpperCase().match(/^[NT]\d+/);
+    // Extract title without tier prefix
     let displayTitle = (h.title || '');
-    if (tierMatch && !/^[NT]\d+[:\s]/i.test(displayTitle)) {
-      displayTitle = tierMatch[0] + ': ' + displayTitle;
+    const tierMatch = (h.tier || '').toUpperCase().match(/^[NT]\d+/);
+    if (tierMatch && displayTitle.indexOf(':') >= 0) {
+      const parts = displayTitle.split(':');
+      displayTitle = parts.slice(1).join(':').trim();
+    } else if (tierMatch) {
+      displayTitle = displayTitle.replace(/^[NT]\d+[\s:]*/, '').trim();
     }
 
-    const dominantCls = (i === 0) ? ' dominant' : '';
-    cardsHtml += '<div class="hyp-card ' + h.dirClass + dominantCls + '">' +
-      '<div class="hc-header"><div class="hc-title">' + displayTitle + '</div><div class="hc-status ' + h.statusClass + '">' + h.statusText + '</div></div>' +
-      '<div class="hc-score-row"><div class="hc-score-number">' + normScore + '</div><div class="hc-score-bar"><div class="hc-score-fill" style="width:' + normWidth + '"></div></div><div class="hc-score-meta">' + h.scoreMeta + '</div></div>' +
-      '<p class="hc-desc">' + h.description + '</p>' +
-      requiresHtml +
-      supportHtml +
-      contradictHtml +
+    // Truncate description to ~200 chars
+    const descShort = h.description && h.description.length > 200
+      ? h.description.substring(0, 200) + '...'
+      : h.description;
+
+    // Build evidence items (supporting)
+    let supportingHtml = '';
+    if (h.supporting && h.supporting.length > 0) {
+      supportingHtml = '<div class="ev-items">';
+      for (let s = 0; s < h.supporting.length; s++) {
+        supportingHtml += '<div class="ev-item"><span class="ev-bullet for">&#9650;</span><span>' + h.supporting[s] + '</span></div>';
+      }
+      supportingHtml += '</div>';
+    }
+
+    // Build evidence items (contradicting/against)
+    let contradictingHtml = '';
+    if (h.contradicting && h.contradicting.length > 0) {
+      contradictingHtml = '<div class="ev-items">';
+      for (let c = 0; c < h.contradicting.length; c++) {
+        contradictingHtml += '<div class="ev-item"><span class="ev-bullet against">&#9660;</span><span>' + h.contradicting[c] + '</span></div>';
+      }
+      contradictingHtml += '</div>';
+    }
+
+    // Calculate EWP contribution (this hypothesis's share of total)
+    const ewpTotal = data.hero && data.hero.position_in_range && data.hero.position_in_range.current_price
+      ? data.hero.position_in_range.current_price
+      : '';
+    const contributionValue = ewpTotal ? (normScore / 100 * ewpTotal).toFixed(2) : '';
+    const contributionText = contributionValue ? currency + contributionValue : '';
+
+    cardsHtml += '<div class="ach-case ' + caseClass + '">' +
+      '<div class="ach-case-head">' +
+        '<div class="ach-case-icon">' + caseLabel + '</div>' +
+        '<div>' +
+          '<div class="ach-case-label">' + caseLabel + ' Case</div>' +
+          '<div class="ach-case-title">' + displayTitle + '</div>' +
+          '<div class="ach-case-bluf">' + descShort + '</div>' +
+        '</div>' +
+        '<div class="ach-case-meta">' +
+          '<div class="ach-price-target">' + priceTarget + '</div>' +
+          '<div class="ach-probability">' + normScore + '% weight</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ach-evidence">' +
+        '<div class="ach-ev-col">' +
+          '<div class="ach-ev-head for"><span class="ev-dot"></span>Evidence For</div>' +
+          supportingHtml +
+        '</div>' +
+        '<div class="ach-ev-col">' +
+          '<div class="ach-ev-head against"><span class="ev-dot"></span>Evidence Against</div>' +
+          contradictingHtml +
+        '</div>' +
+      '</div>' +
+      '<div class="ach-contribution">' +
+        '<span class="contrib-label">EWP Contribution</span>' +
+        '<div class="contrib-track"><div class="contrib-fill" style="width:' + scorePct + '"></div></div>' +
+        '<span class="contrib-weight">' + contributionText + ' of ' + (ewpTotal ? currency + ewpTotal.toFixed(2) : '') + '</span>' +
+      '</div>' +
     '</div>';
   }
 
   return '<div class="report-section" id="' + t + '-hypotheses">' +
-    RS_HDR('Section 02', 'Competing Hypotheses') +
-    '<div class="rs-body">' +
+    '<div class="section-header">' +
+      '<div>' +
+        '<div class="eyebrow">ACH Framework - Section 02</div>' +
+        '<h2 class="sec-title">Competing Hypotheses</h2>' +
+        '<p class="sec-sub">Four cases. Evidence for and against each. Probability weights feed the Evidence Weighted Price.</p>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ach-grid">' +
     cardsHtml +
-  '</div></div>';
+    '</div>' +
+  '</div>';
 }
 
 export function prepareHypotheses(data) {
@@ -216,4 +307,3 @@ export function renderOvercorrectionBanner(data) {
     reviewHtml +
   '</div>';
 }
-

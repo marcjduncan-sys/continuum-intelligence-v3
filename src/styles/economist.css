@@ -1,7 +1,7 @@
 /* ============================================================
    STRATEGIST CHAT -- Docked right-rail panel (mode-switched with Analyst/PM)
    All classes use econ- prefix. Zero overlap with ap- or pm- classes.
-   Accent: muted blue-grey (var(--violet))
+   Accent: muted blue-grey (var(--accent-strat))
    ============================================================ */
 
 /* --- Panel positioning (mirrors .pm-panel) --- */
@@ -53,7 +53,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--violet);
+    color: var(--accent-strat);
     flex-shrink: 0;
 }
 .econ-header-icon svg {
@@ -64,11 +64,11 @@
     overflow: hidden;
 }
 .econ-header-title {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.62rem;
     font-weight: 700;
     letter-spacing: 0.12em;
-    color: var(--violet);
+    color: var(--accent-strat);
     line-height: 1;
 }
 .econ-header-actions {
@@ -87,7 +87,7 @@
     border: none;
     background: transparent;
     cursor: pointer;
-    color: var(--muted);
+    color: var(--text-muted);
     border-radius: 4px;
     transition: color 0.15s, background 0.15s;
 }
@@ -100,14 +100,14 @@
     border: none;
     background: transparent;
     cursor: pointer;
-    color: var(--muted);
+    color: var(--text-muted);
     border-radius: 4px;
     transition: color 0.15s, background 0.15s;
 }
 .econ-history-btn:hover,
 .econ-clear-btn:hover,
 .econ-collapse-btn:hover {
-    color: var(--text);
+    color: var(--text-primary);
     background: rgba(255, 255, 255, 0.06);
 }
 .econ-history-btn svg,
@@ -128,7 +128,7 @@
     left: 50%;
     transform: translateX(-50%);
     background: var(--bg-elevated, #1a1f2e);
-    color: var(--text);
+    color: var(--text-primary);
     font-size: 0.62rem;
     font-family: var(--font-ui);
     font-weight: 400;
@@ -147,7 +147,7 @@
     align-items: center;
     gap: 6px;
     margin-top: 3px;
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.54rem;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -164,7 +164,7 @@
 }
 .econ-policy-path {
     font-weight: 400;
-    color: var(--muted);
+    color: var(--text-muted);
     margin-left: 6px;
     white-space: nowrap;
     overflow: hidden;
@@ -172,17 +172,17 @@
 }
 
 /* Regime colours */
-.econ-regime-risk-on .econ-regime-dot { background: var(--green, #4CAF50); }
-.econ-regime-risk-on .econ-regime-label { color: var(--green, #4CAF50); }
+.econ-regime-risk-on .econ-regime-dot { background: var(--signal-green, #4CAF50); }
+.econ-regime-risk-on .econ-regime-label { color: var(--signal-green, #4CAF50); }
 
-.econ-regime-risk-off .econ-regime-dot { background: var(--red, #F44336); }
-.econ-regime-risk-off .econ-regime-label { color: var(--red, #F44336); }
+.econ-regime-risk-off .econ-regime-dot { background: var(--signal-red, #F44336); }
+.econ-regime-risk-off .econ-regime-label { color: var(--signal-red, #F44336); }
 
 .econ-regime-transition .econ-regime-dot { background: #F5A623; }
 .econ-regime-transition .econ-regime-label { color: #F5A623; }
 
-.econ-regime-none .econ-regime-dot { background: var(--muted); }
-.econ-regime-none .econ-regime-label { color: var(--muted); }
+.econ-regime-none .econ-regime-dot { background: var(--text-muted); }
+.econ-regime-none .econ-regime-label { color: var(--text-muted); }
 
 /* --- Sidebar (conversation history) --- */
 .econ-sidebar {
@@ -215,14 +215,14 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--text);
+    color: var(--text-primary);
 }
 .econ-sidebar-close {
     background: none;
     border: none;
     cursor: pointer;
     font-size: 18px;
-    color: var(--text-2);
+    color: var(--text-secondary);
     padding: 2px 6px;
     border-radius: 4px;
 }
@@ -238,7 +238,7 @@
 .econ-sidebar-empty {
     text-align: center;
     padding: 32px 14px;
-    color: var(--muted);
+    color: var(--text-muted);
     font-size: 0.75rem;
 }
 .econ-conversation-item {
@@ -256,7 +256,7 @@
 .econ-conv-title {
     font-size: 0.75rem;
     font-weight: 500;
-    color: var(--text);
+    color: var(--text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -268,7 +268,7 @@
     flex-direction: column;
     align-items: flex-end;
     font-size: 0.60rem;
-    color: var(--muted);
+    color: var(--text-muted);
     flex-shrink: 0;
     margin-left: 8px;
 }
@@ -299,24 +299,24 @@
     padding: 32px 0 16px;
 }
 .econ-welcome-title {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.10em;
     text-transform: uppercase;
-    color: var(--violet);
+    color: var(--accent-strat);
     margin-bottom: 10px;
 }
 .econ-welcome-text {
     font-size: 0.82rem;
     line-height: 1.6;
-    color: var(--muted);
+    color: var(--text-muted);
     margin-bottom: 14px;
 }
 .econ-welcome-descriptor {
     font-size: 0.75rem;
     line-height: 1.5;
-    color: var(--muted);
+    color: var(--text-muted);
     margin-bottom: 24px;
     padding: 10px 14px;
     background: rgba(91, 141, 239, 0.05);
@@ -335,7 +335,7 @@
     border-radius: 4px;
     padding: 10px 12px;
     font-size: 0.78rem;
-    color: var(--text-2);
+    color: var(--text-secondary);
     cursor: pointer;
     text-align: left;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
@@ -344,7 +344,7 @@
 .econ-suggestion:hover {
     background: rgba(91, 141, 239, 0.08);
     border-color: rgba(91, 141, 239, 0.25);
-    color: var(--text);
+    color: var(--text-primary);
 }
 
 /* --- Message rows --- */
@@ -362,27 +362,27 @@
     margin-bottom: 5px;
 }
 .econ-msg-role {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.58rem;
     font-weight: 700;
     letter-spacing: 0.10em;
     text-transform: uppercase;
 }
 .econ-msg-role.user {
-    color: var(--muted);
+    color: var(--text-muted);
 }
 .econ-msg-role.economist {
-    color: var(--violet);
+    color: var(--accent-strat);
 }
 .econ-msg-time {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.58rem;
     color: rgba(255, 255, 255, 0.20);
 }
 .econ-msg-body {
     font-size: 0.82rem;
     line-height: 1.65;
-    color: var(--text-2);
+    color: var(--text-secondary);
 }
 .econ-msg-body p {
     margin: 0 0 6px;
@@ -391,7 +391,7 @@
     margin-bottom: 0;
 }
 .econ-msg-body strong {
-    color: var(--text);
+    color: var(--text-primary);
     font-weight: 600;
 }
 .econ-msg-body ul,
@@ -403,7 +403,7 @@
     margin-bottom: 2px;
 }
 .econ-msg-body code {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.78rem;
     background: rgba(255, 255, 255, 0.06);
     padding: 1px 4px;
@@ -423,7 +423,7 @@
 }
 .econ-msg-body th {
     font-weight: 600;
-    color: var(--text);
+    color: var(--text-primary);
     background: rgba(255, 255, 255, 0.03);
 }
 
@@ -435,12 +435,12 @@
     gap: 8px;
 }
 .econ-typing-label {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.58rem;
     font-weight: 700;
     letter-spacing: 0.10em;
     text-transform: uppercase;
-    color: var(--violet);
+    color: var(--accent-strat);
 }
 .econ-typing-dots {
     display: flex;
@@ -451,7 +451,7 @@
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    background: var(--violet);
+    background: var(--accent-strat);
     animation: econ-dot-pulse 1.4s infinite ease-in-out;
 }
 .econ-typing-dot:nth-child(1) { animation-delay: 0s; }
@@ -467,10 +467,10 @@
     padding: 8px 12px;
     margin: 8px 0;
     background: rgba(212, 85, 85, 0.08);
-    border-left: 2px solid var(--red, #F44336);
+    border-left: 2px solid var(--signal-red, #F44336);
     border-radius: 0 4px 4px 0;
     font-size: 0.78rem;
-    color: var(--red, #F44336);
+    color: var(--signal-red, #F44336);
 }
 
 /* --- Input area --- */
@@ -487,7 +487,7 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--analyst-panel-border, rgba(255,255,255,0.08));
     border-radius: 4px;
-    color: var(--text);
+    color: var(--text-primary);
     font-family: var(--font-ui);
     font-size: 0.82rem;
     line-height: 1.5;
@@ -512,7 +512,7 @@
     gap: 8px;
 }
 .econ-shortcut-hint {
-    font-family: var(--font-mono);
+    font-family: var(--font-data);
     font-size: 0.60rem;
     color: rgba(255, 255, 255, 0.20);
     letter-spacing: 0.04em;
@@ -525,7 +525,7 @@
     align-items: center;
     justify-content: center;
     border: none;
-    background: var(--violet);
+    background: var(--accent-strat);
     border-radius: 4px;
     cursor: pointer;
     color: #0B1220;
@@ -580,7 +580,7 @@
     color: #A0AEC0;
 }
 [data-theme="light"] .econ-input:focus {
-    border-color: var(--violet);
+    border-color: var(--accent-strat);
 }
 [data-theme="light"] .econ-msg-row {
     border-bottom-color: #F0F1F4;
@@ -652,7 +652,7 @@
    ============================================================ */
 
 .econ-streaming {
-    border-left: 2px solid var(--violet);
+    border-left: 2px solid var(--accent-strat);
     padding-left: 12px;
 }
 
@@ -660,7 +660,7 @@
     content: '\25AE';
     display: inline;
     animation: econ-cursor-blink 0.8s step-end infinite;
-    color: var(--violet);
+    color: var(--accent-strat);
     font-weight: bold;
     margin-left: 1px;
 }
@@ -671,9 +671,9 @@
 }
 
 [data-theme="light"] .econ-streaming {
-    border-left-color: var(--violet);
+    border-left-color: var(--accent-strat);
 }
 
 [data-theme="light"] .econ-streaming::after {
-    color: var(--violet);
+    color: var(--accent-strat);
 }

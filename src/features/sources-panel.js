@@ -231,7 +231,7 @@ function bindDeleteHandlers(container, ticker) {
       })
       .catch(function(err) {
         console.warn('[Sources] Delete failed:', err);
-        btn.style.color = 'var(--red)';
+        btn.style.color = 'var(--signal-red)';
         setTimeout(function() { btn.style.color = ''; }, 2000);
       });
     });

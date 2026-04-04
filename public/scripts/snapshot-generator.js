@@ -177,8 +177,8 @@
       for (var i = 0; i < stock.hypotheses.length; i++) {
         var h = stock.hypotheses[i];
         var pct = Math.round(h.score / totalScore * 100);
-        var barColor = h.direction === 'upside' ? 'var(--green)' :
-                       h.direction === 'downside' ? 'var(--red)' : 'var(--amber)';
+        var barColor = h.direction === 'upside' ? 'var(--signal-green)' :
+                       h.direction === 'downside' ? 'var(--signal-red)' : 'var(--signal-amber)';
         var titleShort = h.title.length > 25 ? h.title.substring(0, 22) + '...' : h.title;
         hypBarsHtml += '<div class="snap-hyp-bar-row">' +
           '<span class="snap-hyp-bar-label">T' + (i + 1) + '</span>' +

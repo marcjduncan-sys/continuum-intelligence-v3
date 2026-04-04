@@ -196,7 +196,7 @@ function updateHomeCardPrice(ticker, price, change, changePct, currency, directi
     const sign = change >= 0 ? '+' : '';
     const cls = change >= 0 ? 'positive' : 'negative';
     priceEl.innerHTML =
-        '<span style="font-size:0.8rem; color:var(--muted)">' + currency + '</span>' +
+        '<span style="font-size:0.8rem; color:var(--text-muted)">' + currency + '</span>' +
         formatPrice(price) +
         '<span class="fc-live-dot"></span>' +
         '<div class="fc-price-change ' + cls + '">' + formatChange(change) + ' (' + formatSignedPercent(changePct) + ')</div>';
