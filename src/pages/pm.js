@@ -335,19 +335,19 @@ export function updatePMDashboard(analytics) {
     const flagsBody = document.getElementById('pmFlagsBody');
     if (flagsBody && analytics.flags) {
         if (analytics.flags.length === 0) {
-            flagsBody.innerHTML = '<div style="color:var(--text-muted);font-size:0.75rem">No risk flags triggered</div>';
+            flagsBody.innerHTML = '<div style="color:var(--muted);font-size:0.75rem">No risk flags triggered</div>';
         } else {
             const flagRows = analytics.flags.map(function(f) {
                 const icon = f.severity === 'warning' ? '!' : 'i';
-                const color = f.severity === 'warning' ? 'var(--accent-gold)' : 'var(--text-muted)';
-                return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">' +
+                const color = f.severity === 'warning' ? 'var(--gold)' : 'var(--muted)';
+                return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)">' +
                     '<div style="' +
                         'width:18px;height:18px;border-radius:50%;flex-shrink:0;' +
                         'display:flex;align-items:center;justify-content:center;' +
-                        'font-family:var(--font-data);font-size:0.55rem;font-weight:700;' +
+                        'font-family:var(--font-mono);font-size:0.55rem;font-weight:700;' +
                         'background:' + color + ';color:var(--bg-body)' +
                     '">' + icon + '</div>' +
-                    '<div style="font-size:0.75rem;line-height:1.5;color:var(--text-primary)">' +
+                    '<div style="font-size:0.75rem;line-height:1.5;color:var(--text)">' +
                         _esc(f.message) +
                     '</div>' +
                 '</div>';
@@ -402,7 +402,7 @@ function _renderThemeExposure(themeExposure) {
         const name = entry[0];
         const weight = entry[1];
         const barWidth = Math.min(weight * 100, 100);
-        const barColor = themeColors[name] || 'var(--accent-gold)';
+        const barColor = themeColors[name] || 'var(--gold)';
         return '<div class="pm-exposure-row">' +
             '<div class="pm-exposure-header">' +
                 '<span class="pm-exposure-name">' + _esc(name) + '</span>' +
@@ -464,7 +464,7 @@ function _renderMandateBreaches(breaches) {
 
     wrapper.style.display = '';
     const rows = breaches.map(function(b) {
-        const sevColor = b.severity === 'critical' ? '#e74c3c' : 'var(--accent-gold)';
+        const sevColor = b.severity === 'critical' ? '#e74c3c' : 'var(--gold)';
         const sevLabel = b.severity === 'critical' ? 'CRITICAL' : 'WARNING';
         const postureLabel = (b.recommended_posture || '').replace(/_/g, ' ');
         return '<div class="pm-breach-row">' +
@@ -691,7 +691,7 @@ function _renderReweighting(suggestions) {
         const action = s.suggested_direction || s.action || '';
         if (action.indexOf('trim') >= 0) actionColor = '#e74c3c';
         else if (action.indexOf('increase') >= 0 || action === 'add') actionColor = '#27ae60';
-        else if (action.indexOf('review') >= 0) actionColor = 'var(--accent-gold)';
+        else if (action.indexOf('review') >= 0) actionColor = 'var(--gold)';
         const actionLabel = action.replace(/_/g, ' ');
 
         return '<div class="pm-reweight-row">' +
@@ -740,7 +740,7 @@ function _renderChangeLog(changes) {
         let badgeLabel = 'CHANGE';
         if (type === 'new_position') { badgeColor = '#27ae60'; badgeLabel = 'NEW'; }
         else if (type === 'removed_position') { badgeColor = '#e74c3c'; badgeLabel = 'REMOVED'; }
-        else if (type.indexOf('weight_') === 0) { badgeColor = 'var(--accent-gold)'; badgeLabel = 'WEIGHT'; }
+        else if (type.indexOf('weight_') === 0) { badgeColor = 'var(--gold)'; badgeLabel = 'WEIGHT'; }
 
         html += '<div class="pm-log-row">' +
             '<span class="pm-log-badge" style="background:' + badgeColor + '">' + badgeLabel + '</span>' +

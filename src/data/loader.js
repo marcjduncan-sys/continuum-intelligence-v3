@@ -221,7 +221,7 @@ export function buildSnapshotFromStock(ticker) {
   // 3. Direction -> CSS class mappings
   const dirCls = { upside: 'snap-upside', downside: 'snap-downside', neutral: 'snap-neutral' };
   const dirSbCls = { upside: 'snap-sb-upside', downside: 'snap-sb-downside', neutral: 'snap-sb-neutral' };
-  const dirColor = { upside: 'var(--signal-green)', downside: 'var(--signal-red)', neutral: 'var(--signal-amber)' };
+  const dirColor = { upside: 'var(--green)', downside: 'var(--red)', neutral: 'var(--amber)' };
   const dirScoreCls = { upside: 'priced', downside: 'high', neutral: 'medium' };
   const statusTagMap = { priced: 'snap-tag-priced', accumulating: 'snap-tag-accumulating', active: 'snap-tag-tail', minimal: 'snap-tag-minimal' };
 
@@ -245,7 +245,7 @@ export function buildSnapshotFromStock(ticker) {
       label: 'N' + (i + 1) + ': ' + normScores[i] + '%'
     });
     survivalLegend.push({
-      color: dirColor[hyps[i].direction] || 'var(--signal-amber)',
+      color: dirColor[hyps[i].direction] || 'var(--amber)',
       label: hyps[i].title
     });
   }

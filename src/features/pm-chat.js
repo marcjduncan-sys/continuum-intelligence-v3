@@ -332,18 +332,18 @@ function _renderRecommendationCard(action, fields) {
     // Action badge
     html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">';
     html += '<span style="' +
-        'font-family:var(--font-data);font-size:0.58rem;font-weight:700;' +
+        'font-family:var(--font-mono);font-size:0.58rem;font-weight:700;' +
         'letter-spacing:0.08em;text-transform:uppercase;' +
         'padding:2px 8px;border-radius:3px;' +
         'color:#fff;background:' + colors.label +
     '">' + escapeHtml(action) + '</span>';
 
     if (fields.security) {
-        html += '<span style="font-weight:600;font-size:0.80rem;color:var(--text-primary)">' +
+        html += '<span style="font-weight:600;font-size:0.80rem;color:var(--text)">' +
             escapeHtml(fields.security) + '</span>';
     }
     if (fields.sizing_band) {
-        html += '<span style="font-family:var(--font-data);font-size:0.70rem;color:var(--text-muted)">' +
+        html += '<span style="font-family:var(--font-mono);font-size:0.70rem;color:var(--muted)">' +
             escapeHtml(fields.sizing_band) + '</span>';
     }
     html += '</div>';
@@ -362,10 +362,10 @@ function _renderRecommendationCard(action, fields) {
         if (fields[key]) {
             html += '<div style="margin-bottom:6px">';
             html += '<span style="' +
-                'font-family:var(--font-data);font-size:0.56rem;font-weight:700;' +
-                'letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)' +
+                'font-family:var(--font-mono);font-size:0.56rem;font-weight:700;' +
+                'letter-spacing:0.06em;text-transform:uppercase;color:var(--muted)' +
             '">' + (fieldLabels[key] || key) + '</span>';
-            html += '<div style="font-size:0.75rem;line-height:1.5;color:var(--text-primary);margin-top:2px">' +
+            html += '<div style="font-size:0.75rem;line-height:1.5;color:var(--text);margin-top:2px">' +
                 escapeHtml(fields[key]) + '</div>';
             html += '</div>';
         }

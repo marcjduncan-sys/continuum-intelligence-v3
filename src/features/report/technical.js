@@ -244,13 +244,13 @@ export function renderTechnicalAnalysis(data) {
     (ma50.value != null ? '<tr>' +
       '<td class="ta-label-cell">50-Day MA</td>' +
       '<td>' + (price.currency || '') + formatPrice(ma50.value) + '</td>' +
-      '<td style="color:' + (ma.priceVsMa50 >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(ma.priceVsMa50) + '</td>' +
+      '<td style="color:' + (ma.priceVsMa50 >= 0 ? 'var(--green)' : 'var(--red)') + '">' + formatSignedPercent(ma.priceVsMa50) + '</td>' +
       '<td>As at ' + (ma50.date || '') + '</td>' +
     '</tr>' : '') +
     (ma200.value != null ? '<tr>' +
       '<td class="ta-label-cell">200-Day MA</td>' +
       '<td>' + (price.currency || '') + formatPrice(ma200.value) + '</td>' +
-      '<td style="color:' + (ma.priceVsMa200 >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(ma.priceVsMa200) + '</td>' +
+      '<td style="color:' + (ma.priceVsMa200 >= 0 ? 'var(--green)' : 'var(--red)') + '">' + formatSignedPercent(ma.priceVsMa200) + '</td>' +
       '<td>As at ' + (ma200.date || '') + '</td>' +
     '</tr>' : '') +
     '</tbody></table>' : '';
@@ -328,13 +328,13 @@ export function renderTechnicalAnalysis(data) {
         '<span>' + (price.currency || '') + formatPrice(mr.rangeHigh) + '</span>' +
       '</div>' +
       '<div class="ta-mr-legend">' +
-        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-red)"></div>Price (' + (price.currency || '') + formatPrice(price.current) + ')</div>' +
-        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-amber)"></div>50-Day MA (' + (price.currency || '') + formatPrice(ma50.value) + ')</div>' +
-        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--signal-blue)"></div>200-Day MA (' + (price.currency || '') + formatPrice(ma200.value) + ')</div>' +
+        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--red)"></div>Price (' + (price.currency || '') + formatPrice(price.current) + ')</div>' +
+        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--amber)"></div>50-Day MA (' + (price.currency || '') + formatPrice(ma50.value) + ')</div>' +
+        '<div class="ta-mr-legend-item"><div class="ta-mr-legend-dot" style="background:var(--blue)"></div>200-Day MA (' + (price.currency || '') + formatPrice(ma200.value) + ')</div>' +
     '</div>' +
     '<table class="ta-ma-table" style="margin-top:var(--space-sm)"><thead><tr><th>Measure</th><th>Value</th></tr></thead><tbody>' +
-      '<tr><td class="ta-label-cell">vs 50-Day MA</td><td style="color:var(--signal-red)">' + formatPercent(mr.vsMa50) + '</td></tr>' +
-      '<tr><td class="ta-label-cell">vs 200-Day MA</td><td style="color:var(--signal-red)">' + formatPercent(mr.vsMa200) + '</td></tr>' +
+      '<tr><td class="ta-label-cell">vs 50-Day MA</td><td style="color:var(--red)">' + formatPercent(mr.vsMa50) + '</td></tr>' +
+      '<tr><td class="ta-label-cell">vs 200-Day MA</td><td style="color:var(--red)">' + formatPercent(mr.vsMa200) + '</td></tr>' +
       '<tr><td class="ta-label-cell">12-Month Range Position</td><td>' + ((mr.rangePosition || 50) <= 50 ? 'Lower ' : 'Upper ') + (mr.rangePosition || 50) + '%</td></tr>' +
     '</tbody></table>' +
   '</div>';
@@ -348,16 +348,16 @@ export function renderTechnicalAnalysis(data) {
         '<th>Benchmark</th><th>Stock Return</th><th>Benchmark Return</th><th>Relative</th>' +
       '</tr></thead><tbody>' +
       '<tr>' +
-        '<td style="font-family:var(--font-ui);font-weight:600;color:var(--text-primary)">' + rp.vsIndex.name + '</td>' +
-        '<td style="color:' + (rp.vsIndex.stockReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(rp.vsIndex.stockReturn) + '</td>' +
-        '<td style="color:' + (rp.vsIndex.indexReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(rp.vsIndex.indexReturn) + '</td>' +
-        '<td style="color:' + (rp.vsIndex.relativeReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(rp.vsIndex.relativeReturn) + '</td>' +
+        '<td style="font-family:var(--font-ui);font-weight:600;color:var(--text)">' + rp.vsIndex.name + '</td>' +
+        '<td style="color:' + (rp.vsIndex.stockReturn >= 0 ? 'var(--green)' : 'var(--red)') + '">' + formatSignedPercent(rp.vsIndex.stockReturn) + '</td>' +
+        '<td style="color:' + (rp.vsIndex.indexReturn >= 0 ? 'var(--green)' : 'var(--red)') + '">' + formatSignedPercent(rp.vsIndex.indexReturn) + '</td>' +
+        '<td style="color:' + (rp.vsIndex.relativeReturn >= 0 ? 'var(--green)' : 'var(--red)') + '">' + formatSignedPercent(rp.vsIndex.relativeReturn) + '</td>' +
       '</tr>' +
       '<tr>' +
-        '<td style="font-family:var(--font-ui);font-weight:600;color:var(--text-primary)">' + rp.vsSector.name + '</td>' +
-        '<td style="color:' + (rp.vsSector.stockReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(rp.vsSector.stockReturn) + '</td>' +
-        '<td style="color:' + (rp.vsSector.sectorReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(rp.vsSector.sectorReturn) + '</td>' +
-        '<td style="color:' + (rp.vsSector.relativeReturn >= 0 ? 'var(--signal-green)' : 'var(--signal-red)') + '">' + formatSignedPercent(rp.vsSector.relativeReturn) + '</td>' +
+        '<td style="font-family:var(--font-ui);font-weight:600;color:var(--text)">' + rp.vsSector.name + '</td>' +
+        '<td style="color:' + (rp.vsSector.stockReturn >= 0 ? 'var(--green)' : 'var(--red)') + '">' + formatSignedPercent(rp.vsSector.stockReturn) + '</td>' +
+        '<td style="color:' + (rp.vsSector.sectorReturn >= 0 ? 'var(--green)' : 'var(--red)') + '">' + formatSignedPercent(rp.vsSector.sectorReturn) + '</td>' +
+        '<td style="color:' + (rp.vsSector.relativeReturn >= 0 ? 'var(--green)' : 'var(--red)') + '">' + formatSignedPercent(rp.vsSector.relativeReturn) + '</td>' +
       '</tr>' +
       '</tbody></table>';
   }

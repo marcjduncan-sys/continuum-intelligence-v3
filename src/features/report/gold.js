@@ -100,7 +100,7 @@ function _renderGoldPeers(ga) {
   if (!medianPNav && !comment) return '';
 
   const discountColor = discount != null
-    ? (discount < 0 ? 'var(--signal-green)' : discount > 0 ? 'var(--signal-red)' : 'var(--text-primary)')
+    ? (discount < 0 ? 'var(--green)' : discount > 0 ? 'var(--red)' : 'var(--text)')
     : '';
   const discountText = discount != null
     ? (discount > 0 ? '+' : '') + discount + '% vs peers'
@@ -150,7 +150,7 @@ function _renderGoldSensitivities(ga) {
     if (nav == null) continue;
     hasAny = true;
     const pctChange = Math.round((nav - baseNav) / baseNav * 100);
-    const color = pctChange >= 0 ? 'var(--signal-green)' : 'var(--signal-red)';
+    const color = pctChange >= 0 ? 'var(--green)' : 'var(--red)';
     const sign = pctChange >= 0 ? '+' : '';
     rows += '<tr>' +
       '<td>' + scenarios[i][0] + '</td>' +
@@ -184,7 +184,7 @@ function _renderGoldDiscoveryInner(data) {
   const netCash = km.net_cash_debt_aud_m != null ? km.net_cash_debt_aud_m : km.net_cash_debt_usd_m;
 
   // ---- Scorecard ----
-  const skewColor = skew >= 55 ? 'var(--signal-green)' : skew <= 45 ? 'var(--signal-red)' : 'var(--signal-amber)';
+  const skewColor = skew >= 55 ? 'var(--green)' : skew <= 45 ? 'var(--red)' : 'var(--amber)';
   const stageBadge = ga.company_stage
     ? '<div class="ga-score-card"><div class="ga-score-label">Stage</div>' +
         '<div class="ga-score-value ga-stage-value">' + ga.company_stage.replace(/_/g, ' ') + '</div></div>'
@@ -242,7 +242,7 @@ function _renderGoldDiscoveryInner(data) {
   const marginHtml = margin != null
     ? '<div class="ga-margin-bar">' +
         '<span class="ga-margin-label">Margin at spot:</span> ' +
-        '<span class="ga-margin-value" style="color:' + (margin > 30 ? 'var(--signal-green)' : margin > 15 ? 'var(--signal-amber)' : 'var(--signal-red)') + '">' + margin + '%</span>' +
+        '<span class="ga-margin-value" style="color:' + (margin > 30 ? 'var(--green)' : margin > 15 ? 'var(--amber)' : 'var(--red)') + '">' + margin + '%</span>' +
       '</div>'
     : '';
 

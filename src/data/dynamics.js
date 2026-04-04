@@ -156,8 +156,8 @@ export function hydrateFeaturedMetrics(stock, computed) {
   }
   // Update featured price colour
   if (computed.drawdownFromHigh != null) {
-    stock.featuredPriceColor = computed.drawdownFromHigh < -20 ? 'var(--signal-red)' :
-      computed.drawdownFromHigh < -5 ? 'var(--signal-amber)' : 'var(--signal-green)';
+    stock.featuredPriceColor = computed.drawdownFromHigh < -20 ? 'var(--red)' :
+      computed.drawdownFromHigh < -5 ? 'var(--amber)' : 'var(--green)';
   }
 }
 

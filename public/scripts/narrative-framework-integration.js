@@ -70,22 +70,22 @@ const NFI_STYLES = `
 .nfi-alert-dismiss:hover { opacity: 1; }
 
 /* Severity badge colours – mirrors .skew-badge styling */
-.nfi-alert-negative { background: var(--bg-surface, #111827); }
+.nfi-alert-negative { background: var(--surface, #111827); }
 .nfi-alert-negative .nfi-alert-severity {
   background: rgba(212, 85, 85, 0.12);
-  color: var(--signal-red, #D45555);
+  color: var(--red, #D45555);
   border: 1px solid rgba(212, 85, 85, 0.25);
 }
-.nfi-alert-positive { background: var(--bg-surface, #111827); }
+.nfi-alert-positive { background: var(--surface, #111827); }
 .nfi-alert-positive .nfi-alert-severity {
   background: rgba(61, 170, 109, 0.12);
-  color: var(--signal-green, #3DAA6D);
+  color: var(--green, #3DAA6D);
   border: 1px solid rgba(61, 170, 109, 0.25);
 }
-.nfi-alert-neutral { background: var(--bg-surface, #111827); }
+.nfi-alert-neutral { background: var(--surface, #111827); }
 .nfi-alert-neutral .nfi-alert-severity {
   background: rgba(212, 160, 60, 0.12);
-  color: var(--signal-amber, #D4A03C);
+  color: var(--amber, #D4A03C);
   border: 1px solid rgba(212, 160, 60, 0.25);
 }
 
@@ -131,7 +131,7 @@ const NFI_STYLES = `
 .nfi-mn-badge-moderate { background: #2563eb; color: #fff; }
 .nfi-mn-body {
   padding: 16px 18px;
-  background: var(--bg-surface, #111827);
+  background: var(--surface, #111827);
 }
 .nfi-mn-section {
   margin-bottom: 16px;
@@ -156,7 +156,7 @@ const NFI_STYLES = `
 .nfi-hyp-weights {
   margin-top: 10px;
   padding: 10px 12px;
-  background: var(--bg-surface-alt, #1a1a2e);
+  background: var(--surface-2, #1a1a2e);
   border-radius: 6px;
   border: 1px solid var(--border, #374151);
 }
@@ -195,8 +195,8 @@ const NFI_STYLES = `
   margin-top: 4px;
   color: var(--text-muted, #6b7280);
 }
-.nfi-hw-gap-high { color: var(--signal-red) !important; font-weight: 600; }
-.nfi-hw-gap-medium { color: var(--signal-amber) !important; }
+.nfi-hw-gap-high { color: var(--red) !important; font-weight: 600; }
+.nfi-hw-gap-medium { color: var(--amber) !important; }
 .nfi-contradicted-badge {
   display: inline-block;
   font-size: 0.65rem;
@@ -208,7 +208,7 @@ const NFI_STYLES = `
   margin-left: 8px;
   letter-spacing: 0.03em;
 }
-.nfi-contradicted-warning { color: var(--signal-red); font-weight: 600; display: block; margin-bottom: 8px; }
+.nfi-contradicted-warning { color: var(--red); font-weight: 600; display: block; margin-bottom: 8px; }
 `;
 
 // ─── STYLE INJECTION ─────────────────────────────────────────────────────────

@@ -146,7 +146,7 @@ export function prepareHypotheses(data) {
   if (!data.hypotheses || !data.hypotheses.length) return;
 
   const dirMap = { upside: 'dir-up', downside: 'dir-down', neutral: 'dir-neutral' };
-  const colorMap = { 'dir-up': 'var(--signal-green)', 'dir-down': 'var(--signal-red)', 'dir-neutral': 'var(--signal-amber)' };
+  const colorMap = { 'dir-up': 'var(--green)', 'dir-down': 'var(--red)', 'dir-neutral': 'var(--amber)' };
 
   const hyps = data.hypotheses;
 

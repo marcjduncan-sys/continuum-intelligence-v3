@@ -80,7 +80,7 @@ function renderStockReport(hash, ticker) {
 
   // Path 1: stock not in STOCK_DATA -- fetch from Railway (dynamically-added stock)
   if (!STOCK_DATA[ticker]) {
-    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Research Data&hellip;</div><div style="font-size:0.9rem">Fetching report for ' + ticker + ' from server</div></div></div>';
+    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Research Data&hellip;</div><div style="font-size:0.9rem">Fetching report for ' + ticker + ' from server</div></div></div>';
     (async function() {
       try {
         const scaffoldResp = await fetch(_REFRESH_API_BASE + '/data/research/' + ticker + '.json');
@@ -112,7 +112,7 @@ function renderStockReport(hash, ticker) {
         if (_pageRenderers.initSourcesOnReport) _pageRenderers.initSourcesOnReport(ticker);
         console.log('[Route] Fetched dynamically-added stock ' + ticker + ' from Railway');
       } catch(err) {
-        container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Stock Not Found</div><div style="font-size:0.9rem">' + ticker + ' is not in coverage. <a href="#home" style="color:var(--brand-green)">Return to home</a></div></div></div>';
+        container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Stock Not Found</div><div style="font-size:0.9rem">' + ticker + ' is not in coverage. <a href="#home" style="color:var(--brand-green)">Return to home</a></div></div></div>';
         console.warn('[Route] Failed to fetch ' + ticker + ':', err);
       }
     })();
@@ -120,7 +120,7 @@ function renderStockReport(hash, ticker) {
 
   // Path 2: stock is index-only -- load full research data then render
   else if (STOCK_DATA[ticker]._indexOnly) {
-    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Research Data&hellip;</div><div style="font-size:0.9rem">Fetching full report for ' + STOCK_DATA[ticker].company + '</div></div></div>';
+    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Research Data&hellip;</div><div style="font-size:0.9rem">Fetching full report for ' + STOCK_DATA[ticker].company + '</div></div></div>';
     if (_pageRenderers.loadFullResearchData) {
       _pageRenderers.loadFullResearchData(ticker, function(data) {
         if (data) {
@@ -136,7 +136,7 @@ function renderStockReport(hash, ticker) {
           if (_pageRenderers.fetchAndPatchLive) _pageRenderers.fetchAndPatchLive(ticker);
           if (_pageRenderers.initSourcesOnReport) _pageRenderers.initSourcesOnReport(ticker);
         } else {
-          container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Failed to load research data</div><div style="font-size:0.9rem">Could not fetch report for ' + ticker + '. <a href="#" onclick="location.reload();return false" style="color:var(--accent)">Retry</a></div></div></div>';
+          container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Failed to load research data</div><div style="font-size:0.9rem">Could not fetch report for ' + ticker + '. <a href="#" onclick="location.reload();return false" style="color:var(--accent)">Retry</a></div></div></div>';
         }
       });
     }
@@ -298,7 +298,7 @@ export function route() {
           renderedSnapshots.add(ticker);
         } else if (STOCK_DATA[ticker]) {
           // Need to load full research data first, then build snapshot
-          container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Snapshot&hellip;</div><div style="font-size:0.9rem">Fetching data for ' + STOCK_DATA[ticker].company + '</div></div></div>';
+          container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Loading Snapshot&hellip;</div><div style="font-size:0.9rem">Fetching data for ' + STOCK_DATA[ticker].company + '</div></div></div>';
           if (_pageRenderers.loadFullResearchData) {
             _pageRenderers.loadFullResearchData(ticker, function(data) {
               if (data) {
@@ -310,7 +310,7 @@ export function route() {
                   renderedSnapshots.add(ticker);
                 }
               } else {
-                container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--text-muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Failed to load snapshot</div><div style="font-size:0.9rem">Could not fetch data for ' + ticker + '. <a href="#" onclick="location.reload();return false" style="color:var(--accent)">Retry</a></div></div></div>';
+                container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;color:var(--muted)"><div style="text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">Failed to load snapshot</div><div style="font-size:0.9rem">Could not fetch data for ' + ticker + '. <a href="#" onclick="location.reload();return false" style="color:var(--accent)">Retry</a></div></div></div>';
               }
             });
           }

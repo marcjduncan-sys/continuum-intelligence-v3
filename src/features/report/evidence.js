@@ -79,7 +79,7 @@ export function renderAlignmentSummary(data) {
 
     tbHtml += '<tr>' +
       '<td>' + row.domain + '</td>' +
-      '<td style="color:var(--text-muted)">' + row.epistemic + '</td>' +
+      '<td style="color:var(--muted)">' + row.epistemic + '</td>' +
       cellFn(row.n1) +
       cellFn(row.n2) +
       cellFn(row.n3) +
@@ -91,10 +91,10 @@ export function renderAlignmentSummary(data) {
   tbHtml += '<tr style="font-weight:700">' +
     '<td>Domain Count</td>' +
     '<td></td>' +
-    '<td style="font-family:var(--font-data)">' + sum.n1 + '</td>' +
-    '<td style="font-family:var(--font-data)' + (sum.n2Color ? ';color:' + sum.n2Color : '') + '">' + sum.n2 + '</td>' +
-    '<td style="font-family:var(--font-data)' + (sum.n3Color ? ';color:' + sum.n3Color : '') + '">' + sum.n3 + '</td>' +
-    '<td style="font-family:var(--font-data)">' + sum.n4 + '</td>' +
+    '<td style="font-family:var(--font-mono)">' + sum.n1 + '</td>' +
+    '<td style="font-family:var(--font-mono)' + (sum.n2Color ? ';color:' + sum.n2Color : '') + '">' + sum.n2 + '</td>' +
+    '<td style="font-family:var(--font-mono)' + (sum.n3Color ? ';color:' + sum.n3Color : '') + '">' + sum.n3 + '</td>' +
+    '<td style="font-family:var(--font-mono)">' + sum.n4 + '</td>' +
   '</tr>';
 
   return '<div class="rs-subtitle">Evidence Alignment Summary</div>' +
@@ -207,7 +207,7 @@ export function renderGaps(data) {
     coverageHtml += '<tr>' +
       '<td>' + r.domain + '</td>' +
       '<td><span class="gap-dot ' + r.coverageLevel + '"></span>' + r.coverageLabel + '</td>' +
-      '<td style="font-family:var(--font-data)">' + r.freshness + '</td>' +
+      '<td style="font-family:var(--font-mono)">' + r.freshness + '</td>' +
       '<td' + confClass + '>' + r.confidence + '</td>' +
     '</tr>';
   }

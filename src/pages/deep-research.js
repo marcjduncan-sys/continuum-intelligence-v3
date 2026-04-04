@@ -65,7 +65,7 @@ function extractTileData(ticker) {
             hyps.push({
                 label: vs.label || ('N' + (j + 1)),
                 score: parseInt(vs.score, 10) || 0,
-                direction: vs.scoreColor === 'var(--signal-green)' ? 'upside' : vs.scoreColor === 'var(--signal-red)' ? 'downside' : 'neutral'
+                direction: vs.scoreColor === 'var(--green)' ? 'upside' : vs.scoreColor === 'var(--red)' ? 'downside' : 'neutral'
             });
         }
     }
@@ -116,7 +116,7 @@ function renderTile(d) {
         const h = d.hyps[j];
         const pct = Math.round((h.score / totalScore) * 100);
         const segCls = h.direction === 'upside' ? 'seg-upside' : h.direction === 'downside' ? 'seg-downside' : 'seg-neutral';
-        const dotColor = h.direction === 'upside' ? 'var(--signal-green)' : h.direction === 'downside' ? 'var(--signal-red)' : 'var(--signal-amber)';
+        const dotColor = h.direction === 'upside' ? 'var(--green)' : h.direction === 'downside' ? 'var(--red)' : 'var(--amber)';
         barHtml += '<div class="dr-hyp-seg ' + segCls + '" style="width:' + pct + '%"></div>';
         legendHtml += '<span class="dr-hyp-label"><span class="dr-hyp-dot" style="background:' + dotColor + '"></span>' + escapeHtml(h.label) + ' ' + h.score + '%</span>';
     }
