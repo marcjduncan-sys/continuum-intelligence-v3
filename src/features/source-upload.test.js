@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import { describe, it, expect } from 'vitest';
 import { renderSourceUploadZone, validateFile } from './source-upload.js';
 
 describe('source-upload', function() {

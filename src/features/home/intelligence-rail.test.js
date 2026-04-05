@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { renderIntelligenceRail } from './intelligence-rail.js';
 
 function makeRow(overrides) {

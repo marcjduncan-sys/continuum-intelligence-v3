@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { renderHealthBanner } from './home-health-banner.js';
 
 describe('renderHealthBanner', () => {

@@ -4,7 +4,6 @@
  * Tests the new coverage command surface architecture.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   STOCK_DATA, FRESHNESS_DATA, REFERENCE_DATA, WORKSTATION_DATA, WORKSTATION_STATUS, BATCH_STATUS,
   initStockData, initFreshnessData, initReferenceData, initWorkstationData, initWorkstationStatus, updateBatchStatus, resetBatchStatus

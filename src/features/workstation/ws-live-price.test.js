@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // We need to mock MarketFeed before importing ws-live-price.js
 // because the module calls MarketFeed.addPriceListener at import time.

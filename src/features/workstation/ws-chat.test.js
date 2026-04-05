@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import { describe, it, expect } from 'vitest';
 import { renderWsChat } from './ws-chat.js';
 import bhpFixture from '../../../data/workstation/BHP.json';
 

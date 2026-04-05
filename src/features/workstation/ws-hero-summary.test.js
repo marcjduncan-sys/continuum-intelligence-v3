@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 
-import { describe, it, expect } from 'vitest';
 import { renderWsHeroSummary } from './ws-hero-summary.js';
 import bhpFixture from '../../../data/workstation/BHP.json';
 
