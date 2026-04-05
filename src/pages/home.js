@@ -191,7 +191,6 @@ function _renderHero(rows) {
   return '<section class="hero">' +
     '<div class="hero-head">' +
     '<div class="hero-identity">' +
-    '<div class="hero-mark">CI</div>' +
     '<div>' +
     '<h1 class="hero-title">Continuum Intelligence</h1>' +
     '<div class="hero-sub">' +
@@ -199,7 +198,6 @@ function _renderHero(rows) {
     '<span class="sep">·</span>' +
     '<span>ASX Coverage Universe</span>' +
     '</div>' +
-    '<div class="hero-cred">Built by former UBS &amp; Goldman Sachs executives &ndash; no conflicts, no investment banking revenue to protect</div>' +
     '</div>' +
     '</div>' +
     '<div class="hero-tags">' +
@@ -211,18 +209,11 @@ function _renderHero(rows) {
     '</div>' +
     '<div class="stat-ribbon">' +
     '<div class="stat-row">' +
-    '<div class="stat-k">Coverage</div>' +
-    '<div class="stat-v">' + total + ' <small>ASX-listed stocks</small></div>' +
-    '<div class="stat-k">High Conviction</div>' +
-    '<div class="stat-v neu">' + highConviction + ' <small>skews ≥80% confidence</small></div>' +
-    '<div class="stat-k">Upside Skew</div>' +
-    '<div class="stat-v pos">' + upside + ' <small>stocks</small></div>' +
-    '<div class="stat-k">Downside Skew</div>' +
-    '<div class="stat-v neg">' + downside + ' <small>stocks</small></div>' +
-    '<div class="stat-k">Neutral</div>' +
-    '<div class="stat-v">' + neutral + ' <small>stocks</small></div>' +
-    '<div class="stat-k">Last Refresh</div>' +
-    '<div class="stat-v"><small>Platform data</small></div>' +
+    '<div class="stat-cell"><div class="stat-k">Coverage</div><div class="stat-v">' + total + ' <small>ASX-listed stocks</small></div></div>' +
+    '<div class="stat-cell"><div class="stat-k">High Conviction</div><div class="stat-v neu">' + highConviction + ' <small>skews ≥80%</small></div></div>' +
+    '<div class="stat-cell"><div class="stat-k">Upside Skew</div><div class="stat-v pos">' + upside + ' <small>stocks</small></div></div>' +
+    '<div class="stat-cell"><div class="stat-k">Downside Skew</div><div class="stat-v neg">' + downside + ' <small>stocks</small></div></div>' +
+    '<div class="stat-cell"><div class="stat-k">Last Refresh</div><div class="stat-v"><small>Platform data</small></div></div>' +
     '</div>' +
     '</div>' +
     '</section>';
@@ -337,6 +328,17 @@ function _renderAnnouncementsSection() {
 function _renderAlertsCard(rows) {
   var alertRows = (rows || []).filter(function(r) { return r.alertFlags && r.alertFlags.length > 0; });
 
+  // Supplement to minimum 5 using top-conviction stocks not already in alerts
+  if (alertRows.length < 5) {
+    var alertTickers = alertRows.reduce(function(acc, r) { acc[r.ticker] = true; return acc; }, {});
+    var supplement = (rows || [])
+      .filter(function(r) { return !alertTickers[r.ticker]; })
+      .sort(function(a, b) { return (b.convictionPct || 0) - (a.convictionPct || 0); })
+      .slice(0, 5 - alertRows.length)
+      .map(function(r) { return { ticker: r.ticker, signal: r.signal || 'neutral', alertFlags: ['signal-changed'], convictionPct: r.convictionPct }; });
+    alertRows = alertRows.concat(supplement);
+  }
+
   var items = alertRows.length === 0
     ? '<div style="padding:14px;font-size:12px;color:var(--muted)">No active alerts.</div>'
     : alertRows.slice(0, 5).map(function(row) {
@@ -344,7 +346,7 @@ function _renderAlertsCard(rows) {
         var msg = '';
         var iconType = 'signal';
         if (flags.indexOf('signal-changed') !== -1) {
-          msg = 'Signal changed to ' + row.signal;
+          msg = 'Signal: ' + (row.signal.charAt(0).toUpperCase() + row.signal.slice(1));
           iconType = row.signal === 'upside' ? 'upside' : row.signal === 'downside' ? 'downside' : 'signal';
         } else if (flags.indexOf('imminent-catalyst') !== -1) {
           msg = row.signal + ' thesis, catalyst within 3 days';
@@ -359,7 +361,7 @@ function _renderAlertsCard(rows) {
         } else {
           msg = flags[0];
         }
-        var icon = iconType === 'upside' ? '↑' : iconType === 'downside' ? '↓' : '!';
+        var icon = iconType === 'upside' ? '↑' : iconType === 'downside' ? '↓' : '~';
         return '<div class="alert-item">' +
           '<div class="alert-icon ' + iconType + '">' + icon + '</div>' +
           '<div>' +
