@@ -398,3 +398,9 @@ body:not([data-route-type="report"]) .pm-panel,
 body:not([data-route-type="report"]) .econ-panel,
 body:not([data-route-type="report"]) .ap-fab,
 body:not([data-route-type="report"]) .pm-fab { display: none !important; }
+
+/* Non-report pages: cancel the 640px body right-offset that initChat applies at boot.
+   The analyst panel auto-opens on all pages (chat.js:891) adding body.analyst-panel-open
+   which sets padding-right: 640px via base.css. This collapses available layout width on
+   home/portfolio/etc. Reset it here; report pages re-enable it via the cascade. */
+body:not([data-route-type="report"]).analyst-panel-open { padding-right: 0 !important; }
