@@ -404,6 +404,24 @@
    W4A COMPARATOR VISUAL REBUILD (prototype 04-comparator.html)
    ============================================================ */
 
+/* Comparator 2-col workstation grid (matches prototype comp-workstation) */
+.comp-workstation {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--workstation-panel);
+  gap: var(--gap);
+  align-items: start;
+}
+.comp-content-col {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+@media (max-width: 1400px) {
+  .comp-workstation {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Comparator header card */
 .comp-header {
   background: var(--surface);
