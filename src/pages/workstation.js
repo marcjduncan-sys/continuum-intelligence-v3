@@ -46,7 +46,7 @@ export function renderWorkstationPage(ticker, container, onRendered) {
     if (!data) {
       container.innerHTML =
         '<div class="ws-error">No workstation data available for ' + ticker +
-        '. <a href="#home" style="color:var(--accent-teal)">Return home</a></div>';
+        '. <a href="#home" style="color:var(--blue)">Return home</a></div>';
       return;
     }
     container.innerHTML = renderWorkstation(data);

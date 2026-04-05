@@ -15,6 +15,10 @@ import { renderGoldDiscovery, renderGoldSection } from '../features/report/gold.
 import { renderNarrativeTimeline } from '../features/report/narrative-timeline.js';
 import { renderPriceDriversPlaceholder, fetchPriceDrivers } from '../features/report/price-drivers.js';
 import { renderSectionNav, renderIdentity, renderNarrative, renderReportFooter, renderPDFDownload, setupScrollSpy } from './report-sections.js';
+import { renderBLUF } from '../features/report/bluf.js';
+import { renderEvidenceDomains } from '../features/report/evidence-domains.js';
+import { renderRiskRegister } from '../features/report/risk-register.js';
+import { renderCatalystCalendar } from '../features/report/catalyst-calendar.js';
 
 import { renderDeepContent, getDeepSectionNavItems } from './deep-report-sections.js';
 
@@ -36,12 +40,6 @@ function sourcesSection(ticker) {
 
 export function renderReport(data) {
   prepareHypotheses(data);
-
-  const floatingToggle =
-    '<button class="sections-float-toggle" onclick="window.toggleAllSections(this)" data-state="expanded" aria-label="Collapse all sections">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="18 15 12 9 6 15"/></svg>' +
-      '<span>Collapse All</span>' +
-    '</button>';
 
   // Deep research: hybrid layout -- existing hero chrome, long-form body
   if (data._deepResearch && data.deepContent) {
@@ -65,35 +63,55 @@ export function renderReport(data) {
         renderHypSidebar(data) +
       '</div>' +
       renderPDFDownload(data) +
-      renderReportFooter(data) +
-      floatingToggle;
+      renderReportFooter(data);
   }
 
   // Standard report: redesigned two-column layout
   const t = data.ticker.toLowerCase();
+
+  // Subnav matching prototype: Overview | ACH Cases | Evidence | Risk Register | Catalysts | Financials | Comparator | sep | Deep Research | Journal
   const navItems = [
-    ['identity', 'Identity'],
-    ['hypotheses', 'Thesis'],
-    ['narrative', 'Narrative'],
-    ['evidence', 'Evidence'],
+    ['identity', 'Overview'],
+    ['hypotheses', 'ACH Cases'],
+    ['evidence-domains', 'Evidence'],
+    ['risk-register', 'Risk Register'],
+    ['catalysts', 'Catalysts'],
   ];
-  if (data.technicalAnalysis) navItems.push(['technical', 'Technical']);
-  if (data.goldAgent || data.goldAnalysis) navItems.push(['gold-analysis', 'Gold']);
+  if (data.technicalAnalysis) navItems.push(['technical', 'Financials']);
+  if (data.goldAgent || data.goldAnalysis) navItems.push(['gold-analysis', 'Comparator']);
+  // Separator then secondary items
+  const sepIndex = navItems.length;
   navItems.push(['sources', 'Ext. Research']);
 
   let subnavHtml = '<nav class="subnav">';
   for (var ni = 0; ni < navItems.length; ni++) {
+    if (ni === sepIndex) {
+      subnavHtml += '<div class="subnav-sep"></div>';
+    }
     const activeCls = ni === 0 ? ' active' : '';
     subnavHtml += '<a href="#' + t + '-' + navItems[ni][0] + '" class="subnav-item' + activeCls + '">' + navItems[ni][1] + '</a>';
   }
   subnavHtml += '</nav>';
 
+  // Content column: new section order matching prototype
   const contentCol =
+    // Section 00: Decision ribbon with EWP strip
     renderDecisionRibbon(data) +
     renderPriceDriversPlaceholder(data.ticker) +
     renderOvercorrectionBanner(data) +
+    // Section 01: BLUF (thesis summary + tags)
+    renderBLUF(data) +
+    // Section 01b: Identity table (overview)
     renderIdentity(data) +
+    // Section 02: ACH Competing Hypotheses (case cards + EWP derivation)
     renderHypotheses(data) +
+    // Section 03: Evidence Domains grid (10 domain cards)
+    renderEvidenceDomains(data) +
+    // Section 04: Risk Register (tripwires + gaps mapped as risks)
+    renderRiskRegister(data) +
+    // Section 05: Catalyst Calendar
+    renderCatalystCalendar(data) +
+    // Existing sections: narrative, evidence detail, gold, technical
     (data.goldAgent ? renderGoldDiscovery(data) : renderGoldSection(data)) +
     renderNarrativeTimeline(data) +
     renderNarrative(data) +
@@ -107,12 +125,23 @@ export function renderReport(data) {
   // Trigger async price drivers fetch after render
   requestAnimationFrame(function() { fetchPriceDrivers(data.ticker); });
 
+  // Suppress legacy panels on report pages (analyst, PM, economist)
+  requestAnimationFrame(function() {
+    const panelIds = ['analyst-panel', 'pm-panel', 'econ-panel'];
+    for (let pi = 0; pi < panelIds.length; pi++) {
+      const panel = document.getElementById(panelIds[pi]);
+      if (panel) {
+        panel.setAttribute('data-report-hidden', 'true');
+        panel.style.display = 'none';
+      }
+    }
+  });
+
   return subnavHtml +
     '<div class="workstation">' +
       '<div class="content-col">' + contentCol + '</div>' +
       renderChatPanel(data) +
     '</div>' +
     renderPDFDownload(data) +
-    renderReportFooter(data) +
-    floatingToggle;
+    renderReportFooter(data);
 }

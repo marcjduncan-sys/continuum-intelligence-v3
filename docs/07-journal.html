@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Analyst Journal · Continuum Intelligence</title>
+<style>
+  :root {
+    --app:#f4f5f7;--surface:#ffffff;--surface-2:#fafbfc;--surface-3:#f1f4f7;
+    --line:#d9e0e8;--line-2:#e7ecf1;--text:#132233;--text-2:#304255;
+    --muted:#66788c;--blue:#1f4b7a;--blue-soft:#e9f0f8;
+    --green:#2f8659;--green-soft:#edf7f1;
+    --red:#b64a46;--red-soft:#fceeed;
+    --amber:#94630d;--amber-soft:#fff4df;
+    --violet:#6e58aa;--violet-soft:#f1edfc;
+    --teal:#1e7a72;--teal-soft:#e8f7f6;
+    --shadow:0 8px 20px rgba(16,32,51,.06);--shadow-lg:0 16px 40px rgba(16,32,51,.10);
+    --sans:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--app);color:var(--text);font-family:var(--sans);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  a{text-decoration:none;color:inherit;}
+  button,input,textarea,select{font:inherit;}
+  .topbar{position:sticky;top:0;z-index:90;display:grid;grid-template-columns:240px 1fr auto auto;gap:12px;align-items:center;height:52px;padding:0 20px;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:13px;}
+  .mark{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(160deg,#234d78,#173653);color:#fff;font-size:10px;font-weight:900;border:1px solid #2a5a87;letter-spacing:.04em;flex-shrink:0;}
+  .search{height:34px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);max-width:520px;width:100%;}
+  .search input{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-size:12px;}
+  .search input::placeholder{color:var(--muted);}
+  .kbd{padding:3px 6px;border-radius:6px;border:1px solid var(--line);background:var(--surface);font-family:var(--mono);color:var(--text-2);font-size:10px;}
+  .topbar-ctx{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--muted);}
+  .topbar-ctx strong{color:var(--text);font-weight:800;}
+  .topbar-ctx a{color:var(--blue);font-weight:700;}
+  .topbar-actions{display:flex;gap:8px;align-items:center;}
+  .btn{height:32px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;transition:background .12s;}
+  .btn:hover{background:var(--surface-3);}
+  .btn.primary{background:linear-gradient(160deg,#234d78,#1b3c60);border-color:#224c75;color:#fff;}
+  .btn-icon{width:32px;padding:0;justify-content:center;}
+  .cap-strip{position:sticky;top:52px;z-index:85;display:flex;gap:6px;align-items:center;padding:7px 20px;overflow-x:auto;background:rgba(244,245,247,.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+  .cap-strip::-webkit-scrollbar{display:none;}
+  .cap-label{font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;margin-right:4px;flex-shrink:0;}
+  .cap-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--text-2);font-size:10px;font-weight:800;letter-spacing:.03em;white-space:nowrap;cursor:pointer;transition:background .12s;}
+  .cap-chip:hover,.cap-chip.active{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue);}
+  .cap-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+  .cap-chip.live .dot{background:var(--green);}
+  .cap-divider{width:1px;height:16px;background:var(--line);flex-shrink:0;margin:0 4px;}
+  .workstation{max-width:1600px;margin:0 auto;padding:16px 20px;display:grid;grid-template-columns:minmax(0,1fr) 520px;gap:16px;align-items:start;}
+  .content-col{display:grid;gap:14px;min-width:0;}
+  .section{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);}
+  .section-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px;}
+  .eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:900;margin-bottom:3px;}
+  .sec-title{margin:0;font-size:16px;font-weight:800;line-height:1.18;letter-spacing:-.025em;}
+  .sec-sub{margin-top:3px;font-size:12px;color:var(--muted);}
+
+  /* JOURNAL ENTRY */
+  .journal-list{display:grid;gap:12px;}
+  .journal-entry{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface);}
+  .je-head{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 16px;background:var(--surface-2);border-bottom:1px solid var(--line-2);}
+  .je-ticker{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;font-size:10px;font-weight:900;color:#fff;flex-shrink:0;}
+  .je-meta{display:flex;flex-direction:column;gap:2px;}
+  .je-title{font-size:13px;font-weight:800;color:var(--text);}
+  .je-sub{font-size:10px;color:var(--muted);}
+  .je-tags{display:flex;gap:5px;align-items:center;}
+  .je-tag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;}
+  .je-tag.thesis{background:var(--blue-soft);color:var(--blue);}
+  .je-tag.evidence{background:var(--green-soft);color:var(--green);}
+  .je-tag.decision{background:var(--amber-soft);color:var(--amber);}
+  .je-tag.risk{background:var(--red-soft);color:var(--red);}
+  .je-tag.macro{background:var(--violet-soft);color:var(--violet);}
+  .je-body{padding:14px 16px;font-size:12px;line-height:1.75;color:var(--text-2);}
+  .je-body strong{color:var(--text);}
+  .je-body p{margin:0 0 10px;}
+  .je-body p:last-child{margin:0;}
+  .je-footer{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;background:var(--surface-2);border-top:1px solid var(--line-2);font-size:10px;color:var(--muted);}
+  .je-footer-actions{display:flex;gap:6px;}
+  .je-btn{height:24px;padding:0 8px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--text-2);font-size:10px;font-weight:700;cursor:pointer;}
+  .je-btn:hover{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue);}
+
+  /* NEW ENTRY COMPOSER */
+  .new-entry{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden;}
+  .ne-head{padding:12px 16px;background:var(--surface-2);border-bottom:1px solid var(--line-2);display:flex;justify-content:space-between;align-items:center;}
+  .ne-title{font-size:13px;font-weight:800;color:var(--text);}
+  .ne-body{padding:14px 16px;}
+  .ne-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+  .ne-input{height:32px;padding:0 10px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:12px;outline:0;}
+  .ne-input:focus{border-color:#a8c0d8;background:#fff;}
+  .ne-textarea{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:12px;line-height:1.65;padding:10px 12px;outline:0;resize:vertical;min-height:100px;margin-bottom:10px;}
+  .ne-textarea:focus{border-color:#a8c0d8;background:#fff;}
+  .ne-footer{display:flex;justify-content:space-between;align-items:center;}
+  .ne-tag-row{display:flex;gap:5px;flex-wrap:wrap;}
+  .ne-tag-btn{padding:4px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:10px;font-weight:800;color:var(--muted);cursor:pointer;transition:background .12s;}
+  .ne-tag-btn:hover,.ne-tag-btn.active{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue);}
+
+  /* CHAT PANEL */
+  .chat-panel{position:sticky;top:88px;height:calc(100vh - 104px);display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);overflow:hidden;}
+  .cp-head{padding:14px 16px 12px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fff 0%,#f9fbfd 100%);flex-shrink:0;}
+  .cp-eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:900;margin-bottom:4px;}
+  .cp-title-row{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .cp-title{font-size:17px;font-weight:800;letter-spacing:-.025em;margin:0;}
+  .cp-context-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:8px;background:var(--violet-soft);border:1px solid #ddd5f5;font-size:10px;font-weight:900;color:var(--violet);letter-spacing:.03em;}
+  .cp-sub{margin-top:5px;font-size:11px;color:var(--muted);line-height:1.45;}
+  .cp-tabs{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line);flex-shrink:0;}
+  .cp-tab{padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border-bottom:2px solid transparent;transition:background .12s,border-color .12s;border-right:1px solid var(--line);}
+  .cp-tab:last-child{border-right:0;}
+  .cp-tab:hover{background:var(--surface-2);}
+  .cp-tab.active{border-bottom-color:var(--violet);background:var(--violet-soft);}
+  .cp-tab-icon{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:11px;font-weight:900;border:1px solid var(--line);}
+  .cp-tab.analyst .cp-tab-icon{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue);}
+  .cp-tab.pm .cp-tab-icon{background:var(--amber-soft);border-color:#f1deb2;color:var(--amber);}
+  .cp-tab.strat .cp-tab-icon{background:var(--violet-soft);border-color:#ddd5f5;color:var(--violet);}
+  .cp-tab.active.strat .cp-tab-icon{background:var(--violet);border-color:var(--violet);color:#fff;}
+  .cp-tab-label{font-size:10px;font-weight:800;letter-spacing:.03em;color:var(--text-2);}
+  .cp-tab-desc{font-size:9px;color:var(--muted);text-align:center;line-height:1.3;}
+  .cp-tab.active.strat .cp-tab-label{color:var(--violet);}
+  .cp-context-bar{display:flex;gap:5px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--surface-2);flex-shrink:0;overflow-x:auto;}
+  .cp-context-bar::-webkit-scrollbar{display:none;}
+  .ctx-label{font-size:9px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;margin-right:2px;}
+  .ctx-chip{padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:10px;font-weight:800;color:var(--text-2);white-space:nowrap;cursor:pointer;transition:background .12s;}
+  .ctx-chip.active{background:var(--violet-soft);border-color:#ddd5f5;color:var(--violet);}
+  .cp-stream{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+  .cp-stream::-webkit-scrollbar{width:4px;}
+  .cp-stream::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+  .msg{display:flex;flex-direction:column;gap:6px;}
+  .msg-header{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .msg-role-row{display:flex;align-items:center;gap:8px;}
+  .msg-avatar{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:10px;font-weight:900;border:1px solid var(--line);flex-shrink:0;}
+  .msg-avatar.strat{background:var(--violet-soft);border-color:#ddd5f5;color:var(--violet);}
+  .msg-avatar.user{background:var(--surface-3);border-color:var(--line);color:var(--text-2);}
+  .msg-name{font-size:11px;font-weight:800;}
+  .msg-name.strat{color:var(--violet);}
+  .msg-time{font-size:10px;color:var(--muted);}
+  .msg-bubble{padding:11px 13px;border-radius:12px;border:1px solid var(--line-2);font-size:12px;line-height:1.65;color:var(--text-2);background:var(--surface-2);}
+  .msg-bubble.strat{border-color:#ddd5f5;background:var(--violet-soft);}
+  .msg-bubble.user{background:var(--surface-3);border-color:var(--line);}
+  .msg-bubble strong{color:var(--text);}
+  .msg-citations{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;}
+  .cite{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:6px;background:rgba(255,255,255,.7);border:1px solid var(--line);font-size:10px;font-weight:800;color:var(--muted);cursor:pointer;}
+  .cite:hover{background:#fff;color:var(--violet);border-color:#ddd5f5;}
+  .cp-suggestions{padding:10px 14px;border-top:1px solid var(--line-2);display:flex;flex-wrap:wrap;gap:6px;background:var(--surface-2);flex-shrink:0;}
+  .suggestion{padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-size:11px;font-weight:700;color:var(--text-2);cursor:pointer;transition:background .12s,border-color .12s;line-height:1.3;}
+  .suggestion:hover{background:var(--violet-soft);border-color:#ddd5f5;color:var(--violet);}
+  .cp-composer{padding:12px 14px 14px;border-top:1px solid var(--line);background:var(--surface);flex-shrink:0;}
+  .composer-inner{display:flex;gap:8px;align-items:flex-end;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:10px 12px;transition:border-color .15s;}
+  .composer-inner:focus-within{border-color:#c8b8f0;background:#fff;}
+  .composer-inner textarea{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-size:12px;line-height:1.55;resize:none;min-height:44px;max-height:120px;}
+  .composer-inner textarea::placeholder{color:var(--muted);}
+  .send-btn{height:34px;width:34px;border-radius:9px;border:0;background:linear-gradient(160deg,#6e58aa,#4e3c8a);color:#fff;display:grid;place-items:center;cursor:pointer;flex-shrink:0;}
+  .composer-meta{display:flex;justify-content:space-between;align-items:center;margin-top:7px;}
+  .composer-meta .tiny{font-size:10px;color:var(--muted);}
+  .composer-meta .tiny a{color:var(--violet);font-weight:700;cursor:pointer;}
+  .site-footer{margin-top:32px;border-top:1px solid var(--line);background:var(--surface);padding:24px 20px 20px;}
+  .footer-inner{max-width:1600px;margin:0 auto;}
+  .footer-disclaimer{font-size:10px;color:var(--muted);line-height:1.7;max-width:800px;margin-bottom:8px;}
+  .footer-meta{font-size:10px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><div class="mark">CI</div><span>Continuum Intelligence</span></div>
+  <div class="search">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Search journal, stocks, hypotheses…" />
+    <span class="kbd">⌘K</span>
+  </div>
+  <div class="topbar-ctx"><span>Module:</span><strong>Analyst Journal</strong><span>·</span><a href="index.html">Home</a></div>
+  <div class="topbar-actions">
+    <button class="btn-icon btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+    <button class="btn">Export Journal</button>
+    <button class="btn primary"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Entry</button>
+  </div>
+</header>
+
+<nav class="cap-strip">
+  <span class="cap-label">Platform</span>
+  <div class="cap-chip live"><span class="dot"></span>Research</div>
+  <div class="cap-chip live"><span class="dot"></span>Deep Research</div>
+  <div class="cap-chip live"><span class="dot"></span>Portfolio Intelligence</div>
+  <div class="cap-chip live active"><span class="dot"></span>Analyst Journal</div>
+  <div class="cap-chip live"><span class="dot"></span>PM Dashboard</div>
+</nav>
+
+<div class="workstation">
+  <div class="content-col">
+
+    <!-- NEW ENTRY -->
+    <div class="new-entry">
+      <div class="ne-head">
+        <div class="ne-title">New Journal Entry</div>
+        <div style="display:flex;gap:7px;"><button class="btn">Discard</button><button class="btn primary">Save Entry</button></div>
+      </div>
+      <div class="ne-body">
+        <div class="ne-row">
+          <input type="text" class="ne-input" placeholder="Stock ticker (e.g. BHP)" style="width:120px;" />
+          <input type="text" class="ne-input" placeholder="Entry title…" style="flex:1;" />
+          <input type="date" class="ne-input" value="2026-04-04" />
+        </div>
+        <textarea class="ne-textarea" placeholder="Write your thesis note, evidence observation, or decision rationale here…"></textarea>
+        <div class="ne-footer">
+          <div class="ne-tag-row">
+            <span style="font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-right:4px;">Tag:</span>
+            <div class="ne-tag-btn">Thesis</div>
+            <div class="ne-tag-btn active">Evidence</div>
+            <div class="ne-tag-btn">Decision</div>
+            <div class="ne-tag-btn">Risk</div>
+            <div class="ne-tag-btn">Macro</div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);">⌘↵ to save</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOURNAL ENTRIES -->
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">Journal · 47 Entries</div>
+          <h2 class="sec-title">Research Journal</h2>
+          <p class="sec-sub">Your structured record of thesis development, evidence observations, and decision rationale.</p>
+        </div>
+        <div style="display:flex;gap:7px;">
+          <button class="btn">Filter</button>
+          <button class="btn">Search</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+        <div style="padding:4px 9px;border-radius:999px;border:1px solid var(--blue);background:var(--blue-soft);font-size:10px;font-weight:800;color:var(--blue);cursor:pointer;">All (47)</div>
+        <div style="padding:4px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:10px;font-weight:800;color:var(--muted);cursor:pointer;">Thesis (12)</div>
+        <div style="padding:4px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:10px;font-weight:800;color:var(--muted);cursor:pointer;">Evidence (18)</div>
+        <div style="padding:4px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:10px;font-weight:800;color:var(--muted);cursor:pointer;">Decision (9)</div>
+        <div style="padding:4px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:10px;font-weight:800;color:var(--muted);cursor:pointer;">Risk (5)</div>
+        <div style="padding:4px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:10px;font-weight:800;color:var(--muted);cursor:pointer;">Macro (3)</div>
+      </div>
+      <div class="journal-list">
+
+        <div class="journal-entry">
+          <div class="je-head">
+            <div class="je-ticker" style="background:linear-gradient(160deg,#234d78,#1a3958);">BHP</div>
+            <div class="je-meta">
+              <div class="je-title">Tariff announcement activates Swing Case — PBOC response is the key variable</div>
+              <div class="je-sub">4 Apr 2026 · 09:18 AEST</div>
+            </div>
+            <div class="je-tags"><span class="je-tag evidence">Evidence</span><span class="je-tag macro">Macro</span></div>
+          </div>
+          <div class="je-body">
+            <p>The overnight US tariff announcement (34% on Chinese imports) is the most significant macro event for the BHP thesis since the PBOC rate cut in November. The key question is not whether this is bad for iron ore demand — it clearly is — but whether the PBOC responds with a stimulus package large enough to offset the demand destruction.</p>
+            <p>I have updated the Swing Case weight from 8% to 10% and the Bear Case from 22% to 25%. The EWP has moved from A$61.80 to A$61.20. The upside skew is maintained, but the conviction has narrowed. The next material evidence event is the PBOC press conference scheduled for 7 April.</p>
+            <p><strong>Key tripwire:</strong> If the PBOC announces infrastructure spending above RMB 500bn, the Swing Case resolves bullishly and the Bull Case weight should be increased. If no stimulus is announced within 2 weeks, the Bear Case weight should increase to 30%+.</p>
+          </div>
+          <div class="je-footer">
+            <span>BHP · Evidence · Macro · EWP: A$61.20</span>
+            <div class="je-footer-actions">
+              <button class="je-btn">Edit</button>
+              <button class="je-btn">Link to Evidence</button>
+              <button class="je-btn">Share</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="journal-entry">
+          <div class="je-head">
+            <div class="je-ticker" style="background:linear-gradient(160deg,#7a3a1e,#5a2a12);">FMG</div>
+            <div class="je-meta">
+              <div class="je-title">FMG Bear Case thesis — structural iron ore decline is the base scenario, not the bear</div>
+              <div class="je-sub">2 Apr 2026 · 14:30 AEST</div>
+            </div>
+            <div class="je-tags"><span class="je-tag thesis">Thesis</span><span class="je-tag risk">Risk</span></div>
+          </div>
+          <div class="je-body">
+            <p>I have been reviewing the FMG thesis and I am increasingly concerned that what we are calling the "Bear Case" is actually the most likely scenario. The Bear Case holds 40% probability weight — the highest of any case. The Base Case at 35% is barely more likely than the Bear Case.</p>
+            <p>The structural argument is compelling: Simandou Phase 1 adds 60Mt of high-grade iron ore to a market that is already in surplus. FMG's ore quality disadvantage (62% vs 65% benchmark) means it will be the marginal producer in a price decline. There is no copper optionality to offset this. There is no Jansen-style long-term growth story.</p>
+            <p><strong>Decision:</strong> I am recommending a reduction to 2–3% portfolio weight, pending the PM's rebalancing model. The EWP gap of −15.1% is the clearest sell signal in the current portfolio.</p>
+          </div>
+          <div class="je-footer">
+            <span>FMG · Thesis · Risk · EWP: A$15.80</span>
+            <div class="je-footer-actions">
+              <button class="je-btn">Edit</button>
+              <button class="je-btn">Link to Evidence</button>
+              <button class="je-btn">Share</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="journal-entry">
+          <div class="je-head">
+            <div class="je-ticker" style="background:linear-gradient(160deg,#1e7a72,#145a54);">GMG</div>
+            <div class="je-meta">
+              <div class="je-title">GMG hyperscaler pre-commitments — Bull Case weight increased to 30%</div>
+              <div class="je-sub">18 Mar 2026 · 11:45 AEST</div>
+            </div>
+            <div class="je-tags"><span class="je-tag evidence">Evidence</span><span class="je-tag decision">Decision</span></div>
+          </div>
+          <div class="je-body">
+            <p>GMG announced pre-commitment agreements with two hyperscalers for data centre development in Sydney and Melbourne, totalling 420MW of capacity. This is a material confirmation of the Bull Case thesis — that GMG's data centre pipeline is being absorbed faster than the market is pricing.</p>
+            <p>I have increased the Bull Case weight from 24% to 30% and added 2.4% to the portfolio position. The EWP gap has widened to +15.5%. The key risk to monitor is construction cost inflation, which could compress the development margin and reduce the Bull Case price target.</p>
+          </div>
+          <div class="je-footer">
+            <span>GMG · Evidence · Decision · EWP: A$39.40</span>
+            <div class="je-footer-actions">
+              <button class="je-btn">Edit</button>
+              <button class="je-btn">Link to Evidence</button>
+              <button class="je-btn">Share</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- CHAT PANEL — STRATEGIST TAB ACTIVE -->
+  <aside class="chat-panel">
+    <div class="cp-head">
+      <div class="cp-eyebrow">AI Research Intelligence</div>
+      <div class="cp-title-row">
+        <h2 class="cp-title">Journal Assistant</h2>
+        <div class="cp-context-tag">Analyst Journal · 47 Entries</div>
+      </div>
+      <p class="cp-sub">Ask the Strategist to identify macro themes across your journal entries, or the Analyst to find contradictions between your thesis notes and the current evidence.</p>
+    </div>
+    <div class="cp-tabs">
+      <div class="cp-tab analyst"><div class="cp-tab-icon">A</div><div class="cp-tab-label">Analyst</div><div class="cp-tab-desc">Thesis consistency</div></div>
+      <div class="cp-tab pm"><div class="cp-tab-icon">PM</div><div class="cp-tab-label">Port. Manager</div><div class="cp-tab-desc">Decision review</div></div>
+      <div class="cp-tab strat active"><div class="cp-tab-icon">S</div><div class="cp-tab-label">Strategist</div><div class="cp-tab-desc">Macro themes</div></div>
+    </div>
+    <div class="cp-context-bar">
+      <span class="ctx-label">Filter</span>
+      <div class="ctx-chip active">All Entries</div>
+      <div class="ctx-chip">BHP</div>
+      <div class="ctx-chip">FMG</div>
+      <div class="ctx-chip">GMG</div>
+      <div class="ctx-chip">Macro</div>
+    </div>
+    <div class="cp-stream">
+      <div class="msg">
+        <div class="msg-header">
+          <div class="msg-role-row"><div class="msg-avatar strat">S</div><span class="msg-name strat">Strategist</span></div>
+          <span class="msg-time">Today · 09:14</span>
+        </div>
+        <div class="msg-bubble strat">
+          I have reviewed your journal entries from the past 30 days. A clear macro theme is emerging across your notes:<br><br>
+          <strong>You are consistently identifying China demand as the single most important variable</strong> across BHP, FMG, RIO, and S32. Your journal entries show you have been tracking this correctly — the PBOC stimulus question appears in 6 of your last 12 entries.<br><br>
+          The tariff announcement this morning is the most significant test of this thesis. Your BHP entry this morning correctly identifies the PBOC response as the key tripwire. I would suggest adding a dedicated macro journal entry on the tariff regime scenario tree — it will be useful context when the PBOC responds.
+        </div>
+        <div class="msg-citations"><span class="cite">BHP Entry</span><span class="cite">FMG Entry</span><span class="cite">Macro Theme</span></div>
+      </div>
+      <div class="msg">
+        <div class="msg-header">
+          <div class="msg-role-row"><div class="msg-avatar user">U</div><span class="msg-name">You</span></div>
+          <span class="msg-time">Today · 09:40</span>
+        </div>
+        <div class="msg-bubble user">Are there any contradictions between my journal entries and the current evidence in the dossiers?</div>
+      </div>
+      <div class="msg">
+        <div class="msg-header">
+          <div class="msg-role-row"><div class="msg-avatar strat">S</div><span class="msg-name strat">Strategist</span></div>
+          <span class="msg-time">Today · 09:41</span>
+        </div>
+        <div class="msg-bubble strat">
+          One potential contradiction: your 18 March GMG entry increased the Bull Case weight to 30% based on hyperscaler pre-commitments. However, the current evidence dossier shows that construction cost inflation has increased 8% since that entry. <br><br>
+          Your entry flagged this as a risk to monitor, but the Bull Case price target has not been revised downward to reflect it. The Analyst would recommend reviewing the GMG Bull Case price target — it may need to come down from A$42.50 to approximately A$39–40, which would narrow the EWP gap from +15.5% to +12–14%.
+        </div>
+        <div class="msg-citations"><span class="cite">GMG Entry</span><span class="cite">Construction Costs</span><span class="cite">Bull Case</span></div>
+      </div>
+    </div>
+    <div class="cp-suggestions">
+      <div class="suggestion">What macro themes appear most frequently in my journal?</div>
+      <div class="suggestion">Summarise my thesis evolution on BHP over the past 60 days</div>
+      <div class="suggestion">Which of my journal entries have been contradicted by subsequent evidence?</div>
+    </div>
+    <div class="cp-composer">
+      <div class="composer-inner">
+        <textarea placeholder="Ask the Strategist to analyse your journal entries…" rows="2"></textarea>
+        <button class="send-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      </div>
+      <div class="composer-meta">
+        <span class="tiny">⌘↵ to send · Context: All Entries · <a>Switch to Analyst</a> · <a>Switch to PM</a></span>
+        <span class="tiny" style="color:var(--violet);font-weight:700;cursor:pointer">History</span>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-disclaimer">Journal entries are private to your account and are not shared with other users. Continuum Intelligence, its principals, and contributors may hold positions in securities discussed.</div>
+    <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
+  </div>
+</footer>
+</body>
+</html>

@@ -332,6 +332,10 @@ export function route() {
     }
   }
 
+  // Set route-type on body so CSS can scope per-page chrome (footer, topbar controls)
+  const isReportRoute = hash.startsWith('report-') || hash.startsWith('deep-report-');
+  document.body.dataset.routeType = isReportRoute ? 'report' : 'page';
+
   const target = document.getElementById('page-' + hash);
   if (target) {
     target.classList.add('active');

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PM Dashboard · Continuum Intelligence</title>
+<style>
+  :root {
+    --app:#f4f5f7;--surface:#ffffff;--surface-2:#fafbfc;--surface-3:#f1f4f7;
+    --line:#d9e0e8;--line-2:#e7ecf1;--text:#132233;--text-2:#304255;
+    --muted:#66788c;--blue:#1f4b7a;--blue-soft:#e9f0f8;
+    --green:#2f8659;--green-soft:#edf7f1;
+    --red:#b64a46;--red-soft:#fceeed;
+    --amber:#94630d;--amber-soft:#fff4df;
+    --violet:#6e58aa;--violet-soft:#f1edfc;
+    --teal:#1e7a72;--teal-soft:#e8f7f6;
+    --shadow:0 8px 20px rgba(16,32,51,.06);--shadow-lg:0 16px 40px rgba(16,32,51,.10);
+    --sans:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--app);color:var(--text);font-family:var(--sans);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  a{text-decoration:none;color:inherit;}
+  button,input,textarea,select{font:inherit;}
+  .topbar{position:sticky;top:0;z-index:90;display:grid;grid-template-columns:240px 1fr auto auto;gap:12px;align-items:center;height:52px;padding:0 20px;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:13px;}
+  .mark{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(160deg,#234d78,#173653);color:#fff;font-size:10px;font-weight:900;border:1px solid #2a5a87;letter-spacing:.04em;flex-shrink:0;}
+  .search{height:34px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);max-width:520px;width:100%;}
+  .search input{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-size:12px;}
+  .search input::placeholder{color:var(--muted);}
+  .kbd{padding:3px 6px;border-radius:6px;border:1px solid var(--line);background:var(--surface);font-family:var(--mono);color:var(--text-2);font-size:10px;}
+  .topbar-ctx{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--muted);}
+  .topbar-ctx strong{color:var(--text);font-weight:800;}
+  .topbar-ctx a{color:var(--blue);font-weight:700;}
+  .topbar-actions{display:flex;gap:8px;align-items:center;}
+  .btn{height:32px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;transition:background .12s;}
+  .btn:hover{background:var(--surface-3);}
+  .btn.primary{background:linear-gradient(160deg,#234d78,#1b3c60);border-color:#224c75;color:#fff;}
+  .btn-icon{width:32px;padding:0;justify-content:center;}
+  .cap-strip{position:sticky;top:52px;z-index:85;display:flex;gap:6px;align-items:center;padding:7px 20px;overflow-x:auto;background:rgba(244,245,247,.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+  .cap-strip::-webkit-scrollbar{display:none;}
+  .cap-label{font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;margin-right:4px;flex-shrink:0;}
+  .cap-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--text-2);font-size:10px;font-weight:800;letter-spacing:.03em;white-space:nowrap;cursor:pointer;transition:background .12s;}
+  .cap-chip:hover,.cap-chip.active{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue);}
+  .cap-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+  .cap-chip.live .dot{background:var(--green);}
+  .cap-divider{width:1px;height:16px;background:var(--line);flex-shrink:0;margin:0 4px;}
+  .workstation{max-width:1600px;margin:0 auto;padding:16px 20px;display:grid;grid-template-columns:minmax(0,1fr) 520px;gap:16px;align-items:start;}
+  .content-col{display:grid;gap:14px;min-width:0;}
+  .section{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);}
+  .section-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px;}
+  .eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:900;margin-bottom:3px;}
+  .sec-title{margin:0;font-size:16px;font-weight:800;line-height:1.18;letter-spacing:-.025em;}
+  .sec-sub{margin-top:3px;font-size:12px;color:var(--muted);}
+
+  /* PM HERO */
+  .pm-hero{background:linear-gradient(160deg,#1a3958,#0f2438);border-radius:18px;padding:22px;box-shadow:var(--shadow-lg);color:#fff;}
+  .pm-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px;}
+  .pm-hero-title{font-size:22px;font-weight:800;letter-spacing:-.04em;line-height:1.15;margin-bottom:4px;}
+  .pm-hero-sub{font-size:12px;color:rgba(255,255,255,.55);}
+  .pm-hero-date{font-size:11px;color:rgba(255,255,255,.4);margin-top:6px;}
+  .pm-actions{display:flex;gap:8px;flex-shrink:0;}
+  .btn-light{height:32px;padding:0 12px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;transition:background .12s;}
+  .btn-light:hover{background:rgba(255,255,255,.18);}
+  .pm-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.1);border-radius:12px;overflow:hidden;}
+  .pm-kpi{padding:14px;background:rgba(255,255,255,.05);display:flex;flex-direction:column;gap:4px;}
+  .pm-kpi-k{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.45);font-weight:900;}
+  .pm-kpi-v{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.04em;}
+  .pm-kpi-sub{font-size:10px;color:rgba(255,255,255,.45);}
+  .pm-kpi-v.pos{color:#4ade80;}
+  .pm-kpi-v.neg{color:#f87171;}
+  .pm-kpi-v.amber{color:#fbbf24;}
+
+  /* ALERT ITEMS */
+  .alert-list{display:grid;gap:8px;}
+  .alert-item{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);}
+  .alert-item.critical{border-color:#f0d0ce;background:var(--red-soft);}
+  .alert-item.warning{border-color:#f1deb2;background:var(--amber-soft);}
+  .alert-item.info{border-color:#c8d8ea;background:var(--blue-soft);}
+  .alert-icon{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:14px;flex-shrink:0;}
+  .alert-icon.critical{background:var(--red);color:#fff;}
+  .alert-icon.warning{background:var(--amber);color:#fff;}
+  .alert-icon.info{background:var(--blue);color:#fff;}
+  .alert-title{font-size:12px;font-weight:800;color:var(--text);margin-bottom:3px;}
+  .alert-body{font-size:11px;color:var(--text-2);line-height:1.55;}
+  .alert-meta{font-size:10px;color:var(--muted);margin-top:4px;}
+  .alert-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0;}
+  .alert-btn{height:26px;padding:0 10px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--text-2);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;}
+  .alert-btn:hover{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue);}
+  .alert-btn.critical{border-color:#f0d0ce;color:var(--red);}
+  .alert-btn.critical:hover{background:var(--red);color:#fff;}
+
+  /* DECISION LOG */
+  .decision-list{display:grid;gap:8px;}
+  .decision-item{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;}
+  .di-date{font-size:10px;font-weight:900;color:var(--muted);white-space:nowrap;}
+  .di-content{font-size:12px;line-height:1.55;color:var(--text-2);}
+  .di-content strong{color:var(--text);}
+  .di-tag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;}
+  .di-tag.add{background:var(--green-soft);color:var(--green);}
+  .di-tag.reduce{background:var(--red-soft);color:var(--red);}
+  .di-tag.hold{background:var(--blue-soft);color:var(--blue);}
+  .di-tag.exit{background:var(--amber-soft);color:var(--amber);}
+
+  /* WATCHLIST MINI */
+  .wl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .wl-card{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);cursor:pointer;transition:border-color .12s;}
+  .wl-card:hover{border-color:#c8d8ea;}
+  .wl-ticker{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;font-size:9px;font-weight:900;color:#fff;margin-bottom:6px;}
+  .wl-name{font-size:11px;font-weight:800;color:var(--text);margin-bottom:2px;}
+  .wl-price{font-size:14px;font-weight:800;color:var(--text);}
+  .wl-ewp{font-size:11px;color:var(--muted);}
+  .wl-gap{font-size:12px;font-weight:900;}
+  .wl-gap.pos{color:var(--green);}
+  .wl-gap.neg{color:var(--red);}
+  .wl-gap.neu{color:var(--blue);}
+
+  /* CHAT PANEL */
+  .chat-panel{position:sticky;top:88px;height:calc(100vh - 104px);display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);overflow:hidden;}
+  .cp-head{padding:14px 16px 12px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fff 0%,#f9fbfd 100%);flex-shrink:0;}
+  .cp-eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:900;margin-bottom:4px;}
+  .cp-title-row{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .cp-title{font-size:17px;font-weight:800;letter-spacing:-.025em;margin:0;}
+  .cp-context-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:8px;background:var(--blue-soft);border:1px solid #c8d8ea;font-size:10px;font-weight:900;color:var(--blue);letter-spacing:.03em;}
+  .cp-sub{margin-top:5px;font-size:11px;color:var(--muted);line-height:1.45;}
+  .cp-tabs{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line);flex-shrink:0;}
+  .cp-tab{padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border-bottom:2px solid transparent;transition:background .12s,border-color .12s;border-right:1px solid var(--line);}
+  .cp-tab:last-child{border-right:0;}
+  .cp-tab:hover{background:var(--surface-2);}
+  .cp-tab.active{border-bottom-color:var(--blue);background:var(--blue-soft);}
+  .cp-tab-icon{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:11px;font-weight:900;border:1px solid var(--line);}
+  .cp-tab.analyst .cp-tab-icon{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue);}
+  .cp-tab.pm .cp-tab-icon{background:var(--amber-soft);border-color:#f1deb2;color:var(--amber);}
+  .cp-tab.strat .cp-tab-icon{background:var(--violet-soft);border-color:#ddd5f5;color:var(--violet);}
+  .cp-tab.active.analyst .cp-tab-icon{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .cp-tab-label{font-size:10px;font-weight:800;letter-spacing:.03em;color:var(--text-2);}
+  .cp-tab-desc{font-size:9px;color:var(--muted);text-align:center;line-height:1.3;}
+  .cp-tab.active .cp-tab-label{color:var(--blue);}
+  .cp-context-bar{display:flex;gap:5px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--surface-2);flex-shrink:0;overflow-x:auto;}
+  .cp-context-bar::-webkit-scrollbar{display:none;}
+  .ctx-label{font-size:9px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;margin-right:2px;}
+  .ctx-chip{padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:10px;font-weight:800;color:var(--text-2);white-space:nowrap;cursor:pointer;transition:background .12s;}
+  .ctx-chip.active{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue);}
+  .cp-stream{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+  .cp-stream::-webkit-scrollbar{width:4px;}
+  .cp-stream::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+  .msg{display:flex;flex-direction:column;gap:6px;}
+  .msg-header{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .msg-role-row{display:flex;align-items:center;gap:8px;}
+  .msg-avatar{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:10px;font-weight:900;border:1px solid var(--line);flex-shrink:0;}
+  .msg-avatar.analyst{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue);}
+  .msg-avatar.user{background:var(--surface-3);border-color:var(--line);color:var(--text-2);}
+  .msg-name{font-size:11px;font-weight:800;}
+  .msg-name.analyst{color:var(--blue);}
+  .msg-time{font-size:10px;color:var(--muted);}
+  .msg-bubble{padding:11px 13px;border-radius:12px;border:1px solid var(--line-2);font-size:12px;line-height:1.65;color:var(--text-2);background:var(--surface-2);}
+  .msg-bubble.analyst{border-color:#c8d8ea;background:var(--blue-soft);}
+  .msg-bubble.user{background:var(--surface-3);border-color:var(--line);}
+  .msg-bubble strong{color:var(--text);}
+  .msg-citations{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;}
+  .cite{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:6px;background:rgba(255,255,255,.7);border:1px solid var(--line);font-size:10px;font-weight:800;color:var(--muted);cursor:pointer;}
+  .cite:hover{background:#fff;color:var(--blue);border-color:#c8d8ea;}
+  .cp-suggestions{padding:10px 14px;border-top:1px solid var(--line-2);display:flex;flex-wrap:wrap;gap:6px;background:var(--surface-2);flex-shrink:0;}
+  .suggestion{padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-size:11px;font-weight:700;color:var(--text-2);cursor:pointer;transition:background .12s,border-color .12s;line-height:1.3;}
+  .suggestion:hover{background:var(--blue-soft);border-color:#c8d8ea;color:var(--blue);}
+  .cp-composer{padding:12px 14px 14px;border-top:1px solid var(--line);background:var(--surface);flex-shrink:0;}
+  .composer-inner{display:flex;gap:8px;align-items:flex-end;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:10px 12px;transition:border-color .15s;}
+  .composer-inner:focus-within{border-color:#a8c0d8;background:#fff;}
+  .composer-inner textarea{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-size:12px;line-height:1.55;resize:none;min-height:44px;max-height:120px;}
+  .composer-inner textarea::placeholder{color:var(--muted);}
+  .send-btn{height:34px;width:34px;border-radius:9px;border:0;background:linear-gradient(160deg,#234d78,#1b3c60);color:#fff;display:grid;place-items:center;cursor:pointer;flex-shrink:0;}
+  .composer-meta{display:flex;justify-content:space-between;align-items:center;margin-top:7px;}
+  .composer-meta .tiny{font-size:10px;color:var(--muted);}
+  .composer-meta .tiny a{color:var(--blue);font-weight:700;cursor:pointer;}
+  .pos{color:var(--green);font-weight:800;}
+  .neg{color:var(--red);font-weight:800;}
+  .site-footer{margin-top:32px;border-top:1px solid var(--line);background:var(--surface);padding:24px 20px 20px;}
+  .footer-inner{max-width:1600px;margin:0 auto;}
+  .footer-disclaimer{font-size:10px;color:var(--muted);line-height:1.7;max-width:800px;margin-bottom:8px;}
+  .footer-meta{font-size:10px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><div class="mark">CI</div><span>Continuum Intelligence</span></div>
+  <div class="search">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Search stocks, sectors, hypotheses…" />
+    <span class="kbd">⌘K</span>
+  </div>
+  <div class="topbar-ctx"><span>Module:</span><strong>PM Dashboard</strong><span>·</span><a href="index.html">Home</a></div>
+  <div class="topbar-actions">
+    <button class="btn-icon btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+    <button class="btn">Morning Brief</button>
+    <button class="btn primary"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Analyst</button>
+  </div>
+</header>
+
+<nav class="cap-strip">
+  <span class="cap-label">Platform</span>
+  <div class="cap-chip live"><span class="dot"></span>Research</div>
+  <div class="cap-chip live"><span class="dot"></span>Portfolio Intelligence</div>
+  <div class="cap-chip live"><span class="dot"></span>Thesis Comparator</div>
+  <div class="cap-chip live active"><span class="dot"></span>PM Dashboard</div>
+  <div class="cap-divider"></div>
+  <span class="cap-label">Integrations</span>
+  <div class="cap-chip"><span class="dot"></span>Risk Engine</div>
+  <div class="cap-chip"><span class="dot"></span>Execution</div>
+</nav>
+
+<div class="workstation">
+  <div class="content-col">
+
+    <!-- PM HERO -->
+    <div class="pm-hero">
+      <div class="pm-hero-top">
+        <div>
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.45);font-weight:900;margin-bottom:8px;">PM Dashboard · Alpha Fund I</div>
+          <div class="pm-hero-title">Good morning. 3 items require your attention.</div>
+          <div class="pm-hero-sub">Portfolio EWP gap is +11.8%. One Downside position. Two evidence events overnight.</div>
+          <div class="pm-hero-date">Saturday, 4 April 2026 · 09:14 AEST</div>
+        </div>
+        <div class="pm-actions">
+          <button class="btn-light">Morning Brief</button>
+          <button class="btn-light" style="background:rgba(255,255,255,.15);">Portfolio View</button>
+        </div>
+      </div>
+      <div class="pm-kpi-grid">
+        <div class="pm-kpi"><div class="pm-kpi-k">Portfolio EWP Gap</div><div class="pm-kpi-v pos">+11.8%</div><div class="pm-kpi-sub">A$33.6M alpha opportunity</div></div>
+        <div class="pm-kpi"><div class="pm-kpi-k">Positions Requiring Action</div><div class="pm-kpi-v amber">3</div><div class="pm-kpi-sub">1 critical · 2 review</div></div>
+        <div class="pm-kpi"><div class="pm-kpi-k">Evidence Events Today</div><div class="pm-kpi-v" style="color:#60a5fa;">2</div><div class="pm-kpi-sub">EWP net −A$0.60 BHP</div></div>
+        <div class="pm-kpi"><div class="pm-kpi-k">High Conviction Skews</div><div class="pm-kpi-v pos">7</div><div class="pm-kpi-sub">≥80% confidence</div></div>
+      </div>
+    </div>
+
+    <!-- ALERTS -->
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">Action Required · 3 Items</div>
+          <h2 class="sec-title">Priority Alerts</h2>
+          <p class="sec-sub">Evidence-driven alerts that require a portfolio decision today.</p>
+        </div>
+        <button class="btn">Mark All Reviewed</button>
+      </div>
+      <div class="alert-list">
+        <div class="alert-item critical">
+          <div class="alert-icon critical">!</div>
+          <div>
+            <div class="alert-title">FMG — Downside Verdict · EWP Gap −15.1%</div>
+            <div class="alert-body">The Bear Case now holds 40% probability weight following the overnight tariff announcement. The EWP of A$15.80 is materially below the live price of A$18.62. At 5.2% portfolio weight, this is a A$14.8M position with a negative evidence skew. The PM has modelled an exit and redeployment into S32 that improves the portfolio EWP gap to +13.6%.</div>
+            <div class="alert-meta">Triggered: 4 Apr 2026 · 06:44 AEST · Source: Tariff Announcement + Quant Signal</div>
+          </div>
+          <div class="alert-actions">
+            <button class="alert-btn critical">Review →</button>
+            <button class="alert-btn">Dismiss</button>
+          </div>
+        </div>
+        <div class="alert-item warning">
+          <div class="alert-icon warning">↓</div>
+          <div>
+            <div class="alert-title">BHP — EWP revised −A$0.60 overnight</div>
+            <div class="alert-body">Net EWP movement: A$61.80 → A$61.20. The tariff event (−A$0.60) was partially offset by the Q3 operations report (+A$0.40). Upside verdict maintained. No position change required, but the Swing Case has been activated. Monitor PBOC response.</div>
+            <div class="alert-meta">Triggered: 4 Apr 2026 · 08:32 AEST · Source: Q3 Ops + Tariff Event</div>
+          </div>
+          <div class="alert-actions">
+            <button class="alert-btn">Review →</button>
+            <button class="alert-btn">Dismiss</button>
+          </div>
+        </div>
+        <div class="alert-item info">
+          <div class="alert-icon info">↑</div>
+          <div>
+            <div class="alert-title">S32 — Consider increasing weight from 8.4% to 10–12%</div>
+            <div class="alert-body">S32 has the highest risk-adjusted EWP gap in the portfolio (+17.4%, 74% confidence) and is currently underweight relative to conviction. The PM has identified this as the highest-priority add opportunity in the current market environment.</div>
+            <div class="alert-meta">Triggered: 4 Apr 2026 · 09:14 AEST · Source: Portfolio Optimisation</div>
+          </div>
+          <div class="alert-actions">
+            <button class="alert-btn">Review →</button>
+            <button class="alert-btn">Dismiss</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DECISION LOG -->
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">Decision Log</div>
+          <h2 class="sec-title">Recent Portfolio Decisions</h2>
+          <p class="sec-sub">Every decision linked to the evidence that drove it.</p>
+        </div>
+        <button class="btn">Full History</button>
+      </div>
+      <div class="decision-list">
+        <div class="decision-item"><div class="di-date">28 Mar 2026</div><div class="di-content"><strong>BHP</strong> — Maintained position at 12.1%. Jansen Stage 2 FID not imminent. Base Case weight increased. EWP gap widened to +16.4%.</div><div class="di-tag hold">Hold</div></div>
+        <div class="decision-item"><div class="di-date">18 Mar 2026</div><div class="di-content"><strong>GMG</strong> — Added 2.4% to position (8.2% → 9.8%). Hyperscaler pre-commitment evidence upgraded Bull Case weight. EWP gap +15.5%.</div><div class="di-tag add">Add</div></div>
+        <div class="decision-item"><div class="di-date">5 Mar 2026</div><div class="di-content"><strong>WOW</strong> — Reduced position from 7.8% to 4.2%. ACCC dispute evidence increased Bear Case weight. EWP gap narrowed to +2.1%.</div><div class="di-tag reduce">Reduce</div></div>
+        <div class="decision-item"><div class="di-date">18 Feb 2026</div><div class="di-content"><strong>CSL</strong> — Maintained position at 11.2%. H1 plasma volume data confirmed Bull Case trajectory. EWP gap +12.5%.</div><div class="di-tag hold">Hold</div></div>
+        <div class="decision-item"><div class="di-date">2 Feb 2026</div><div class="di-content"><strong>NCM</strong> — Exited full position (6.1%). EWP gap turned negative following reserve downgrade. Bear Case weight exceeded 45%.</div><div class="di-tag exit">Exit</div></div>
+      </div>
+    </section>
+
+    <!-- WATCHLIST -->
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow">Watchlist · Potential Additions</div>
+          <h2 class="sec-title">High Conviction Candidates</h2>
+          <p class="sec-sub">Stocks under coverage with strong EWP gaps — not yet in the portfolio.</p>
+        </div>
+        <button class="btn">Manage Watchlist</button>
+      </div>
+      <div class="wl-grid">
+        <div class="wl-card"><div class="wl-ticker" style="background:linear-gradient(160deg,#1e7a72,#145a54);">WDS</div><div class="wl-name">Woodside Energy</div><div class="wl-price">A$24.80</div><div class="wl-ewp">EWP A$29.40</div><div class="wl-gap pos">+18.5%</div></div>
+        <div class="wl-card"><div class="wl-ticker" style="background:linear-gradient(160deg,#6e58aa,#4e3c8a);">REA</div><div class="wl-name">REA Group</div><div class="wl-price">A$188.20</div><div class="wl-ewp">EWP A$218.00</div><div class="wl-gap pos">+15.8%</div></div>
+        <div class="wl-card"><div class="wl-ticker" style="background:linear-gradient(160deg,#234d78,#1a3958);">ANZ</div><div class="wl-name">ANZ Group</div><div class="wl-price">A$28.40</div><div class="wl-ewp">EWP A$31.20</div><div class="wl-gap pos">+9.9%</div></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- CHAT PANEL -->
+  <aside class="chat-panel">
+    <div class="cp-head">
+      <div class="cp-eyebrow">AI Research Intelligence</div>
+      <div class="cp-title-row">
+        <h2 class="cp-title">Morning Briefing</h2>
+        <div class="cp-context-tag">PM Dashboard · 4 Apr 2026</div>
+      </div>
+      <p class="cp-sub">Your morning intelligence briefing. Ask the Analyst to summarise overnight events, the PM to model rebalancing scenarios, or the Strategist for the macro outlook.</p>
+    </div>
+    <div class="cp-tabs">
+      <div class="cp-tab analyst active"><div class="cp-tab-icon">A</div><div class="cp-tab-label">Analyst</div><div class="cp-tab-desc">Evidence &amp; overnight</div></div>
+      <div class="cp-tab pm"><div class="cp-tab-icon">PM</div><div class="cp-tab-label">Port. Manager</div><div class="cp-tab-desc">Action &amp; sizing</div></div>
+      <div class="cp-tab strat"><div class="cp-tab-icon">S</div><div class="cp-tab-label">Strategist</div><div class="cp-tab-desc">Macro &amp; regime</div></div>
+    </div>
+    <div class="cp-context-bar">
+      <span class="ctx-label">Focus</span>
+      <div class="ctx-chip active">All Alerts</div>
+      <div class="ctx-chip">FMG</div>
+      <div class="ctx-chip">BHP</div>
+      <div class="ctx-chip">S32</div>
+      <div class="ctx-chip">Macro</div>
+    </div>
+    <div class="cp-stream">
+      <div class="msg">
+        <div class="msg-header">
+          <div class="msg-role-row"><div class="msg-avatar analyst">A</div><span class="msg-name analyst">Analyst</span></div>
+          <span class="msg-time">Today · 09:14</span>
+        </div>
+        <div class="msg-bubble analyst">
+          Good morning. Two material evidence events overnight:<br><br>
+          <strong>1. US Tariff Announcement (34% on Chinese imports)</strong> — This is the most significant macro event in the portfolio since the PBOC rate cut in November. It has activated the Swing Case across all four mining positions and increased Bear Case weights portfolio-wide. FMG is the most exposed.<br><br>
+          <strong>2. BHP Q3 Operations Report</strong> — Operationally strong. Iron ore and copper both in line or above guidance. This partially offsets the tariff impact on BHP specifically, but does not change the macro picture.<br><br>
+          Net portfolio EWP impact: approximately −A$1.8M. The portfolio EWP gap remains positive at +11.8%. The primary action required is a decision on FMG.
+        </div>
+        <div class="msg-citations"><span class="cite">Tariff Event</span><span class="cite">BHP Q3</span><span class="cite">Portfolio EWP</span></div>
+      </div>
+      <div class="msg">
+        <div class="msg-header">
+          <div class="msg-role-row"><div class="msg-avatar user">U</div><span class="msg-name">You</span></div>
+          <span class="msg-time">Today · 09:22</span>
+        </div>
+        <div class="msg-bubble user">What is the single most important decision I need to make today?</div>
+      </div>
+      <div class="msg">
+        <div class="msg-header">
+          <div class="msg-role-row"><div class="msg-avatar analyst">A</div><span class="msg-name analyst">Analyst</span></div>
+          <span class="msg-time">Today · 09:23</span>
+        </div>
+        <div class="msg-bubble analyst">
+          <strong>Exit FMG.</strong><br><br>
+          The evidence is unambiguous. The Bear Case holds 40% probability weight. The EWP gap is −15.1%. The position is A$14.8M. Every day the position is held, the portfolio is exposed to a stock where the evidence says the market is overpricing the risk.<br><br>
+          The PM has already modelled the rebalance: exit FMG, redeploy into S32. Portfolio EWP gap improves from +11.8% to +13.6%. Zero Downside positions.<br><br>
+          Switch to the PM tab for the full rebalancing model and execution parameters.
+        </div>
+        <div class="msg-citations"><span class="cite">FMG Bear Case</span><span class="cite">Rebalance Model</span></div>
+      </div>
+    </div>
+    <div class="cp-suggestions">
+      <div class="suggestion">Summarise overnight macro events and their portfolio impact</div>
+      <div class="suggestion">What is the portfolio's maximum drawdown scenario today?</div>
+      <div class="suggestion">Which position has the most stale evidence?</div>
+    </div>
+    <div class="cp-composer">
+      <div class="composer-inner">
+        <textarea placeholder="Ask about overnight events, portfolio risk, or decisions…" rows="2"></textarea>
+        <button class="send-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      </div>
+      <div class="composer-meta">
+        <span class="tiny">⌘↵ to send · Context: All Alerts · <a>Switch to PM</a> · <a>Switch to Strategist</a></span>
+        <span class="tiny" style="color:var(--blue);font-weight:700;cursor:pointer">History</span>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-disclaimer">This portal does not constitute personal financial advice. All analysis uses publicly available information and the ACH methodology. The EWP is a probability-weighted analytical output and is not a price target or investment recommendation. Continuum Intelligence, its principals, and contributors may hold positions in securities discussed.</div>
+    <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
+  </div>
+</footer>
+</body>
+</html>
