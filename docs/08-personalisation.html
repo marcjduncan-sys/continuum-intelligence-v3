@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Personalisation · Continuum Intelligence</title>
+<style>
+  :root {
+    --app:#f4f5f7;--surface:#ffffff;--surface-2:#fafbfc;--surface-3:#f1f4f7;
+    --line:#d9e0e8;--line-2:#e7ecf1;--text:#132233;--text-2:#304255;
+    --muted:#66788c;--blue:#1f4b7a;--blue-soft:#e9f0f8;
+    --green:#2f8659;--green-soft:#edf7f1;
+    --red:#b64a46;--red-soft:#fceeed;
+    --amber:#94630d;--amber-soft:#fff4df;
+    --violet:#6e58aa;--violet-soft:#f1edfc;
+    --shadow:0 8px 20px rgba(16,32,51,.06);--shadow-lg:0 16px 40px rgba(16,32,51,.10);
+    --sans:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--app);color:var(--text);font-family:var(--sans);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  a{text-decoration:none;color:inherit;}
+  button,input,textarea,select{font:inherit;}
+  .topbar{position:sticky;top:0;z-index:90;display:grid;grid-template-columns:240px 1fr auto auto;gap:12px;align-items:center;height:52px;padding:0 20px;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:13px;}
+  .mark{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(160deg,#234d78,#173653);color:#fff;font-size:10px;font-weight:900;border:1px solid #2a5a87;letter-spacing:.04em;flex-shrink:0;}
+  .search{height:34px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);max-width:520px;width:100%;}
+  .search input{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-size:12px;}
+  .search input::placeholder{color:var(--muted);}
+  .kbd{padding:3px 6px;border-radius:6px;border:1px solid var(--line);background:var(--surface);font-family:var(--mono);color:var(--text-2);font-size:10px;}
+  .topbar-ctx{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--muted);}
+  .topbar-ctx strong{color:var(--text);font-weight:800;}
+  .topbar-ctx a{color:var(--blue);font-weight:700;}
+  .topbar-actions{display:flex;gap:8px;align-items:center;}
+  .btn{height:32px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;transition:background .12s;}
+  .btn:hover{background:var(--surface-3);}
+  .btn.primary{background:linear-gradient(160deg,#234d78,#1b3c60);border-color:#224c75;color:#fff;}
+  .btn.primary:hover{opacity:.9;}
+  .btn-icon{width:32px;padding:0;justify-content:center;}
+
+  /* PAGE */
+  .page-body{max-width:1100px;margin:0 auto;padding:28px 20px;}
+  .page-header{margin-bottom:28px;}
+  .page-eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:900;margin-bottom:6px;}
+  .page-title{font-size:26px;font-weight:800;letter-spacing:-.04em;margin:0 0 6px;}
+  .page-sub{font-size:13px;color:var(--muted);}
+
+  /* SETTINGS LAYOUT */
+  .settings-layout{display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:start;}
+  .settings-nav{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:var(--shadow);position:sticky;top:72px;}
+  .sn-item{padding:9px 12px;border-radius:10px;font-size:12px;font-weight:700;color:var(--text-2);cursor:pointer;transition:background .12s;display:flex;align-items:center;gap:9px;}
+  .sn-item:hover{background:var(--surface-2);}
+  .sn-item.active{background:var(--blue-soft);color:var(--blue);}
+  .sn-item .sn-icon{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:11px;background:var(--surface-3);border:1px solid var(--line);flex-shrink:0;}
+  .sn-item.active .sn-icon{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .sn-divider{height:1px;background:var(--line);margin:6px 4px;}
+  .settings-content{display:grid;gap:16px;}
+
+  /* SETTINGS SECTION */
+  .settings-section{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow);}
+  .ss-header{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line-2);}
+  .ss-eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:900;margin-bottom:4px;}
+  .ss-title{font-size:16px;font-weight:800;letter-spacing:-.025em;margin:0;}
+  .ss-sub{margin-top:3px;font-size:12px;color:var(--muted);}
+
+  /* FORM ELEMENTS */
+  .form-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid var(--line-2);}
+  .form-row:last-child{border-bottom:0;padding-bottom:0;}
+  .form-row:first-child{padding-top:0;}
+  .form-label{font-size:12px;font-weight:800;color:var(--text);}
+  .form-desc{font-size:11px;color:var(--muted);margin-top:2px;}
+  .form-control{flex-shrink:0;}
+  .toggle{position:relative;width:40px;height:22px;cursor:pointer;}
+  .toggle input{opacity:0;width:0;height:0;}
+  .toggle-track{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--line);border-radius:999px;transition:background .2s;}
+  .toggle input:checked + .toggle-track{background:var(--blue);}
+  .toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s;}
+  .toggle input:checked ~ .toggle-thumb{transform:translateX(18px);}
+  select.form-select{height:32px;padding:0 10px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;outline:0;}
+  input.form-input{height:32px;padding:0 10px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:12px;outline:0;width:180px;}
+  input.form-input:focus{border-color:#a8c0d8;background:#fff;}
+
+  /* COVERAGE UNIVERSE */
+  .coverage-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px;}
+  .cov-sector{border:1px solid var(--line);border-radius:12px;padding:12px;}
+  .cov-sector-title{font-size:11px;font-weight:900;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;}
+  .cov-stock{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line-2);font-size:11px;}
+  .cov-stock:last-child{border-bottom:0;padding-bottom:0;}
+  .cov-ticker{font-weight:900;color:var(--blue);}
+  .cov-name{color:var(--muted);font-size:10px;}
+  .cov-check{width:16px;height:16px;border-radius:5px;border:1px solid var(--line);background:var(--surface-2);display:grid;place-items:center;cursor:pointer;flex-shrink:0;}
+  .cov-check.checked{background:var(--blue);border-color:var(--blue);}
+  .cov-check.checked::after{content:'✓';font-size:9px;color:#fff;font-weight:900;}
+
+  /* ALERT THRESHOLDS */
+  .threshold-grid{display:grid;gap:10px;margin-top:4px;}
+  .threshold-item{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);}
+  .th-label{font-size:12px;font-weight:800;color:var(--text);}
+  .th-desc{font-size:10px;color:var(--muted);}
+  .th-value{font-size:13px;font-weight:900;color:var(--blue);min-width:50px;text-align:right;}
+  input[type=range]{width:100px;accent-color:var(--blue);}
+
+  /* PROFILE */
+  .profile-card{display:flex;align-items:center;gap:16px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2);margin-bottom:16px;}
+  .profile-avatar{width:52px;height:52px;border-radius:14px;background:linear-gradient(160deg,#234d78,#1a3958);display:grid;place-items:center;color:#fff;font-size:18px;font-weight:900;flex-shrink:0;}
+  .profile-name{font-size:16px;font-weight:800;letter-spacing:-.02em;}
+  .profile-role{font-size:12px;color:var(--muted);margin-top:2px;}
+  .profile-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:8px;background:var(--blue-soft);border:1px solid #c8d8ea;font-size:10px;font-weight:900;color:var(--blue);margin-top:6px;}
+
+  .site-footer{margin-top:32px;border-top:1px solid var(--line);background:var(--surface);padding:24px 20px 20px;}
+  .footer-inner{max-width:1100px;margin:0 auto;}
+  .footer-disclaimer{font-size:10px;color:var(--muted);line-height:1.7;max-width:800px;margin-bottom:8px;}
+  .footer-meta{font-size:10px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><div class="mark">CI</div><span>Continuum Intelligence</span></div>
+  <div class="search">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Search stocks, sectors, hypotheses…" />
+    <span class="kbd">⌘K</span>
+  </div>
+  <div class="topbar-ctx"><span>Module:</span><strong>Personalisation</strong><span>·</span><a href="index.html">Home</a></div>
+  <div class="topbar-actions">
+    <button class="btn">Discard Changes</button>
+    <button class="btn primary">Save Settings</button>
+  </div>
+</header>
+
+<div class="page-body">
+  <div class="page-header">
+    <div class="page-eyebrow">Platform Settings</div>
+    <h1 class="page-title">Personalisation</h1>
+    <p class="page-sub">Configure your coverage universe, alert thresholds, display preferences, and analyst workflow settings.</p>
+  </div>
+
+  <div class="settings-layout">
+
+    <!-- SETTINGS NAV -->
+    <nav class="settings-nav">
+      <div class="sn-item active"><div class="sn-icon">👤</div>Profile</div>
+      <div class="sn-item"><div class="sn-icon">📊</div>Coverage Universe</div>
+      <div class="sn-item"><div class="sn-icon">🔔</div>Alert Thresholds</div>
+      <div class="sn-item"><div class="sn-icon">🤖</div>AI Preferences</div>
+      <div class="sn-divider"></div>
+      <div class="sn-item"><div class="sn-icon">🖥</div>Display</div>
+      <div class="sn-item"><div class="sn-icon">⌨</div>Keyboard Shortcuts</div>
+      <div class="sn-item"><div class="sn-icon">🔗</div>Integrations</div>
+      <div class="sn-divider"></div>
+      <div class="sn-item"><div class="sn-icon">🔒</div>Security</div>
+      <div class="sn-item"><div class="sn-icon">📋</div>Audit Log</div>
+    </nav>
+
+    <div class="settings-content">
+
+      <!-- PROFILE -->
+      <div class="settings-section">
+        <div class="ss-header">
+          <div class="ss-eyebrow">Account</div>
+          <h2 class="ss-title">Profile</h2>
+          <p class="ss-sub">Your identity and role on the platform. Role determines which AI agents are available by default.</p>
+        </div>
+        <div class="profile-card">
+          <div class="profile-avatar">JH</div>
+          <div>
+            <div class="profile-name">James Harrison</div>
+            <div class="profile-role">Portfolio Manager · Alpha Fund I</div>
+            <div class="profile-badge">Continuum Pro · Top 1%</div>
+          </div>
+          <button class="btn" style="margin-left:auto;">Edit Profile</button>
+        </div>
+        <div class="form-row">
+          <div><div class="form-label">Default AI Role</div><div class="form-desc">Which AI agent opens by default on workstation pages.</div></div>
+          <select class="form-select form-control">
+            <option>Portfolio Manager</option>
+            <option>Analyst</option>
+            <option>Strategist</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div><div class="form-label">Fund Name</div><div class="form-desc">Displayed in portfolio headers and exports.</div></div>
+          <input type="text" class="form-input form-control" value="Alpha Fund I" />
+        </div>
+        <div class="form-row">
+          <div><div class="form-label">Timezone</div><div class="form-desc">Used for all timestamps and market hours.</div></div>
+          <select class="form-select form-control">
+            <option>AEST (UTC+11)</option>
+            <option>AEDT (UTC+10)</option>
+            <option>UTC</option>
+            <option>EST (UTC-5)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- COVERAGE UNIVERSE -->
+      <div class="settings-section">
+        <div class="ss-header">
+          <div class="ss-eyebrow">Coverage Universe</div>
+          <h2 class="ss-title">Tracked Stocks</h2>
+          <p class="ss-sub">Select the stocks you want tracked in your coverage universe. Evidence is only ingested for tracked stocks.</p>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div style="font-size:12px;color:var(--muted);">22 stocks tracked · 8 sectors</div>
+          <div style="display:flex;gap:7px;"><button class="btn">Add Stock</button><button class="btn">Import List</button></div>
+        </div>
+        <div class="coverage-grid">
+          <div class="cov-sector">
+            <div class="cov-sector-title">Mining</div>
+            <div class="cov-stock"><div><div class="cov-ticker">BHP</div><div class="cov-name">BHP Group</div></div><div class="cov-check checked"></div></div>
+            <div class="cov-stock"><div><div class="cov-ticker">RIO</div><div class="cov-name">Rio Tinto</div></div><div class="cov-check checked"></div></div>
+            <div class="cov-stock"><div><div class="cov-ticker">FMG</div><div class="cov-name">Fortescue</div></div><div class="cov-check checked"></div></div>
+            <div class="cov-stock"><div><div class="cov-ticker">S32</div><div class="cov-name">South32</div></div><div class="cov-check checked"></div></div>
+          </div>
+          <div class="cov-sector">
+            <div class="cov-sector-title">Banking</div>
+            <div class="cov-stock"><div><div class="cov-ticker">CBA</div><div class="cov-name">Commonwealth Bank</div></div><div class="cov-check checked"></div></div>
+            <div class="cov-stock"><div><div class="cov-ticker">NAB</div><div class="cov-name">NAB</div></div><div class="cov-check checked"></div></div>
+            <div class="cov-stock"><div><div class="cov-ticker">ANZ</div><div class="cov-name">ANZ Group</div></div><div class="cov-check"></div></div>
+            <div class="cov-stock"><div><div class="cov-ticker">WBC</div><div class="cov-name">Westpac</div></div><div class="cov-check"></div></div>
+          </div>
+          <div class="cov-sector">
+            <div class="cov-sector-title">Healthcare</div>
+            <div class="cov-stock"><div><div class="cov-ticker">CSL</div><div class="cov-name">CSL Limited</div></div><div class="cov-check checked"></div></div>
+            <div class="cov-stock"><div><div class="cov-ticker">RMD</div><div class="cov-name">ResMed</div></div><div class="cov-check checked"></div></div>
+            <div class="cov-stock"><div><div class="cov-ticker">COH</div><div class="cov-name">Cochlear</div></div><div class="cov-check"></div></div>
+          </div>
+          <div class="cov-sector">
+            <div class="cov-sector-title">Real Estate</div>
+            <div class="cov-stock"><div><div class="cov-ticker">GMG</div><div class="cov-name">Goodman Group</div></div><div class="cov-check checked"></div></div>
+            <div class="cov-stock"><div><div class="cov-ticker">SCG</div><div class="cov-name">Scentre Group</div></div><div class="cov-check"></div></div>
+            <div class="cov-stock"><div><div class="cov-ticker">DXS</div><div class="cov-name">Dexus</div></div><div class="cov-check"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALERT THRESHOLDS -->
+      <div class="settings-section">
+        <div class="ss-header">
+          <div class="ss-eyebrow">Alert Configuration</div>
+          <h2 class="ss-title">Alert Thresholds</h2>
+          <p class="ss-sub">Set the evidence and EWP conditions that trigger alerts on the PM Dashboard and Home page.</p>
+        </div>
+        <div class="threshold-grid">
+          <div class="threshold-item">
+            <div><div class="th-label">EWP Gap Alert</div><div class="th-desc">Alert when EWP gap exceeds this threshold (upside or downside).</div></div>
+            <input type="range" min="5" max="30" value="15" />
+            <div class="th-value">±15%</div>
+          </div>
+          <div class="threshold-item">
+            <div><div class="th-label">Confidence Alert</div><div class="th-desc">Alert when evidence confidence reaches this level.</div></div>
+            <input type="range" min="60" max="95" value="80" />
+            <div class="th-value">80%</div>
+          </div>
+          <div class="threshold-item">
+            <div><div class="th-label">Bear Case Weight Alert</div><div class="th-desc">Alert when Bear Case probability exceeds this threshold.</div></div>
+            <input type="range" min="20" max="60" value="35" />
+            <div class="th-value">35%</div>
+          </div>
+          <div class="threshold-item">
+            <div><div class="th-label">EWP Daily Movement Alert</div><div class="th-desc">Alert when EWP moves by more than this amount in a single day.</div></div>
+            <input type="range" min="1" max="10" value="3" />
+            <div class="th-value">3%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI PREFERENCES -->
+      <div class="settings-section">
+        <div class="ss-header">
+          <div class="ss-eyebrow">AI Configuration</div>
+          <h2 class="ss-title">AI Analyst Preferences</h2>
+          <p class="ss-sub">Configure how the Analyst, PM, and Strategist agents behave across the platform.</p>
+        </div>
+        <div class="form-row">
+          <div><div class="form-label">Analyst Response Style</div><div class="form-desc">How detailed and verbose the Analyst's responses are by default.</div></div>
+          <select class="form-select form-control">
+            <option>Concise (2–3 sentences)</option>
+            <option selected>Standard (1–2 paragraphs)</option>
+            <option>Detailed (full analysis)</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div><div class="form-label">Auto-cite Evidence</div><div class="form-desc">Automatically attach evidence citation chips to every AI response.</div></div>
+          <label class="toggle form-control"><input type="checkbox" checked /><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="form-row">
+          <div><div class="form-label">Morning Briefing</div><div class="form-desc">Automatically generate a morning briefing on PM Dashboard at market open.</div></div>
+          <label class="toggle form-control"><input type="checkbox" checked /><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="form-row">
+          <div><div class="form-label">Suggested Prompts</div><div class="form-desc">Show contextually relevant suggested prompts above the chat composer.</div></div>
+          <label class="toggle form-control"><input type="checkbox" checked /><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="form-row">
+          <div><div class="form-label">EWP Sensitivity Alerts</div><div class="form-desc">Analyst proactively flags when a new evidence item materially changes the EWP.</div></div>
+          <label class="toggle form-control"><input type="checkbox" checked /><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+      </div>
+
+      <!-- DISPLAY -->
+      <div class="settings-section">
+        <div class="ss-header">
+          <div class="ss-eyebrow">Display Preferences</div>
+          <h2 class="ss-title">Display</h2>
+        </div>
+        <div class="form-row">
+          <div><div class="form-label">Currency Display</div><div class="form-desc">Default currency for prices and portfolio values.</div></div>
+          <select class="form-select form-control"><option>AUD (A$)</option><option>USD (US$)</option><option>GBP (£)</option></select>
+        </div>
+        <div class="form-row">
+          <div><div class="form-label">Price Change Display</div><div class="form-desc">Show price changes as percentage, absolute, or both.</div></div>
+          <select class="form-select form-control"><option>Both (% and $)</option><option>Percentage only</option><option>Absolute only</option></select>
+        </div>
+        <div class="form-row">
+          <div><div class="form-label">Compact Tables</div><div class="form-desc">Reduce row height in coverage and portfolio tables for higher information density.</div></div>
+          <label class="toggle form-control"><input type="checkbox" /><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="form-row">
+          <div><div class="form-label">Show EWP Derivation</div><div class="form-desc">Always show the full EWP derivation arithmetic on research pages.</div></div>
+          <label class="toggle form-control"><input type="checkbox" checked /><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-disclaimer">Settings are saved to your Continuum Intelligence profile and apply across all sessions and devices. Continuum Intelligence, its principals, and contributors may hold positions in securities discussed.</div>
+    <div class="footer-meta">&copy; 2026 Continuum Intelligence</div>
+  </div>
+</footer>
+</body>
+</html>
