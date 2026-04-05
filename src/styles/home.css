@@ -684,7 +684,11 @@
 .health-banner { margin-bottom: 12px; }
 
 /* ── Responsive ── */
-@media (max-width: 1300px) {
+@media (max-width: 1100px) {
+  .featured-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-row { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 960px) {
   .home-grid {
     grid-template-columns: 1fr;
   }
@@ -692,8 +696,6 @@
     position: static;
     grid-template-columns: repeat(2, 1fr);
   }
-  .featured-grid { grid-template-columns: repeat(2, 1fr); }
-  .stat-row { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 900px) {
   .featured-grid { grid-template-columns: 1fr; }
