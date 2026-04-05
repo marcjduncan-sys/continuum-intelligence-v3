@@ -8,7 +8,6 @@
  * - Error logging covers all fetch paths (no silent 404 swallowing)
  */
 
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   PER_TICKER_FILES,
   GLOBAL_FILES,

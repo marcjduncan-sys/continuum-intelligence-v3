@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 
 // Test the source attribution logic extracted from chat.js rendering.
 // Since chat.js uses module-scoped state and DOM manipulation, we test

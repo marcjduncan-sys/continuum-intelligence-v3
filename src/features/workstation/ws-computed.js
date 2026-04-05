@@ -4,6 +4,8 @@
  * No side effects, no DOM, no state imports.
  */
 
+import { formatNum } from '../../lib/format.js';
+
 // ============================================================================
 // EWP (Expected Weighted Price) Functions
 // ============================================================================
@@ -161,9 +163,9 @@ export function buildEWPFootnote(scenarios, ewp, currency = 'A$') {
   const sorted = sortScenarios(scenarios);
   const parts = sorted.map(s => {
     const pct = Math.round(s.probability * 100);
-    return pct + '% x ' + currency + s.target_price.toFixed(0);
+    return pct + '% x ' + currency + formatNum(s.target_price, 0);
   });
-  return 'Weighted outcome: ' + currency + ewp.toFixed(2) + ' = ' + parts.join(' + ') + '.';
+  return 'Weighted outcome: ' + currency + formatNum(ewp, 2) + ' = ' + parts.join(' + ') + '.';
 }
 
 // ============================================================================

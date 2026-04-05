@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 
-import { describe, it, expect } from 'vitest';
 import { renderWsDecisionStrip } from './ws-decision-strip.js';
 import bhpFixture from '../../../data/workstation/BHP.json';
 

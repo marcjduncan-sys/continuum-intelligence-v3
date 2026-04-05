@@ -1,4 +1,3 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Fresh module per test to avoid cross-test listener leakage
 let on, off, emit;

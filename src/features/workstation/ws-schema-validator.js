@@ -1,5 +1,6 @@
 // Workstation JSON payload schema validator
-// Pure JS validator; no external dependencies
+
+import { formatNum } from '../../lib/format.js';
 
 const VERDICT_RATINGS = new Set(['Strong Buy', 'Accumulate', 'Hold', 'Reduce', 'Sell']);
 const SKEW_OPTIONS = new Set(['Strong upside', 'Moderate upside', 'Balanced', 'Moderate downside', 'Strong downside']);
@@ -125,7 +126,7 @@ export function validateScenarioProbabilities(scenarios) {
   }
 
   if (Math.abs(sum - 1.0) > 0.001) {
-    errors.push(`Scenario probabilities sum to ${sum.toFixed(3)}, not 1.0 (tolerance 0.001)`);
+    errors.push(`Scenario probabilities sum to ${formatNum(sum, 3)}, not 1.0 (tolerance 0.001)`);
   }
 
   if (baseCount !== 1) {

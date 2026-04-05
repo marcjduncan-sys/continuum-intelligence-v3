@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import { describe, it, expect } from 'vitest';
 import { renderSourcesPanel, renderSourceCard } from './sources-panel.js';
 
 const MOCK_SOURCE = {

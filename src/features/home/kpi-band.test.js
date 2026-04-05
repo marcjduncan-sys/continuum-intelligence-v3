@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { renderKpiBand } from './kpi-band.js';
 
 function makeRow(overrides) {

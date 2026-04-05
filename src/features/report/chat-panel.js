@@ -1,6 +1,8 @@
 // Report chat panel -- redesigned shell (3 tabs: Analyst / PM / Strategist)
 // Matches approved prototype with structured header, context bar, and full composer UI
 
+import { formatNum } from '../../lib/format.js';
+
 export function renderChatPanel(data) {
   const ticker = data.ticker || '';
   const company = data.company || ticker;
@@ -20,7 +22,7 @@ export function renderChatPanel(data) {
       }
     }
     if (totalProbability > 0) {
-      ewpPrice = (weightedSum / totalProbability).toFixed(2);
+      ewpPrice = formatNum(weightedSum / totalProbability, 2);
     }
   }
 

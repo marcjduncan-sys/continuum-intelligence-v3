@@ -4,6 +4,7 @@
  */
 
 import { sanitiseInlineHtml } from './ws-computed.js';
+import { svgCoord } from '../../lib/format.js';
 
 /**
  * Escape plain text for safe use in HTML text nodes and attributes.
@@ -65,7 +66,7 @@ function buildPolylinePoints(datapoints, minVal, maxVal, viewW, viewH, padX, pad
   return datapoints.map((d, i) => {
     const x = n > 1 ? padX + (i / (n - 1)) * chartW : padX + chartW / 2;
     const y = padY + chartH - ((d.value - minVal) / range) * chartH;
-    return x.toFixed(1) + ',' + y.toFixed(1);
+    return svgCoord(x) + ',' + svgCoord(y);
   }).join(' ');
 }
 
@@ -100,7 +101,7 @@ function renderChart(chart) {
 
   const labelsHtml = firstPoints.map((d, i) => {
     const x = n > 1 ? padX + (i / (n - 1)) * chartW : padX + chartW / 2;
-    return '<text x="' + x.toFixed(1) + '" y="' + labelY + '" text-anchor="middle" font-size="7" fill="#888">' +
+    return '<text x="' + svgCoord(x) + '" y="' + labelY + '" text-anchor="middle" font-size="7" fill="#888">' +
       escapeText(d.period) + '</text>';
   }).join('');
 
