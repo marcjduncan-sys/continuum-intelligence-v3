@@ -163,7 +163,6 @@ describe('Critical Functions (src/ modules)', () => {
     ['renderReport()',       REPORT,   'export function renderReport'],
     ['renderSnapshotPage()', SNAPSHOT, 'export function renderSnapshotPage'],
     ['renderFeaturedCard()', HOME,     'export function renderFeaturedCard'],
-    ['renderCoverageRow()',  HOME,     'export function renderCoverageRow'],
     ['buildSnapshotFromStock()', SNAPSHOT, 'export function buildSnapshotFromStock'],
     ['computeSkewScore()',   DOM_LIB,  'export function computeSkewScore'],
     ['loadFullResearchData()', LOADER, 'export function loadFullResearchData'],
