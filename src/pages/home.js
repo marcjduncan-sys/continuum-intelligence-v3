@@ -11,6 +11,7 @@ import { buildCoverageRows, sortCoverageRows, filterCoverageRows } from '../feat
 import { getHomeState, resetHomeState, toggleSort, updateHomeState } from '../features/home/home-state.js';
 import { renderCoverageTable, renderCoverageTableBody } from '../features/home/coverage-table.js';
 import { renderHealthBanner } from '../features/home/home-health-banner.js';
+import { formatPrice, formatSignedPercent } from '../lib/format.js';
 
 // Cached rows for the current render cycle.
 var _currentRows = [];
@@ -169,8 +170,8 @@ function _handleStockUpdate(ticker) {
 
 function _getFormatFns() {
   return {
-    formatPrice: function(v) { return isNaN(v) ? '--' : 'A$' + v.toFixed(2); },
-    formatSignedPercent: function(v) { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; }
+    formatPrice: function(v) { return formatPrice(v); },
+    formatSignedPercent: function(v) { return formatSignedPercent(v); }
   };
 }
 
@@ -254,10 +255,8 @@ function _renderFeaturedSection(rows) {
       ? '<span class="tag red">Downside</span>'
       : '<span class="tag amber">Balanced</span>';
     var confTag = pct != null ? '<span class="tag">' + pct + '%</span>' : '';
-    var priceStr = row.price ? 'A$' + row.price.toFixed(2) : '--';
-    var chgStr = row.dayChangePct != null
-      ? (row.dayChangePct >= 0 ? '+' : '') + row.dayChangePct.toFixed(1) + '%'
-      : '';
+    var priceStr = row.price ? formatPrice(row.price) : '--';
+    var chgStr = row.dayChangePct != null ? formatSignedPercent(row.dayChangePct) : '';
     var chgCls = row.dayChangePct > 0 ? 'pos' : row.dayChangePct < 0 ? 'neg' : '';
 
     return '<div class="research-card" data-research-ticker="' + row.ticker + '">' +
@@ -353,7 +352,7 @@ function _renderAlertsCard(rows) {
           iconType = 'macro';
         } else if (flags.indexOf('large-move') !== -1) {
           var chg = row.dayChangePct;
-          msg = 'Large move: ' + (chg >= 0 ? '+' : '') + chg.toFixed(1) + '%';
+          msg = 'Large move: ' + formatSignedPercent(chg);
           iconType = chg > 0 ? 'upside' : 'downside';
         } else if (flags.indexOf('stale-research') !== -1) {
           msg = 'Research stale (> 72h)';
@@ -422,10 +421,8 @@ function _renderWatchlistCard(rows) {
     var pct = row.convictionPct != null ? Math.round(row.convictionPct) : 0;
     var signalStr = row.signal.charAt(0).toUpperCase() + row.signal.slice(1);
     var tagCls = row.signal === 'upside' ? 'green' : row.signal === 'downside' ? 'red' : 'amber';
-    var priceStr = row.price ? 'A$' + row.price.toFixed(2) : '--';
-    var chgStr = row.dayChangePct != null
-      ? (row.dayChangePct >= 0 ? '+' : '') + row.dayChangePct.toFixed(1) + '%'
-      : '';
+    var priceStr = row.price ? formatPrice(row.price) : '--';
+    var chgStr = row.dayChangePct != null ? formatSignedPercent(row.dayChangePct) : '';
     var chgCls = row.dayChangePct > 0 ? 'pos' : row.dayChangePct < 0 ? 'neg' : '';
     return '<div class="wl-item" data-wl-ticker="' + row.ticker + '">' +
       '<div class="wl-badge">' + row.ticker + '</div>' +

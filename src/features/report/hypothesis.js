@@ -2,6 +2,7 @@
 // Extracted from report-sections.js without logic changes
 
 import { normaliseScores, computeSkewScore, _inferPolarity } from '../../lib/dom.js';
+import { formatNum } from '../../lib/format.js';
 
 export function renderSkewBar(data) {
   if (!data.skew && !data._skew && (!data.hypotheses || !data.hypotheses.length)) return '';
@@ -183,7 +184,7 @@ export function renderHypotheses(data) {
     const ewpTotal = data.hero && data.hero.position_in_range && data.hero.position_in_range.current_price
       ? data.hero.position_in_range.current_price
       : '';
-    const contributionValue = ewpTotal ? (normScore / 100 * ewpTotal).toFixed(2) : '';
+    const contributionValue = ewpTotal ? formatNum(normScore / 100 * ewpTotal, 2) : '';
     const contributionText = contributionValue ? currency + contributionValue : '';
 
     cardsHtml += '<div class="ach-case ' + caseClass + '">' +
@@ -212,7 +213,7 @@ export function renderHypotheses(data) {
       '<div class="ach-contribution">' +
         '<span class="contrib-label">EWP Contribution</span>' +
         '<div class="contrib-track"><div class="contrib-fill" style="width:' + scorePct + '"></div></div>' +
-        '<span class="contrib-weight">' + contributionText + ' of ' + (ewpTotal ? currency + ewpTotal.toFixed(2) : '') + '</span>' +
+        '<span class="contrib-weight">' + contributionText + ' of ' + (ewpTotal ? currency + formatNum(ewpTotal, 2) : '') + '</span>' +
       '</div>' +
     '</div>';
   }

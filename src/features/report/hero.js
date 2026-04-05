@@ -2,7 +2,7 @@
 // Extracted from report-sections.js without logic changes
 
 import { STOCK_DATA, ANNOUNCEMENTS_DATA, FEATURED_ORDER } from '../../lib/state.js';
-import { renderSparkline, formatDateAEST, fmtPE, formatPrice, formatPriceWithCurrency, svgCoord, formatSignedPercent, fmtB } from '../../lib/format.js';
+import { renderSparkline, formatDateAEST, fmtPE, formatPrice, formatPriceWithCurrency, svgCoord, formatSignedPercent, fmtB, formatNum } from '../../lib/format.js';
 
 export function renderRefreshControls(data) {
   return '<div class="refresh-controls">' +
@@ -97,7 +97,7 @@ export function renderDecisionRibbon(data) {
       '</div>' +
       '<div class="ewp-cell">' +
         '<div class="ewp-k">EWP Gap</div>' +
-        '<div class="ewp-gap-v ' + gapCls + '">' + gapSign + ewpGap.toFixed(1) + '%</div>' +
+        '<div class="ewp-gap-v ' + gapCls + '">' + gapSign + formatNum(ewpGap, 1) + '%</div>' +
         '<div class="ewp-gap-badge ' + gapCls + '">' + (ewpGap >= 0 ? chevronUp : chevronDown) + ' ' + gapLabel + '</div>' +
       '</div>' +
       '<div class="ewp-cell">' +
